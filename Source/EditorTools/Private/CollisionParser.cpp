@@ -238,6 +238,10 @@ void UCollisionParser::ImportAndApplyCollisionInfo()
 			{
 				break;
 			}
+			else
+			{
+				NumOfParsedCollision = 0;
+			}
 		}
 
 	}
