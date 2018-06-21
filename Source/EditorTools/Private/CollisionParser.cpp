@@ -95,8 +95,19 @@ void UCollisionParser::ImportAndApplyCollisionInfo()
 
 		FAnimationHitInfo AnimHitInfo;
 		AnimHitInfo.TALENT_HIT_id = TALENT_HIT_node->GetAttribute(FString("id"));
+		FString ModeString = TALENT_HIT_node->GetAttribute(FString("Mode"));
 
-		TArray<FString> AnimationNames = UCollisionParser::GetAnimationNamesFromTalentID(AnimHitInfo.TALENT_HIT_id);
+		TArray<FString> AnimationNames;
+
+		if (ModeString == FString(""))
+		{
+			AnimationNames = UCollisionParser::GetAnimationNamesFromTalentID(AnimHitInfo.TALENT_HIT_id);
+		}
+		else
+		{
+			AnimationNames = UCollisionParser::GetAnimationNamesFromTalentID(AnimHitInfo.TALENT_HIT_id + FString("_") + ModeString);
+		}
+
 		for (FString& AnimationName : AnimationNames)
 		{
 			FString StringSearch = FString("AnimSequence ") + AnimationName;
