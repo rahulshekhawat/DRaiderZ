@@ -229,6 +229,8 @@ private:
 public:
 
 	FPlayerAnimationReferences* PlayerAnimationReferences = nullptr;
+
+	void UpdatePlayerAnimationReferences();
 	
 	//~ Begin multiplayer code
 	/** Character movement direction for Idle Walk Run */

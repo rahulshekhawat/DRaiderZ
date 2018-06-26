@@ -82,7 +82,50 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UAnimMontage* AnimationMontage_Flinch;
 
+	~FPlayerAnimationReferences();
+
 };
+
+USTRUCT(BlueprintType)
+struct EOD_API FPlayerAnimationSoftReferences : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSoftObjectPath Jump;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSoftObjectPath Dodge;
+	
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	// FSoftObjectPath WeaponChange;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSoftObjectPath NormalAttacks;
+
+	//~ @note Add AnimationMontage_WeaponChange animations here
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSoftObjectPath SpecialActions;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSoftObjectPath Skills;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSoftObjectPath Spells;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSoftObjectPath SpecialMovement;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSoftObjectPath CrowdControlEffects;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSoftObjectPath Flinch;
+
+};
+
 
 
 /**

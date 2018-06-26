@@ -26,7 +26,11 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		// Transform rotation
 		FRotator TransformedRotation = WorldTransform.TransformRotation(CapsuleRotation.Quaternion()).Rotator();
 
-		UKismetSystemLibrary::DrawDebugCapsule(MeshComp, Center, HalfHeightVector.Size(), Capsule.Radius, TransformedRotation, FLinearColor::White, 5.f, 1.f);
+		UKismetSystemLibrary::DrawDebugCapsule(MeshComp, TransformedCenter, HalfHeightVector.Size(), Capsule.Radius, TransformedRotation, FLinearColor::White, 5.f, 1.f);
+		
+		FVector TransformedBottom = WorldTransform.TransformPosition(CorrectedBottom);
+		FVector TransformedTop = WorldTransform.TransformPosition(CorrectedTop);
+		UKismetSystemLibrary::DrawDebugArrow(MeshComp, TransformedBottom, TransformedTop, 100.f, FLinearColor::Red, 5.f, 2.f);
 
 	}
 }

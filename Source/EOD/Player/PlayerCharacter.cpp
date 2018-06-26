@@ -187,7 +187,9 @@ void APlayerCharacter::BeginPlay()
 	SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndSword);
 
 	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-	PlayerAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(CurrentWeaponAnimationToUse);
+
+	UpdatePlayerAnimationReferences();
+
 }
 
 USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(FName Name, const FObjectInitializer & ObjectInitializer)
@@ -539,6 +541,19 @@ void APlayerCharacter::UpdateBlockState(float DeltaTime)
 			SetBlockMovementDirectionYaw(NewYaw);
 		}
 	}
+}
+
+void APlayerCharacter::UpdatePlayerAnimationReferences()
+{
+	if (PlayerAnimationReferences)
+	{
+		// delete older animation references, prevent memory leak
+		delete PlayerAnimationReferences;
+		PlayerAnimationReferences = nullptr;
+	}
+
+	PlayerAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(CurrentWeaponAnimationToUse);
+
 }
 
 void APlayerCharacter::OnUsingSkill(uint32 SkillButtonIndex)

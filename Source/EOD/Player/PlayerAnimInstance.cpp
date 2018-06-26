@@ -14,8 +14,16 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 	OwningPlayer = CastPawnOwnerToPlayerCharacter();
 	
-	OnMontageBlendingOut.AddDynamic(this, &UPlayerAnimInstance::HandleMontageBlendingOut);
-	OnMontageEnded.AddDynamic(this, &UPlayerAnimInstance::HandleMontageEnded);
+	// OnMontageBlendingOut.AddDynamic(this, &UPlayerAnimInstance::HandleMontageBlendingOut);
+	// OnMontageEnded.AddDynamic(this, &UPlayerAnimInstance::HandleMontageEnded);
+
+	FScriptDelegate OutDelegate;
+	OutDelegate.BindUFunction(this, FName("HandleMontageBlendingOut"));
+	OnMontageBlendingOut.AddUnique(OutDelegate);
+	
+	FScriptDelegate EndDelegate;
+	EndDelegate.BindUFunction(this, FName("HandleMontageEnded"));
+	OnMontageBlendingOut.AddUnique(EndDelegate);
 }
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
