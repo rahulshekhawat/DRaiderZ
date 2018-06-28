@@ -2,6 +2,20 @@
 
 #include "SecondaryWeapon.h"
 
+ASecondaryWeapon::ASecondaryWeapon()
+{
+}
 
+void ASecondaryWeapon::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 
+}
 
+void ASecondaryWeapon::OnEquip(ABaseWeapon * LastWeapon)
+{
+}
+
+void ASecondaryWeapon::OnUnEquip()
+{
+}

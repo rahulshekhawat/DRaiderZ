@@ -6,6 +6,19 @@
 #include "GameFramework/Actor.h"
 #include "BaseWeapon.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	GreatSword,
+	WarHammer,
+	LongSword,
+	Mace,
+	Dagger,
+	Staff,
+	Shield
+};
+
 UCLASS()
 class EOD_API ABaseWeapon : public AActor
 {
@@ -22,7 +35,15 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	virtual void OnEquip(ABaseWeapon* LastWeapon);
 
+	virtual void OnUnEquip();
 	
-	
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	EWeaponType WeaponType;
+
+	// @todo add status effect class
+	// @todo add elemental class
+
 };
