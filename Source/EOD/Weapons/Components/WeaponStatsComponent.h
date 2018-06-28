@@ -46,7 +46,7 @@ public:
 	
 	/** Magickal damage power of weapon */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
-	int MagicAttack;
+	int MagickalAttack;
 	
 	/** Chance of causing a physical critical damage */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
@@ -54,7 +54,7 @@ public:
 	
 	/** Chance of causing a magickal critical damage */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
-	float MagickCritRate;
+	float MagickalCritRate;
 	
 	/** Bonus physical damage caused on a successful physical critical hit */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
@@ -62,7 +62,7 @@ public:
 	
 	/** Bonus magickal damage caused on a successful magickal critical hit */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
-	float MagickCritBonusDamage;
+	float MagickalCritBonusDamage;
 	
 	/** Minimum amount of stamina consumed on blocking damage less than DamageThreshold */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
@@ -74,7 +74,7 @@ public:
 	
 	/** Percentage of damage reduction on blocking a magickal attack */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
-	int OnBlock_MagicDamageReduction;
+	int OnBlock_MagickalDamageReduction;
 		
 	
 };
