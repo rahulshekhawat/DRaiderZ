@@ -46,16 +46,16 @@ public:
 private:
 
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* LeftHandedMeshComp;
+	USkeletalMeshComponent* LeftHandWeaponMeshComp;
 		
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* RightHandedMeshComp;
+	USkeletalMeshComponent* RightHandWeaponMeshComp;
 		
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* FallenMeshComp;
+	USkeletalMeshComponent* FallenWeaponMeshComp;
 	
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* SheathedMeshComp;
+	USkeletalMeshComponent* SheathedWeaponMeshComp;
 
 	
 };

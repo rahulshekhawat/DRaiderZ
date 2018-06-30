@@ -2,15 +2,15 @@
 
 #include "PlayerCharacter.h"
 #include "EmberPlayerController.h"
-// #include "Statics/CharacterLibrary.h"
 #include "Core/GameSingleton.h"
-#include "Components/PrimeStatsComponent.h"
-#include "Components/InventoryComponent.h"
 #include "PlayerAnimInstance.h"
 #include "Weapons/PrimaryWeapon.h"
 #include "Weapons/SecondaryWeapon.h"
-#include "Engine/World.h"
+#include "Statics/WeaponLibrary.h"
+#include "Components/PrimeStatsComponent.h"
+#include "Components/InventoryComponent.h"
 
+#include "Engine/World.h"
 #include "UnrealNetwork.h"
 #include "Engine/StreamableManager.h"
 #include "Camera/CameraComponent.h"
@@ -135,7 +135,22 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	
+		
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
+	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
+
+	PrimaryWeapon->SetOwningCharacter(this);
+	SecondaryWeapon->SetOwningCharacter(this);
+
+	// @note please set secondary weapon first and primary weapon later.
+	SetCurrentWeapon(PrimaryWeaponID);
+
+
+	// Implement multiplayer version later
+	/*
 	if (Role == ROLE_Authority)
 	{
 		FActorSpawnParameters SpawnInfo;
@@ -144,7 +159,13 @@ void APlayerCharacter::PostInitializeComponents()
 		PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 		SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
 
+		PrimaryWeapon->SetOwningCharacter(this);
+		SecondaryWeapon->SetOwningCharacter(this);
+
+		// @note please set secondary weapon first and primary weapon later.
+		SetCurrentWeapon(PrimaryWeaponID);
 	}
+	*/
 }
 
 #if WITH_EDITOR
@@ -683,6 +704,32 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 	}
 
 	return ResultingRotation;
+}
+
+void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
+{
+	FWeaponData* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
+	SetCurrentWeapon(WeaponData);
+}
+
+void APlayerCharacter::SetCurrentWeapon(FWeaponData* WeaponData)
+{
+	// If WeaponData is nullptr
+	if (!WeaponData)
+	{
+		return;
+	}
+	
+	if (UWeaponLibrary::IsSecondaryWeapon(WeaponData->WeaponType))
+	{
+		// SecondaryWeapon->
+	}
+	else
+	{
+		PrimaryWeapon->OnEquip(WeaponData);
+	}
+
+	// if (UWeaponLibrary::IsWeaponDualHanded)
 }
 
 void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)

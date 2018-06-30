@@ -72,8 +72,15 @@ public:
 	UPROPERTY(Transient)
 	class ASecondaryWeapon* SecondaryWeapon;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
+	FName PrimaryWeaponID;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
+	FName SecondaryWeaponID;
+
 	void SetCurrentWeapon(FName WeaponID);
 
+	void SetCurrentWeapon(FWeaponData* WeaponData);
 
 private:
 

@@ -159,6 +159,10 @@ public:
 	static bool IsWeaponDualHanded(EWeaponType WeaponType);
 	
 	static bool IsWeaponSingleHanded(EWeaponType WeaponType);
+
+	static bool IsPrimaryWeapon(EWeaponType WeaponType);
+
+	static bool IsSecondaryWeapon(EWeaponType WeaponType);
 	
 	static FWeaponData* GetWeaponData(FName WeaponID);
 	

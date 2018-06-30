@@ -33,6 +33,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	EWeaponType WeaponType;
 
+	void SetOwningCharacter(ABaseCharacter* NewCharacter);
+
+protected:
+	
+	//~ @todo network replication
+	ABaseCharacter* OwningCharacter;
+
 private:
 
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

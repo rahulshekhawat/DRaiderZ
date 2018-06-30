@@ -27,6 +27,12 @@ void ABaseWeapon::Tick(float DeltaTime)
 
 }
 
+void ABaseWeapon::SetOwningCharacter(ABaseCharacter * NewCharacter)
+{
+	OwningCharacter = NewCharacter;
+
+}
+
 /*
 void ABaseWeapon::OnEquip(FWeaponData * NewWeaponData)
 {
