@@ -23,8 +23,9 @@
 			"AdditionalDependencies": [
 				"CoreUObject",
 				"XmlParser",
-        "AssetRegistry",
-        "EOD"
+				"AssetRegistry",
+				"EOD",
+				"UnrealEd"
 			]
 		}
 	],

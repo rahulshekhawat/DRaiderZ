@@ -2,13 +2,15 @@
 
 #include "PlayerCharacter.h"
 #include "EmberPlayerController.h"
-// #include "Statics/CharacterLibrary.h"
 #include "Core/GameSingleton.h"
+#include "PlayerAnimInstance.h"
+#include "Weapons/PrimaryWeapon.h"
+#include "Weapons/SecondaryWeapon.h"
+#include "Statics/WeaponLibrary.h"
 #include "Components/PrimeStatsComponent.h"
 #include "Components/InventoryComponent.h"
-#include "PlayerAnimInstance.h"
-// #include "HumanPlayerAnimInstance.h"
 
+#include "Engine/World.h"
 #include "UnrealNetwork.h"
 #include "Engine/StreamableManager.h"
 #include "Camera/CameraComponent.h"
@@ -45,12 +47,12 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	Legs			= CreateNewArmorComponent(TEXT("Legs"), ObjectInitializer);
 	Feet			= CreateNewArmorComponent(TEXT("Feet"), ObjectInitializer);
 
-	PrimaryWeapon				= CreateNewWeaponComponent(TEXT("Primary Weapon"), ObjectInitializer);
-	SheathedPrimaryWeapon		= CreateNewWeaponComponent(TEXT("Sheathed Primary Weapon"), ObjectInitializer);
-	DroppedPrimaryWeapon		= CreateNewWeaponComponent(TEXT("Dropped Primary Weapon"), ObjectInitializer);
-	SecondaryWeapon				= CreateNewWeaponComponent(TEXT("Secondary Weapon"), ObjectInitializer);
-	SheathedSecondaryWeapon		= CreateNewWeaponComponent(TEXT("Sheathed Secondary Weapon"), ObjectInitializer);
-	DroppedSecondaryWeapon		= CreateNewWeaponComponent(TEXT("Dropped Secondary Weapon"), ObjectInitializer);
+	// PrimaryWeapon				= CreateNewWeaponComponent(TEXT("Primary Weapon"), ObjectInitializer);
+	// SheathedPrimaryWeapon		= CreateNewWeaponComponent(TEXT("Sheathed Primary Weapon"), ObjectInitializer);
+	// DroppedPrimaryWeapon		= CreateNewWeaponComponent(TEXT("Dropped Primary Weapon"), ObjectInitializer);
+	// SecondaryWeapon				= CreateNewWeaponComponent(TEXT("Secondary Weapon"), ObjectInitializer);
+	// SheathedSecondaryWeapon		= CreateNewWeaponComponent(TEXT("Sheathed Secondary Weapon"), ObjectInitializer);
+	// DroppedSecondaryWeapon		= CreateNewWeaponComponent(TEXT("Dropped Secondary Weapon"), ObjectInitializer);
 
 
 	//~ Begin Camera Components Initialization
@@ -128,6 +130,42 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION(APlayerCharacter, CurrentWeaponAnimationToUse, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
 
+}
+
+void APlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+		
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
+	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
+
+	PrimaryWeapon->SetOwningCharacter(this);
+	SecondaryWeapon->SetOwningCharacter(this);
+
+	// @note please set secondary weapon first and primary weapon later.
+	SetCurrentWeapon(PrimaryWeaponID);
+
+
+	// Implement multiplayer version later
+	/*
+	if (Role == ROLE_Authority)
+	{
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
+		SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
+
+		PrimaryWeapon->SetOwningCharacter(this);
+		SecondaryWeapon->SetOwningCharacter(this);
+
+		// @note please set secondary weapon first and primary weapon later.
+		SetCurrentWeapon(PrimaryWeaponID);
+	}
+	*/
 }
 
 #if WITH_EDITOR
@@ -277,6 +315,13 @@ void APlayerCharacter::OnDodge()
 		float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
 		float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
 		float DesiredPlayerRotationYaw = GetPlayerControlRotationYaw();
+		
+		if (ForwardAxisValue != 0)
+		{
+			DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
+		}
+
+		SetCharacterRotation(FRotator(0.f, DesiredPlayerRotationYaw, 0.f));
 
 		if (ForwardAxisValue == 0)
 		{
@@ -304,14 +349,6 @@ void APlayerCharacter::OnDodge()
 				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
 			}
 		}
-		
-		if (ForwardAxisValue != 0)
-		{
-			DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
-		}
-
-		SetCharacterRotation(FRotator(0.f, DesiredPlayerRotationYaw, 0.f));
-
 	}
 }
 
@@ -667,6 +704,32 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 	}
 
 	return ResultingRotation;
+}
+
+void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
+{
+	FWeaponData* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
+	SetCurrentWeapon(WeaponData);
+}
+
+void APlayerCharacter::SetCurrentWeapon(FWeaponData* WeaponData)
+{
+	// If WeaponData is nullptr
+	if (!WeaponData)
+	{
+		return;
+	}
+	
+	if (UWeaponLibrary::IsSecondaryWeapon(WeaponData->WeaponType))
+	{
+		// SecondaryWeapon->
+	}
+	else
+	{
+		PrimaryWeapon->OnEquip(WeaponData);
+	}
+
+	// if (UWeaponLibrary::IsWeaponDualHanded)
 }
 
 void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)

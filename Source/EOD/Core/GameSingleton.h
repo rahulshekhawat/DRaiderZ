@@ -19,12 +19,14 @@ class EOD_API UGameSingleton : public UObject
 public:
 
 	UGameSingleton(const FObjectInitializer& ObjectInitializer);
+
+	/** A singleton instance of FStreamableManager */
+	FStreamableManager StreamableManager;
 	
 	UPROPERTY(EditDefaultsOnly, Category = PlayerAnimationsReferences)
 	UDataTable* PlayerAnimationReferencesDataTable;
 	
-	FStreamableManager StreamableManager;
-
-
+	UPROPERTY(EditDefaultsOnly, Category = Weapons)
+	UDataTable* WeaponDataTable;
 
 };

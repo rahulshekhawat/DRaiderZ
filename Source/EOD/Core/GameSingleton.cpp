@@ -4,5 +4,6 @@
 
 UGameSingleton::UGameSingleton(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
-
+	PlayerAnimationReferencesDataTable = nullptr;
+	WeaponDataTable = nullptr;
 }

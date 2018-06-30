@@ -45,7 +45,7 @@ enum class ECharacterState : uint8
 };
 
 USTRUCT(BlueprintType)
-struct EOD_API FPlayerAnimationReferences : public FTableRowBase
+struct EOD_API FPlayerAnimationReferences
 {
 	GENERATED_USTRUCT_BODY()
 
