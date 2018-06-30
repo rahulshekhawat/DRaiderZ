@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StatusEffects/StatusEffect.h"
-#include "StatusEffects/BaseElemental.h"
 #include "Engine/DataTable.h"
 #include "UObject/NoExportTypes.h"
 #include "WeaponLibrary.generated.h"
@@ -22,6 +20,17 @@ enum class EWeaponAnimationType : uint8
 	Daggers
 };
 
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	GreatSword,
+	WarHammer,
+	LongSword,
+	Mace,
+	Dagger,
+	Staff,
+	Shield
+};
 
 USTRUCT(BlueprintType)
 struct EOD_API FWeaponData : public FTableRowBase
@@ -46,6 +55,21 @@ public:
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	TSoftObjectPtr<class UTexture> Icon;
 	
+	/**
+	 * Weapon Type determines:
+	 * - whether the weapon is singled handed or dual handed.
+	 * - the skills that can be used along with this weapon.
+	 * 
+	 * By Default:
+	 * - shield is secondary weapon and every weapon except shield is primary weapon.
+	 * - shield, longsword, and mace are single handed weapons
+	 * - greatswords, warhammer, staff, and daggers are dual handed weapons
+	 *
+	 * Note: Daggers are dual handed because player is not allowed tp equip just a single dagger.
+	 */
+	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	EWeaponType WeaponType;
+
 	/** Minimum level required to equip this weapon */
 	UPROPERTY(EditAnywhere, Category = Stats)
 	int Level;
@@ -110,14 +134,14 @@ public:
 	
 	/** Status effects (both buffs and debuffs) */
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	TArray<TSubclassOf<UStatusEffect>> StatusEffects;
+	TArray<TSubclassOf<class UStatusEffect>> StatusEffects;
 	
 	/**
 	 * Default elemental affinity of this weapon
 	 * @note The weapon won't support elemental enchant if the elemental affinity is not none
 	 */
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	TSubclassOf<UBaseElemental> ElementalAffinity;
+	TSubclassOf<class UBaseElemental> ElementalAffinity;
 
 };
 
@@ -130,6 +154,13 @@ class EOD_API UWeaponLibrary : public UObject
 {
 	GENERATED_BODY()
 	
+public:
+
+	static bool IsWeaponDualHanded(EWeaponType WeaponType);
+	
+	static bool IsWeaponSingleHanded(EWeaponType WeaponType);
+	
+	static FWeaponData* GetWeaponData(FName WeaponID);
 	
 	
 	

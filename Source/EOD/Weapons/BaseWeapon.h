@@ -3,21 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Statics/WeaponLibrary.h"
 #include "GameFramework/Actor.h"
 #include "BaseWeapon.generated.h"
-
-
-UENUM(BlueprintType)
-enum class EWeaponType : uint8
-{
-	GreatSword,
-	WarHammer,
-	LongSword,
-	Mace,
-	Dagger,
-	Staff,
-	Shield
-};
 
 UCLASS()
 class EOD_API ABaseWeapon : public AActor
