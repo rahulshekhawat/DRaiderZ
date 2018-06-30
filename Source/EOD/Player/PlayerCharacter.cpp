@@ -45,12 +45,12 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	Legs			= CreateNewArmorComponent(TEXT("Legs"), ObjectInitializer);
 	Feet			= CreateNewArmorComponent(TEXT("Feet"), ObjectInitializer);
 
-	PrimaryWeapon				= CreateNewWeaponComponent(TEXT("Primary Weapon"), ObjectInitializer);
-	SheathedPrimaryWeapon		= CreateNewWeaponComponent(TEXT("Sheathed Primary Weapon"), ObjectInitializer);
-	DroppedPrimaryWeapon		= CreateNewWeaponComponent(TEXT("Dropped Primary Weapon"), ObjectInitializer);
-	SecondaryWeapon				= CreateNewWeaponComponent(TEXT("Secondary Weapon"), ObjectInitializer);
-	SheathedSecondaryWeapon		= CreateNewWeaponComponent(TEXT("Sheathed Secondary Weapon"), ObjectInitializer);
-	DroppedSecondaryWeapon		= CreateNewWeaponComponent(TEXT("Dropped Secondary Weapon"), ObjectInitializer);
+	// PrimaryWeapon				= CreateNewWeaponComponent(TEXT("Primary Weapon"), ObjectInitializer);
+	// SheathedPrimaryWeapon		= CreateNewWeaponComponent(TEXT("Sheathed Primary Weapon"), ObjectInitializer);
+	// DroppedPrimaryWeapon		= CreateNewWeaponComponent(TEXT("Dropped Primary Weapon"), ObjectInitializer);
+	// SecondaryWeapon				= CreateNewWeaponComponent(TEXT("Secondary Weapon"), ObjectInitializer);
+	// SheathedSecondaryWeapon		= CreateNewWeaponComponent(TEXT("Sheathed Secondary Weapon"), ObjectInitializer);
+	// DroppedSecondaryWeapon		= CreateNewWeaponComponent(TEXT("Dropped Secondary Weapon"), ObjectInitializer);
 
 
 	//~ Begin Camera Components Initialization
