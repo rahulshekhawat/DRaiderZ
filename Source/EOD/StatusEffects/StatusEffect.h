@@ -45,5 +45,7 @@ private:
 	
 	// @todo Add flags to determine allies and enemies (for buff and debuff effects)
 	// int AllyFlag;
+	// @todo add boolean to check if this status effects deactives on death
+	// @todo add boolean to determine whether the status effect is currently active or not
 	
 };

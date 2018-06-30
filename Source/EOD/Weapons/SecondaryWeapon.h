@@ -14,6 +14,16 @@ class EOD_API ASecondaryWeapon : public ABaseWeapon
 {
 	GENERATED_BODY()
 	
+public:
+	// Sets default values for this actor's properties
+	ASecondaryWeapon();
+	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void OnEquip(ABaseWeapon* LastWeapon);
+
+	virtual void OnUnEquip();
 	
 	
 	
