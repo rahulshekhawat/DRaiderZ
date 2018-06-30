@@ -27,6 +27,11 @@ public:
 	// Sets default values for this actor's properties
 	APrimaryWeapon(const FObjectInitializer& ObjectInitializer);
 	
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
@@ -37,19 +42,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	EWeaponType PrimaryWeaponType;
 	
+
 private:
 
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* LeftHandedMeshComp;
+	USkeletalMeshComponent* LeftHandedMeshComp;
 		
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* RightHandedMeshComp;
+	USkeletalMeshComponent* RightHandedMeshComp;
 		
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* FallenMeshComp;
+	USkeletalMeshComponent* FallenMeshComp;
 	
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* SheathedMeshComp;
+	USkeletalMeshComponent* SheathedMeshComp;
 
 	
 };

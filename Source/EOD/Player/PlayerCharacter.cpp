@@ -7,7 +7,9 @@
 #include "Components/PrimeStatsComponent.h"
 #include "Components/InventoryComponent.h"
 #include "PlayerAnimInstance.h"
-// #include "HumanPlayerAnimInstance.h"
+#include "Weapons/PrimaryWeapon.h"
+#include "Weapons/SecondaryWeapon.h"
+#include "Engine/World.h"
 
 #include "UnrealNetwork.h"
 #include "Engine/StreamableManager.h"
@@ -128,6 +130,21 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION(APlayerCharacter, CurrentWeaponAnimationToUse, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
 
+}
+
+void APlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
+	if (Role == ROLE_Authority)
+	{
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
+		SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
+
+	}
 }
 
 #if WITH_EDITOR
@@ -277,6 +294,13 @@ void APlayerCharacter::OnDodge()
 		float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
 		float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
 		float DesiredPlayerRotationYaw = GetPlayerControlRotationYaw();
+		
+		if (ForwardAxisValue != 0)
+		{
+			DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
+		}
+
+		SetCharacterRotation(FRotator(0.f, DesiredPlayerRotationYaw, 0.f));
 
 		if (ForwardAxisValue == 0)
 		{
@@ -304,14 +328,6 @@ void APlayerCharacter::OnDodge()
 				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
 			}
 		}
-		
-		if (ForwardAxisValue != 0)
-		{
-			DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
-		}
-
-		SetCharacterRotation(FRotator(0.f, DesiredPlayerRotationYaw, 0.f));
-
 	}
 }
 

@@ -27,7 +27,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// Property replication
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;		/** Spawn default weapon */	virtual void PostInitializeComponents() override;
 
 #if WITH_EDITOR
 	/**
@@ -66,6 +66,15 @@ public:
 	float GetRotationYawFromAxisInput();
 	//~ End Functions to Assist Input Handling
 	
+	UPROPERTY(Transient)
+	class APrimaryWeapon* PrimaryWeapon;
+	
+	UPROPERTY(Transient)
+	class ASecondaryWeapon* SecondaryWeapon;
+
+	void SetCurrentWeapon(FName WeaponID);
+
+
 private:
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
