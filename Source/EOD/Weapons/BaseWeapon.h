@@ -7,14 +7,16 @@
 #include "GameFramework/Actor.h"
 #include "BaseWeapon.generated.h"
 
-UCLASS()
+class ABaseCharacter;
+
+UCLASS(Abstract)
 class EOD_API ABaseWeapon : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ABaseWeapon();
+	ABaseWeapon(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Called when the game starts or when spawned
@@ -24,14 +26,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-	virtual void OnEquip(ABaseWeapon* LastWeapon);
+	virtual void OnEquip(FWeaponData* NewWeaponData) PURE_VIRTUAL(ABaseWeapon::OnEquip, );
 
-	virtual void OnUnEquip();
+	virtual void OnUnEquip() PURE_VIRTUAL(ABaseWeapon::OnUnEquip, );
 	
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	EWeaponType WeaponType;
 
-	// @todo add status effect class
-	// @todo add elemental class
+private:
+
+	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UWeaponStatsComponent* StatsComp;
+
 
 };

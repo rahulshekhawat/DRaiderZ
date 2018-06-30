@@ -2,7 +2,7 @@
 
 #include "PrimaryWeapon.h"
 
-APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer)
+APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 }
 
@@ -12,7 +12,7 @@ void APrimaryWeapon::Tick(float DeltaTime)
 
 }
 
-void APrimaryWeapon::OnEquip(ABaseWeapon * LastWeapon)
+void APrimaryWeapon::OnEquip(FWeaponData * NewWeaponData)
 {
 }
 

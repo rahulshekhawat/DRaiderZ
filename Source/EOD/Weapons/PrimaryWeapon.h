@@ -29,8 +29,8 @@ public:
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	virtual void OnEquip(ABaseWeapon* LastWeapon) override;
+	
+	virtual void OnEquip(FWeaponData* NewWeaponData) override;
 
 	virtual void OnUnEquip() override;
 	

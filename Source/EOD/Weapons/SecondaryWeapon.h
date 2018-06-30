@@ -16,14 +16,14 @@ class EOD_API ASecondaryWeapon : public ABaseWeapon
 	
 public:
 	// Sets default values for this actor's properties
-	ASecondaryWeapon();
+	ASecondaryWeapon(const FObjectInitializer& ObjectInitializer);
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	virtual void OnEquip(FWeaponData* NewWeaponData) override;
 
-	virtual void OnEquip(ABaseWeapon* LastWeapon);
-
-	virtual void OnUnEquip();
+	virtual void OnUnEquip() override;
 	
 	
 	

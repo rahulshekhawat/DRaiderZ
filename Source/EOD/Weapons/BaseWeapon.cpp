@@ -1,13 +1,15 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "BaseWeapon.h"
+#include "Components/WeaponStatsComponent.h"
 
 
 // Sets default values
-ABaseWeapon::ABaseWeapon()
+ABaseWeapon::ABaseWeapon(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+		StatsComp = ObjectInitializer.CreateDefaultSubobject<UWeaponStatsComponent>(this, FName("Weapon Stats Component"));
 
 }
 
@@ -25,10 +27,12 @@ void ABaseWeapon::Tick(float DeltaTime)
 
 }
 
-void ABaseWeapon::OnEquip(ABaseWeapon * LastWeapon)
+/*
+void ABaseWeapon::OnEquip(FWeaponData * NewWeaponData)
 {
 }
 
 void ABaseWeapon::OnUnEquip()
 {
 }
+*/
