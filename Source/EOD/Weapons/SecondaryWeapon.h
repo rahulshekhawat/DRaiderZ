@@ -25,6 +25,16 @@ public:
 
 	virtual void OnUnEquip() override;
 	
+private:
+
+	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* LeftHandWeaponMeshComp;
+		
+	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* FallenWeaponMeshComp;
+	
+	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* SheathedWeaponMeshComp;
 	
 	
 };
