@@ -2,7 +2,7 @@
 
 #include "PrimaryWeapon.h"
 
-APrimaryWeapon::APrimaryWeapon()
+APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer)
 {
 }
 
