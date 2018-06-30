@@ -22,15 +22,15 @@ public:
 	 * If the owning character successfully hits the enemy
 	 * @param HitCharacter The enemy character that got hit
 	 */
-	virtual void OnSuccessfulHit(ABaseCharacter* HitCharacter);
+	virtual void OnSuccessfulHit(ABaseCharacter* HitCharacter) override;
 	
 	/** If the owning character fails to hit the enemy */
-	virtual void OnUnsuccessfulHit();
+	virtual void OnUnsuccessfulHit() override;
 	
 	/** Called when the status effect is activated */
-	virtual void OnActivation();
+	virtual void OnActivation() override;
 
 	/** Called when the status effect is deactivated */
-	virtual void OnDeactivation();
+	virtual void OnDeactivation() override;
 
 };

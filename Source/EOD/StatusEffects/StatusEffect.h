@@ -18,6 +18,8 @@ class EOD_API UStatusEffect : public UObject
 	
 public:
 
+	UStatusEffect();
+
 	// virtual void OnHit();
 
 	/**

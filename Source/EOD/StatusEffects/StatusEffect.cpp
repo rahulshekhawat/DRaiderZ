@@ -2,6 +2,10 @@
 
 #include "StatusEffect.h"
 
+UStatusEffect::UStatusEffect()
+{
+}
+
 void UStatusEffect::OnSuccessfulHit(ABaseCharacter * HitCharacter)
 {
 }
