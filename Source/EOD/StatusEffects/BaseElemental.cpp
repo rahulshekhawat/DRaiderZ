@@ -2,11 +2,27 @@
 
 #include "BaseElemental.h"
 
+void UBaseElemental::OnReceivingHit(ABaseCharacter * HittingCharacter)
+{
+}
+
 void UBaseElemental::OnSuccessfulHit(ABaseCharacter * HitCharacter)
 {
 }
 
+void UBaseElemental::OnCriticalHit(ABaseCharacter * HitCharacter)
+{
+}
+
 void UBaseElemental::OnUnsuccessfulHit()
+{
+}
+
+void UBaseElemental::OnInitialize(ABaseCharacter * Owner)
+{
+}
+
+void UBaseElemental::OnDeinitialize()
 {
 }
 
