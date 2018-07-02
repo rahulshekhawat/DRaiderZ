@@ -7,6 +7,7 @@ UIceElemental::UIceElemental()
 	bTriggersOnSuccessfulHit = true;
 }
 
+/*
 void UIceElemental::OnReceivingHit(ABaseCharacter * HittingCharacter)
 {
 }
@@ -19,6 +20,7 @@ void UIceElemental::OnSuccessfulHit(ABaseCharacter * HitCharacter)
 void UIceElemental::OnUnsuccessfulHit()
 {
 }
+*/
 
 void UIceElemental::OnInitialize(ABaseCharacter * Owner)
 {
@@ -35,7 +37,7 @@ void UIceElemental::OnDeinitialize()
 	// this->ConditionalBeginDestroy();
 }
 
-void UIceElemental::OnActivation()
+void UIceElemental::OnActivation(ABaseCharacter* RecipientCharacter)
 {
 }
 

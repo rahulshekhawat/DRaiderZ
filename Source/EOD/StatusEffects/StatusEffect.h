@@ -24,22 +24,22 @@ public:
 	 * If the owner of status effect received any damage 
 	 * @param HittingCharacter The enemy character that landed a hit on you
 	 */
-	virtual void OnReceivingHit(ABaseCharacter* HittingCharacter) PURE_VIRTUAL(UStatusEffect::OnGettingHit, );
+	// virtual void OnReceivingHit(ABaseCharacter* HittingCharacter) PURE_VIRTUAL(UStatusEffect::OnGettingHit, );
 
 	/**
 	 * If the owning character successfully hits the enemy
 	 * @param HitCharacter The enemy character that got hit
 	 */
-	virtual void OnSuccessfulHit(ABaseCharacter* HitCharacter) PURE_VIRTUAL(UStatusEffect::OnSuccessfulHit, );
+	// virtual void OnSuccessfulHit(ABaseCharacter* HitCharacter) PURE_VIRTUAL(UStatusEffect::OnSuccessfulHit, );
 
 	/** 
 	 * If the owning character lands a critical hit on enemy
 	 * @param HitCharacter The enemy character that got hit
 	 */
-	virtual void OnCriticalHit(ABaseCharacter* HitCharacter) PURE_VIRTUAL(UStatusEffect::OnCriticalHit, );
+	// virtual void OnCriticalHit(ABaseCharacter* HitCharacter) PURE_VIRTUAL(UStatusEffect::OnCriticalHit, );
 	
 	/** If the owning character fails to hit the enemy */
-	virtual void OnUnsuccessfulHit() PURE_VIRTUAL(UStatusEffect::OnUnsuccessfulHit, );
+	// virtual void OnUnsuccessfulHit() PURE_VIRTUAL(UStatusEffect::OnUnsuccessfulHit, );
 	
 	/** Called to initialize this status effect on a character */
 	virtual void OnInitialize(class ABaseCharacter* Owner) PURE_VIRTUAL(UStatusEffect::OnInitialize, );
@@ -48,7 +48,7 @@ public:
 	virtual void OnDeinitialize() PURE_VIRTUAL(UStatusEffect::OnDeinitialize, );
 
 	/** Called when the status effect is activated */
-	virtual void OnActivation() PURE_VIRTUAL(UStatusEffect::OnActivation, );
+	virtual void OnActivation(ABaseCharacter* RecipientCharacter) PURE_VIRTUAL(UStatusEffect::OnActivation, );
 
 	/** Called when the status effect is deactivated */
 	virtual void OnDeactivation() PURE_VIRTUAL(UStatusEffect::OnDeactivation, );
@@ -59,21 +59,49 @@ public:
 
 protected:
 
+	/** True if the status effect triggers on Owner receiving damage */
 	UPROPERTY(EditDefaultsOnly, Category=ActivationCondition)
 	uint32 bTriggersOnReceivingHit : 1;
 
+	/** True if the status effect triggers on Owner successfully landing an attack on enemy */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnSuccessfulHit : 1;
 
-	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
-	uint32 bTriggersOnCritical : 1;
-
+	/** True if the status effect triggers on Owner failing to land an attack on enemy */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnUnsuccessfulHit : 1;
 
+	/** True if the status effect triggers on Owner successfully landing a critical attack on enemy */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnCriticalHit : 1;
+
+	/** True if the status effect triggers on Owner successfully dodging an incoming enemy attack */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnSuccessfulDodge : 1;
 
+	/** True if the status effect triggers on Owner successfully blocking an incoming enemy attack */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnSuccessfulBlock : 1;
+
+	/** True if the status effect triggers on Owner regenerating full health */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnFullHealth : 1;
+
+	/** True if the status effect triggers on Owner hitting 'low health' mark */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnLowHealth : 1;
+
+	/** True if the status effect triggers on Owner entering combat */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnEnteringCombat : 1;
+
+	/** True if the status effect triggers on Owner leaving combat */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnLeavingCombat : 1;
+
+	//~ @note Redundant property but it could be useful in certain situations
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnInitialization : 1;
 
 	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc.
 
