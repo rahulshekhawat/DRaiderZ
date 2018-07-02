@@ -27,7 +27,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// Property replication
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;		/** Spawn default weapon */	virtual void PostInitializeComponents() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	/** Spawn default weapon */
+	virtual void PostInitializeComponents() override;
 
 #if WITH_EDITOR
 	/**
@@ -81,6 +84,8 @@ public:
 	void SetCurrentWeapon(FName WeaponID);
 
 	void SetCurrentWeapon(FWeaponData* WeaponData);
+
+	void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
 
 private:
 
