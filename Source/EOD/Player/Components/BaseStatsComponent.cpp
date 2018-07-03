@@ -34,4 +34,3 @@ void UBaseStatsComponent::BeginPlay()
 	// ...
 	
 }
-
