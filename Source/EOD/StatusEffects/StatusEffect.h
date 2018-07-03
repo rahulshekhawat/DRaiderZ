@@ -41,8 +41,12 @@ public:
 	/** If the owning character fails to hit the enemy */
 	// virtual void OnUnsuccessfulHit() PURE_VIRTUAL(UStatusEffect::OnUnsuccessfulHit, );
 	
-	/** Called to initialize this status effect on a character */
-	virtual void OnInitialize(class ABaseCharacter* Owner) PURE_VIRTUAL(UStatusEffect::OnInitialize, );
+	/**
+	 * Called to initialize a status effect on a character.
+	 * @param Owner The character that owns the status effect
+	 * @param Initiator The actor that initiated the status effect. Can be nullptr. For elemental effects this would be a weapon.
+	 */
+	virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Initiator) PURE_VIRTUAL(UStatusEffect::OnInitialize, );
 
 	/** Called to deinitialize this status effect on a character */
 	virtual void OnDeinitialize() PURE_VIRTUAL(UStatusEffect::OnDeinitialize, );
@@ -116,6 +120,5 @@ private:
 	// @todo add boolean to check if this status effects deactives on death
 	// @todo add boolean to determine whether the status effect is currently active or not
 	
-
 	
 };

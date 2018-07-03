@@ -22,7 +22,7 @@ void UIceElemental::OnUnsuccessfulHit()
 }
 */
 
-void UIceElemental::OnInitialize(ABaseCharacter * Owner)
+void UIceElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Initiator)
 {
 	// Owner is needed to activate buffs no self or allies
 	SetOwningCharacter(Owner);
@@ -39,6 +39,8 @@ void UIceElemental::OnDeinitialize()
 
 void UIceElemental::OnActivation(ABaseCharacter* RecipientCharacter)
 {
+	// RecipientCharacter in this case would be the enemy that got hit by elemental attack
+
 }
 
 void UIceElemental::OnDeactivation()

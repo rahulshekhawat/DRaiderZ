@@ -20,7 +20,7 @@ void UBaseElemental::OnUnsuccessfulHit()
 }
 */
 
-void UBaseElemental::OnInitialize(ABaseCharacter * Owner)
+void UBaseElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Initiator)
 {
 }
 

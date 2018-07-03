@@ -4,7 +4,7 @@
 
 UStatusEffect::UStatusEffect()
 {
-	bTriggersOnCritical = false;
+	bTriggersOnCriticalHit = false;
 	bTriggersOnReceivingHit = false;
 	bTriggersOnSuccessfulDodge = false;
 	bTriggersOnSuccessfulHit = false;

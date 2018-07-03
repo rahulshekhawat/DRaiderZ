@@ -38,7 +38,7 @@ public:
 	// virtual void OnUnsuccessfulHit() override;
 
 	/** Called to initiate this status effect on a character */
-	virtual void OnInitialize(class ABaseCharacter* Owner) override;
+	virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Initiator) override;
 
 	/** Called to de-initiate this status effect on a character */
 	virtual void OnDeinitialize() override;
