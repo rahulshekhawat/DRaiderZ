@@ -7,8 +7,8 @@
 #include "Weapons/PrimaryWeapon.h"
 #include "Weapons/SecondaryWeapon.h"
 #include "Statics/WeaponLibrary.h"
-#include "Components/PrimeStatsComponent.h"
 #include "Components/InventoryComponent.h"
+#include "Components/PlayerStatsComponent.h"
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
@@ -21,7 +21,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
-APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer.SetDefaultSubobjectClass<UPrimeStatsComponent>(FName("Character Stats Component")))
+APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
