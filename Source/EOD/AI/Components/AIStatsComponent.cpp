@@ -16,13 +16,13 @@ void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(UAIStatsComponent, CurrentHealth);
 	DOREPLIFETIME(UAIStatsComponent, MaxMana);
 	DOREPLIFETIME(UAIStatsComponent, CurrentMana);
-	DOREPLIFETIME(UAIStatsComponent, MaxStamina);
-	DOREPLIFETIME(UAIStatsComponent, CurrentStamina);
-
+	// DOREPLIFETIME(UAIStatsComponent, MaxStamina);
+	// DOREPLIFETIME(UAIStatsComponent, CurrentStamina);
 	DOREPLIFETIME(UAIStatsComponent, HealthRegenRate);
 	DOREPLIFETIME(UAIStatsComponent, ManaRegenRate);
-	DOREPLIFETIME(UAIStatsComponent, StaminaRegenRate);
+	// DOREPLIFETIME(UAIStatsComponent, StaminaRegenRate);
 
+	/*
 	DOREPLIFETIME(UAIStatsComponent, PhysicalAttack);
 	DOREPLIFETIME(UAIStatsComponent, MagickAttack);
 	DOREPLIFETIME(UAIStatsComponent, PhysicalResistance);
@@ -47,10 +47,13 @@ void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	
 	DOREPLIFETIME(UAIStatsComponent, BleedResistance);
 	DOREPLIFETIME(UAIStatsComponent, CrowdControlResistance);
+
 	DOREPLIFETIME(UAIStatsComponent, CooldownModifier);
 	DOREPLIFETIME(UAIStatsComponent, ExpModifier);
 	DOREPLIFETIME(UAIStatsComponent, DropRateModifier);
 	DOREPLIFETIME(UAIStatsComponent, StaminaConsumptionModifier);
+	*/
+
 	DOREPLIFETIME(UAIStatsComponent, MovementSpeedModifier);
 	DOREPLIFETIME(UAIStatsComponent, AnimationSpeedModifier);
 	DOREPLIFETIME(UAIStatsComponent, SpellCastingSpeedModifier);
@@ -126,32 +129,35 @@ void UAIStatsComponent::ModifyCurrentMana(int32 Value)
 
 int32 UAIStatsComponent::GetBaseStamina() const
 {
-	return BaseStamina;
+	return 0;
+	// return BaseStamina;
 }
 
 int32 UAIStatsComponent::GetMaxStamina() const
 {
-	return MaxStamina;
+	return 0;
+	// return MaxStamina;
 }
 
 int32 UAIStatsComponent::GetCurrentStamina() const
 {
-	return CurrentStamina;
+	return 0;
+	// return CurrentStamina;
 }
 
 void UAIStatsComponent::ModifyBaseStamina(int32 Value)
 {
-	BaseStamina += Value;
+	// BaseStamina += Value;
 }
 
 void UAIStatsComponent::ModifyMaxStamina(int32 Value)
 {
-	MaxStamina += Value;
+	// MaxStamina += Value;
 }
 
 void UAIStatsComponent::ModifyCurrentStamina(int32 Value)
 {
-	CurrentStamina += Value;
+	// CurrentStamina += Value;
 }
 
 int32 UAIStatsComponent::GetHealthRegenRate() const
@@ -166,7 +172,8 @@ int32 UAIStatsComponent::GetManaRegenRate() const
 
 int32 UAIStatsComponent::GetStaminaRegenRate() const
 {
-	return StaminaRegenRate;
+	return 0;
+	// return StaminaRegenRate;
 }
 
 int32 UAIStatsComponent::GetPhysicalAttack() const

@@ -19,18 +19,18 @@ void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(UPlayerStatsComponent, MaxStamina);
 	DOREPLIFETIME(UPlayerStatsComponent, CurrentStamina);
 
-	DOREPLIFETIME(UPlayerStatsComponent, HealthRegenRate);
-	DOREPLIFETIME(UPlayerStatsComponent, ManaRegenRate);
-	DOREPLIFETIME(UPlayerStatsComponent, StaminaRegenRate);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, HealthRegenRate, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, ManaRegenRate, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, StaminaRegenRate, COND_OwnerOnly);
 
-	DOREPLIFETIME(UPlayerStatsComponent, PhysicalAttack);
-	DOREPLIFETIME(UPlayerStatsComponent, MagickAttack);
-	DOREPLIFETIME(UPlayerStatsComponent, PhysicalResistance);
-	DOREPLIFETIME(UPlayerStatsComponent, MagickResistance);
-	DOREPLIFETIME(UPlayerStatsComponent, PhysicalCritRate);
-	DOREPLIFETIME(UPlayerStatsComponent, MagickCritRate);
-	DOREPLIFETIME(UPlayerStatsComponent, PhysicalCritBonus);
-	DOREPLIFETIME(UPlayerStatsComponent, MagickCritBonus);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, PhysicalAttack, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, MagickAttack, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, PhysicalResistance, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, MagickResistance, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, PhysicalCritRate, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, MagickCritRate, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, PhysicalCritBonus, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, MagickCritBonus, COND_OwnerOnly);
 
 	DOREPLIFETIME(UPlayerStatsComponent, ElementalFireDamage);
 	DOREPLIFETIME(UPlayerStatsComponent, ElementalIceDamage);
@@ -47,10 +47,12 @@ void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	
 	DOREPLIFETIME(UPlayerStatsComponent, BleedResistance);
 	DOREPLIFETIME(UPlayerStatsComponent, CrowdControlResistance);
-	DOREPLIFETIME(UPlayerStatsComponent, CooldownModifier);
-	DOREPLIFETIME(UPlayerStatsComponent, ExpModifier);
-	DOREPLIFETIME(UPlayerStatsComponent, DropRateModifier);
-	DOREPLIFETIME(UPlayerStatsComponent, StaminaConsumptionModifier);
+	
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, CooldownModifier, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, ExpModifier, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, DropRateModifier, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, StaminaConsumptionModifier, COND_OwnerOnly);
+	
 	DOREPLIFETIME(UPlayerStatsComponent, MovementSpeedModifier);
 	DOREPLIFETIME(UPlayerStatsComponent, AnimationSpeedModifier);
 	DOREPLIFETIME(UPlayerStatsComponent, SpellCastingSpeedModifier);

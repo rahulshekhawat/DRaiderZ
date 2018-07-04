@@ -139,6 +139,5 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Conditionals)
 	uint32 bHasStaminaRegenration : 1;
 
-		
 	
 };

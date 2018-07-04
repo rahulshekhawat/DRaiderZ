@@ -128,10 +128,18 @@ public:
 	virtual int32 GetDarkness() const override;
 
 private:
-		
-	/** Character Level */
+
+	// @note All changes to variables similar to MaxHealth, CurrentHealth, etc. will occur ONLY on server and will automatically get replicated. No RPC needed.
+	
+	/** Current character level */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 Level;
+
+	/**
+	 * @note
+	 * Mana might be used to limit some AI characters like spell casters and healers
+	 * Stamina might not be a stat needed by AI. Probably remove it
+	*/
 
 	/** Maximum health of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
@@ -158,102 +166,117 @@ private:
 	int32 CurrentMana;
 	
 	/** Maximum stamina of character without any status effects */
-	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
-	int32 BaseStamina;
+	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
+	// int32 BaseStamina;
 
 	/** Current maximum stamina of character - with or without any status effects */
-	UPROPERTY(Replicated)
-	int32 MaxStamina;
+	// UPROPERTY(Replicated)
+	// int32 MaxStamina;
 
 	/** Current stamina of character */
-	UPROPERTY(Replicated)
-	int32 CurrentStamina;
+	// UPROPERTY(Replicated)
+	// int32 CurrentStamina;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
+	/**
+	 * @note
+	 * Assuming the regeneration rates for AI wouldn't change,
+	 * they do not need to replicated.
+	 * If they do change, server should handle any changes in their
+	 * health, mana and stamina
+	*/
+
+	UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
 	int32 HealthRegenRate;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
 	int32 ManaRegenRate;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
-	int32 StaminaRegenRate;
+	//~ No stamina -> no stamina regen rate
+	// UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
+	// int32 StaminaRegenRate;
 
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats)
+	/**
+	 * @note
+	 * since server will handle the entire damage logic for AIs,
+	 * it might not be necessary to replicated any of the damge stats
+	*/
+
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats)
 	int32 PhysicalAttack;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats)
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats)
 	int32 PhysicalResistance;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats)
 	int32 MagickAttack;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats)
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats)
 	int32 MagickResistance;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats)
 	float PhysicalCritRate;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats)
 	float MagickCritRate;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats)
 	int32 PhysicalCritBonus;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats)
 	int32 MagickCritBonus;
 
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
 	int32 ElementalFireDamage;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
 	int32 ElementalIceDamage;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
 	int32 ElementalPoisonDamage;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
 	int32 ElementalLightningDamage;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
 	int32 ElementalHolyDamage;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
 	int32 ElementalDarkDamage;
 
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 ElementalFireResistance;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 ElementalIceResistance;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 ElementalPoisonResistance;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 ElementalLightningResistance;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 ElementalHolyResistance;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 ElementalDarkResistance;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 BleedResistance;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 CrowdControlResistance;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float CooldownModifier;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float ExpModifier;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float DropRateModifier;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float StaminaConsumptionModifier;
 	
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
@@ -262,7 +285,7 @@ private:
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float AnimationSpeedModifier;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
+	UPROPERTY(EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float SpellCastingSpeedModifier;
 
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats)
