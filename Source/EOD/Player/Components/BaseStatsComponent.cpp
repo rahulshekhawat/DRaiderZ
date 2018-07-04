@@ -4,7 +4,7 @@
 
 
 // Sets default values for this component's properties
-UBaseStatsComponent::UBaseStatsComponent()
+UBaseStatsComponent::UBaseStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 	// Doesn't need to tick at the moment
 	PrimaryComponentTick.bCanEverTick = false;
@@ -18,19 +18,4 @@ void UBaseStatsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-}
-
-void UBaseStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-}
-
-// Called when the game starts
-void UBaseStatsComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
 }

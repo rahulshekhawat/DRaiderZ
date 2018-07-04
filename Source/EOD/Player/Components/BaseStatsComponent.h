@@ -7,7 +7,7 @@
 #include "BaseStatsComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Abstract)
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class EOD_API UBaseStatsComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -15,18 +15,10 @@ class EOD_API UBaseStatsComponent : public UActorComponent
 public:
 
 	// Sets default values for this component's properties
-	UBaseStatsComponent();
+	UBaseStatsComponent(const FObjectInitializer& ObjectInitializer);
 	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
-	// Property replication
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-protected:
-
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
 public:
 	
