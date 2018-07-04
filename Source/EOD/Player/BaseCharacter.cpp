@@ -48,12 +48,12 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 bool ABaseCharacter::IsAlive() const
 {
-	return StatsComp->CurrentHealth > 0;
+	return StatsComp->GetCurrentHealth() > 0;
 }
 
 bool ABaseCharacter::IsDead() const
 {
-	return StatsComp->CurrentHealth <= 0;
+	return StatsComp->GetCurrentHealth() <= 0;
 }
 
 bool ABaseCharacter::IsIdle() const
@@ -93,7 +93,7 @@ bool ABaseCharacter::IsDodging() const
 
 bool ABaseCharacter::NeedsHeal() const
 {
-	return StatsComp->CurrentHealth / StatsComp->MaxHealth <= 0.25;
+	return StatsComp->IsLowOnHealth();
 }
 
 void ABaseCharacter::SetCharacterState(ECharacterState NewState)

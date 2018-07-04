@@ -7,8 +7,8 @@
 #include "Weapons/PrimaryWeapon.h"
 #include "Weapons/SecondaryWeapon.h"
 #include "Statics/WeaponLibrary.h"
-#include "Components/PrimeStatsComponent.h"
 #include "Components/InventoryComponent.h"
+#include "Components/PlayerStatsComponent.h"
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
@@ -21,7 +21,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
-APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer.SetDefaultSubobjectClass<UPrimeStatsComponent>(FName("Character Stats Component")))
+APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -136,6 +136,7 @@ void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 		
+
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -146,6 +147,7 @@ void APlayerCharacter::PostInitializeComponents()
 	SecondaryWeapon->SetOwningCharacter(this);
 
 	// @note please set secondary weapon first and primary weapon later.
+	SetCurrentWeapon(SecondaryWeaponID);
 	SetCurrentWeapon(PrimaryWeaponID);
 
 
@@ -222,7 +224,7 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// @development_only_code
-	SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndSword);
+	// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndSword);
 
 	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
@@ -709,7 +711,11 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
 {
 	FWeaponData* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
-	SetCurrentWeapon(WeaponData);
+	if (WeaponData)
+	{
+		SetCurrentWeapon(WeaponData);
+		UpdateCurrentWeaponAnimationType(WeaponData->WeaponType);		
+	}
 }
 
 void APlayerCharacter::SetCurrentWeapon(FWeaponData* WeaponData)
@@ -730,6 +736,37 @@ void APlayerCharacter::SetCurrentWeapon(FWeaponData* WeaponData)
 	}
 
 	// if (UWeaponLibrary::IsWeaponDualHanded)
+}
+
+void APlayerCharacter::UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType)
+{
+	switch (NewWeaponType)
+	{
+	case EWeaponType::GreatSword:
+		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::GreatSword);
+		break;
+	case EWeaponType::WarHammer:
+		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::WarHammer);
+		break;
+	case EWeaponType::LongSword:
+		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndSword);
+		break;
+	case EWeaponType::Mace:
+		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndMace);
+		break;
+	case EWeaponType::Dagger:
+		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
+		break;
+	case EWeaponType::Staff:
+		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Staff);
+		break;
+	case EWeaponType::Shield:
+		// probably best not to update animation type on equipping shield
+		// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Shi);
+		break;
+	default:
+		break;
+	}
 }
 
 void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)

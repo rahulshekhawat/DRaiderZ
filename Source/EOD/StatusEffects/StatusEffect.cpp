@@ -4,22 +4,11 @@
 
 UStatusEffect::UStatusEffect()
 {
-}
-
-void UStatusEffect::OnSuccessfulHit(ABaseCharacter * HitCharacter)
-{
-}
-
-void UStatusEffect::OnUnsuccessfulHit()
-{
-}
-
-void UStatusEffect::OnActivation()
-{
-}
-
-void UStatusEffect::OnDeactivation()
-{
+	bTriggersOnCriticalHit = false;
+	bTriggersOnReceivingHit = false;
+	bTriggersOnSuccessfulDodge = false;
+	bTriggersOnSuccessfulHit = false;
+	bTriggersOnUnsuccessfulHit = false;
 }
 
 ABaseCharacter * UStatusEffect::GetOwningCharacter() const

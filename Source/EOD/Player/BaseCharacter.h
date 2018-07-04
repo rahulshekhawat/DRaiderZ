@@ -7,7 +7,7 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class EOD_API ABaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
