@@ -8,6 +8,14 @@
 
 class ABaseCharacter;
 
+UENUM(BlueprintType)
+enum class EStatusEffectReactivationCondition :uint8
+{
+	None,
+	Reset,
+	Stack
+};
+
 /**
  * 
  */
@@ -19,27 +27,6 @@ class EOD_API UStatusEffect : public UObject
 public:
 
 	UStatusEffect();
-
-	/** 
-	 * If the owner of status effect received any damage 
-	 * @param HittingCharacter The enemy character that landed a hit on you
-	 */
-	// virtual void OnReceivingHit(ABaseCharacter* HittingCharacter) PURE_VIRTUAL(UStatusEffect::OnGettingHit, );
-
-	/**
-	 * If the owning character successfully hits the enemy
-	 * @param HitCharacter The enemy character that got hit
-	 */
-	// virtual void OnSuccessfulHit(ABaseCharacter* HitCharacter) PURE_VIRTUAL(UStatusEffect::OnSuccessfulHit, );
-
-	/** 
-	 * If the owning character lands a critical hit on enemy
-	 * @param HitCharacter The enemy character that got hit
-	 */
-	// virtual void OnCriticalHit(ABaseCharacter* HitCharacter) PURE_VIRTUAL(UStatusEffect::OnCriticalHit, );
-	
-	/** If the owning character fails to hit the enemy */
-	// virtual void OnUnsuccessfulHit() PURE_VIRTUAL(UStatusEffect::OnUnsuccessfulHit, );
 	
 	/**
 	 * Called to initialize a status effect on a character.
@@ -106,6 +93,13 @@ protected:
 	//~ @note Redundant property but it could be useful in certain situations
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnInitialization : 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
+	EStatusEffectReactivationCondition ReactivationCondition;
+	
+	/** Number of times this status effect can stack. Only applicable if ReactivationCondition is set to EStatusEffectReactivationCondition::Stack */
+	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
+	int32 StackLimit;
 
 	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc.
 
