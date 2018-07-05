@@ -4,11 +4,17 @@
 
 UStatusEffect::UStatusEffect()
 {
-	bTriggersOnCriticalHit = false;
 	bTriggersOnReceivingHit = false;
-	bTriggersOnSuccessfulDodge = false;
 	bTriggersOnSuccessfulHit = false;
 	bTriggersOnUnsuccessfulHit = false;
+	bTriggersOnCriticalHit = false;
+	bTriggersOnSuccessfulDodge = false;
+	bTriggersOnSuccessfulBlock = false;
+	bTriggersOnFullHealth = false;
+	bTriggersOnLowHealth = false;
+	bTriggersOnEnteringCombat = false;
+	bTriggersOnLeavingCombat = false;
+	bTriggersOnInitialization = false;
 }
 
 ABaseCharacter * UStatusEffect::GetOwningCharacter() const

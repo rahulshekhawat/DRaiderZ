@@ -37,10 +37,12 @@ void UIceElemental::OnDeinitialize()
 	// this->ConditionalBeginDestroy();
 }
 
-void UIceElemental::OnActivation(ABaseCharacter* RecipientCharacter)
+void UIceElemental::OnActivation(TArray<ABaseCharacter*> RecipientCharacters)
 {
 	// RecipientCharacter in this case would be the enemy that got hit by elemental attack
+	// FTimerHandle* NewHandle = new FTimerHandle;
 
+	// GetOwningCharacter()->GetWorldTimerManager().SetTimer(*NewHandle, this)
 }
 
 void UIceElemental::OnDeactivation()

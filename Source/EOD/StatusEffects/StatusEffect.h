@@ -52,7 +52,7 @@ public:
 	virtual void OnDeinitialize() PURE_VIRTUAL(UStatusEffect::OnDeinitialize, );
 
 	/** Called when the status effect is activated */
-	virtual void OnActivation(ABaseCharacter* RecipientCharacter) PURE_VIRTUAL(UStatusEffect::OnActivation, );
+	virtual void OnActivation(TArray<ABaseCharacter*> RecipientCharacters) PURE_VIRTUAL(UStatusEffect::OnActivation, );
 
 	/** Called when the status effect is deactivated */
 	virtual void OnDeactivation() PURE_VIRTUAL(UStatusEffect::OnDeactivation, );
@@ -64,7 +64,7 @@ public:
 protected:
 
 	/** True if the status effect triggers on Owner receiving damage */
-	UPROPERTY(EditDefaultsOnly, Category=ActivationCondition)
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnReceivingHit : 1;
 
 	/** True if the status effect triggers on Owner successfully landing an attack on enemy */

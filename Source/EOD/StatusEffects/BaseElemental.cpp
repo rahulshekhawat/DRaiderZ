@@ -28,7 +28,7 @@ void UBaseElemental::OnDeinitialize()
 {
 }
 
-void UBaseElemental::OnActivation(ABaseCharacter* RecipientCharacter)
+void UBaseElemental::OnActivation(TArray<ABaseCharacter*> RecipientCharacters)
 {
 }
 

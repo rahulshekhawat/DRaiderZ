@@ -44,7 +44,7 @@ public:
 	virtual void OnDeinitialize() override;
 
 	/** Called when the status effect is activated */
-	virtual void OnActivation(ABaseCharacter* RecipientCharacter) override;
+	virtual void OnActivation(TArray<ABaseCharacter*> RecipientCharacters) override;
 
 	/** Called when the status effect is deactivated */
 	virtual void OnDeactivation() override;
