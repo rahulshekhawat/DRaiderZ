@@ -304,6 +304,16 @@ bool ABaseCharacter::CanDodge() const
 	return CharacterState == ECharacterState::IdleWalkRun;
 }
 
+void ABaseCharacter::AddStatusEffectVisuals(UTexture * Icon, UParticleSystem * ParticleSystem)
+{
+	// @todo definition
+}
+
+void ABaseCharacter::RemoveStatusEffectVisuals(UTexture * Icon, UParticleSystem * ParticleSystem)
+{
+	// @todo definition
+}
+
 // Called when the game starts or when spawned
 void ABaseCharacter::BeginPlay()
 {
