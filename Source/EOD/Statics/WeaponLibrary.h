@@ -41,11 +41,11 @@ public:
 
 	/** The in-game name used for this weapon */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	FText DisplayName;
+	FString DisplayName;
 	
 	/** Weapon description that will be displayed on hovering over the weapon icon */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	FText Description;
+	FString Description;
 	
 	/** The skeletal mesh that represents this weapon */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
