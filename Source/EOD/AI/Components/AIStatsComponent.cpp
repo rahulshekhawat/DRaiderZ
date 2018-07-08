@@ -55,7 +55,7 @@ void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	*/
 
 	DOREPLIFETIME(UAIStatsComponent, MovementSpeedModifier);
-	DOREPLIFETIME(UAIStatsComponent, AnimationSpeedModifier);
+	// DOREPLIFETIME(UAIStatsComponent, AnimationSpeedModifier);
 	DOREPLIFETIME(UAIStatsComponent, SpellCastingSpeedModifier);
 	
 	DOREPLIFETIME(UAIStatsComponent, Darkness);
@@ -311,10 +311,22 @@ float UAIStatsComponent::GetMovementSpeedModifier() const
 	return MovementSpeedModifier;
 }
 
+float UAIStatsComponent::GetActiveTimeDilation() const
+{
+	return ActiveTimeDilation;
+}
+
+void UAIStatsComponent::ModifyActiveTimeDilation(float Value)
+{
+	ActiveTimeDilation += Value;
+}
+
+/*
 float UAIStatsComponent::GetAnimationSpeedModifier() const
 {
 	return AnimationSpeedModifier;
 }
+*/
 
 float UAIStatsComponent::GetSpellCastingSpeedModifier() const
 {

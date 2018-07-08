@@ -122,7 +122,11 @@ public:
 
 	virtual float GetMovementSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetMovementSpeedModifier, return 0.f; );
 
-	virtual float GetAnimationSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetAnimationSpeedModifier, return 0.f; );
+	// virtual float GetAnimationSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetAnimationSpeedModifier, return 0.f; );
+
+	virtual float GetActiveTimeDilation() const PURE_VIRTUAL(UBaseStatsComponent::GetActiveTimeDilation, return 0.f; );
+
+	virtual void ModifyActiveTimeDilation(float Value) PURE_VIRTUAL(UBaseStatsComponent::ModifyActiveTimeDilation, );
 
 	virtual float GetSpellCastingSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetSpellCastingSpeedModifier, return 0.f; );
 

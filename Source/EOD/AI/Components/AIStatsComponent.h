@@ -121,7 +121,11 @@ public:
 
 	virtual float GetMovementSpeedModifier() const override;
 
-	virtual float GetAnimationSpeedModifier() const override;
+	// virtual float GetAnimationSpeedModifier() const override;
+	
+	virtual float GetActiveTimeDilation() const override;
+
+	virtual void ModifyActiveTimeDilation(float Value) override;
 
 	virtual float GetSpellCastingSpeedModifier() const override;
 
@@ -282,8 +286,11 @@ private:
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float MovementSpeedModifier;
 	
+	// UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
+	// float AnimationSpeedModifier;
+
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
-	float AnimationSpeedModifier;
+	float ActiveTimeDilation;
 	
 	UPROPERTY(EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float SpellCastingSpeedModifier;
