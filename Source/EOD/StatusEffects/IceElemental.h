@@ -32,7 +32,25 @@ public:
 	/** Called when the status effect is deactivated */
 	virtual void OnDeactivation() override;
 	
-private:
-
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	float SlowDownDuration;
 	
+	/**
+	 * How much should this status effect slow down the enemy between 0 to 1 ? 
+	 * 1 = 100 % , 0 = 0 %
+	*/
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	float SlowDownModifier;
+
+private:
+	
+	/** The characters that have already been inflicted with this status effect */
+	static TArray<ABaseCharacter*> AffectedCharacters;
+
+	void ApplySlowDown(ABaseCharacter* TargetCharacter);
+
+	UFUNCTION()
+	void RemoveSlowDown(ABaseCharacter* TargetCharacter);
+
+
 };
