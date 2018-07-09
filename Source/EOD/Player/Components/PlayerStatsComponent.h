@@ -85,6 +85,8 @@ public:
 	
 	virtual int32 GetElementalIceResistance() const override;
 	
+	virtual int32 ModifyElementalIceResistance(int32 Value) override;
+	
 	virtual int32 GetElementalLightningResistance() const override;
 	
 	virtual int32 GetElementalPoisonResistance() const override;

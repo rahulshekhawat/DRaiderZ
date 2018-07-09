@@ -222,6 +222,11 @@ int32 UPlayerStatsComponent::GetElementalIceResistance() const
 	return ElementalIceResistance;
 }
 
+int32 UPlayerStatsComponent::ModifyElementalIceResistance(int32 Value)
+{
+	return ElementalIceResistance += Value;
+}
+
 int32 UPlayerStatsComponent::GetElementalLightningResistance() const
 {
 	return ElementalLightningResistance;

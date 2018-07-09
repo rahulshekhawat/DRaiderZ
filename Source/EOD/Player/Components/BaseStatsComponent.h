@@ -85,6 +85,8 @@ public:
 	virtual int32 GetElementalFireResistance() const PURE_VIRTUAL(UBaseStatsComponent::GetElementalFireResistance, return 0; );
 	
 	virtual int32 GetElementalIceResistance() const PURE_VIRTUAL(UBaseStatsComponent::GetElementalIceResistance, return 0; );
+
+	virtual int32 ModifyElementalIceResistance(int32 Value) PURE_VIRTUAL(UBaseStatsComponent::ModifyElementalIceResistance, return 0; );
 	
 	virtual int32 GetElementalLightningResistance() const PURE_VIRTUAL(UBaseStatsComponent::GetElementalLightningResistance, return 0; );
 	

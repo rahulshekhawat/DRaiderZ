@@ -226,6 +226,11 @@ int32 UAIStatsComponent::GetElementalIceResistance() const
 	return ElementalIceResistance;
 }
 
+int32 UAIStatsComponent::ModifyElementalIceResistance(int32 Value)
+{
+	return ElementalIceResistance += Value;
+}
+
 int32 UAIStatsComponent::GetElementalLightningResistance() const
 {
 	return ElementalLightningResistance;
