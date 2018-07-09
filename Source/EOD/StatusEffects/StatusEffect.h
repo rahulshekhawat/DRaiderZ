@@ -19,7 +19,7 @@ enum class EStatusEffectReactivationCondition :uint8
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS(Abstract, Blueprintable)
 class EOD_API UStatusEffect : public UObject
 {
 	GENERATED_BODY()
@@ -39,7 +39,7 @@ public:
 	virtual void OnDeinitialize() PURE_VIRTUAL(UStatusEffect::OnDeinitialize, );
 
 	/** Called when the status effect is activated */
-	virtual void OnActivation(TArray<ABaseCharacter*> RecipientCharacters) PURE_VIRTUAL(UStatusEffect::OnActivation, );
+	virtual void OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters) PURE_VIRTUAL(UStatusEffect::OnActivation, );
 
 	/** Called when the status effect is deactivated */
 	virtual void OnDeactivation() PURE_VIRTUAL(UStatusEffect::OnDeactivation, );
@@ -47,6 +47,14 @@ public:
 	ABaseCharacter* GetOwningCharacter() const;
 
 	void SetOwningCharacter(ABaseCharacter* NewCharacter);
+	
+	/** The name of this status effect that will be used inside game */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FString InGameName;
+	
+	/** In-game description of this status effect */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FString Description;
 
 protected:
 
@@ -89,11 +97,15 @@ protected:
 	/** True if the status effect triggers on Owner leaving combat */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnLeavingCombat : 1;
+	
+	/** True if the status effect triggers on using a particular skill */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnUsingSkill : 1;
 
 	//~ @note Redundant property but it could be useful in certain situations
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnInitialization : 1;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
 	EStatusEffectReactivationCondition ReactivationCondition;
 	
@@ -102,11 +114,19 @@ protected:
 	int32 StackLimit;
 
 	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc.
+	
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	class UTexture* Icon;
+	
+	/** Particle system associated with this status effect */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	class UParticleSystem* ParticleSystem;
 
 private:
 
 	UPROPERTY(Transient)
 	ABaseCharacter* OwningCharacter;
+
 	
 	// @todo Add flags to determine allies and enemies (for buff and debuff effects)
 	// @note better to handle allies from ABaseCharacter class and add/use a function like TArray<ABaseCharacter*> GetAllies();
