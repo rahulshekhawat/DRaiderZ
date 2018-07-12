@@ -16,6 +16,33 @@ enum class EStatusEffectReactivationCondition :uint8
 	Stack
 };
 
+USTRUCT(BlueprintType)
+struct EOD_API FStatusEffectInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	UPROPERTY(EditDefaultsOnly)
+	FString InGameName;
+	
+	UPROPERTY(EditDefaultsOnly)
+	FString Description;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UTexture* Icon;
+	
+	/** Particle system associated with this status effect */
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* ParticleSystem;
+	
+	UPROPERTY(EditDefaultsOnly)
+	FName ParticleEffectAttachBone;
+
+	int NewStackValue;
+
+};
+
 /**
  * 
  */
@@ -48,13 +75,16 @@ public:
 
 	void SetOwningCharacter(ABaseCharacter* NewCharacter);
 	
-	/** The name of this status effect that will be used inside game */
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
-	FString InGameName;
+	FStatusEffectInfo StatusEffectInfo;
+
+	/** The name of this status effect that will be used inside game */
+	// UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	// FString InGameName;
 	
 	/** In-game description of this status effect */
-	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
-	FString Description;
+	// UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	// FString Description;
 
 protected:
 
@@ -115,12 +145,12 @@ protected:
 
 	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc.
 	
-	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
-	class UTexture* Icon;
+	// UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	// class UTexture* Icon;
 	
 	/** Particle system associated with this status effect */
-	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
-	class UParticleSystem* ParticleSystem;
+	// UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	// class UParticleSystem* ParticleSystem;
 
 private:
 
