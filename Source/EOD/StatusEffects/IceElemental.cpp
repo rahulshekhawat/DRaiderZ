@@ -7,7 +7,7 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 
-TArray<ABaseCharacter*> UIceElemental::AffectedCharacters = TArray<ABaseCharacter*>();
+TArray<ABaseCharacter*> UIceElemental::SlowedDownCharacters = TArray<ABaseCharacter*>();
 
 UIceElemental::UIceElemental()
 {
@@ -46,7 +46,7 @@ void UIceElemental::OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> Recipien
 				// @todo Deal special elemental ice damage
 			}
 			
-			if (UIceElemental::AffectedCharacters.Contains(Character))
+			if (UIceElemental::SlowedDownCharacters.Contains(Character))
 			{
 				continue;
 			}
@@ -69,7 +69,9 @@ void UIceElemental::ApplySlowDown(ABaseCharacter * TargetCharacter)
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, SlowDownDuration, false);
 
 	TargetCharacter->StatsComp->ModifyActiveTimeDilation(-SlowDownModifier);
-	AffectedCharacters.Add(TargetCharacter);	
+	SlowedDownCharacters.Add(TargetCharacter);
+
+	// @todo pass status info to the affected character
 }
 
 void UIceElemental::RemoveSlowDown(ABaseCharacter * TargetCharacter)
@@ -80,7 +82,7 @@ void UIceElemental::RemoveSlowDown(ABaseCharacter * TargetCharacter)
 	}
 
 	TargetCharacter->StatsComp->ModifyActiveTimeDilation(SlowDownModifier);
-	AffectedCharacters.Remove(TargetCharacter);
+	SlowedDownCharacters.Remove(TargetCharacter);
 }
 
 /*

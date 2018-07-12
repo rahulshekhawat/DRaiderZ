@@ -35,17 +35,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	float SlowDownDuration;
 	
-	/**
-	 * How much should this status effect slow down the enemy between 0 to 1 ? 
-	 * 1 = 100 % , 0 = 0 %
-	*/
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	float SlowDownModifier;
 
 private:
 	
-	/** The characters that have already been inflicted with this status effect */
-	static TArray<ABaseCharacter*> AffectedCharacters;
+	/** The list of characters that have been slowed down by this status effect */
+	static TArray<ABaseCharacter*> SlowedDownCharacters;
 
 	void ApplySlowDown(ABaseCharacter* TargetCharacter);
 
