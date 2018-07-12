@@ -304,12 +304,12 @@ bool ABaseCharacter::CanDodge() const
 	return CharacterState == ECharacterState::IdleWalkRun;
 }
 
-void ABaseCharacter::AddStatusEffectVisuals(UTexture * Icon, UParticleSystem * ParticleSystem)
+void ABaseCharacter::AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo)
 {
 	// @todo definition
 }
 
-void ABaseCharacter::RemoveStatusEffectVisuals(UTexture * Icon, UParticleSystem * ParticleSystem)
+void ABaseCharacter::RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo)
 {
 	// @todo definition
 }

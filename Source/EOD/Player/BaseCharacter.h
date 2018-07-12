@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "StatusEffects/StatusEffect.h"
 #include "Statics/CharacterLibrary.h"
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
@@ -120,13 +121,13 @@ public:
 	/**
 	 * Call this to add status effect visuals on character (e.g. burning particle effect)
 	 * This function will be used to add the status effect icon in player UI as well.
-	*/
+	*/	
 	UFUNCTION(BlueprintCallable, Category = StatusEffects)
-	virtual void AddStatusEffectVisuals(class UTexture* Icon, class UParticleSystem* ParticleSystem);
+	virtual void AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
 	
 	UFUNCTION(BlueprintCallable, Category = StatusEffects)
-	virtual void RemoveStatusEffectVisuals(class UTexture* Icon, class UParticleSystem* ParticleSystem);
-	
+	virtual void RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	class UBaseStatsComponent* StatsComp;
 
