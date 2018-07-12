@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "StatusEffects/StatusEffect.h"
 #include "Statics/CharacterLibrary.h"
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
@@ -116,6 +117,20 @@ public:
 	void MultiCast_PlayAnimationMontage(class UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 	//~ End Multiplayer Code
 
+	// @todo improve the status effect visuals system
+	/**
+	 * Call this to add status effect visuals on character (e.g. burning particle effect)
+	 * This function will be used to add the status effect icon in player UI as well.
+	*/	
+	UFUNCTION(BlueprintCallable, Category = StatusEffects)
+	virtual void AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
+	
+	UFUNCTION(BlueprintCallable, Category = StatusEffects)
+	virtual void RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	class UBaseStatsComponent* StatsComp;
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -125,10 +140,6 @@ protected:
 	// UPROPERTY(replicated)
 	bool bInCombat = false;	
 
-private:
-	
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UBaseStatsComponent* StatsComp;
-	
+
 
 };

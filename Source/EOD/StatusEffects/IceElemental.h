@@ -6,6 +6,8 @@
 #include "StatusEffects/BaseElemental.h"
 #include "IceElemental.generated.h"
 
+class ABaseCharacter;
+
 /**
  * 
  */
@@ -18,21 +20,6 @@ public:
 
 	UIceElemental();
 
-	/**
-	* If the owner of status effect received any damage
-	* @param HittingCharacter The enemy character that landed a hit on you
-	*/
-	// virtual void OnReceivingHit(ABaseCharacter* HittingCharacter) override;
-
-	/**
-	* If the owning character successfully hits the enemy
-	* @param HitCharacter The enemy character that got hit
-	*/
-	// virtual void OnSuccessfulHit(ABaseCharacter* HitCharacter) override;
-
-	/** If the owning character fails to hit the enemy */
-	// virtual void OnUnsuccessfulHit() override;
-
 	/** Called to initiate this status effect on a character */
 	virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Initiator) override;
 
@@ -40,10 +27,26 @@ public:
 	virtual void OnDeinitialize() override;
 
 	/** Called when the status effect is activated */
-	virtual void OnActivation(ABaseCharacter* RecipientCharacter) override;
+	virtual void OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters) override;
 
 	/** Called when the status effect is deactivated */
 	virtual void OnDeactivation() override;
 	
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	float SlowDownDuration;
 	
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	float SlowDownModifier;
+
+private:
+	
+	/** The list of characters that have been slowed down by this status effect */
+	static TArray<ABaseCharacter*> SlowedDownCharacters;
+
+	void ApplySlowDown(ABaseCharacter* TargetCharacter);
+
+	UFUNCTION()
+	void RemoveSlowDown(ABaseCharacter* TargetCharacter);
+
+
 };

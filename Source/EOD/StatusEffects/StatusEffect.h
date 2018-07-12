@@ -8,10 +8,45 @@
 
 class ABaseCharacter;
 
+UENUM(BlueprintType)
+enum class EStatusEffectReactivationCondition :uint8
+{
+	None,
+	Reset,
+	Stack
+};
+
+USTRUCT(BlueprintType)
+struct EOD_API FStatusEffectInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	UPROPERTY(EditDefaultsOnly)
+	FString InGameName;
+	
+	UPROPERTY(EditDefaultsOnly)
+	FString Description;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UTexture* Icon;
+	
+	/** Particle system associated with this status effect */
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* ParticleSystem;
+	
+	UPROPERTY(EditDefaultsOnly)
+	FName ParticleEffectAttachBone;
+
+	int NewStackValue;
+
+};
+
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS(Abstract, Blueprintable)
 class EOD_API UStatusEffect : public UObject
 {
 	GENERATED_BODY()
@@ -19,27 +54,6 @@ class EOD_API UStatusEffect : public UObject
 public:
 
 	UStatusEffect();
-
-	/** 
-	 * If the owner of status effect received any damage 
-	 * @param HittingCharacter The enemy character that landed a hit on you
-	 */
-	// virtual void OnReceivingHit(ABaseCharacter* HittingCharacter) PURE_VIRTUAL(UStatusEffect::OnGettingHit, );
-
-	/**
-	 * If the owning character successfully hits the enemy
-	 * @param HitCharacter The enemy character that got hit
-	 */
-	// virtual void OnSuccessfulHit(ABaseCharacter* HitCharacter) PURE_VIRTUAL(UStatusEffect::OnSuccessfulHit, );
-
-	/** 
-	 * If the owning character lands a critical hit on enemy
-	 * @param HitCharacter The enemy character that got hit
-	 */
-	// virtual void OnCriticalHit(ABaseCharacter* HitCharacter) PURE_VIRTUAL(UStatusEffect::OnCriticalHit, );
-	
-	/** If the owning character fails to hit the enemy */
-	// virtual void OnUnsuccessfulHit() PURE_VIRTUAL(UStatusEffect::OnUnsuccessfulHit, );
 	
 	/**
 	 * Called to initialize a status effect on a character.
@@ -52,7 +66,7 @@ public:
 	virtual void OnDeinitialize() PURE_VIRTUAL(UStatusEffect::OnDeinitialize, );
 
 	/** Called when the status effect is activated */
-	virtual void OnActivation(ABaseCharacter* RecipientCharacter) PURE_VIRTUAL(UStatusEffect::OnActivation, );
+	virtual void OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters) PURE_VIRTUAL(UStatusEffect::OnActivation, );
 
 	/** Called when the status effect is deactivated */
 	virtual void OnDeactivation() PURE_VIRTUAL(UStatusEffect::OnDeactivation, );
@@ -60,11 +74,22 @@ public:
 	ABaseCharacter* GetOwningCharacter() const;
 
 	void SetOwningCharacter(ABaseCharacter* NewCharacter);
+	
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FStatusEffectInfo StatusEffectInfo;
+
+	/** The name of this status effect that will be used inside game */
+	// UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	// FString InGameName;
+	
+	/** In-game description of this status effect */
+	// UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	// FString Description;
 
 protected:
 
 	/** True if the status effect triggers on Owner receiving damage */
-	UPROPERTY(EditDefaultsOnly, Category=ActivationCondition)
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnReceivingHit : 1;
 
 	/** True if the status effect triggers on Owner successfully landing an attack on enemy */
@@ -102,17 +127,36 @@ protected:
 	/** True if the status effect triggers on Owner leaving combat */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnLeavingCombat : 1;
+	
+	/** True if the status effect triggers on using a particular skill */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnUsingSkill : 1;
 
 	//~ @note Redundant property but it could be useful in certain situations
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnInitialization : 1;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
+	EStatusEffectReactivationCondition ReactivationCondition;
+	
+	/** Number of times this status effect can stack. Only applicable if ReactivationCondition is set to EStatusEffectReactivationCondition::Stack */
+	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
+	int32 StackLimit;
 
 	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc.
+	
+	// UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	// class UTexture* Icon;
+	
+	/** Particle system associated with this status effect */
+	// UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	// class UParticleSystem* ParticleSystem;
 
 private:
 
 	UPROPERTY(Transient)
 	ABaseCharacter* OwningCharacter;
+
 	
 	// @todo Add flags to determine allies and enemies (for buff and debuff effects)
 	// @note better to handle allies from ABaseCharacter class and add/use a function like TArray<ABaseCharacter*> GetAllies();

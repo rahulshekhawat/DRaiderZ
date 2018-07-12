@@ -54,7 +54,8 @@ void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, StaminaConsumptionModifier, COND_OwnerOnly);
 	
 	DOREPLIFETIME(UPlayerStatsComponent, MovementSpeedModifier);
-	DOREPLIFETIME(UPlayerStatsComponent, AnimationSpeedModifier);
+	// DOREPLIFETIME(UPlayerStatsComponent, AnimationSpeedModifier);
+	DOREPLIFETIME(UPlayerStatsComponent, ActiveTimeDilation);
 	DOREPLIFETIME(UPlayerStatsComponent, SpellCastingSpeedModifier);
 	
 	DOREPLIFETIME(UPlayerStatsComponent, Darkness);
@@ -221,6 +222,11 @@ int32 UPlayerStatsComponent::GetElementalIceResistance() const
 	return ElementalIceResistance;
 }
 
+int32 UPlayerStatsComponent::ModifyElementalIceResistance(int32 Value)
+{
+	return ElementalIceResistance += Value;
+}
+
 int32 UPlayerStatsComponent::GetElementalLightningResistance() const
 {
 	return ElementalLightningResistance;
@@ -306,10 +312,22 @@ float UPlayerStatsComponent::GetMovementSpeedModifier() const
 	return MovementSpeedModifier;
 }
 
+float UPlayerStatsComponent::GetActiveTimeDilation() const
+{
+	return ActiveTimeDilation;
+}
+
+void UPlayerStatsComponent::ModifyActiveTimeDilation(float Value)
+{
+	ActiveTimeDilation += Value;
+}
+
+/*
 float UPlayerStatsComponent::GetAnimationSpeedModifier() const
 {
 	return AnimationSpeedModifier;
 }
+*/
 
 float UPlayerStatsComponent::GetSpellCastingSpeedModifier() const
 {

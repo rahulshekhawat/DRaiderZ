@@ -85,6 +85,8 @@ public:
 	
 	virtual int32 GetElementalIceResistance() const override;
 	
+	virtual int32 ModifyElementalIceResistance(int32 Value) override;
+	
 	virtual int32 GetElementalLightningResistance() const override;
 	
 	virtual int32 GetElementalPoisonResistance() const override;
@@ -121,7 +123,11 @@ public:
 
 	virtual float GetMovementSpeedModifier() const override;
 
-	virtual float GetAnimationSpeedModifier() const override;
+	// virtual float GetAnimationSpeedModifier() const override;
+	
+	virtual float GetActiveTimeDilation() const override;
+
+	virtual void ModifyActiveTimeDilation(float Value) override;
 
 	virtual float GetSpellCastingSpeedModifier() const override;
 
@@ -300,9 +306,13 @@ private:
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float MovementSpeedModifier;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
-	float AnimationSpeedModifier;
+	//~ AnimationSpeedModifier has been replaced with ActiveTimeDilation
+	// UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
+	// float AnimationSpeedModifier;
 	
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
+	float ActiveTimeDilation;
+
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float SpellCastingSpeedModifier;
 

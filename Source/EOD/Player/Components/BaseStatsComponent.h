@@ -85,6 +85,8 @@ public:
 	virtual int32 GetElementalFireResistance() const PURE_VIRTUAL(UBaseStatsComponent::GetElementalFireResistance, return 0; );
 	
 	virtual int32 GetElementalIceResistance() const PURE_VIRTUAL(UBaseStatsComponent::GetElementalIceResistance, return 0; );
+
+	virtual int32 ModifyElementalIceResistance(int32 Value) PURE_VIRTUAL(UBaseStatsComponent::ModifyElementalIceResistance, return 0; );
 	
 	virtual int32 GetElementalLightningResistance() const PURE_VIRTUAL(UBaseStatsComponent::GetElementalLightningResistance, return 0; );
 	
@@ -122,7 +124,11 @@ public:
 
 	virtual float GetMovementSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetMovementSpeedModifier, return 0.f; );
 
-	virtual float GetAnimationSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetAnimationSpeedModifier, return 0.f; );
+	// virtual float GetAnimationSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetAnimationSpeedModifier, return 0.f; );
+
+	virtual float GetActiveTimeDilation() const PURE_VIRTUAL(UBaseStatsComponent::GetActiveTimeDilation, return 0.f; );
+
+	virtual void ModifyActiveTimeDilation(float Value) PURE_VIRTUAL(UBaseStatsComponent::ModifyActiveTimeDilation, );
 
 	virtual float GetSpellCastingSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetSpellCastingSpeedModifier, return 0.f; );
 
