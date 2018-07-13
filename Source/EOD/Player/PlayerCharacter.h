@@ -87,6 +87,19 @@ public:
 
 	void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
 
+	//~ Begin player HUD
+
+	UPROPERTY(EditDefaultsOnly, Category = CharacterWidgets)
+	TSubclassOf<class UHUDWidget> BP_HUDWidget;
+
+	/** Player HUD reference */
+	UPROPERTY()
+	class UHUDWidget* HUDWidget;
+
+
+
+	//~ End player HUD
+
 private:
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

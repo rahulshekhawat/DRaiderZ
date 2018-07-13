@@ -7,11 +7,13 @@
 #include "Weapons/PrimaryWeapon.h"
 #include "Weapons/SecondaryWeapon.h"
 #include "Statics/WeaponLibrary.h"
+#include "UI/HUDWidget.h"
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
+#include "Blueprint/UserWidget.h"
 #include "Engine/StreamableManager.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -222,6 +224,16 @@ void APlayerCharacter::BeginPlay()
 
 	UpdatePlayerAnimationReferences();
 
+
+	//~ Player HUD
+	if (Controller && Controller->IsLocalPlayerController())
+	{
+		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), BP_HUDWidget);
+		if (HUDWidget)
+		{
+			HUDWidget->AddToViewport();
+		}
+	}
 }
 
 USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(FName Name, const FObjectInitializer & ObjectInitializer)

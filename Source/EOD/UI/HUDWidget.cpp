@@ -8,7 +8,13 @@ UHUDWidget::UHUDWidget(const FObjectInitializer & ObjectInitializer) : Super(Obj
 
 bool UHUDWidget::Initialize()
 {
-	return Super::Initialize();
+	if (Super::Initialize() && HealthBar && ManaBar && StaminaBar && LevelText)
+		// && HealthText && ManaText && StaminaText)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 void UHUDWidget::NativeConstruct()

@@ -37,17 +37,21 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* StaminaBar;
 	
-	/** TextBlock to display current/max health */
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* HealthText;
+	class UTextBlock* LevelText;
+
+	
+	/** TextBlock to display current/max health */
+	// UPROPERTY(meta = (BindWidget))
+	// class UTextBlock* HealthText;
 	
 	/** TextBlock to display current/max mana */
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* ManaText;
+	// UPROPERTY(meta = (BindWidget))
+	// class UTextBlock* ManaText;
 	
 	/** TextBlock to display current/max stamina */
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* StaminaText;
+	// UPROPERTY(meta = (BindWidget))
+	// class UTextBlock* StaminaText;
 	
 	
 };
