@@ -126,6 +126,40 @@ public:
 
 };
 
+USTRUCT(BlueprintType)
+struct EOD_API FSkillInfoTable : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	FSoftObjectPath Icon;
+	
+	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	FString InGameName;
+	
+	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	FString Description;
+	
+	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	FString MontageSectionName;
+	
+	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	int StaminaRequired;
+	
+	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	int ManaRequired;
+	
+	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	float Cooldown;
+
+	// error - Issue #6
+	// UPROPERTY(EditAnywhere, Category = BaseInfo)
+	// TSubclassOf<class UStatusEffect> StatusEffect;
+
+	// @todo Skill max level up and changes that occur at each level
+};
 
 
 /**
