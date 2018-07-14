@@ -28,8 +28,8 @@ enum class ECharMovementDirection : uint8
 UENUM(BlueprintType)
 enum class ECharacterState : uint8
 {
-	// None,
 	IdleWalkRun,
+	AutoRun,
 	Jumping,
 	Dodging,
 	Blocking,
@@ -153,6 +153,19 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	float Cooldown;
+	
+	// @todo skill type (support/damage)
+
+	// @todo instant use skill? spell?
+
+	// UPROPERTY(EditAnywhere, Category = BaseInfo)
+	// @todo damage type (magick/physical)
+
+	// @todo damage info
+
+	// @todo crowd control effect
+
+	// @todo crown control immunities
 
 	// error - Issue #6
 	// UPROPERTY(EditAnywhere, Category = BaseInfo)

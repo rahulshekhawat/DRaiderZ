@@ -91,6 +91,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("ToggleStats", IE_Pressed, this, &APlayerCharacter::OnToggleCharacterStatsUI);
 	PlayerInputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &APlayerCharacter::OnToggleMouseCursor);
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
+	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
 
 	PlayerInputComponent->BindAction("Skill_1", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<0>);
 	PlayerInputComponent->BindAction("Skill_2", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<1>);
@@ -202,6 +203,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			UpdateIdleState(DeltaTime);
 		}
+		else if (IsAutoRunning())
+		{
+			UpdateAutoRun(DeltaTime);
+		}
 		else if (IsMoving())
 		{
 			UpdateMovement(DeltaTime);
@@ -275,16 +280,19 @@ bool APlayerCharacter::CanNormalAttack() const
 	return CharacterState == ECharacterState::IdleWalkRun || CharacterState == ECharacterState::Attacking;
 }
 
+bool APlayerCharacter::IsAutoRunning() const
+{
+	return CharacterState == ECharacterState::AutoRun;
+}
+
+bool APlayerCharacter::CanAutoRun() const
+{
+	// The character can auto run only if character is in idle state
+	return CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0;
+}
+
 void APlayerCharacter::MoveForward(const float Value)
 {
-	/*
-	Need to do something like this.
-	if (bAutoRun)
-	{
-		Value = 1.f;
-	}
-	*/
-
 	if (Value != 0 && CanMove())
 	{
 		FRotator rot = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
@@ -483,6 +491,33 @@ void APlayerCharacter::OnNormalAttack()
 	}
 }
 
+void APlayerCharacter::OnToggleAutoRun()
+{
+	if (CharacterState == ECharacterState::AutoRun)
+	{
+		DisableAutoRun();
+	}
+	else if (CanAutoRun())
+	{
+		EnableAutoRun();
+	}
+}
+
+void APlayerCharacter::EnableAutoRun()
+{
+	SetCharacterState(ECharacterState::AutoRun);
+	SetUseControllerRotationYaw(true);
+}
+
+void APlayerCharacter::DisableAutoRun()
+{
+	// Make sure that auto run is active before you attempt to disable it
+	check(CharacterState == ECharacterState::AutoRun);
+
+	SetCharacterState(ECharacterState::IdleWalkRun);
+	SetUseControllerRotationYaw(false);
+}
+
 void APlayerCharacter::UpdateIdleState(float DeltaTime)
 {
 	if (IWR_CharacterMovementDirection != ECharMovementDirection::None)
@@ -579,10 +614,31 @@ void APlayerCharacter::UpdateBlockState(float DeltaTime)
 	else
 	{
 		float NewYaw = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
+		
 		if (BlockMovementDirectionYaw != NewYaw)
 		{
 			SetBlockMovementDirectionYaw(NewYaw);
 		}
+	}
+}
+
+void APlayerCharacter::UpdateAutoRun(float DeltaTime)
+{
+	if (Controller && Controller->IsLocalPlayerController())
+	{
+		FRotator rot = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
+		FVector Direction = FRotationMatrix(rot).GetScaledAxis(EAxis::X);
+		AddMovementInput(Direction, 1.f);
+	}
+
+	if (IWR_CharacterMovementDirection != ECharMovementDirection::F)
+	{
+		SetIWRCharMovementDir(ECharMovementDirection::F);
+	}
+	
+	if (GetCharacterMovement()->MaxWalkSpeed != 400)
+	{
+		SetWalkSpeed(400);
 	}
 }
 

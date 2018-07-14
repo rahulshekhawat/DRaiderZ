@@ -194,6 +194,10 @@ private:
 	virtual bool CanDodge() const override;
 	
 	virtual bool CanNormalAttack() const;
+
+	bool IsAutoRunning() const;
+
+	bool CanAutoRun() const;
 	//~ End Character Action State Handlers
 
 
@@ -229,6 +233,12 @@ private:
 	void OnToggleMouseCursor();
 
 	void OnNormalAttack();
+
+	void OnToggleAutoRun();
+
+	void EnableAutoRun();
+
+	void DisableAutoRun();
 	//~ End Input Handling Functions
 
 	
@@ -259,6 +269,8 @@ private:
 	void UpdateMovement(float DeltaTime);
 
 	void UpdateBlockState(float DeltaTime);
+
+	void UpdateAutoRun(float DeltaTime);
 
 public:
 
