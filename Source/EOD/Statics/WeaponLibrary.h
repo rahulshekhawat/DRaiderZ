@@ -7,6 +7,11 @@
 #include "UObject/NoExportTypes.h"
 #include "WeaponLibrary.generated.h"
 
+/**
+ * This enum lists all the types of animations available to the human character,
+ * categorized based on type of weapon equipped (because human character animation is
+ * dependent on the weapon equipped)
+ */
 UENUM(BlueprintType)
 enum class EWeaponAnimationType : uint8
 {
@@ -20,6 +25,7 @@ enum class EWeaponAnimationType : uint8
 	Daggers
 };
 
+/** This enum describes all the types of weapons available in-game */
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
@@ -31,6 +37,8 @@ enum class EWeaponType : uint8
 	Staff,
 	Shield
 };
+
+//~ @todo FWeaponData vs WeaponStatsComponent, decide which one to keep
 
 USTRUCT(BlueprintType)
 struct EOD_API FWeaponData : public FTableRowBase
@@ -147,7 +155,8 @@ public:
 
 
 /**
- * 
+ * WeaponLibrary contains static helper functions for handling in-game weapon and weapon types.
+ * @note Do not derive from this class
  */
 UCLASS()
 class EOD_API UWeaponLibrary : public UObject
@@ -156,16 +165,25 @@ class EOD_API UWeaponLibrary : public UObject
 	
 public:
 
+	/** Returns true if the weapon requires both hands to wield it */
 	static bool IsWeaponDualHanded(EWeaponType WeaponType);
 	
+	/** Returns true if the weapon can be wielded with single hand */
 	static bool IsWeaponSingleHanded(EWeaponType WeaponType);
 
+	/**
+	 * Returns true if weapon is a primary weapon type
+	 * @see APrimaryWeapon
+	 */
 	static bool IsPrimaryWeapon(EWeaponType WeaponType);
 
+	/**
+	 * Returns true if weapon is a secondary weapon type
+	 * @see ASecondaryWeapon
+	 */
 	static bool IsSecondaryWeapon(EWeaponType WeaponType);
 	
+	/** Returns FWeaponData corresponding to WeaponID from the weapons data table */
 	static FWeaponData* GetWeaponData(FName WeaponID);
-	
-	
 	
 };
