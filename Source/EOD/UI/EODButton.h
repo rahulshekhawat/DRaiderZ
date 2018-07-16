@@ -7,7 +7,7 @@
 #include "EODButton.generated.h"
 
 /**
- * 
+ * EODButton expands upon UE4's UButton to provide functionality and support for inventory buttons, skill bar buttons, etc.
  */
 UCLASS()
 class EOD_API UEODButton : public UButton

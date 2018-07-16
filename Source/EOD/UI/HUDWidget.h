@@ -7,7 +7,7 @@
 #include "HUDWidget.generated.h"
 
 /**
- * 
+ * HUDWidget is used to display player HUD
  */
 UCLASS()
 class EOD_API UHUDWidget : public UUserWidget

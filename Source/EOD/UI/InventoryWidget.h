@@ -7,7 +7,7 @@
 #include "InventoryWidget.generated.h"
 
 /**
- * 
+ * InventoryWidget is the visual representation of player inventory
  */
 UCLASS()
 class EOD_API UInventoryWidget : public UUserWidget
