@@ -12,7 +12,7 @@ class USkeletalMeshComponent;
 class UStaticMeshComponent;
 
 /**
- * 
+ * PlayerCharacter is the base class for playable characters
  */
 UCLASS()
 class EOD_API APlayerCharacter : public ABaseCharacter
@@ -21,18 +21,20 @@ class EOD_API APlayerCharacter : public ABaseCharacter
 	
 public:
 
+	/** Create and initialize skeletal armor mesh, camera, and inventory components. */
 	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
 
-	// Called to bind functionality to input
+	/** Called to bind functionality to input */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-	// Property replication
+	/** Property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	/** Spawn default weapon */
+	/** Spawn default weapon(s) */
 	virtual void PostInitializeComponents() override;
 
 #if WITH_EDITOR
+
 	/**
 	 * Detects changes to EditorArmorID and EditorWeaponID properties.
 	 * If the ID changes, it looks up for respective weapon or armor in
@@ -41,96 +43,26 @@ public:
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
+	/** Updates player states */
 	virtual void Tick(float DeltaTime) override;
 
 protected:
 	
+	/** Initializes player animation references. Creates player HUD widget and adds it to the viewport. */
 	virtual void BeginPlay() override;
-	
-public:
-	
-	//~ Begin Functions to Assist Input Handling
-	/** Player used a skill */
-	void OnUsingSkill(uint32 SkillButtonIndex);
-	
-	/** Converts player controller rotation from 0/360 range to -180/180 range and returns it. */
-	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
-	float GetPlayerControlRotationYaw();
-	
-	/** Delta rotate player toward desired yaw */
-	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
-	bool DeltaRotatePlayerToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate = 600.f);
-	
-	/**
-	 * Returns the expected rotation yaw of character based on current Axis Input.
-	 * NOTE: Only call for locally controlled character otherwise it would lead to crash (intentional)
-	 */
-	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
-	float GetRotationYawFromAxisInput();
-	//~ End Functions to Assist Input Handling
-	
-	UPROPERTY(Transient)
-	class APrimaryWeapon* PrimaryWeapon;
-	
-	UPROPERTY(Transient)
-	class ASecondaryWeapon* SecondaryWeapon;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
-	FName PrimaryWeaponID;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
-	FName SecondaryWeaponID;
-
-	void SetCurrentWeapon(FName WeaponID);
-
-	void SetCurrentWeapon(FWeaponData* WeaponData);
-
-	void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
-
-	//~ Begin player HUD
-
-	UPROPERTY(EditDefaultsOnly, Category = CharacterWidgets)
-	TSubclassOf<class UHUDWidget> BP_HUDWidget;
-
-	/** Player HUD reference */
-	UPROPERTY()
-	class UHUDWidget* HUDWidget;
-
-
-
-	//~ End player HUD
 
 private:
-
+	
+	//~ Begin camera components
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* PlayerCamera;
+	//~ End camera components
 
-
-	//~ Begin Weapon Components Declaration
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UStaticMeshComponent* PrimaryWeapon;
-
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UStaticMeshComponent* SecondaryWeapon;
-
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UStaticMeshComponent* SheathedPrimaryWeapon;
-
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UStaticMeshComponent* SheathedSecondaryWeapon;
-
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UStaticMeshComponent* DroppedPrimaryWeapon;
-
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UStaticMeshComponent* DroppedSecondaryWeapon;
-	//~ End Weapon Components Declaration
-
-
-	//~ Begin Armor Components Declaration
+	//~ Begin armor components
+	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player chest
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Hair;
 	
@@ -151,55 +83,33 @@ private:
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Feet;
-	//~ End Armor Components Declaration
-
-
-	//~ Inventory
+	//~ End armor components
+	
+	//~ Inventory component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UInventoryComponent* InventoryComponent;
-
-	/** Creates new armor component. Helper function for constructor */
-	USkeletalMeshComponent* CreateNewArmorComponent(FName Name, const FObjectInitializer& ObjectInitializer);
-
-
-
-	//~ Begin Input Handling Variables
-	bool bWPressed;
-
-	bool bAPressed;
-
-	bool bDPressed;
-
-	bool bSPressed;
 	
-	bool bBlockPressed;
+	/** A helper function that must be called from constructor. Creates and returns new armor skeletal mesh component */
+	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
+	
 
-	bool bAttackPressed;
+	//~ Begin input handlers
+	bool bBlockPressed;
 	
 	const int CameraZoomRate = 15;
 
 	const int CameraArmMinimumLength = 50;
 
 	const int CameraArmMaximumLength = 500;
-	//~ End Input Handling Variables
+
+	//~ @note Pressing and releasing skill keys are separate events to support charge events (e.g. charge rage)
+
+	/** Handles player pressing a skill key */
+	void OnPressingSkillKey(const uint32 SkillButtonIndex);
+
+	/** Handles player releasing a skill key */
+	void OnReleasingSkillKey(const uint32 SkillButtonIndex);
 	
-
-	//~ Begin Character Action State Handlers
-	virtual bool CanMove() const override;
-	
-	virtual bool CanJump() const override;
-
-	virtual bool CanDodge() const override;
-	
-	virtual bool CanNormalAttack() const;
-
-	bool IsAutoRunning() const;
-
-	bool CanAutoRun() const;
-	//~ End Character Action State Handlers
-
-
-	//~ Begin Input Handling Functions
 	/** Move player forward/backward */
 	void MoveForward(const float Value);
 
@@ -237,31 +147,24 @@ private:
 	void EnableAutoRun();
 
 	void DisableAutoRun();
-	//~ End Input Handling Functions
-
+	//~ End input handlers
 	
-	//~ Begin template functions
-	/** Player pressed a skill action key */
-	template<uint32 SkillButtonIndex>
-	void OnPressedSkillKey();
 
-	/** Player released a skill action key */
-	template<uint32 SkillButtonIndex>
-	void OnReleasedSkillKey();
-
-	// template<typename StructType>
-	// void AddStatsToCharacter(StructType* StructData);
-
-	// template<typename StructType>
-	// void RemoveStatsFromCharacter(StructType* StructData);
-	//~ End template functions
-
-
-	class UPlayerAnimInstance* PlayerAnimInstance;
-	// class UHumanPlayerAnimInstance* PlayerAnimInstance;
-	
+	//~ Begin state handlers
 	float MaxPlayerWalkSpeed = 400.f;
 
+	virtual bool CanMove() const override;
+	
+	virtual bool CanJump() const override;
+
+	virtual bool CanDodge() const override;
+	
+	virtual bool CanNormalAttack() const;
+
+	bool CanAutoRun() const;
+	
+	bool IsAutoRunning() const;
+	
 	void UpdateIdleState(float DeltaTime);
 
 	void UpdateMovement(float DeltaTime);
@@ -269,50 +172,128 @@ private:
 	void UpdateBlockState(float DeltaTime);
 
 	void UpdateAutoRun(float DeltaTime);
+	//~ End state handlers
+	
+
+	//~ Begin UI
+	/** The blueprint widget class to use for player HUD */
+	UPROPERTY(EditDefaultsOnly, Category = CharacterWidgets)
+	TSubclassOf<class UHUDWidget> BP_HUDWidget;
+
+	/** Player HUD class reference */
+	UPROPERTY(Transient)
+	class UHUDWidget* HUDWidget;
+	//~ End UI
 
 public:
-
-	FPlayerAnimationReferences* PlayerAnimationReferences = nullptr;
-
-	void UpdatePlayerAnimationReferences();
 	
-	//~ Begin multiplayer code
-	/** Character movement direction for Idle Walk Run */
+	/**
+	 * Returns player controller rotation yaw in -180/180 range.
+	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
+	 */
+	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
+	float GetPlayerControlRotationYaw();
+	
+	/**
+	 * Rotate player toward desired yaw based on the rotation rate in given delta time
+	 * @param DesiredYaw 	The desired yaw of player character
+	 * @param DeltaTime 	The time between last and current tick
+	 * @param RotationRate 	Desired rotation rate
+	 * @return 				True if character successfully rotates to DesiredYaw (CurrentYaw == DesiredYaw)
+	*/
+	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
+	bool DeltaRotatePlayerToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate = 600.f);
+	
+	/**
+	 * Returns the expected rotation yaw of character based on current Axis Input.
+	 * @warning Only call for locally controlled character otherwise it would lead to crash (intentional)
+	 */
+	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
+	float GetRotationYawFromAxisInput();
+	
+	/** Contains the references to the animation montages */
+	FPlayerAnimationReferences* PlayerAnimationReferences;
+	
+	/** A reference to player anim instance */
+	class UPlayerAnimInstance* PlayerAnimInstance;
+	
+	/** Updates the 'PlayerAnimationReferences' variable based on current weapon equipped */
+	void UpdatePlayerAnimationReferences();
+
+	UPROPERTY(Transient)
+	class APrimaryWeapon* PrimaryWeapon;
+	
+	UPROPERTY(Transient)
+	class ASecondaryWeapon* SecondaryWeapon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
+	FName PrimaryWeaponID;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
+	FName SecondaryWeaponID;
+
+	void SetCurrentWeapon(FName WeaponID);
+
+	void SetCurrentWeapon(FWeaponData* WeaponData);
+
+	void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
+
+private:
+
+	//~ Template functions
+
+	/** Called when player presses a skill key */
+	template<uint32 SkillButtonIndex>
+	void PressedSkillKey();
+
+	/** Called when player releases a skill key */
+	template<uint32 SkillButtonIndex>
+	void ReleasedSkillKey();
+
+public:
+	
+	/** Character movement direction for Idle-Walk-Run state */
 	UPROPERTY(Replicated)
 	ECharMovementDirection IWR_CharacterMovementDirection;
 	
 	void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 	
+	/** Animations to use based on that is determined by equipped weapon */
 	UPROPERTY(Replicated)
 	EWeaponAnimationType CurrentWeaponAnimationToUse;
 	
 	void SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType);
-
+	
+	/** The relative yaw of character's movement direction from the direction character is facing while blocking */
 	UPROPERTY(Replicated)
 	float BlockMovementDirectionYaw;
 
 	void SetBlockMovementDirectionYaw(float NewYaw);
+
+private:
+	
+	//~ Begin multiplayer code
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
-
 	//~ End multiplayer code
+
 
 };
 
 template<uint32 SkillButtonIndex>
-inline void APlayerCharacter::OnPressedSkillKey()
+inline void APlayerCharacter::PressedSkillKey()
 {
-	OnUsingSkill(SkillButtonIndex);
+	OnPressingSkillKey(SkillButtonIndex);
 }
 
 template<uint32 SkillButtonIndex>
-inline void APlayerCharacter::OnReleasedSkillKey()
+inline void APlayerCharacter::ReleasedSkillKey()
 {
+	OnReleasingSkillKey(SkillButtonIndex);
 }

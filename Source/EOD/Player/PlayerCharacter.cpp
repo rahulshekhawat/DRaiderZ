@@ -10,6 +10,7 @@
 #include "UI/HUDWidget.h"
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
+#include "Core/EODPreprocessors.h"
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
@@ -93,26 +94,26 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
 	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
 
-	PlayerInputComponent->BindAction("Skill_1", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<0>);
-	PlayerInputComponent->BindAction("Skill_2", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<1>);
-	PlayerInputComponent->BindAction("Skill_3", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<2>);
-	PlayerInputComponent->BindAction("Skill_4", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<3>);
-	PlayerInputComponent->BindAction("Skill_5", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<4>);
-	PlayerInputComponent->BindAction("Skill_6", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<5>);
-	PlayerInputComponent->BindAction("Skill_7", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<6>);
-	PlayerInputComponent->BindAction("Skill_8", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<7>);
-	PlayerInputComponent->BindAction("Skill_9", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<8>);
-	PlayerInputComponent->BindAction("Skill_10", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<9>);
-	PlayerInputComponent->BindAction("Skill_11", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<10>);
-	PlayerInputComponent->BindAction("Skill_12", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<11>);
-	PlayerInputComponent->BindAction("Skill_13", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<12>);
-	PlayerInputComponent->BindAction("Skill_14", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<13>);
-	PlayerInputComponent->BindAction("Skill_15", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<14>);
-	PlayerInputComponent->BindAction("Skill_16", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<15>);
-	PlayerInputComponent->BindAction("Skill_17", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<16>);
-	PlayerInputComponent->BindAction("Skill_18", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<17>);
-	PlayerInputComponent->BindAction("Skill_19", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<18>);
-	PlayerInputComponent->BindAction("Skill_20", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<19>);
+	PlayerInputComponent->BindAction("Skill_1", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<0>);
+	PlayerInputComponent->BindAction("Skill_2", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<1>);
+	PlayerInputComponent->BindAction("Skill_3", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<2>);
+	PlayerInputComponent->BindAction("Skill_4", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<3>);
+	PlayerInputComponent->BindAction("Skill_5", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<4>);
+	PlayerInputComponent->BindAction("Skill_6", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<5>);
+	PlayerInputComponent->BindAction("Skill_7", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<6>);
+	PlayerInputComponent->BindAction("Skill_8", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<7>);
+	PlayerInputComponent->BindAction("Skill_9", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<8>);
+	PlayerInputComponent->BindAction("Skill_10", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<9>);
+	PlayerInputComponent->BindAction("Skill_11", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<10>);
+	PlayerInputComponent->BindAction("Skill_12", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<11>);
+	PlayerInputComponent->BindAction("Skill_13", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<12>);
+	PlayerInputComponent->BindAction("Skill_14", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<13>);
+	PlayerInputComponent->BindAction("Skill_15", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<14>);
+	PlayerInputComponent->BindAction("Skill_16", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<15>);
+	PlayerInputComponent->BindAction("Skill_17", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<16>);
+	PlayerInputComponent->BindAction("Skill_18", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<17>);
+	PlayerInputComponent->BindAction("Skill_19", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<18>);
+	PlayerInputComponent->BindAction("Skill_20", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<19>);
 	//~ End Action Input Bindings
 
 }
@@ -170,6 +171,7 @@ void APlayerCharacter::PostEditChangeProperty(FPropertyChangedEvent & PropertyCh
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
+	// @todo definition
 }
 #endif
 
@@ -241,7 +243,7 @@ void APlayerCharacter::BeginPlay()
 	}
 }
 
-USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(FName Name, const FObjectInitializer & ObjectInitializer)
+USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer & ObjectInitializer)
 {
 	USkeletalMeshComponent* Sk = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, Name);
 	Sk->SetupAttachment(GetMesh());
@@ -648,9 +650,9 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 
 }
 
-void APlayerCharacter::OnUsingSkill(uint32 SkillButtonIndex)
+void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
-	// Begin @development_only_code
+#if WITH_DEVSTAGE_CODE
 	if (SkillButtonIndex == 0)
 	{
 		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
@@ -675,8 +677,11 @@ void APlayerCharacter::OnUsingSkill(uint32 SkillButtonIndex)
 	{
 		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
 	}
-	// End @development_only_code
+#endif
+}
 
+void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
+{
 }
 
 float APlayerCharacter::GetPlayerControlRotationYaw()
@@ -815,7 +820,7 @@ void APlayerCharacter::UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponTyp
 		break;
 	case EWeaponType::Shield:
 		// probably best not to update animation type on equipping shield
-		// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Shi);
+		// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Shield);
 		break;
 	default:
 		break;
