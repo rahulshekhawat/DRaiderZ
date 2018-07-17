@@ -6,7 +6,6 @@
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "AnimNotify_RaidCollision.generated.h"
 
-
 USTRUCT(BlueprintType)
 struct FCapsuleInfo
 {
@@ -31,7 +30,8 @@ public:
 };
 
 /**
- * 
+ * AnimNotify_RaidCollision performs capsule collisions using the capsules created from
+ * RaiderZ collision files.
  */
 UCLASS()
 class EOD_API UAnimNotify_RaidCollision : public UAnimNotify
@@ -42,6 +42,7 @@ public:
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation);
 
+	/** Capsules that will be used for doing collision tests */
 	UPROPERTY(EditAnywhere, Category = CollisionInfo)
 	TArray<FCapsuleInfo> CollisionCapsules;	
 	
