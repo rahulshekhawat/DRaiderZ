@@ -8,7 +8,7 @@
 #include "CharAnimInstance.generated.h"
 
 /**
- * 
+ * CharAnimInstance is the base class for animation blueprints of non-playable characters
  */
 UCLASS()
 class EOD_API UCharAnimInstance : public UAnimInstance

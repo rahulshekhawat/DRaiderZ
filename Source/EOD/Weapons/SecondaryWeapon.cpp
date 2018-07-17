@@ -7,12 +7,14 @@
 
 ASecondaryWeapon::ASecondaryWeapon(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	// This actor doesn't tick
+	PrimaryActorTick.bCanEverTick = false;
+
 	LeftHandWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Left Hand Weapon"));
 	SheathedWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Sheathed Weapon"));
 	FallenWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Fallen Weapon"));
 
-	// RightHandWeaponMeshComp->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
-	
+	// Weapon's skeletal components do not have any collision. Also, we do not setup attachment for these components at construction.
 	LeftHandWeaponMeshComp->SetCollisionObjectType(ECC_WorldDynamic);
 	LeftHandWeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	LeftHandWeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -26,7 +28,9 @@ ASecondaryWeapon::ASecondaryWeapon(const FObjectInitializer& ObjectInitializer) 
 	FallenWeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	
 	RootComponent = LeftHandWeaponMeshComp;
-	// No need to setup attachment at creation
+
+	// @todo Render settings
+	// RightHandWeaponMeshComp->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
 }
 
 void ASecondaryWeapon::Tick(float DeltaTime)
@@ -47,7 +51,7 @@ void ASecondaryWeapon::OnEquip(FWeaponData * NewWeaponData)
 	}
 
 	USkeletalMesh* NewSkeletalMesh = nullptr;
-
+	
 	if (NewWeaponData->WeaponMesh.IsPending())
 	{
 		NewSkeletalMesh = NewWeaponData->WeaponMesh.LoadSynchronous();
@@ -65,33 +69,22 @@ void ASecondaryWeapon::OnEquip(FWeaponData * NewWeaponData)
 	SheathedWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
 	FallenWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
 
-	switch (NewWeaponData->WeaponType)
+	if (NewWeaponData->WeaponType == EWeaponType::Dagger)
 	{
-	case EWeaponType::GreatSword:
-		break;
-	case EWeaponType::WarHammer:
-		break;
-	case EWeaponType::LongSword:
-		break;
-	case EWeaponType::Mace:
-		break;
-	case EWeaponType::Staff:
-		break;
-	case EWeaponType::Dagger:
 		LeftHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGL"));
 		SheathedWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGL_b"));
 		FallenWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGL_w"));
-		break;
-	case EWeaponType::Shield:
+	}
+	else if (NewWeaponData->WeaponType == EWeaponType::Shield)
+	{
 		LeftHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD"));
 		SheathedWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD_b"));
 		FallenWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD_w"));
-		break;
-	default:
-		break;
 	}
-
-
+	else
+	{
+		// pass
+	}
 }
 
 void ASecondaryWeapon::OnUnEquip()

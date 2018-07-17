@@ -7,11 +7,14 @@
 #include "Weapons/PrimaryWeapon.h"
 #include "Weapons/SecondaryWeapon.h"
 #include "Statics/WeaponLibrary.h"
+#include "UI/HUDWidget.h"
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
+#include "Core/EODPreprocessors.h"
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
+#include "Blueprint/UserWidget.h"
 #include "Engine/StreamableManager.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -89,27 +92,28 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("ToggleStats", IE_Pressed, this, &APlayerCharacter::OnToggleCharacterStatsUI);
 	PlayerInputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &APlayerCharacter::OnToggleMouseCursor);
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
+	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
 
-	PlayerInputComponent->BindAction("Skill_1", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<0>);
-	PlayerInputComponent->BindAction("Skill_2", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<1>);
-	PlayerInputComponent->BindAction("Skill_3", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<2>);
-	PlayerInputComponent->BindAction("Skill_4", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<3>);
-	PlayerInputComponent->BindAction("Skill_5", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<4>);
-	PlayerInputComponent->BindAction("Skill_6", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<5>);
-	PlayerInputComponent->BindAction("Skill_7", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<6>);
-	PlayerInputComponent->BindAction("Skill_8", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<7>);
-	PlayerInputComponent->BindAction("Skill_9", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<8>);
-	PlayerInputComponent->BindAction("Skill_10", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<9>);
-	PlayerInputComponent->BindAction("Skill_11", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<10>);
-	PlayerInputComponent->BindAction("Skill_12", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<11>);
-	PlayerInputComponent->BindAction("Skill_13", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<12>);
-	PlayerInputComponent->BindAction("Skill_14", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<13>);
-	PlayerInputComponent->BindAction("Skill_15", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<14>);
-	PlayerInputComponent->BindAction("Skill_16", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<15>);
-	PlayerInputComponent->BindAction("Skill_17", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<16>);
-	PlayerInputComponent->BindAction("Skill_18", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<17>);
-	PlayerInputComponent->BindAction("Skill_19", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<18>);
-	PlayerInputComponent->BindAction("Skill_20", IE_Pressed, this, &APlayerCharacter::OnPressedSkillKey<19>);
+	PlayerInputComponent->BindAction("Skill_1", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<0>);
+	PlayerInputComponent->BindAction("Skill_2", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<1>);
+	PlayerInputComponent->BindAction("Skill_3", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<2>);
+	PlayerInputComponent->BindAction("Skill_4", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<3>);
+	PlayerInputComponent->BindAction("Skill_5", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<4>);
+	PlayerInputComponent->BindAction("Skill_6", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<5>);
+	PlayerInputComponent->BindAction("Skill_7", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<6>);
+	PlayerInputComponent->BindAction("Skill_8", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<7>);
+	PlayerInputComponent->BindAction("Skill_9", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<8>);
+	PlayerInputComponent->BindAction("Skill_10", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<9>);
+	PlayerInputComponent->BindAction("Skill_11", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<10>);
+	PlayerInputComponent->BindAction("Skill_12", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<11>);
+	PlayerInputComponent->BindAction("Skill_13", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<12>);
+	PlayerInputComponent->BindAction("Skill_14", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<13>);
+	PlayerInputComponent->BindAction("Skill_15", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<14>);
+	PlayerInputComponent->BindAction("Skill_16", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<15>);
+	PlayerInputComponent->BindAction("Skill_17", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<16>);
+	PlayerInputComponent->BindAction("Skill_18", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<17>);
+	PlayerInputComponent->BindAction("Skill_19", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<18>);
+	PlayerInputComponent->BindAction("Skill_20", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<19>);
 	//~ End Action Input Bindings
 
 }
@@ -167,6 +171,7 @@ void APlayerCharacter::PostEditChangeProperty(FPropertyChangedEvent & PropertyCh
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
+	// @todo definition
 }
 #endif
 
@@ -200,6 +205,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			UpdateIdleState(DeltaTime);
 		}
+		else if (IsAutoRunning())
+		{
+			UpdateAutoRun(DeltaTime);
+		}
 		else if (IsMoving())
 		{
 			UpdateMovement(DeltaTime);
@@ -222,9 +231,19 @@ void APlayerCharacter::BeginPlay()
 
 	UpdatePlayerAnimationReferences();
 
+
+	//~ Player HUD
+	if (Controller && Controller->IsLocalPlayerController())
+	{
+		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), BP_HUDWidget);
+		if (HUDWidget)
+		{
+			HUDWidget->AddToViewport();
+		}
+	}
 }
 
-USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(FName Name, const FObjectInitializer & ObjectInitializer)
+USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer & ObjectInitializer)
 {
 	USkeletalMeshComponent* Sk = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, Name);
 	Sk->SetupAttachment(GetMesh());
@@ -233,13 +252,6 @@ USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(FName Name, c
 	Sk->SetMasterPoseComponent(GetMesh());
 	Sk->bUseAttachParentBound = true;
 	return Sk;
-}
-
-UStaticMeshComponent * APlayerCharacter::CreateNewWeaponComponent(FName Name, const FObjectInitializer & ObjectInitializer)
-{
-	UStaticMeshComponent* Wep = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, Name);
-	Wep->SetupAttachment(GetMesh());
-	return Wep;
 }
 
 bool APlayerCharacter::CanMove() const
@@ -263,16 +275,19 @@ bool APlayerCharacter::CanNormalAttack() const
 	return CharacterState == ECharacterState::IdleWalkRun || CharacterState == ECharacterState::Attacking;
 }
 
+bool APlayerCharacter::IsAutoRunning() const
+{
+	return CharacterState == ECharacterState::AutoRun;
+}
+
+bool APlayerCharacter::CanAutoRun() const
+{
+	// The character can auto run only if character is in idle state
+	return CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0;
+}
+
 void APlayerCharacter::MoveForward(const float Value)
 {
-	/*
-	Need to do something like this.
-	if (bAutoRun)
-	{
-		Value = 1.f;
-	}
-	*/
-
 	if (Value != 0 && CanMove())
 	{
 		FRotator rot = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
@@ -471,6 +486,33 @@ void APlayerCharacter::OnNormalAttack()
 	}
 }
 
+void APlayerCharacter::OnToggleAutoRun()
+{
+	if (CharacterState == ECharacterState::AutoRun)
+	{
+		DisableAutoRun();
+	}
+	else if (CanAutoRun())
+	{
+		EnableAutoRun();
+	}
+}
+
+void APlayerCharacter::EnableAutoRun()
+{
+	SetCharacterState(ECharacterState::AutoRun);
+	SetUseControllerRotationYaw(true);
+}
+
+void APlayerCharacter::DisableAutoRun()
+{
+	// Make sure that auto run is active before you attempt to disable it
+	check(CharacterState == ECharacterState::AutoRun);
+
+	SetCharacterState(ECharacterState::IdleWalkRun);
+	SetUseControllerRotationYaw(false);
+}
+
 void APlayerCharacter::UpdateIdleState(float DeltaTime)
 {
 	if (IWR_CharacterMovementDirection != ECharMovementDirection::None)
@@ -567,10 +609,31 @@ void APlayerCharacter::UpdateBlockState(float DeltaTime)
 	else
 	{
 		float NewYaw = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
+		
 		if (BlockMovementDirectionYaw != NewYaw)
 		{
 			SetBlockMovementDirectionYaw(NewYaw);
 		}
+	}
+}
+
+void APlayerCharacter::UpdateAutoRun(float DeltaTime)
+{
+	if (Controller && Controller->IsLocalPlayerController())
+	{
+		FRotator rot = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
+		FVector Direction = FRotationMatrix(rot).GetScaledAxis(EAxis::X);
+		AddMovementInput(Direction, 1.f);
+	}
+
+	if (IWR_CharacterMovementDirection != ECharMovementDirection::F)
+	{
+		SetIWRCharMovementDir(ECharMovementDirection::F);
+	}
+	
+	if (GetCharacterMovement()->MaxWalkSpeed != 400)
+	{
+		SetWalkSpeed(400);
 	}
 }
 
@@ -587,9 +650,9 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 
 }
 
-void APlayerCharacter::OnUsingSkill(uint32 SkillButtonIndex)
+void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
-	// Begin @development_only_code
+#if WITH_DEVSTAGE_CODE
 	if (SkillButtonIndex == 0)
 	{
 		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
@@ -614,8 +677,11 @@ void APlayerCharacter::OnUsingSkill(uint32 SkillButtonIndex)
 	{
 		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
 	}
-	// End @development_only_code
+#endif
+}
 
+void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
+{
 }
 
 float APlayerCharacter::GetPlayerControlRotationYaw()
@@ -754,7 +820,7 @@ void APlayerCharacter::UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponTyp
 		break;
 	case EWeaponType::Shield:
 		// probably best not to update animation type on equipping shield
-		// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Shi);
+		// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Shield);
 		break;
 	default:
 		break;

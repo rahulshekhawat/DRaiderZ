@@ -6,30 +6,34 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
-
+/**
+ * InventoryComponent is used to implement and manage player inventory
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EOD_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+
+	/** Sets default values for this component's properties */
 	UInventoryComponent(const FObjectInitializer& ObjectInitializer);
 	
-	// Called every frame
+	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	/** Toggle the display of inventory UI in player viewport */
 	void ToggleInventoryUI();
 
 protected:
-	// Called when the game starts
+	/** Called when the game starts */
 	virtual void BeginPlay() override;
 
 public:	
 	
-	// Maximum number of inventory slots
+	/** Maximum number of inventory slots */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	uint32 MaxSlots = 100;
+	uint32 MaxSlots;
 
 
 	

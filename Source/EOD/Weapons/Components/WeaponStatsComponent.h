@@ -6,22 +6,25 @@
 #include "Components/ActorComponent.h"
 #include "WeaponStatsComponent.generated.h"
 
-
+/**
+ * A stats component for weapons
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EOD_API UWeaponStatsComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+
 	UWeaponStatsComponent();
 
 protected:
-	// Called when the game starts
+
+	/** Called when the game starts */
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
+	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	// @todo remove Level from weapon stats if it's not needed
@@ -32,6 +35,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 	int Level;
 	
+	//~ @todo min/max value limits for Stability
 	/** Determines how efficiently a weapon can block incoming attacks */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
 	float Stability;

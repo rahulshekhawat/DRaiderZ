@@ -7,7 +7,8 @@
 #include "MobController.generated.h"
 
 /**
- * 
+ * Base class for EOD's AI controller.
+ * All AI controller classes for EOD's in-game AI should inherit from this class
  */
 UCLASS()
 class EOD_API AMobController : public AAIController

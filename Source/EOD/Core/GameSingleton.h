@@ -9,7 +9,7 @@
 #include "GameSingleton.generated.h"
 
 /**
- * 
+ * EOD's singleton class
  */
 UCLASS(Blueprintable)
 class EOD_API UGameSingleton : public UObject
@@ -23,9 +23,11 @@ public:
 	/** A singleton instance of FStreamableManager */
 	FStreamableManager StreamableManager;
 	
+	/** Reference to data table containing player animation references data */
 	UPROPERTY(EditDefaultsOnly, Category = PlayerAnimationsReferences)
 	UDataTable* PlayerAnimationReferencesDataTable;
 	
+	/** Reference to data table containing weapons data */
 	UPROPERTY(EditDefaultsOnly, Category = Weapons)
 	UDataTable* WeaponDataTable;
 

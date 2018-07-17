@@ -7,13 +7,15 @@
 
 APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
+	// This actor doesn't tick
+	PrimaryActorTick.bCanEverTick = false;
+
 	RightHandWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Right Hand Weapon"));
 	LeftHandWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Left Hand Weapon"));
 	SheathedWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Sheathed Weapon"));
 	FallenWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Fallen Weapon"));
 
-	// RightHandWeaponMeshComp->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
-
+	// Weapon's skeletal components do not have any collision. Also, we do not setup attachment for these components at construction.
 	RightHandWeaponMeshComp->SetCollisionObjectType(ECC_WorldDynamic);
 	RightHandWeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RightHandWeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -31,7 +33,9 @@ APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Sup
 	FallenWeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	
 	RootComponent = RightHandWeaponMeshComp;
-	// No need to setup attachment at creation
+	
+	// @todo Render settings
+	// RightHandWeaponMeshComp->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
 }
 
 void APrimaryWeapon::Tick(float DeltaTime)
@@ -52,7 +56,7 @@ void APrimaryWeapon::OnEquip(FWeaponData * NewWeaponData)
 	}
 
 	USkeletalMesh* NewSkeletalMesh = nullptr;
-
+	
 	if (NewWeaponData->WeaponMesh.IsPending())
 	{
 		NewSkeletalMesh = NewWeaponData->WeaponMesh.LoadSynchronous();
@@ -62,53 +66,66 @@ void APrimaryWeapon::OnEquip(FWeaponData * NewWeaponData)
 		NewSkeletalMesh = NewWeaponData->WeaponMesh.Get();
 	}
 
+	// Do not Activate and SetSkeletalMesh for LeftHandWeaponMeshComp as not all weapon types have LeftHandWeaponMeshComp
 	RightHandWeaponMeshComp->Activate();
-	LeftHandWeaponMeshComp->Activate();
 	SheathedWeaponMeshComp->Activate();
 	FallenWeaponMeshComp->Activate();
 
 	RightHandWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
-	LeftHandWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
 	SheathedWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
 	FallenWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
 
-	// @todo attach based on weapon type
-
+	// Setup attachment for all weapon mesh components as well as also Activate and SetSkeletalMesh for LeftHandWeaponMeshComp wherever applicable
 	switch (NewWeaponData->WeaponType)
 	{
 	case EWeaponType::GreatSword:
+		LeftHandWeaponMeshComp->Activate();
+		LeftHandWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
+
 		RightHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GS"));
 		LeftHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GS_c"));
 		SheathedWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GS_b"));
 		FallenWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GS_w"));
 		break;
+
 	case EWeaponType::WarHammer:
+		LeftHandWeaponMeshComp->Activate();
+		LeftHandWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
+
 		RightHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WH"));
 		LeftHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WH_c"));
 		SheathedWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WH_b"));
 		FallenWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WH_w"));
 		break;
+
 	case EWeaponType::LongSword:
 		RightHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("LS"));
 		SheathedWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("LS_b"));
 		FallenWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("LS_w"));
 		break;
+
 	case EWeaponType::Mace:
 		RightHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("MC"));
 		SheathedWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("MC_b"));
 		FallenWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("MC_w"));
 		break;
+
 	case EWeaponType::Dagger:
 		RightHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGR"));
 		SheathedWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGR_b"));
 		FallenWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGR_w"));
 		break;
+
 	case EWeaponType::Staff:
+		LeftHandWeaponMeshComp->Activate();
+		LeftHandWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
+
 		RightHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("ST"));
 		LeftHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("ST_c"));
 		SheathedWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("ST_b"));
 		FallenWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("ST_w"));
 		break;
+
 	default:
 		break;
 	}
