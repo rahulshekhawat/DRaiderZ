@@ -9,7 +9,7 @@
 #include "PlayerAnimInstance.generated.h"
 
 /**
- * 
+ * PlayerAnimInstance is the base class for animation blueprints of playable characters
  */
 UCLASS()
 class EOD_API UPlayerAnimInstance : public UAnimInstance
@@ -18,8 +18,10 @@ class EOD_API UPlayerAnimInstance : public UAnimInstance
 	
 public:
 
+	/** Sets default values for blend times */
 	UPlayerAnimInstance(const FObjectInitializer& ObjectInitializer);
 	
+	/** Binds delegates for OnMontageBlendingOut and OnMontageEnded delegates */
 	virtual void NativeInitializeAnimation() override;
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
@@ -28,13 +30,15 @@ public:
 
 	virtual void NativeUninitializeAnimation() override;
 	
+	/** Blend time for transitions between the animations coming from various state machines in main anim graph */
 	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = IdleWalkRunUpdate)
 	float MasterStateMachine_AnimationsBlendTime;
 	
+	/** Blend time for transition between IdleWalkRun animations (of all state machines) */
 	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = IdleWalkRunUpdate)
 	float IdleWalkRun_AnimationsBlendTime;
 
-	
+
 	//~ Begin functions to update animation blueprint
 	UFUNCTION(BlueprintCallable, Category = BlockAnimationUpdate, meta = (BlueprintThreadSafe))
 	bool IsBlocking() const;
