@@ -147,33 +147,7 @@ private:
 	void EnableAutoRun();
 
 	void DisableAutoRun();
-	//~ End input handlers
-	
-
-	//~ Begin state handlers
-	float MaxPlayerWalkSpeed = 400.f;
-
-	virtual bool CanMove() const override;
-	
-	virtual bool CanJump() const override;
-
-	virtual bool CanDodge() const override;
-	
-	virtual bool CanNormalAttack() const;
-
-	bool CanAutoRun() const;
-	
-	bool IsAutoRunning() const;
-	
-	void UpdateIdleState(float DeltaTime);
-
-	void UpdateMovement(float DeltaTime);
-
-	void UpdateBlockState(float DeltaTime);
-
-	void UpdateAutoRun(float DeltaTime);
-	//~ End state handlers
-	
+	//~ End input handlers	
 
 	//~ Begin UI
 	/** The blueprint widget class to use for player HUD */
@@ -184,6 +158,8 @@ private:
 	UPROPERTY(Transient)
 	class UHUDWidget* HUDWidget;
 	//~ End UI
+	
+	float MaxPlayerWalkSpeed = 400.f;
 
 public:
 	
@@ -237,6 +213,28 @@ public:
 	void SetCurrentWeapon(FWeaponData* WeaponData);
 
 	void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
+	
+	//~ Begin state handlers
+	virtual bool CanMove() const override;
+	
+	virtual bool CanJump() const override;
+
+	virtual bool CanDodge() const override;
+	
+	virtual bool CanNormalAttack() const;
+
+	bool CanAutoRun() const;
+	
+	bool IsAutoRunning() const;
+	
+	void UpdateIdleState(float DeltaTime);
+
+	void UpdateMovement(float DeltaTime);
+
+	void UpdateBlockState(float DeltaTime);
+
+	void UpdateAutoRun(float DeltaTime);
+	//~ End state handlers
 
 private:
 
