@@ -6,7 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "BaseStatsComponent.generated.h"
 
-
+/**
+ * An abstract base class that lays out the expected behavior of stats component to manage character stats.
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class EOD_API UBaseStatsComponent : public UActorComponent
 {
@@ -14,10 +16,10 @@ class EOD_API UBaseStatsComponent : public UActorComponent
 
 public:
 
-	// Sets default values for this component's properties
+	/** Sets default values for this component's properties */
 	UBaseStatsComponent(const FObjectInitializer& ObjectInitializer);
 	
-	// Called every frame
+	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
@@ -124,8 +126,6 @@ public:
 
 	virtual float GetMovementSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetMovementSpeedModifier, return 0.f; );
 
-	// virtual float GetAnimationSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetAnimationSpeedModifier, return 0.f; );
-
 	virtual float GetActiveTimeDilation() const PURE_VIRTUAL(UBaseStatsComponent::GetActiveTimeDilation, return 0.f; );
 
 	virtual void ModifyActiveTimeDilation(float Value) PURE_VIRTUAL(UBaseStatsComponent::ModifyActiveTimeDilation, );
@@ -135,6 +135,8 @@ public:
 	virtual int32 GetDarkness() const PURE_VIRTUAL(UBaseStatsComponent::GetDarkness, return 0; );
 
 protected:
+
+	//~ @note following booleans are used to initialize timers for derived stats components
 
 	UPROPERTY(EditDefaultsOnly, Category = Conditionals)
 	uint32 bHasHealthRegenration : 1;

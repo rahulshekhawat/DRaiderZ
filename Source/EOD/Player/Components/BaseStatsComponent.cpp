@@ -6,16 +6,14 @@
 // Sets default values for this component's properties
 UBaseStatsComponent::UBaseStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
-	// Doesn't need to tick at the moment
+	// This compnent doesn't tick
 	PrimaryComponentTick.bCanEverTick = false;
 
 	SetIsReplicated(true);
 }
 
-// Called every frame
 void UBaseStatsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
 }

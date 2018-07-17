@@ -322,13 +322,6 @@ void UPlayerStatsComponent::ModifyActiveTimeDilation(float Value)
 	ActiveTimeDilation += Value;
 }
 
-/*
-float UPlayerStatsComponent::GetAnimationSpeedModifier() const
-{
-	return AnimationSpeedModifier;
-}
-*/
-
 float UPlayerStatsComponent::GetSpellCastingSpeedModifier() const
 {
 	return SpellCastingSpeedModifier;
