@@ -8,6 +8,10 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
+/**
+ * An abstract base class to handle the behavior of in-game characters.
+ * All in-game characters must inherit from this class.
+ */
 UCLASS(Abstract)
 class EOD_API ABaseCharacter : public ACharacter
 {
@@ -15,20 +19,18 @@ class EOD_API ABaseCharacter : public ACharacter
 
 public:
 
-	// Sets default values for this character's properties
+	/** Sets default values for this character's properties */
 	ABaseCharacter(const FObjectInitializer& ObjectInitializer);
 
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
+	/** Called to bind functionality to input */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-	// Property replication
+	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	//~ Begin Character Action State Handlers
-	
+	//~ Begin state handlers
 	virtual bool IsAlive() const;
 
 	virtual bool IsDead() const;
@@ -59,56 +61,78 @@ public:
 
 	virtual bool CanNormalAttack() const;
 	
-	// Playing special idle animations through Random Sequece Player seems like a better idea
-	// virtual bool IsPlayingSpecialIdle() const;
-
-	//~ End Character Action State Handlers
-
-
 	virtual void SetInCombat(bool bValue) { bInCombat = bValue; }
-
-	// virtual void SetCombatState
-	//~ TODO : Combat State: Damaged, running, waiting, engaged with enemy, healing etc.?
-
-	//~ Begin Character Combat Status Functionality
-	virtual bool NeedsHeal() const;
-	//~ End Character Combat Status Functionality
-
-
-	//~ Begin Multiplayer Code
-	void SetCharacterState(ECharacterState NewState);
 	
+	virtual bool NeedsHeal() const;
+	//~ End state handlers
+
+	//~ @todo Combat State: Damaged, running, waiting, engaged in combat with enemy, healing etc.?
+	// @todo improve the status effect visuals system
+
+	/**
+	 * Adds the status effect visuals to this character
+	 * For example, if a character is burning, this function will put the flame (particle effects) on character
+	 * If the character is also a player character, this function will add status effect icon to player's viewport
+	 */
+	UFUNCTION(BlueprintCallable, Category = StatusEffects)
+	virtual void AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
+	
+	/** Removes the status effect visuals from this character */
+	UFUNCTION(BlueprintCallable, Category = StatusEffects)
+	virtual void RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
+
+	/** StatsComp contains and manages the stats info of this character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	class UBaseStatsComponent* StatsComp;
+
+protected:
+
+	/** Called when the game starts or when spawned */
+	virtual void BeginPlay() override;
+	
+public:
+	
+	/** Character state determines the current action character is doing */
 	UPROPERTY(Replicated)
 	ECharacterState CharacterState;
+	
+	/** Determines whether character is currently engaged in combat or not */
+	UPROPERTY(Transient)
+	bool bInCombat;
 
+	void SetCharacterState(ECharacterState NewState);
+	
+	void SetWalkSpeed(float WalkSpeed);
+	
+	void SetCharacterRotation(FRotator NewRotation);
+	
+	void SetUseControllerRotationYaw(bool bNewBool);
+	
+	void SetNextMontageSection(FName CurrentSection, FName NextSection);
+	
+	UFUNCTION(BlueprintCallable, Category = Animations)
+	void PlayAnimationMontage(class UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+
+private:
+	
+	//~ Begin Multiplayer Code
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterState(ECharacterState NewState);
-
-	void SetWalkSpeed(float WalkSpeed);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetWalkSpeed(float WalkSpeed);
 
-	void SetCharacterRotation(FRotator NewRotation);
-
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterRotation(FRotator NewRotation);
-
-	void SetUseControllerRotationYaw(bool bNewBool);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetUseControllerRotationYaw(bool bNewBool);
-
-	void SetNextMontageSection(FName CurrentSection, FName NextSection);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetNextMontageSection(FName CurrentSection, FName NextSection);
 	
 	UFUNCTION(NetMultiCast, Reliable)
 	void Multicast_SetNextMontageSection(FName CurrentSection, FName NextSection);
-
-	UFUNCTION(BlueprintCallable, Category = Animations)
-	void PlayAnimationMontage(class UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_PlayAnimationMontage(class UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
@@ -116,30 +140,5 @@ public:
 	UFUNCTION(NetMultiCast, Reliable)
 	void MultiCast_PlayAnimationMontage(class UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 	//~ End Multiplayer Code
-
-	// @todo improve the status effect visuals system
-	/**
-	 * Call this to add status effect visuals on character (e.g. burning particle effect)
-	 * This function will be used to add the status effect icon in player UI as well.
-	*/	
-	UFUNCTION(BlueprintCallable, Category = StatusEffects)
-	virtual void AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
-	
-	UFUNCTION(BlueprintCallable, Category = StatusEffects)
-	virtual void RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
-	class UBaseStatsComponent* StatsComp;
-
-protected:
-
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
-	/** Determines whether character is currently engaged in combat or not. Not in combat by default. */
-	// UPROPERTY(replicated)
-	bool bInCombat = false;	
-
-
 
 };

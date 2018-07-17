@@ -10,10 +10,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
-// Sets default values
 ABaseCharacter::ABaseCharacter(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Initialize Stats Component
@@ -21,17 +19,14 @@ ABaseCharacter::ABaseCharacter(const FObjectInitializer& ObjectInitializer): Sup
 	
 	// Initialize variables
 	CharacterState = ECharacterState::IdleWalkRun;
-
 }
 
-// Called every frame
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-// Called to bind functionality to input
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -198,18 +193,6 @@ bool ABaseCharacter::Server_SetWalkSpeed_Validate(float WalkSpeed)
 	return true;
 }
 
-/*
-void ABaseCharacter::PlayAnimationMontage(UAnimMontage * MontageToPlay)
-{
-	if (GetMesh()->GetAnimInstance())
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
-	}
-
-	Server_PlayAnimationMontage(MontageToPlay);
-}
-*/
-
 void ABaseCharacter::Multicast_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection)
 {
 	FString Message = FString("Multi cast called");
@@ -242,26 +225,6 @@ bool ABaseCharacter::Server_PlayAnimationMontage_Validate(UAnimMontage * Montage
 {
 	return true;
 }
-
-/*
-void ABaseCharacter::Server_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay)
-{
-	MultiCast_PlayAnimationMontage(MontageToPlay);
-}
-
-bool ABaseCharacter::Server_PlayAnimationMontage_Validate(UAnimMontage * MontageToPlay)
-{
-	return true;
-}
-
-void ABaseCharacter::MultiCast_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay)
-{
-	if (GetMesh()->GetAnimInstance())
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
-	}
-}
-*/
 
 void ABaseCharacter::MultiCast_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
@@ -314,7 +277,6 @@ void ABaseCharacter::RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInf
 	// @todo definition
 }
 
-// Called when the game starts or when spawned
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
