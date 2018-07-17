@@ -7,7 +7,7 @@
 #include "AIStatsComponent.generated.h"
 
 /**
- * 
+ * AIStatsComponent is used to manage stats of an AI controlled character
  */
 UCLASS()
 class EOD_API UAIStatsComponent : public UBaseStatsComponent
@@ -18,7 +18,7 @@ public:
 
 	UAIStatsComponent(const FObjectInitializer& ObjectInitializer);
 	
-	// Property replication
+	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	virtual int32 GetBaseHealth() const override;
@@ -47,22 +47,29 @@ public:
 
 	virtual void ModifyCurrentMana(int32 Value) override;
 	
+	/** Returns 0 always */
 	virtual int32 GetBaseStamina() const override;
-
+	
+	/** Returns 0 always */
 	virtual int32 GetMaxStamina() const override;
-
+	
+	/** Returns 0 always */
 	virtual int32 GetCurrentStamina() const override;
 	
+	/** Override for PURE_VIRTUAL function in BaseStatsComponent. Does nothing */
 	virtual void ModifyBaseStamina(int32 Value) override;
-
+	
+	/** Override for PURE_VIRTUAL function in BaseStatsComponent. Does nothing */
 	virtual void ModifyMaxStamina(int32 Value) override;
-
+	
+	/** Override for PURE_VIRTUAL function in BaseStatsComponent. Does nothing */
 	virtual void ModifyCurrentStamina(int32 Value) override;
 
 	virtual int32 GetHealthRegenRate() const override;
 
 	virtual int32 GetManaRegenRate() const override;
 
+	/** Returns 0 always */
 	virtual int32 GetStaminaRegenRate() const override;
 
 	virtual int32 GetPhysicalAttack() const override;
@@ -122,8 +129,6 @@ public:
 	virtual float GetStaminaConsumptionModifer() const override;
 
 	virtual float GetMovementSpeedModifier() const override;
-
-	// virtual float GetAnimationSpeedModifier() const override;
 	
 	virtual float GetActiveTimeDilation() const override;
 
@@ -134,18 +139,16 @@ public:
 	virtual int32 GetDarkness() const override;
 
 private:
-
-	// @note All changes to variables similar to MaxHealth, CurrentHealth, etc. will occur ONLY on server and will automatically get replicated. No RPC needed.
 	
+	//~ @note All changes to variables similar to MaxHealth, CurrentHealth, etc. will occur ONLY on server and will automatically get replicated. No RPC needed.
+	//~ @note Mana might be used to restrict AIs from spamming powerful spells/AOEs
+	//~ @note AI characters do not have stamina
+	
+	//~ @todo Client RPCs to replicate the changes in BaseHealth, BaseMana, and BaseStamina to owning character
+
 	/** Current character level */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 Level;
-
-	/**
-	 * @note
-	 * Mana might be used to limit some AI characters like spell casters and healers
-	 * Stamina might not be a stat needed by AI. Probably remove it
-	*/
 
 	/** Maximum health of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
@@ -171,25 +174,8 @@ private:
 	UPROPERTY(Replicated)
 	int32 CurrentMana;
 	
-	/** Maximum stamina of character without any status effects */
-	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
-	// int32 BaseStamina;
-
-	/** Current maximum stamina of character - with or without any status effects */
-	// UPROPERTY(Replicated)
-	// int32 MaxStamina;
-
-	/** Current stamina of character */
-	// UPROPERTY(Replicated)
-	// int32 CurrentStamina;
-	
-	/**
-	 * @note
-	 * Assuming the regeneration rates for AI wouldn't change,
-	 * they do not need to replicated.
-	 * If they do change, server should handle any changes in their
-	 * health, mana and stamina
-	*/
+	//~ @note Assuming the regeneration rates for AI wouldn't change, they do not need to be replicated
+	//~ If they do change, however, server should handle any changes in character health and mana
 
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
 	int32 HealthRegenRate;
@@ -197,15 +183,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
 	int32 ManaRegenRate;
 	
-	//~ No stamina -> no stamina regen rate
-	// UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
-	// int32 StaminaRegenRate;
-
-	/**
-	 * @note
-	 * since server will handle the entire damage logic for AIs,
-	 * it might not be necessary to replicated any of the damge stats
-	*/
+	//~ @note Since server will handle all calculations for damage, combat stats are not needed to be replicated to client
 
 	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats)
 	int32 PhysicalAttack;
@@ -282,15 +260,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float DropRateModifier;
 	
-	UPROPERTY(EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
-	float StaminaConsumptionModifier;
-	
+	//~ @note MovementSpeedModifier, AnimationSpeedModifier, and SpellCastingSpeedModifier will be replicated to all clients
+
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float MovementSpeedModifier;
 	
-	// UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
-	// float AnimationSpeedModifier;
-
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float ActiveTimeDilation;
 	

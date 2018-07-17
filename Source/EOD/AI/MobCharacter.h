@@ -7,7 +7,7 @@
 #include "MobCharacter.generated.h"
 
 /**
- * 
+ * Base class for in-game AI controlled mob character
  */
 UCLASS()
 class EOD_API AMobCharacter : public ABaseCharacter
@@ -19,7 +19,8 @@ public:
 	AMobCharacter(const FObjectInitializer& ObjectInitializer);
 	
 protected:
-	// Called when the game starts or when spawned
+
+	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
 public:

@@ -16,46 +16,9 @@ void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(UAIStatsComponent, CurrentHealth);
 	DOREPLIFETIME(UAIStatsComponent, MaxMana);
 	DOREPLIFETIME(UAIStatsComponent, CurrentMana);
-	// DOREPLIFETIME(UAIStatsComponent, MaxStamina);
-	// DOREPLIFETIME(UAIStatsComponent, CurrentStamina);
-	DOREPLIFETIME(UAIStatsComponent, HealthRegenRate);
-	DOREPLIFETIME(UAIStatsComponent, ManaRegenRate);
-	// DOREPLIFETIME(UAIStatsComponent, StaminaRegenRate);
-
-	/*
-	DOREPLIFETIME(UAIStatsComponent, PhysicalAttack);
-	DOREPLIFETIME(UAIStatsComponent, MagickAttack);
-	DOREPLIFETIME(UAIStatsComponent, PhysicalResistance);
-	DOREPLIFETIME(UAIStatsComponent, MagickResistance);
-	DOREPLIFETIME(UAIStatsComponent, PhysicalCritRate);
-	DOREPLIFETIME(UAIStatsComponent, MagickCritRate);
-	DOREPLIFETIME(UAIStatsComponent, PhysicalCritBonus);
-	DOREPLIFETIME(UAIStatsComponent, MagickCritBonus);
-
-	DOREPLIFETIME(UAIStatsComponent, ElementalFireDamage);
-	DOREPLIFETIME(UAIStatsComponent, ElementalIceDamage);
-	DOREPLIFETIME(UAIStatsComponent, ElementalPoisonDamage);
-	DOREPLIFETIME(UAIStatsComponent, ElementalLightningDamage);
-	DOREPLIFETIME(UAIStatsComponent, ElementalHolyDamage);
-	DOREPLIFETIME(UAIStatsComponent, ElementalDarkDamage);
-	DOREPLIFETIME(UAIStatsComponent, ElementalFireResistance);
-	DOREPLIFETIME(UAIStatsComponent, ElementalIceResistance);
-	DOREPLIFETIME(UAIStatsComponent, ElementalPoisonResistance);
-	DOREPLIFETIME(UAIStatsComponent, ElementalLightningResistance);
-	DOREPLIFETIME(UAIStatsComponent, ElementalHolyResistance);
-	DOREPLIFETIME(UAIStatsComponent, ElementalDarkResistance);
-	
-	DOREPLIFETIME(UAIStatsComponent, BleedResistance);
-	DOREPLIFETIME(UAIStatsComponent, CrowdControlResistance);
-
-	DOREPLIFETIME(UAIStatsComponent, CooldownModifier);
-	DOREPLIFETIME(UAIStatsComponent, ExpModifier);
-	DOREPLIFETIME(UAIStatsComponent, DropRateModifier);
-	DOREPLIFETIME(UAIStatsComponent, StaminaConsumptionModifier);
-	*/
 
 	DOREPLIFETIME(UAIStatsComponent, MovementSpeedModifier);
-	// DOREPLIFETIME(UAIStatsComponent, AnimationSpeedModifier);
+	DOREPLIFETIME(UAIStatsComponent, ActiveTimeDilation);
 	DOREPLIFETIME(UAIStatsComponent, SpellCastingSpeedModifier);
 	
 	DOREPLIFETIME(UAIStatsComponent, Darkness);
@@ -129,35 +92,35 @@ void UAIStatsComponent::ModifyCurrentMana(int32 Value)
 
 int32 UAIStatsComponent::GetBaseStamina() const
 {
+	// AI stats component does not implement BaseStamina
 	return 0;
-	// return BaseStamina;
 }
 
 int32 UAIStatsComponent::GetMaxStamina() const
 {
+	// AI stats component does not implement MaxStamina
 	return 0;
-	// return MaxStamina;
 }
 
 int32 UAIStatsComponent::GetCurrentStamina() const
 {
+	// AI stats component does not implement CurrentStamina
 	return 0;
-	// return CurrentStamina;
 }
 
 void UAIStatsComponent::ModifyBaseStamina(int32 Value)
 {
-	// BaseStamina += Value;
+	// empty definition
 }
 
 void UAIStatsComponent::ModifyMaxStamina(int32 Value)
 {
-	// MaxStamina += Value;
+	// empty definition
 }
 
 void UAIStatsComponent::ModifyCurrentStamina(int32 Value)
 {
-	// CurrentStamina += Value;
+	// empty definition
 }
 
 int32 UAIStatsComponent::GetHealthRegenRate() const
@@ -172,8 +135,8 @@ int32 UAIStatsComponent::GetManaRegenRate() const
 
 int32 UAIStatsComponent::GetStaminaRegenRate() const
 {
+	// AI stats component does not implement StaminaRegenRate
 	return 0;
-	// return StaminaRegenRate;
 }
 
 int32 UAIStatsComponent::GetPhysicalAttack() const
@@ -325,13 +288,6 @@ void UAIStatsComponent::ModifyActiveTimeDilation(float Value)
 {
 	ActiveTimeDilation += Value;
 }
-
-/*
-float UAIStatsComponent::GetAnimationSpeedModifier() const
-{
-	return AnimationSpeedModifier;
-}
-*/
 
 float UAIStatsComponent::GetSpellCastingSpeedModifier() const
 {
