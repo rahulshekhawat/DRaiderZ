@@ -161,8 +161,6 @@ private:
 	/** Creates new armor component. Helper function for constructor */
 	USkeletalMeshComponent* CreateNewArmorComponent(FName Name, const FObjectInitializer& ObjectInitializer);
 
-	/** Creates new armor component. Helper function for constructor */
-	UStaticMeshComponent* CreateNewWeaponComponent(FName Name, const FObjectInitializer& ObjectInitializer);
 
 
 	//~ Begin Input Handling Variables

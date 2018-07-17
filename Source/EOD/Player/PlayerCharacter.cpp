@@ -252,13 +252,6 @@ USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(FName Name, c
 	return Sk;
 }
 
-UStaticMeshComponent * APlayerCharacter::CreateNewWeaponComponent(FName Name, const FObjectInitializer & ObjectInitializer)
-{
-	UStaticMeshComponent* Wep = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, Name);
-	Wep->SetupAttachment(GetMesh());
-	return Wep;
-}
-
 bool APlayerCharacter::CanMove() const
 {
 	return CharacterState == ECharacterState::IdleWalkRun || IsBlocking();
