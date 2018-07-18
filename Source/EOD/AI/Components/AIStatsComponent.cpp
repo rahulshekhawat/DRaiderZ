@@ -271,7 +271,7 @@ float UAIStatsComponent::GetDropRateModifier() const
 
 float UAIStatsComponent::GetStaminaConsumptionModifer() const
 {
-	return StaminaConsumptionModifier;
+	return 1;
 }
 
 float UAIStatsComponent::GetMovementSpeedModifier() const
