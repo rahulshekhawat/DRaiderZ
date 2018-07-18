@@ -85,6 +85,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	class UBaseStatsComponent* StatsComp;
 
+	//~ Begin combat events
+	FCombatEvent OnReceivingHit;
+	FCombatEvent OnSuccessfulHit;
+	FCombatEvent OnUnsuccessfulHit;
+	FCombatEvent OnCriticalHit;
+	FCombatEvent OnSuccessfulDodge;
+	FCombatEvent OnSuccessfulBlock;
+	FCombatEvent OnFullHealth;
+	FCombatEvent OnDamageAtFullHealth;
+	FCombatEvent OnLowHealth;
+	FCombatEvent OnEnteringCombat;
+	FCombatEvent OnLeavingCombat;
+	//~ End combat events
+
 protected:
 
 	/** Called when the game starts or when spawned */

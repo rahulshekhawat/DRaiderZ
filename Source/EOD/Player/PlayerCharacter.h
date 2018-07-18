@@ -11,6 +11,8 @@ class UAnimMontage;
 class USkeletalMeshComponent;
 class UStaticMeshComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TArray<TWeakObjectPtr<ABaseCharacter>>, RecipientCharacters);
+
 /**
  * PlayerCharacter is the base class for playable characters
  */
@@ -236,6 +238,19 @@ public:
 	void UpdateAutoRun(float DeltaTime);
 	//~ End state handlers
 
+	//~ Begin combat events	
+	FCombatEvent OnUsingSkill_0;
+	FCombatEvent OnUsingSkill_1;
+	FCombatEvent OnUsingSkill_2;
+	FCombatEvent OnUsingSkill_3;
+	FCombatEvent OnUsingSkill_4;
+	FCombatEvent OnUsingSkill_5;
+	FCombatEvent OnUsingSkill_6;
+	FCombatEvent OnUsingSkill_7;
+	FCombatEvent OnUsingSkill_8;
+	FCombatEvent OnUsingSkill_9;
+	//~ End combat events
+
 private:
 
 	//~ Template functions
@@ -280,7 +295,6 @@ private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
 	//~ End multiplayer code
-
 
 };
 

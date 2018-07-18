@@ -394,6 +394,7 @@ void APlayerCharacter::StartNormalAttack()
 		DummyLocLastFrame = FVector(0.f, 0.f, 0.f);
 	}
 	*/
+
 }
 
 void APlayerCharacter::StopNormalAttack()
