@@ -15,7 +15,7 @@ UIceElemental::UIceElemental()
 	SlowDownDuration = 2.f;
 }
 
-void UIceElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Initiator)
+void UIceElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Instigator)
 {
 	// Owner is needed to activate buffs on self or allies
 	SetOwningCharacter(Owner);

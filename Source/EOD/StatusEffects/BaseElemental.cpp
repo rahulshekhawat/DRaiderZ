@@ -2,7 +2,7 @@
 
 #include "BaseElemental.h"
 
-void UBaseElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Initiator)
+void UBaseElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Instigator)
 {
 }
 

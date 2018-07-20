@@ -20,8 +20,12 @@ public:
 
 	UIceElemental();
 
-	/** Called to initiate this status effect on a character */
-	virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Initiator) override;
+	/**
+	 * Called to initialize a status effect on a character.
+	 * @param Owner The character that owns the status effect
+	 * @param Instigator The actor that initiated the status effect. Can be nullptr. For elemental effects this would be a weapon.
+	 */
+	virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Instigator) override;
 
 	/** Called to de-initiate this status effect on a character */
 	virtual void OnDeinitialize() override;

@@ -8,7 +8,7 @@ UFireElemental::UFireElemental()
 	bTriggersOnCriticalHit = true;
 }
 
-void UFireElemental::OnInitialize(ABaseCharacter * Owner, AActor * Initiator)
+void UFireElemental::OnInitialize(ABaseCharacter* Owner, AActor* Instigator)
 {
 }
 

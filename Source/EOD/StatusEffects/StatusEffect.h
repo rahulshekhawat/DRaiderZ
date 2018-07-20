@@ -97,9 +97,9 @@ public:
 	/**
 	 * Called to initialize a status effect on a character.
 	 * @param Owner The character that owns the status effect
-	 * @param Initiator The actor that initiated the status effect. Can be nullptr. For a weapon with elemental enchant, the Initiator would be the weapon.
+	 * @param Instigator The actor that initiated the status effect. Can be nullptr. For a weapon with elemental enchant, the Instigator would be the weapon.
 	 */
-	virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Initiator) PURE_VIRTUAL(UStatusEffect::OnInitialize, );
+	virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Instigator) PURE_VIRTUAL(UStatusEffect::OnInitialize, );
 
 	/** Called to deinitialize this status effect on a character */
 	virtual void OnDeinitialize() PURE_VIRTUAL(UStatusEffect::OnDeinitialize, );
