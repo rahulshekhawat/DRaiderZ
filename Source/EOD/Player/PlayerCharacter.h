@@ -11,8 +11,6 @@ class UAnimMontage;
 class USkeletalMeshComponent;
 class UStaticMeshComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TArray<TWeakObjectPtr<ABaseCharacter>>, RecipientCharacters);
-
 /**
  * PlayerCharacter is the base class for playable characters
  */

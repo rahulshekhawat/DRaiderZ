@@ -8,6 +8,8 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TArray<TWeakObjectPtr<ABaseCharacter>>, RecipientCharacters);
+
 /**
  * An abstract base class to handle the behavior of in-game characters.
  * All in-game characters must inherit from this class.
