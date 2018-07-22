@@ -3,10 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TimerManager.h"
 #include "UObject/NoExportTypes.h"
 #include "StatusEffect.generated.h"
 
 class ABaseCharacter;
+
+USTRUCT()
+struct EOD_API FStatusTickInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	int CurrentStackLevel;
+
+	FTimerHandle* TimerHandle;
+
+	TWeakObjectPtr<ABaseCharacter> RecipientCharacter;
+
+};
 
 /**
  * This struct contains some basic information related to a status effect which
@@ -20,7 +36,6 @@ struct EOD_API FStatusEffectInfo
 	GENERATED_USTRUCT_BODY()
 
 public:
-
 
 	/** The current stack level of this status effect */
 	int NewStackValue;
@@ -55,6 +70,20 @@ public:
 	/** Initializes booleans for status effects */
 	UStatusEffect();
 	
+	virtual void Initialize(class ABaseCharacter* Owner, class AActor* Instigator);
+
+	virtual void Deinitialize();
+
+	virtual void OnTrigger(TArray<TWeakObjectPtr<ABaseCharacter>>& RecipientCharacters);
+
+	virtual void ActivateStatusEffect(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter);
+
+	virtual void DeactivateStatusEffect();
+
+	UFUNCTION()
+	virtual void OnStatusEffectTick(FStatusTickInfo& StatusTickInfo);
+	// virtual void OnStatusEffectTick(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter, FStatusTickInfo& StatusTickInfo) PURE_VIRTUAL(UStatusEffect::OnStatusEffectTick, );
+
 	/**
 	 * Called to initialize a status effect on a character.
 	 * @param Owner The character that owns the status effect
@@ -72,40 +101,53 @@ public:
 	// virtual void OnDeactivation() PURE_VIRTUAL(UStatusEffect::OnDeactivation, );
 	
 	/** Status effect name that will be visible to player inside game */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	FString InGameName;
 	
 	/** The status effect description that will be displayed to player on hovering over the status effect icon */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	FString TooltipDescription;
 
 	/**
 	 * The detailed in-game description of this status effect which may or may not be made available for player
 	 * This can be null, in which case TooltipDescription will be used wherever needed.
 	 */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	FString DetailedDescription;
 
 	/** Icon associated with this status effect */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	class UTexture* Icon;
 	
 	/** Particle system associated with this status effect */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	class UParticleSystem* ParticleSystem;
 
 	/** Character bone that the particle effect should attach to */	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	FName ParticleEffectAttachBone;
+	
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	float ActivationChance;
+	
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	float TickInterval;
 	
 	// @todo Add a boolean to follow particle effect attach bone if needed
 	
 	ABaseCharacter* GetOwningCharacter() const;
 
+	AActor* GetInstigator() const;
+
 	void SetOwningCharacter(ABaseCharacter* NewCharacter);
 
+	void SetInstigator(AActor* NewInstigator);
+
 protected:
-	
+
+	/** Map of characters affected by this status effect */
+	static TMap<TWeakObjectPtr<ABaseCharacter>, FStatusTickInfo> CharacterToStatusTickInfoMap;
+
 	/** Determines if this status effect should reset on reactivation */
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	uint32 bResetsOnReactivation : 1;
@@ -168,6 +210,9 @@ private:
 
 	UPROPERTY(Transient)
 	ABaseCharacter* OwningCharacter;
+
+	UPROPERTY(Transient)
+	AActor* Instigator;
 	
 	// @todo Add flags to determine allies and enemies (for buff and debuff effects)
 	// @note better to handle allies from ABaseCharacter class and add/use a function like TArray<ABaseCharacter*> GetAllies();
