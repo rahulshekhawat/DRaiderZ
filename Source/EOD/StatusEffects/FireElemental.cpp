@@ -3,6 +3,7 @@
 #include "FireElemental.h"
 #include "Player/BaseCharacter.h"
 
+/*
 UFireElemental::UFireElemental()
 {
 	bTriggersOnCriticalHit = true;
@@ -18,7 +19,6 @@ void UFireElemental::OnDeinitialize()
 
 void UFireElemental::OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters)
 {
-	/*
 	if (ReactivationCondition == EStatusEffectReactivationCondition::None)
 	{
 	}
@@ -34,15 +34,14 @@ void UFireElemental::OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> Recipie
 	{
 
 	}
-	*/
-	/*
+
 	for (ABaseCharacter* RecipientCharacter : RecipientCharacters)
 	{
 		RecipientCharacter->AddStatusEffectVisuals(Icon, ParticleSystem);
 	}
-	*/
 }
 
 void UFireElemental::OnDeactivation()
 {
 }
+*/

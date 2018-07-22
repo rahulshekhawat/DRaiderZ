@@ -87,16 +87,16 @@ public:
 	 * @param Owner The character that owns the status effect
 	 * @param Instigator The actor that initiated the status effect. Can be nullptr. For a weapon with elemental enchant, the Instigator would be the weapon.
 	 */
-	virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Instigator) PURE_VIRTUAL(UStatusEffect::OnInitialize, );
+	// virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Instigator) PURE_VIRTUAL(UStatusEffect::OnInitialize, );
 
 	/** Called to deinitialize this status effect on a character */
-	virtual void OnDeinitialize() PURE_VIRTUAL(UStatusEffect::OnDeinitialize, );
+	// virtual void OnDeinitialize() PURE_VIRTUAL(UStatusEffect::OnDeinitialize, );
 
 	/** Called when the status effect is activated */
-	virtual void OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters) PURE_VIRTUAL(UStatusEffect::OnActivation, );
+	// virtual void OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters) PURE_VIRTUAL(UStatusEffect::OnActivation, );
 
 	/** Called when the status effect is deactivated */
-	virtual void OnDeactivation() PURE_VIRTUAL(UStatusEffect::OnDeactivation, );
+	// virtual void OnDeactivation() PURE_VIRTUAL(UStatusEffect::OnDeactivation, );
 
 	ABaseCharacter* GetOwningCharacter() const;
 

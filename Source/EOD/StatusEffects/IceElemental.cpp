@@ -9,6 +9,7 @@
 
 TArray<ABaseCharacter*> UIceElemental::SlowedDownCharacters = TArray<ABaseCharacter*>();
 
+/*
 UIceElemental::UIceElemental()
 {
 	bTriggersOnSuccessfulHit = true;
@@ -85,7 +86,6 @@ void UIceElemental::RemoveSlowDown(ABaseCharacter * TargetCharacter)
 	SlowedDownCharacters.Remove(TargetCharacter);
 }
 
-/*
 void UIceElemental::ApplySlowDown(TWeakObjectPtr<ABaseCharacter> TargetCharacter)
 {
 	FTimerHandle TimerHandle;
