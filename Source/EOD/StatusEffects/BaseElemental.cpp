@@ -2,6 +2,7 @@
 
 #include "BaseElemental.h"
 
+/*
 void UBaseElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Instigator)
 {
 }
@@ -17,3 +18,4 @@ void UBaseElemental::OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> Recipie
 void UBaseElemental::OnDeactivation()
 {
 }
+*/
