@@ -18,6 +18,7 @@ void UFireElemental::OnDeinitialize()
 
 void UFireElemental::OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters)
 {
+	/*
 	if (ReactivationCondition == EStatusEffectReactivationCondition::None)
 	{
 	}
@@ -33,7 +34,7 @@ void UFireElemental::OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> Recipie
 	{
 
 	}
-
+	*/
 	/*
 	for (ABaseCharacter* RecipientCharacter : RecipientCharacters)
 	{

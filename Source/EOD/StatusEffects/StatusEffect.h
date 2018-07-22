@@ -9,18 +9,6 @@
 class ABaseCharacter;
 
 /**
- * StatusEffectReactivationCondition is used to determine how status effect
- * should reactivate when it is already activated on a character.
- */
-UENUM(BlueprintType)
-enum class EStatusEffectReactivationCondition :uint8
-{
-	None,
-	Reset,
-	Stack
-};
-
-/**
  * This struct contains some basic information related to a status effect which
  * can be passed onto the activated character for further processing.
  * For example, player character may require status effect Icon so it can be 
@@ -118,6 +106,10 @@ public:
 	FStatusEffectInfo StatusEffectInfo;
 
 protected:
+	
+	/** Determines if this status effect should reset on reactivation */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	uint32 bResetsOnReactivation : 1;
 
 	/** True if the status effect triggers on Owner receiving damage */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
@@ -166,9 +158,6 @@ protected:
 	//~ @note Redundant property but it could be useful in certain situations
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnInitialization : 1;
-	
-	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
-	EStatusEffectReactivationCondition ReactivationCondition;
 	
 	/** Number of times this status effect can stack. Only applicable if ReactivationCondition is set to EStatusEffectReactivationCondition::Stack */
 	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
