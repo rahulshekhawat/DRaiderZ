@@ -10,6 +10,17 @@
 class ABaseCharacter;
 
 USTRUCT()
+struct EOD_API FBaseCharacter_WeakObjPtrWrapper
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	TWeakObjectPtr<ABaseCharacter> RecipientCharacter;
+
+};
+
+USTRUCT()
 struct EOD_API FStatusTickInfo
 {
 	GENERATED_USTRUCT_BODY()
@@ -18,7 +29,11 @@ public:
 
 	int CurrentStackLevel;
 
+	float TotalElapsedTime;
+
 	FTimerHandle* TimerHandle;
+
+	FTimerDelegate TimerDelegate;
 
 	TWeakObjectPtr<ABaseCharacter> RecipientCharacter;
 
@@ -56,15 +71,9 @@ public:
 
 	virtual void Deinitialize();
 
-	virtual void OnTrigger(TArray<TWeakObjectPtr<ABaseCharacter>>& RecipientCharacters);
+	virtual void OnTriggerEvent(TArray<TWeakObjectPtr<ABaseCharacter>>& RecipientCharacters);
 
-	virtual void ActivateStatusEffect(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter);
-
-	virtual void DeactivateStatusEffect();
-
-	UFUNCTION()
-	virtual void OnStatusEffectTick(FStatusTickInfo& StatusTickInfo);
-	// virtual void OnStatusEffectTick(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter, FStatusTickInfo& StatusTickInfo) PURE_VIRTUAL(UStatusEffect::OnStatusEffectTick, );
+	virtual void RequestDeactivation(ABaseCharacter* Character);
 
 	/**
 	 * Called to initialize a status effect on a character.
@@ -130,7 +139,10 @@ protected:
 	/** Map of characters affected by this status effect */
 	static TMap<TWeakObjectPtr<ABaseCharacter>, FStatusTickInfo> CharacterToStatusTickInfoMap;
 
-	/** Determines if this status effect should reset on reactivation */
+	/**
+	 * Determines if this status effect should reset on reactivation.
+	 * If this is set to false, stacking will be disabled by default and StackLimit will be ignored
+	 */
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	uint32 bResetsOnReactivation : 1;
 
@@ -188,6 +200,16 @@ protected:
 
 	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc.
 	
+	virtual void ActivateStatusEffect(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter);
+
+	virtual void DeactivateStatusEffect(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter);
+
+	UFUNCTION()
+	virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& StatusTickInfo) PURE_VIRTUAL(UStatusEffect::OnStatusEffectTick, );
+	// virtual void OnStatusEffectTick(FStatusTickInfo& StatusTickInfo);
+	// virtual void OnStatusEffectTick(FStatusTickInfo& StatusTickInfo) PURE_VIRTUAL(UStatusEffect::OnStatusEffectTick, );
+
+
 private:
 
 	UPROPERTY(Transient)

@@ -22,6 +22,8 @@ UStatusEffect::UStatusEffect()
 
 	// Default stack limit is 1
 	StackLimit = 1;
+	// Default activation chance is also 1
+	ActivationChance = 1.f;
 }
 
 void UStatusEffect::Initialize(ABaseCharacter* Owner, AActor* Instigator)
@@ -32,10 +34,16 @@ void UStatusEffect::Initialize(ABaseCharacter* Owner, AActor* Instigator)
 
 void UStatusEffect::Deinitialize()
 {
-	// clean up all references
+	for (TPair<TWeakObjectPtr<ABaseCharacter>, FStatusTickInfo> CharacterToStatusTickInfoPair : CharacterToStatusTickInfoMap)
+	{
+		FStatusTickInfo& StatusTickInfo = CharacterToStatusTickInfoPair.Value;
+		GetWorld()->GetTimerManager().ClearTimer(*StatusTickInfo.TimerHandle);
+		delete StatusTickInfo.TimerHandle;
+	}
+	CharacterToStatusTickInfoMap.Empty();
 }
 
-void UStatusEffect::OnTrigger(TArray<TWeakObjectPtr<ABaseCharacter>>& RecipientCharacters)
+void UStatusEffect::OnTriggerEvent(TArray<TWeakObjectPtr<ABaseCharacter>>& RecipientCharacters)
 {
 	bool bShouldActivate = ActivationChance >= FMath::RandRange(0.f, 1.f) ? true : false;
 
@@ -50,34 +58,39 @@ void UStatusEffect::OnTrigger(TArray<TWeakObjectPtr<ABaseCharacter>>& RecipientC
 	}
 }
 
+void UStatusEffect::RequestDeactivation(ABaseCharacter * Character)
+{
+}
+
 void UStatusEffect::ActivateStatusEffect(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter)
 {
 	if (CharacterToStatusTickInfoMap.Contains(RecipientCharacter))
 	{
+		if (!bResetsOnReactivation)
+		{
+			return;
+		}
 
+		FStatusTickInfo& StatusTickInfo = CharacterToStatusTickInfoMap[RecipientCharacter];
+		StatusTickInfo.CurrentStackLevel += 1;
+
+		GetWorld()->GetTimerManager().SetTimer(*StatusTickInfo.TimerHandle, StatusTickInfo.TimerDelegate, TickInterval, true, 0);
 	}
 	else
 	{
-		FTimerHandle* TimerHandle = new FTimerHandle;
-		FTimerDelegate TimerDelegate;
-		
 		FStatusTickInfo StatusTickInfo;
 		StatusTickInfo.CurrentStackLevel = 1;
-		StatusTickInfo.TimerHandle = TimerHandle;
+		StatusTickInfo.TimerHandle = new FTimerHandle;
+		StatusTickInfo.TimerDelegate.BindUFunction(this, FName("OnStatusEffectTick"), StatusTickInfo);
 		StatusTickInfo.RecipientCharacter = RecipientCharacter;
 
-		TimerDelegate.BindUFunction(this, FName("OnStatusEffectTick"), StatusTickInfo);
-		GetWorld()->GetTimerManager().SetTimer(*TimerHandle, TimerDelegate, TickInterval, true, 0);
+		GetWorld()->GetTimerManager().SetTimer(*StatusTickInfo.TimerHandle, StatusTickInfo.TimerDelegate, TickInterval, true, 0);
 
 		CharacterToStatusTickInfoMap.Add(RecipientCharacter, StatusTickInfo);
 	}
 }
 
-void UStatusEffect::DeactivateStatusEffect()
-{
-}
-
-void UStatusEffect::OnStatusEffectTick(FStatusTickInfo & StatusTickInfo)
+void UStatusEffect::DeactivateStatusEffect(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter)
 {
 }
 
