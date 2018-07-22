@@ -4,7 +4,7 @@
 
 #include "Engine/World.h"
 
-TMap<TWeakObjectPtr<ABaseCharacter>, FStatusTickInfo> UStatusEffect::CharacterToStatusTickInfoMap = TMap<TWeakObjectPtr<ABaseCharacter>, FStatusTickInfo>();
+TMap<TWeakObjectPtr<ABaseCharacter>, FStatusInfo> UStatusEffect::CharacterToStatusInfoMap = TMap<TWeakObjectPtr<ABaseCharacter>, FStatusInfo>();
 
 UStatusEffect::UStatusEffect()
 {
@@ -34,13 +34,13 @@ void UStatusEffect::Initialize(ABaseCharacter* Owner, AActor* Instigator)
 
 void UStatusEffect::Deinitialize()
 {
-	for (TPair<TWeakObjectPtr<ABaseCharacter>, FStatusTickInfo> CharacterToStatusTickInfoPair : CharacterToStatusTickInfoMap)
+	for (TPair<TWeakObjectPtr<ABaseCharacter>, FStatusInfo> CharacterToStatusInfoPair : CharacterToStatusInfoMap)
 	{
-		FStatusTickInfo& StatusTickInfo = CharacterToStatusTickInfoPair.Value;
-		GetWorld()->GetTimerManager().ClearTimer(*StatusTickInfo.TimerHandle);
-		delete StatusTickInfo.TimerHandle;
+		FStatusInfo& StatusInfo = CharacterToStatusInfoPair.Value;
+		GetWorld()->GetTimerManager().ClearTimer(*StatusInfo.TimerHandle);
+		delete StatusInfo.TimerHandle;
 	}
-	CharacterToStatusTickInfoMap.Empty();
+	CharacterToStatusInfoMap.Empty();
 }
 
 void UStatusEffect::OnTriggerEvent(TArray<TWeakObjectPtr<ABaseCharacter>>& RecipientCharacters)
@@ -64,29 +64,29 @@ void UStatusEffect::RequestDeactivation(ABaseCharacter * Character)
 
 void UStatusEffect::ActivateStatusEffect(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter)
 {
-	if (CharacterToStatusTickInfoMap.Contains(RecipientCharacter))
+	if (CharacterToStatusInfoMap.Contains(RecipientCharacter))
 	{
 		if (!bResetsOnReactivation)
 		{
 			return;
 		}
 
-		FStatusTickInfo& StatusTickInfo = CharacterToStatusTickInfoMap[RecipientCharacter];
-		StatusTickInfo.CurrentStackLevel += 1;
+		FStatusInfo& StatusInfo = CharacterToStatusInfoMap[RecipientCharacter];
+		StatusInfo.CurrentStackLevel += 1;
 
-		GetWorld()->GetTimerManager().SetTimer(*StatusTickInfo.TimerHandle, StatusTickInfo.TimerDelegate, TickInterval, true, 0);
+		GetWorld()->GetTimerManager().SetTimer(*StatusInfo.TimerHandle, StatusInfo.TimerDelegate, TickInterval, true, 0);
 	}
 	else
 	{
-		FStatusTickInfo StatusTickInfo;
-		StatusTickInfo.CurrentStackLevel = 1;
-		StatusTickInfo.TimerHandle = new FTimerHandle;
-		StatusTickInfo.TimerDelegate.BindUFunction(this, FName("OnStatusEffectTick"), StatusTickInfo);
-		StatusTickInfo.RecipientCharacter = RecipientCharacter;
+		FStatusInfo StatusInfo;
+		StatusInfo.CurrentStackLevel = 1;
+		StatusInfo.TimerHandle = new FTimerHandle;
+		StatusInfo.TimerDelegate.BindUFunction(this, FName("OnStatusEffectTick"), StatusInfo);
+		// StatusInfo.RecipientCharacter = RecipientCharacter;
 
-		GetWorld()->GetTimerManager().SetTimer(*StatusTickInfo.TimerHandle, StatusTickInfo.TimerDelegate, TickInterval, true, 0);
+		GetWorld()->GetTimerManager().SetTimer(*StatusInfo.TimerHandle, StatusInfo.TimerDelegate, TickInterval, true, 0);
 
-		CharacterToStatusTickInfoMap.Add(RecipientCharacter, StatusTickInfo);
+		CharacterToStatusInfoMap.Add(RecipientCharacter, StatusInfo);
 	}
 }
 
