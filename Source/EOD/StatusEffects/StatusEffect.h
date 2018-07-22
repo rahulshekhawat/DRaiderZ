@@ -25,24 +25,6 @@ public:
 };
 
 /**
- * This struct contains some basic information related to a status effect which
- * can be passed onto the activated character for further processing.
- * For example, player character may require status effect Icon so it can be 
- * added to player's viewport.
- */
-USTRUCT(BlueprintType)
-struct EOD_API FStatusEffectInfo
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	/** The current stack level of this status effect */
-	int NewStackValue;
-
-};
-
-/**
  * The base abstract class for status effects
  * 
  * @note The status effect class is not analogous to in-game status effects

@@ -267,6 +267,7 @@ bool ABaseCharacter::CanDodge() const
 	return CharacterState == ECharacterState::IdleWalkRun;
 }
 
+/*
 void ABaseCharacter::AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo)
 {
 	// @todo definition
@@ -276,6 +277,7 @@ void ABaseCharacter::RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInf
 {
 	// @todo definition
 }
+*/
 
 void ABaseCharacter::BeginPlay()
 {

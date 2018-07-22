@@ -76,12 +76,12 @@ public:
 	 * For example, if a character is burning, this function will put the flame (particle effects) on character
 	 * If the character is also a player character, this function will add status effect icon to player's viewport
 	 */
-	UFUNCTION(BlueprintCallable, Category = StatusEffects)
-	virtual void AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
+	// UFUNCTION(BlueprintCallable, Category = StatusEffects)
+	// virtual void AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
 	
 	/** Removes the status effect visuals from this character */
-	UFUNCTION(BlueprintCallable, Category = StatusEffects)
-	virtual void RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
+	// UFUNCTION(BlueprintCallable, Category = StatusEffects)
+	// virtual void RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo);
 
 	/** StatsComp contains and manages the stats info of this character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
