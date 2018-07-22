@@ -21,37 +21,10 @@ struct EOD_API FStatusEffectInfo
 
 public:
 
-	/** Status effect name that will be visible to player inside game */
-	UPROPERTY(EditDefaultsOnly)
-	FString InGameName;
-	
-	/** The status effect description that will be displayed to player on hovering over the status effect icon */
-	UPROPERTY(EditDefaultsOnly)
-	FString TooltipDescription;
-
-	/**
-	 * The detailed in-game description of this status effect which may or may not be made available for player
-	 * Can be null, in which case TooltipDescription will be used wherever needed.
-	 */
-	UPROPERTY(EditDefaultsOnly)
-	FString DetailedDescription;
-
-	/** Icon associated with this status effect */
-	UPROPERTY(EditDefaultsOnly)
-	class UTexture* Icon;
-	
-	/** Particle system associated with this status effect */
-	UPROPERTY(EditDefaultsOnly)
-	class UParticleSystem* ParticleSystem;
-
-	/** Character bone that the particle effect should attach to */	
-	UPROPERTY(EditDefaultsOnly)
-	FName ParticleEffectAttachBone;
 
 	/** The current stack level of this status effect */
 	int NewStackValue;
 
-	// @todo Add a boolean to follow particle effect attach bone if needed
 };
 
 /**
@@ -97,13 +70,39 @@ public:
 
 	/** Called when the status effect is deactivated */
 	// virtual void OnDeactivation() PURE_VIRTUAL(UStatusEffect::OnDeactivation, );
+	
+	/** Status effect name that will be visible to player inside game */
+	UPROPERTY(EditDefaultsOnly)
+	FString InGameName;
+	
+	/** The status effect description that will be displayed to player on hovering over the status effect icon */
+	UPROPERTY(EditDefaultsOnly)
+	FString TooltipDescription;
 
+	/**
+	 * The detailed in-game description of this status effect which may or may not be made available for player
+	 * This can be null, in which case TooltipDescription will be used wherever needed.
+	 */
+	UPROPERTY(EditDefaultsOnly)
+	FString DetailedDescription;
+
+	/** Icon associated with this status effect */
+	UPROPERTY(EditDefaultsOnly)
+	class UTexture* Icon;
+	
+	/** Particle system associated with this status effect */
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* ParticleSystem;
+
+	/** Character bone that the particle effect should attach to */	
+	UPROPERTY(EditDefaultsOnly)
+	FName ParticleEffectAttachBone;
+	
+	// @todo Add a boolean to follow particle effect attach bone if needed
+	
 	ABaseCharacter* GetOwningCharacter() const;
 
 	void SetOwningCharacter(ABaseCharacter* NewCharacter);
-	
-	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
-	FStatusEffectInfo StatusEffectInfo;
 
 protected:
 	
