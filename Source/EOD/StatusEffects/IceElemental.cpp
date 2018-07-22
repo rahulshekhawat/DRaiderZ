@@ -9,13 +9,14 @@
 
 TArray<ABaseCharacter*> UIceElemental::SlowedDownCharacters = TArray<ABaseCharacter*>();
 
+/*
 UIceElemental::UIceElemental()
 {
 	bTriggersOnSuccessfulHit = true;
 	SlowDownDuration = 2.f;
 }
 
-void UIceElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Initiator)
+void UIceElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Instigator)
 {
 	// Owner is needed to activate buffs on self or allies
 	SetOwningCharacter(Owner);
@@ -85,7 +86,6 @@ void UIceElemental::RemoveSlowDown(ABaseCharacter * TargetCharacter)
 	SlowedDownCharacters.Remove(TargetCharacter);
 }
 
-/*
 void UIceElemental::ApplySlowDown(TWeakObjectPtr<ABaseCharacter> TargetCharacter)
 {
 	FTimerHandle TimerHandle;

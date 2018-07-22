@@ -3,86 +3,56 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TimerManager.h"
 #include "UObject/NoExportTypes.h"
 #include "StatusEffect.generated.h"
 
 class ABaseCharacter;
 
-/**
- * StatusEffectReactivationCondition is used to determine how status effect
- * should reactivate when it is already activated on a character.
- */
-UENUM(BlueprintType)
-enum class EStatusEffectReactivationCondition :uint8
-{
-	None,
-	Reset,
-	Stack
-};
-
-/**
- * This struct contains some basic information related to a status effect which
- * can be passed onto the activated character for further processing.
- * For example, player character may require status effect Icon so it can be 
- * added to player's viewport.
- */
-USTRUCT(BlueprintType)
-struct EOD_API FStatusEffectInfo
+/** This USTRUCT is just a wrapper around TWeakObjectPtr<ABaseCharacter> so that it can be passed as a parameter for ufunction */
+USTRUCT()
+struct EOD_API FBaseCharacter_WeakObjPtrWrapper
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 
-	/** Status effect name that will be visible to player inside game */
-	UPROPERTY(EditDefaultsOnly)
-	FString InGameName;
-	
-	/** The status effect description that will be displayed to player on hovering over the status effect icon */
-	UPROPERTY(EditDefaultsOnly)
-	FString TooltipDescription;
+	TWeakObjectPtr<ABaseCharacter> RecipientCharacter;
 
-	/**
-	 * The detailed in-game description of this status effect which may or may not be made available for player
-	 * Can be null, in which case TooltipDescription will be used wherever needed.
-	 */
-	UPROPERTY(EditDefaultsOnly)
-	FString DetailedDescription;
+};
 
-	/** Icon associated with this status effect */
-	UPROPERTY(EditDefaultsOnly)
-	class UTexture* Icon;
-	
-	/** Particle system associated with this status effect */
-	UPROPERTY(EditDefaultsOnly)
-	class UParticleSystem* ParticleSystem;
+/** FStatusInfo holds the required info required by the CharacterToStatusInfoMap */
+USTRUCT()
+struct EOD_API FStatusInfo
+{
+	GENERATED_USTRUCT_BODY()
 
-	/** Character bone that the particle effect should attach to */	
-	UPROPERTY(EditDefaultsOnly)
-	FName ParticleEffectAttachBone;
+public:
 
-	/** The current stack level of this status effect */
-	int NewStackValue;
+	int CurrentStackLevel;
 
-	// @todo Add a boolean to follow particle effect attach bone if needed
+	float TotalElapsedTime;
+
+	FTimerHandle* TimerHandle;
+
+	FTimerDelegate TimerDelegate;
+
 };
 
 /**
  * The base abstract class for status effects
  * 
- * @note The status effect class is not analogous to in-game status effects
- * Think of this class as the status effects manager class, which has the ability to manage the behavior and state of 
- * one particular type of status effect for a particular owner.
- * For example, an object of BleedStatusEffect class will simply manage the status effects of 'bleed' type that are triggered by its owner.
- * Keeping that in mind, the difference between OnInitialize and OnActivation is easy to understand.
- * OnInitiailize must be called right after the status effect class is instantiated.
- * For example, if a player equips a weapon that has the ability to cause bleeding in-game then an object of BleedStatusEffect
- * will be instantiated as soon as the player equips that weapon, and OnInitialize will be immediately called to set the player as owner
- * of that status effect, as well as to do any necessary preprocessing.
- * The 'OnActivation' function, however, will only be called whenever an event that could trigger the bleed status effect happens.
- * In the example above, if the player does a critical damage on enemy, `OnActivation` will be called. This function will do the necessary
- * chance calculation (50% chance of bleed on critical hit), and initiate the status effect on enemy character.
- * It also implies that the status effect object will persist in memory as long as the weapon to cause bleed will be equipped by character.
- * The status effect object shall be deinitialized and then destroyed when the weapon is unequipped.
+ * @note The status effect class is not analogous to in-game status effects. Think of this class as the status effects manager class, which
+ * has the ability to manage the behavior and state of one particular type of status effect for a particular owner. For example, an object
+ * of BleedStatusEffect class will simply manage the status effects of 'bleed' type that are triggered by its owner.
+ * 
+ * Initialize() must be right after any of the status effect class is instantiated. Failing to do so will throw a runtime error.
+ * Initialize() would set up any prerequisites for the class. Similarly, Deinitialize() must be called right before the status effect's
+ * object is destroyed.
+ * 
+ * The status effect object will persist in memory as long as the instigator persists. e.g., if a weapon with elemental enchant has been
+ * equipped by player, the elemental status effect object will persist in memory as long as the weapon is equipped by player and must be
+ * destroyed when the weapon is unequipped.
  */
 UCLASS(Abstract, Blueprintable)
 class EOD_API UStatusEffect : public UObject
@@ -97,27 +67,73 @@ public:
 	/**
 	 * Called to initialize a status effect on a character.
 	 * @param Owner The character that owns the status effect
-	 * @param Initiator The actor that initiated the status effect. Can be nullptr. For a weapon with elemental enchant, the Initiator would be the weapon.
+	 * @param Instigator The actor that initiated the status effect. Can be nullptr. For a weapon with elemental enchant, the Instigator would be the weapon.
 	 */
-	virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Initiator) PURE_VIRTUAL(UStatusEffect::OnInitialize, );
-
+	virtual void Initialize(class ABaseCharacter* Owner, class AActor* Instigator);
+	
 	/** Called to deinitialize this status effect on a character */
-	virtual void OnDeinitialize() PURE_VIRTUAL(UStatusEffect::OnDeinitialize, );
+	virtual void Deinitialize();
 
-	/** Called when the status effect is activated */
-	virtual void OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters) PURE_VIRTUAL(UStatusEffect::OnActivation, );
+	/** Called when an event that triggers this status effect occurs */
+	virtual void OnTriggerEvent(TArray<TWeakObjectPtr<ABaseCharacter>>& RecipientCharacters);
 
-	/** Called when the status effect is deactivated */
-	virtual void OnDeactivation() PURE_VIRTUAL(UStatusEffect::OnDeactivation, );
+	/** Called for recipient character to deactivate this status effect, i.e., using a potion to stop bleed effect */
+	virtual void RequestDeactivation(ABaseCharacter* Character);
+	
+	/** Status effect name that will be visible to player inside game */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FString InGameName;
+	
+	/** The status effect description that will be displayed to player on hovering over the status effect icon */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FString TooltipDescription;
 
-	ABaseCharacter* GetOwningCharacter() const;
+	/**
+	 * The detailed in-game description of this status effect which may or may not be made available for player
+	 * This can be null, in which case TooltipDescription will be used wherever needed.
+	 */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FString DetailedDescription;
 
-	void SetOwningCharacter(ABaseCharacter* NewCharacter);
+	/** Icon associated with this status effect */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	class UTexture* Icon;
+	
+	/** Particle system associated with this status effect */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	class UParticleSystem* ParticleSystem;
+
+	/** Character bone that the particle effect should attach to */	
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FName ParticleEffectAttachBone;
 	
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
-	FStatusEffectInfo StatusEffectInfo;
+	float ActivationChance;
+	
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	float TickInterval;
+	
+	// @todo Add a boolean to follow particle effect attach bone if needed
+	
+	ABaseCharacter* GetOwningCharacter() const;
+
+	AActor* GetInstigator() const;
+
+	void SetOwningCharacter(ABaseCharacter* NewCharacter);
+
+	void SetInstigator(AActor* NewInstigator);
 
 protected:
+
+	/** Map of characters affected by this status effect */
+	static TMap<TWeakObjectPtr<ABaseCharacter>, FStatusInfo> CharacterToStatusInfoMap;
+
+	/**
+	 * Determines if this status effect should reset on reactivation.
+	 * If this is set to false, stacking will be disabled by default and StackLimit will be ignored
+	 */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	uint32 bResetsOnReactivation : 1;
 
 	/** True if the status effect triggers on Owner receiving damage */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
@@ -167,19 +183,29 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnInitialization : 1;
 	
-	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
-	EStatusEffectReactivationCondition ReactivationCondition;
-	
 	/** Number of times this status effect can stack. Only applicable if ReactivationCondition is set to EStatusEffectReactivationCondition::Stack */
 	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
 	int32 StackLimit;
 
 	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc.
 	
+	/** Called to activate this status effect on a recipient character */
+	virtual void ActivateStatusEffect(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter);
+	
+	/** Called to deactivate this status effect on a recipient character */
+	virtual void DeactivateStatusEffect(TWeakObjectPtr<ABaseCharacter>& RecipientCharacter);
+
+	/** Called to process the ticking of this status effect. Must be overridden in inherited classes */
+	UFUNCTION()
+	virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter) PURE_VIRTUAL(UStatusEffect::OnStatusEffectTick, );
+
 private:
 
 	UPROPERTY(Transient)
 	ABaseCharacter* OwningCharacter;
+
+	UPROPERTY(Transient)
+	AActor* Instigator;
 	
 	// @todo Add flags to determine allies and enemies (for buff and debuff effects)
 	// @note better to handle allies from ABaseCharacter class and add/use a function like TArray<ABaseCharacter*> GetAllies();
