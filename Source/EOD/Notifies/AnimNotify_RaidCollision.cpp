@@ -12,35 +12,43 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 {
 	for (FRaidCapsule& Capsule : CollisionCapsules)
 	{
-#if WITH_EDITOR
-
 		FTransform WorldTransform = MeshComp->GetComponentTransform();
 
 		FVector CorrectedBottom = Capsule.Bottom.RotateAngleAxis(90.f, FVector(0.f, 0.f, 1.f));
 		FVector CorrectedTop = Capsule.Top.RotateAngleAxis(90.f, FVector(0.f, 0.f, 1.f));
 
 		FVector HalfHeightVector = (CorrectedTop - CorrectedBottom) / 2;
+		FVector NormalizedHeightVector = HalfHeightVector.GetSafeNormal();
 		FVector Center = CorrectedBottom + HalfHeightVector;
-
-		// Transform Center
-		FVector TransformedCenter = WorldTransform.TransformPosition(Center);
 
 		FRotator CapsuleRotation = UKismetMathLibrary::MakeRotFromZ(HalfHeightVector);
 
+		// Transform Center
+		FVector TransformedCenter = WorldTransform.TransformPosition(Center);
 		// Transform rotation
 		FRotator TransformedRotation = WorldTransform.TransformRotation(CapsuleRotation.Quaternion()).Rotator();
 
+
+#if WITH_EDITOR // draw debug shapes only if inside editor
+
 		UKismetSystemLibrary::DrawDebugCapsule(MeshComp, TransformedCenter, HalfHeightVector.Size(), Capsule.Radius, TransformedRotation, FLinearColor::White, 5.f, 1.f);
+
+		FVector TransformedBottom;
+		FVector TransformedTop;
+
+		if (HalfHeightVector.Size() > Capsule.Radius)
+		{
+			TransformedBottom = TransformedCenter - NormalizedHeightVector * HalfHeightVector.Size();
+			TransformedTop = TransformedCenter + NormalizedHeightVector * HalfHeightVector.Size();
+		}
+		else
+		{
+			TransformedBottom = TransformedCenter - NormalizedHeightVector * Capsule.Radius;
+			TransformedTop = TransformedCenter + NormalizedHeightVector * Capsule.Radius;
+		}
 		
-		FVector TransformedBottom = WorldTransform.TransformPosition(CorrectedBottom);
-		FVector TransformedTop = WorldTransform.TransformPosition(CorrectedTop);
 		UKismetSystemLibrary::DrawDebugArrow(MeshComp, TransformedBottom, TransformedTop, 100.f, FLinearColor::Red, 5.f, 2.f);
-
-		FVector CapsuleTop = TransformedCenter + TransformedRotation.Vector() * HalfHeightVector.Size();
-		FVector CapsuleBottom = TransformedCenter - TransformedRotation.Vector() * HalfHeightVector.Size();
-		UKismetSystemLibrary::DrawDebugArrow(MeshComp, CapsuleBottom, CapsuleTop, 100.f, FLinearColor::Blue, 5.f, 2.f);	
-
-
+		
 #endif // WITH_EDITOR
 
 		//~ Begin collision handling code
