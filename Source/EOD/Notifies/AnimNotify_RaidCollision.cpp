@@ -3,6 +3,7 @@
 #include "AnimNotify_RaidCollision.h"
 #include "Core/EODPreprocessors.h"
 
+#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -27,12 +28,7 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		FVector TransformedCenter = WorldTransform.TransformPosition(Center);
 		// Transform rotation
 		FRotator TransformedRotation = WorldTransform.TransformRotation(CapsuleRotation.Quaternion()).Rotator();
-
-
-#if WITH_EDITOR // draw debug shapes only if inside editor
-
-		UKismetSystemLibrary::DrawDebugCapsule(MeshComp, TransformedCenter, HalfHeightVector.Size(), Capsule.Radius, TransformedRotation, FLinearColor::White, 5.f, 1.f);
-
+		
 		FVector TransformedBottom;
 		FVector TransformedTop;
 
@@ -46,17 +42,40 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 			TransformedBottom = TransformedCenter - NormalizedHeightVector * Capsule.Radius;
 			TransformedTop = TransformedCenter + NormalizedHeightVector * Capsule.Radius;
 		}
+
+#if WITH_EDITOR // draw debug shapes only if inside editor
+
+		UKismetSystemLibrary::DrawDebugCapsule(MeshComp, TransformedCenter, HalfHeightVector.Size(), Capsule.Radius, TransformedRotation, FLinearColor::White, 5.f, 1.f);
 		
 		UKismetSystemLibrary::DrawDebugArrow(MeshComp, TransformedBottom, TransformedTop, 100.f, FLinearColor::Red, 5.f, 2.f);
 		
 #endif // WITH_EDITOR
 
-		//~ Begin collision handling code
+		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(Capsule.Radius, HalfHeightVector.Size());
+		TArray<FHitResult> CapsuleHitResults;
+		
+		FCollisionQueryParams Params;
+		// Always ignore self
+		Params.AddIgnoredActor(MeshComp->GetOwner());
+		Params.bIgnoreTouches = true;
+		Params.bIgnoreBlocks = false;
+		Params.bReturnFaceIndex = false;
+		Params.bReturnPhysicalMaterial = false;
+		Params.MobilityType = EQueryMobilityType::Dynamic;
+		Params.bTraceComplex = false;
+		Params.TraceTag = FName("CollisionQueryForCombat");
+		// @todo mask filter for teams.
+
+		bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(CapsuleHitResults, TransformedCenter, TransformedCenter, TransformedRotation.Quaternion(), COLLISION_COMBAT, CollisionShape, Params);
+
+		if (bHit || CapsuleHitResults.Num() > 0)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White, TEXT("HIT"));
+		}
 
 		/*
 		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(Capsule.Radius, HalfHeightVector.Size());
 		TArray<FHitResult> HitResults;
-		MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, TransformedRotation.Quaternion(), ECollisionChannel::ECC_Camera, CollisionShape);
 
 		for (FHitResult& HitResult : HitResults)
 		{
