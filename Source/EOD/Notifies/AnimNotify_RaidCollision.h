@@ -6,8 +6,9 @@
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "AnimNotify_RaidCollision.generated.h"
 
+/** A struct to hold capsule information of RaiderZ format */
 USTRUCT(BlueprintType)
-struct FCapsuleInfo
+struct FRaidCapsule
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -22,7 +23,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	float Radius;
 
-	FORCEINLINE bool operator == (const FCapsuleInfo& Other) const
+	FORCEINLINE bool operator == (const FRaidCapsule& Other) const
 	{
 		return (this->Bottom == Other.Bottom && this->Top == Other.Top && this->Radius == Other.Radius);
 	}
@@ -30,8 +31,7 @@ public:
 };
 
 /**
- * AnimNotify_RaidCollision performs capsule collisions using the capsules created from
- * RaiderZ collision files.
+ * An anim notify class to handle collisions of RaiderZ's format
  */
 UCLASS()
 class EOD_API UAnimNotify_RaidCollision : public UAnimNotify
@@ -44,6 +44,6 @@ public:
 
 	/** Capsules that will be used for doing collision tests */
 	UPROPERTY(EditAnywhere, Category = CollisionInfo)
-	TArray<FCapsuleInfo> CollisionCapsules;	
+	TArray<FRaidCapsule> CollisionCapsules;	
 	
 };

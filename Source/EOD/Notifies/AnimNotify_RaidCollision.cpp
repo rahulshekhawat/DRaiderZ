@@ -10,7 +10,7 @@
 
 void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
 {
-	for (FCapsuleInfo& Capsule : CollisionCapsules)
+	for (FRaidCapsule& Capsule : CollisionCapsules)
 	{
 #if WITH_EDITOR
 
@@ -35,6 +35,11 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		FVector TransformedBottom = WorldTransform.TransformPosition(CorrectedBottom);
 		FVector TransformedTop = WorldTransform.TransformPosition(CorrectedTop);
 		UKismetSystemLibrary::DrawDebugArrow(MeshComp, TransformedBottom, TransformedTop, 100.f, FLinearColor::Red, 5.f, 2.f);
+
+		FVector CapsuleTop = TransformedCenter + TransformedRotation.Vector() * HalfHeightVector.Size();
+		FVector CapsuleBottom = TransformedCenter - TransformedRotation.Vector() * HalfHeightVector.Size();
+		UKismetSystemLibrary::DrawDebugArrow(MeshComp, CapsuleBottom, CapsuleTop, 100.f, FLinearColor::Blue, 5.f, 2.f);	
+
 
 #endif // WITH_EDITOR
 
