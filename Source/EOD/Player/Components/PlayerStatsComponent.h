@@ -261,6 +261,9 @@ private:
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 CrowdControlResistance;
 	
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	uint8 CrowdControlImmunities;
+
 	//~ @note CooldownModifier, ExpModifier, DropRateModifier, and StaminaConsumptionModifier
 	//~ will be replicated to owner only. They are irrelevant to other clients.
 
