@@ -653,7 +653,7 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
-#if WITH_DEVSTAGE_CODE
+#if DEVSTAGE_CODE_ENABLED
 	if (SkillButtonIndex == 0)
 	{
 		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);

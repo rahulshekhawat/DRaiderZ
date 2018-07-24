@@ -19,7 +19,7 @@ public:
 	float Time;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<FCapsuleInfo> Capsules;
+	TArray<FRaidCapsule> Capsules;
 
 
 };

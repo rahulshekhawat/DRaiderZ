@@ -122,7 +122,7 @@ public:
 
 	virtual float GetDropRateModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetDropRateModifier, return 0.f; );
 
-	virtual float GetStaminaConsumptionModifer() const PURE_VIRTUAL(UBaseStatsComponent::GetStaminaConsumptionModifer, return 0.f; );
+	virtual float GetStaminaConsumptionModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetStaminaConsumptionModifier, return 0.f; );
 
 	virtual float GetMovementSpeedModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetMovementSpeedModifier, return 0.f; );
 

@@ -131,7 +131,7 @@ void UCollisionParser::ImportAndApplyCollisionInfo()
 
 				for (FXmlNode* Capsule_node : Capsule_Nodes)
 				{
-					FCapsuleInfo CapsuleInfo;
+					FRaidCapsule CapsuleInfo;
 
 					FString CapsuleString = Capsule_node->GetContent();
 					TArray<FString> CapsuleContentArray;
@@ -167,9 +167,9 @@ void UCollisionParser::ImportAndApplyCollisionInfo()
 							continue;
 						}
 						
-						for (FCapsuleInfo& NotifyCapsule : Notify->CollisionCapsules)
+						for (FRaidCapsule& NotifyCapsule : Notify->CollisionCapsules)
 						{
-							for (FCapsuleInfo& InfoCapsule : CollisionInfo.Capsules)
+							for (FRaidCapsule& InfoCapsule : CollisionInfo.Capsules)
 							{
 								if (NotifyCapsule == InfoCapsule)
 								{

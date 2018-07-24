@@ -126,7 +126,7 @@ public:
 
 	virtual float GetDropRateModifier() const override;
 
-	virtual float GetStaminaConsumptionModifer() const override;
+	virtual float GetStaminaConsumptionModifier() const override;
 
 	virtual float GetMovementSpeedModifier() const override;
 	
@@ -182,7 +182,7 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
 	int32 ManaRegenRate;
-	
+
 	//~ @note Since server will handle all calculations for damage, combat stats are not needed to be replicated to client
 
 	UPROPERTY(EditDefaultsOnly, Category = OffensiveStats)
@@ -241,6 +241,9 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 ElementalHolyResistance;
+	
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	uint8 CrowdControlImmunities;
 	
 	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 ElementalDarkResistance;

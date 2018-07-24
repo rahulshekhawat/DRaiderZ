@@ -119,7 +119,7 @@ public:
 
 	virtual float GetDropRateModifier() const override;
 
-	virtual float GetStaminaConsumptionModifer() const override;
+	virtual float GetStaminaConsumptionModifier() const override;
 
 	virtual float GetMovementSpeedModifier() const override;
 	
@@ -261,6 +261,9 @@ private:
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 CrowdControlResistance;
 	
+	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	uint8 CrowdControlImmunities;
+
 	//~ @note CooldownModifier, ExpModifier, DropRateModifier, and StaminaConsumptionModifier
 	//~ will be replicated to owner only. They are irrelevant to other clients.
 

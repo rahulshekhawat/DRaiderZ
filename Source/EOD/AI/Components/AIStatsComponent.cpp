@@ -269,7 +269,7 @@ float UAIStatsComponent::GetDropRateModifier() const
 	return DropRateModifier;
 }
 
-float UAIStatsComponent::GetStaminaConsumptionModifer() const
+float UAIStatsComponent::GetStaminaConsumptionModifier() const
 {
 	return 1;
 }
