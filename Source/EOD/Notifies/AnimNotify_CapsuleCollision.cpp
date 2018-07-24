@@ -10,6 +10,12 @@
 
 void UAnimNotify_CapsuleCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
 {
+	// only call from server
+	if (!MeshComp->GetOwner() || MeshComp->GetOwner()->GetNetMode() == NM_Client)
+	{
+		return;
+	}
+
 	FTransform WorldTransform = MeshComp->GetComponentTransform();
 
 	FVector TransformedCenter = WorldTransform.TransformPosition(Center);
@@ -19,22 +25,22 @@ void UAnimNotify_CapsuleCollision::Notify(USkeletalMeshComponent * MeshComp, UAn
 	
 	UKismetSystemLibrary::DrawDebugCapsule(MeshComp, TransformedCenter, HalfHeight, Radius, TransformedQuat.Rotator(), FLinearColor::White, 5.f, 1.f);
 
-#endif
-
-	FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(MeshComp->GetOwner());
+#endif // WITH_EDITOR
 
 	FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(Radius, HalfHeight);
-	TArray<FHitResult> CapsuleHitResults;
+	TArray<FHitResult> HitResults;
 	
-	bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(CapsuleHitResults, TransformedCenter, TransformedCenter, TransformedQuat, COLLISION_COMBAT, CollisionShape, Params);
+	FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(MeshComp->GetOwner());
+	
+	bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, TransformedQuat, COLLISION_COMBAT, CollisionShape, Params);
 	ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(MeshComp->GetOwner());
 	if (BaseCharacter)
 	{
-		UCombatLibrary::HandleCombatCollision(BaseCharacter, CapsuleHitResults, bHit);
+		UCombatLibrary::HandleCombatCollision(BaseCharacter, HitResults, bHit);
 	}
 	else
 	{
-		UCombatLibrary::HandleCombatCollision(MeshComp->GetOwner(), CapsuleHitResults, bHit);
+		UCombatLibrary::HandleCombatCollision(MeshComp->GetOwner(), HitResults, bHit);
 	}
 
 }

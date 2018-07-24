@@ -16,7 +16,7 @@ class EOD_API UAnimNotify_CapsuleCollision : public UAnimNotify
 	
 public:
 
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation);
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	/** Position of collision capsule's center */
 	UPROPERTY(EditDefaultsOnly, Category = CapsuleInfo)

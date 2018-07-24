@@ -40,7 +40,7 @@ class EOD_API UAnimNotify_RaidCollision : public UAnimNotify
 	
 public:
 
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation);
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	/** Capsules that will be used for doing collision tests */
 	UPROPERTY(EditAnywhere, Category = CollisionInfo)

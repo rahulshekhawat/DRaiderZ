@@ -2,11 +2,11 @@
 
 #include "CombatLibrary.h"
 
-void UCombatLibrary::HandleCombatCollision(ABaseCharacter * Instigator, TArray<FHitResult>& CapsuleHitResults, bool bHit)
+void UCombatLibrary::HandleCombatCollision(ABaseCharacter * Instigator, TArray<FHitResult>& HitResults, bool bHit)
 {
 }
 
-void UCombatLibrary::HandleCombatCollision(AActor * Instigator, TArray<FHitResult>& CapsuleHitResults, bool bHit)
+void UCombatLibrary::HandleCombatCollision(AActor * Instigator, TArray<FHitResult>& HitResults, bool bHit)
 {
 }
 

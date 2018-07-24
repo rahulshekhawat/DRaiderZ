@@ -33,9 +33,9 @@ class EOD_API UCombatLibrary : public UObject
 	
 public:
 
-	static void HandleCombatCollision(ABaseCharacter* Instigator, TArray<FHitResult>& CapsuleHitResults, bool bHit);
+	static void HandleCombatCollision(ABaseCharacter* Instigator, TArray<FHitResult>& HitResults, bool bHit);
 	
-	static void HandleCombatCollision(AActor* Instigator, TArray<FHitResult>& CapsuleHitResults, bool bHit);
+	static void HandleCombatCollision(AActor* Instigator, TArray<FHitResult>& HitResults, bool bHit);
 
 	static FCollisionQueryParams GenerateCombatCollisionQueryParams(AActor* ActorToIgnore, EQueryMobilityType MobilityType = EQueryMobilityType::Dynamic, bool bReturnPhysicalMaterial = false, FName TraceTag = FName("CollisionQueryForCombat"));
 	
