@@ -18,7 +18,21 @@ public:
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation);
 
+	/** Position of collision capsule's center */
+	UPROPERTY(EditDefaultsOnly, Category = CapsuleInfo)
+	FVector Center;
 	
+	/** Rotation of collision capsule */
+	UPROPERTY(EditDefaultsOnly, Category = CapsuleInfo)
+	FRotator Rotation;
+	
+	/** Radius of collision capsule */
+	UPROPERTY(EditDefaultsOnly, Category = CapsuleInfo)
+	float Radius;
+	
+	/** Half height of collision capsule */
+	UPROPERTY(EditDefaultsOnly, Category = CapsuleInfo)
+	float HalfHeight;
 	
 	
 };

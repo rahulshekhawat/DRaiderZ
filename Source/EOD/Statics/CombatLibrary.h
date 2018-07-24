@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/EngineTypes.h"
+#include "CollisionQueryParams.h"
 #include "UObject/NoExportTypes.h"
 #include "CombatLibrary.generated.h"
 
@@ -34,6 +35,8 @@ public:
 
 	static void HandleCombatCollision(ABaseCharacter* Instigator, TArray<FHitResult>& CapsuleHitResults, bool bHit);
 	
-	
+	static void HandleCombatCollision(AActor* Instigator, TArray<FHitResult>& CapsuleHitResults, bool bHit);
+
+	static FCollisionQueryParams GenerateCombatCollisionQueryParams(AActor* ActorToIgnore, EQueryMobilityType MobilityType = EQueryMobilityType::Dynamic, bool bReturnPhysicalMaterial = false, FName TraceTag = FName("CollisionQueryForCombat"));
 	
 };

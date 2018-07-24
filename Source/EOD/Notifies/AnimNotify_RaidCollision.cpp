@@ -2,6 +2,8 @@
 
 #include "AnimNotify_RaidCollision.h"
 #include "Core/EODPreprocessors.h"
+#include "Statics/CombatLibrary.h"
+#include "Player/BaseCharacter.h"
 
 #include "Engine/Engine.h"
 #include "Engine/World.h"
@@ -11,6 +13,12 @@
 
 void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
 {
+	// only call from server
+	if (!MeshComp->GetOwner() || MeshComp->GetOwner()->GetNetMode() == NM_Client)
+	{
+		return;
+	}
+
 	for (FRaidCapsule& Capsule : CollisionCapsules)
 	{
 		FTransform WorldTransform = MeshComp->GetComponentTransform();
@@ -51,6 +59,8 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		
 #endif // WITH_EDITOR
 
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("CALLED FROM SERVER"));
+
 		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(Capsule.Radius, HalfHeightVector.Size());
 		TArray<FHitResult> CapsuleHitResults;
 		
@@ -67,50 +77,14 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		// @todo mask filter for teams.
 
 		bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(CapsuleHitResults, TransformedCenter, TransformedCenter, TransformedRotation.Quaternion(), COLLISION_COMBAT, CollisionShape, Params);
-
-		if (bHit || CapsuleHitResults.Num() > 0)
+		ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(MeshComp->GetOwner());
+		if (BaseCharacter)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White, TEXT("HIT"));
+			UCombatLibrary::HandleCombatCollision(BaseCharacter, CapsuleHitResults, bHit);
 		}
-
-		/*
-		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(Capsule.Radius, HalfHeightVector.Size());
-		TArray<FHitResult> HitResults;
-
-		for (FHitResult& HitResult : HitResults)
+		else
 		{
-			FString HitActorName = HitResult.GetActor()->GetName();
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, *HitActorName);
-			}
+			UCombatLibrary::HandleCombatCollision(MeshComp->GetOwner(), CapsuleHitResults, bHit);
 		}
-		*/
-		//~ End collision handling code
-
 	}
-
-#if WITH_DEVSTAGE_CODE
-	/*
-	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
-	RV_TraceParams.bTraceComplex = true;
-	RV_TraceParams.bTraceAsyncScene = true;
-	RV_TraceParams.bReturnPhysicalMaterial = false;
- 
-	//	Re-initialize hit info
-	FHitResult RV_Hit(ForceInit);
-     
-	//	call GetWorld() from within an actor extending class
-	GetWorld()->LineTraceSingle(
-		RV_Hit,        //result
-		Start,    //start
-		End, //end
-		ECC_Pawn, //collision channel
-		RV_TraceParams
-		);
-	 */
-
-	// TSharedPtr<FCapsuleInfo> MyPtr = 
-#endif
-
 }
