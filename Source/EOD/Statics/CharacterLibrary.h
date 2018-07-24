@@ -177,7 +177,7 @@ public:
 
 /** This struct contains info related to in-game class skills */
 USTRUCT(BlueprintType)
-struct EOD_API FSkillInfoTable : public FTableRowBase
+struct EOD_API FSkillInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
