@@ -72,11 +72,11 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(MeshComp->GetOwner());
 		if (BaseCharacter)
 		{
-			UCombatLibrary::HandleCombatCollision(BaseCharacter, HitResults, bHit);
+			UCombatLibrary::HandleCombatCollision(BaseCharacter, Animation, HitResults, bHit);
 		}
 		else
 		{
-			UCombatLibrary::HandleCombatCollision(MeshComp->GetOwner(), HitResults, bHit);
+			UCombatLibrary::HandleCombatCollision(MeshComp->GetOwner(), Animation, HitResults, bHit);
 		}
 	}
 }
