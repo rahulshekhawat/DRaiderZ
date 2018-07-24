@@ -302,7 +302,7 @@ float UPlayerStatsComponent::GetDropRateModifier() const
 	return DropRateModifier;
 }
 
-float UPlayerStatsComponent::GetStaminaConsumptionModifer() const
+float UPlayerStatsComponent::GetStaminaConsumptionModifier() const
 {
 	return StaminaConsumptionModifier;
 }

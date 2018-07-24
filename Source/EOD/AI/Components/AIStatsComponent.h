@@ -126,7 +126,7 @@ public:
 
 	virtual float GetDropRateModifier() const override;
 
-	virtual float GetStaminaConsumptionModifer() const override;
+	virtual float GetStaminaConsumptionModifier() const override;
 
 	virtual float GetMovementSpeedModifier() const override;
 	
