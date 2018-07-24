@@ -2,7 +2,10 @@
 
 #include "AnimNotify_RaidCollision.h"
 #include "Core/EODPreprocessors.h"
+#include "Statics/CombatLibrary.h"
+#include "Player/BaseCharacter.h"
 
+#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -10,75 +13,70 @@
 
 void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
 {
-	for (FCapsuleInfo& Capsule : CollisionCapsules)
+	// only call from server
+	if (!MeshComp->GetOwner() || MeshComp->GetOwner()->GetNetMode() == NM_Client)
 	{
-#if WITH_EDITOR
+		return;
+	}
 
+	for (FRaidCapsule& Capsule : CollisionCapsules)
+	{
 		FTransform WorldTransform = MeshComp->GetComponentTransform();
 
 		FVector CorrectedBottom = Capsule.Bottom.RotateAngleAxis(90.f, FVector(0.f, 0.f, 1.f));
 		FVector CorrectedTop = Capsule.Top.RotateAngleAxis(90.f, FVector(0.f, 0.f, 1.f));
 
 		FVector HalfHeightVector = (CorrectedTop - CorrectedBottom) / 2;
+		FVector NormalizedHeightVector = HalfHeightVector.GetSafeNormal();
 		FVector Center = CorrectedBottom + HalfHeightVector;
+		FRotator CapsuleRotation = UKismetMathLibrary::MakeRotFromZ(HalfHeightVector);
 
 		// Transform Center
 		FVector TransformedCenter = WorldTransform.TransformPosition(Center);
-
-		FRotator CapsuleRotation = UKismetMathLibrary::MakeRotFromZ(HalfHeightVector);
-
 		// Transform rotation
 		FRotator TransformedRotation = WorldTransform.TransformRotation(CapsuleRotation.Quaternion()).Rotator();
 
+#if WITH_EDITOR // draw debug shapes only if inside editor
+
 		UKismetSystemLibrary::DrawDebugCapsule(MeshComp, TransformedCenter, HalfHeightVector.Size(), Capsule.Radius, TransformedRotation, FLinearColor::White, 5.f, 1.f);
 		
-		FVector TransformedBottom = WorldTransform.TransformPosition(CorrectedBottom);
-		FVector TransformedTop = WorldTransform.TransformPosition(CorrectedTop);
-		UKismetSystemLibrary::DrawDebugArrow(MeshComp, TransformedBottom, TransformedTop, 100.f, FLinearColor::Red, 5.f, 2.f);
+		FVector TransformedBottom;
+		FVector TransformedTop;
+		if (HalfHeightVector.Size() > Capsule.Radius)
+		{
+			TransformedBottom = TransformedCenter - NormalizedHeightVector * HalfHeightVector.Size();
+			TransformedTop = TransformedCenter + NormalizedHeightVector * HalfHeightVector.Size();
+		}
+		else
+		{
+			TransformedBottom = TransformedCenter - NormalizedHeightVector * Capsule.Radius;
+			TransformedTop = TransformedCenter + NormalizedHeightVector * Capsule.Radius;
+		}
 
+		UKismetSystemLibrary::DrawDebugArrow(MeshComp, TransformedBottom, TransformedTop, 100.f, FLinearColor::Red, 5.f, 2.f);
+		
 #endif // WITH_EDITOR
 
-		//~ Begin collision handling code
+#if DEVSTAGE_CODE_ENABLED
 
-		/*
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("CALLED FROM SERVER"));
+
+#endif // DEVSTAGE_CODE_ENABLED
+
 		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(Capsule.Radius, HalfHeightVector.Size());
 		TArray<FHitResult> HitResults;
-		MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, TransformedRotation.Quaternion(), ECollisionChannel::ECC_Camera, CollisionShape);
+		
+		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(MeshComp->GetOwner());
 
-		for (FHitResult& HitResult : HitResults)
+		bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, TransformedRotation.Quaternion(), COLLISION_COMBAT, CollisionShape, Params);
+		ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(MeshComp->GetOwner());
+		if (BaseCharacter)
 		{
-			FString HitActorName = HitResult.GetActor()->GetName();
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, *HitActorName);
-			}
+			UCombatLibrary::HandleCombatCollision(BaseCharacter, HitResults, bHit);
 		}
-		*/
-		//~ End collision handling code
-
+		else
+		{
+			UCombatLibrary::HandleCombatCollision(MeshComp->GetOwner(), HitResults, bHit);
+		}
 	}
-
-#if WITH_DEVSTAGE_CODE
-	/*
-	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
-	RV_TraceParams.bTraceComplex = true;
-	RV_TraceParams.bTraceAsyncScene = true;
-	RV_TraceParams.bReturnPhysicalMaterial = false;
- 
-	//	Re-initialize hit info
-	FHitResult RV_Hit(ForceInit);
-     
-	//	call GetWorld() from within an actor extending class
-	GetWorld()->LineTraceSingle(
-		RV_Hit,        //result
-		Start,    //start
-		End, //end
-		ECC_Pawn, //collision channel
-		RV_TraceParams
-		);
-	 */
-
-	// TSharedPtr<FCapsuleInfo> MyPtr = 
-#endif
-
 }

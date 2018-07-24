@@ -149,8 +149,8 @@ public:
 	 * @note The weapon won't support elemental enchant if the elemental affinity is not none
 	*/
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	TArray<TSubclassOf<class UBaseElemental>> ElementalAffinities;
-	// TSubclassOf<class UBaseElemental> ElementalAffinity;
+	TSubclassOf<class UBaseElemental> ElementalAffinity;
+	// TArray<TSubclassOf<class UBaseElemental>> ElementalAffinities;
 };
 
 
