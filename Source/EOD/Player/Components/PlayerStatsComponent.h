@@ -110,8 +110,20 @@ public:
 	virtual int32 GetBleedResistance() const override;
 
 	virtual int32 GetCrowdControlResistance() const override;
+	
+	virtual void AddCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) override;
+	
+	virtual void AddCrowdControlImmunities(uint8 CrowdControlImmunities) override;
+	
+	virtual void RemoveCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) override;
+	
+	virtual void RemoveCrowdControlImmunities(uint8 CrowdControlImmunities) override;
 
-	// @todo crowd control immunities
+	virtual void RemoveAllCrowdControlImmunities() override;
+
+	virtual bool HasCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) const override;
+
+	virtual uint8 GetCrowdControlImmunities() const override;
 
 	virtual float GetCooldownModifier() const override;
 
@@ -261,7 +273,7 @@ private:
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 CrowdControlResistance;
 	
-	UPROPERTY(EditDefaultsOnly, Category = DefensiveStats, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
 	uint8 CrowdControlImmunities;
 
 	//~ @note CooldownModifier, ExpModifier, DropRateModifier, and StaminaConsumptionModifier

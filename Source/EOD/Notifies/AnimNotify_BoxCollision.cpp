@@ -36,11 +36,11 @@ void UAnimNotify_BoxCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimSe
 	ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(MeshComp->GetOwner());
 	if (BaseCharacter)
 	{
-		UCombatLibrary::HandleCombatCollision(BaseCharacter, HitResults, bHit);
+		UCombatLibrary::HandleCombatCollision(BaseCharacter, Animation, HitResults, bHit);
 	}
 	else
 	{
-		UCombatLibrary::HandleCombatCollision(MeshComp->GetOwner(), HitResults, bHit);
+		UCombatLibrary::HandleCombatCollision(MeshComp->GetOwner(), Animation, HitResults, bHit);
 	}
 
 

@@ -279,6 +279,17 @@ void ABaseCharacter::RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInf
 }
 */
 
+FActiveSkill ABaseCharacter::GetCurrentActiveSkillInfo()
+{
+	return FActiveSkill();
+}
+
+void ABaseCharacter::HandleMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
+{
+	
+
+}
+
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();

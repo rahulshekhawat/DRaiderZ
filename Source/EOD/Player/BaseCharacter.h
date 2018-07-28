@@ -101,6 +101,18 @@ public:
 	FCombatEvent OnLeavingCombat;
 	//~ End combat events
 
+	/** Map of skill index and it's respective combat event */
+	TMap<uint8, FCombatEvent> OnUsingSkillEventMap;
+
+	/** Returns the info for skill that this character is curretly using */
+	virtual FActiveSkill GetCurrentActiveSkillInfo();
+
+	/** [server] Handle melee collision */
+	virtual void HandleMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
+
+	// @todo
+	// virtual void HandleRangedCollision();
+
 protected:
 
 	/** Called when the game starts or when spawned */

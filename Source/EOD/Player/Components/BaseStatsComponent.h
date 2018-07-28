@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Statics/CombatLibrary.h"
 #include "Components/ActorComponent.h"
 #include "BaseStatsComponent.generated.h"
 
@@ -114,7 +115,19 @@ public:
 
 	virtual int32 GetCrowdControlResistance() const PURE_VIRTUAL(UBaseStatsComponent::GetCrowdControlResistance, return 0; );
 
-	// @todo crowd control immunities
+	virtual void AddCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) PURE_VIRTUAL(UBaseStatsComponent::AddCrowdControlImmunity, );
+
+	virtual void AddCrowdControlImmunities(uint8 CrowdControlImmunities) PURE_VIRTUAL(UBaseStatsComponent::AddCrowdControlImmunities, );
+
+	virtual void RemoveCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) PURE_VIRTUAL(UBaseStatsComponent::RemoveCrowdControlImmunity, );
+
+	virtual void RemoveCrowdControlImmunities(uint8 CrowdControlImmunities) PURE_VIRTUAL(UBaseStatsComponent::RemoveCrowdControlImmunity, );
+
+	virtual void RemoveAllCrowdControlImmunities() PURE_VIRTUAL(UBaseStatsComponent::RemoveAllCrowdControlImmunity, );
+
+	virtual bool HasCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) const PURE_VIRTUAL(UBaseStatsComponent::HasCrowdControlImmunity, return false; );
+
+	virtual uint8 GetCrowdControlImmunities() const PURE_VIRTUAL(UBaseStatsComponent::GetCrowdControlImmunities, return 0; );
 
 	virtual float GetCooldownModifier() const PURE_VIRTUAL(UBaseStatsComponent::GetCooldownModifier, return 0.f; );
 
