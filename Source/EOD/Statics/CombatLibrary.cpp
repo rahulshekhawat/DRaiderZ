@@ -1,9 +1,23 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "CombatLibrary.h"
+#include "Player/BaseCharacter.h"
+#include "Statics/CombatLibrary.h"
 
 void UCombatLibrary::HandleCombatCollision(ABaseCharacter * Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
+	if (!IsValid(Instigator))
+	{
+		return;
+	}
+
+	Instigator->HandleMeleeCollision(Animation, HitResults, bHit);
+	// FActiveSkill ActiveSkill = Instigator->GetCurrentActiveSkillInfo();
+	
+
+
+
+
 }
 
 void UCombatLibrary::HandleCombatCollision(AActor * Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)

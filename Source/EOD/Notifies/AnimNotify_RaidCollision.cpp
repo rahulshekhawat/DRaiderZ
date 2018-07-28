@@ -72,11 +72,25 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(MeshComp->GetOwner());
 		if (BaseCharacter)
 		{
-			UCombatLibrary::HandleCombatCollision(BaseCharacter, Animation, HitResults, bHit);
+			// UCombatLibrary::HandleCombatCollision(BaseCharacter, Animation, HitResults, bHit);
+			BaseCharacter->HandleMeleeCollision(Animation, HitResults, bHit);
 		}
 		else
 		{
 			UCombatLibrary::HandleCombatCollision(MeshComp->GetOwner(), Animation, HitResults, bHit);
 		}
+		
+#if DEVSTAGE_CODE_ENABLED
+
+		TArray<FHitResult> LineHitResults;
+		MeshComp->GetWorld()->LineTraceMultiByChannel(LineHitResults, TransformedTop, TransformedBottom, COLLISION_COMBAT, Params);
+
+		for (FHitResult& HitResult : LineHitResults)
+		{
+			FVector Start = HitResult.ImpactPoint;
+			FVector End = HitResult.ImpactPoint + HitResult.ImpactNormal * 50;
+			UKismetSystemLibrary::DrawDebugArrow(MeshComp, Start, End, 100, FLinearColor::Blue, 5.f, 2.f);
+		}
+#endif
 	}
 }
