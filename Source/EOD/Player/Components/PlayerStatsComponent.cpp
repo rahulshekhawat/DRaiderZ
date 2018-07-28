@@ -6,6 +6,8 @@
 
 UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
+	AddCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	RemoveCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 }
 
 void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -285,6 +287,41 @@ int32 UPlayerStatsComponent::GetBleedResistance() const
 int32 UPlayerStatsComponent::GetCrowdControlResistance() const
 {
 	return CrowdControlResistance;
+}
+
+void UPlayerStatsComponent::AddCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect)
+{
+	CrowdControlImmunities |= (1 << (uint8)CrowdControlEffect);
+}
+
+void UPlayerStatsComponent::AddCrowdControlImmunities(uint8 CrowdControlImmunities)
+{
+	this->CrowdControlImmunities |= CrowdControlImmunities;
+}
+
+void UPlayerStatsComponent::RemoveCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect)
+{
+	CrowdControlImmunities ^= (1 << (uint8)CrowdControlEffect);
+}
+
+void UPlayerStatsComponent::RemoveCrowdControlImmunities(uint8 CrowdControlImmunities)
+{
+	this->CrowdControlImmunities ^= CrowdControlImmunities;
+}
+
+void UPlayerStatsComponent::RemoveAllCrowdControlImmunities()
+{
+	CrowdControlImmunities = 0;
+}
+
+bool UPlayerStatsComponent::HasCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) const
+{
+	return (CrowdControlImmunities & (1 << (uint8)CrowdControlEffect));
+}
+
+uint8 UPlayerStatsComponent::GetCrowdControlImmunities() const
+{
+	return CrowdControlImmunities;
 }
 
 float UPlayerStatsComponent::GetCooldownModifier() const
