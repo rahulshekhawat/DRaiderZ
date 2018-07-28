@@ -177,7 +177,7 @@ public:
 
 /** This struct contains info related to in-game class skills */
 USTRUCT(BlueprintType)
-struct EOD_API FSkillInfoTable : public FTableRowBase
+struct EOD_API FSkillInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -224,6 +224,25 @@ public:
 	// @todo Skill max level up and changes that occur at each level
 };
 
+/** Struct containing information of the skill that a character is currently using */
+USTRUCT(BlueprintType)
+struct FActiveSkill
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	uint8 SkillIndex;
+
+	FName CurrentSkillInUse;
+
+	FName AnimationMontageSectionName;
+
+	UAnimMontage* SkillAnimationMontage;
+
+	UDataTable* SkillDataTableReference;
+
+};
 
 /**
  * CharacterLibrary contains static helper functions for in-game characters.
