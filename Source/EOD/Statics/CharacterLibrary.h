@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "WeaponLibrary.h"
+#include "CombatLibrary.h"
 #include "UObject/NoExportTypes.h"
 #include "CharacterLibrary.generated.h"
 
@@ -175,6 +176,61 @@ public:
 
 };
 
+UENUM(BlueprintType)
+enum class ESkillCastType : uint8
+{
+	// Skills that are cast instantly, i.e., almost all physical attacks and magic attacks such as rapid blast and divine punishment
+	InstantCast,
+	// Skills that require time to cast, i.e., spells
+	DelayedCast,
+	// Passives skill that can't be cast
+	NoCast
+};
+
+UENUM(BlueprintType)
+enum class EDamageType : uint8
+{
+	Physical,
+	Magickal
+};
+
+/** This struct contains info related to in-game class skills */
+USTRUCT(BlueprintType)
+struct EOD_API FSkillLevelUpInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	/** Minimum stamina required to use this skill */
+	UPROPERTY(EditDefaultsOnly)
+	int StaminaRequired;
+	
+	/** Minimum mana required to use this skill */
+	UPROPERTY(EditDefaultsOnly)
+	int ManaRequired;
+	
+	/** Skill cooldown */
+	UPROPERTY(EditDefaultsOnly)
+	float Cooldown;
+
+	/** Damage in percentage of player's magickal or physical attack that will inflicted on enemy */
+	UPROPERTY(EditDefaultsOnly)
+	float DamagePercent;
+
+	/** Crowd control effect on hit */
+	ECrowdControlEffect CrowdControlEffect;
+
+	/** Immunities from crowd control effects granted on using this skill */
+	UPROPERTY(EditDefaultsOnly, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	uint8 CrowdControlImmunities;
+
+	/** Status effect that this skill triggers */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UStatusEffect> StatusEffect;
+
+};
+
 /** This struct contains info related to in-game class skills */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillInfo : public FTableRowBase
@@ -192,36 +248,30 @@ public:
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	FString Description;
 	
+	/** The montage that contains the animation(s) for this skill */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	FString MontageSectionName;
+	TSoftObjectPtr<UAnimMontage> AnimMontage;
+
+	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	FName SkillStartMontageSectionName;
 	
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	int StaminaRequired;
+	FName SkillLoopMontageSectionName;
 	
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	int ManaRequired;
+	FName SkillEndMontageSectionName;		
 	
+	/** Type of damage inflicted from this skill */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	float Cooldown;
+	EDamageType DamageType;
 	
-	// @todo skill type (support/damage)
+	//~ Maximum number of level ups = SkillLevelUpsInfo.Num()
+	UPROPERTY(EditAnywhere, Category = SkillInfo)
+	TArray<FSkillLevelUpInfo> SkillLevelUpsInfo;
 
-	// @todo instant use skill? spell?
 
-	// UPROPERTY(EditAnywhere, Category = BaseInfo)
-	// @todo damage type (magick/physical)
+	// @todo What does this skill do (heal/damage/buff)? It will be useful for AI logic
 
-	// @todo damage info
-
-	// @todo crowd control effect
-
-	// @todo crown control immunities
-
-	// error - Issue #6
-	// UPROPERTY(EditAnywhere, Category = BaseInfo)
-	// TSubclassOf<class UStatusEffect> StatusEffect;
-
-	// @todo Skill max level up and changes that occur at each level
 };
 
 /** Struct containing information of the skill that a character is currently using */
