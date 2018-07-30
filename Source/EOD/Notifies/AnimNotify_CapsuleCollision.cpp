@@ -2,7 +2,7 @@
 
 #include "AnimNotify_CapsuleCollision.h"
 #include "Statics/CombatLibrary.h"
-#include "Player/BaseCharacter.h"
+#include "Player/EODCharacterBase.h"
 #include "Core/EODPreprocessors.h"
 
 #include "Components/SkeletalMeshComponent.h"
@@ -33,7 +33,7 @@ void UAnimNotify_CapsuleCollision::Notify(USkeletalMeshComponent * MeshComp, UAn
 	FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(MeshComp->GetOwner());
 	
 	bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, TransformedQuat, COLLISION_COMBAT, CollisionShape, Params);
-	ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(MeshComp->GetOwner());
+	AEODCharacterBase* BaseCharacter = Cast<AEODCharacterBase>(MeshComp->GetOwner());
 	if (BaseCharacter)
 	{
 		UCombatLibrary::HandleCombatCollision(BaseCharacter, Animation, HitResults, bHit);

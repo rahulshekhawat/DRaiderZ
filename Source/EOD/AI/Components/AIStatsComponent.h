@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/Components/BaseStatsComponent.h"
+#include "Player/Components/StatsComponentBase.h"
 #include "AIStatsComponent.generated.h"
 
 /**
  * AIStatsComponent is used to manage stats of an AI controlled character
  */
 UCLASS()
-class EOD_API UAIStatsComponent : public UBaseStatsComponent
+class EOD_API UAIStatsComponent : public UStatsComponentBase
 {
 	GENERATED_BODY()
 	

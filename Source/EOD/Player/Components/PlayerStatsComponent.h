@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/Components/BaseStatsComponent.h"
+#include "Player/Components/StatsComponentBase.h"
 #include "PlayerStatsComponent.generated.h"
 
 /**
  * PlayerStatsComponent is used to manage stats of a player controlled character
  */
 UCLASS()
-class EOD_API UPlayerStatsComponent : public UBaseStatsComponent
+class EOD_API UPlayerStatsComponent : public UStatsComponentBase
 {
 	GENERATED_BODY()
 	

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Weapons/BaseWeapon.h"
+#include "Weapons/WeaponBase.h"
 #include "PrimaryWeapon.generated.h"
 
 class USkeletalMeshComponent;
@@ -22,7 +22,7 @@ enum class EPrimaryWeaponType : uint8
  * A PrimaryWeapon is a either a dual handed weapon or a single handed weapon that can be equipped in right hand
  */
 UCLASS()
-class EOD_API APrimaryWeapon : public ABaseWeapon
+class EOD_API APrimaryWeapon : public AWeaponBase
 {
 	GENERATED_BODY()
 	

@@ -1,13 +1,12 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "IceElemental.h"
-#include "Player/BaseCharacter.h"
-#include "Player/Components/BaseStatsComponent.h"
+#include "Player/EODCharacterBase.h"
 
 #include "Engine/World.h"
 #include "TimerManager.h"
 
-TArray<ABaseCharacter*> UIceElemental::SlowedDownCharacters = TArray<ABaseCharacter*>();
+TArray<AEODCharacterBase*> UIceElemental::SlowedDownCharacters = TArray<AEODCharacterBase*>();
 
 /*
 UIceElemental::UIceElemental()

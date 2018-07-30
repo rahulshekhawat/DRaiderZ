@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "Player/BaseCharacter.h"
+#include "Player/EODCharacterBase.h"
 #include "PlayerCharacter.generated.h"
 
 class UAnimMontage;
@@ -15,7 +15,7 @@ class UStaticMeshComponent;
  * PlayerCharacter is the base class for playable characters
  */
 UCLASS()
-class EOD_API APlayerCharacter : public ABaseCharacter
+class EOD_API APlayerCharacter : public AEODCharacterBase
 {
 	GENERATED_BODY()
 	

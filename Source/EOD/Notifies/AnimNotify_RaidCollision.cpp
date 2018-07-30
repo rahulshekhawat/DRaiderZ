@@ -3,7 +3,7 @@
 #include "AnimNotify_RaidCollision.h"
 #include "Core/EODPreprocessors.h"
 #include "Statics/CombatLibrary.h"
-#include "Player/BaseCharacter.h"
+#include "Player/EODCharacterBase.h"
 
 #include "Engine/Engine.h"
 #include "Engine/World.h"
@@ -69,7 +69,7 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(MeshComp->GetOwner());
 
 		bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, TransformedRotation.Quaternion(), COLLISION_COMBAT, CollisionShape, Params);
-		ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(MeshComp->GetOwner());
+		AEODCharacterBase* BaseCharacter = Cast<AEODCharacterBase>(MeshComp->GetOwner());
 		if (BaseCharacter)
 		{
 			// UCombatLibrary::HandleCombatCollision(BaseCharacter, Animation, HitResults, bHit);

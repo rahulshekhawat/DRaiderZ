@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StatusEffects/BaseElemental.h"
+#include "StatusEffects/ElementalBase.h"
 #include "IceElemental.generated.h"
 
 class ABaseCharacter;
@@ -12,7 +12,7 @@ class ABaseCharacter;
  * 
  */
 UCLASS()
-class EOD_API UIceElemental : public UBaseElemental
+class EOD_API UIceElemental : public UElementalBase
 {
 	GENERATED_BODY()
 	
@@ -45,7 +45,7 @@ public:
 private:
 	
 	/** The list of characters that have been slowed down by this status effect */
-	static TArray<ABaseCharacter*> SlowedDownCharacters;
+	static TArray<AEODCharacterBase*> SlowedDownCharacters;
 
 	// void ApplySlowDown(ABaseCharacter* TargetCharacter);
 

@@ -43,9 +43,9 @@ protected:
 
 private:
 
-	class ABaseCharacter* OwningCharacter;
+	class AEODCharacterBase* OwningCharacter;
 
-	class ABaseCharacter* CastOwnerToBaseCharacter() const;
+	class AEODCharacterBase* CastOwnerToBaseCharacter() const;
 	
 	
 	
