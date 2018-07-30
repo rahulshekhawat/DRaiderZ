@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StatusEffects/BaseElemental.h"
+#include "StatusEffects/ElementalBase.h"
 #include "LightningElemental.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API ULightningElemental : public UBaseElemental
+class EOD_API ULightningElemental : public UElementalBase
 {
 	GENERATED_BODY()
 	

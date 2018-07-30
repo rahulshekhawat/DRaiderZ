@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StatusEffects/BaseElemental.h"
+#include "StatusEffects/ElementalBase.h"
 #include "DarkElemental.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API UDarkElemental : public UBaseElemental
+class EOD_API UDarkElemental : public UElementalBase
 {
 	GENERATED_BODY()
 	

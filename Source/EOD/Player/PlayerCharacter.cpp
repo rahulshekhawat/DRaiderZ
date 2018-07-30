@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "PlayerCharacter.h"
-#include "EmberPlayerController.h"
+#include "EODPlayerController.h"
 #include "Core/GameSingleton.h"
 #include "PlayerAnimInstance.h"
 #include "Weapons/PrimaryWeapon.h"

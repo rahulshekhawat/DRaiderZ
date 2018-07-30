@@ -8,7 +8,7 @@
 #include "UObject/NoExportTypes.h"
 #include "CombatLibrary.generated.h"
 
-class ABaseCharacter;
+class AEODCharacterBase;
 class UAnimSequenceBase;
 
 /** This enum describes all the possible crowd control effects in-game */
@@ -34,7 +34,7 @@ class EOD_API UCombatLibrary : public UObject
 	
 public:
 
-	static void HandleCombatCollision(ABaseCharacter* Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
+	static void HandleCombatCollision(AEODCharacterBase* Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 	
 	static void HandleCombatCollision(AActor* Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 

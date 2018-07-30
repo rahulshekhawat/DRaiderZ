@@ -227,7 +227,7 @@ public:
 
 	/** Status effect that this skill triggers */
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UStatusEffect> StatusEffect;
+	TSubclassOf<class UStatusEffectBase> StatusEffect;
 
 };
 
