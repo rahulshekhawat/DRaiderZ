@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "CharAnimInstance.h"
-#include "BaseCharacter.h"
+#include "EODCharacterBase.h"
 
 
 UCharAnimInstance::UCharAnimInstance(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
@@ -78,13 +78,13 @@ bool UCharAnimInstance::IsBlocking() const
 	return true;
 }
 
-ABaseCharacter * UCharAnimInstance::CastOwnerToBaseCharacter() const
+AEODCharacterBase * UCharAnimInstance::CastOwnerToBaseCharacter() const
 {
-	ABaseCharacter* BaseCharacter = nullptr;
+	AEODCharacterBase* BaseCharacter = nullptr;
 
 	if (TryGetPawnOwner())
 	{
-		BaseCharacter = Cast<ABaseCharacter>(TryGetPawnOwner());
+		BaseCharacter = Cast<AEODCharacterBase>(TryGetPawnOwner());
 	}
 
 	return BaseCharacter;

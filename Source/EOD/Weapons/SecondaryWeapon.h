@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Weapons/BaseWeapon.h"
+#include "Weapons/WeaponBase.h"
 #include "SecondaryWeapon.generated.h"
 
 /**
  * A SecondaryWeapon is a single handed weapon that can be equipped in left hand
  */
 UCLASS()
-class EOD_API ASecondaryWeapon : public ABaseWeapon
+class EOD_API ASecondaryWeapon : public AWeaponBase
 {
 	GENERATED_BODY()
 	

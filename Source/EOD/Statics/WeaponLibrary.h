@@ -142,15 +142,15 @@ public:
 	
 	/** Status effects (both buffs and debuffs) */
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	TArray<TSubclassOf<class UStatusEffect>> StatusEffects;
+	TArray<TSubclassOf<class UStatusEffectBase>> StatusEffects;
 	
 	/**
 	 * Default elemental affinity of this weapon
 	 * @note The weapon won't support elemental enchant if the elemental affinity is not none
 	*/
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	TSubclassOf<class UBaseElemental> ElementalAffinity;
-	// TArray<TSubclassOf<class UBaseElemental>> ElementalAffinities;
+	TSubclassOf<class UElementalBase> ElementalAffinity;
+	// TArray<TSubclassOf<class UElementalBase>> ElementalAffinities;
 };
 
 

@@ -3,7 +3,7 @@
 #include "AnimNotify_SphereCollision.h"
 #include "Statics/CombatLibrary.h"
 #include "Core/EODPreprocessors.h"
-#include "Player/BaseCharacter.h"
+#include "Player/EODCharacterBase.h"
 
 
 #include "Kismet/KismetSystemLibrary.h"
@@ -32,7 +32,7 @@ void UAnimNotify_SphereCollision::Notify(USkeletalMeshComponent * MeshComp, UAni
 	TArray<FHitResult> HitResults;
 	
 	bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, FQuat::Identity, COLLISION_COMBAT, CollisionShape, Params);
-	ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(MeshComp->GetOwner());
+	AEODCharacterBase* BaseCharacter = Cast<AEODCharacterBase>(MeshComp->GetOwner());
 	if (BaseCharacter)
 	{
 		UCombatLibrary::HandleCombatCollision(BaseCharacter, Animation, HitResults, bHit);
