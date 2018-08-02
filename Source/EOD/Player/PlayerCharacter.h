@@ -210,7 +210,7 @@ public:
 
 	void SetCurrentWeapon(FName WeaponID);
 
-	void SetCurrentWeapon(FWeaponData* WeaponData);
+	void SetCurrentWeapon(FWeaponTableRow* WeaponData);
 
 	void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
 	

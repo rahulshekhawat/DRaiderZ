@@ -129,7 +129,7 @@ public:
  * @see FPlayerAnimationReferences
  */
 USTRUCT(BlueprintType)
-struct EOD_API FPlayerAnimationSoftReferences : public FTableRowBase
+struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -242,7 +242,7 @@ public:
 
 /** This struct contains info related to in-game class skills */
 USTRUCT(BlueprintType)
-struct EOD_API FSkillInfo : public FTableRowBase
+struct EOD_API FSkillTableRow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 

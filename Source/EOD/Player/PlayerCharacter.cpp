@@ -822,7 +822,7 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 
 void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
 {
-	FWeaponData* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
+	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
 	if (WeaponData)
 	{
 		SetCurrentWeapon(WeaponData);
@@ -830,7 +830,7 @@ void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
 	}
 }
 
-void APlayerCharacter::SetCurrentWeapon(FWeaponData* WeaponData)
+void APlayerCharacter::SetCurrentWeapon(FWeaponTableRow* WeaponData)
 {
 	// If WeaponData is nullptr
 	if (!WeaponData)

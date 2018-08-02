@@ -23,7 +23,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	/** Called when this weapon is equipped by a character */
-	virtual void OnEquip(FWeaponData* NewWeaponData) override;
+	virtual void OnEquip(FWeaponTableRow* NewWeaponData) override;
 
 	/** Called when this weapon is unequipped by a character */
 	virtual void OnUnEquip() override;

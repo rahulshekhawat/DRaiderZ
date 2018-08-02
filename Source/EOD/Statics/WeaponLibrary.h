@@ -41,7 +41,7 @@ enum class EWeaponType : uint8
 //~ @todo FWeaponData vs WeaponStatsComponent, decide which one to keep
 
 USTRUCT(BlueprintType)
-struct EOD_API FWeaponData : public FTableRowBase
+struct EOD_API FWeaponTableRow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -149,8 +149,8 @@ public:
 	 * @note The weapon won't support elemental enchant if the elemental affinity is not none
 	*/
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	TSubclassOf<class UElementalBase> ElementalAffinity;
-	// TArray<TSubclassOf<class UElementalBase>> ElementalAffinities;
+	// TSubclassOf<class UElementalBase> ElementalAffinity;
+	TArray<TSubclassOf<class UElementalBase>> ElementalAffinities;
 };
 
 
@@ -184,6 +184,6 @@ public:
 	static bool IsSecondaryWeapon(EWeaponType WeaponType);
 	
 	/** Returns FWeaponData corresponding to WeaponID from the weapons data table */
-	static FWeaponData* GetWeaponData(FName WeaponID);
+	static FWeaponTableRow* GetWeaponData(FName WeaponID);
 	
 };
