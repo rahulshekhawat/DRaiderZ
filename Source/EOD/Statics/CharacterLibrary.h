@@ -218,7 +218,16 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float DamagePercent;
 
+	/** Determines if this skill can be blocked */
+	UPROPERTY(EditDefaultsOnly)
+	bool bUnblockable;
+
+	/** Determines if this skill can be dodged */
+	UPROPERTY(EditDefaultsOnly)
+	bool bUndodgable;
+
 	/** Crowd control effect on hit */
+	UPROPERTY(EditDefaultsOnly)
 	ECrowdControlEffect CrowdControlEffect;
 
 	/** Immunities from crowd control effects granted on using this skill */
@@ -296,7 +305,7 @@ public:
 
 /**
  * CharacterLibrary contains static helper functions for in-game characters.
- * @note Do not derive from this class
+ * @note Do not inherit from this class
  */
 UCLASS()
 class EOD_API UCharacterLibrary : public UObject

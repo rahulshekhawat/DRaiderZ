@@ -108,7 +108,7 @@ public:
 	virtual FActiveSkill GetCurrentActiveSkillInfo();
 
 	/** [server] Handle melee collision */
-	virtual void HandleMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
+	virtual void HandleMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) PURE_VIRTUAL(AEODCharacterBase::HandleMeleeCollision, );
 
 	// @todo
 	// virtual void HandleRangedCollision();

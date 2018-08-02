@@ -14,6 +14,7 @@
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/StreamableManager.h"
 #include "Camera/CameraComponent.h"
@@ -635,6 +636,58 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 	if (GetCharacterMovement()->MaxWalkSpeed != 400)
 	{
 		SetWalkSpeed(400);
+	}
+}
+
+void APlayerCharacter::HandleMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
+{
+	/*
+	if (!PlayerAnimationReferences || PlayerAnimationReferences->AnimationMontage_Skills != Animation)
+	{
+		return;
+	}
+	*/
+
+	for (FHitResult& HitResult : HitResults)
+	{
+		if (HitResult.Actor.Get())
+		{
+			AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
+			if (HitCharacter)
+			{
+				TArray<FHitResult> LineHitResults;
+				FVector LineStart = GetActorLocation();
+				FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
+
+				FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
+				GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
+
+				FHitResult LineHitResultToHitCharacter;
+				bool bLineHitResultFound = false;
+
+				for (FHitResult& LineHitResult : LineHitResults)
+				{
+					if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
+					{
+						LineHitResultToHitCharacter = LineHitResult;
+						bLineHitResultFound = true;
+						break;
+					}
+				}
+
+				if (bLineHitResultFound)
+				{
+
+					FVector Start = LineHitResultToHitCharacter.ImpactPoint;
+					FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
+					UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
+				}
+			}
+			else
+			{
+				// @todo handle damage for non AEODCharacterBase actors
+			}
+		}
 	}
 }
 

@@ -249,6 +249,10 @@ public:
 	FCombatEvent OnUsingSkill_9;
 	//~ End combat events
 
+	/** [server] Handle melee collision */
+	virtual void HandleMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
+
+
 private:
 
 	//~ Template functions

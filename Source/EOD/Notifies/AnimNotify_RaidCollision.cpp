@@ -42,15 +42,20 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		
 		FVector TransformedBottom;
 		FVector TransformedTop;
+		FVector RotationFixedNormalizedHeightVector = TransformedRotation.RotateVector(NormalizedHeightVector);
 		if (HalfHeightVector.Size() > Capsule.Radius)
 		{
-			TransformedBottom = TransformedCenter - NormalizedHeightVector * HalfHeightVector.Size();
-			TransformedTop = TransformedCenter + NormalizedHeightVector * HalfHeightVector.Size();
+			// TransformedBottom = TransformedCenter - NormalizedHeightVector * HalfHeightVector.Size();
+			TransformedBottom = TransformedCenter - RotationFixedNormalizedHeightVector * HalfHeightVector.Size();
+			// TransformedTop = TransformedCenter + NormalizedHeightVector * HalfHeightVector.Size();
+			TransformedTop = TransformedCenter + RotationFixedNormalizedHeightVector * HalfHeightVector.Size();
 		}
 		else
 		{
-			TransformedBottom = TransformedCenter - NormalizedHeightVector * Capsule.Radius;
-			TransformedTop = TransformedCenter + NormalizedHeightVector * Capsule.Radius;
+			// TransformedBottom = TransformedCenter - NormalizedHeightVector * Capsule.Radius;
+			TransformedBottom = TransformedCenter - RotationFixedNormalizedHeightVector * Capsule.Radius;
+			// TransformedTop = TransformedCenter + NormalizedHeightVector * Capsule.Radius;
+			TransformedTop = TransformedCenter + RotationFixedNormalizedHeightVector * Capsule.Radius;
 		}
 
 		UKismetSystemLibrary::DrawDebugArrow(MeshComp, TransformedBottom, TransformedTop, 100.f, FLinearColor::Red, 5.f, 2.f);
