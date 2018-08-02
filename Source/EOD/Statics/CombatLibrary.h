@@ -39,5 +39,6 @@ public:
 	static void HandleCombatCollision(AActor* Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
 	static FCollisionQueryParams GenerateCombatCollisionQueryParams(AActor* ActorToIgnore, EQueryMobilityType MobilityType = EQueryMobilityType::Dynamic, bool bReturnPhysicalMaterial = false, FName TraceTag = FName("CollisionQueryForCombat"));
-	
+
+
 };

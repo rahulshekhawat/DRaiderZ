@@ -280,14 +280,8 @@ void AEODCharacterBase::RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffect
 */
 
 FActiveSkill AEODCharacterBase::GetCurrentActiveSkillInfo()
-{
+{	
 	return FActiveSkill();
-}
-
-void AEODCharacterBase::HandleMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
-{
-	
-
 }
 
 void AEODCharacterBase::BeginPlay()
