@@ -137,40 +137,40 @@ public:
 	
 	/** Reference to player animation montage that contains animations for jumping */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath Jump;
+	TSoftObjectPtr<UAnimMontage> Jump;
 	
 	/** Reference to player animation montage that contains animations for dodging */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath Dodge;
+	TSoftObjectPtr<UAnimMontage> Dodge;
 	
 	/** Reference to player animation montage that contains animations for normal attacks */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath NormalAttacks;
+	TSoftObjectPtr<UAnimMontage> NormalAttacks;
 
 	//~ @note Add AnimationMontage_WeaponChange animations here
 	/** Reference to player animation montage that contains animations for special actions (@todo list special actions) */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath SpecialActions;
+	TSoftObjectPtr<UAnimMontage> SpecialActions;
 	
 	/** Reference to player animation montage that contains animations for using weapon skils */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath Skills;
+	TSoftObjectPtr<UAnimMontage> Skills;
 	
 	/** Reference to player animation montage that contains animations for spells */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath Spells;
+	TSoftObjectPtr<UAnimMontage> Spells;
 	
 	/** Reference to player animation montage that contains animations for special movement (@todo more info) */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath SpecialMovement;
+	TSoftObjectPtr<UAnimMontage> SpecialMovement;
 	
 	/** Reference to player animation montage that contains animations for crowd control effects */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath CrowdControlEffects;
+	TSoftObjectPtr<UAnimMontage> CrowdControlEffects;
 	
 	/** Reference to player animation montage that contains animations for flinching */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath Flinch;
+	TSoftObjectPtr<UAnimMontage> Flinch;
 
 	// @todo Death animations
 
@@ -249,7 +249,7 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 public:
 
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	FSoftObjectPath Icon;
+	TSoftObjectPtr<UTexture> Icon;
 	
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	FString InGameName;
