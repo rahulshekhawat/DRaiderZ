@@ -46,7 +46,7 @@ public:
  * has the ability to manage the behavior and state of one particular type of status effect for a particular owner. For example, an object
  * of BleedStatusEffect class will simply manage the status effects of 'bleed' type that are triggered by its owner.
  * 
- * Initialize() must be right after any of the status effect class is instantiated. Failing to do so will throw a runtime error.
+ * Initialize() must be called right after any of the status effect class is instantiated. Failing to do so will throw a runtime error.
  * Initialize() would set up any prerequisites for the class. Similarly, Deinitialize() must be called right before the status effect's
  * object is destroyed.
  * 

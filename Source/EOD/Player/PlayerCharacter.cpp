@@ -641,12 +641,12 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 
 void APlayerCharacter::HandleMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
-	/*
-	if (!PlayerAnimationReferences || PlayerAnimationReferences->AnimationMontage_Skills != Animation)
+	if (!PlayerAnimationReferences || !(Animation == PlayerAnimationReferences->AnimationMontage_NormalAttacks || 
+										Animation == PlayerAnimationReferences->AnimationMontage_Skills || 
+										Animation == PlayerAnimationReferences->AnimationMontage_Spells))
 	{
 		return;
 	}
-	*/
 
 	for (FHitResult& HitResult : HitResults)
 	{
