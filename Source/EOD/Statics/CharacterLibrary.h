@@ -129,7 +129,7 @@ public:
  * @see FPlayerAnimationReferences
  */
 USTRUCT(BlueprintType)
-struct EOD_API FPlayerAnimationSoftReferences : public FTableRowBase
+struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -137,40 +137,40 @@ public:
 	
 	/** Reference to player animation montage that contains animations for jumping */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath Jump;
+	TSoftObjectPtr<UAnimMontage> Jump;
 	
 	/** Reference to player animation montage that contains animations for dodging */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath Dodge;
+	TSoftObjectPtr<UAnimMontage> Dodge;
 	
 	/** Reference to player animation montage that contains animations for normal attacks */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath NormalAttacks;
+	TSoftObjectPtr<UAnimMontage> NormalAttacks;
 
 	//~ @note Add AnimationMontage_WeaponChange animations here
 	/** Reference to player animation montage that contains animations for special actions (@todo list special actions) */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath SpecialActions;
+	TSoftObjectPtr<UAnimMontage> SpecialActions;
 	
 	/** Reference to player animation montage that contains animations for using weapon skils */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath Skills;
+	TSoftObjectPtr<UAnimMontage> Skills;
 	
 	/** Reference to player animation montage that contains animations for spells */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath Spells;
+	TSoftObjectPtr<UAnimMontage> Spells;
 	
 	/** Reference to player animation montage that contains animations for special movement (@todo more info) */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath SpecialMovement;
+	TSoftObjectPtr<UAnimMontage> SpecialMovement;
 	
 	/** Reference to player animation montage that contains animations for crowd control effects */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath CrowdControlEffects;
+	TSoftObjectPtr<UAnimMontage> CrowdControlEffects;
 	
 	/** Reference to player animation montage that contains animations for flinching */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FSoftObjectPath Flinch;
+	TSoftObjectPtr<UAnimMontage> Flinch;
 
 	// @todo Death animations
 
@@ -218,7 +218,16 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float DamagePercent;
 
+	/** Determines if this skill can be blocked */
+	UPROPERTY(EditDefaultsOnly)
+	bool bUnblockable;
+
+	/** Determines if this skill can be dodged */
+	UPROPERTY(EditDefaultsOnly)
+	bool bUndodgable;
+
 	/** Crowd control effect on hit */
+	UPROPERTY(EditDefaultsOnly)
 	ECrowdControlEffect CrowdControlEffect;
 
 	/** Immunities from crowd control effects granted on using this skill */
@@ -233,14 +242,14 @@ public:
 
 /** This struct contains info related to in-game class skills */
 USTRUCT(BlueprintType)
-struct EOD_API FSkillInfo : public FTableRowBase
+struct EOD_API FSkillTableRow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	FSoftObjectPath Icon;
+	TSoftObjectPtr<UTexture> Icon;
 	
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	FString InGameName;
@@ -296,7 +305,7 @@ public:
 
 /**
  * CharacterLibrary contains static helper functions for in-game characters.
- * @note Do not derive from this class
+ * @note Do not inherit from this class
  */
 UCLASS()
 class EOD_API UCharacterLibrary : public UObject

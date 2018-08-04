@@ -68,12 +68,12 @@ private:
 	
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* HatItem;
-
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Face;
 	
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* FaceItem;
+
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* Chest;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Hands;
@@ -126,10 +126,6 @@ private:
 	
 	void DisableBlock();
 
-	void StartNormalAttack();
-
-	void StopNormalAttack();
-
 	void OnJump();
 
 	void OnInteract();
@@ -159,7 +155,7 @@ private:
 	class UHUDWidget* HUDWidget;
 	//~ End UI
 	
-	float MaxPlayerWalkSpeed = 400.f;
+	float MaxPlayerWalkSpeed;
 
 public:
 	
@@ -210,7 +206,7 @@ public:
 
 	void SetCurrentWeapon(FName WeaponID);
 
-	void SetCurrentWeapon(FWeaponData* WeaponData);
+	void SetCurrentWeapon(FWeaponTableRow* WeaponData);
 
 	void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
 	
@@ -248,6 +244,10 @@ public:
 	FCombatEvent OnUsingSkill_8;
 	FCombatEvent OnUsingSkill_9;
 	//~ End combat events
+
+	/** [server] Handle melee collision */
+	virtual void HandleMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
+
 
 private:
 

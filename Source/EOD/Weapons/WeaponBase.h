@@ -33,7 +33,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	/** Called when this weapon is equipped by a character */
-	virtual void OnEquip(FWeaponData* NewWeaponData) PURE_VIRTUAL(ABaseWeapon::OnEquip, );
+	virtual void OnEquip(FWeaponTableRow* NewWeaponData) PURE_VIRTUAL(ABaseWeapon::OnEquip, );
 
 	/** Called when this weapon is unequipped by a character */
 	virtual void OnUnEquip() PURE_VIRTUAL(ABaseWeapon::OnUnEquip, );

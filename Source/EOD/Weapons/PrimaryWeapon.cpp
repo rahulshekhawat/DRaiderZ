@@ -44,7 +44,7 @@ void APrimaryWeapon::Tick(float DeltaTime)
 
 }
 
-void APrimaryWeapon::OnEquip(FWeaponData * NewWeaponData)
+void APrimaryWeapon::OnEquip(FWeaponTableRow * NewWeaponData)
 {
 	check(NewWeaponData);
 	check(OwningCharacter);

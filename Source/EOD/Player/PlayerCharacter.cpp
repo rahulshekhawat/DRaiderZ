@@ -14,6 +14,7 @@
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/StreamableManager.h"
 #include "Camera/CameraComponent.h"
@@ -34,6 +35,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	bReplicateMovement = true;
 	GetCharacterMovement()->SetIsReplicated(true);
 
+	// @note Defaul skeletal mesh component inherited from ACharacter class will contain face mesh
 	if (GetMesh())
 	{
 		GetMesh()->AddLocalOffset(FVector(0.f, 0.f, -90.f));
@@ -44,8 +46,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	Hair			= CreateNewArmorComponent(TEXT("Hair"), ObjectInitializer);
 	HatItem			= CreateNewArmorComponent(TEXT("Hat Item"), ObjectInitializer);
-	Face			= CreateNewArmorComponent(TEXT("Chest"), ObjectInitializer);
 	FaceItem		= CreateNewArmorComponent(TEXT("Face Item"), ObjectInitializer);
+	Chest			= CreateNewArmorComponent(TEXT("Chest"), ObjectInitializer);
 	Hands			= CreateNewArmorComponent(TEXT("Hands"), ObjectInitializer);
 	Legs			= CreateNewArmorComponent(TEXT("Legs"), ObjectInitializer);
 	Feet			= CreateNewArmorComponent(TEXT("Feet"), ObjectInitializer);
@@ -62,7 +64,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Player Inventory"));
 
-	SetWalkSpeed(400);
+	MaxPlayerWalkSpeed = 400;
+	SetWalkSpeed(MaxPlayerWalkSpeed);
 
 }
 
@@ -78,7 +81,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	//~ Begin Action Input Bindings
 	PlayerInputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &APlayerCharacter::ZoomInCamera);
 	PlayerInputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &APlayerCharacter::ZoomOutCamera);
-
 
 	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::EnableBlock);
 	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::DisableBlock);
@@ -131,7 +133,6 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-		
 
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -145,25 +146,6 @@ void APlayerCharacter::PostInitializeComponents()
 	// @note please set secondary weapon first and primary weapon later.
 	SetCurrentWeapon(SecondaryWeaponID);
 	SetCurrentWeapon(PrimaryWeaponID);
-
-
-	// Implement multiplayer version later
-	/*
-	if (Role == ROLE_Authority)
-	{
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
-		SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
-
-		PrimaryWeapon->SetOwningCharacter(this);
-		SecondaryWeapon->SetOwningCharacter(this);
-
-		// @note please set secondary weapon first and primary weapon later.
-		SetCurrentWeapon(PrimaryWeaponID);
-	}
-	*/
 }
 
 #if WITH_EDITOR
@@ -233,7 +215,7 @@ void APlayerCharacter::BeginPlay()
 
 
 	//~ Player HUD
-	if (Controller && Controller->IsLocalPlayerController())
+	if (Controller && Controller->IsLocalPlayerController() && BP_HUDWidget.Get())
 	{
 		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), BP_HUDWidget);
 		if (HUDWidget)
@@ -381,25 +363,6 @@ void APlayerCharacter::DisableBlock()
 		SetCharacterState(ECharacterState::IdleWalkRun);
 		// CharacterState = ECharacterState::IdleWalkRun;
 	}
-}
-
-void APlayerCharacter::StartNormalAttack()
-{
-	/*
-	if (CanNormalAttack() && PlayerAnimInstance && PlayerAnimationReferences)
-	{
-		CharacterState = ECharacterState::Attacking;
-		PlayerAnimInstance->Montage_Play(PlayerAnimationReferences->AnimationMontage_NormalAttacks);
-		bFollowDummyLoc = true;
-		DummyLocLastFrame = FVector(0.f, 0.f, 0.f);
-	}
-	*/
-
-}
-
-void APlayerCharacter::StopNormalAttack()
-{
-
 }
 
 void APlayerCharacter::OnJump()
@@ -638,6 +601,58 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 	}
 }
 
+void APlayerCharacter::HandleMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
+{
+	if (!PlayerAnimationReferences || !(Animation == PlayerAnimationReferences->AnimationMontage_NormalAttacks || 
+										Animation == PlayerAnimationReferences->AnimationMontage_Skills || 
+										Animation == PlayerAnimationReferences->AnimationMontage_Spells))
+	{
+		return;
+	}
+
+	for (FHitResult& HitResult : HitResults)
+	{
+		if (HitResult.Actor.Get())
+		{
+			AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
+			if (HitCharacter)
+			{
+				TArray<FHitResult> LineHitResults;
+				FVector LineStart = GetActorLocation();
+				FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
+
+				FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
+				GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
+
+				FHitResult LineHitResultToHitCharacter;
+				bool bLineHitResultFound = false;
+
+				for (FHitResult& LineHitResult : LineHitResults)
+				{
+					if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
+					{
+						LineHitResultToHitCharacter = LineHitResult;
+						bLineHitResultFound = true;
+						break;
+					}
+				}
+
+				if (bLineHitResultFound)
+				{
+
+					FVector Start = LineHitResultToHitCharacter.ImpactPoint;
+					FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
+					UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
+				}
+			}
+			else
+			{
+				// @todo handle damage for non AEODCharacterBase actors
+			}
+		}
+	}
+}
+
 void APlayerCharacter::UpdatePlayerAnimationReferences()
 {
 	if (PlayerAnimationReferences)
@@ -769,7 +784,7 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 
 void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
 {
-	FWeaponData* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
+	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
 	if (WeaponData)
 	{
 		SetCurrentWeapon(WeaponData);
@@ -777,7 +792,7 @@ void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
 	}
 }
 
-void APlayerCharacter::SetCurrentWeapon(FWeaponData* WeaponData)
+void APlayerCharacter::SetCurrentWeapon(FWeaponTableRow* WeaponData)
 {
 	// If WeaponData is nullptr
 	if (!WeaponData)

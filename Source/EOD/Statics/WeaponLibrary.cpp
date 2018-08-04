@@ -3,6 +3,8 @@
 #include "WeaponLibrary.h"
 #include "Core/GameSingleton.h"
 
+#include "Engine/Engine.h"
+
 bool UWeaponLibrary::IsWeaponDualHanded(EWeaponType WeaponType)
 {
 	if ((WeaponType == EWeaponType::GreatSword) ||
@@ -45,16 +47,16 @@ bool UWeaponLibrary::IsSecondaryWeapon(EWeaponType WeaponType)
 	return false;
 }
 
-FWeaponData * UWeaponLibrary::GetWeaponData(FName WeaponID)
+FWeaponTableRow * UWeaponLibrary::GetWeaponData(FName WeaponID)
 {
-	FWeaponData* WeaponData = nullptr;
+	FWeaponTableRow* WeaponData = nullptr;
 
 	if (GEngine && GEngine->GameSingleton)
 	{
 		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
 		if (GameSingleton && GameSingleton->WeaponDataTable)
 		{
-			WeaponData = GameSingleton->WeaponDataTable->FindRow<FWeaponData>(WeaponID, FString("Weapon data lookup"));
+			WeaponData = GameSingleton->WeaponDataTable->FindRow<FWeaponTableRow>(WeaponID, FString("Weapon data lookup"));
 		}
 	}
 
