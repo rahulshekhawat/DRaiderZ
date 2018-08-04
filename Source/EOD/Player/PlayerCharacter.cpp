@@ -35,6 +35,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	bReplicateMovement = true;
 	GetCharacterMovement()->SetIsReplicated(true);
 
+	// @note Defaul skeletal mesh component inherited from ACharacter class will contain face mesh
 	if (GetMesh())
 	{
 		GetMesh()->AddLocalOffset(FVector(0.f, 0.f, -90.f));
@@ -45,8 +46,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	Hair			= CreateNewArmorComponent(TEXT("Hair"), ObjectInitializer);
 	HatItem			= CreateNewArmorComponent(TEXT("Hat Item"), ObjectInitializer);
-	Face			= CreateNewArmorComponent(TEXT("Chest"), ObjectInitializer);
 	FaceItem		= CreateNewArmorComponent(TEXT("Face Item"), ObjectInitializer);
+	Chest			= CreateNewArmorComponent(TEXT("Chest"), ObjectInitializer);
 	Hands			= CreateNewArmorComponent(TEXT("Hands"), ObjectInitializer);
 	Legs			= CreateNewArmorComponent(TEXT("Legs"), ObjectInitializer);
 	Feet			= CreateNewArmorComponent(TEXT("Feet"), ObjectInitializer);
@@ -63,7 +64,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Player Inventory"));
 
-	SetWalkSpeed(400);
+	MaxPlayerWalkSpeed = 400;
+	SetWalkSpeed(MaxPlayerWalkSpeed);
 
 }
 
@@ -79,7 +81,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	//~ Begin Action Input Bindings
 	PlayerInputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &APlayerCharacter::ZoomInCamera);
 	PlayerInputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &APlayerCharacter::ZoomOutCamera);
-
 
 	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::EnableBlock);
 	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::DisableBlock);
@@ -132,7 +133,6 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-		
 
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -146,25 +146,6 @@ void APlayerCharacter::PostInitializeComponents()
 	// @note please set secondary weapon first and primary weapon later.
 	SetCurrentWeapon(SecondaryWeaponID);
 	SetCurrentWeapon(PrimaryWeaponID);
-
-
-	// Implement multiplayer version later
-	/*
-	if (Role == ROLE_Authority)
-	{
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
-		SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
-
-		PrimaryWeapon->SetOwningCharacter(this);
-		SecondaryWeapon->SetOwningCharacter(this);
-
-		// @note please set secondary weapon first and primary weapon later.
-		SetCurrentWeapon(PrimaryWeaponID);
-	}
-	*/
 }
 
 #if WITH_EDITOR
@@ -234,7 +215,7 @@ void APlayerCharacter::BeginPlay()
 
 
 	//~ Player HUD
-	if (Controller && Controller->IsLocalPlayerController())
+	if (Controller && Controller->IsLocalPlayerController() && BP_HUDWidget.Get())
 	{
 		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), BP_HUDWidget);
 		if (HUDWidget)
@@ -382,25 +363,6 @@ void APlayerCharacter::DisableBlock()
 		SetCharacterState(ECharacterState::IdleWalkRun);
 		// CharacterState = ECharacterState::IdleWalkRun;
 	}
-}
-
-void APlayerCharacter::StartNormalAttack()
-{
-	/*
-	if (CanNormalAttack() && PlayerAnimInstance && PlayerAnimationReferences)
-	{
-		CharacterState = ECharacterState::Attacking;
-		PlayerAnimInstance->Montage_Play(PlayerAnimationReferences->AnimationMontage_NormalAttacks);
-		bFollowDummyLoc = true;
-		DummyLocLastFrame = FVector(0.f, 0.f, 0.f);
-	}
-	*/
-
-}
-
-void APlayerCharacter::StopNormalAttack()
-{
-
 }
 
 void APlayerCharacter::OnJump()
