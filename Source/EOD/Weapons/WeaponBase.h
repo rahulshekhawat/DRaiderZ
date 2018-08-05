@@ -41,6 +41,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	EWeaponType WeaponType;
 
+	bool bEquipped;
+
 	/** 
 	 * Call this to set the owner of this weapon.
 	 * @note It is important to set owner before attempting to equip weapon.

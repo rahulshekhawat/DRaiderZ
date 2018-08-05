@@ -206,9 +206,23 @@ public:
 
 	void SetCurrentWeapon(FName WeaponID);
 
-	void SetCurrentWeapon(FWeaponTableRow* WeaponData);
+	// void SetCurrentWeapon(FWeaponTableRow* WeaponData);
 
-	void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
+	// void SetPrimaryWeapon(FWeaponTableRow* PrimaryWeaponData);
+
+	// void SetSecondaryWeapon(FWeaponTableRow* SecondaryWeaponData);
+
+	void RemovePrimaryWeapon();
+
+	void RemoveSecondaryWeapon();
+
+	// void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
+
+	void UpdateCurrentWeaponAnimationType();
+
+	bool IsPrimaryWeaponEquippped() const;
+
+	bool IsSecondaryWeaponEquipped() const;
 	
 	//~ Begin state handlers
 	virtual bool CanMove() const override;

@@ -10,6 +10,8 @@ AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer): Super(Obj
 	// This actor doesn't tick
 	PrimaryActorTick.bCanEverTick = false;
 	
+	bEquipped = false;
+
 	// Setup stats component
 	StatsComp = ObjectInitializer.CreateDefaultSubobject<UWeaponStatsComponent>(this, FName("Weapon Stats Component"));
 }

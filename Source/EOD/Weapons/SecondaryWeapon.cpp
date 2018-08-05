@@ -85,6 +85,9 @@ void ASecondaryWeapon::OnEquip(FWeaponTableRow * NewWeaponData)
 	{
 		// pass
 	}
+
+	bEquipped = true;
+	WeaponType = NewWeaponData->WeaponType;
 }
 
 void ASecondaryWeapon::OnUnEquip()
@@ -101,4 +104,6 @@ void ASecondaryWeapon::OnUnEquip()
 	LeftHandWeaponMeshComp->Deactivate();
 	SheathedWeaponMeshComp->Deactivate();
 	FallenWeaponMeshComp->Deactivate();
+
+	bEquipped = false;
 }

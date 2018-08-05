@@ -46,8 +46,7 @@ void APrimaryWeapon::Tick(float DeltaTime)
 
 void APrimaryWeapon::OnEquip(FWeaponTableRow * NewWeaponData)
 {
-	check(NewWeaponData);
-	check(OwningCharacter);
+	check (NewWeaponData && OwningCharacter)
 
 	if (NewWeaponData->WeaponMesh.IsNull())
 	{
@@ -130,6 +129,9 @@ void APrimaryWeapon::OnEquip(FWeaponTableRow * NewWeaponData)
 		break;
 	}
 	
+	bEquipped = true;
+	WeaponType = NewWeaponData->WeaponType;
+
 }
 
 void APrimaryWeapon::OnUnEquip()
@@ -149,4 +151,6 @@ void APrimaryWeapon::OnUnEquip()
 	LeftHandWeaponMeshComp->Deactivate();
 	SheathedWeaponMeshComp->Deactivate();
 	FallenWeaponMeshComp->Deactivate();
+
+	bEquipped = false;
 }

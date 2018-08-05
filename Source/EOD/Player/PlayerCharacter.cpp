@@ -785,13 +785,46 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
 {
 	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
-	if (WeaponData)
+
+	// If WeaponData is nullptr
+	if (!WeaponData)
 	{
-		SetCurrentWeapon(WeaponData);
-		UpdateCurrentWeaponAnimationType(WeaponData->WeaponType);		
+		return;
 	}
+
+	if (UWeaponLibrary::IsHybridWeapon(WeaponData->WeaponType))
+	{
+	}
+	else if (UWeaponLibrary::IsPrimaryWeapon(WeaponData->WeaponType))
+	{
+		if (UWeaponLibrary::IsWeaponSingleHanded(WeaponData->WeaponType))
+		{
+			RemovePrimaryWeapon();
+		}
+		else if (UWeaponLibrary::IsWeaponDualHanded(WeaponData->WeaponType))
+		{
+			RemovePrimaryWeapon();
+			RemoveSecondaryWeapon();
+		}
+
+		PrimaryWeapon->OnEquip(WeaponData);
+		PrimaryWeaponID = WeaponID;
+	}
+	else if (UWeaponLibrary::IsSecondaryWeapon(WeaponData->WeaponType))
+	{
+		if (IsPrimaryWeaponEquippped() && UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->WeaponType))
+		{
+			RemovePrimaryWeapon();
+		}
+
+		SecondaryWeapon->OnEquip(WeaponData);
+		SecondaryWeaponID = WeaponID;
+	}
+
+	UpdateCurrentWeaponAnimationType();
 }
 
+/*
 void APlayerCharacter::SetCurrentWeapon(FWeaponTableRow* WeaponData)
 {
 	// If WeaponData is nullptr
@@ -800,18 +833,58 @@ void APlayerCharacter::SetCurrentWeapon(FWeaponTableRow* WeaponData)
 		return;
 	}
 	
-	if (UWeaponLibrary::IsSecondaryWeapon(WeaponData->WeaponType))
+	if (UWeaponLibrary::IsHybridWeapon(WeaponData->WeaponType))
 	{
-		// SecondaryWeapon->
 	}
-	else
+	else if (UWeaponLibrary::IsPrimaryWeapon(WeaponData->WeaponType))
 	{
+		if (UWeaponLibrary::IsWeaponSingleHanded(WeaponData->WeaponType))
+		{
+			RemovePrimaryWeapon();
+		}
+		else if (UWeaponLibrary::IsWeaponDualHanded(WeaponData->WeaponType))
+		{
+			RemovePrimaryWeapon();
+			RemoveSecondaryWeapon();
+		}
+
 		PrimaryWeapon->OnEquip(WeaponData);
 	}
+	else if (UWeaponLibrary::IsSecondaryWeapon(WeaponData->WeaponType))
+	{
+		if (IsPrimaryWeaponEquippped() && UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->WeaponType))
+		{
+			RemovePrimaryWeapon();
+		}
 
-	// if (UWeaponLibrary::IsWeaponDualHanded)
+		SecondaryWeapon->OnEquip(WeaponData);
+	}
+}
+*/
+
+/*
+void APlayerCharacter::SetPrimaryWeapon(FWeaponTableRow * PrimaryWeaponData)
+{
 }
 
+void APlayerCharacter::SetSecondaryWeapon(FWeaponTableRow * SecondaryWeaponData)
+{
+}
+*/
+
+void APlayerCharacter::RemovePrimaryWeapon()
+{
+	PrimaryWeaponID = NAME_None;
+	PrimaryWeapon->OnUnEquip();
+}
+
+void APlayerCharacter::RemoveSecondaryWeapon()
+{
+	SecondaryWeaponID = NAME_None;
+	SecondaryWeapon->OnUnEquip();
+}
+
+/*
 void APlayerCharacter::UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType)
 {
 	switch (NewWeaponType)
@@ -841,6 +914,63 @@ void APlayerCharacter::UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponTyp
 	default:
 		break;
 	}
+}
+*/
+
+void APlayerCharacter::UpdateCurrentWeaponAnimationType()
+{
+	if (IsPrimaryWeaponEquippped())
+	{
+		switch (PrimaryWeapon->WeaponType)
+		{
+		case EWeaponType::GreatSword:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::GreatSword);
+			break;
+		case EWeaponType::WarHammer:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::WarHammer);
+			break;
+		case EWeaponType::LongSword:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndSword);
+			break;
+		case EWeaponType::Mace:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndMace);
+			break;
+		case EWeaponType::Dagger:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
+			break;
+		case EWeaponType::Staff:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Staff);
+			break;
+		default:
+			// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
+			break;
+		}
+	}
+	else if (IsSecondaryWeaponEquipped())
+	{
+		if (SecondaryWeapon->WeaponType == EWeaponType::Dagger)
+		{
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
+		}
+		else
+		{
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
+		}
+	}
+	else
+	{
+		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
+	}
+}
+
+bool APlayerCharacter::IsPrimaryWeaponEquippped() const
+{
+	return PrimaryWeaponID != NAME_None && PrimaryWeapon->bEquipped;
+}
+
+bool APlayerCharacter::IsSecondaryWeaponEquipped() const
+{
+	return SecondaryWeaponID != NAME_None && SecondaryWeapon->bEquipped;
 }
 
 void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
