@@ -70,11 +70,11 @@ public:
 	 * - the skills that can be used along with this weapon.
 	 * 
 	 * By Default:
-	 * - shield is secondary weapon and every weapon except shield is primary weapon.
-	 * - shield, longsword, and mace are single handed weapons
-	 * - greatswords, warhammer, staff, and daggers are dual handed weapons
-	 *
-	 * Note: Daggers are dual handed because player is not allowed tp equip just a single dagger.
+	 * - shield is secondary weapon
+	 * - Dagger is a hybrid weapon
+	 * - everything else is a primary weapon.
+	 * - shield, longsword, dagger, and mace are single handed weapons
+	 * - greatswords, warhammer, and staff dual handed weapons
 	 */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	EWeaponType WeaponType;
@@ -130,6 +130,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
 	uint8 MaxEnchantLevel = 5;
 	
+	/** Weapon quality scale determines how much the weapon strengthens on enchant */
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
 	float WeaponQualityScale;
 	
