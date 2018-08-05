@@ -2,6 +2,6 @@
 
 #include "ElementalBase.h"
 
-
-
-
+UElementalBase::UElementalBase(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+{
+}

@@ -62,7 +62,7 @@ class EOD_API UStatusEffectBase : public UObject
 public:
 
 	/** Initializes booleans to defaults */
-	UStatusEffectBase();
+	UStatusEffectBase(const FObjectInitializer& ObjectInitializer);
 	
 	/**
 	 * Called to initialize a status effect on a character.
