@@ -9,7 +9,6 @@ bool UWeaponLibrary::IsWeaponDualHanded(EWeaponType WeaponType)
 {
 	if ((WeaponType == EWeaponType::GreatSword) ||
 		(WeaponType == EWeaponType::WarHammer) ||
-		(WeaponType == EWeaponType::Dagger) ||
 		(WeaponType == EWeaponType::Staff))
 		return true;
 
@@ -20,6 +19,7 @@ bool UWeaponLibrary::IsWeaponSingleHanded(EWeaponType WeaponType)
 {
 	if ((WeaponType == EWeaponType::LongSword) ||
 		(WeaponType == EWeaponType::Mace) ||
+		(WeaponType == EWeaponType::Dagger) ||
 		(WeaponType == EWeaponType::Shield))
 		return true;
 
@@ -30,7 +30,6 @@ bool UWeaponLibrary::IsPrimaryWeapon(EWeaponType WeaponType)
 {
 	if ((WeaponType == EWeaponType::GreatSword) ||
 		(WeaponType == EWeaponType::WarHammer) ||
-		(WeaponType == EWeaponType::Dagger) ||
 		(WeaponType == EWeaponType::Staff) ||
 		(WeaponType == EWeaponType::LongSword) ||
 		(WeaponType == EWeaponType::Mace))
@@ -42,6 +41,14 @@ bool UWeaponLibrary::IsPrimaryWeapon(EWeaponType WeaponType)
 bool UWeaponLibrary::IsSecondaryWeapon(EWeaponType WeaponType)
 {
 	if (WeaponType == EWeaponType::Shield)
+		return true;
+
+	return false;
+}
+
+bool UWeaponLibrary::IsHybridWeapon(EWeaponType WeaponType)
+{
+	if (WeaponType == EWeaponType::Dagger)
 		return true;
 
 	return false;

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "UObject/NoExportTypes.h"
+#include "StatusEffects/ElementalBase.h"
 #include "WeaponLibrary.generated.h"
 
 /**
@@ -149,8 +150,7 @@ public:
 	 * @note The weapon won't support elemental enchant if the elemental affinity is not none
 	 */
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	TSubclassOf<class UElementalBase> ElementalAffinity;
-	// TArray<TSubclassOf<class UElementalBase>> ElementalAffinities;
+	TSubclassOf<UElementalBase> ElementalAffinity;
 };
 
 
@@ -172,16 +172,20 @@ public:
 	static bool IsWeaponSingleHanded(EWeaponType WeaponType);
 
 	/**
-	 * Returns true if weapon is a primary weapon type
+	 * Returns true if weapon is a primary weapon type, i.e., weapon can be equipped in primary (right) hand
+	 * @note Dual handed weapons count as primary weapons
 	 * @see APrimaryWeapon
 	 */
 	static bool IsPrimaryWeapon(EWeaponType WeaponType);
 
 	/**
-	 * Returns true if weapon is a secondary weapon type
+	 * Returns true if weapon is a secondary weapon type, i.e., weapon can be equipped in secondary (left) hand
 	 * @see ASecondaryWeapon
 	 */
 	static bool IsSecondaryWeapon(EWeaponType WeaponType);
+
+	/** Returns true if weapon is a hybrid weapon type, i.e., weapon can be equipped in either primary or secondary hand */
+	static bool IsHybridWeapon(EWeaponType WeaponType);
 	
 	/** Returns FWeaponData corresponding to WeaponID from the weapons data table */
 	static FWeaponTableRow* GetWeaponData(FName WeaponID);

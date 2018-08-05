@@ -14,7 +14,9 @@ class EOD_API UElementalBase : public UStatusEffectBase
 {
 	GENERATED_BODY()
 	
-	
+public:
+
+	UElementalBase(const FObjectInitializer& ObjectInitializer);
 	
 	
 };

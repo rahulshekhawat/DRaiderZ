@@ -6,7 +6,7 @@
 
 TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> UStatusEffectBase::CharacterToStatusInfoMap = TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>();
 
-UStatusEffectBase::UStatusEffectBase()
+UStatusEffectBase::UStatusEffectBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bTriggersOnReceivingHit = false;
 	bTriggersOnSuccessfulHit = false;
