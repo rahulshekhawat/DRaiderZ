@@ -206,19 +206,13 @@ public:
 
 	bool bWeaponSheathed;
 
-	void SetCurrentWeapon(FName WeaponID);
+	void SetCurrentPrimaryWeapon(FName WeaponID);
 
-	// void SetCurrentWeapon(FWeaponTableRow* WeaponData);
-
-	// void SetPrimaryWeapon(FWeaponTableRow* PrimaryWeaponData);
-
-	// void SetSecondaryWeapon(FWeaponTableRow* SecondaryWeaponData);
+	void SetCurrentSecondaryWeapon(FName WeaponID);
 
 	void RemovePrimaryWeapon();
 
 	void RemoveSecondaryWeapon();
-
-	// void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
 
 	void UpdateCurrentWeaponAnimationType();
 
