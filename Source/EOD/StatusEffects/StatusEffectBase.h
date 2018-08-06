@@ -37,6 +37,12 @@ public:
 
 	FTimerDelegate TimerDelegate;
 
+	FStatusInfo()
+	{
+		CurrentStackLevel = 0;
+		TotalElapsedTime = 0.f;
+		TimerHandle = nullptr;
+	}
 };
 
 /**
@@ -112,6 +118,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	float TickInterval;
+
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	float StatusEffectDuration;
 	
 	// @todo Add a boolean to follow particle effect attach bone if needed
 	

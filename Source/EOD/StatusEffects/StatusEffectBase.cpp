@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "StatusEffectBase.h"
+#include "Player/EODCharacterBase.h"
 
 #include "Engine/World.h"
 
@@ -39,6 +40,7 @@ void UStatusEffectBase::Deinitialize()
 		FStatusInfo& StatusInfo = CharacterToStatusInfoPair.Value;
 		GetWorld()->GetTimerManager().ClearTimer(*StatusInfo.TimerHandle);
 		delete StatusInfo.TimerHandle;
+		StatusInfo.TimerHandle = nullptr;
 	}
 	CharacterToStatusInfoMap.Empty();
 }
@@ -60,6 +62,8 @@ void UStatusEffectBase::OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>
 
 void UStatusEffectBase::RequestDeactivation(AEODCharacterBase * Character)
 {
+	TWeakObjectPtr<AEODCharacterBase> RecipientCharacter(Character);
+	DeactivateStatusEffect(RecipientCharacter);
 }
 
 void UStatusEffectBase::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter)
@@ -72,7 +76,8 @@ void UStatusEffectBase::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& 
 		}
 
 		FStatusInfo& StatusInfo = CharacterToStatusInfoMap[RecipientCharacter];
-		StatusInfo.CurrentStackLevel += 1;
+		StatusInfo.CurrentStackLevel = StatusInfo.CurrentStackLevel >= StackLimit ? StackLimit : StatusInfo.CurrentStackLevel + 1;
+		// StatusInfo.CurrentStackLevel += 1;
 
 		GetWorld()->GetTimerManager().SetTimer(*StatusInfo.TimerHandle, StatusInfo.TimerDelegate, TickInterval, true, 0);
 	}
@@ -82,7 +87,6 @@ void UStatusEffectBase::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& 
 		StatusInfo.CurrentStackLevel = 1;
 		StatusInfo.TimerHandle = new FTimerHandle;
 		StatusInfo.TimerDelegate.BindUFunction(this, FName("OnStatusEffectTick"), StatusInfo);
-		// StatusInfo.RecipientCharacter = RecipientCharacter;
 
 		GetWorld()->GetTimerManager().SetTimer(*StatusInfo.TimerHandle, StatusInfo.TimerDelegate, TickInterval, true, 0);
 
@@ -92,6 +96,11 @@ void UStatusEffectBase::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& 
 
 void UStatusEffectBase::DeactivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter)
 {
+	FStatusInfo& StatusInfo = CharacterToStatusInfoMap[RecipientCharacter];
+	GetWorld()->GetTimerManager().ClearTimer(*StatusInfo.TimerHandle);
+	delete StatusInfo.TimerHandle;
+	StatusInfo.TimerHandle = nullptr;
+	CharacterToStatusInfoMap.Remove(RecipientCharacter);
 }
 
 AEODCharacterBase* UStatusEffectBase::GetOwningCharacter() const
