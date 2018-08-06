@@ -44,9 +44,9 @@ void APrimaryWeapon::Tick(float DeltaTime)
 
 }
 
-void APrimaryWeapon::OnEquip(FWeaponTableRow * NewWeaponData)
+void APrimaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponData)
 {
-	check (NewWeaponData && OwningCharacter)
+	check(NewWeaponData && OwningCharacter);
 
 	if (NewWeaponData->WeaponMesh.IsNull())
 	{
@@ -55,7 +55,7 @@ void APrimaryWeapon::OnEquip(FWeaponTableRow * NewWeaponData)
 	}
 
 	USkeletalMesh* NewSkeletalMesh = nullptr;
-	
+
 	if (NewWeaponData->WeaponMesh.IsPending())
 	{
 		NewSkeletalMesh = NewWeaponData->WeaponMesh.LoadSynchronous();
@@ -128,9 +128,12 @@ void APrimaryWeapon::OnEquip(FWeaponTableRow * NewWeaponData)
 	default:
 		break;
 	}
-	
+
 	bEquipped = true;
+	WeaponID = NewWeaponID;
 	WeaponType = NewWeaponData->WeaponType;
+
+	// @todo intialize weapon stats
 
 }
 
@@ -153,4 +156,7 @@ void APrimaryWeapon::OnUnEquip()
 	FallenWeaponMeshComp->Deactivate();
 
 	bEquipped = false;
+	WeaponID = NAME_None;
+	WeaponType = EWeaponType::None;
+	// @todo reset weapon stats
 }

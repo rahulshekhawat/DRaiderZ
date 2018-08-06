@@ -67,6 +67,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	MaxPlayerWalkSpeed = 400;
 	SetWalkSpeed(MaxPlayerWalkSpeed);
 
+	// be default the weapon should be sheathed
+	bWeaponSheathed = true;
+
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -144,8 +147,10 @@ void APlayerCharacter::PostInitializeComponents()
 	SecondaryWeapon->SetOwningCharacter(this);
 
 	// @note please set secondary weapon first and primary weapon later.
-	SetCurrentWeapon(SecondaryWeaponID);
-	SetCurrentWeapon(PrimaryWeaponID);
+	if (SecondaryWeaponID != NAME_None)
+		SetCurrentWeapon(SecondaryWeaponID);
+	if (PrimaryWeaponID != NAME_None)
+		SetCurrentWeapon(PrimaryWeaponID);
 }
 
 #if WITH_EDITOR
@@ -388,6 +393,7 @@ void APlayerCharacter::OnInteract()
 
 void APlayerCharacter::OnToggleSheath()
 {
+
 }
 
 void APlayerCharacter::OnToggleCharacterStatsUI()
@@ -807,7 +813,8 @@ void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
 			RemoveSecondaryWeapon();
 		}
 
-		PrimaryWeapon->OnEquip(WeaponData);
+		PrimaryWeapon->OnEquip(WeaponID, WeaponData);
+		// PrimaryWeapon->WeaponID = WeaponID;
 		PrimaryWeaponID = WeaponID;
 	}
 	else if (UWeaponLibrary::IsSecondaryWeapon(WeaponData->WeaponType))
@@ -817,7 +824,8 @@ void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
 			RemovePrimaryWeapon();
 		}
 
-		SecondaryWeapon->OnEquip(WeaponData);
+		SecondaryWeapon->OnEquip(WeaponID, WeaponData);
+		// SecondaryWeapon->WeaponID = WeaponID;
 		SecondaryWeaponID = WeaponID;
 	}
 

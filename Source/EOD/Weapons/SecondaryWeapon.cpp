@@ -39,11 +39,10 @@ void ASecondaryWeapon::Tick(float DeltaTime)
 
 }
 
-void ASecondaryWeapon::OnEquip(FWeaponTableRow * NewWeaponData)
+void ASecondaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponData)
 {
-	check(NewWeaponData);
-	check(OwningCharacter);
-	
+	check(NewWeaponData && OwningCharacter);
+
 	if (NewWeaponData->WeaponMesh.IsNull())
 	{
 		// @todo handle failed to equip
@@ -51,7 +50,7 @@ void ASecondaryWeapon::OnEquip(FWeaponTableRow * NewWeaponData)
 	}
 
 	USkeletalMesh* NewSkeletalMesh = nullptr;
-	
+
 	if (NewWeaponData->WeaponMesh.IsPending())
 	{
 		NewSkeletalMesh = NewWeaponData->WeaponMesh.LoadSynchronous();
@@ -87,7 +86,10 @@ void ASecondaryWeapon::OnEquip(FWeaponTableRow * NewWeaponData)
 	}
 
 	bEquipped = true;
+	WeaponID = NewWeaponID;
 	WeaponType = NewWeaponData->WeaponType;
+
+	// @todo intialize weapon stats
 }
 
 void ASecondaryWeapon::OnUnEquip()
@@ -106,4 +108,7 @@ void ASecondaryWeapon::OnUnEquip()
 	FallenWeaponMeshComp->Deactivate();
 
 	bEquipped = false;
+	WeaponID = NAME_None;
+	WeaponType = EWeaponType::None;
+	// @todo reset weapon stats
 }

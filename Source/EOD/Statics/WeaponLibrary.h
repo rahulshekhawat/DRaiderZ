@@ -30,6 +30,7 @@ enum class EWeaponAnimationType : uint8
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
+	None,
 	GreatSword,
 	WarHammer,
 	LongSword,

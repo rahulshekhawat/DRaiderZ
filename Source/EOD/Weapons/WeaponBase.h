@@ -32,8 +32,11 @@ public:
 	/** Dummy declaration. Weapon actors are not supposed to tick */
 	virtual void Tick(float DeltaTime) override;
 	
-	/** Called when this weapon is equipped by a character */
-	virtual void OnEquip(FWeaponTableRow* NewWeaponData) PURE_VIRTUAL(ABaseWeapon::OnEquip, );
+	/** Called when a new weapon is equipped by a character */
+	void OnEquip(FName NewWeaponID);
+
+	/** Called when a new weapon is equipped by a character */
+	virtual void OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData) PURE_VIRTUAL(AWeaponBase::OnEquip, );
 
 	/** Called when this weapon is unequipped by a character */
 	virtual void OnUnEquip() PURE_VIRTUAL(ABaseWeapon::OnUnEquip, );
@@ -42,6 +45,8 @@ public:
 	EWeaponType WeaponType;
 
 	bool bEquipped;
+
+	FName WeaponID;
 
 	/** 
 	 * Call this to set the owner of this weapon.

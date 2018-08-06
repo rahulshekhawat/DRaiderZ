@@ -204,6 +204,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
 	FName SecondaryWeaponID;
 
+	bool bWeaponSheathed;
+
 	void SetCurrentWeapon(FName WeaponID);
 
 	// void SetCurrentWeapon(FWeaponTableRow* WeaponData);
