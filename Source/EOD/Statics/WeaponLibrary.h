@@ -30,14 +30,14 @@ enum class EWeaponAnimationType : uint8
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
-	None,
 	GreatSword,
 	WarHammer,
 	LongSword,
 	Mace,
 	Dagger,
 	Staff,
-	Shield
+	Shield,
+	None
 };
 
 //~ @todo FWeaponData vs WeaponStatsComponent, decide which one to keep

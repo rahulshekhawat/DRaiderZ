@@ -130,6 +130,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION(APlayerCharacter, IWR_CharacterMovementDirection, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, CurrentWeaponAnimationToUse, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(APlayerCharacter, bWeaponSheathed, COND_SkipOwner);
 
 }
 
@@ -391,7 +392,8 @@ void APlayerCharacter::OnInteract()
 
 void APlayerCharacter::OnToggleSheath()
 {
-
+	bool bNewValue = !bWeaponSheathed;
+	SetWeaponSheathed(bNewValue);
 }
 
 void APlayerCharacter::OnToggleCharacterStatsUI()
@@ -854,6 +856,16 @@ void APlayerCharacter::RemoveSecondaryWeapon()
 
 void APlayerCharacter::UpdateCurrentWeaponAnimationType()
 {
+	if (bWeaponSheathed)
+	{
+		if (CurrentWeaponAnimationToUse != EWeaponAnimationType::SheathedWeapon)
+		{
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::SheathedWeapon);
+		}
+
+		return;
+	}
+
 	if (IsPrimaryWeaponEquippped())
 	{
 		switch (PrimaryWeapon->WeaponType)
@@ -964,6 +976,32 @@ void APlayerCharacter::Server_SetBlockMovementDirectionYaw_Implementation(float 
 }
 
 bool APlayerCharacter::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw)
+{
+	return true;
+}
+
+void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
+{
+	bWeaponSheathed = bNewValue;
+	UpdateCurrentWeaponAnimationType();
+
+	if (Role < ROLE_Authority)
+	{
+		Server_SetWeaponSheathed(bNewValue);
+	}
+}
+
+void APlayerCharacter::OnRep_WeaponSheathed()
+{
+	UpdateCurrentWeaponAnimationType();	
+}
+
+void APlayerCharacter::Server_SetWeaponSheathed_Implementation(bool bNewValue)
+{
+	SetWeaponSheathed(bNewValue);
+}
+
+bool APlayerCharacter::Server_SetWeaponSheathed_Validate(bool bNewValue)
 {
 	return true;
 }

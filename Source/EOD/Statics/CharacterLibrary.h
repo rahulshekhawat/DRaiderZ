@@ -261,6 +261,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	TSoftObjectPtr<UAnimMontage> AnimMontage;
 
+	UPROPERTY(EditAnywhere, Category = BaseInfo, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
+	uint8 SupportedWeapons;
+
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	FName SkillStartMontageSectionName;
 	
@@ -281,6 +284,12 @@ public:
 
 	// @todo What does this skill do (heal/damage/buff)? It will be useful for AI logic
 
+	FSkillTableRow()
+	{
+		SkillStartMontageSectionName = NAME_None;
+		SkillLoopMontageSectionName = NAME_None;
+		SkillEndMontageSectionName = NAME_None;
+	}
 };
 
 /** Struct containing information of the skill that a character is currently using */

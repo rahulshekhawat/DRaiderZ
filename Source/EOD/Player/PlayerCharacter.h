@@ -204,8 +204,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
 	FName SecondaryWeaponID;
 
-	bool bWeaponSheathed;
-
 	void SetCurrentPrimaryWeapon(FName WeaponID);
 
 	void SetCurrentSecondaryWeapon(FName WeaponID);
@@ -291,9 +289,18 @@ public:
 
 	void SetBlockMovementDirectionYaw(float NewYaw);
 
+	/** Determines whether weapon is currently sheathed or not */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_WeaponSheathed)
+	bool bWeaponSheathed;
+	
+	void SetWeaponSheathed(bool bNewValue);
+
 private:
 	
 	//~ Begin multiplayer code
+	UFUNCTION()
+	void OnRep_WeaponSheathed();
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 	
@@ -302,6 +309,9 @@ private:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetWeaponSheathed(bool bNewValue);
 	//~ End multiplayer code
 
 };
