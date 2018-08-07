@@ -63,12 +63,15 @@ public:
 	//~ @note Words like `JumpStart` and `JumpEnd` have been intentionally capitalized because
 	//~ they are animation montage section names
 
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
+	FName FPlayerAnimationReferencesTableRowID;
+
 	/** Contains animations for player JumpStart, JumpLoop, and JumpEnd */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Jump;
 	
 	/** Contains animations for ForwardDodge, BackwardDodge, LeftDodge, and RightDodge */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Dodge;
 	
 	/** Contains animations for:
@@ -79,39 +82,39 @@ public:
 	 * BackwardSwing, BackwardSwingEnd
 	 * ...
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_NormalAttacks;
 
 	//~ @note Add AnimationMontage_WeaponChange animations here
 	//~ @todo List montage section names for AnimationMontage_SpecialActions
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_SpecialActions;
 	
 	/**
 	 * Contains animations for instant skills.
 	 * Section name will be same as skill name
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Skills;
 	
 	/**
 	 * Contains animations for spells
 	 * Section name will be same as spell name
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Spells;
 	
 	//~ @todo documentation
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_SpecialMovement;
 	
 	//~ @todo List montage section names for AnimationMontage_CrowdControlEffects
 	/** Contains animations for crowd control effects like interrupted, frozen, etc. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_CrowdControlEffects;
 	
 	/** Contains animations for player flinching */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Flinch;
 
 	/** Handle proper destruction of player animation references */
@@ -328,5 +331,8 @@ public:
 	//~ @note Blueprints don't support raw struct pointers, therefore it can't be BlueprintCallable
 	/** Returns player animation references based on the EWeaponAnimationType of player */
 	static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType);
+
+	/** Attempts to unload player animation references, returns true if successful */
+	static bool UnloadPlayerAnimationReferences(FPlayerAnimationReferences* PlayerAnimationReferences);
 
 };

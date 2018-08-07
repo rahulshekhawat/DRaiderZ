@@ -663,6 +663,8 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 {
 	if (PlayerAnimationReferences)
 	{
+		UCharacterLibrary::UnloadPlayerAnimationReferences(PlayerAnimationReferences);
+
 		// delete older animation references, prevent memory leak
 		delete PlayerAnimationReferences;
 		PlayerAnimationReferences = nullptr;

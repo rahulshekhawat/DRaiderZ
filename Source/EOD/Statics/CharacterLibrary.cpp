@@ -20,32 +20,41 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 	{
 		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
 		FPlayerAnimationReferencesTableRow* PlayerAnimationSoftReferences = nullptr;
+		FName PlayerAnimationReferencesTableRowID = NAME_None;
 		
 		switch (PlayerWeaponAnimationType)
 		{
 		case EWeaponAnimationType::NoWeapon:
 			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("NoWeapon"), FString("Animation references for no weapon equipped"));
+			PlayerAnimationReferencesTableRowID = FName("NoWeapon");
 			break;
 		case EWeaponAnimationType::SheathedWeapon:
 			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("SheathedWeapon"), FString("Animation references when weapon is sheathed"));
+			PlayerAnimationReferencesTableRowID = FName("SheathedWeapon");
 			break;
 		case EWeaponAnimationType::ShieldAndSword:
 			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("ShieldAndSword"), FString("Animation references for Shield and Sword"));
+			PlayerAnimationReferencesTableRowID = FName("ShieldAndSword");
 			break;
 		case EWeaponAnimationType::ShieldAndMace:
 			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("ShieldAndMace"), FString("Animation references for Shield and Mace"));
+			PlayerAnimationReferencesTableRowID = FName("ShieldAndMace");
 			break;
 		case EWeaponAnimationType::GreatSword:
 			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("GreatSword"), FString("Animation references for GreatSword"));
+			PlayerAnimationReferencesTableRowID = FName("GreatSword");
 			break;
 		case EWeaponAnimationType::WarHammer:
 			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("WarHammer"), FString("Animation references for WarHammer"));
+			PlayerAnimationReferencesTableRowID = FName("WarHammer");
 			break;
 		case EWeaponAnimationType::Staff:
 			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Staff"), FString("Animation references for Staff"));
+			PlayerAnimationReferencesTableRowID = FName("Staff");
 			break;
 		case EWeaponAnimationType::Daggers:
 			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Daggers"), FString("Animation references for Daggers"));
+			PlayerAnimationReferencesTableRowID = FName("Daggers");
 			break;
 		default:
 			break;
@@ -55,6 +64,7 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 		if (PlayerAnimationSoftReferences)
 		{
 			PlayerAnimationReferences = new FPlayerAnimationReferences;
+			PlayerAnimationReferences->FPlayerAnimationReferencesTableRowID = PlayerAnimationReferencesTableRowID;
 			PlayerAnimationReferences->AnimationMontage_Dodge = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Dodge);
 			PlayerAnimationReferences->AnimationMontage_Jump = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Jump);
 			PlayerAnimationReferences->AnimationMontage_NormalAttacks = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->NormalAttacks);
@@ -69,6 +79,40 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 	}
 
 	return PlayerAnimationReferences;
+}
+
+bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferences * PlayerAnimationReferences)
+{
+	if (!(PlayerAnimationReferences && GEngine && GEngine->GameSingleton))
+	{
+		return false;
+	}
+
+	UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+	if (!GameSingleton)
+	{
+		return false;
+	}
+
+	FPlayerAnimationReferencesTableRow* PlayerAnimationSoftReferences = nullptr;
+	PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(PlayerAnimationReferences->FPlayerAnimationReferencesTableRowID, FString("Animation references lookup for unloading"));
+
+	if (!PlayerAnimationSoftReferences)
+	{
+		return false;
+	}
+
+	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->CrowdControlEffects.ToSoftObjectPath());
+	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Dodge.ToSoftObjectPath());
+	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Flinch.ToSoftObjectPath());
+	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Jump.ToSoftObjectPath());
+	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->NormalAttacks.ToSoftObjectPath());
+	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Skills.ToSoftObjectPath());
+	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->SpecialActions.ToSoftObjectPath());
+	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->SpecialMovement.ToSoftObjectPath());
+	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Spells.ToSoftObjectPath());
+
+	return true;
 }
 
 FPlayerAnimationReferences::~FPlayerAnimationReferences()
