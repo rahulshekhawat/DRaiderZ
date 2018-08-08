@@ -43,9 +43,22 @@ public:
 
 	virtual bool IsJumping() const;
 
+	/** Determines if the character is in dodge state. Used to trigger dodge animation */
 	virtual bool IsDodging() const;	
 	
+	/** Determines if the character is dodging incoming damage */
+	virtual bool IsDodgingDamage() const;
+
+	/**
+	 * Detemines if the character is in block state. Used to trigger block animation.
+	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
+	 */
 	virtual bool IsBlocking() const;
+
+	/** Determines if the character is actively blocking any incoming damage
+	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
+	 */
+	virtual bool IsBlockingDamage() const;
 
 	virtual bool IsCastingSpell() const;
 
@@ -105,13 +118,23 @@ public:
 	TMap<uint8, FCombatEvent> OnUsingSkillEventMap;
 
 	/** Returns the info for skill that this character is curretly using */
-	virtual FActiveSkill GetCurrentActiveSkillInfo();
+	// virtual FActiveSkill GetCurrentActiveSkillInfo();
+
+	/** Returns the current active skill */
+	virtual FSkillTableRow* GetCurrentActiveSkill() PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkill, return nullptr; );
 
 	/** [server] Handle melee collision */
-	virtual void HandleMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) PURE_VIRTUAL(AEODCharacterBase::HandleMeleeCollision, );
+	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) PURE_VIRTUAL(AEODCharacterBase::HandleMeleeCollision, );
 
 	// @todo
 	// virtual void HandleRangedCollision();
+
+	/** [server] Apply damage to a character */
+	// virtual void ApplyDamage(AEODCharacterBase* HitCharacter, FHitResult HitResults) PURE_VIRTUAL(AEODCharacterBase::ApplyDamage, );
+
+	/** [server] Take damage from another character */
+	// @todo
+	// void TakeDamage()
 
 protected:
 

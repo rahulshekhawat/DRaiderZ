@@ -70,6 +70,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	// be default the weapon should be sheathed
 	bWeaponSheathed = true;
 
+	// bHasActiveiframes = false;
+	// bIsBlockingDamage = false;
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -607,55 +609,70 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 	}
 }
 
-void APlayerCharacter::HandleMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
+void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
+	/*
+	// @note intentionally commented out. If player animation references are null when a collision event is triggered, we want it to crash.
 	if (!PlayerAnimationReferences || !(Animation == PlayerAnimationReferences->AnimationMontage_NormalAttacks || 
 										Animation == PlayerAnimationReferences->AnimationMontage_Skills || 
 										Animation == PlayerAnimationReferences->AnimationMontage_Spells))
 	{
 		return;
 	}
+	*/
+
+	bool bEnemiesHit = false;
+	FSkillTableRow* SkillTableRow = GetCurrentActiveSkill();
 
 	for (FHitResult& HitResult : HitResults)
 	{
-		if (HitResult.Actor.Get())
+		if (!HitResult.Actor.Get())
 		{
-			AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
-			if (HitCharacter)
+			continue;
+		}
+
+		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
+		
+		if (!HitCharacter || HitCharacter->IsDodgingDamage())
+		{
+			// @todo handle damage for non AEODCharacterBase actors
+			continue;
+		}
+
+		bEnemiesHit = true;
+
+		TArray<FHitResult> LineHitResults;
+		FVector LineStart = GetActorLocation();
+		FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
+
+		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
+		GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
+
+		FHitResult LineHitResultToHitCharacter;
+		bool bLineHitResultFound = false;
+
+		for (FHitResult& LineHitResult : LineHitResults)
+		{
+			if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
 			{
-				TArray<FHitResult> LineHitResults;
-				FVector LineStart = GetActorLocation();
-				FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
-
-				FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
-				GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
-
-				FHitResult LineHitResultToHitCharacter;
-				bool bLineHitResultFound = false;
-
-				for (FHitResult& LineHitResult : LineHitResults)
-				{
-					if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
-					{
-						LineHitResultToHitCharacter = LineHitResult;
-						bLineHitResultFound = true;
-						break;
-					}
-				}
-
-				if (bLineHitResultFound)
-				{
-
-					FVector Start = LineHitResultToHitCharacter.ImpactPoint;
-					FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
-					UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
-				}
-			}
-			else
-			{
-				// @todo handle damage for non AEODCharacterBase actors
+				LineHitResultToHitCharacter = LineHitResult;
+				bLineHitResultFound = true;
+				break;
 			}
 		}
+
+		if (bLineHitResultFound)
+		{
+
+			FVector Start = LineHitResultToHitCharacter.ImpactPoint;
+			FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
+			UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
+		}
+	}
+
+	if (!bEnemiesHit)
+	{
+		OnUnsuccessfulHit.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
 	}
 }
 

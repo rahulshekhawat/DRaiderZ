@@ -11,7 +11,7 @@ void UCombatLibrary::HandleCombatCollision(AEODCharacterBase * Instigator, UAnim
 		return;
 	}
 
-	Instigator->HandleMeleeCollision(Animation, HitResults, bHit);
+	Instigator->OnMeleeCollision(Animation, HitResults, bHit);
 	// FActiveSkill ActiveSkill = Instigator->GetCurrentActiveSkillInfo();
 	
 }

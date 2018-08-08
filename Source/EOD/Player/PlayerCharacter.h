@@ -240,6 +240,10 @@ public:
 	void UpdateAutoRun(float DeltaTime);
 	//~ End state handlers
 
+	// bool bHasActiveiframes;
+
+	// bool bIsBlockingDamage;
+
 	//~ Begin combat events	
 	FCombatEvent OnUsingSkill_0;
 	FCombatEvent OnUsingSkill_1;
@@ -254,8 +258,7 @@ public:
 	//~ End combat events
 
 	/** [server] Handle melee collision */
-	virtual void HandleMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
-
+	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
 private:
 

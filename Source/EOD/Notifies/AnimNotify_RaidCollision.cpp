@@ -78,7 +78,7 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		if (BaseCharacter)
 		{
 			// UCombatLibrary::HandleCombatCollision(BaseCharacter, Animation, HitResults, bHit);
-			BaseCharacter->HandleMeleeCollision(Animation, HitResults, bHit);
+			BaseCharacter->OnMeleeCollision(Animation, HitResults, bHit);
 		}
 		else
 		{
