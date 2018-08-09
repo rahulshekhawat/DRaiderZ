@@ -12,7 +12,7 @@ UCharacterLibrary::UCharacterLibrary(const FObjectInitializer& ObjectInitializer
 {
 }
 
-FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType)
+FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType, ECharacterGender Gender)
 {
 	FPlayerAnimationReferences* PlayerAnimationReferences = nullptr;
 
@@ -22,45 +22,89 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 		FPlayerAnimationReferencesTableRow* PlayerAnimationSoftReferences = nullptr;
 		FName PlayerAnimationReferencesTableRowID = NAME_None;
 		
-		switch (PlayerWeaponAnimationType)
+		if (Gender == ECharacterGender::Female)
 		{
-		case EWeaponAnimationType::NoWeapon:
-			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("NoWeapon"), FString("Animation references for no weapon equipped"));
-			PlayerAnimationReferencesTableRowID = FName("NoWeapon");
-			break;
-		case EWeaponAnimationType::SheathedWeapon:
-			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("SheathedWeapon"), FString("Animation references when weapon is sheathed"));
-			PlayerAnimationReferencesTableRowID = FName("SheathedWeapon");
-			break;
-		case EWeaponAnimationType::ShieldAndSword:
-			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("ShieldAndSword"), FString("Animation references for Shield and Sword"));
-			PlayerAnimationReferencesTableRowID = FName("ShieldAndSword");
-			break;
-		case EWeaponAnimationType::ShieldAndMace:
-			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("ShieldAndMace"), FString("Animation references for Shield and Mace"));
-			PlayerAnimationReferencesTableRowID = FName("ShieldAndMace");
-			break;
-		case EWeaponAnimationType::GreatSword:
-			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("GreatSword"), FString("Animation references for GreatSword"));
-			PlayerAnimationReferencesTableRowID = FName("GreatSword");
-			break;
-		case EWeaponAnimationType::WarHammer:
-			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("WarHammer"), FString("Animation references for WarHammer"));
-			PlayerAnimationReferencesTableRowID = FName("WarHammer");
-			break;
-		case EWeaponAnimationType::Staff:
-			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Staff"), FString("Animation references for Staff"));
-			PlayerAnimationReferencesTableRowID = FName("Staff");
-			break;
-		case EWeaponAnimationType::Daggers:
-			PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Daggers"), FString("Animation references for Daggers"));
-			PlayerAnimationReferencesTableRowID = FName("Daggers");
-			break;
-		default:
-			break;
+			switch (PlayerWeaponAnimationType)
+			{
+			case EWeaponAnimationType::NoWeapon:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Female_NoWeapon"), FString("Animation references for no weapon equipped"));
+				PlayerAnimationReferencesTableRowID = FName("Female_NoWeapon");
+				break;
+			case EWeaponAnimationType::SheathedWeapon:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Female_SheathedWeapon"), FString("Animation references when weapon is sheathed"));
+				PlayerAnimationReferencesTableRowID = FName("Female_SheathedWeapon");
+				break;
+			case EWeaponAnimationType::ShieldAndSword:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Female_ShieldAndSword"), FString("Animation references for Shield and Sword"));
+				PlayerAnimationReferencesTableRowID = FName("Female_ShieldAndSword");
+				break;
+			case EWeaponAnimationType::ShieldAndMace:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Female_ShieldAndMace"), FString("Animation references for Shield and Mace"));
+				PlayerAnimationReferencesTableRowID = FName("Female_ShieldAndMace");
+				break;
+			case EWeaponAnimationType::GreatSword:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Female_GreatSword"), FString("Animation references for GreatSword"));
+				PlayerAnimationReferencesTableRowID = FName("Female_GreatSword");
+				break;
+			case EWeaponAnimationType::WarHammer:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Female_WarHammer"), FString("Animation references for WarHammer"));
+				PlayerAnimationReferencesTableRowID = FName("Female_WarHammer");
+				break;
+			case EWeaponAnimationType::Staff:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Female_Staff"), FString("Animation references for Staff"));
+				PlayerAnimationReferencesTableRowID = FName("Female_Staff");
+				break;
+			case EWeaponAnimationType::Daggers:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Female_Daggers"), FString("Animation references for Daggers"));
+				PlayerAnimationReferencesTableRowID = FName("Female_Daggers");
+				break;
+			default:
+				break;
+			}
+		}
+		else if (Gender == ECharacterGender::Male)
+		{
+			switch (PlayerWeaponAnimationType)
+			{
+			case EWeaponAnimationType::NoWeapon:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Male_NoWeapon"), FString("Animation references for no weapon equipped"));
+				PlayerAnimationReferencesTableRowID = FName("Male_NoWeapon");
+				break;
+			case EWeaponAnimationType::SheathedWeapon:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Male_SheathedWeapon"), FString("Animation references when weapon is sheathed"));
+				PlayerAnimationReferencesTableRowID = FName("Male_SheathedWeapon");
+				break;
+			case EWeaponAnimationType::ShieldAndSword:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Male_ShieldAndSword"), FString("Animation references for Shield and Sword"));
+				PlayerAnimationReferencesTableRowID = FName("Male_ShieldAndSword");
+				break;
+			case EWeaponAnimationType::ShieldAndMace:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Male_ShieldAndMace"), FString("Animation references for Shield and Mace"));
+				PlayerAnimationReferencesTableRowID = FName("Male_ShieldAndMace");
+				break;
+			case EWeaponAnimationType::GreatSword:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Male_GreatSword"), FString("Animation references for GreatSword"));
+				PlayerAnimationReferencesTableRowID = FName("Male_GreatSword");
+				break;
+			case EWeaponAnimationType::WarHammer:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Male_WarHammer"), FString("Animation references for WarHammer"));
+				PlayerAnimationReferencesTableRowID = FName("Male_WarHammer");
+				break;
+			case EWeaponAnimationType::Staff:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Male_Staff"), FString("Animation references for Staff"));
+				PlayerAnimationReferencesTableRowID = FName("Male_Staff");
+				break;
+			case EWeaponAnimationType::Daggers:
+				PlayerAnimationSoftReferences = GameSingleton->PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(FName("Male_Daggers"), FString("Animation references for Daggers"));
+				PlayerAnimationReferencesTableRowID = FName("Male_Daggers");
+				break;
+			default:
+				break;
+			}
 		}
 
-		//@ todo Modify following code to load assets asynchronously
+
+		// @todo Modify following code to load assets asynchronously
 		if (PlayerAnimationSoftReferences)
 		{
 			PlayerAnimationReferences = new FPlayerAnimationReferences;
@@ -81,7 +125,7 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 	return PlayerAnimationReferences;
 }
 
-bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferences * PlayerAnimationReferences)
+bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferences * PlayerAnimationReferences, ECharacterGender Gender)
 {
 	if (!(PlayerAnimationReferences && GEngine && GEngine->GameSingleton))
 	{

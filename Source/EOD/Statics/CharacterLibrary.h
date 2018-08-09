@@ -29,6 +29,13 @@ enum class ECharMovementDirection : uint8
 	BR 		UMETA(DisplayName = "Backward Right"),
 };
 
+UENUM(BlueprintType)
+enum class ECharacterGender : uint8
+{
+	Female,
+	Male
+};
+
 /** This enum describes the current action/state of character */
 UENUM(BlueprintType)
 enum class ECharacterState : uint8
@@ -342,9 +349,9 @@ public:
 	
 	//~ @note Blueprints don't support raw struct pointers, therefore it can't be BlueprintCallable
 	/** Returns player animation references based on the EWeaponAnimationType of player */
-	static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType);
+	static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType, ECharacterGender Gender = ECharacterGender::Female);
 
 	/** Attempts to unload player animation references, returns true if successful */
-	static bool UnloadPlayerAnimationReferences(FPlayerAnimationReferences* PlayerAnimationReferences);
+	static bool UnloadPlayerAnimationReferences(FPlayerAnimationReferences* PlayerAnimationReferences, ECharacterGender Gender = ECharacterGender::Female);
 
 };

@@ -157,6 +157,9 @@ private:
 	
 	float MaxPlayerWalkSpeed;
 
+	UPROPERTY(EditDefaultsOnly, Category = Gender)
+	ECharacterGender Gender;
+
 public:
 	
 	/**
