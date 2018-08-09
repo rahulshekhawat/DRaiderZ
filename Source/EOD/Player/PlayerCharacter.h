@@ -257,6 +257,13 @@ public:
 	FCombatEvent OnUsingSkill_9;
 	//~ End combat events
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills)
+	uint8 MaxNumberOfSkills;
+
+	TArray<FCombatEvent> EventsOnUsingSkill;
+
+	TArray<FCombatEvent> EventsOnSuccessfulSkillAttack;
+
 	/** [server] Handle melee collision */
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 

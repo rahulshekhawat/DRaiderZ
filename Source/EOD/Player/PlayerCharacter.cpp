@@ -72,6 +72,14 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	// bHasActiveiframes = false;
 	// bIsBlockingDamage = false;
+
+	MaxNumberOfSkills = 30;
+	
+	for (int i = 0; i < MaxNumberOfSkills; i++)
+	{
+		EventsOnSuccessfulSkillAttack.Add(FCombatEvent());
+		EventsOnUsingSkill.Add(FCombatEvent());
+	}
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
