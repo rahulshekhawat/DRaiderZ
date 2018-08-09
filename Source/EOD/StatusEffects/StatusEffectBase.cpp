@@ -9,17 +9,19 @@ TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> UStatusEffectBase::Characte
 
 UStatusEffectBase::UStatusEffectBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bTriggersOnReceivingHit = false;
-	bTriggersOnSuccessfulHit = false;
-	bTriggersOnUnsuccessfulHit = false;
-	bTriggersOnCriticalHit = false;
-	bTriggersOnSuccessfulDodge = false;
-	bTriggersOnSuccessfulBlock = false;
-	bTriggersOnFullHealth = false;
-	bTriggersOnLowHealth = false;
-	bTriggersOnEnteringCombat = false;
-	bTriggersOnLeavingCombat = false;
-	bTriggersOnInitialization = false;
+	bTriggersOnReceivingHit				= false;
+	bTriggersOnSuccessfulHit			= false;
+	bTriggersOnUnsuccessfulHit			= false;
+	bTriggersOnCriticalHit				= false;
+	bTriggersOnSuccessfulDodge			= false;
+	bTriggersOnSuccessfulBlock			= false;
+	bTriggersOnFullHealth				= false;
+	bTriggersOnLowHealth				= false;
+	bTriggersOnEnteringCombat			= false;
+	bTriggersOnLeavingCombat			= false;
+	bTriggersOnInitialization			= false;
+	bTriggersOnUsingSkill				= false;
+	bTriggersOnSuccessfulSkillAttack	= false;
 
 	// Default stack limit is 1
 	StackLimit = 1;

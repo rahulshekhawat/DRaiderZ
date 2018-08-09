@@ -188,6 +188,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnUsingSkill : 1;
 
+	/** True if the status effect triggers on successfully attacking an enemy with a particular skill */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnSuccessfulSkillAttack : 1;
+
 	//~ @note Redundant property but it could be useful in certain situations
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnInitialization : 1;
