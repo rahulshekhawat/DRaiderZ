@@ -702,14 +702,14 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 {
 	if (PlayerAnimationReferences)
 	{
-		UCharacterLibrary::UnloadPlayerAnimationReferences(PlayerAnimationReferences);
+		UCharacterLibrary::UnloadPlayerAnimationReferences(PlayerAnimationReferences, Gender);
 
 		// delete older animation references, prevent memory leak
 		delete PlayerAnimationReferences;
 		PlayerAnimationReferences = nullptr;
 	}
 
-	PlayerAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(CurrentWeaponAnimationToUse);
+	PlayerAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(CurrentWeaponAnimationToUse, Gender);
 
 }
 
