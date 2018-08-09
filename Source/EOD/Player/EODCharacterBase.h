@@ -130,11 +130,10 @@ public:
 	// virtual void HandleRangedCollision();
 
 	/** [server] Apply damage to a character */
-	// virtual void ApplyDamage(AEODCharacterBase* HitCharacter, FHitResult HitResults) PURE_VIRTUAL(AEODCharacterBase::ApplyDamage, );
+	virtual void ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage) PURE_VIRTUAL(AEODCharacterBase::ApplyEODDamage, );
 
 	/** [server] Take damage from another character */
-	// @todo
-	// void TakeDamage()
+	virtual void TakeEODDamage(AEODCharacterBase* Instigator, FEODDamage& EODDamage) PURE_VIRTUAL(AEODCharacterBase::TakeEODDamage, );
 
 protected:
 

@@ -190,13 +190,6 @@ enum class ESkillCastType : uint8
 	NoCast
 };
 
-UENUM(BlueprintType)
-enum class EDamageType : uint8
-{
-	Physical,
-	Magickal
-};
-
 /** Struct containing level specific info for an in-game skill */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillLevelUpInfo
@@ -302,6 +295,8 @@ struct FSkill
 	GENERATED_USTRUCT_BODY()
 
 public:
+
+	// uint8 SkillSlotIndex;
 
 	uint8 CurrentSkillLevel;
 

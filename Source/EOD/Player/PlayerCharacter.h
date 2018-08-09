@@ -260,6 +260,12 @@ public:
 	/** [server] Handle melee collision */
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
+	/** [server] Apply damage to a character */
+	virtual void ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage) override;
+
+	/** [server] Take damage from another character */
+	virtual void TakeEODDamage(AEODCharacterBase* Instigator, FEODDamage& EODDamage) override;
+
 private:
 
 	//~ Template functions

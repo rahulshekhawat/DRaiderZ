@@ -624,7 +624,7 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 	bool bEnemiesHit = false;
 	FSkill* ActiveSkill = GetCurrentActiveSkill();
 
-	// if (ActiveSkill && ActiveSkill->SkillLevelUpInfo.bUndodgable)
+	check(ActiveSkill);
 
 	for (FHitResult& HitResult : HitResults)
 	{
@@ -635,7 +635,7 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 
 		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
 		
-		if (!HitCharacter || HitCharacter->IsDodgingDamage())
+		if (!HitCharacter || (HitCharacter->IsDodgingDamage() && !ActiveSkill->SkillLevelUpInfo.bUndodgable))
 		{
 			// @todo handle damage for non AEODCharacterBase actors
 			continue;
@@ -665,17 +665,29 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 
 		if (bLineHitResultFound)
 		{
-
 			FVector Start = LineHitResultToHitCharacter.ImpactPoint;
 			FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
 			UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
 		}
+
+		FEODDamage EODDamage(ActiveSkill);
+		EODDamage.CapsuleHitResult = HitResult;
+		EODDamage.LineHitResult = LineHitResultToHitCharacter;
+		ApplyEODDamage(HitCharacter, EODDamage);
 	}
 
 	if (!bEnemiesHit)
 	{
 		OnUnsuccessfulHit.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
 	}
+}
+
+void APlayerCharacter::ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage)
+{
+}
+
+void APlayerCharacter::TakeEODDamage(AEODCharacterBase* Instigator, FEODDamage& EODDamage)
+{
 }
 
 void APlayerCharacter::UpdatePlayerAnimationReferences()
