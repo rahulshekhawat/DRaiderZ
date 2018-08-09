@@ -197,7 +197,7 @@ enum class EDamageType : uint8
 	Magickal
 };
 
-/** This struct contains info related to in-game class skills */
+/** Struct containing level specific info for an in-game skill */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillLevelUpInfo
 {
@@ -243,7 +243,7 @@ public:
 
 };
 
-/** This struct contains info related to in-game class skills */
+/** Table row struct for in-game skills */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillTableRow : public FTableRowBase
 {
@@ -274,7 +274,7 @@ public:
 	FName SkillLoopMontageSectionName;
 	
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	FName SkillEndMontageSectionName;		
+	FName SkillEndMontageSectionName;
 	
 	/** Type of damage inflicted from this skill */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
@@ -295,23 +295,40 @@ public:
 	}
 };
 
-/** Struct containing information of the skill that a character is currently using */
+/** In-game skill */
 USTRUCT(BlueprintType)
-struct FActiveSkill
+struct FSkill
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 
-	uint8 SkillIndex;
+	uint8 CurrentSkillLevel;
 
-	FName CurrentSkillInUse;
+	FName SkillID;
 
 	FName AnimationMontageSectionName;
 
-	UAnimMontage* SkillAnimationMontage;
+	UTexture* Icon;
 
-	UDataTable* SkillDataTableReference;
+	FString InGameName;
+	
+	FString Description;
+
+	UAnimMontage* AnimationMontage;
+
+	UPROPERTY(EditAnywhere, Category = BaseInfo, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
+	uint8 SupportedWeapons;
+
+	FName SkillStartMontageSectionName;
+
+	FName SkillLoopMontageSectionName;
+
+	FName SkillEndMontageSectionName;
+
+	EDamageType DamageType;
+
+	FSkillLevelUpInfo SkillLevelUpInfo;
 
 };
 

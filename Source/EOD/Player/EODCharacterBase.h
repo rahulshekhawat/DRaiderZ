@@ -121,7 +121,7 @@ public:
 	// virtual FActiveSkill GetCurrentActiveSkillInfo();
 
 	/** Returns the current active skill */
-	virtual FSkillTableRow* GetCurrentActiveSkill() PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkill, return nullptr; );
+	virtual FSkill* GetCurrentActiveSkill() PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkill, return nullptr; );
 
 	/** [server] Handle melee collision */
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) PURE_VIRTUAL(AEODCharacterBase::HandleMeleeCollision, );

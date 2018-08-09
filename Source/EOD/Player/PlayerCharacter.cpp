@@ -622,7 +622,9 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 	*/
 
 	bool bEnemiesHit = false;
-	FSkillTableRow* SkillTableRow = GetCurrentActiveSkill();
+	FSkill* ActiveSkill = GetCurrentActiveSkill();
+
+	// if (ActiveSkill && ActiveSkill->SkillLevelUpInfo.bUndodgable)
 
 	for (FHitResult& HitResult : HitResults)
 	{
