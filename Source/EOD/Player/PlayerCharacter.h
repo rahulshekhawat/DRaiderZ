@@ -185,15 +185,24 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
 	float GetRotationYawFromAxisInput();
-	
-	/** Contains the references to the animation montages */
+
 	FPlayerAnimationReferences* PlayerAnimationReferences;
-	
+
+	/** Animation montage references for currently equipped weapon */
+	FPlayerAnimationReferences* EquippedWeaponAnimationReferences;
+
+	/** Animations references for sheathed weapon */
+	FPlayerAnimationReferences* SheathedWeaponAnimationReferences;
+
 	/** A reference to player anim instance */
 	class UPlayerAnimInstance* PlayerAnimInstance;
 	
 	/** Updates the 'PlayerAnimationReferences' variable based on current weapon equipped */
 	void UpdatePlayerAnimationReferences();
+
+	void UpdateEquippedWeaponAnimationReferences();
+
+	FPlayerAnimationReferences* GetActiveAnimationReferences() const;
 
 	UPROPERTY(Transient)
 	class APrimaryWeapon* PrimaryWeapon;
@@ -297,7 +306,7 @@ public:
 	void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 	
 	/** Animations to use based on that is determined by equipped weapon */
-	UPROPERTY(Replicated)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeaponAnimationToUse)
 	EWeaponAnimationType CurrentWeaponAnimationToUse;
 	
 	void SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType);
@@ -319,6 +328,9 @@ private:
 	//~ Begin multiplayer code
 	UFUNCTION()
 	void OnRep_WeaponSheathed();
+
+	UFUNCTION()
+	void OnRep_CurrentWeaponAnimationToUse();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);

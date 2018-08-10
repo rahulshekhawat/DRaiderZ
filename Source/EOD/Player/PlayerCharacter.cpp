@@ -109,6 +109,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
 	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
 
+
 	PlayerInputComponent->BindAction("Skill_1", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<0>);
 	PlayerInputComponent->BindAction("Skill_2", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<1>);
 	PlayerInputComponent->BindAction("Skill_3", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<2>);
@@ -129,6 +130,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("Skill_18", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<17>);
 	PlayerInputComponent->BindAction("Skill_19", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<18>);
 	PlayerInputComponent->BindAction("Skill_20", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<19>);
+
 	//~ End Action Input Bindings
 
 }
@@ -232,6 +234,8 @@ void APlayerCharacter::BeginPlay()
 
 	UpdatePlayerAnimationReferences();
 
+	SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
+	UpdateEquippedWeaponAnimationReferences();
 
 	//~ Player HUD
 	if (Controller && Controller->IsLocalPlayerController() && BP_HUDWidget.Get())
@@ -713,6 +717,16 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 
 }
 
+void APlayerCharacter::UpdateEquippedWeaponAnimationReferences()
+{
+
+}
+
+FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() const
+{
+	return bWeaponSheathed ? SheathedWeaponAnimationReferences : EquippedWeaponAnimationReferences;
+}
+
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
 #if DEVSTAGE_CODE_ENABLED
@@ -1035,6 +1049,10 @@ void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 void APlayerCharacter::OnRep_WeaponSheathed()
 {
 	UpdateCurrentWeaponAnimationType();	
+}
+
+void APlayerCharacter::OnRep_CurrentWeaponAnimationToUse()
+{
 }
 
 void APlayerCharacter::Server_SetWeaponSheathed_Implementation(bool bNewValue)

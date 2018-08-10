@@ -109,21 +109,28 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 		{
 			PlayerAnimationReferences = new FPlayerAnimationReferences;
 			PlayerAnimationReferences->FPlayerAnimationReferencesTableRowID = PlayerAnimationReferencesTableRowID;
-			PlayerAnimationReferences->AnimationMontage_Dodge = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Dodge);
-			PlayerAnimationReferences->AnimationMontage_Jump = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Jump);
-			PlayerAnimationReferences->AnimationMontage_NormalAttacks = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->NormalAttacks);
-			PlayerAnimationReferences->AnimationMontage_SpecialActions = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->SpecialActions);
-			PlayerAnimationReferences->AnimationMontage_Skills = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Skills);
-			PlayerAnimationReferences->AnimationMontage_Spells = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Spells);
-			PlayerAnimationReferences->AnimationMontage_SpecialMovement = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->SpecialMovement);
+			PlayerAnimationReferences->AnimationMontage_Dodge				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Dodge);
+			PlayerAnimationReferences->AnimationMontage_Jump				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Jump);
+			PlayerAnimationReferences->AnimationMontage_NormalAttacks		= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->NormalAttacks);
+			PlayerAnimationReferences->AnimationMontage_SpecialActions		= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->SpecialActions);
+			PlayerAnimationReferences->AnimationMontage_Skills				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Skills);
+			PlayerAnimationReferences->AnimationMontage_Spells				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Spells);
+			PlayerAnimationReferences->AnimationMontage_SpecialMovement		= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->SpecialMovement);
 			PlayerAnimationReferences->AnimationMontage_CrowdControlEffects = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->CrowdControlEffects);
-			PlayerAnimationReferences->AnimationMontage_Flinch = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Flinch);
+			PlayerAnimationReferences->AnimationMontage_Flinch				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Flinch);
 
 		}
 	}
 
 	return PlayerAnimationReferences;
 }
+
+/*
+FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(const FName AnimationID)
+{
+	return nullptr;
+}
+*/
 
 bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferences * PlayerAnimationReferences, ECharacterGender Gender)
 {
@@ -146,6 +153,16 @@ bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferenc
 		return false;
 	}
 
+	PlayerAnimationReferences->AnimationMontage_Jump					= nullptr;
+	PlayerAnimationReferences->AnimationMontage_Dodge					= nullptr;
+	PlayerAnimationReferences->AnimationMontage_NormalAttacks			= nullptr;
+	PlayerAnimationReferences->AnimationMontage_SpecialActions			= nullptr;
+	PlayerAnimationReferences->AnimationMontage_Skills					= nullptr;
+	PlayerAnimationReferences->AnimationMontage_Spells					= nullptr;
+	PlayerAnimationReferences->AnimationMontage_SpecialMovement			= nullptr;
+	PlayerAnimationReferences->AnimationMontage_CrowdControlEffects		= nullptr;
+	PlayerAnimationReferences->AnimationMontage_Flinch					= nullptr;	
+
 	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->CrowdControlEffects.ToSoftObjectPath());
 	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Dodge.ToSoftObjectPath());
 	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Flinch.ToSoftObjectPath());
@@ -157,18 +174,4 @@ bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferenc
 	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Spells.ToSoftObjectPath());
 
 	return true;
-}
-
-FPlayerAnimationReferences::~FPlayerAnimationReferences()
-{
-	AnimationMontage_Jump = nullptr;
-	AnimationMontage_Dodge = nullptr;
-	AnimationMontage_NormalAttacks = nullptr;
-	AnimationMontage_SpecialActions = nullptr;
-	AnimationMontage_Skills = nullptr;
-	AnimationMontage_Spells = nullptr;
-	AnimationMontage_SpecialMovement = nullptr;
-	AnimationMontage_CrowdControlEffects = nullptr;
-	AnimationMontage_Flinch = nullptr;
-
 }

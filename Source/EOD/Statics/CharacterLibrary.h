@@ -124,9 +124,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Flinch;
 
-	/** Handle proper destruction of player animation references */
-	~FPlayerAnimationReferences();
-
 	// @todo Death animations
 
 };
@@ -350,6 +347,8 @@ public:
 	//~ @note Blueprints don't support raw struct pointers, therefore it can't be BlueprintCallable
 	/** Returns player animation references based on the EWeaponAnimationType of player */
 	static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType, ECharacterGender Gender = ECharacterGender::Female);
+
+	// static FPlayerAnimationReferences* GetPlayerAnimationReferences(const FName AnimationID);
 
 	/** Attempts to unload player animation references, returns true if successful */
 	static bool UnloadPlayerAnimationReferences(FPlayerAnimationReferences* PlayerAnimationReferences, ECharacterGender Gender = ECharacterGender::Female);
