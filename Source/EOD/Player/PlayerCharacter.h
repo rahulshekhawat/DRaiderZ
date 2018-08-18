@@ -202,6 +202,8 @@ public:
 
 	void UpdateEquippedWeaponAnimationReferences();
 
+	void UpdateEquippedWeaponAnimationReferences(EWeaponType EquippedWeaponType);
+
 	FPlayerAnimationReferences* GetActiveAnimationReferences() const;
 
 	UPROPERTY(Transient)
@@ -284,6 +286,9 @@ public:
 
 	/** [server] Take damage from another character */
 	virtual void TakeEODDamage(AEODCharacterBase* Instigator, FEODDamage& EODDamage) override;
+
+	/** Called once this actor has been deleted */
+	virtual void Destroyed() override;
 
 private:
 

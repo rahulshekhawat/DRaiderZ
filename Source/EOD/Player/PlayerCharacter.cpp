@@ -183,12 +183,10 @@ void APlayerCharacter::PostInitializeComponents()
 	// @note please set secondary weapon first and primary weapon later.
 	if (SecondaryWeaponID != NAME_None)
 	{
-		// SetCurrentWeapon(SecondaryWeaponID);
 		SetCurrentPrimaryWeapon(SecondaryWeaponID);
 	}
 	if (PrimaryWeaponID != NAME_None)
 	{
-		// SetCurrentWeapon(PrimaryWeaponID);
 		SetCurrentPrimaryWeapon(PrimaryWeaponID);
 	}
 }
@@ -723,6 +721,18 @@ void APlayerCharacter::TakeEODDamage(AEODCharacterBase* Instigator, FEODDamage& 
 {
 }
 
+void APlayerCharacter::Destroyed()
+{
+	if (PrimaryWeapon)
+	{
+		PrimaryWeapon->Destroy();
+	}
+	if (SecondaryWeapon)
+	{
+		SecondaryWeapon->Destroy();
+	}
+}
+
 void APlayerCharacter::UpdatePlayerAnimationReferences()
 {
 	if (PlayerAnimationReferences)
@@ -739,6 +749,10 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 }
 
 void APlayerCharacter::UpdateEquippedWeaponAnimationReferences()
+{
+}
+
+void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(EWeaponType EquippedWeaponType)
 {
 
 }
@@ -878,7 +892,6 @@ void APlayerCharacter::SetCurrentPrimaryWeapon(FName WeaponID)
 	{
 		return;
 	}
-
 
 	RemovePrimaryWeapon();
 	if (UWeaponLibrary::IsWeaponDualHanded(WeaponData->WeaponType))
