@@ -40,8 +40,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = BlockAnimationUpdate, meta = (BlueprintThreadSafe))
 	ECharMovementDirection GetIWRCharMovementDir() const;
 
-protected:
-
 	// virtual void UpdateIdleAnimation();
 
 	// @todo change moving to movement

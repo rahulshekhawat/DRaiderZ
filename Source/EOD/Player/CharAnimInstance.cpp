@@ -12,7 +12,6 @@ UCharAnimInstance::UCharAnimInstance(const FObjectInitializer & ObjectInitialize
 void UCharAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
-
 	OwningCharacter = CastOwnerToBaseCharacter();
 }
 
@@ -59,6 +58,11 @@ void UCharAnimInstance::NativeUninitializeAnimation()
 
 float UCharAnimInstance::GetMovementSpeed() const
 {
+	if (OwningCharacter)
+	{
+		return OwningCharacter->GetVelocity().Size();
+	}
+
 	return 0.0f;
 }
 
@@ -84,12 +88,24 @@ void UCharAnimInstance::UpdateDodgeAnimation()
 
 bool UCharAnimInstance::IsBlocking() const
 {
-	return true;
+	if (OwningCharacter)
+	{
+		return OwningCharacter->IsBlocking();
+	}
+
+	return false;
 }
 
 ECharMovementDirection UCharAnimInstance::GetIWRCharMovementDir() const
 {
-	return ECharMovementDirection();
+	if (GetMovementSpeed() == 0)
+	{
+		return ECharMovementDirection::None;
+	}
+	else
+	{
+		return ECharMovementDirection::F;
+	}
 }
 
 AEODCharacterBase * UCharAnimInstance::CastOwnerToBaseCharacter() const
