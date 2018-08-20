@@ -717,7 +717,7 @@ void APlayerCharacter::ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamag
 {
 }
 
-void APlayerCharacter::TakeEODDamage(AEODCharacterBase* Instigator, FEODDamage& EODDamage)
+void APlayerCharacter::TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamage& EODDamage)
 {
 }
 

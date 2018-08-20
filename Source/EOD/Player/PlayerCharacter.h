@@ -285,7 +285,7 @@ public:
 	virtual void ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage) override;
 
 	/** [server] Take damage from another character */
-	virtual void TakeEODDamage(AEODCharacterBase* Instigator, FEODDamage& EODDamage) override;
+	virtual void TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamage& EODDamage) override;
 
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;

@@ -26,20 +26,31 @@ public:
 	virtual void NativePostEvaluateAnimation() override;
 
 	virtual void NativeUninitializeAnimation() override;
-	
+
+	/** Blend time for transition between IdleWalkRun animations (of all state machines) */
+	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = LocomotionUpdate)
+	float IdleWalkRun_AnimationsBlendTime;
+
+	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
+	float GetMovementSpeed() const;
+
+	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
+	virtual bool IsBlocking() const;
+
+	UFUNCTION(BlueprintCallable, Category = BlockAnimationUpdate, meta = (BlueprintThreadSafe))
+	ECharMovementDirection GetIWRCharMovementDir() const;
+
 protected:
 
-	virtual void UpdateIdleAnimation();
+	// virtual void UpdateIdleAnimation();
 
 	// @todo change moving to movement
-	virtual void UpdateMovementAnimation();
+	// virtual void UpdateMovementAnimation();
 
-	virtual void UpdateBlockAnimation();
+	// virtual void UpdateBlockAnimation();
 	
-	virtual void UpdateDodgeAnimation();
+	// virtual void UpdateDodgeAnimation();
 
-	UFUNCTION(BlueprintCallable, Category=BlockAnimationUpdate, meta=(BlueprintThreadSafe))
-	virtual bool IsBlocking() const;
 
 private:
 

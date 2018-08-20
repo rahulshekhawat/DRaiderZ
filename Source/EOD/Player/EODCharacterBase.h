@@ -133,7 +133,7 @@ public:
 	virtual void ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage) PURE_VIRTUAL(AEODCharacterBase::ApplyEODDamage, );
 
 	/** [server] Take damage from another character */
-	virtual void TakeEODDamage(AEODCharacterBase* Instigator, FEODDamage& EODDamage) PURE_VIRTUAL(AEODCharacterBase::TakeEODDamage, );
+	virtual void TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamage& EODDamage) PURE_VIRTUAL(AEODCharacterBase::TakeEODDamage, );
 
 protected:
 
