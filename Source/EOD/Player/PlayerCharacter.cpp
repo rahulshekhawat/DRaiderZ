@@ -251,10 +251,9 @@ void APlayerCharacter::BeginPlay()
 
 	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
-	UpdatePlayerAnimationReferences();
-
-	SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
-	UpdateEquippedWeaponAnimationReferences();
+	// UpdatePlayerAnimationReferences();
+	// SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
+	// UpdateEquippedWeaponAnimationReferences();
 
 	//~ Player HUD
 	if (Controller && Controller->IsLocalPlayerController() && BP_HUDWidget.Get())
@@ -723,16 +722,23 @@ void APlayerCharacter::TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamag
 
 void APlayerCharacter::Destroyed()
 {
+	Super::Destroyed();
+
 	if (PrimaryWeapon)
 	{
+		PrimaryWeapon->SetOwningCharacter(nullptr);
+		PrimaryWeapon->OnUnEquip();
 		PrimaryWeapon->Destroy();
 	}
 	if (SecondaryWeapon)
 	{
+		SecondaryWeapon->SetOwningCharacter(nullptr);
+		SecondaryWeapon->OnUnEquip();
 		SecondaryWeapon->Destroy();
 	}
 }
 
+/*
 void APlayerCharacter::UpdatePlayerAnimationReferences()
 {
 	if (PlayerAnimationReferences)
@@ -747,14 +753,49 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 	PlayerAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(CurrentWeaponAnimationToUse, Gender);
 
 }
-
-void APlayerCharacter::UpdateEquippedWeaponAnimationReferences()
-{
-}
+*/
 
 void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(EWeaponType EquippedWeaponType)
 {
+	if (PlayerAnimationReferences)
+	{
+		UCharacterLibrary::UnloadPlayerAnimationReferences(PlayerAnimationReferences, Gender);
 
+		// delete older animation references, prevent memory leak
+		delete PlayerAnimationReferences;
+		PlayerAnimationReferences = nullptr;
+	}
+
+	EWeaponAnimationType WeaponAnimationType;
+	switch (EquippedWeaponType)
+	{
+	case EWeaponType::GreatSword:
+		WeaponAnimationType = EWeaponAnimationType::GreatSword;
+		break;
+	case EWeaponType::WarHammer:
+		WeaponAnimationType = EWeaponAnimationType::WarHammer;
+		break;
+	case EWeaponType::LongSword:
+		WeaponAnimationType = EWeaponAnimationType::ShieldAndSword;
+		break;
+	case EWeaponType::Mace:
+		WeaponAnimationType = EWeaponAnimationType::ShieldAndMace;
+		break;
+	case EWeaponType::Dagger:
+		WeaponAnimationType = EWeaponAnimationType::Daggers;
+		break;
+	case EWeaponType::Staff:
+		WeaponAnimationType = EWeaponAnimationType::Staff;
+		break;
+	case EWeaponType::Shield:
+	case EWeaponType::None:
+	default:
+		WeaponAnimationType = EWeaponAnimationType::NoWeapon;
+		break;
+	}
+
+	SetCurrentWeaponAnimationToUse(WeaponAnimationType);
+	PlayerAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(WeaponAnimationType, Gender);
 }
 
 FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() const
@@ -928,7 +969,7 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(FName WeaponID)
 	SecondaryWeaponID = WeaponID;
 	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
 
-	UpdateCurrentWeaponAnimationType();
+	// UpdateCurrentWeaponAnimationType();
 }
 
 void APlayerCharacter::RemovePrimaryWeapon()
@@ -1033,10 +1074,12 @@ void APlayerCharacter::SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWe
 {
 	CurrentWeaponAnimationToUse = NewWeaponAnimationType;
 	
+	/*
 	if (Role < ROLE_Authority)
 	{
 		Server_SetCurrentWeaponAnimationToUse(NewWeaponAnimationType);
 	}
+	*/
 }
 
 void APlayerCharacter::Server_SetCurrentWeaponAnimationToUse_Implementation(EWeaponAnimationType NewWeaponAnimationType)

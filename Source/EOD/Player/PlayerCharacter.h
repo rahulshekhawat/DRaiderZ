@@ -198,9 +198,7 @@ public:
 	class UPlayerAnimInstance* PlayerAnimInstance;
 	
 	/** Updates the 'PlayerAnimationReferences' variable based on current weapon equipped */
-	void UpdatePlayerAnimationReferences();
-
-	void UpdateEquippedWeaponAnimationReferences();
+	// void UpdatePlayerAnimationReferences();
 
 	void UpdateEquippedWeaponAnimationReferences(EWeaponType EquippedWeaponType);
 

@@ -7,7 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "WeaponBase.generated.h"
 
-class AEODCharacterBase;
+class APlayerCharacter;
 
 /**
  * An abstract base class for player equippable weapons
@@ -49,15 +49,15 @@ public:
 	FName WeaponID;
 
 	/** 
-	 * Call this to set the owner of this weapon.
+	 * Call this to set the owning player character of this weapon.
 	 * @note It is important to set owner before attempting to equip weapon.
 	 */
-	void SetOwningCharacter(AEODCharacterBase* NewCharacter);
+	void SetOwningCharacter(APlayerCharacter* NewPlayer);
 
 protected:
 	
 	//~ @todo network replication
-	AEODCharacterBase* OwningCharacter;
+	APlayerCharacter* OwningPlayer;
 
 private:
 

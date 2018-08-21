@@ -40,7 +40,7 @@ void AWeaponBase::OnEquip(FName NewWeaponID)
 	}
 }
 
-void AWeaponBase::SetOwningCharacter(AEODCharacterBase * NewCharacter)
+void AWeaponBase::SetOwningCharacter(APlayerCharacter* NewPlayer)
 {
-	OwningCharacter = NewCharacter;
+	OwningPlayer = NewPlayer;
 }

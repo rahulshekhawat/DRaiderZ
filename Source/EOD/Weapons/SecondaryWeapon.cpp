@@ -1,7 +1,8 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "SecondaryWeapon.h"
-#include "Player/EODCharacterBase.h"
+#include "Player/PlayerCharacter.h"
+#include "Weapons/PrimaryWeapon.h"
 
 #include "Components/SkeletalMeshComponent.h"
 
@@ -41,7 +42,7 @@ void ASecondaryWeapon::Tick(float DeltaTime)
 
 void ASecondaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponData)
 {
-	check(NewWeaponData && OwningCharacter);
+	check(NewWeaponData && OwningPlayer);
 
 	if (NewWeaponData->WeaponMesh.IsNull())
 	{
@@ -70,19 +71,25 @@ void ASecondaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponDat
 
 	if (NewWeaponData->WeaponType == EWeaponType::Dagger)
 	{
-		LeftHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGL"));
-		SheathedWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGL_b"));
-		FallenWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGL_w"));
+		LeftHandWeaponMeshComp->AttachToComponent(OwningPlayer->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGL"));
+		SheathedWeaponMeshComp->AttachToComponent(OwningPlayer->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGL_b"));
+		FallenWeaponMeshComp->AttachToComponent(OwningPlayer->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGL_w"));
 	}
 	else if (NewWeaponData->WeaponType == EWeaponType::Shield)
 	{
-		LeftHandWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD"));
-		SheathedWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD_b"));
-		FallenWeaponMeshComp->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD_w"));
+		LeftHandWeaponMeshComp->AttachToComponent(OwningPlayer->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD"));
+		SheathedWeaponMeshComp->AttachToComponent(OwningPlayer->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD_b"));
+		FallenWeaponMeshComp->AttachToComponent(OwningPlayer->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD_w"));
 	}
 	else
 	{
 		// pass
+	}
+
+	// Change player animation references if the newer weapon type is different from previous weapon type
+	if (NewWeaponData->WeaponType != WeaponType && NewWeaponData->WeaponType == EWeaponType::Dagger)
+	{
+		OwningPlayer->UpdateEquippedWeaponAnimationReferences(NewWeaponData->WeaponType);
 	}
 
 	bEquipped = true;
@@ -111,4 +118,10 @@ void ASecondaryWeapon::OnUnEquip()
 	WeaponID = NAME_None;
 	WeaponType = EWeaponType::None;
 	// @todo reset weapon stats
+
+	// If no primary weapon is equipped by owning player then update player animation references to 'no weapon equipped'
+	if (OwningPlayer && OwningPlayer->PrimaryWeapon && !OwningPlayer->PrimaryWeapon->bEquipped)
+	{
+		OwningPlayer->UpdateEquippedWeaponAnimationReferences(EWeaponType::None);
+	}
 }
