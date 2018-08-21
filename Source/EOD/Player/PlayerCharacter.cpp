@@ -183,7 +183,7 @@ void APlayerCharacter::PostInitializeComponents()
 	// @note please set secondary weapon first and primary weapon later.
 	if (SecondaryWeaponID != NAME_None)
 	{
-		SetCurrentPrimaryWeapon(SecondaryWeaponID);
+		SetCurrentSecondaryWeapon(SecondaryWeaponID);
 	}
 	if (PrimaryWeaponID != NAME_None)
 	{
