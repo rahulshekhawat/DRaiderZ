@@ -186,7 +186,7 @@ public:
 	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
 	float GetRotationYawFromAxisInput();
 
-	FPlayerAnimationReferences* PlayerAnimationReferences;
+	// FPlayerAnimationReferences* PlayerAnimationReferences;
 
 	/** Animation montage references for currently equipped weapon */
 	FPlayerAnimationReferences* EquippedWeaponAnimationReferences;

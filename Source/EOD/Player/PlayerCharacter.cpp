@@ -174,6 +174,8 @@ void APlayerCharacter::PostInitializeComponents()
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+	SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
+
 	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
 
@@ -210,17 +212,17 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 		// This case is an exception to CharacterState replication
 		CharacterState = ECharacterState::Jumping;
-		GetMesh()->GetAnimInstance()->Montage_Play(PlayerAnimationReferences->AnimationMontage_Jump);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpLoop"), PlayerAnimationReferences->AnimationMontage_Jump);
+		GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Jump);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpLoop"), GetActiveAnimationReferences()->AnimationMontage_Jump);
 	}
 	// It is necessary to test if jump montage is playing, or else the "JumpEnd" sections ends up playing twice because of montage blending out
-	else if (!GetCharacterMovement()->IsFalling() && IsJumping() && GetMesh()->GetAnimInstance()->Montage_IsPlaying(PlayerAnimationReferences->AnimationMontage_Jump))
+	else if (!GetCharacterMovement()->IsFalling() && IsJumping() && GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetActiveAnimationReferences()->AnimationMontage_Jump))
 	{
-		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(PlayerAnimationReferences->AnimationMontage_Jump);
+		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_Jump);
 		if (CurrentSection != FName("JumpEnd"))
 		{
-			GetMesh()->GetAnimInstance()->Montage_Play(PlayerAnimationReferences->AnimationMontage_Jump);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpEnd"), PlayerAnimationReferences->AnimationMontage_Jump);
+			GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Jump);
+			GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpEnd"), GetActiveAnimationReferences()->AnimationMontage_Jump);
 		}
 	}
 
@@ -250,10 +252,6 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-
-	// UpdatePlayerAnimationReferences();
-	// SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
-	// UpdateEquippedWeaponAnimationReferences();
 
 	//~ Player HUD
 	if (Controller && Controller->IsLocalPlayerController() && BP_HUDWidget.Get())
@@ -342,7 +340,7 @@ void APlayerCharacter::ZoomOutCamera()
 
 void APlayerCharacter::OnDodge()
 {
-	if (CanDodge() && PlayerAnimInstance && PlayerAnimationReferences)
+	if (CanDodge() && PlayerAnimInstance && GetActiveAnimationReferences())
 	{
 		float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
 		float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
@@ -359,26 +357,26 @@ void APlayerCharacter::OnDodge()
 		{
 			if (RightAxisValue > 0)
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("RightDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("RightDodge"), ECharacterState::Dodging);
 			}
 			else if (RightAxisValue < 0)
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("LeftDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("LeftDodge"), ECharacterState::Dodging);
 			}
 			else
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
 			}
 		}
 		else
 		{
 			if (ForwardAxisValue > 0)
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("ForwardDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("ForwardDodge"), ECharacterState::Dodging);
 			}
 			else if (ForwardAxisValue < 0)
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
 			}
 		}
 	}
@@ -406,7 +404,7 @@ void APlayerCharacter::DisableBlock()
 
 void APlayerCharacter::OnJump()
 {
-	if (CanJump() && PlayerAnimInstance && PlayerAnimationReferences)
+	if (CanJump() && PlayerAnimInstance && GetActiveAnimationReferences())
 	{
 		if (IsBlocking())
 		{
@@ -414,7 +412,7 @@ void APlayerCharacter::OnJump()
 		}
 
 		Jump();
-		PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Jump, FName("JumpStart"), ECharacterState::Jumping);
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Jump, FName("JumpStart"), ECharacterState::Jumping);
 	}
 }
 
@@ -438,29 +436,29 @@ void APlayerCharacter::OnToggleMouseCursor()
 
 void APlayerCharacter::OnNormalAttack()
 {
-	if (CanNormalAttack() && PlayerAnimInstance && PlayerAnimationReferences)
+	if (CanNormalAttack() && PlayerAnimInstance && GetActiveAnimationReferences())
 	{
 		if (IsNormalAttacking())
 		{
-			FName CurrentSection = PlayerAnimInstance->Montage_GetCurrentSection(PlayerAnimationReferences->AnimationMontage_NormalAttacks);
+			FName CurrentSection = PlayerAnimInstance->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
 			if (CurrentSection == FName("FirstSwingEnd"))
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_NormalAttacks, FName("SecondSwing"), ECharacterState::Attacking);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("SecondSwing"), ECharacterState::Attacking);
 				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 			}
 			else if (CurrentSection == FName("SecondSwingEnd"))
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_NormalAttacks, FName("ThirdSwing"), ECharacterState::Attacking);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("ThirdSwing"), ECharacterState::Attacking);
 				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 			}
 			else if (CurrentSection == FName("ThirdSwingEnd"))
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_NormalAttacks, FName("FourthSwing"), ECharacterState::Attacking);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FourthSwing"), ECharacterState::Attacking);
 				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 			}
 			else if (CurrentSection == FName("FourthSwingEnd"))
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_NormalAttacks, FName("FifthSwing"), ECharacterState::Attacking);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FifthSwing"), ECharacterState::Attacking);
 				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 			}
 			else if (CurrentSection == FName("FirstSwing"))
@@ -482,7 +480,7 @@ void APlayerCharacter::OnNormalAttack()
 		}
 		else
 		{
-			PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
+			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
 			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 		}
 	}
@@ -757,13 +755,13 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 
 void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(EWeaponType EquippedWeaponType)
 {
-	if (PlayerAnimationReferences)
+	if (EquippedWeaponAnimationReferences)
 	{
-		UCharacterLibrary::UnloadPlayerAnimationReferences(PlayerAnimationReferences, Gender);
+		UCharacterLibrary::UnloadPlayerAnimationReferences(EquippedWeaponAnimationReferences, Gender);
 
 		// delete older animation references, prevent memory leak
-		delete PlayerAnimationReferences;
-		PlayerAnimationReferences = nullptr;
+		delete EquippedWeaponAnimationReferences;
+		EquippedWeaponAnimationReferences = nullptr;
 	}
 
 	EWeaponAnimationType WeaponAnimationType;
@@ -795,7 +793,7 @@ void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(EWeaponType Equip
 	}
 
 	SetCurrentWeaponAnimationToUse(WeaponAnimationType);
-	PlayerAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(WeaponAnimationType, Gender);
+	EquippedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(WeaponAnimationType, Gender);
 }
 
 FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() const
