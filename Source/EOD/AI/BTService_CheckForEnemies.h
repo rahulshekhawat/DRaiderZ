@@ -16,6 +16,8 @@ class EOD_API UBTService_CheckForEnemies : public UBTService_BlackboardBase
 	
 public:
 
+	UBTService_CheckForEnemies(const FObjectInitializer& ObjectInitializer);
+
 	/** called when auxiliary node becomes active
 	 * this function should be considered as const (don't modify state of object) if node is not instanced! */
 	virtual void OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
@@ -31,6 +33,23 @@ public:
 	/** called when search enters underlying branch
 	 * this function should be considered as const (don't modify state of object) if node is not instanced! */
 	virtual void OnSearchStart(FBehaviorTreeSearchData& SearchData) override;
+
+private:
+
+	FName BBKey_bHasEnemyTarget;
+
+	FName BBKey_TargetEnemy;
 	
-	
+	FName BBKey_AggroActivationRadius;
+
+	FName BBKey_AggroAreaRadius;
+
+	FName BBKey_MaxEnemyChaseRadius;
+
+	FName BBKey_WanderRadius;
+
+	FName BBKey_SpawnLocation;
+
+	void LookForAnotherEnemy(UBehaviorTreeComponent& OwnerComp, uint8 * NodeMemory, float DeltaSeconds);
+
 };
