@@ -29,7 +29,7 @@ protected:
 	virtual void ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter);
 
 	/** Called to process the ticking of this status effect. Must be overridden in inherited classes */
-	UFUNCTION()
+	// UFUNCTION()
 	virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter) override;
 
 
