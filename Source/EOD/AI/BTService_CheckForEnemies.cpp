@@ -3,9 +3,10 @@
 #include "BTService_CheckForEnemies.h"
 #include "Player/EODCharacterBase.h"
 #include "Core/EODPreprocessors.h"
-#include "Statics/CharacterLibrary.h"
 #include "Statics/AILibrary.h"
+#include "Statics/CharacterLibrary.h"
 
+#include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
@@ -26,9 +27,10 @@ void UBTService_CheckForEnemies::OnCeaseRelevant(UBehaviorTreeComponent & OwnerC
 void UBTService_CheckForEnemies::TickNode(UBehaviorTreeComponent& OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
-	
-	AActor* Owner = OwnerComp.GetOwner();
-	AAIController* AIController = UAIBlueprintHelperLibrary::GetAIController(Owner);
+
+	// The owner of 'OwnerComp' is a controller (not pawn)
+	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
+	APawn* OwningPawn = AIController->GetPawn();
 
 	bool bHasEnemyTarget = OwnerComp.GetBlackboardComponent()->GetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget);
 
@@ -39,7 +41,7 @@ void UBTService_CheckForEnemies::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 		if (EnemyCharacter)
 		{
 			float MaxEnemyChaseRadius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(UAILibrary::BBKey_MaxEnemyChaseRadius);
-			float Distance = (Owner->GetActorLocation() - EnemyCharacter->GetActorLocation()).Size();
+			float Distance = (OwningPawn->GetActorLocation() - EnemyCharacter->GetActorLocation()).Size();
 
 			if (Distance < MaxEnemyChaseRadius)
 			{
@@ -58,7 +60,6 @@ void UBTService_CheckForEnemies::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 	}
 
 	LookForAnotherEnemy(OwnerComp, NodeMemory, DeltaSeconds);
-
 }
 
 void UBTService_CheckForEnemies::OnSearchStart(FBehaviorTreeSearchData & SearchData)
@@ -69,14 +70,20 @@ void UBTService_CheckForEnemies::OnSearchStart(FBehaviorTreeSearchData & SearchD
 void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(UAILibrary::BBKey_TargetEnemy, nullptr);
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget, false);
 
-	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(OwnerComp.GetOwner());
+	UE_LOG(LogTemp, Warning, TEXT("LOOKUP"));
+
+	// The owner of 'OwnerComp' is a controller (not pawn)
+	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
+	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
+	
 	float AggroActivationRadius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(FName("AggroActivationRadius"));
 
 	FCollisionShape CollisionShape = FCollisionShape::MakeSphere(AggroActivationRadius);
 	TArray<FHitResult> HitResults;
-	FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(OwnerComp.GetOwner());
-	FVector OwnerLocation = OwnerComp.GetOwner()->GetActorLocation();
+	FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(OwningCharacter);
+	FVector OwnerLocation = OwningCharacter->GetActorLocation();
 
 	bool bHit = OwnerComp.GetWorld()->SweepMultiByChannel(HitResults, OwnerLocation, OwnerLocation, FQuat::Identity, COLLISION_COMBAT, CollisionShape, Params);
 
@@ -87,6 +94,9 @@ void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& Own
 		{
 			continue;
 		}
+
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *HitCharacter->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *OwningCharacter->GetName());
 
 		if (!UCharacterLibrary::AreEnemies(HitCharacter, OwningCharacter))
 		{
