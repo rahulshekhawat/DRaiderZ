@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/Services/BTService_BlackboardBase.h"
+#include "BehaviorTree/BTService.h"
 #include "BTService_CheckForEnemies.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API UBTService_CheckForEnemies : public UBTService_BlackboardBase
+class EOD_API UBTService_CheckForEnemies : public UBTService
 {
 	GENERATED_BODY()
 	
