@@ -36,20 +36,6 @@ public:
 
 private:
 
-	FName BBKey_bHasEnemyTarget;
-
-	FName BBKey_TargetEnemy;
-	
-	FName BBKey_AggroActivationRadius;
-
-	FName BBKey_AggroAreaRadius;
-
-	FName BBKey_MaxEnemyChaseRadius;
-
-	FName BBKey_WanderRadius;
-
-	FName BBKey_SpawnLocation;
-
 	void LookForAnotherEnemy(UBehaviorTreeComponent& OwnerComp, uint8 * NodeMemory, float DeltaSeconds);
 
 };

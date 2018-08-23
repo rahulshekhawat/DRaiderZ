@@ -4,19 +4,13 @@
 #include "Player/EODCharacterBase.h"
 #include "Core/EODPreprocessors.h"
 #include "Statics/CharacterLibrary.h"
+#include "Statics/AILibrary.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
 UBTService_CheckForEnemies::UBTService_CheckForEnemies(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
-	BBKey_bHasEnemyTarget = FName("bHasEnemyTarget");
-	BBKey_TargetEnemy = FName("TargetEnemy");
-	BBKey_AggroActivationRadius = FName("AggroActivationRadius");
-	BBKey_AggroAreaRadius = FName("AggroAreaRadius");
-	BBKey_MaxEnemyChaseRadius = FName("MaxEnemyChaseRadius");
-	BBKey_WanderRadius = FName("WanderRadius");
-	BBKey_SpawnLocation = FName("SpawnLocation");
 }
 
 void UBTService_CheckForEnemies::OnBecomeRelevant(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
@@ -36,23 +30,23 @@ void UBTService_CheckForEnemies::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 	AActor* Owner = OwnerComp.GetOwner();
 	AAIController* AIController = UAIBlueprintHelperLibrary::GetAIController(Owner);
 
-	bool bHasEnemyTarget = OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKey_bHasEnemyTarget);
+	bool bHasEnemyTarget = OwnerComp.GetBlackboardComponent()->GetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget);
 
 	if (bHasEnemyTarget)
 	{
-		AEODCharacterBase* EnemyCharacter = Cast<AEODCharacterBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKey_TargetEnemy));
+		AEODCharacterBase* EnemyCharacter = Cast<AEODCharacterBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(UAILibrary::BBKey_TargetEnemy));
 		
 		if (EnemyCharacter)
 		{
-			float MaxEnemyChaseRadius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKey_MaxEnemyChaseRadius);
+			float MaxEnemyChaseRadius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(UAILibrary::BBKey_MaxEnemyChaseRadius);
 			float Distance = (Owner->GetActorLocation() - EnemyCharacter->GetActorLocation()).Size();
 
 			if (Distance < MaxEnemyChaseRadius)
 			{
-				FVector SpawnLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKey_SpawnLocation);
+				FVector SpawnLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(UAILibrary::BBKey_SpawnLocation);
 				FVector EnemyLocation = EnemyCharacter->GetActorLocation();
 
-				float AggroAreaRadius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKey_AggroAreaRadius);
+				float AggroAreaRadius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(UAILibrary::BBKey_AggroAreaRadius);
 
 				if ((SpawnLocation - EnemyLocation).Size() < AggroAreaRadius)
 				{
@@ -74,7 +68,7 @@ void UBTService_CheckForEnemies::OnSearchStart(FBehaviorTreeSearchData & SearchD
 
 void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
-	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKey_TargetEnemy, nullptr);
+	OwnerComp.GetBlackboardComponent()->SetValueAsObject(UAILibrary::BBKey_TargetEnemy, nullptr);
 
 	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(OwnerComp.GetOwner());
 	float AggroActivationRadius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(FName("AggroActivationRadius"));
@@ -99,7 +93,8 @@ void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& Own
 			continue;
 		}
 
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKey_TargetEnemy, HitCharacter);
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(UAILibrary::BBKey_TargetEnemy, HitCharacter);
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget, true);
 		break;
 	}
 }
