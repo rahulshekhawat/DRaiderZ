@@ -19,19 +19,19 @@ public:
 	UAILibrary(const FObjectInitializer& ObjectInitializer);
 
 	//~ Begin blackboard key names
-	static FName BBKey_bHasEnemyTarget;
+	static const FName BBKey_bHasEnemyTarget;
 
-	static FName BBKey_TargetEnemy;
+	static const FName BBKey_TargetEnemy;
 
-	static FName BBKey_AggroActivationRadius;
+	static const FName BBKey_AggroActivationRadius;
 
-	static FName BBKey_AggroAreaRadius;
+	static const FName BBKey_AggroAreaRadius;
 
-	static FName BBKey_MaxEnemyChaseRadius;
+	static const FName BBKey_MaxEnemyChaseRadius;
 
-	static FName BBKey_WanderRadius;
+	static const FName BBKey_WanderRadius;
 
-	static FName BBKey_SpawnLocation;
+	static const FName BBKey_SpawnLocation;
 	//~ End blackboard key names
 	
 	
