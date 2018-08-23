@@ -72,7 +72,7 @@ void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& Own
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(UAILibrary::BBKey_TargetEnemy, nullptr);
 	OwnerComp.GetBlackboardComponent()->SetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget, false);
 
-	UE_LOG(LogTemp, Warning, TEXT("LOOKUP"));
+	// UE_LOG(LogTemp, Warning, TEXT("LOOKUP"));
 
 	// The owner of 'OwnerComp' is a controller (not pawn)
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
@@ -95,8 +95,8 @@ void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& Own
 			continue;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *HitCharacter->GetName());
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *OwningCharacter->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("%s"), *HitCharacter->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("%s"), *OwningCharacter->GetName());
 
 		if (!UCharacterLibrary::AreEnemies(HitCharacter, OwningCharacter))
 		{
