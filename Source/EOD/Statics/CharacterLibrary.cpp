@@ -178,5 +178,6 @@ bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferenc
 
 bool UCharacterLibrary::AreEnemies(AEODCharacterBase * CharacterOne, AEODCharacterBase * CharacterTwo)
 {
-	return false;
+	// return false;
+	return true;
 }
