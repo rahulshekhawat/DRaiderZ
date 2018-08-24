@@ -31,28 +31,28 @@ public:
 	virtual void NativeUninitializeAnimation() override;
 	
 	/** Blend time for transitions between the animations coming from various state machines in main anim graph */
-	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = IdleWalkRunUpdate)
+	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = MasterStateUpdate)
 	float MasterStateMachine_AnimationsBlendTime;
 	
 	/** Blend time for transition between IdleWalkRun animations (of all state machines) */
-	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = IdleWalkRunUpdate)
+	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = LocomotionUpdate)
 	float IdleWalkRun_AnimationsBlendTime;
 
 
 	//~ Begin functions to update animation blueprint
-	UFUNCTION(BlueprintCallable, Category = BlockAnimationUpdate, meta = (BlueprintThreadSafe))
+	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
 	bool IsBlocking() const;
 	
-	UFUNCTION(BlueprintCallable, Category = BlockAnimationUpdate, meta = (BlueprintThreadSafe))
+	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
 	ECharMovementDirection GetIWRCharMovementDir() const;
 	
-	UFUNCTION(BlueprintCallable, Category = BlockAnimationUpdate, meta = (BlueprintThreadSafe))
+	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
 	float GetMovementSpeed() const;
 	
-	UFUNCTION(BlueprintCallable, Category = BlockAnimationUpdate, meta = (BlueprintThreadSafe))
+	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
 	float GetBlockMovementDirectionYaw() const;
 	
-	UFUNCTION(BlueprintCallable, Category = BlockAnimationUpdate, meta = (BlueprintThreadSafe))
+	UFUNCTION(BlueprintCallable, Category = MasterStateUpdate, meta = (BlueprintThreadSafe))
 	EWeaponAnimationType GetWeaponAnimationType() const;
 	//~ End functions to update animation blueprint
 

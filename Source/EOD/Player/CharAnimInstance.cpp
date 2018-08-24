@@ -6,13 +6,12 @@
 
 UCharAnimInstance::UCharAnimInstance(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
-	// IdleWalkRun_AnimationsBlendTime = 0.2f;
+	IdleWalkRun_AnimationsBlendTime = 0.2f;
 }
 
 void UCharAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
-
 	OwningCharacter = CastOwnerToBaseCharacter();
 }
 
@@ -27,6 +26,7 @@ void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 
+	/*
 	if (OwningCharacter->IsIdle())
 	{
 		UpdateIdleAnimation();
@@ -43,6 +43,7 @@ void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		UpdateDodgeAnimation();
 	}
+	*/
 }
 
 void UCharAnimInstance::NativePostEvaluateAnimation()
@@ -55,6 +56,17 @@ void UCharAnimInstance::NativeUninitializeAnimation()
 	Super::NativeUninitializeAnimation();
 }
 
+float UCharAnimInstance::GetMovementSpeed() const
+{
+	if (OwningCharacter)
+	{
+		return OwningCharacter->GetVelocity().Size();
+	}
+
+	return 0.0f;
+}
+
+/*
 void UCharAnimInstance::UpdateIdleAnimation()
 {
 	// IdleWalkRun_MovementSpeed = 0.f;
@@ -72,10 +84,28 @@ void UCharAnimInstance::UpdateBlockAnimation()
 void UCharAnimInstance::UpdateDodgeAnimation()
 {
 }
+*/
 
 bool UCharAnimInstance::IsBlocking() const
 {
-	return true;
+	if (OwningCharacter)
+	{
+		return OwningCharacter->IsBlocking();
+	}
+
+	return false;
+}
+
+ECharMovementDirection UCharAnimInstance::GetIWRCharMovementDir() const
+{
+	if (GetMovementSpeed() == 0)
+	{
+		return ECharMovementDirection::None;
+	}
+	else
+	{
+		return ECharMovementDirection::F;
+	}
 }
 
 AEODCharacterBase * UCharAnimInstance::CastOwnerToBaseCharacter() const

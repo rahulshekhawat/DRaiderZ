@@ -37,6 +37,12 @@ public:
 
 	FTimerDelegate TimerDelegate;
 
+	FStatusInfo()
+	{
+		CurrentStackLevel = 0;
+		TotalElapsedTime = 0.f;
+		TimerHandle = nullptr;
+	}
 };
 
 /**
@@ -112,6 +118,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	float TickInterval;
+
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	float StatusEffectDuration;
 	
 	// @todo Add a boolean to follow particle effect attach bone if needed
 	
@@ -178,6 +187,10 @@ protected:
 	/** True if the status effect triggers on using a particular skill */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnUsingSkill : 1;
+
+	/** True if the status effect triggers on successfully attacking an enemy with a particular skill */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnSuccessfulSkillAttack : 1;
 
 	//~ @note Redundant property but it could be useful in certain situations
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)

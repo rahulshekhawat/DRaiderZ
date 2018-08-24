@@ -29,6 +29,13 @@ enum class ECharMovementDirection : uint8
 	BR 		UMETA(DisplayName = "Backward Right"),
 };
 
+UENUM(BlueprintType)
+enum class ECharacterGender : uint8
+{
+	Female,
+	Male
+};
+
 /** This enum describes the current action/state of character */
 UENUM(BlueprintType)
 enum class ECharacterState : uint8
@@ -63,12 +70,15 @@ public:
 	//~ @note Words like `JumpStart` and `JumpEnd` have been intentionally capitalized because
 	//~ they are animation montage section names
 
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
+	FName FPlayerAnimationReferencesTableRowID;
+
 	/** Contains animations for player JumpStart, JumpLoop, and JumpEnd */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Jump;
 	
 	/** Contains animations for ForwardDodge, BackwardDodge, LeftDodge, and RightDodge */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Dodge;
 	
 	/** Contains animations for:
@@ -79,43 +89,40 @@ public:
 	 * BackwardSwing, BackwardSwingEnd
 	 * ...
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_NormalAttacks;
 
 	//~ @note Add AnimationMontage_WeaponChange animations here
 	//~ @todo List montage section names for AnimationMontage_SpecialActions
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_SpecialActions;
 	
 	/**
 	 * Contains animations for instant skills.
 	 * Section name will be same as skill name
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Skills;
 	
 	/**
 	 * Contains animations for spells
 	 * Section name will be same as spell name
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Spells;
 	
 	//~ @todo documentation
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_SpecialMovement;
 	
 	//~ @todo List montage section names for AnimationMontage_CrowdControlEffects
 	/** Contains animations for crowd control effects like interrupted, frozen, etc. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_CrowdControlEffects;
 	
 	/** Contains animations for player flinching */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
 	UAnimMontage* AnimationMontage_Flinch;
-
-	/** Handle proper destruction of player animation references */
-	~FPlayerAnimationReferences();
 
 	// @todo Death animations
 
@@ -187,14 +194,7 @@ enum class ESkillCastType : uint8
 	NoCast
 };
 
-UENUM(BlueprintType)
-enum class EDamageType : uint8
-{
-	Physical,
-	Magickal
-};
-
-/** This struct contains info related to in-game class skills */
+/** Struct containing level specific info for an in-game skill */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillLevelUpInfo
 {
@@ -240,7 +240,7 @@ public:
 
 };
 
-/** This struct contains info related to in-game class skills */
+/** Table row struct for in-game skills */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillTableRow : public FTableRowBase
 {
@@ -261,6 +261,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	TSoftObjectPtr<UAnimMontage> AnimMontage;
 
+	UPROPERTY(EditAnywhere, Category = BaseInfo, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
+	uint8 SupportedWeapons;
+
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	FName SkillStartMontageSectionName;
 	
@@ -268,7 +271,7 @@ public:
 	FName SkillLoopMontageSectionName;
 	
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	FName SkillEndMontageSectionName;		
+	FName SkillEndMontageSectionName;
 	
 	/** Type of damage inflicted from this skill */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
@@ -281,25 +284,50 @@ public:
 
 	// @todo What does this skill do (heal/damage/buff)? It will be useful for AI logic
 
+	FSkillTableRow()
+	{
+		SkillStartMontageSectionName = NAME_None;
+		SkillLoopMontageSectionName = NAME_None;
+		SkillEndMontageSectionName = NAME_None;
+	}
 };
 
-/** Struct containing information of the skill that a character is currently using */
+/** In-game skill */
 USTRUCT(BlueprintType)
-struct FActiveSkill
+struct FSkill
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 
-	uint8 SkillIndex;
+	// uint8 SkillSlotIndex;
 
-	FName CurrentSkillInUse;
+	uint8 CurrentSkillLevel;
+
+	FName SkillID;
 
 	FName AnimationMontageSectionName;
 
-	UAnimMontage* SkillAnimationMontage;
+	UTexture* Icon;
 
-	UDataTable* SkillDataTableReference;
+	FString InGameName;
+	
+	FString Description;
+
+	UAnimMontage* AnimationMontage;
+
+	UPROPERTY(EditAnywhere, Category = BaseInfo, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
+	uint8 SupportedWeapons;
+
+	FName SkillStartMontageSectionName;
+
+	FName SkillLoopMontageSectionName;
+
+	FName SkillEndMontageSectionName;
+
+	EDamageType DamageType;
+
+	FSkillLevelUpInfo SkillLevelUpInfo;
 
 };
 
@@ -318,6 +346,13 @@ public:
 	
 	//~ @note Blueprints don't support raw struct pointers, therefore it can't be BlueprintCallable
 	/** Returns player animation references based on the EWeaponAnimationType of player */
-	static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType);
+	static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType, ECharacterGender Gender = ECharacterGender::Female);
+
+	// static FPlayerAnimationReferences* GetPlayerAnimationReferences(const FName AnimationID);
+
+	/** Attempts to unload player animation references, returns true if successful */
+	static bool UnloadPlayerAnimationReferences(FPlayerAnimationReferences* PlayerAnimationReferences, ECharacterGender Gender = ECharacterGender::Female);
+
+	static bool AreEnemies(AEODCharacterBase* CharacterOne, AEODCharacterBase* CharacterTwo);
 
 };

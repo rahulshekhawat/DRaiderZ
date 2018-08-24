@@ -23,6 +23,46 @@ enum class ECrowdControlEffect : uint8
 	Crystalized
 };
 
+UENUM(BlueprintType)
+enum class EDamageType : uint8
+{
+	Physical,
+	Magickal
+};
+
+/** In-game skill */
+USTRUCT(BlueprintType)
+struct FEODDamage
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	FHitResult LineHitResult;
+
+	FHitResult CapsuleHitResult;
+
+	EDamageType DamageType;
+
+	ECrowdControlEffect CrowdControlEffect;
+
+	float DamagePercent;
+
+	bool bUnblockable;
+
+	bool bUndodgable;
+
+	FEODDamage()
+	{
+		DamagePercent = 0.f;
+		bUnblockable = false;
+		bUndodgable = false;
+	}
+
+	FEODDamage(struct FSkill* Skill);
+
+};
+
 /**
  * CombatLibrary contains static helper functions for handling in-game combat.
  * @note Do not derive from this class

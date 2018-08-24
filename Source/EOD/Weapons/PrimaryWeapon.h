@@ -34,8 +34,8 @@ public:
 	/** Dummy declaration. This actor doesn't tick */
 	virtual void Tick(float DeltaTime) override;
 	
-	/** Called when this weapon is equipped by a character */
-	virtual void OnEquip(FWeaponTableRow* NewWeaponData) override;
+	/** Called when a new weapon is equipped by a character */
+	virtual void OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData) override;
 	
 	/** Called when this weapon is unequipped by a character */
 	virtual void OnUnEquip() override;	
