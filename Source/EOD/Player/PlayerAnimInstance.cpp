@@ -92,11 +92,11 @@ void UPlayerAnimInstance::HandleMontageBlendingOut(UAnimMontage * AnimMontage, b
 {
 	if(!bInterrupted)
 	{
-		if (AnimMontage == OwningPlayer->PlayerAnimationReferences->AnimationMontage_Jump)
+		if (AnimMontage == OwningPlayer->GetActiveAnimationReferences()->AnimationMontage_Jump)
 		{
 			OwningPlayer->CharacterState = ECharacterState::IdleWalkRun;
 		}
-		else if (AnimMontage == OwningPlayer->PlayerAnimationReferences->AnimationMontage_Dodge)
+		else if (AnimMontage == OwningPlayer->GetActiveAnimationReferences()->AnimationMontage_Dodge)
 		{
 			OwningPlayer->CharacterState = ECharacterState::IdleWalkRun;
 			// @todo

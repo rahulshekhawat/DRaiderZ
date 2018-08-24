@@ -15,7 +15,26 @@ class EOD_API AMobController : public AAIController
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+public:
+
+	AMobController(const FObjectInitializer& ObjectInitializer);
+
+	UFUNCTION(BlueprintCallable, Category = Blackboard)
+	void InitializeBlackboardValues(class UBlackboardComponent* BlackboardComponent);
+
+private:
+
+	UPROPERTY(EditDefaultsOnly, Category = BlackboardValues)
+	float AggroActivationRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = BlackboardValues)
+	float AggroAreaRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = BlackboardValues)
+	float MaxEnemyChaseRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = BlackboardValues)
+	float WanderRadius;
+
+
 };

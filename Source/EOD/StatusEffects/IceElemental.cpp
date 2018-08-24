@@ -2,108 +2,82 @@
 
 #include "IceElemental.h"
 #include "Player/EODCharacterBase.h"
+#include "Player/Components/StatsComponentBase.h"
 
 #include "Engine/World.h"
 #include "TimerManager.h"
 
-TArray<AEODCharacterBase*> UIceElemental::SlowedDownCharacters = TArray<AEODCharacterBase*>();
 
-/*
-UIceElemental::UIceElemental()
+UIceElemental::UIceElemental(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bTriggersOnSuccessfulHit = true;
-	SlowDownDuration = 2.f;
+	StackLimit = 1;
+	StatusEffectDuration = 10.f;
+	ActivationChance = 0.1f;
+	bResetsOnReactivation = true;
+	SlowDownModifier = 0.2f;
 }
 
-void UIceElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Instigator)
+void UIceElemental::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter)
 {
-	// Owner is needed to activate buffs on self or allies
-	SetOwningCharacter(Owner);
-	
-}
+	// @todo
 
-void UIceElemental::OnDeinitialize()
-{
-	SetOwningCharacter(nullptr);
-
-
-
-	// @todo remove any timers that this status effect has activated on enemies?
-	// @todo maybe call ConditionalBeginDestroy() on this object?
-	// this->ConditionalBeginDestroy();
-}
-
-void UIceElemental::OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters)
-{
-	for (TWeakObjectPtr<ABaseCharacter> RecipientCharacter : RecipientCharacters)
+	if (CharacterToStatusInfoMap.Contains(RecipientCharacter))
 	{
-		if (RecipientCharacter.IsValid())
+		if (!bResetsOnReactivation)
 		{
-			ABaseCharacter* Character = RecipientCharacter.Get();
-			int32 ElementalResistance = Character->StatsComp->ModifyElementalIceResistance(-GetOwningCharacter()->StatsComp->GetElementalIceDamage());
-			if (ElementalResistance <= 0)
-			{
-				// @todo Deal special elemental ice damage
-			}
-			
-			if (UIceElemental::SlowedDownCharacters.Contains(Character))
-			{
-				continue;
-			}
-
-			ApplySlowDown(Character);
 		}
 	}
-}
 
-void UIceElemental::OnDeactivation()
-{
-}
-
-void UIceElemental::ApplySlowDown(ABaseCharacter * TargetCharacter)
-{
-	FTimerHandle TimerHandle;
-	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindUFunction(this, FName("RemoveSlowDown"), TargetCharacter);
-
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, SlowDownDuration, false);
-
-	TargetCharacter->StatsComp->ModifyActiveTimeDilation(-SlowDownModifier);
-	SlowedDownCharacters.Add(TargetCharacter);
-
-	// @todo pass status info to the affected character
-}
-
-void UIceElemental::RemoveSlowDown(ABaseCharacter * TargetCharacter)
-{
-	if (GEngine)
+	/*
+	if (CharacterToStatusInfoMap.Contains(RecipientCharacter))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, *FString("Removed slowdown"));
+		if (!bResetsOnReactivation)
+		{
+			return;
+		}
+
+		FStatusInfo& StatusInfo = CharacterToStatusInfoMap[RecipientCharacter];
+		StatusInfo.CurrentStackLevel += 1;
+
+		GetWorld()->GetTimerManager().SetTimer(*StatusInfo.TimerHandle, StatusInfo.TimerDelegate, TickInterval, true, 0);
+	}
+	else
+	{
+		FStatusInfo StatusInfo;
+		StatusInfo.CurrentStackLevel = 1;
+		StatusInfo.TimerHandle = new FTimerHandle;
+		StatusInfo.TimerDelegate.BindUFunction(this, FName("OnStatusEffectTick"), StatusInfo);
+
+		GetWorld()->GetTimerManager().SetTimer(*StatusInfo.TimerHandle, StatusInfo.TimerDelegate, TickInterval, true, 0);
+
+		CharacterToStatusInfoMap.Add(RecipientCharacter, StatusInfo);
+	}
+	*/
+}
+
+void UIceElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter)
+{
+	AEODCharacterBase* TargetCharacter = WrappedRecipientCharacter.RecipientCharacter.Get();
+
+	// In case the target character has been destroyed (dead)
+	if (!IsValid(TargetCharacter))
+	{
+		DeactivateStatusEffect(WrappedRecipientCharacter.RecipientCharacter);
+		return;
 	}
 
-	TargetCharacter->StatsComp->ModifyActiveTimeDilation(SlowDownModifier);
-	SlowedDownCharacters.Remove(TargetCharacter);
-}
+	FStatusInfo& StatusInfo = CharacterToStatusInfoMap[WrappedRecipientCharacter.RecipientCharacter];
+	StatusInfo.TotalElapsedTime += GetWorld()->GetTimerManager().GetTimerElapsed(*StatusInfo.TimerHandle);
 
-void UIceElemental::ApplySlowDown(TWeakObjectPtr<ABaseCharacter> TargetCharacter)
-{
-	FTimerHandle TimerHandle;
-	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindUFunction(this, FName("RemoveSlowDown"), TargetCharacter);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, SlowDownDuration, false);
-	TargetCharacter.Get()->StatsComp->ModifyActiveTimeDilation(-SlowDownModifier);
 
-	AffectedCharacters.Add(TargetCharacter);
-}
-
-void UIceElemental::RemoveSlowDown(TWeakObjectPtr<ABaseCharacter> TargetCharacter)
-{
-	if (GEngine)
+	if (StatusInfo.TotalElapsedTime >= StatusEffectDuration)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, *FString("Removed slowdown"));
+		TargetCharacter->StatsComp->ModifyActiveTimeDilation(SlowDownModifier);
+		DeactivateStatusEffect(WrappedRecipientCharacter.RecipientCharacter);
+		return;
 	}
 
-	TargetCharacter.Get()->StatsComp->ModifyActiveTimeDilation(SlowDownModifier);
-	AffectedCharacters.Remove(TargetCharacter);
+	// @todo
+	// Character->StatsComp->ModifyActiveTimeDilation()
+
 }
-*/

@@ -70,6 +70,7 @@ void UCollisionParser::ImportAndApplyCollisionInfo()
 		for (FAssetData AssetData : AssetData_Temp)
 		{
 			FString FullName = AssetData.GetFullName();
+			FullName.ToLowerInline();
 			// AssetData.GetPackage()
 			// UE_LOG(LogTemp, Warning, TEXT("%s"), *FullName);
 			AssetDataMap_Animations.Add(FullName, AssetData);
@@ -110,7 +111,8 @@ void UCollisionParser::ImportAndApplyCollisionInfo()
 
 		for (FString& AnimationName : AnimationNames)
 		{
-			FString StringSearch = FString("AnimSequence ") + AnimationName;
+			FString StringSearch = FString("animsequence ") + AnimationName.ToLower();
+			// FString StringSearch = FString("AnimSequence ") + AnimationName;
 			if (!AssetDataMap_Animations.Contains(StringSearch))
 			{
 				continue;
@@ -158,7 +160,14 @@ void UCollisionParser::ImportAndApplyCollisionInfo()
 				bool bNotifyExists = false;
 				for (FAnimNotifyEvent& NotifyEvent : CurrentAnimSequence->Notifies)
 				{
-					if (NotifyEvent.NotifyName == FName("RaidCollision") && NotifyEvent.GetTriggerTime() == CollisionInfo.Time)
+					if (NotifyEvent.NotifyName == FName("RaidCollision") && FMath::IsNearlyEqual(NotifyEvent.GetTriggerTime(), CollisionInfo.Time, 0.033f))
+					{
+						bNotifyExists = true;
+					}
+
+					// if (NotifyEvent.NotifyName == FName("RaidCollision") && NotifyEvent.GetTriggerTime() == CollisionInfo.Time)
+					/*
+					if (NotifyEvent.NotifyName == FName("RaidCollision") && FMath::IsNearlyEqual(NotifyEvent.GetTriggerTime(), CollisionInfo.Time, 0.033f))
 					{
 						UAnimNotify_RaidCollision* Notify = Cast<UAnimNotify_RaidCollision>(NotifyEvent.Notify);
 
@@ -184,6 +193,7 @@ void UCollisionParser::ImportAndApplyCollisionInfo()
 							}
 						}
 					}
+					*/
 				}
 
 				// If notify doesn't exist, create it

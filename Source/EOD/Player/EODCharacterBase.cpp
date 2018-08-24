@@ -71,6 +71,11 @@ bool AEODCharacterBase::IsBlocking() const
 	return CharacterState == ECharacterState::Blocking;
 }
 
+bool AEODCharacterBase::IsBlockingDamage() const
+{
+	return false;
+}
+
 bool AEODCharacterBase::IsCastingSpell() const
 {
 	return CharacterState == ECharacterState::CastingSpell;
@@ -84,6 +89,11 @@ bool AEODCharacterBase::IsNormalAttacking() const
 bool AEODCharacterBase::IsDodging() const
 {
 	return CharacterState == ECharacterState::Dodging;
+}
+
+bool AEODCharacterBase::IsDodgingDamage() const
+{
+	return false;
 }
 
 bool AEODCharacterBase::NeedsHeal() const
@@ -278,11 +288,6 @@ void AEODCharacterBase::RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffect
 	// @todo definition
 }
 */
-
-FActiveSkill AEODCharacterBase::GetCurrentActiveSkillInfo()
-{	
-	return FActiveSkill();
-}
 
 void AEODCharacterBase::BeginPlay()
 {

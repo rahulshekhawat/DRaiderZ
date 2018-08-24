@@ -67,6 +67,19 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	MaxPlayerWalkSpeed = 400;
 	SetWalkSpeed(MaxPlayerWalkSpeed);
 
+	// be default the weapon should be sheathed
+	bWeaponSheathed = true;
+
+	// bHasActiveiframes = false;
+	// bIsBlockingDamage = false;
+
+	MaxNumberOfSkills = 30;
+	
+	for (int i = 0; i < MaxNumberOfSkills; i++)
+	{
+		EventsOnSuccessfulSkillAttack.Add(FCombatEvent());
+		EventsOnUsingSkill.Add(FCombatEvent());
+	}
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -96,6 +109,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
 	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
 
+
 	PlayerInputComponent->BindAction("Skill_1", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<0>);
 	PlayerInputComponent->BindAction("Skill_2", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<1>);
 	PlayerInputComponent->BindAction("Skill_3", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<2>);
@@ -116,6 +130,28 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("Skill_18", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<17>);
 	PlayerInputComponent->BindAction("Skill_19", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<18>);
 	PlayerInputComponent->BindAction("Skill_20", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<19>);
+
+	PlayerInputComponent->BindAction("Skill_1", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<0>);
+	PlayerInputComponent->BindAction("Skill_2", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<1>);
+	PlayerInputComponent->BindAction("Skill_3", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<2>);
+	PlayerInputComponent->BindAction("Skill_4", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<3>);
+	PlayerInputComponent->BindAction("Skill_5", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<4>);
+	PlayerInputComponent->BindAction("Skill_6", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<5>);
+	PlayerInputComponent->BindAction("Skill_7", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<6>);
+	PlayerInputComponent->BindAction("Skill_8", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<7>);
+	PlayerInputComponent->BindAction("Skill_9", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<8>);
+	PlayerInputComponent->BindAction("Skill_10", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<9>);
+	PlayerInputComponent->BindAction("Skill_11", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<10>);
+	PlayerInputComponent->BindAction("Skill_12", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<11>);
+	PlayerInputComponent->BindAction("Skill_13", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<12>);
+	PlayerInputComponent->BindAction("Skill_14", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<13>);
+	PlayerInputComponent->BindAction("Skill_15", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<14>);
+	PlayerInputComponent->BindAction("Skill_16", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<15>);
+	PlayerInputComponent->BindAction("Skill_17", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<16>);
+	PlayerInputComponent->BindAction("Skill_18", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<17>);
+	PlayerInputComponent->BindAction("Skill_19", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<18>);
+	PlayerInputComponent->BindAction("Skill_20", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<19>);
+
 	//~ End Action Input Bindings
 
 }
@@ -127,6 +163,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION(APlayerCharacter, IWR_CharacterMovementDirection, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, CurrentWeaponAnimationToUse, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(APlayerCharacter, bWeaponSheathed, COND_SkipOwner);
 
 }
 
@@ -137,6 +174,8 @@ void APlayerCharacter::PostInitializeComponents()
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+	SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
+
 	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
 
@@ -144,8 +183,14 @@ void APlayerCharacter::PostInitializeComponents()
 	SecondaryWeapon->SetOwningCharacter(this);
 
 	// @note please set secondary weapon first and primary weapon later.
-	SetCurrentWeapon(SecondaryWeaponID);
-	SetCurrentWeapon(PrimaryWeaponID);
+	if (SecondaryWeaponID != NAME_None)
+	{
+		SetCurrentSecondaryWeapon(SecondaryWeaponID);
+	}
+	if (PrimaryWeaponID != NAME_None)
+	{
+		SetCurrentPrimaryWeapon(PrimaryWeaponID);
+	}
 }
 
 #if WITH_EDITOR
@@ -167,17 +212,17 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 		// This case is an exception to CharacterState replication
 		CharacterState = ECharacterState::Jumping;
-		GetMesh()->GetAnimInstance()->Montage_Play(PlayerAnimationReferences->AnimationMontage_Jump);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpLoop"), PlayerAnimationReferences->AnimationMontage_Jump);
+		GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Jump);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpLoop"), GetActiveAnimationReferences()->AnimationMontage_Jump);
 	}
 	// It is necessary to test if jump montage is playing, or else the "JumpEnd" sections ends up playing twice because of montage blending out
-	else if (!GetCharacterMovement()->IsFalling() && IsJumping() && GetMesh()->GetAnimInstance()->Montage_IsPlaying(PlayerAnimationReferences->AnimationMontage_Jump))
+	else if (!GetCharacterMovement()->IsFalling() && IsJumping() && GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetActiveAnimationReferences()->AnimationMontage_Jump))
 	{
-		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(PlayerAnimationReferences->AnimationMontage_Jump);
+		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_Jump);
 		if (CurrentSection != FName("JumpEnd"))
 		{
-			GetMesh()->GetAnimInstance()->Montage_Play(PlayerAnimationReferences->AnimationMontage_Jump);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpEnd"), PlayerAnimationReferences->AnimationMontage_Jump);
+			GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Jump);
+			GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpEnd"), GetActiveAnimationReferences()->AnimationMontage_Jump);
 		}
 	}
 
@@ -206,13 +251,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// @development_only_code
-	// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndSword);
-
 	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-
-	UpdatePlayerAnimationReferences();
-
 
 	//~ Player HUD
 	if (Controller && Controller->IsLocalPlayerController() && BP_HUDWidget.Get())
@@ -301,7 +340,7 @@ void APlayerCharacter::ZoomOutCamera()
 
 void APlayerCharacter::OnDodge()
 {
-	if (CanDodge() && PlayerAnimInstance && PlayerAnimationReferences)
+	if (CanDodge() && PlayerAnimInstance && GetActiveAnimationReferences())
 	{
 		float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
 		float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
@@ -318,26 +357,26 @@ void APlayerCharacter::OnDodge()
 		{
 			if (RightAxisValue > 0)
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("RightDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("RightDodge"), ECharacterState::Dodging);
 			}
 			else if (RightAxisValue < 0)
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("LeftDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("LeftDodge"), ECharacterState::Dodging);
 			}
 			else
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
 			}
 		}
 		else
 		{
 			if (ForwardAxisValue > 0)
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("ForwardDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("ForwardDodge"), ECharacterState::Dodging);
 			}
 			else if (ForwardAxisValue < 0)
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
 			}
 		}
 	}
@@ -348,7 +387,6 @@ void APlayerCharacter::EnableBlock()
 	if (CanBlock())
 	{
 		SetCharacterState(ECharacterState::Blocking);
-		// CharacterState = ECharacterState::Blocking;
 		SetUseControllerRotationYaw(true);
 		SetWalkSpeed(150);
 	}
@@ -361,13 +399,12 @@ void APlayerCharacter::DisableBlock()
 	if (IsBlocking())
 	{
 		SetCharacterState(ECharacterState::IdleWalkRun);
-		// CharacterState = ECharacterState::IdleWalkRun;
 	}
 }
 
 void APlayerCharacter::OnJump()
 {
-	if (CanJump() && PlayerAnimInstance && PlayerAnimationReferences)
+	if (CanJump() && PlayerAnimInstance && GetActiveAnimationReferences())
 	{
 		if (IsBlocking())
 		{
@@ -375,10 +412,7 @@ void APlayerCharacter::OnJump()
 		}
 
 		Jump();
-		// CharacterState = ECharacterState::Jumping;
-		// PlayerAnimInstance->Montage_Play(PlayerAnimationReferences->AnimationMontage_Jump);
-		// PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Jump);
-		PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_Jump, FName("JumpStart"), ECharacterState::Jumping);
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Jump, FName("JumpStart"), ECharacterState::Jumping);
 	}
 }
 
@@ -388,6 +422,8 @@ void APlayerCharacter::OnInteract()
 
 void APlayerCharacter::OnToggleSheath()
 {
+	bool bNewValue = !bWeaponSheathed;
+	SetWeaponSheathed(bNewValue);
 }
 
 void APlayerCharacter::OnToggleCharacterStatsUI()
@@ -400,29 +436,29 @@ void APlayerCharacter::OnToggleMouseCursor()
 
 void APlayerCharacter::OnNormalAttack()
 {
-	if (CanNormalAttack() && PlayerAnimInstance && PlayerAnimationReferences)
+	if (CanNormalAttack() && PlayerAnimInstance && GetActiveAnimationReferences())
 	{
 		if (IsNormalAttacking())
 		{
-			FName CurrentSection = PlayerAnimInstance->Montage_GetCurrentSection(PlayerAnimationReferences->AnimationMontage_NormalAttacks);
+			FName CurrentSection = PlayerAnimInstance->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
 			if (CurrentSection == FName("FirstSwingEnd"))
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_NormalAttacks, FName("SecondSwing"), ECharacterState::Attacking);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("SecondSwing"), ECharacterState::Attacking);
 				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 			}
 			else if (CurrentSection == FName("SecondSwingEnd"))
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_NormalAttacks, FName("ThirdSwing"), ECharacterState::Attacking);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("ThirdSwing"), ECharacterState::Attacking);
 				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 			}
 			else if (CurrentSection == FName("ThirdSwingEnd"))
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_NormalAttacks, FName("FourthSwing"), ECharacterState::Attacking);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FourthSwing"), ECharacterState::Attacking);
 				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 			}
 			else if (CurrentSection == FName("FourthSwingEnd"))
 			{
-				PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_NormalAttacks, FName("FifthSwing"), ECharacterState::Attacking);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FifthSwing"), ECharacterState::Attacking);
 				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 			}
 			else if (CurrentSection == FName("FirstSwing"))
@@ -444,7 +480,7 @@ void APlayerCharacter::OnNormalAttack()
 		}
 		else
 		{
-			PlayAnimationMontage(PlayerAnimationReferences->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
+			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
 			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 		}
 	}
@@ -601,69 +637,168 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 	}
 }
 
-void APlayerCharacter::HandleMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
+void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
+	/*
+	// @note intentionally commented out. If player animation references are null when a collision event is triggered, we want it to crash.
 	if (!PlayerAnimationReferences || !(Animation == PlayerAnimationReferences->AnimationMontage_NormalAttacks || 
 										Animation == PlayerAnimationReferences->AnimationMontage_Skills || 
 										Animation == PlayerAnimationReferences->AnimationMontage_Spells))
 	{
 		return;
 	}
+	*/
+
+	bool bEnemiesHit = false;
+	FSkill* ActiveSkill = GetCurrentActiveSkill();
+
+	check(ActiveSkill);
 
 	for (FHitResult& HitResult : HitResults)
 	{
-		if (HitResult.Actor.Get())
+		if (!HitResult.Actor.Get())
 		{
-			AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
-			if (HitCharacter)
+			continue;
+		}
+
+		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
+		
+		if (!HitCharacter || (HitCharacter->IsDodgingDamage() && !ActiveSkill->SkillLevelUpInfo.bUndodgable))
+		{
+			// @todo handle damage for non AEODCharacterBase actors
+			continue;
+		}
+
+		bEnemiesHit = true;
+
+		TArray<FHitResult> LineHitResults;
+		FVector LineStart = GetActorLocation();
+		FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
+
+		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
+		GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
+
+		FHitResult LineHitResultToHitCharacter;
+		bool bLineHitResultFound = false;
+
+		for (FHitResult& LineHitResult : LineHitResults)
+		{
+			if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
 			{
-				TArray<FHitResult> LineHitResults;
-				FVector LineStart = GetActorLocation();
-				FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
-
-				FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
-				GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
-
-				FHitResult LineHitResultToHitCharacter;
-				bool bLineHitResultFound = false;
-
-				for (FHitResult& LineHitResult : LineHitResults)
-				{
-					if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
-					{
-						LineHitResultToHitCharacter = LineHitResult;
-						bLineHitResultFound = true;
-						break;
-					}
-				}
-
-				if (bLineHitResultFound)
-				{
-
-					FVector Start = LineHitResultToHitCharacter.ImpactPoint;
-					FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
-					UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
-				}
-			}
-			else
-			{
-				// @todo handle damage for non AEODCharacterBase actors
+				LineHitResultToHitCharacter = LineHitResult;
+				bLineHitResultFound = true;
+				break;
 			}
 		}
+
+		if (bLineHitResultFound)
+		{
+			FVector Start = LineHitResultToHitCharacter.ImpactPoint;
+			FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
+			UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
+		}
+
+		FEODDamage EODDamage(ActiveSkill);
+		EODDamage.CapsuleHitResult = HitResult;
+		EODDamage.LineHitResult = LineHitResultToHitCharacter;
+		ApplyEODDamage(HitCharacter, EODDamage);
+	}
+
+	if (!bEnemiesHit)
+	{
+		OnUnsuccessfulHit.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
 	}
 }
 
+void APlayerCharacter::ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage)
+{
+}
+
+void APlayerCharacter::TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamage& EODDamage)
+{
+}
+
+void APlayerCharacter::Destroyed()
+{
+	Super::Destroyed();
+
+	if (PrimaryWeapon)
+	{
+		PrimaryWeapon->SetOwningCharacter(nullptr);
+		PrimaryWeapon->OnUnEquip();
+		PrimaryWeapon->Destroy();
+	}
+	if (SecondaryWeapon)
+	{
+		SecondaryWeapon->SetOwningCharacter(nullptr);
+		SecondaryWeapon->OnUnEquip();
+		SecondaryWeapon->Destroy();
+	}
+}
+
+/*
 void APlayerCharacter::UpdatePlayerAnimationReferences()
 {
 	if (PlayerAnimationReferences)
 	{
+		UCharacterLibrary::UnloadPlayerAnimationReferences(PlayerAnimationReferences, Gender);
+
 		// delete older animation references, prevent memory leak
 		delete PlayerAnimationReferences;
 		PlayerAnimationReferences = nullptr;
 	}
 
-	PlayerAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(CurrentWeaponAnimationToUse);
+	PlayerAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(CurrentWeaponAnimationToUse, Gender);
 
+}
+*/
+
+void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(EWeaponType EquippedWeaponType)
+{
+	if (EquippedWeaponAnimationReferences)
+	{
+		UCharacterLibrary::UnloadPlayerAnimationReferences(EquippedWeaponAnimationReferences, Gender);
+
+		// delete older animation references, prevent memory leak
+		delete EquippedWeaponAnimationReferences;
+		EquippedWeaponAnimationReferences = nullptr;
+	}
+
+	EWeaponAnimationType WeaponAnimationType;
+	switch (EquippedWeaponType)
+	{
+	case EWeaponType::GreatSword:
+		WeaponAnimationType = EWeaponAnimationType::GreatSword;
+		break;
+	case EWeaponType::WarHammer:
+		WeaponAnimationType = EWeaponAnimationType::WarHammer;
+		break;
+	case EWeaponType::LongSword:
+		WeaponAnimationType = EWeaponAnimationType::ShieldAndSword;
+		break;
+	case EWeaponType::Mace:
+		WeaponAnimationType = EWeaponAnimationType::ShieldAndMace;
+		break;
+	case EWeaponType::Dagger:
+		WeaponAnimationType = EWeaponAnimationType::Daggers;
+		break;
+	case EWeaponType::Staff:
+		WeaponAnimationType = EWeaponAnimationType::Staff;
+		break;
+	case EWeaponType::Shield:
+	case EWeaponType::None:
+	default:
+		WeaponAnimationType = EWeaponAnimationType::NoWeapon;
+		break;
+	}
+
+	SetCurrentWeaponAnimationToUse(WeaponAnimationType);
+	EquippedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(WeaponAnimationType, Gender);
+}
+
+FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() const
+{
+	return bWeaponSheathed ? SheathedWeaponAnimationReferences : EquippedWeaponAnimationReferences;
 }
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
@@ -782,65 +917,135 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 	return ResultingRotation;
 }
 
-void APlayerCharacter::SetCurrentWeapon(FName WeaponID)
+void APlayerCharacter::SetCurrentPrimaryWeapon(FName WeaponID)
 {
-	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
-	if (WeaponData)
+	if (WeaponID == NAME_None)
 	{
-		SetCurrentWeapon(WeaponData);
-		UpdateCurrentWeaponAnimationType(WeaponData->WeaponType);		
+		RemovePrimaryWeapon();
+		return;
 	}
-}
 
-void APlayerCharacter::SetCurrentWeapon(FWeaponTableRow* WeaponData)
-{
-	// If WeaponData is nullptr
+	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
+	// If WeaponID is invalid
 	if (!WeaponData)
 	{
 		return;
 	}
-	
-	if (UWeaponLibrary::IsSecondaryWeapon(WeaponData->WeaponType))
+
+	RemovePrimaryWeapon();
+	if (UWeaponLibrary::IsWeaponDualHanded(WeaponData->WeaponType))
 	{
-		// SecondaryWeapon->
+		RemoveSecondaryWeapon();
+	}
+	PrimaryWeaponID = WeaponID;
+	PrimaryWeapon->OnEquip(WeaponID, WeaponData);
+
+	UpdateCurrentWeaponAnimationType();
+}
+
+void APlayerCharacter::SetCurrentSecondaryWeapon(FName WeaponID)
+{
+	if (WeaponID == NAME_None)
+	{
+		RemoveSecondaryWeapon();
+		return;
+	}
+
+	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
+	// If WeaponID is invalid
+	if (!WeaponData)
+	{
+		return;
+	}
+
+	// Since secondary weapon is guaranteed to be single handed
+	RemoveSecondaryWeapon();
+	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->WeaponType))
+	{
+		RemovePrimaryWeapon();
+	}
+	SecondaryWeaponID = WeaponID;
+	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
+
+	// UpdateCurrentWeaponAnimationType();
+}
+
+void APlayerCharacter::RemovePrimaryWeapon()
+{
+	PrimaryWeaponID = NAME_None;
+	PrimaryWeapon->OnUnEquip();
+}
+
+void APlayerCharacter::RemoveSecondaryWeapon()
+{
+	SecondaryWeaponID = NAME_None;
+	SecondaryWeapon->OnUnEquip();
+}
+
+void APlayerCharacter::UpdateCurrentWeaponAnimationType()
+{
+	if (bWeaponSheathed)
+	{
+		if (CurrentWeaponAnimationToUse != EWeaponAnimationType::SheathedWeapon)
+		{
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::SheathedWeapon);
+		}
+
+		return;
+	}
+
+	if (IsPrimaryWeaponEquippped())
+	{
+		switch (PrimaryWeapon->WeaponType)
+		{
+		case EWeaponType::GreatSword:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::GreatSword);
+			break;
+		case EWeaponType::WarHammer:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::WarHammer);
+			break;
+		case EWeaponType::LongSword:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndSword);
+			break;
+		case EWeaponType::Mace:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndMace);
+			break;
+		case EWeaponType::Dagger:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
+			break;
+		case EWeaponType::Staff:
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Staff);
+			break;
+		default:
+			// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
+			break;
+		}
+	}
+	else if (IsSecondaryWeaponEquipped())
+	{
+		if (SecondaryWeapon->WeaponType == EWeaponType::Dagger)
+		{
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
+		}
+		else
+		{
+			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
+		}
 	}
 	else
 	{
-		PrimaryWeapon->OnEquip(WeaponData);
+		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
 	}
-
-	// if (UWeaponLibrary::IsWeaponDualHanded)
 }
 
-void APlayerCharacter::UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType)
+bool APlayerCharacter::IsPrimaryWeaponEquippped() const
 {
-	switch (NewWeaponType)
-	{
-	case EWeaponType::GreatSword:
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::GreatSword);
-		break;
-	case EWeaponType::WarHammer:
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::WarHammer);
-		break;
-	case EWeaponType::LongSword:
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndSword);
-		break;
-	case EWeaponType::Mace:
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndMace);
-		break;
-	case EWeaponType::Dagger:
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
-		break;
-	case EWeaponType::Staff:
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Staff);
-		break;
-	case EWeaponType::Shield:
-		// probably best not to update animation type on equipping shield
-		// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Shield);
-		break;
-	default:
-		break;
-	}
+	return PrimaryWeaponID != NAME_None && PrimaryWeapon->bEquipped;
+}
+
+bool APlayerCharacter::IsSecondaryWeaponEquipped() const
+{
+	return SecondaryWeaponID != NAME_None && SecondaryWeapon->bEquipped;
 }
 
 void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
@@ -867,10 +1072,12 @@ void APlayerCharacter::SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWe
 {
 	CurrentWeaponAnimationToUse = NewWeaponAnimationType;
 	
+	/*
 	if (Role < ROLE_Authority)
 	{
 		Server_SetCurrentWeaponAnimationToUse(NewWeaponAnimationType);
 	}
+	*/
 }
 
 void APlayerCharacter::Server_SetCurrentWeaponAnimationToUse_Implementation(EWeaponAnimationType NewWeaponAnimationType)
@@ -899,6 +1106,36 @@ void APlayerCharacter::Server_SetBlockMovementDirectionYaw_Implementation(float 
 }
 
 bool APlayerCharacter::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw)
+{
+	return true;
+}
+
+void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
+{
+	bWeaponSheathed = bNewValue;
+	UpdateCurrentWeaponAnimationType();
+
+	if (Role < ROLE_Authority)
+	{
+		Server_SetWeaponSheathed(bNewValue);
+	}
+}
+
+void APlayerCharacter::OnRep_WeaponSheathed()
+{
+	UpdateCurrentWeaponAnimationType();	
+}
+
+void APlayerCharacter::OnRep_CurrentWeaponAnimationToUse()
+{
+}
+
+void APlayerCharacter::Server_SetWeaponSheathed_Implementation(bool bNewValue)
+{
+	SetWeaponSheathed(bNewValue);
+}
+
+bool APlayerCharacter::Server_SetWeaponSheathed_Validate(bool bNewValue)
 {
 	return true;
 }

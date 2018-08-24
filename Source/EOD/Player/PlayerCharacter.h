@@ -157,6 +157,9 @@ private:
 	
 	float MaxPlayerWalkSpeed;
 
+	UPROPERTY(EditDefaultsOnly, Category = Gender)
+	ECharacterGender Gender;
+
 public:
 	
 	/**
@@ -182,15 +185,24 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
 	float GetRotationYawFromAxisInput();
-	
-	/** Contains the references to the animation montages */
-	FPlayerAnimationReferences* PlayerAnimationReferences;
-	
+
+	// FPlayerAnimationReferences* PlayerAnimationReferences;
+
+	/** Animation montage references for currently equipped weapon */
+	FPlayerAnimationReferences* EquippedWeaponAnimationReferences;
+
+	/** Animations references for sheathed weapon */
+	FPlayerAnimationReferences* SheathedWeaponAnimationReferences;
+
 	/** A reference to player anim instance */
 	class UPlayerAnimInstance* PlayerAnimInstance;
 	
 	/** Updates the 'PlayerAnimationReferences' variable based on current weapon equipped */
-	void UpdatePlayerAnimationReferences();
+	// void UpdatePlayerAnimationReferences();
+
+	void UpdateEquippedWeaponAnimationReferences(EWeaponType EquippedWeaponType);
+
+	FPlayerAnimationReferences* GetActiveAnimationReferences() const;
 
 	UPROPERTY(Transient)
 	class APrimaryWeapon* PrimaryWeapon;
@@ -204,11 +216,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
 	FName SecondaryWeaponID;
 
-	void SetCurrentWeapon(FName WeaponID);
+	void SetCurrentPrimaryWeapon(FName WeaponID);
 
-	void SetCurrentWeapon(FWeaponTableRow* WeaponData);
+	void SetCurrentSecondaryWeapon(FName WeaponID);
 
-	void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
+	void RemovePrimaryWeapon();
+
+	void RemoveSecondaryWeapon();
+
+	void UpdateCurrentWeaponAnimationType();
+
+	bool IsPrimaryWeaponEquippped() const;
+
+	bool IsSecondaryWeaponEquipped() const;
 	
 	//~ Begin state handlers
 	virtual bool CanMove() const override;
@@ -232,6 +252,10 @@ public:
 	void UpdateAutoRun(float DeltaTime);
 	//~ End state handlers
 
+	// bool bHasActiveiframes;
+
+	// bool bIsBlockingDamage;
+
 	//~ Begin combat events	
 	FCombatEvent OnUsingSkill_0;
 	FCombatEvent OnUsingSkill_1;
@@ -245,9 +269,24 @@ public:
 	FCombatEvent OnUsingSkill_9;
 	//~ End combat events
 
-	/** [server] Handle melee collision */
-	virtual void HandleMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills)
+	uint8 MaxNumberOfSkills;
 
+	TArray<FCombatEvent> EventsOnUsingSkill;
+
+	TArray<FCombatEvent> EventsOnSuccessfulSkillAttack;
+
+	/** [server] Handle melee collision */
+	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
+
+	/** [server] Apply damage to a character */
+	virtual void ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage) override;
+
+	/** [server] Take damage from another character */
+	virtual void TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamage& EODDamage) override;
+
+	/** Called once this actor has been deleted */
+	virtual void Destroyed() override;
 
 private:
 
@@ -270,7 +309,7 @@ public:
 	void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 	
 	/** Animations to use based on that is determined by equipped weapon */
-	UPROPERTY(Replicated)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeaponAnimationToUse)
 	EWeaponAnimationType CurrentWeaponAnimationToUse;
 	
 	void SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType);
@@ -281,9 +320,21 @@ public:
 
 	void SetBlockMovementDirectionYaw(float NewYaw);
 
+	/** Determines whether weapon is currently sheathed or not */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_WeaponSheathed)
+	bool bWeaponSheathed;
+	
+	void SetWeaponSheathed(bool bNewValue);
+
 private:
 	
 	//~ Begin multiplayer code
+	UFUNCTION()
+	void OnRep_WeaponSheathed();
+
+	UFUNCTION()
+	void OnRep_CurrentWeaponAnimationToUse();
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 	
@@ -292,6 +343,9 @@ private:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetWeaponSheathed(bool bNewValue);
 	//~ End multiplayer code
 
 };

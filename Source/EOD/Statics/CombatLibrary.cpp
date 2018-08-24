@@ -1,8 +1,8 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "CombatLibrary.h"
+#include "CharacterLibrary.h"
 #include "Player/EODCharacterBase.h"
-#include "Statics/CombatLibrary.h"
 
 void UCombatLibrary::HandleCombatCollision(AEODCharacterBase * Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
@@ -11,7 +11,7 @@ void UCombatLibrary::HandleCombatCollision(AEODCharacterBase * Instigator, UAnim
 		return;
 	}
 
-	Instigator->HandleMeleeCollision(Animation, HitResults, bHit);
+	Instigator->OnMeleeCollision(Animation, HitResults, bHit);
 	// FActiveSkill ActiveSkill = Instigator->GetCurrentActiveSkillInfo();
 	
 }
@@ -34,4 +34,20 @@ FCollisionQueryParams UCombatLibrary::GenerateCombatCollisionQueryParams(AActor 
 	// @todo mask filter for teams.
 
 	return Params;
+}
+
+FEODDamage::FEODDamage(FSkill * Skill)
+{
+	if (Skill)
+	{
+		DamageType				= Skill->DamageType;
+		bUndodgable				= Skill->SkillLevelUpInfo.bUndodgable;
+		bUnblockable			= Skill->SkillLevelUpInfo.bUnblockable;
+		DamagePercent			= Skill->SkillLevelUpInfo.DamagePercent;
+		CrowdControlEffect		= Skill->SkillLevelUpInfo.CrowdControlEffect;		
+	}
+	else
+	{
+		FEODDamage();
+	}
 }
