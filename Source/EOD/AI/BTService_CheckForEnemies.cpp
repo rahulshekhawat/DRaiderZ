@@ -32,9 +32,11 @@ void UBTService_CheckForEnemies::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
 	APawn* OwningPawn = AIController->GetPawn();
 
-	bool bHasEnemyTarget = OwnerComp.GetBlackboardComponent()->GetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget);
+	// bool bHasEnemyTarget = OwnerComp.GetBlackboardComponent()->GetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget);
+	UObject* TargetEnemy = OwnerComp.GetBlackboardComponent()->GetValueAsObject(UAILibrary::BBKey_TargetEnemy);
 
-	if (bHasEnemyTarget)
+	// if (bHasEnemyTarget)
+	if(TargetEnemy)
 	{
 		AEODCharacterBase* EnemyCharacter = Cast<AEODCharacterBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(UAILibrary::BBKey_TargetEnemy));
 		
@@ -70,7 +72,7 @@ void UBTService_CheckForEnemies::OnSearchStart(FBehaviorTreeSearchData & SearchD
 void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(UAILibrary::BBKey_TargetEnemy, nullptr);
-	OwnerComp.GetBlackboardComponent()->SetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget, false);
+	// OwnerComp.GetBlackboardComponent()->SetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget, false);
 
 	// UE_LOG(LogTemp, Warning, TEXT("LOOKUP"));
 
@@ -105,6 +107,12 @@ void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& Own
 
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(UAILibrary::BBKey_TargetEnemy, HitCharacter);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget, true);
-		break;
+
+		// Put character in combat state
+		OwningCharacter->SetInCombat(true);
+		// break;
+		return;
 	}
+
+	OwningCharacter->SetInCombat(false);
 }
