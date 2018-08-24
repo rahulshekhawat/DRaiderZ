@@ -64,8 +64,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Player Inventory"));
 
-	MaxPlayerWalkSpeed = 400;
-	SetWalkSpeed(MaxPlayerWalkSpeed);
+	SetWalkSpeed(BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier());
 
 	// be default the weapon should be sheathed
 	bWeaponSheathed = true;
@@ -388,7 +387,7 @@ void APlayerCharacter::EnableBlock()
 	{
 		SetCharacterState(ECharacterState::Blocking);
 		SetUseControllerRotationYaw(true);
-		SetWalkSpeed(150);
+		SetWalkSpeed(BaseBlockMovementSpeed * StatsComp->GetMovementSpeedModifier());
 	}
 }
 
@@ -543,18 +542,20 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 
 	if (ForwardAxisValue < 0)
 	{
-		if (GetCharacterMovement()->MaxWalkSpeed != 125)
+		float Speed = (BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier() * 5) / 16;
+		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			// SetWalkSpeed calls an RPC every frame and we want to avoid the overhead of RPC
-			SetWalkSpeed(125);
+			SetWalkSpeed(Speed);
 		}
 	}
 	else
 	{
-		if (GetCharacterMovement()->MaxWalkSpeed != 400)
+		float Speed = BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier();
+		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			// SetWalkSpeed calls an RPC every frame and we want to avoid the overhead of RPC
-			SetWalkSpeed(400);
+			SetWalkSpeed(Speed);
 		}
 	}
 
@@ -631,9 +632,10 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 		SetIWRCharMovementDir(ECharMovementDirection::F);
 	}
 	
-	if (GetCharacterMovement()->MaxWalkSpeed != 400)
+	float Speed = BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier();
+	if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 	{
-		SetWalkSpeed(400);
+		SetWalkSpeed(Speed);
 	}
 }
 
@@ -800,6 +802,13 @@ FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() co
 {
 	return bWeaponSheathed ? SheathedWeaponAnimationReferences : EquippedWeaponAnimationReferences;
 }
+
+/*
+float APlayerCharacter::GetMaxPlayerWalkSpeed() const
+{
+	return BaseWalkSpeed * StatsComp->GetMovementSpeedModifier();
+}
+*/
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {

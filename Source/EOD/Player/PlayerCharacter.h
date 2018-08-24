@@ -102,6 +102,16 @@ private:
 
 	const int CameraArmMaximumLength = 500;
 
+	const float BaseNormalMovementSpeed = 400;
+
+	// @todo test special movement speed (current value has been set untested and set on a guess)
+	const float BaseSpecialMovementSpeed = 600;
+
+	// Maximum speed of player when walking during player's guard is up
+	const float BaseBlockMovementSpeed = 150;
+
+	// float GetMaxPlayerWalkSpeed() const;
+
 	//~ @note Pressing and releasing skill keys are separate events to support charge events (e.g. charge rage)
 
 	/** Handles player pressing a skill key */
@@ -154,8 +164,6 @@ private:
 	UPROPERTY(Transient)
 	class UHUDWidget* HUDWidget;
 	//~ End UI
-	
-	float MaxPlayerWalkSpeed;
 
 	UPROPERTY(EditDefaultsOnly, Category = Gender)
 	ECharacterGender Gender;
