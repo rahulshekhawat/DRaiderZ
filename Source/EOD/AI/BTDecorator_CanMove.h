@@ -16,7 +16,7 @@ class EOD_API UBTDecorator_CanMove : public UBTDecorator
 	
 public:
 
-	UBTDecorator_CanMove(const FObjectInitializer & ObjectInitializer);
+	UBTDecorator_CanMove();
 
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 

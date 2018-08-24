@@ -6,7 +6,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-UBTDecorator_CanMove::UBTDecorator_CanMove(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
+UBTDecorator_CanMove::UBTDecorator_CanMove()
 {
 }
 
