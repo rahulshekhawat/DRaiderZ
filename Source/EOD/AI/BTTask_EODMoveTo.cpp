@@ -17,18 +17,32 @@ EBTNodeResult::Type UBTTask_EODMoveTo::ExecuteTask(UBehaviorTreeComponent & Owne
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
 	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
 
+	EBTNodeResult::Type BTNodeResult = EBTNodeResult::Failed;
+
 	if (OwningCharacter->CanMove())
 	{
-		EBTNodeResult::Type BTNodeResult = Super::ExecuteTask(OwnerComp, NodeMemory);
+		BTNodeResult = Super::ExecuteTask(OwnerComp, NodeMemory);
 		return BTNodeResult;
 	}
 
-	return EBTNodeResult::Failed;
+	return BTNodeResult;
 }
 
 void UBTTask_EODMoveTo::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
-	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+	// The owner of 'OwnerComp' is a controller (not pawn)
+	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
+	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
+
+	EBTNodeResult::Type BTNodeResult = EBTNodeResult::Failed;
+
+	if (OwningCharacter->CanMove())
+	{
+		Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+		return;
+	}
+
+	FinishLatentTask(OwnerComp, BTNodeResult);
 }
 
 void UBTTask_EODMoveTo::OnTaskFinished(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, EBTNodeResult::Type TaskResult)
