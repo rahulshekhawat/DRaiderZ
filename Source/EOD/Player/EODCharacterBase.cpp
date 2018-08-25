@@ -101,6 +101,11 @@ bool AEODCharacterBase::NeedsHeal() const
 	return StatsComp->IsLowOnHealth();
 }
 
+int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
+{
+	return 0;
+}
+
 void AEODCharacterBase::SetCharacterState(ECharacterState NewState)
 {
 	CharacterState = NewState;
