@@ -120,8 +120,14 @@ public:
 	/** Returns the info for skill that this character is curretly using */
 	// virtual FActiveSkill GetCurrentActiveSkillInfo();
 
-	UFUNCTION(BlueprintCallable, Category=Skills)
+	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual int32 GetMostWeightedSkillIndex() const;
+
+	UFUNCTION(BlueprintCallable, Category = Skills)
+	virtual bool UseSkill(int32 SkillIndex);
+
+	UFUNCTION(BlueprintCallable, Category = Skills)
+	virtual EEODTaskStatus CheckSkillStatus(int32 SkillIndex);
 
 	/** Returns the current active skill */
 	virtual FSkill* GetCurrentActiveSkill() PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkill, return nullptr; );

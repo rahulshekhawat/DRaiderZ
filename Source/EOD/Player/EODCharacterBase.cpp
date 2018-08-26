@@ -106,6 +106,17 @@ int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
 	return 0;
 }
 
+bool AEODCharacterBase::UseSkill(int32 SkillIndex)
+{
+	return true;
+	// return false;
+}
+
+EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
+{
+	return EEODTaskStatus();
+}
+
 void AEODCharacterBase::SetCharacterState(ECharacterState NewState)
 {
 	CharacterState = NewState;

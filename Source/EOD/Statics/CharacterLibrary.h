@@ -194,6 +194,15 @@ enum class ESkillCastType : uint8
 	NoCast
 };
 
+UENUM(BlueprintType)
+enum class EEODTaskStatus : uint8
+{
+	Active,
+	Inactive,
+	Finished,
+	Aborted
+};
+
 /** Struct containing level specific info for an in-game skill */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillLevelUpInfo
