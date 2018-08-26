@@ -654,6 +654,13 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 	bool bEnemiesHit = false;
 	FSkill* ActiveSkill = GetCurrentActiveSkill();
 
+#if DEVSTAGE_CODE_ENABLED
+	if (!ActiveSkill)
+	{
+		return;
+	}
+#endif // DEVSTAGE_CODE_ENABLED
+
 	check(ActiveSkill);
 
 	for (FHitResult& HitResult : HitResults)

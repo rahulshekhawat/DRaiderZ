@@ -19,6 +19,8 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	
 	// Initialize variables
 	CharacterState = ECharacterState::IdleWalkRun;
+
+	CurrentActiveSkill = nullptr;
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
@@ -115,6 +117,11 @@ bool AEODCharacterBase::UseSkill(int32 SkillIndex)
 EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 {
 	return EEODTaskStatus();
+}
+
+FSkill * AEODCharacterBase::GetCurrentActiveSkill()
+{
+	return CurrentActiveSkill;
 }
 
 void AEODCharacterBase::SetCharacterState(ECharacterState NewState)
