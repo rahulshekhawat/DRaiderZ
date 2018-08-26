@@ -118,7 +118,7 @@ public:
 	//~ @todo List montage section names for AnimationMontage_CrowdControlEffects
 	/** Contains animations for crowd control effects like interrupted, frozen, etc. */
 	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	UAnimMontage* AnimationMontage_CrowdControlEffects;
+	UAnimMontage* AnimationMontage_HitEffects;
 	
 	/** Contains animations for player flinching */
 	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
@@ -173,7 +173,7 @@ public:
 	
 	/** Reference to player animation montage that contains animations for crowd control effects */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> CrowdControlEffects;
+	TSoftObjectPtr<UAnimMontage> HitEffects;
 	
 	/** Reference to player animation montage that contains animations for flinching */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

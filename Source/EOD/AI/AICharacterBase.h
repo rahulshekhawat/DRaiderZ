@@ -44,7 +44,7 @@ private:
 	FName GreetingMontageSectionName;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animations)
-	UAnimMontage* AnimationMontage_CrowdControlEffects;
+	UAnimMontage* AnimationMontage_HitEffects;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animations)
 	UAnimMontage* AnimationMontage_Flinch;
