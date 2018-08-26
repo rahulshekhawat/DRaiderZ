@@ -42,5 +42,18 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Animations)
 	FName GreetingMontageSectionName;
-	
+
+	UPROPERTY(EditDefaultsOnly, Category = Animations)
+	UAnimMontage* AnimationMontage_CrowdControlEffects;
+
+	UPROPERTY(EditDefaultsOnly, Category = Animations)
+	UAnimMontage* AnimationMontage_Flinch;
+
+	UPROPERTY(EditDefaultsOnly, Category = Animations)
+	UAnimMontage* AnimationMontage_Skills;
+
+	UPROPERTY(EditDefaultsOnly, Category = Skills)
+	UDataTable* DataTable_Skills;
+
+
 };
