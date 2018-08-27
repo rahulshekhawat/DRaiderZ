@@ -49,15 +49,15 @@ void UStatusEffectBase::Deinitialize()
 
 void UStatusEffectBase::OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>& RecipientCharacters)
 {
-	bool bShouldActivate = ActivationChance >= FMath::RandRange(0.f, 1.f) ? true : false;
-
-	if (!bShouldActivate)
-	{
-		return;
-	}
-
 	for (TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter : RecipientCharacters)
 	{
+		bool bShouldActivate = ActivationChance >= FMath::RandRange(0.f, 1.f) ? true : false;
+
+		if (!bShouldActivate)
+		{
+			continue;
+		}
+
 		ActivateStatusEffect(RecipientCharacter);
 	}
 }
