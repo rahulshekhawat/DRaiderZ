@@ -11,6 +11,10 @@ ULightningElemental::ULightningElemental(const FObjectInitializer & ObjectInitia
 	StunDuration = 1.f;
 }
 
+void ULightningElemental::Deinitialize()
+{
+	// empty override is intentional
+}
 
 void ULightningElemental::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter)
 {
@@ -25,4 +29,9 @@ void ULightningElemental::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>
 	{
 		TargetCharacter->ApplyStun(StunDuration);
 	}
+}
+
+void ULightningElemental::DeactivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter)
+{
+	// empty override is intentional
 }
