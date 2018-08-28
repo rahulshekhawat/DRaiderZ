@@ -132,10 +132,12 @@ public:
 
 	void SetInstigator(AActor* NewInstigator);
 
+	virtual TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* GetCharacterToStatusInfoMap() PURE_VIRTUAL(UStatusEffect::OnStatusEffectTick, return nullptr; );
+
 protected:
 
 	/** Map of characters affected by this status effect */
-	static TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CharacterToStatusInfoMap;
+	// static TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CharacterToStatusInfoMap;
 
 	/**
 	 * Determines if this status effect should reset on reactivation.
