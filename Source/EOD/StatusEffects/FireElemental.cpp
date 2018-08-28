@@ -7,6 +7,8 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 
+TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> UFireElemental::BurningCharactersToStatusInfoMap = TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>();
+
 UFireElemental::UFireElemental(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
 	bTriggersOnCriticalHit = true;

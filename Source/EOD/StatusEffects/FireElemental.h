@@ -28,6 +28,6 @@ protected:
 
 private:
 
-	TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> BurningCharactersToStatusInfoMap;
+	static TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> BurningCharactersToStatusInfoMap;
 
 };
