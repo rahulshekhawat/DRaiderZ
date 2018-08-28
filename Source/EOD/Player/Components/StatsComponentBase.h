@@ -75,6 +75,10 @@ public:
 
 	virtual int32 GetMagickResistance() const PURE_VIRTUAL(UStatsComponentBase::GetMagickResistance, return 0; );
 
+	virtual void ModifyPhysicalResistance(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyPhysicalResistance, );
+
+	virtual void ModifyMagickalResistance(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyMagickalResistance, );
+
 	virtual float GetPhysicalCritRate() const PURE_VIRTUAL(UStatsComponentBase::GetPhysicalCritRate, return 0.f; );
 
 	virtual float GetMagickCritRate() const PURE_VIRTUAL(UStatsComponentBase::GetMagickCritRate, return 0.f; );
