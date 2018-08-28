@@ -2,46 +2,49 @@
 
 #include "FireElemental.h"
 #include "Player/EODCharacterBase.h"
+#include "Player/Components/StatsComponentBase.h"
 
-/*
-UFireElemental::UFireElemental()
+#include "Engine/World.h"
+#include "TimerManager.h"
+
+UFireElemental::UFireElemental(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
 	bTriggersOnCriticalHit = true;
+	ActivationChance = 0.5;
+	StackLimit = 3;
+
+	StatusEffectDuration = 10;
+	TickInterval = 1;
 }
 
-void UFireElemental::OnInitialize(ABaseCharacter* Owner, AActor* Instigator)
+TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* UFireElemental::GetCharacterToStatusInfoMap()
 {
+	return &BurningCharactersToStatusInfoMap;
 }
 
-void UFireElemental::OnDeinitialize()
+void UFireElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper & WrappedRecipientCharacter)
 {
+	AEODCharacterBase* TargetCharacter = WrappedRecipientCharacter.RecipientCharacter.Get();
+
+	// In case the target character has been destroyed (dead)
+	if (!IsValid(TargetCharacter))
+	{
+		DeactivateStatusEffect(WrappedRecipientCharacter.RecipientCharacter);
+		return;
+	}
+
+	FStatusInfo& StatusInfo = (*GetCharacterToStatusInfoMap())[WrappedRecipientCharacter.RecipientCharacter];
+	StatusInfo.TotalElapsedTime += GetWorld()->GetTimerManager().GetTimerElapsed(*StatusInfo.TimerHandle);
+
+	float OwnerFireDamage = GetOwningCharacter()->StatsComp->GetElementalFireDamage();
+	float TargetFireResistance = TargetCharacter->StatsComp->GetElementalFireResistance();
+
+	float Damage = UCombatLibrary::CalculateDamage(OwnerFireDamage, TargetFireResistance);
+	TargetCharacter->StatsComp->ModifyMaxHealth(-Damage);
+
+	if (StatusInfo.TotalElapsedTime >= StatusEffectDuration)
+	{
+		DeactivateStatusEffect(WrappedRecipientCharacter.RecipientCharacter);
+		return;
+	}
 }
-
-void UFireElemental::OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters)
-{
-	if (ReactivationCondition == EStatusEffectReactivationCondition::None)
-	{
-	}
-	else if (ReactivationCondition == EStatusEffectReactivationCondition::Reset)
-	{
-
-	}
-	else if (ReactivationCondition == EStatusEffectReactivationCondition::Stack)
-	{
-
-	}
-	else
-	{
-
-	}
-
-	for (ABaseCharacter* RecipientCharacter : RecipientCharacters)
-	{
-		RecipientCharacter->AddStatusEffectVisuals(Icon, ParticleSystem);
-	}
-}
-
-void UFireElemental::OnDeactivation()
-{
-}
-*/
