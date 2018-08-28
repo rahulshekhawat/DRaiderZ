@@ -36,6 +36,11 @@ FCollisionQueryParams UCombatLibrary::GenerateCombatCollisionQueryParams(AActor 
 	return Params;
 }
 
+float UCombatLibrary::CalculateDamage(float Attack, float Defense)
+{
+	return 0.0f;
+}
+
 FEODDamage::FEODDamage(FSkill * Skill)
 {
 	if (Skill)
