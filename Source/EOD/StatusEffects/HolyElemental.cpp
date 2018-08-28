@@ -8,7 +8,8 @@
 #include "TimerManager.h"
 
 TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> UHolyElemental::CharactersToStatusInfoMap = TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>();
-TMap<TWeakObjectPtr<AEODCharacterBase>, float> UHolyElemental::CharacterToDefenseReductionMap = TMap<TWeakObjectPtr<AEODCharacterBase>, float>();
+TMap<TWeakObjectPtr<AEODCharacterBase>, float> UHolyElemental::CharacterToPhysicalDefenseReductionMap = TMap<TWeakObjectPtr<AEODCharacterBase>, float>();
+TMap<TWeakObjectPtr<AEODCharacterBase>, float> UHolyElemental::CharacterToMagickalDefenseReductionMap = TMap<TWeakObjectPtr<AEODCharacterBase>, float>();
 
 UHolyElemental::UHolyElemental(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -27,7 +28,8 @@ UHolyElemental::UHolyElemental(const FObjectInitializer & ObjectInitializer) : S
 void UHolyElemental::Deinitialize()
 {
 	Super::Deinitialize();
-	CharacterToDefenseReductionMap.Empty();
+	CharacterToPhysicalDefenseReductionMap.Empty();
+	CharacterToMagickalDefenseReductionMap.Empty();
 }
 
 TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* UHolyElemental::GetCharacterToStatusInfoMap()
@@ -49,32 +51,50 @@ void UHolyElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper & Wrapp
 	FStatusInfo& StatusInfo = (*GetCharacterToStatusInfoMap())[WrappedRecipientCharacter.RecipientCharacter];
 	StatusInfo.TotalElapsedTime += GetWorld()->GetTimerManager().GetTimerElapsed(*StatusInfo.TimerHandle);
 
-	if (CharacterToDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter) && StatusInfo.TotalElapsedTime >= StatusEffectDuration)
+	if ((CharacterToMagickalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter) &&
+		CharacterToPhysicalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter)) &&
+		StatusInfo.TotalElapsedTime >= StatusEffectDuration)
 	{
-		float DefenseReduction = CharacterToDefenseReductionMap[WrappedRecipientCharacter.RecipientCharacter];
-		TargetCharacter->StatsComp->ModifyPhysicalResistance(DefenseReduction);
-		TargetCharacter->StatsComp->ModifyMagickalResistance(DefenseReduction);
+		float PhysicalDefenseReduction = CharacterToPhysicalDefenseReductionMap[WrappedRecipientCharacter.RecipientCharacter];
+		float MagickalDefenseReduction = CharacterToMagickalDefenseReductionMap[WrappedRecipientCharacter.RecipientCharacter];
+
+		TargetCharacter->StatsComp->ModifyPhysicalResistance(PhysicalDefenseReduction);
+		TargetCharacter->StatsComp->ModifyMagickalResistance(MagickalDefenseReduction);
+		
 		DeactivateStatusEffect(WrappedRecipientCharacter.RecipientCharacter);
 	}
-	else if(!CharacterToDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter))
+	else if (CharacterToMagickalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter) &&
+		CharacterToPhysicalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter))
 	{
 		float OwnerHolyDamage = GetOwningCharacter()->StatsComp->GetElementalHolyDamage();
 		float TargetHolyResistance = TargetCharacter->StatsComp->GetElementalHolyResistance();
 
-		float DefenseReduction = CalculateDefenseReduction(OwnerHolyDamage, TargetHolyResistance);
-		TargetCharacter->StatsComp->ModifyPhysicalResistance(-DefenseReduction);
-		TargetCharacter->StatsComp->ModifyMagickalResistance(-DefenseReduction);
-		CharacterToDefenseReductionMap.Add(WrappedRecipientCharacter.RecipientCharacter, DefenseReduction);
+		float PhysicalDefenseReduction = CalculatePhysicalDefenseReduction(OwnerHolyDamage, TargetHolyResistance);
+		float MagickalDefenseReduction = CalculateMagickalDefenseReduction(OwnerHolyDamage, TargetHolyResistance);
+
+		TargetCharacter->StatsComp->ModifyPhysicalResistance(-PhysicalDefenseReduction);
+		TargetCharacter->StatsComp->ModifyMagickalResistance(-MagickalDefenseReduction);
+		
+		CharacterToPhysicalDefenseReductionMap.Add(WrappedRecipientCharacter.RecipientCharacter, PhysicalDefenseReduction);
+		CharacterToMagickalDefenseReductionMap.Add(WrappedRecipientCharacter.RecipientCharacter, MagickalDefenseReduction);
 	}
 }
 
 void UHolyElemental::DeactivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter)
 {
 	Super::DeactivateStatusEffect(RecipientCharacter);
-	CharacterToDefenseReductionMap.Remove(RecipientCharacter);
+	CharacterToPhysicalDefenseReductionMap.Remove(RecipientCharacter);
+	CharacterToMagickalDefenseReductionMap.Remove(RecipientCharacter);
 }
 
-float UHolyElemental::CalculateDefenseReduction(float HolyDamage, float HolyDefense)
+float UHolyElemental::CalculatePhysicalDefenseReduction(float HolyDamage, float HolyDefense)
 {
+	// @todo
+	return 0.0f;
+}
+
+float UHolyElemental::CalculateMagickalDefenseReduction(float HolyDamage, float HolyDefense)
+{
+	// @todo
 	return 0.0f;
 }
