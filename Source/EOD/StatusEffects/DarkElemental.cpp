@@ -7,6 +7,8 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 
+TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> UDarkElemental::CursedCharactersToStatusInfoMap = TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>();
+
 UDarkElemental::UDarkElemental(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
 	bTriggersOnSuccessfulHit = true;
