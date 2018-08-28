@@ -119,6 +119,10 @@ EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 	return EEODTaskStatus();
 }
 
+void AEODCharacterBase::ApplyStun(float Duration)
+{
+}
+
 FSkill * AEODCharacterBase::GetCurrentActiveSkill()
 {
 	return CurrentActiveSkill;
@@ -293,6 +297,11 @@ bool AEODCharacterBase::CanRespawn() const
 bool AEODCharacterBase::CanNormalAttack() const
 {
 	return CharacterState == ECharacterState::IdleWalkRun;
+}
+
+bool AEODCharacterBase::CanBeStunned() const
+{
+	return false;
 }
 
 bool AEODCharacterBase::CanDodge() const

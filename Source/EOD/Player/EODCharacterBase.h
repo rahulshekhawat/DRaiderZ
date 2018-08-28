@@ -75,6 +75,8 @@ public:
 	virtual bool CanRespawn() const;
 
 	virtual bool CanNormalAttack() const;
+
+	virtual bool CanBeStunned() const;
 	
 	virtual void SetInCombat(bool bValue) { bInCombat = bValue; }
 	
@@ -128,6 +130,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual EEODTaskStatus CheckSkillStatus(int32 SkillIndex);
+
+	virtual void ApplyStun(float Duration);
 
 	/** Returns the current active skill */
 	virtual FSkill* GetCurrentActiveSkill();

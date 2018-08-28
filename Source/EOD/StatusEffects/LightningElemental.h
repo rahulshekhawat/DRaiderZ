@@ -14,7 +14,16 @@ class EOD_API ULightningElemental : public UElementalBase
 {
 	GENERATED_BODY()
 	
-	
-	
+public:
+
+	ULightningElemental(const FObjectInitializer& ObjectInitializer);
+
+	UPROPERTY(EditDefaultsOnly, Category = LightningElemental)
+	float StunDuration;
+
+protected:
+
+	/** Called to activate this status effect on a recipient character */
+	virtual void ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter);
 	
 };
