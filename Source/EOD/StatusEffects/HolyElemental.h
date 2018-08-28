@@ -13,8 +13,34 @@ UCLASS()
 class EOD_API UHolyElemental : public UElementalBase
 {
 	GENERATED_BODY()
-	
-	
-	
+
+public:
+
+	UHolyElemental(const FObjectInitializer& ObjectInitializer);
+
+	/** Called to deinitialize this status effect on a character */
+	virtual void Deinitialize() override;
+
+	virtual TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* GetCharacterToStatusInfoMap() override;
+
+protected:
+
+	/** Called to process the ticking of this status effect. Must be overridden in inherited classes */
+	// UFUNCTION()
+	virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter) override;
+
+	/** Called to deactivate this status effect on a recipient character */
+	virtual void DeactivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter) override;
+
+	UPROPERTY(EditDefaultsOnly, Category = HolyElemental)
+	float MaxDefenseReduction;
+
+private:
+
+	static TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CharactersToStatusInfoMap;
+
+	static TMap<TWeakObjectPtr<AEODCharacterBase>, float> CharacterToDefenseReductionMap;
+
+	float CalculateDefenseReduction(float HolyDamage, float HolyDefense);
 	
 };
