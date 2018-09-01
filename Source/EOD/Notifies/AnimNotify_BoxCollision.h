@@ -19,15 +19,15 @@ public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 	
 	/** Position of collision box's center */
-	UPROPERTY(EditDefaultsOnly, Category = BoxInfo)
+	UPROPERTY(EditAnywhere, Category = BoxInfo)
 	FVector Center;
 	
 	/** Half extent of collision box */
-	UPROPERTY(EditDefaultsOnly, Category = BoxInfo)
+	UPROPERTY(EditAnywhere, Category = BoxInfo)
 	FVector BoxHalfExtent;
 	
 	/** Rotation of collision box */
-	UPROPERTY(EditDefaultsOnly, Category = BoxInfo)
+	UPROPERTY(EditAnywhere, Category = BoxInfo)
 	FRotator Rotation;
 
 

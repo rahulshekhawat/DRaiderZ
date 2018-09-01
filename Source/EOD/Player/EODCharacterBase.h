@@ -75,6 +75,8 @@ public:
 	virtual bool CanRespawn() const;
 
 	virtual bool CanNormalAttack() const;
+
+	virtual bool CanBeStunned() const;
 	
 	virtual void SetInCombat(bool bValue) { bInCombat = bValue; }
 	
@@ -120,8 +122,19 @@ public:
 	/** Returns the info for skill that this character is curretly using */
 	// virtual FActiveSkill GetCurrentActiveSkillInfo();
 
+	UFUNCTION(BlueprintCallable, Category = Skills)
+	virtual int32 GetMostWeightedSkillIndex() const;
+
+	UFUNCTION(BlueprintCallable, Category = Skills)
+	virtual bool UseSkill(int32 SkillIndex);
+
+	UFUNCTION(BlueprintCallable, Category = Skills)
+	virtual EEODTaskStatus CheckSkillStatus(int32 SkillIndex);
+
+	virtual void ApplyStun(float Duration);
+
 	/** Returns the current active skill */
-	virtual FSkill* GetCurrentActiveSkill() PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkill, return nullptr; );
+	virtual FSkill* GetCurrentActiveSkill();
 
 	/** [server] Handle melee collision */
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) PURE_VIRTUAL(AEODCharacterBase::HandleMeleeCollision, );
@@ -139,6 +152,8 @@ protected:
 
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
+
+	FSkill* CurrentActiveSkill;
 
 public:
 	

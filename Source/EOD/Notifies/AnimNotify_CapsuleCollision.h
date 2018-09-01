@@ -19,19 +19,19 @@ public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	/** Position of collision capsule's center */
-	UPROPERTY(EditDefaultsOnly, Category = CapsuleInfo)
+	UPROPERTY(EditAnywhere, Category = CapsuleInfo)
 	FVector Center;
 	
 	/** Rotation of collision capsule */
-	UPROPERTY(EditDefaultsOnly, Category = CapsuleInfo)
+	UPROPERTY(EditAnywhere, Category = CapsuleInfo)
 	FRotator Rotation;
 	
 	/** Radius of collision capsule */
-	UPROPERTY(EditDefaultsOnly, Category = CapsuleInfo)
+	UPROPERTY(EditAnywhere, Category = CapsuleInfo)
 	float Radius;
 	
 	/** Half height of collision capsule */
-	UPROPERTY(EditDefaultsOnly, Category = CapsuleInfo)
+	UPROPERTY(EditAnywhere, Category = CapsuleInfo)
 	float HalfHeight;
 	
 	

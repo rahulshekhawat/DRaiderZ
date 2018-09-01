@@ -8,6 +8,8 @@ UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectIni
 {
 	AddCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 	RemoveCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+
+	MovementSpeedModifier = 1.f;
 }
 
 void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

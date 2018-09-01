@@ -80,5 +80,6 @@ public:
 
 	static FCollisionQueryParams GenerateCombatCollisionQueryParams(AActor* ActorToIgnore, EQueryMobilityType MobilityType = EQueryMobilityType::Dynamic, bool bReturnPhysicalMaterial = false, FName TraceTag = FName("CollisionQueryForCombat"));
 
+	static float CalculateDamage(float Attack, float Defense);
 
 };

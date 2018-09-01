@@ -19,6 +19,8 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	
 	// Initialize variables
 	CharacterState = ECharacterState::IdleWalkRun;
+
+	CurrentActiveSkill = nullptr;
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
@@ -99,6 +101,31 @@ bool AEODCharacterBase::IsDodgingDamage() const
 bool AEODCharacterBase::NeedsHeal() const
 {
 	return StatsComp->IsLowOnHealth();
+}
+
+int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
+{
+	return 0;
+}
+
+bool AEODCharacterBase::UseSkill(int32 SkillIndex)
+{
+	return true;
+	// return false;
+}
+
+EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
+{
+	return EEODTaskStatus();
+}
+
+void AEODCharacterBase::ApplyStun(float Duration)
+{
+}
+
+FSkill * AEODCharacterBase::GetCurrentActiveSkill()
+{
+	return CurrentActiveSkill;
 }
 
 void AEODCharacterBase::SetCharacterState(ECharacterState NewState)
@@ -270,6 +297,11 @@ bool AEODCharacterBase::CanRespawn() const
 bool AEODCharacterBase::CanNormalAttack() const
 {
 	return CharacterState == ECharacterState::IdleWalkRun;
+}
+
+bool AEODCharacterBase::CanBeStunned() const
+{
+	return false;
 }
 
 bool AEODCharacterBase::CanDodge() const

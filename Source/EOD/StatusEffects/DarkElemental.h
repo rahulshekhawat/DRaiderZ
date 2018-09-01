@@ -14,7 +14,20 @@ class EOD_API UDarkElemental : public UElementalBase
 {
 	GENERATED_BODY()
 	
-	
-	
+public:
+
+	UDarkElemental(const FObjectInitializer& ObjectInitializer);
+
+	virtual TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* GetCharacterToStatusInfoMap() override;
+
+protected:
+
+	/** Called to process the ticking of this status effect. Must be overridden in inherited classes */
+	// UFUNCTION()
+	virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter) override;
+
+private:
+
+	static TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CursedCharactersToStatusInfoMap;	
 	
 };

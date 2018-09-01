@@ -5,7 +5,7 @@
 
 #include "Engine/World.h"
 
-TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> UStatusEffectBase::CharacterToStatusInfoMap = TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>();
+// TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> UStatusEffectBase::CharacterToStatusInfoMap = TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>();
 
 UStatusEffectBase::UStatusEffectBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -37,27 +37,28 @@ void UStatusEffectBase::Initialize(AEODCharacterBase* Owner, AActor* Instigator)
 
 void UStatusEffectBase::Deinitialize()
 {
-	for (TPair<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CharacterToStatusInfoPair : CharacterToStatusInfoMap)
+	for (TPair<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CharacterToStatusInfoPair : *GetCharacterToStatusInfoMap())
 	{
 		FStatusInfo& StatusInfo = CharacterToStatusInfoPair.Value;
 		GetWorld()->GetTimerManager().ClearTimer(*StatusInfo.TimerHandle);
 		delete StatusInfo.TimerHandle;
 		StatusInfo.TimerHandle = nullptr;
 	}
-	CharacterToStatusInfoMap.Empty();
+
+	GetCharacterToStatusInfoMap()->Empty();
 }
 
 void UStatusEffectBase::OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>& RecipientCharacters)
 {
-	bool bShouldActivate = ActivationChance >= FMath::RandRange(0.f, 1.f) ? true : false;
-
-	if (!bShouldActivate)
-	{
-		return;
-	}
-
 	for (TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter : RecipientCharacters)
 	{
+		bool bShouldActivate = ActivationChance >= FMath::RandRange(0.f, 1.f) ? true : false;
+
+		if (!bShouldActivate)
+		{
+			continue;
+		}
+
 		ActivateStatusEffect(RecipientCharacter);
 	}
 }
@@ -70,14 +71,14 @@ void UStatusEffectBase::RequestDeactivation(AEODCharacterBase * Character)
 
 void UStatusEffectBase::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter)
 {
-	if (CharacterToStatusInfoMap.Contains(RecipientCharacter))
+	if (GetCharacterToStatusInfoMap()->Contains(RecipientCharacter))
 	{
 		if (!bResetsOnReactivation)
 		{
 			return;
 		}
 
-		FStatusInfo& StatusInfo = CharacterToStatusInfoMap[RecipientCharacter];
+		FStatusInfo& StatusInfo = (*GetCharacterToStatusInfoMap())[RecipientCharacter];
 		StatusInfo.CurrentStackLevel = StatusInfo.CurrentStackLevel >= StackLimit ? StackLimit : StatusInfo.CurrentStackLevel + 1;
 		// StatusInfo.CurrentStackLevel += 1;
 
@@ -92,17 +93,17 @@ void UStatusEffectBase::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& 
 
 		GetWorld()->GetTimerManager().SetTimer(*StatusInfo.TimerHandle, StatusInfo.TimerDelegate, TickInterval, true, 0);
 
-		CharacterToStatusInfoMap.Add(RecipientCharacter, StatusInfo);
+		GetCharacterToStatusInfoMap()->Add(RecipientCharacter, StatusInfo);
 	}
 }
 
 void UStatusEffectBase::DeactivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter)
 {
-	FStatusInfo& StatusInfo = CharacterToStatusInfoMap[RecipientCharacter];
+	FStatusInfo& StatusInfo = (*GetCharacterToStatusInfoMap())[RecipientCharacter];
 	GetWorld()->GetTimerManager().ClearTimer(*StatusInfo.TimerHandle);
 	delete StatusInfo.TimerHandle;
 	StatusInfo.TimerHandle = nullptr;
-	CharacterToStatusInfoMap.Remove(RecipientCharacter);
+	GetCharacterToStatusInfoMap()->Remove(RecipientCharacter);
 }
 
 AEODCharacterBase* UStatusEffectBase::GetOwningCharacter() const
