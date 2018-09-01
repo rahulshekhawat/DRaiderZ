@@ -116,7 +116,7 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 			PlayerAnimationReferences->AnimationMontage_Skills				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Skills);
 			PlayerAnimationReferences->AnimationMontage_Spells				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Spells);
 			PlayerAnimationReferences->AnimationMontage_SpecialMovement		= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->SpecialMovement);
-			PlayerAnimationReferences->AnimationMontage_CrowdControlEffects = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->CrowdControlEffects);
+			PlayerAnimationReferences->AnimationMontage_HitEffects = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->HitEffects);
 			PlayerAnimationReferences->AnimationMontage_Flinch				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Flinch);
 
 		}
@@ -160,10 +160,10 @@ bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferenc
 	PlayerAnimationReferences->AnimationMontage_Skills					= nullptr;
 	PlayerAnimationReferences->AnimationMontage_Spells					= nullptr;
 	PlayerAnimationReferences->AnimationMontage_SpecialMovement			= nullptr;
-	PlayerAnimationReferences->AnimationMontage_CrowdControlEffects		= nullptr;
+	PlayerAnimationReferences->AnimationMontage_HitEffects				= nullptr;
 	PlayerAnimationReferences->AnimationMontage_Flinch					= nullptr;	
 
-	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->CrowdControlEffects.ToSoftObjectPath());
+	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->HitEffects.ToSoftObjectPath());
 	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Dodge.ToSoftObjectPath());
 	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Flinch.ToSoftObjectPath());
 	GameSingleton->StreamableManager.Unload(PlayerAnimationSoftReferences->Jump.ToSoftObjectPath());

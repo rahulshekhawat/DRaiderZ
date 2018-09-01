@@ -2,6 +2,6 @@
 
 #include "PoisonElemental.h"
 
-
-
-
+UPoisonElemental::UPoisonElemental(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+{
+}

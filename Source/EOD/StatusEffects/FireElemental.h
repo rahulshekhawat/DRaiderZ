@@ -16,27 +16,18 @@ class EOD_API UFireElemental : public UElementalBase
 	
 public:
 
-	// UFireElemental();
-	
-	/**
-	 * Called to initialize a status effect on a character.
-	 * @param Owner The character that owns the status effect
-	 * @param Instigator The actor that initiated the status effect. Can be nullptr. For elemental effects this would be a weapon.
-	 */
-	// virtual void OnInitialize(class ABaseCharacter* Owner, class AActor* Instigator) override;
+	UFireElemental(const FObjectInitializer& ObjectInitializer);
 
-	/** Called to deinitialize this status effect on a character */
-	// virtual void OnDeinitialize() override;
+	virtual TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* GetCharacterToStatusInfoMap() override;
 
-	/** Called when the status effect is activated */
-	// virtual void OnActivation(TArray<TWeakObjectPtr<ABaseCharacter>> RecipientCharacters) override;
+protected:
 
-	/** Called when the status effect is deactivated */
-	// virtual void OnDeactivation() override;
+	/** Called to process the ticking of this status effect. Must be overridden in inherited classes */
+	// UFUNCTION()
+	virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter) override;
 
 private:
 
-	
-	
-	
+	static TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> BurningCharactersToStatusInfoMap;
+
 };

@@ -18,13 +18,13 @@ class EOD_API UAnimNotifyState_EODTrail : public UAnimNotifyState
 	
 public:
 
-	UPROPERTY(EditDefaultsOnly, Category = TrailInfo)
+	UPROPERTY(EditAnywhere, Category = TrailInfo)
 	FString Socket_SwordTrailStart;
 
-	UPROPERTY(EditDefaultsOnly, Category = TrailInfo)
+	UPROPERTY(EditAnywhere, Category = TrailInfo)
 	FString Socket_SwordTrailEnd;
-	
-	UPROPERTY(EditDefaultsOnly, Category = TrailInfo)
+
+	UPROPERTY(EditAnywhere, Category = TrailInfo)
 	UParticleSystem* PSWeaponTrail;
 
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
