@@ -7,53 +7,29 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 
+TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> UIceElemental::CharactersToStatusInfoMap = TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>();
+// TMap<TWeakObjectPtr<AEODCharacterBase>, float> UIceElemental::CharacterToPhysicalDefenseReductionMap = TMap<TWeakObjectPtr<AEODCharacterBase>, float>();
+// TMap<TWeakObjectPtr<AEODCharacterBase>, float> UIceElemental::CharacterToMagickalDefenseReductionMap = TMap<TWeakObjectPtr<AEODCharacterBase>, float>();
 
 UIceElemental::UIceElemental(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	StackLimit = 1;
-	StatusEffectDuration = 10.f;
-	ActivationChance = 0.1f;
 	bResetsOnReactivation = true;
+
 	SlowDownModifier = 0.2f;
+
+	bTriggersOnSuccessfulHit = true;
+	ActivationChance = 0.1;
+	StackLimit = 1;
+
+	StatusEffectDuration = 5.f;
+	TickInterval = StatusEffectDuration;
 }
 
-void UIceElemental::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter)
+TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* UIceElemental::GetCharacterToStatusInfoMap()
 {
-	// @todo
-
-	if (CharacterToStatusInfoMap.Contains(RecipientCharacter))
-	{
-		if (!bResetsOnReactivation)
-		{
-		}
-	}
-
-	/*
-	if (CharacterToStatusInfoMap.Contains(RecipientCharacter))
-	{
-		if (!bResetsOnReactivation)
-		{
-			return;
-		}
-
-		FStatusInfo& StatusInfo = CharacterToStatusInfoMap[RecipientCharacter];
-		StatusInfo.CurrentStackLevel += 1;
-
-		GetWorld()->GetTimerManager().SetTimer(*StatusInfo.TimerHandle, StatusInfo.TimerDelegate, TickInterval, true, 0);
-	}
-	else
-	{
-		FStatusInfo StatusInfo;
-		StatusInfo.CurrentStackLevel = 1;
-		StatusInfo.TimerHandle = new FTimerHandle;
-		StatusInfo.TimerDelegate.BindUFunction(this, FName("OnStatusEffectTick"), StatusInfo);
-
-		GetWorld()->GetTimerManager().SetTimer(*StatusInfo.TimerHandle, StatusInfo.TimerDelegate, TickInterval, true, 0);
-
-		CharacterToStatusInfoMap.Add(RecipientCharacter, StatusInfo);
-	}
-	*/
+	return &CharactersToStatusInfoMap;
 }
+
 
 void UIceElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter)
 {
@@ -66,18 +42,72 @@ void UIceElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& Wrapped
 		return;
 	}
 
-	FStatusInfo& StatusInfo = CharacterToStatusInfoMap[WrappedRecipientCharacter.RecipientCharacter];
+	FStatusInfo& StatusInfo = (*GetCharacterToStatusInfoMap())[WrappedRecipientCharacter.RecipientCharacter];
 	StatusInfo.TotalElapsedTime += GetWorld()->GetTimerManager().GetTimerElapsed(*StatusInfo.TimerHandle);
 
+	/*
+	if ((CharacterToMagickalDamageReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter) &&
+		CharacterToPhysicalDamageReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter)) &&
+		StatusInfo.TotalElapsedTime >= StatusEffectDuration)
+	{
 
+	}
+	else if (CharacterToMagickalDamageReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter) &&
+		CharacterToPhysicalDamageReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter))
+	{
+
+	}
+	*/
+
+	/*
 	if (StatusInfo.TotalElapsedTime >= StatusEffectDuration)
 	{
 		TargetCharacter->StatsComp->ModifyActiveTimeDilation(SlowDownModifier);
 		DeactivateStatusEffect(WrappedRecipientCharacter.RecipientCharacter);
 		return;
 	}
+	if ((CharacterToMagickalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter) &&
+		CharacterToPhysicalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter)) &&
+		StatusInfo.TotalElapsedTime >= StatusEffectDuration)
+	{
+		float PhysicalDefenseReduction = CharacterToPhysicalDefenseReductionMap[WrappedRecipientCharacter.RecipientCharacter];
+		float MagickalDefenseReduction = CharacterToMagickalDefenseReductionMap[WrappedRecipientCharacter.RecipientCharacter];
+
+		TargetCharacter->StatsComp->ModifyPhysicalResistance(PhysicalDefenseReduction);
+		TargetCharacter->StatsComp->ModifyMagickalResistance(MagickalDefenseReduction);
+
+		DeactivateStatusEffect(WrappedRecipientCharacter.RecipientCharacter);
+	}
+	else if (CharacterToMagickalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter) &&
+		CharacterToPhysicalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter))
+	{
+		float OwnerHolyDamage = GetOwningCharacter()->StatsComp->GetElementalHolyDamage();
+		float TargetHolyResistance = TargetCharacter->StatsComp->GetElementalHolyResistance();
+
+		float PhysicalDefenseReduction = CalculatePhysicalDefenseReduction(OwnerHolyDamage, TargetHolyResistance);
+		float MagickalDefenseReduction = CalculateMagickalDefenseReduction(OwnerHolyDamage, TargetHolyResistance);
+
+		TargetCharacter->StatsComp->ModifyPhysicalResistance(-PhysicalDefenseReduction);
+		TargetCharacter->StatsComp->ModifyMagickalResistance(-MagickalDefenseReduction);
+
+		CharacterToPhysicalDefenseReductionMap.Add(WrappedRecipientCharacter.RecipientCharacter, PhysicalDefenseReduction);
+		CharacterToMagickalDefenseReductionMap.Add(WrappedRecipientCharacter.RecipientCharacter, MagickalDefenseReduction);
+	}
+	*/
 
 	// @todo
 	// Character->StatsComp->ModifyActiveTimeDilation()
 
+}
+
+float UIceElemental::CalculatePhysicalDamageReduction(float IceDamage, float IceDefense)
+{
+	// @todo
+	return 0.0f;
+}
+
+float UIceElemental::CalculateMagickalDamageReduction(float IceDamage, float IceDefense)
+{
+	// @todo
+	return 0.0f;
 }

@@ -14,7 +14,9 @@ class EOD_API UPoisonElemental : public UElementalBase
 {
 	GENERATED_BODY()
 	
-	
+public:
+
+	UPoisonElemental(const FObjectInitializer& ObjectInitializer);
 	
 	
 };
