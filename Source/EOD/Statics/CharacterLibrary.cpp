@@ -183,6 +183,26 @@ bool UCharacterLibrary::AreEnemies(AEODCharacterBase * CharacterOne, AEODCharact
 	return true;
 }
 
+void UCharacterLibrary::GetAllAICharacterSkills(const FString & CharacterName, const UDataTable * SkillsDataTable, TArray<FSkill*>& OutSkills)
+{
+	if (!SkillsDataTable)
+	{
+		return;
+	}
+
+	FString ContextString = FString("Looking up skills for ") + CharacterName;
+	TArray<FSkillTableRow*> SkillTableRows;
+	SkillsDataTable->GetAllRows<FSkillTableRow>(ContextString, SkillTableRows);
+
+	for (FSkillTableRow* SkillTableRow : SkillTableRows)
+	{
+		FSkill* Skill = new FSkill(SkillTableRow);
+		OutSkills.Add(Skill);
+	}
+
+	return;
+}
+
 FSkill::FSkill()
 {
 	this->CurrentSkillLevel = 0;

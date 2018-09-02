@@ -368,4 +368,6 @@ public:
 
 	static bool AreEnemies(AEODCharacterBase* CharacterOne, AEODCharacterBase* CharacterTwo);
 
+	static void GetAllAICharacterSkills(const FString& CharacterName, const UDataTable* SkillsDataTable, TArray<FSkill*> &OutSkills);
+
 };
