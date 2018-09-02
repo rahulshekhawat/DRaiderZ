@@ -4,6 +4,7 @@
 #include "Core/GameSingleton.h"
 
 #include "Engine/Engine.h"
+#include "Engine/Texture.h"
 #include "Engine/StreamableManager.h"
 #include "Animation/AnimMontage.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
@@ -180,4 +181,39 @@ bool UCharacterLibrary::AreEnemies(AEODCharacterBase * CharacterOne, AEODCharact
 {
 	// return false;
 	return true;
+}
+
+FSkill::FSkill()
+{
+	this->CurrentSkillLevel = 0;
+}
+
+FSkill::FSkill(FSkillTableRow * SkillTableRow)
+{
+	this->CurrentSkillLevel 				= 1;	// Always one when initializing from SkillTableRow pointer
+	this->InGameName 						= SkillTableRow->InGameName;
+	this->Description 						= SkillTableRow->Description;
+	this->SupportedWeapons 					= SkillTableRow->SupportedWeapons;
+	this->SkillStartMontageSectionName 		= SkillTableRow->SkillStartMontageSectionName;
+	this->SkillLoopMontageSectionName 		= SkillTableRow->SkillLoopMontageSectionName;
+	this->SkillEndMontageSectionName 		= SkillTableRow->SkillEndMontageSectionName;
+	this->DamageType 						= SkillTableRow->DamageType;
+
+	if (SkillTableRow->SkillLevelUpsInfo.Num() > 1)
+	{
+		this->SkillLevelUpInfo = SkillTableRow->SkillLevelUpsInfo[1];
+	}
+
+	if (SkillTableRow->Icon.IsNull())
+	{
+		this->Icon = nullptr;
+	}
+	else if (SkillTableRow->Icon.IsPending())
+	{
+		this->Icon = SkillTableRow->Icon.LoadSynchronous();
+	}
+	else if (SkillTableRow->Icon.IsValid())
+	{
+		this->Icon = SkillTableRow->Icon.Get();
+	}
 }

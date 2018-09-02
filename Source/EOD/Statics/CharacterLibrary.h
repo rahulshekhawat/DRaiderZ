@@ -313,9 +313,9 @@ public:
 
 	uint8 CurrentSkillLevel;
 
-	FName SkillID;
+	FName SkillID; // What was this for?
 
-	FName AnimationMontageSectionName;
+	// FName AnimationMontageSectionName;
 
 	UTexture* Icon;
 
@@ -337,6 +337,10 @@ public:
 	EDamageType DamageType;
 
 	FSkillLevelUpInfo SkillLevelUpInfo;
+
+	FSkill();
+
+	FSkill(FSkillTableRow* SkillTableRow);
 
 };
 
