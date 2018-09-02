@@ -236,4 +236,17 @@ FSkill::FSkill(FSkillTableRow * SkillTableRow)
 	{
 		this->Icon = SkillTableRow->Icon.Get();
 	}
+
+	if (SkillTableRow->AnimMontage.IsNull())
+	{
+		this->AnimationMontage = nullptr;
+	}
+	else if (SkillTableRow->AnimMontage.IsPending())
+	{
+		this->AnimationMontage = SkillTableRow->AnimMontage.LoadSynchronous();
+	}
+	else if (SkillTableRow->AnimMontage.IsValid())
+	{
+		this->AnimationMontage = SkillTableRow->AnimMontage.Get();
+	}
 }
