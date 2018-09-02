@@ -30,6 +30,12 @@ public:
 
 	FName GetGreetingMontageSectionName() const { return GreetingMontageSectionName; }
 
+	/** Initialize TArray<FSkill*> */
+	virtual void PostInitializeComponents() override;
+
+	/** [server] Handle melee collision */
+	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) override;
+
 protected:
 
 	/** Called when the game starts or when spawned */
@@ -55,5 +61,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Skills)
 	UDataTable* DataTable_Skills;
 
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FString InGameName;
+
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FString InGameDescription;
 
 };

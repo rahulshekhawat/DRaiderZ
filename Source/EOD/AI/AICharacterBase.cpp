@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "AICharacterBase.h"
+#include "Core/GameSingleton.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -16,11 +17,25 @@ void AAICharacterBase::SetInCombat(bool bValue)
 	UpdateMaxWalkSpeed();
 }
 
+void AAICharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	UCharacterLibrary::GetAllAICharacterSkills(InGameName, DataTable_Skills, Skills);
+
+}
+
+void AAICharacterBase::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
+{
+}
+
 void AAICharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
 	SetInCombat(false);
+
+
 }
 
 void AAICharacterBase::UpdateMaxWalkSpeed()

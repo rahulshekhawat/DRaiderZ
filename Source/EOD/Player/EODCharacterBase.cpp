@@ -105,27 +105,78 @@ bool AEODCharacterBase::NeedsHeal() const
 
 int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
 {
+	// @todo
 	return 0;
 }
 
 bool AEODCharacterBase::UseSkill(int32 SkillIndex)
 {
-	return true;
-	// return false;
+	if (CanUseAnySkill())
+	{
+		FSkill* SkillToUse = GetSkill(SkillIndex);
+
+		if (!SkillToUse)
+		{
+			// unable to use skill - return false
+			return false;
+		}
+
+		// SkillToUse->AnimationMontage
+		PlayAnimationMontage(SkillToUse->AnimationMontage, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		CurrentActiveSkill = SkillToUse;
+		return true;
+	}
+
+	return false;
 }
 
 EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 {
-	return EEODTaskStatus();
+	EEODTaskStatus TaskStatus = EEODTaskStatus::Inactive;
+
+	FSkill* SkillToCheck = GetSkill(SkillIndex);
+	if (SkillToCheck == CurrentActiveSkill)
+	{
+		return EEODTaskStatus::Active;
+	}
+
+	if (GetLastUsedSkill().LastUsedSkill != CurrentActiveSkill)
+	{
+		return EEODTaskStatus::Inactive;
+	}
+
+	if (GetLastUsedSkill().bInterrupted)
+	{
+		return EEODTaskStatus::Aborted;
+	}
+	else
+	{
+		return EEODTaskStatus::Finished;
+	}
 }
 
 void AEODCharacterBase::ApplyStun(float Duration)
 {
 }
 
-FSkill * AEODCharacterBase::GetCurrentActiveSkill()
+FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
 {
 	return CurrentActiveSkill;
+}
+
+FSkill * AEODCharacterBase::GetSkill(int32 SkillIndex) const
+{
+	if (Skills.Num() > SkillIndex)
+	{
+		return Skills[SkillIndex];
+	}
+
+	return nullptr;
+}
+
+FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
+{
+	return LastUsedSkillInfo;
 }
 
 void AEODCharacterBase::SetCharacterState(ECharacterState NewState)
@@ -304,6 +355,16 @@ bool AEODCharacterBase::CanBeStunned() const
 	return false;
 }
 
+bool AEODCharacterBase::CanUseAnySkill() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanUseSkill(int32 SkillIndex) const
+{
+	return false;
+}
+
 bool AEODCharacterBase::CanDodge() const
 {
 	return CharacterState == ECharacterState::IdleWalkRun;
@@ -325,4 +386,7 @@ void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	TArray<FSkillTableRow*> SkillTableRows;
+
+
 }

@@ -10,6 +10,25 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TArray<TWeakObjectPtr<AEODCharacterBase>>, RecipientCharacters);
 
+USTRUCT(BlueprintType)
+struct FLastUsedSkillInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	FSkill* LastUsedSkill;
+
+	/** True if the last skill was interrupted */
+	bool bInterrupted;
+
+	FLastUsedSkillInfo()
+	{
+		bInterrupted = false;
+		LastUsedSkill = nullptr;
+	}
+};
+
 /**
  * An abstract base class to handle the behavior of in-game characters.
  * All in-game characters must inherit from this class.
@@ -78,6 +97,12 @@ public:
 
 	virtual bool CanBeStunned() const;
 	
+	/** Returns true if this character can use any skill at all */
+	virtual bool CanUseAnySkill() const;
+
+	/** Returns true if this character use a particular skill at SkillIndex */
+	virtual bool CanUseSkill(int32 SkillIndex) const;
+	
 	virtual void SetInCombat(bool bValue) { bInCombat = bValue; }
 	
 	virtual bool NeedsHeal() const;
@@ -134,7 +159,15 @@ public:
 	virtual void ApplyStun(float Duration);
 
 	/** Returns the current active skill */
-	virtual FSkill* GetCurrentActiveSkill();
+	virtual FSkill* GetCurrentActiveSkill() const;
+
+	virtual FSkill* GetSkill(int32 SkillIndex) const;
+
+	FLastUsedSkillInfo LastUsedSkillInfo;
+
+	TArray<FSkill*> Skills;
+
+	virtual FLastUsedSkillInfo& GetLastUsedSkill();
 
 	/** [server] Handle melee collision */
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) PURE_VIRTUAL(AEODCharacterBase::HandleMeleeCollision, );
