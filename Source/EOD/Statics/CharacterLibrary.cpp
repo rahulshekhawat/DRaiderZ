@@ -2,6 +2,7 @@
 
 #include "CharacterLibrary.h"
 #include "Core/GameSingleton.h"
+#include "Player/EODCharacterBase.h"
 
 #include "Engine/Engine.h"
 #include "Engine/Texture.h"
@@ -179,7 +180,11 @@ bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferenc
 
 bool UCharacterLibrary::AreEnemies(AEODCharacterBase * CharacterOne, AEODCharacterBase * CharacterTwo)
 {
-	// return false;
+	if (CharacterOne->GetFaction() == CharacterTwo->GetFaction())
+	{
+		return false;
+	}
+
 	return true;
 }
 

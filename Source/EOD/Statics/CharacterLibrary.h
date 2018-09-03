@@ -49,6 +49,7 @@ enum class EFaction : uint8
 	Rendel_Soldier,
 	Undead,
 	Corrupted,
+	Player,
 };
 
 UENUM(BlueprintType)
