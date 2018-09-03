@@ -423,6 +423,7 @@ bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float
 	}
 }
 
+/*
 bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate)
 {
 	float CurrentYaw = GetActorRotation().Yaw;
@@ -452,6 +453,7 @@ bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float
 		return false;
 	}
 }
+*/
 
 void AEODCharacterBase::BeginPlay()
 {

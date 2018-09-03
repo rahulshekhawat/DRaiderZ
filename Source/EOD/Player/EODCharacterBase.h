@@ -210,7 +210,7 @@ public:
 	 * 
 	 * @note This version is not a UFUNCTION because function overloading is not supported for UFUNCTIONS
 	 */
-	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate = 600.f);
+	// bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate = 600.f);
 
 protected:
 
