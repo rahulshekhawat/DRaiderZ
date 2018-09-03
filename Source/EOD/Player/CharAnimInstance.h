@@ -52,6 +52,12 @@ public:
 
 private:
 
+	UFUNCTION()
+	void HandleMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
+
+	UFUNCTION()
+	void HandleMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
+
 	class AEODCharacterBase* OwningCharacter;
 
 	class AEODCharacterBase* CastOwnerToBaseCharacter() const;
