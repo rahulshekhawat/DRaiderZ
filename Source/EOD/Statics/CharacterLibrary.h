@@ -29,6 +29,28 @@ enum class ECharMovementDirection : uint8
 	BR 		UMETA(DisplayName = "Backward Right"),
 };
 
+/*
+UENUM(BlueprintType)
+enum class ESpecies : uint8
+{
+	Human,
+	Ghoul,
+	Skeleton,
+	Yeti,
+	Troll,
+	Ogre,
+};
+*/
+
+UENUM(BlueprintType)
+enum class EFaction : uint8
+{
+	Rendel_Commoner, // People of rendel kingdom
+	Rendel_Soldier,
+	Undead,
+	Corrupted,
+};
+
 UENUM(BlueprintType)
 enum class ECharacterGender : uint8
 {
