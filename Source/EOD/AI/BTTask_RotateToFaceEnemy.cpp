@@ -38,7 +38,7 @@ void UBTTask_RotateToFaceEnemy::TickTask(UBehaviorTreeComponent & OwnerComp, uin
 	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(OwningCharacter->GetActorLocation(), TargetEnemy->GetActorLocation());
 	FRotator ActorRotation = OwningCharacter->GetActorRotation();
 
-	bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(LookAtRotation.Yaw, 0.f, Precision);
+	bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(LookAtRotation.Yaw, DeltaSeconds, Precision);
 	if (bResult)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
