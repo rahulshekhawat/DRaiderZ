@@ -147,6 +147,9 @@ public:
 	/** Returns the info for skill that this character is curretly using */
 	// virtual FActiveSkill GetCurrentActiveSkillInfo();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Rotations)
+	float CharacterRotationPrecision;
+
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual int32 GetMostWeightedSkillIndex() const;
 
@@ -186,6 +189,28 @@ public:
 	virtual void TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamage& EODDamage) PURE_VIRTUAL(AEODCharacterBase::TakeEODDamage, );
 
 	EFaction GetFaction() const;
+
+	/**
+	 * Rotate a character toward desired yaw based on the rotation rate in a given delta time (Precision based)
+	 * @param DesiredYaw 	The desired yaw of character in degrees
+	 * @param DeltaTime 	The time between last and current tick
+	 * @param Precision		Yaw difference in degrees that will be used to determine success condition
+	 * @param RotationRate 	Rotation rate to use for yaw rotation in degrees
+	 * @return 				True if character successfully rotates to DesiredYaw (CurrentYaw == DesiredYaw)
+	 */
+	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
+	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision, float RotationRate = 600.f);
+
+	/**
+	 * Rotate a character toward desired yaw based on the rotation rate in a given delta time
+	 * @param DesiredYaw 	The desired yaw of character in degrees
+	 * @param DeltaTime 	The time between last and current tick
+	 * @param RotationRate 	Rotation rate to use for yaw rotation in degrees
+	 * @return 				True if character successfully rotates to DesiredYaw (CurrentYaw == DesiredYaw)
+	 * 
+	 * @note This version is not a UFUNCTION because function overloading is not supported for UFUNCTIONS
+	 */
+	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate = 600.f);
 
 protected:
 

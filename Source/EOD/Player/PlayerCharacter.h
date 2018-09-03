@@ -169,14 +169,7 @@ private:
 	ECharacterGender Gender;
 
 public:
-	
-	/**
-	 * Returns player controller rotation yaw in -180/180 range.
-	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
-	 */
-	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
-	float GetPlayerControlRotationYaw();
-	
+
 	/**
 	 * Rotate player toward desired yaw based on the rotation rate in given delta time
 	 * @param DesiredYaw 	The desired yaw of player character
@@ -186,6 +179,13 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
 	bool DeltaRotatePlayerToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate = 600.f);
+
+	/**
+	 * Returns player controller rotation yaw in -180/180 range.
+	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
+	 */
+	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
+	float GetPlayerControlRotationYaw();
 	
 	/**
 	 * Returns the expected rotation yaw of character based on current Axis Input.
