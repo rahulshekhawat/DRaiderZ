@@ -179,6 +179,14 @@ FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
 	return LastUsedSkillInfo;
 }
 
+void AEODCharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
+{
+}
+
+void AEODCharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
+{
+}
+
 void AEODCharacterBase::SetCharacterState(ECharacterState NewState)
 {
 	CharacterState = NewState;

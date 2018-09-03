@@ -172,6 +172,10 @@ public:
 	/** [server] Handle melee collision */
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) PURE_VIRTUAL(AEODCharacterBase::HandleMeleeCollision, );
 
+	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
+
+	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
+
 	// @todo
 	// virtual void HandleRangedCollision();
 
