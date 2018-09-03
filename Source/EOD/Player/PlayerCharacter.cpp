@@ -79,6 +79,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 		EventsOnSuccessfulSkillAttack.Add(FCombatEvent());
 		EventsOnUsingSkill.Add(FCombatEvent());
 	}
+
+	Faction = EFaction::Player;
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)

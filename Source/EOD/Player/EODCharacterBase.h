@@ -185,12 +185,17 @@ public:
 	/** [server] Take damage from another character */
 	virtual void TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamage& EODDamage) PURE_VIRTUAL(AEODCharacterBase::TakeEODDamage, );
 
+	EFaction GetFaction() const;
+
 protected:
 
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
 	FSkill* CurrentActiveSkill;
+
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	EFaction Faction;
 
 public:
 	

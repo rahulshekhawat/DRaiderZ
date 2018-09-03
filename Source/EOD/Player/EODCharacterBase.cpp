@@ -390,6 +390,11 @@ void AEODCharacterBase::RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffect
 }
 */
 
+EFaction AEODCharacterBase::GetFaction() const
+{
+	return Faction;
+}
+
 void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
