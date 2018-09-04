@@ -199,18 +199,7 @@ public:
 	 * @return 				True if character successfully rotates to DesiredYaw (CurrentYaw == DesiredYaw)
 	 */
 	UFUNCTION(BlueprintCallable, category = PlayerRotationHandler)
-	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision, float RotationRate = 600.f);
-
-	/**
-	 * Rotate a character toward desired yaw based on the rotation rate in a given delta time
-	 * @param DesiredYaw 	The desired yaw of character in degrees
-	 * @param DeltaTime 	The time between last and current tick
-	 * @param RotationRate 	Rotation rate to use for yaw rotation in degrees
-	 * @return 				True if character successfully rotates to DesiredYaw (CurrentYaw == DesiredYaw)
-	 * 
-	 * @note This version is not a UFUNCTION because function overloading is not supported for UFUNCTIONS
-	 */
-	// bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate = 600.f);
+	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision = 0.1f, float RotationRate = 600.f);
 
 protected:
 

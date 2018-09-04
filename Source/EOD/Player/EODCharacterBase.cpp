@@ -423,38 +423,6 @@ bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float
 	}
 }
 
-/*
-bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate)
-{
-	float CurrentYaw = GetActorRotation().Yaw;
-
-	bool Result = FMath::IsNearlyEqual(CurrentYaw, DesiredYaw, 0.1f);
-	if (Result)
-	{
-		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-		return true;
-	}
-	else
-	{
-		float YawDiff = FMath::FindDeltaAngleDegrees(CurrentYaw, DesiredYaw);
-		float Multiplier = YawDiff / FMath::Abs(YawDiff);
-		float RotateBy = Multiplier * RotationRate * DeltaTime;
-
-		if (FMath::Abs(YawDiff) <= FMath::Abs(RotateBy) + 0.5f)
-		{
-			SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-			return true;
-		}
-		else
-		{
-			SetCharacterRotation(FRotator(0.f, CurrentYaw + RotateBy, 0.f));
-			return false;
-		}
-		return false;
-	}
-}
-*/
-
 void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
