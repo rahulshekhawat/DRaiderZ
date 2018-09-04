@@ -2,10 +2,11 @@
 
 #include "AICharacterBase.h"
 #include "Core/GameSingleton.h"
+#include "Components/AIStatsComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 
-AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UAIStatsComponent>(FName("Character Stats Component")))
 {
 	// Mob characters don't have strafe animations and so they must be rotated in the direction of their movement.
 	GetCharacterMovement()->bOrientRotationToMovement = true;
