@@ -120,7 +120,7 @@ void ASecondaryWeapon::OnUnEquip()
 	// @todo reset weapon stats
 
 	// If no primary weapon is equipped by owning player then update player animation references to 'no weapon equipped'
-	if (OwningPlayer && OwningPlayer->PrimaryWeapon && !OwningPlayer->PrimaryWeapon->bEquipped)
+	if (OwningPlayer && OwningPlayer->GetPrimaryWeapon() && !OwningPlayer->GetPrimaryWeapon()->bEquipped)
 	{
 		OwningPlayer->UpdateEquippedWeaponAnimationReferences(EWeaponType::None);
 	}

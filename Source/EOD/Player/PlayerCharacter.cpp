@@ -99,12 +99,13 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::EnableBlock);
 	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::DisableBlock);
 
-	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnNormalAttack);
+	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnNormalAttackKeyPressed);
+	PlayerInputComponent->BindAction("NormalAttack", IE_Released, this, &APlayerCharacter::OnNormalAttackKeyReleased);
 	
 	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &APlayerCharacter::OnDodge);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::OnJump);
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::OnInteract);
-	PlayerInputComponent->BindAction("ToggleSheath", IE_Pressed, this, &APlayerCharacter::OnToggleSheath);
+	PlayerInputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &APlayerCharacter::OnToggleSheathe);
 	PlayerInputComponent->BindAction("ToggleStats", IE_Pressed, this, &APlayerCharacter::OnToggleCharacterStatsUI);
 	PlayerInputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &APlayerCharacter::OnToggleMouseCursor);
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
@@ -302,6 +303,16 @@ bool APlayerCharacter::IsAutoRunning() const
 	return CharacterState == ECharacterState::AutoRun;
 }
 
+APrimaryWeapon * APlayerCharacter::GetPrimaryWeapon() const
+{
+	return PrimaryWeapon;
+}
+
+ASecondaryWeapon * APlayerCharacter::GetSecondaryWeapon() const
+{
+	return SecondaryWeapon;
+}
+
 bool APlayerCharacter::CanAutoRun() const
 {
 	// The character can auto run only if character is in idle state
@@ -421,7 +432,7 @@ void APlayerCharacter::OnInteract()
 {
 }
 
-void APlayerCharacter::OnToggleSheath()
+void APlayerCharacter::OnToggleSheathe()
 {
 	bool bNewValue = !bWeaponSheathed;
 	SetWeaponSheathed(bNewValue);
@@ -435,6 +446,7 @@ void APlayerCharacter::OnToggleMouseCursor()
 {
 }
 
+/*
 void APlayerCharacter::OnNormalAttack()
 {
 	if (CanNormalAttack() && PlayerAnimInstance && GetActiveAnimationReferences())
@@ -485,6 +497,15 @@ void APlayerCharacter::OnNormalAttack()
 			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 		}
 	}
+}
+*/
+
+void APlayerCharacter::OnNormalAttackKeyPressed()
+{
+}
+
+void APlayerCharacter::OnNormalAttackKeyReleased()
+{
 }
 
 void APlayerCharacter::OnToggleAutoRun()
@@ -538,10 +559,10 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 
 	if (bRotatePlayer)
 	{
-		DeltaRotatePlayerToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
+		// DeltaRotatePlayerToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
+		DeltaRotateCharacterToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
 	}
 	
-
 	if (ForwardAxisValue < 0)
 	{
 		float Speed = (BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier() * 5) / 16;
@@ -764,7 +785,7 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 }
 */
 
-void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(EWeaponType EquippedWeaponType)
+void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType)
 {
 	if (EquippedWeaponAnimationReferences)
 	{
@@ -869,36 +890,6 @@ float APlayerCharacter::GetPlayerControlRotationYaw()
 		return ControlRotationYaw;
 }
 
-bool APlayerCharacter::DeltaRotatePlayerToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate)
-{
-	float CurrentYaw = GetActorRotation().Yaw;
-
-	bool Result = FMath::IsNearlyEqual(CurrentYaw, DesiredYaw, 0.1f);
-	if (Result)
-	{
-		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-		return true;
-	}
-	else
-	{
-		float YawDiff = FMath::FindDeltaAngleDegrees(CurrentYaw, DesiredYaw);
-		float Multiplier = YawDiff / FMath::Abs(YawDiff);
-		float RotateBy = Multiplier * RotationRate * DeltaTime;
-
-		if (FMath::Abs(YawDiff) <= FMath::Abs(RotateBy) + 0.5f)
-		{
-			SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-			return true;
-		}
-		else
-		{
-			SetCharacterRotation(FRotator(0.f, CurrentYaw + RotateBy, 0.f));
-			return false;
-		}
-		return false;
-	}
-}
-
 float APlayerCharacter::GetRotationYawFromAxisInput()
 {
 	float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
@@ -935,7 +926,19 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 	return ResultingRotation;
 }
 
-void APlayerCharacter::SetCurrentPrimaryWeapon(FName WeaponID)
+void APlayerCharacter::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
+{
+	if (!bInterrupted)
+	{
+		CharacterState = ECharacterState::IdleWalkRun;
+	}
+}
+
+void APlayerCharacter::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
+{
+}
+
+void APlayerCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
 {
 	if (WeaponID == NAME_None)
 	{
@@ -961,7 +964,7 @@ void APlayerCharacter::SetCurrentPrimaryWeapon(FName WeaponID)
 	UpdateCurrentWeaponAnimationType();
 }
 
-void APlayerCharacter::SetCurrentSecondaryWeapon(FName WeaponID)
+void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 {
 	if (WeaponID == NAME_None)
 	{

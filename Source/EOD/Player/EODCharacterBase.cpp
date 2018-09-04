@@ -26,7 +26,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 void AEODCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AEODCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -103,9 +102,24 @@ bool AEODCharacterBase::NeedsHeal() const
 	return StatsComp->IsLowOnHealth();
 }
 
+bool AEODCharacterBase::IsHealing() const
+{
+	return false;
+}
+
+void AEODCharacterBase::ApplyStatusEffect(const UStatusEffectBase * StatusEffect)
+{
+	// @todo definition
+}
+
+void AEODCharacterBase::RemoveStatusEffect(const UStatusEffectBase * StatusEffect)
+{
+	// @todo definition
+}
+
 int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
 {
-	// @todo
+	// @todo definition
 	return 0;
 }
 
@@ -187,7 +201,7 @@ void AEODCharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterru
 {
 }
 
-void AEODCharacterBase::SetCharacterState(ECharacterState NewState)
+void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
 {
 	CharacterState = NewState;
 
@@ -207,7 +221,7 @@ bool AEODCharacterBase::Server_SetCharacterState_Validate(ECharacterState NewSta
 	return true;
 }
 
-void AEODCharacterBase::SetWalkSpeed(float WalkSpeed)
+void AEODCharacterBase::SetWalkSpeed(const float WalkSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	
@@ -217,7 +231,7 @@ void AEODCharacterBase::SetWalkSpeed(float WalkSpeed)
 	}
 }
 
-void AEODCharacterBase::SetCharacterRotation(FRotator NewRotation)
+void AEODCharacterBase::SetCharacterRotation(const FRotator NewRotation)
 {
 	GetCharacterMovement()->FlushServerMoves();
 	SetActorRotation(NewRotation);
@@ -228,7 +242,7 @@ void AEODCharacterBase::SetCharacterRotation(FRotator NewRotation)
 	}
 }
 
-void AEODCharacterBase::SetUseControllerRotationYaw(bool bNewBool)
+void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)
 {
 	bUseControllerRotationYaw = bNewBool;
 
@@ -378,21 +392,14 @@ bool AEODCharacterBase::CanDodge() const
 	return CharacterState == ECharacterState::IdleWalkRun;
 }
 
-/*
-void AEODCharacterBase::AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo)
-{
-	// @todo definition
-}
-
-void AEODCharacterBase::RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo)
-{
-	// @todo definition
-}
-*/
-
 EFaction AEODCharacterBase::GetFaction() const
 {
 	return Faction;
+}
+
+ECharacterState AEODCharacterBase::GetCharacterState() const
+{
+	return CharacterState;
 }
 
 bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision, float RotationRate)

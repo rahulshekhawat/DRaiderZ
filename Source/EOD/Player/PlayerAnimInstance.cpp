@@ -90,36 +90,32 @@ EWeaponAnimationType UPlayerAnimInstance::GetWeaponAnimationType() const
 
 void UPlayerAnimInstance::HandleMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
 {
+	OwningPlayer->OnMontageBlendingOut(AnimMontage, bInterrupted);
+
+	/*
 	if(!bInterrupted)
 	{
 		if (AnimMontage == OwningPlayer->GetActiveAnimationReferences()->AnimationMontage_Jump)
 		{
-			OwningPlayer->CharacterState = ECharacterState::IdleWalkRun;
+			// OwningPlayer->GetCharacterState() == ECharacterState::IdleWalkRun;
 		}
 		else if (AnimMontage == OwningPlayer->GetActiveAnimationReferences()->AnimationMontage_Dodge)
 		{
-			OwningPlayer->CharacterState = ECharacterState::IdleWalkRun;
+			// OwningPlayer->GetCharacterState() == ECharacterState::IdleWalkRun;
 			// @todo
 			// OwningPlayer-> UpdateMovementAnimation();
 		}
 		else
 		{
-			OwningPlayer->CharacterState = ECharacterState::IdleWalkRun;
+			// OwningPlayer->GetCharacterState() == ECharacterState::IdleWalkRun;
 		}
 	}
+	*/
 }
 
 void UPlayerAnimInstance::HandleMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
 {
-	/*
-	if (!bInterrupted)
-	{
-		if (AnimMontage == OwningPlayer->PlayerAnimationReferences->AnimationMontage_Dodge)
-		{
-			// OwningPlayer->CharacterState = ECharacterState::IdleWalkRun;
-		}
-	}
-	*/
+	OwningPlayer->OnMontageEnded(AnimMontage, bInterrupted);
 }
 
 APlayerCharacter * UPlayerAnimInstance::CastPawnOwnerToPlayerCharacter()
