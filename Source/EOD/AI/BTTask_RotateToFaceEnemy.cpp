@@ -9,16 +9,22 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+UBTTask_RotateToFaceEnemy::UBTTask_RotateToFaceEnemy(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer), Precision(0.1f)
+{
+	NodeName = "Rotate to face BB entry";
+	bNotifyTick = true;
+}
+
 EBTNodeResult::Type UBTTask_RotateToFaceEnemy::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
 	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
 	AEODCharacterBase* TargetEnemy = Cast<AEODCharacterBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(UAILibrary::BBKey_TargetEnemy));
 
-	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(OwningCharacter->GetActorLocation(), TargetEnemy->GetActorLocation());
-	FRotator ActorRotation = OwningCharacter->GetActorRotation();
+	FVector OrientationVector = TargetEnemy->GetActorLocation() - OwningCharacter->GetActorLocation();
+	FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
 
-	bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(LookAtRotation.Yaw, 0.f, Precision);
+	bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(OrientationRotator.Yaw, 0.f, Precision);
 	if (bResult)
 	{
 		return EBTNodeResult::Succeeded;
@@ -35,10 +41,10 @@ void UBTTask_RotateToFaceEnemy::TickTask(UBehaviorTreeComponent & OwnerComp, uin
 	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
 	AEODCharacterBase* TargetEnemy = Cast<AEODCharacterBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(UAILibrary::BBKey_TargetEnemy));
 
-	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(OwningCharacter->GetActorLocation(), TargetEnemy->GetActorLocation());
-	FRotator ActorRotation = OwningCharacter->GetActorRotation();
+	FVector OrientationVector = TargetEnemy->GetActorLocation() - OwningCharacter->GetActorLocation();
+	FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
 
-	bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(LookAtRotation.Yaw, DeltaSeconds, Precision);
+	bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(OrientationRotator.Yaw, DeltaSeconds, Precision);
 	if (bResult)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

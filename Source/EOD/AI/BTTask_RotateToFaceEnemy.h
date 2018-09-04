@@ -16,6 +16,8 @@ class EOD_API UBTTask_RotateToFaceEnemy : public UBTTaskNode
 	
 public:
 
+	UBTTask_RotateToFaceEnemy(const FObjectInitializer& ObjectInitializer);
+
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
@@ -25,7 +27,7 @@ public:
 protected:
 
 	/** Success condition precision in degrees */
-	UPROPERTY(EditDefaultsOnly, Category = Node)
+	UPROPERTY(EditAnywhere, Category = Node)
 	float Precision;
 
 };
