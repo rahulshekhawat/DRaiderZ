@@ -440,3 +440,8 @@ void AEODCharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 }
+
+void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
+{
+	//~ @todo : Cleanup old state
+}

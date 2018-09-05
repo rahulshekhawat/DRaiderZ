@@ -275,7 +275,7 @@ protected:
 	EFaction Faction;
 	
 	/** Character state determines the current action character is doing */
-	UPROPERTY(Replicated)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
 	ECharacterState CharacterState;
 	
 	/** Determines whether character is currently engaged in combat or not */
@@ -285,6 +285,9 @@ protected:
 private:
 	
 	//~ Begin Multiplayer Code
+	UFUNCTION()
+	void OnRep_CharacterState(ECharacterState OldState);
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterState(ECharacterState NewState);
 
