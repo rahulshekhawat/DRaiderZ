@@ -93,8 +93,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
 	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
 
-	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnNormalAttackKeyPressed);
-	PlayerInputComponent->BindAction("NormalAttack", IE_Released, this, &APlayerCharacter::OnNormalAttackKeyReleased);
+	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnPressedNormalAttack);
+	PlayerInputComponent->BindAction("NormalAttack", IE_Released, this, &APlayerCharacter::OnReleasedNormalAttack);
 	
 	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &APlayerCharacter::OnDodge);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::OnJump);
@@ -491,6 +491,14 @@ void APlayerCharacter::OnToggleMouseCursor()
 {
 }
 
+void APlayerCharacter::OnPressedNormalAttack()
+{
+}
+
+void APlayerCharacter::OnReleasedNormalAttack()
+{
+}
+
 /*
 void APlayerCharacter::OnNormalAttack()
 {
@@ -544,14 +552,6 @@ void APlayerCharacter::OnNormalAttack()
 	}
 }
 */
-
-void APlayerCharacter::OnNormalAttackKeyPressed()
-{
-}
-
-void APlayerCharacter::OnNormalAttackKeyReleased()
-{
-}
 
 void APlayerCharacter::OnToggleAutoRun()
 {

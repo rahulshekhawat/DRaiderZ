@@ -299,9 +299,9 @@ private:
 	/** Display or hide mouse cursor */
 	void OnToggleMouseCursor();
 
-	void OnNormalAttackKeyPressed();
+	void OnPressedNormalAttack();
 
-	void OnNormalAttackKeyReleased();
+	void OnReleasedNormalAttack();
 
 	void UpdateIdleState(float DeltaTime);
 
