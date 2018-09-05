@@ -160,7 +160,9 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 	FSkill* ActiveSkill = GetCurrentActiveSkill();
 	check(ActiveSkill); // Make sure ActiveSkil is not a nullptr
 
-	bool bEnemyHit = false;
+	TArray<TWeakObjectPtr<AEODCharacterBase>> CharactersSuccessfullyHit;
+	TArray<TWeakObjectPtr<AEODCharacterBase>> CharactersHitWithCriticalDamage;
+
 	for (FHitResult& HitResult : HitResults)
 	{
 		if (!HitResult.Actor.Get())
@@ -181,8 +183,6 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 			HitCharacter->OnSuccessfulDodge.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
 			continue;
 		}
-
-		bEnemyHit = true;
 
 		TArray<FHitResult> LineHitResults;
 		FVector LineStart = GetActorLocation();
@@ -213,22 +213,52 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 		}
 #endif
 
+		TWeakObjectPtr<AEODCharacterBase> HitCharacterWeakPtr(HitCharacter);
+		CharactersSuccessfullyHit.Add(HitCharacterWeakPtr);
+
+		bool bCriticalHit = IsCriticalHit(ActiveSkill);
+		if (bCriticalHit)
+		{
+			CharactersHitWithCriticalDamage.Add(HitCharacterWeakPtr);
+		}
+
 		FEODDamage EODDamage;
 		EODDamage.Instigator = this;
 		EODDamage.CollisionHitResult = HitResult;
 		EODDamage.LineHitResult = LineHitResultToHitCharacter;
-		EODDamage.bCriticalHit = IsCriticalHit(ActiveSkill);
+		EODDamage.bCriticalHit = bCriticalHit;
 
 		HitCharacter->ApplyEODDamage(EODDamage);
 	}
 
-	if (!bEnemyHit)
+	if (CharactersSuccessfullyHit.Num() == 0)
 	{
 		OnUnsuccessfulHit.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
 	}
+	else
+	{
+		OnSuccessfulHit.Broadcast(CharactersSuccessfullyHit);
+
+		switch (ActiveSkill->DamageType)
+		{
+		case EDamageType::Physical:
+			OnSuccessfulPhysicalAttack.Broadcast(CharactersSuccessfullyHit);
+			break;
+		case EDamageType::Magickal:
+			OnSuccessfulMagickAttack.Broadcast(CharactersSuccessfullyHit);
+			break;
+		default:
+			break;
+		}
+
+		if (CharactersHitWithCriticalDamage.Num() > 0)
+		{
+			OnCriticalHit.Broadcast(CharactersHitWithCriticalDamage);
+		}
+	}
 }
 
-void AEODCharacterBase::ApplyEODDamage(FEODDamage & EODDamage)
+void AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
 {
 }
 
