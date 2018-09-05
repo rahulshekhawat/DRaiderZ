@@ -338,6 +338,12 @@ ASecondaryWeapon * APlayerCharacter::GetSecondaryWeapon() const
 	return SecondaryWeapon;
 }
 
+UHUDWidget * APlayerCharacter::GetHUDWidget() const
+{
+	return HUDWidget;
+	// return nullptr;
+}
+
 bool APlayerCharacter::CanAutoRun() const
 {
 	// The character can auto run only if character is in idle state
@@ -793,7 +799,7 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 
 int32 APlayerCharacter::ApplyEODDamage(FEODDamage& EODDamage)
 {
-	return 0;
+	return Super::ApplyEODDamage(EODDamage);
 }
 
 void APlayerCharacter::Destroyed()

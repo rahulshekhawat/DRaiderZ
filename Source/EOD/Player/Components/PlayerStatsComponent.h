@@ -6,6 +6,8 @@
 #include "Player/Components/StatsComponentBase.h"
 #include "PlayerStatsComponent.generated.h"
 
+class APlayerCharacter;
+
 /**
  * PlayerStatsComponent is used to manage stats of a player controlled character
  */
@@ -17,6 +19,11 @@ class EOD_API UPlayerStatsComponent : public UStatsComponentBase
 public:
 
 	UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer);
+
+	/** Initialize current health, mana, and stamina */
+	virtual void PostInitProperties() override;
+
+	virtual void BeginPlay() override;
 
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -306,4 +313,6 @@ private:
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats)
 	int32 Darkness;
 	
+	APlayerCharacter* OwningPlayer;
+
 };

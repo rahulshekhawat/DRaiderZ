@@ -1,8 +1,11 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "PlayerStatsComponent.h"
+#include "Player/PlayerCharacter.h"
+#include "UI/HUDWidget.h"
 
 #include "UnrealNetwork.h"
+#include "Components/ProgressBar.h"
 
 UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
@@ -10,6 +13,22 @@ UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectIni
 	RemoveCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 
 	MovementSpeedModifier = 1.f;
+
+	OwningPlayer = Cast<APlayerCharacter>(GetOwner());
+}
+
+void UPlayerStatsComponent::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+}
+
+void UPlayerStatsComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	ModifyMaxHealth(BaseHealth);
+	ModifyCurrentHealth(BaseHealth);
 }
 
 void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -94,6 +113,12 @@ void UPlayerStatsComponent::ModifyMaxHealth(int32 Value)
 void UPlayerStatsComponent::ModifyCurrentHealth(int32 Value)
 {
 	CurrentHealth += Value;
+
+	// @todo only modify HUDwidget if the OwningPlayer is local player
+	if (OwningPlayer && OwningPlayer->GetHUDWidget() && MaxHealth != 0)
+	{
+		OwningPlayer->GetHUDWidget()->HealthBar->SetPercent(CurrentHealth / MaxHealth);
+	}
 }
 
 bool UPlayerStatsComponent::IsLowOnHealth() const

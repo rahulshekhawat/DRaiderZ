@@ -124,6 +124,8 @@ public:
 
 	ASecondaryWeapon* GetSecondaryWeapon() const;
 
+	UHUDWidget* GetHUDWidget() const;
+
 	/** Replace primary weapon with a new weapon */
 	void SetCurrentPrimaryWeapon(const FName WeaponID);
 
@@ -215,11 +217,11 @@ private:
 
 	/** Player HUD class reference */
 	UPROPERTY(Transient)
-	class UHUDWidget* HUDWidget;
+	UHUDWidget* HUDWidget;
 
 	/** The blueprint widget class to use for player HUD */
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
-	TSubclassOf<class UHUDWidget> BP_HUDWidget;
+	TSubclassOf<UHUDWidget> BP_HUDWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	ECharacterGender Gender;
