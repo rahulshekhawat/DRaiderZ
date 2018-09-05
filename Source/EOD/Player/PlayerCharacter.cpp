@@ -777,10 +777,12 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 			UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
 		}
 
+		/*
 		FEODDamage EODDamage(ActiveSkill);
 		EODDamage.CapsuleHitResult = HitResult;
 		EODDamage.LineHitResult = LineHitResultToHitCharacter;
 		ApplyEODDamage(HitCharacter, EODDamage);
+		*/
 	}
 
 	if (!bEnemiesHit)
@@ -789,11 +791,7 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 	}
 }
 
-void APlayerCharacter::ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage)
-{
-}
-
-void APlayerCharacter::TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamage& EODDamage)
+void APlayerCharacter::ApplyEODDamage(FEODDamage & EODDamage)
 {
 }
 

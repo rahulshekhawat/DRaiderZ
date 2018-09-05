@@ -105,6 +105,9 @@ public:
 	/** Returns true if character is using skill at SkillIndex */
 	virtual bool IsUsingSkill(int32 SkillIndex) const;
 
+	/** Returns true if a hit from HitSkill was critical */
+	virtual bool IsCriticalHit(const FSkill* HitSkill) const;
+
 	/** Returns true if character can move */
 	virtual bool CanMove() const;
 	
@@ -205,11 +208,8 @@ public:
 	/** [server] Handle melee collision */
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
-	/** [server] Apply damage to a character */
-	virtual void ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage) PURE_VIRTUAL(AEODCharacterBase::ApplyEODDamage, );
-
-	/** [server] Take damage from another character */
-	virtual void TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamage& EODDamage) PURE_VIRTUAL(AEODCharacterBase::TakeEODDamage, );
+	/** [server] Apply damage to this character */
+	virtual void ApplyEODDamage(FEODDamage& EODDamage);
 
 	/** Called on an animation montage blending out to clean up, reset, or change any state variables */
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);

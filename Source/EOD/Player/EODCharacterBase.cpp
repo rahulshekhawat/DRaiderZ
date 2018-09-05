@@ -90,7 +90,7 @@ bool AEODCharacterBase::IsCastingSpell() const
 
 bool AEODCharacterBase::IsNormalAttacking() const
 {
-	return CharacterState == ECharacterState::Attacking;
+	return CharacterState == ECharacterState::Attacking && CurrentActiveSkill != nullptr;
 }
 
 bool AEODCharacterBase::IsUsingAnySkill() const
@@ -101,6 +101,28 @@ bool AEODCharacterBase::IsUsingAnySkill() const
 bool AEODCharacterBase::IsUsingSkill(int32 SkillIndex) const
 {
 	return IsUsingAnySkill() && CurrentActiveSkill == GetSkill(SkillIndex);
+}
+
+bool AEODCharacterBase::IsCriticalHit(const FSkill * HitSkill) const
+{
+	bool bCriticalHit = false;
+
+	if (HitSkill)
+	{
+		switch (HitSkill->DamageType)
+		{
+		case EDamageType::Physical:
+			bCriticalHit = StatsComp->GetPhysicalCritRate() >= FMath::RandRange(0.f, 100.f) ? true : false;
+			break;
+		case EDamageType::Magickal:
+			bCriticalHit = StatsComp->GetMagickCritRate() >= FMath::RandRange(0.f, 100.f) ? true : false;
+			break;
+		default:
+			break;
+		}
+	}
+
+	return bCriticalHit;
 }
 
 bool AEODCharacterBase::IsDodging() const
@@ -135,62 +157,79 @@ void AEODCharacterBase::RemoveStatusEffect(const UStatusEffectBase * StatusEffec
 
 void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
-	// If character is using normal attack and not a skill
-	if (IsNormalAttacking())
+	FSkill* ActiveSkill = GetCurrentActiveSkill();
+	check(ActiveSkill); // Make sure ActiveSkil is not a nullptr
+
+	bool bEnemyHit = false;
+	for (FHitResult& HitResult : HitResults)
 	{
-
-
-
-	}
-	else if (IsUsingAnySkill())
-	{
-		FSkill* ActiveSkill = GetCurrentActiveSkill();
-
-		for (FHitResult& HitResult : HitResults)
+		if (!HitResult.Actor.Get())
 		{
-			if (!HitResult.Actor.Get())
+			continue;
+		}
+
+		// @todo handle damage for non AEODCharacterBase actors
+		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
+		if (!HitCharacter)
+		{
+			continue;
+		}
+
+		// If the skill is dodgable and the hit character is currently dodging damage
+		if (HitCharacter->IsDodgingDamage() && !ActiveSkill->SkillLevelUpInfo.bUndodgable)
+		{
+			HitCharacter->OnSuccessfulDodge.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
+			continue;
+		}
+
+		bEnemyHit = true;
+
+		TArray<FHitResult> LineHitResults;
+		FVector LineStart = GetActorLocation();
+		FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
+
+		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
+		GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
+
+		FHitResult LineHitResultToHitCharacter;
+		bool bLineHitResultFound = false;
+
+		for (FHitResult& LineHitResult : LineHitResults)
+		{
+			if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
 			{
-				continue;
+				LineHitResultToHitCharacter = LineHitResult;
+				bLineHitResultFound = true;
+				break;
 			}
-
-			AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
-			// @todo handle damage for non AEODCharacterBase actors
-			// If the skill is dodgable and the hit character is currently dodging damage
-			if (!HitCharacter || (HitCharacter->IsDodgingDamage() && !ActiveSkill->SkillLevelUpInfo.bUndodgable))
-			{
-				continue;
-			}
-
-			TArray<FHitResult> LineHitResults;
-			FVector LineStart = GetActorLocation();
-			FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
-
-			FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
-			GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
-
-			FHitResult LineHitResultToHitCharacter;
-			bool bLineHitResultFound = false;
-
-			for (FHitResult& LineHitResult : LineHitResults)
-			{
-				if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
-				{
-					LineHitResultToHitCharacter = LineHitResult;
-					bLineHitResultFound = true;
-					break;
-				}
-			}
+		}
 
 #if DEVSTAGE_CODE_ENABLED
-			if (bLineHitResultFound)
-			{
-				FVector Start = LineHitResultToHitCharacter.ImpactPoint;
-				FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
-				UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::Blue, 5.f, 2.f);
-			}
-#endif
+		if (bLineHitResultFound)
+		{
+			FVector Start = LineHitResultToHitCharacter.ImpactPoint;
+			FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
+			UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::Blue, 5.f, 2.f);
 		}
+#endif
+
+		FEODDamage EODDamage;
+		EODDamage.Instigator = this;
+		EODDamage.CollisionHitResult = HitResult;
+		EODDamage.LineHitResult = LineHitResultToHitCharacter;
+		EODDamage.bCriticalHit = IsCriticalHit(ActiveSkill);
+
+		HitCharacter->ApplyEODDamage(EODDamage);
 	}
+
+	if (bEnemyHit)
+	{
+		OnUnsuccessfulHit.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
+	}
+}
+
+void AEODCharacterBase::ApplyEODDamage(FEODDamage & EODDamage)
+{
 }
 
 int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
