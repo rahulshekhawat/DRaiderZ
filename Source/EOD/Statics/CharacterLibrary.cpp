@@ -336,9 +336,9 @@ FSkill::FSkill(FSkillTableRow * SkillTableRow)
 	this->SkillEndMontageSectionName 		= SkillTableRow->SkillEndMontageSectionName;
 	this->DamageType 						= SkillTableRow->DamageType;
 
-	if (SkillTableRow->SkillLevelUpsInfo.Num() > 1)
+	if (SkillTableRow->SkillLevelUpsInfo.Num() > 0)
 	{
-		this->SkillLevelUpInfo = SkillTableRow->SkillLevelUpsInfo[1];
+		this->SkillLevelUpInfo = SkillTableRow->SkillLevelUpsInfo[0];
 	}
 
 	if (SkillTableRow->Icon.IsNull())
