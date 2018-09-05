@@ -247,6 +247,10 @@ protected:
 
 	FCombatEvent OnSuccessfulHit;
 
+	FCombatEvent OnSuccessfulMagickAttack;
+
+	FCombatEvent OnSuccessfulPhysicalAttack;
+
 	FCombatEvent OnUnsuccessfulHit;
 
 	FCombatEvent OnCriticalHit;
