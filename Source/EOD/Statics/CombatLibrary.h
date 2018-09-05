@@ -38,29 +38,25 @@ struct FEODDamage
 
 public:
 
+	/** Actual collision hit result */
+	FHitResult CollisionHitResult;
+
+	/** 
+	 * Line hit result from instigator to hit character.
+	 * Impact location and impact normal are used to play hit sound, hit particle effect, and determining whether hit character blocked the attack
+	 */
 	FHitResult LineHitResult;
+	
+	/** The character that caused damage */
+	AEODCharacterBase* Instigator;
 
-	FHitResult CapsuleHitResult;
-
-	EDamageType DamageType;
-
-	ECrowdControlEffect CrowdControlEffect;
-
-	float DamagePercent;
-
-	bool bUnblockable;
-
-	bool bUndodgable;
+	/** Determines whether the hit causes critical damage or not */
+	bool bCriticalHit;
 
 	FEODDamage()
 	{
-		DamagePercent = 0.f;
-		bUnblockable = false;
-		bUndodgable = false;
+		bCriticalHit = false;
 	}
-
-	FEODDamage(struct FSkill* Skill);
-
 };
 
 /**

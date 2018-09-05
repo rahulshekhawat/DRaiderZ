@@ -18,6 +18,7 @@ void UCombatLibrary::HandleCombatCollision(AEODCharacterBase * Instigator, UAnim
 
 void UCombatLibrary::HandleCombatCollision(AActor * Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
+	// @todo definition
 }
 
 FCollisionQueryParams UCombatLibrary::GenerateCombatCollisionQueryParams(AActor * ActorToIgnore, EQueryMobilityType MobilityType, bool bReturnPhysicalMaterial, FName TraceTag)
@@ -38,9 +39,11 @@ FCollisionQueryParams UCombatLibrary::GenerateCombatCollisionQueryParams(AActor 
 
 float UCombatLibrary::CalculateDamage(float Attack, float Defense)
 {
+	// @todo definition
 	return 0.0f;
 }
 
+/*
 FEODDamage::FEODDamage(FSkill * Skill)
 {
 	if (Skill)
@@ -56,3 +59,4 @@ FEODDamage::FEODDamage(FSkill * Skill)
 		FEODDamage();
 	}
 }
+*/
