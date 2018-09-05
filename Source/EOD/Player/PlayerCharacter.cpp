@@ -90,8 +90,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &APlayerCharacter::ZoomInCamera);
 	PlayerInputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &APlayerCharacter::ZoomOutCamera);
 
-	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::EnableBlock);
-	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::DisableBlock);
+	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
+	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
 
 	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnNormalAttackKeyPressed);
 	PlayerInputComponent->BindAction("NormalAttack", IE_Released, this, &APlayerCharacter::OnNormalAttackKeyReleased);
@@ -212,6 +212,24 @@ void APlayerCharacter::PostEditChangeProperty(FPropertyChangedEvent & PropertyCh
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (IsDead())
+	{
+		return;
+	}
+
+	/*
+	if (IsDead() && CharacterState != ECharacterState::Dead)
+	{
+		CharacterState = ECharacterState::Dead;
+		GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_HitEffects);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName(""), GetActiveAnimationReferences()->AnimationMontage_HitEffects);
+	}
+	else if (IsDead() && CharacterState == ECharacterState::Dead)
+	{
+
+	}
+	*/
 
 	if (GetCharacterMovement()->IsFalling() && !IsJumping())
 	{
@@ -409,6 +427,16 @@ void APlayerCharacter::OnDodge()
 			}
 		}
 	}
+}
+
+void APlayerCharacter::OnPressedBlock()
+{
+	bBlockPressed = true;
+}
+
+void APlayerCharacter::OnReleasedBlock()
+{
+	bBlockPressed = false;
 }
 
 void APlayerCharacter::EnableBlock()
@@ -849,13 +877,6 @@ FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() co
 {
 	return bWeaponSheathed ? SheathedWeaponAnimationReferences : EquippedWeaponAnimationReferences;
 }
-
-/*
-float APlayerCharacter::GetMaxPlayerWalkSpeed() const
-{
-	return BaseWalkSpeed * StatsComp->GetMovementSpeedModifier();
-}
-*/
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {

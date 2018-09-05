@@ -275,9 +275,13 @@ private:
 	void OnDodge();
 
 	/** Sets the boolean used to enable block to true */
-	void EnableBlock();
+	void OnPressedBlock();
 	
 	/** Sets the boolean used to enable block to false */
+	void OnReleasedBlock();
+
+	void EnableBlock();
+
 	void DisableBlock();
 
 	/** Event triggered when player presses the jump key */
