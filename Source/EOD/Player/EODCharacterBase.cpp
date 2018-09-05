@@ -228,7 +228,7 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 		EODDamage.LineHitResult = LineHitResultToHitCharacter;
 		EODDamage.bCriticalHit = bCriticalHit;
 
-		HitCharacter->ApplyEODDamage(EODDamage);
+		int32 DamageApplied = HitCharacter->ApplyEODDamage(EODDamage);
 	}
 
 	if (CharactersSuccessfullyHit.Num() == 0)
@@ -258,8 +258,9 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 	}
 }
 
-void AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
+int32 AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
 {
+	return 0;
 }
 
 int32 AEODCharacterBase::GetMostWeightedSkillIndex() const

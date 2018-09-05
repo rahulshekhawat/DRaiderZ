@@ -791,8 +791,9 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 	}
 }
 
-void APlayerCharacter::ApplyEODDamage(FEODDamage & EODDamage)
+int32 APlayerCharacter::ApplyEODDamage(FEODDamage& EODDamage)
 {
+	return 0;
 }
 
 void APlayerCharacter::Destroyed()
