@@ -117,7 +117,8 @@ void UPlayerStatsComponent::ModifyCurrentHealth(int32 Value)
 	// @todo only modify HUDwidget if the OwningPlayer is local player
 	if (OwningPlayer && OwningPlayer->GetHUDWidget() && MaxHealth != 0)
 	{
-		OwningPlayer->GetHUDWidget()->HealthBar->SetPercent(CurrentHealth / MaxHealth);
+		float Percent = (float)CurrentHealth / (float)MaxHealth;
+		OwningPlayer->GetHUDWidget()->HealthBar->SetPercent(Percent);
 	}
 }
 
