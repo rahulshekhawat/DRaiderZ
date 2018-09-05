@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/ObjectMacros.h"
 #include "Blueprint/UserWidget.h"
 #include "HUDWidget.generated.h"
 
