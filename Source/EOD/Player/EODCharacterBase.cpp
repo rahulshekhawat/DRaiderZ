@@ -260,7 +260,40 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 
 int32 AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
 {
-	return 0;
+	//~ @todo crowd control effects
+
+	FSkill* HitBySkill = EODDamage.Instigator->GetCurrentActiveSkill();
+	AEODCharacterBase* Instigator = EODDamage.Instigator;
+
+	int32 DamageApplied = 0;
+	if (HitBySkill->DamageType == EDamageType::Physical)
+	{
+		int32 PhysicalAttack = Instigator->StatsComp->GetPhysicalAttack();
+		int32 MyPhysicalResistance = this->StatsComp->GetPhysicalResistance();
+		int32 CritBonus = 0;
+		if (EODDamage.bCriticalHit)
+		{
+			CritBonus = PhysicalAttack * UCombatLibrary::PhysicalCritMultiplier + Instigator->StatsComp->GetPhysicalCritBonus();
+		}
+
+		DamageApplied = UCombatLibrary::CalculateDamage(PhysicalAttack + CritBonus, MyPhysicalResistance);
+		this->StatsComp->ModifyCurrentHealth(-DamageApplied);
+	}
+	else if (HitBySkill->DamageType == EDamageType::Magickal)
+	{
+		int32 MagickAttack = Instigator->StatsComp->GetMagickAttack();
+		int32 MyMagickResistance = this->StatsComp->GetMagickResistance();
+		int32 CritBonus = 0;
+		if (EODDamage.bCriticalHit)
+		{
+			CritBonus = MagickAttack * UCombatLibrary::MagickalCritMultiplier + Instigator->StatsComp->GetMagickCritBonus();
+		}
+
+		DamageApplied = UCombatLibrary::CalculateDamage(MagickAttack + CritBonus, MyMagickResistance);
+		this->StatsComp->ModifyCurrentHealth(-DamageApplied);
+	}
+
+	return DamageApplied;
 }
 
 int32 AEODCharacterBase::GetMostWeightedSkillIndex() const

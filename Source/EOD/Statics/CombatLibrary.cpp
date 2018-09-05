@@ -4,6 +4,9 @@
 #include "CharacterLibrary.h"
 #include "Player/EODCharacterBase.h"
 
+int UCombatLibrary::PhysicalCritMultiplier = 2;
+int UCombatLibrary::MagickalCritMultiplier = 2;
+
 void UCombatLibrary::HandleCombatCollision(AEODCharacterBase * Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
 	if (!IsValid(Instigator))

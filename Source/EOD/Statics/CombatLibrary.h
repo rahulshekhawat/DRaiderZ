@@ -78,4 +78,8 @@ public:
 
 	static float CalculateDamage(float Attack, float Defense);
 
+	static int PhysicalCritMultiplier;
+
+	static int MagickalCritMultiplier;
+
 };
