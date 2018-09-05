@@ -154,6 +154,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnSuccessfulHit : 1;
 
+	/** True if the status effect triggers on Owner successfully landing a magick attack on enemy */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnSuccessfulMagickAttack : 1;
+
+	/** True if the status effect triggers on Owner successfully landing a physical attack on enemy */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnSuccessfulPhysicalAttack : 1;
+
 	/** True if the status effect triggers on Owner failing to land an attack on enemy */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnUnsuccessfulHit : 1;

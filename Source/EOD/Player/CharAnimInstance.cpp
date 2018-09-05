@@ -13,6 +13,14 @@ void UCharAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 	OwningCharacter = CastOwnerToBaseCharacter();
+
+	FScriptDelegate OutDelegate;
+	OutDelegate.BindUFunction(this, FName("HandleMontageBlendingOut"));
+	OnMontageBlendingOut.AddUnique(OutDelegate);
+
+	FScriptDelegate EndDelegate;
+	EndDelegate.BindUFunction(this, FName("HandleMontageEnded"));
+	OnMontageEnded.AddUnique(EndDelegate);
 }
 
 void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -106,6 +114,15 @@ ECharMovementDirection UCharAnimInstance::GetIWRCharMovementDir() const
 	{
 		return ECharMovementDirection::F;
 	}
+}
+
+void UCharAnimInstance::HandleMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
+{
+	OwningCharacter->OnMontageBlendingOut(AnimMontage, bInterrupted);
+}
+
+void UCharAnimInstance::HandleMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
+{
 }
 
 AEODCharacterBase * UCharAnimInstance::CastOwnerToBaseCharacter() const

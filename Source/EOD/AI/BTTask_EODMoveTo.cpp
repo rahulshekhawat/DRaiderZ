@@ -6,6 +6,11 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+UBTTask_EODMoveTo::UBTTask_EODMoveTo(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+{
+	NodeName = "EOD Move To";
+}
+
 void UBTTask_EODMoveTo::OnGameplayTaskActivated(UGameplayTask & Task)
 {
 	Super::OnGameplayTaskActivated(Task);
