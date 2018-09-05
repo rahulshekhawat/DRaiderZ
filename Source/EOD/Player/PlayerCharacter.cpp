@@ -222,7 +222,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Jump);
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpLoop"), GetActiveAnimationReferences()->AnimationMontage_Jump);
 	}
-	// It is necessary to test if jump montage is playing, or else the "JumpEnd" sections ends up playing twice because of montage blending out
+	// It is necessary to test if jump montage is playing, or else the "JumpEnd" section ends up playing twice because of montage blending out
 	else if (!GetCharacterMovement()->IsFalling() && IsJumping() && GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetActiveAnimationReferences()->AnimationMontage_Jump))
 	{
 		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_Jump);
@@ -284,7 +284,8 @@ USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName N
 
 bool APlayerCharacter::CanMove() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun || IsBlocking();
+	// return CharacterState == ECharacterState::IdleWalkRun || IsBlocking();
+	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning();
 }
 
 bool APlayerCharacter::CanJump() const
@@ -321,13 +322,19 @@ ASecondaryWeapon * APlayerCharacter::GetSecondaryWeapon() const
 bool APlayerCharacter::CanAutoRun() const
 {
 	// The character can auto run only if character is in idle state
-	return CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0;
+	// return CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0;
+	return IsIdleOrMoving();
 }
 
 void APlayerCharacter::MoveForward(const float Value)
 {
 	if (Value != 0 && CanMove())
 	{
+		if (IsAutoRunning())
+		{
+			DisableAutoRun();
+		}
+
 		FRotator rot = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
 		FVector Direction = FRotationMatrix(rot).GetScaledAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
@@ -338,6 +345,11 @@ void APlayerCharacter::MoveRight(const float Value)
 {
 	if (Value != 0 && CanMove())
 	{
+		if (IsAutoRunning())
+		{
+			DisableAutoRun();
+		}
+
 		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
 		AddMovementInput(Direction, Value);
 	}

@@ -62,6 +62,11 @@ bool AEODCharacterBase::IsMoving() const
 	return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() != 0);
 }
 
+bool AEODCharacterBase::IsIdleOrMoving() const
+{
+	return CharacterState == ECharacterState::IdleWalkRun;
+}
+
 bool AEODCharacterBase::IsJumping() const
 {
 	return CharacterState == ECharacterState::Jumping;

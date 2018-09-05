@@ -69,6 +69,9 @@ public:
 	/** Returns true if character is moving around */
 	virtual bool IsMoving() const;
 
+	/** Returns true if character is in idle-walk-run state */
+	virtual bool IsIdleOrMoving() const;
+
 	/** Returns true if character is jumping */
 	virtual bool IsJumping() const;
 
