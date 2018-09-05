@@ -110,6 +110,125 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 		if (PlayerAnimationSoftReferences)
 		{
 			PlayerAnimationReferences = new FPlayerAnimationReferences;
+
+			if (PlayerAnimationSoftReferences->Dodge.IsNull())
+			{
+				PlayerAnimationReferences->AnimationMontage_Dodge = nullptr;
+			}
+			else if (PlayerAnimationSoftReferences->Dodge.IsPending())
+			{
+				PlayerAnimationReferences->AnimationMontage_Dodge = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Dodge);
+			}
+			else if (PlayerAnimationSoftReferences->Dodge.IsValid())
+			{
+				PlayerAnimationReferences->AnimationMontage_Dodge = PlayerAnimationSoftReferences->Dodge.Get();
+			}
+
+			if (PlayerAnimationSoftReferences->Jump.IsNull())
+			{
+				PlayerAnimationReferences->AnimationMontage_Jump = nullptr;
+			}
+			else if (PlayerAnimationSoftReferences->Jump.IsPending())
+			{
+				PlayerAnimationReferences->AnimationMontage_Jump = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Jump);
+			}
+			else if (PlayerAnimationSoftReferences->Jump.IsValid())
+			{
+				PlayerAnimationReferences->AnimationMontage_Jump = PlayerAnimationSoftReferences->Jump.Get();
+			}
+			
+			if (PlayerAnimationSoftReferences->NormalAttacks.IsNull())
+			{
+				PlayerAnimationReferences->AnimationMontage_NormalAttacks = nullptr;
+			}
+			else if (PlayerAnimationSoftReferences->NormalAttacks.IsPending())
+			{
+				PlayerAnimationReferences->AnimationMontage_NormalAttacks = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->NormalAttacks);
+			}
+			else if (PlayerAnimationSoftReferences->NormalAttacks.IsValid())
+			{
+				PlayerAnimationReferences->AnimationMontage_NormalAttacks = PlayerAnimationSoftReferences->NormalAttacks.Get();
+			}
+			
+			if (PlayerAnimationSoftReferences->SpecialActions.IsNull())
+			{
+				PlayerAnimationReferences->AnimationMontage_SpecialActions = nullptr;
+			}
+			else if (PlayerAnimationSoftReferences->SpecialActions.IsPending())
+			{
+				PlayerAnimationReferences->AnimationMontage_SpecialActions = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->SpecialActions);
+			}
+			else if (PlayerAnimationSoftReferences->SpecialActions.IsValid())
+			{
+				PlayerAnimationReferences->AnimationMontage_SpecialActions = PlayerAnimationSoftReferences->SpecialActions.Get();
+			}
+			
+			if (PlayerAnimationSoftReferences->Skills.IsNull())
+			{
+				PlayerAnimationReferences->AnimationMontage_Skills = nullptr;
+			}
+			else if (PlayerAnimationSoftReferences->Skills.IsPending())
+			{
+				PlayerAnimationReferences->AnimationMontage_Skills = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Skills);
+			}
+			else if (PlayerAnimationSoftReferences->Skills.IsValid())
+			{
+				PlayerAnimationReferences->AnimationMontage_Skills = PlayerAnimationSoftReferences->Skills.Get();
+			}
+
+			if (PlayerAnimationSoftReferences->Spells.IsNull())
+			{
+				PlayerAnimationReferences->AnimationMontage_Spells = nullptr;
+			}
+			else if (PlayerAnimationSoftReferences->Spells.IsPending())
+			{
+				PlayerAnimationReferences->AnimationMontage_Spells = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Spells);
+			}
+			else if (PlayerAnimationSoftReferences->Spells.IsValid())
+			{
+				PlayerAnimationReferences->AnimationMontage_Spells = PlayerAnimationSoftReferences->Spells.Get();
+			}
+			
+			if (PlayerAnimationSoftReferences->SpecialMovement.IsNull())
+			{
+				PlayerAnimationReferences->AnimationMontage_SpecialMovement = nullptr;
+			}
+			else if (PlayerAnimationSoftReferences->SpecialMovement.IsPending())
+			{
+				PlayerAnimationReferences->AnimationMontage_SpecialMovement = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->SpecialMovement);
+			}
+			else if (PlayerAnimationSoftReferences->SpecialMovement.IsValid())
+			{
+				PlayerAnimationReferences->AnimationMontage_SpecialMovement = PlayerAnimationSoftReferences->SpecialMovement.Get();
+			}
+			
+			if (PlayerAnimationSoftReferences->HitEffects.IsNull())
+			{
+				PlayerAnimationReferences->AnimationMontage_HitEffects = nullptr;
+			}
+			else if (PlayerAnimationSoftReferences->HitEffects.IsPending())
+			{
+				PlayerAnimationReferences->AnimationMontage_HitEffects = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->HitEffects);
+			}
+			else if (PlayerAnimationSoftReferences->HitEffects.IsValid())
+			{
+				PlayerAnimationReferences->AnimationMontage_HitEffects = PlayerAnimationSoftReferences->HitEffects.Get();
+			}
+			
+			if (PlayerAnimationSoftReferences->Flinch.IsNull())
+			{
+				PlayerAnimationReferences->AnimationMontage_Flinch = nullptr;
+			}
+			else if (PlayerAnimationSoftReferences->Flinch.IsPending())
+			{
+				PlayerAnimationReferences->AnimationMontage_Flinch = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Flinch);
+			}
+			else if (PlayerAnimationSoftReferences->Flinch.IsValid())
+			{
+				PlayerAnimationReferences->AnimationMontage_Flinch = PlayerAnimationSoftReferences->Flinch.Get();
+			}
+
+			/*
 			PlayerAnimationReferences->FPlayerAnimationReferencesTableRowID = PlayerAnimationReferencesTableRowID;
 			PlayerAnimationReferences->AnimationMontage_Dodge				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Dodge);
 			PlayerAnimationReferences->AnimationMontage_Jump				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Jump);
@@ -120,19 +239,12 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 			PlayerAnimationReferences->AnimationMontage_SpecialMovement		= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->SpecialMovement);
 			PlayerAnimationReferences->AnimationMontage_HitEffects = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->HitEffects);
 			PlayerAnimationReferences->AnimationMontage_Flinch				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Flinch);
-
+			*/
 		}
 	}
 
 	return PlayerAnimationReferences;
 }
-
-/*
-FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(const FName AnimationID)
-{
-	return nullptr;
-}
-*/
 
 bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferences * PlayerAnimationReferences, ECharacterGender Gender)
 {
