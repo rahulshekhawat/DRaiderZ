@@ -213,11 +213,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/*
 	if (IsDead())
 	{
 		return;
 	}
-
+	*/
 	/*
 	if (IsDead() && CharacterState != ECharacterState::Dead)
 	{
@@ -493,6 +494,7 @@ void APlayerCharacter::OnToggleMouseCursor()
 
 void APlayerCharacter::OnPressedNormalAttack()
 {
+
 }
 
 void APlayerCharacter::OnReleasedNormalAttack()

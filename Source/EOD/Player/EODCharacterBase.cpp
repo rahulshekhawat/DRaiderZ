@@ -2,6 +2,7 @@
 
 #include "EODCharacterBase.h"
 #include "CharAnimInstance.h"
+#include "Core/EODPreprocessors.h"
 #include "Components/StatsComponentBase.h"
 
 #include "UnrealNetwork.h"
@@ -92,6 +93,16 @@ bool AEODCharacterBase::IsNormalAttacking() const
 	return CharacterState == ECharacterState::Attacking;
 }
 
+bool AEODCharacterBase::IsUsingAnySkill() const
+{
+	return CharacterState == ECharacterState::UsingActiveSkill && CurrentActiveSkill != nullptr;
+}
+
+bool AEODCharacterBase::IsUsingSkill(int32 SkillIndex) const
+{
+	return IsUsingAnySkill() && CurrentActiveSkill == GetSkill(SkillIndex);
+}
+
 bool AEODCharacterBase::IsDodging() const
 {
 	return CharacterState == ECharacterState::Dodging;
@@ -120,6 +131,66 @@ void AEODCharacterBase::ApplyStatusEffect(const UStatusEffectBase * StatusEffect
 void AEODCharacterBase::RemoveStatusEffect(const UStatusEffectBase * StatusEffect)
 {
 	// @todo definition
+}
+
+void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)
+{
+	// If character is using normal attack and not a skill
+	if (IsNormalAttacking())
+	{
+
+
+
+	}
+	else if (IsUsingAnySkill())
+	{
+		FSkill* ActiveSkill = GetCurrentActiveSkill();
+
+		for (FHitResult& HitResult : HitResults)
+		{
+			if (!HitResult.Actor.Get())
+			{
+				continue;
+			}
+
+			AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
+			// @todo handle damage for non AEODCharacterBase actors
+			// If the skill is dodgable and the hit character is currently dodging damage
+			if (!HitCharacter || (HitCharacter->IsDodgingDamage() && !ActiveSkill->SkillLevelUpInfo.bUndodgable))
+			{
+				continue;
+			}
+
+			TArray<FHitResult> LineHitResults;
+			FVector LineStart = GetActorLocation();
+			FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
+
+			FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
+			GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
+
+			FHitResult LineHitResultToHitCharacter;
+			bool bLineHitResultFound = false;
+
+			for (FHitResult& LineHitResult : LineHitResults)
+			{
+				if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
+				{
+					LineHitResultToHitCharacter = LineHitResult;
+					bLineHitResultFound = true;
+					break;
+				}
+			}
+
+#if DEVSTAGE_CODE_ENABLED
+			if (bLineHitResultFound)
+			{
+				FVector Start = LineHitResultToHitCharacter.ImpactPoint;
+				FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
+				UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::Blue, 5.f, 2.f);
+			}
+#endif
+		}
+	}
 }
 
 int32 AEODCharacterBase::GetMostWeightedSkillIndex() const

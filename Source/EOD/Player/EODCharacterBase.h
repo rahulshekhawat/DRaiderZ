@@ -99,6 +99,12 @@ public:
 	/** Returns true if character is using a normal attack */
 	virtual bool IsNormalAttacking() const;
 
+	/** Returns true if character is using any skill */
+	virtual bool IsUsingAnySkill() const;
+
+	/** Returns true if character is using skill at SkillIndex */
+	virtual bool IsUsingSkill(int32 SkillIndex) const;
+
 	/** Returns true if character can move */
 	virtual bool CanMove() const;
 	
@@ -197,7 +203,7 @@ public:
 	virtual void RemoveStatusEffect(const UStatusEffectBase* StatusEffect);
 
 	/** [server] Handle melee collision */
-	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) PURE_VIRTUAL(AEODCharacterBase::HandleMeleeCollision, );
+	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
 	/** [server] Apply damage to a character */
 	virtual void ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage) PURE_VIRTUAL(AEODCharacterBase::ApplyEODDamage, );
