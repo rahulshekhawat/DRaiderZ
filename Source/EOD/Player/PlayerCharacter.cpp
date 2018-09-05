@@ -73,12 +73,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	// bIsBlockingDamage = false;
 
 	MaxNumberOfSkills = 30;
-	
-	for (int i = 0; i < MaxNumberOfSkills; i++)
-	{
-		EventsOnSuccessfulSkillAttack.Add(FCombatEvent());
-		EventsOnUsingSkill.Add(FCombatEvent());
-	}
+
+	Faction = EFaction::Player;
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -94,15 +90,16 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &APlayerCharacter::ZoomInCamera);
 	PlayerInputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &APlayerCharacter::ZoomOutCamera);
 
-	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::EnableBlock);
-	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::DisableBlock);
+	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
+	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
 
-	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnNormalAttack);
+	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnPressedNormalAttack);
+	PlayerInputComponent->BindAction("NormalAttack", IE_Released, this, &APlayerCharacter::OnReleasedNormalAttack);
 	
 	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &APlayerCharacter::OnDodge);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::OnJump);
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::OnInteract);
-	PlayerInputComponent->BindAction("ToggleSheath", IE_Pressed, this, &APlayerCharacter::OnToggleSheath);
+	PlayerInputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &APlayerCharacter::OnToggleSheathe);
 	PlayerInputComponent->BindAction("ToggleStats", IE_Pressed, this, &APlayerCharacter::OnToggleCharacterStatsUI);
 	PlayerInputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &APlayerCharacter::OnToggleMouseCursor);
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
@@ -192,6 +189,17 @@ void APlayerCharacter::PostInitializeComponents()
 	}
 }
 
+void APlayerCharacter::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	for (int i = 0; i < MaxNumberOfSkills; i++)
+	{
+		EventsOnSuccessfulSkillAttack.Add(FCombatEvent());
+		EventsOnUsingSkill.Add(FCombatEvent());
+	}
+}
+
 #if WITH_EDITOR
 void APlayerCharacter::PostEditChangeProperty(FPropertyChangedEvent & PropertyChangedEvent)
 {
@@ -205,6 +213,25 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/*
+	if (IsDead())
+	{
+		return;
+	}
+	*/
+	/*
+	if (IsDead() && CharacterState != ECharacterState::Dead)
+	{
+		CharacterState = ECharacterState::Dead;
+		GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_HitEffects);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName(""), GetActiveAnimationReferences()->AnimationMontage_HitEffects);
+	}
+	else if (IsDead() && CharacterState == ECharacterState::Dead)
+	{
+
+	}
+	*/
+
 	if (GetCharacterMovement()->IsFalling() && !IsJumping())
 	{
 		// SetCharacterState(ECharacterState::Jumping);
@@ -214,7 +241,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Jump);
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpLoop"), GetActiveAnimationReferences()->AnimationMontage_Jump);
 	}
-	// It is necessary to test if jump montage is playing, or else the "JumpEnd" sections ends up playing twice because of montage blending out
+	// It is necessary to test if jump montage is playing, or else the "JumpEnd" section ends up playing twice because of montage blending out
 	else if (!GetCharacterMovement()->IsFalling() && IsJumping() && GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetActiveAnimationReferences()->AnimationMontage_Jump))
 	{
 		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_Jump);
@@ -276,7 +303,8 @@ USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName N
 
 bool APlayerCharacter::CanMove() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun || IsBlocking();
+	// return CharacterState == ECharacterState::IdleWalkRun || IsBlocking();
+	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning();
 }
 
 bool APlayerCharacter::CanJump() const
@@ -300,16 +328,32 @@ bool APlayerCharacter::IsAutoRunning() const
 	return CharacterState == ECharacterState::AutoRun;
 }
 
+APrimaryWeapon * APlayerCharacter::GetPrimaryWeapon() const
+{
+	return PrimaryWeapon;
+}
+
+ASecondaryWeapon * APlayerCharacter::GetSecondaryWeapon() const
+{
+	return SecondaryWeapon;
+}
+
 bool APlayerCharacter::CanAutoRun() const
 {
 	// The character can auto run only if character is in idle state
-	return CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0;
+	// return CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0;
+	return IsIdleOrMoving();
 }
 
 void APlayerCharacter::MoveForward(const float Value)
 {
 	if (Value != 0 && CanMove())
 	{
+		if (IsAutoRunning())
+		{
+			DisableAutoRun();
+		}
+
 		FRotator rot = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
 		FVector Direction = FRotationMatrix(rot).GetScaledAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
@@ -320,6 +364,11 @@ void APlayerCharacter::MoveRight(const float Value)
 {
 	if (Value != 0 && CanMove())
 	{
+		if (IsAutoRunning())
+		{
+			DisableAutoRun();
+		}
+
 		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
 		AddMovementInput(Direction, Value);
 	}
@@ -381,6 +430,16 @@ void APlayerCharacter::OnDodge()
 	}
 }
 
+void APlayerCharacter::OnPressedBlock()
+{
+	bBlockPressed = true;
+}
+
+void APlayerCharacter::OnReleasedBlock()
+{
+	bBlockPressed = false;
+}
+
 void APlayerCharacter::EnableBlock()
 {
 	if (CanBlock())
@@ -419,7 +478,7 @@ void APlayerCharacter::OnInteract()
 {
 }
 
-void APlayerCharacter::OnToggleSheath()
+void APlayerCharacter::OnToggleSheathe()
 {
 	bool bNewValue = !bWeaponSheathed;
 	SetWeaponSheathed(bNewValue);
@@ -433,6 +492,16 @@ void APlayerCharacter::OnToggleMouseCursor()
 {
 }
 
+void APlayerCharacter::OnPressedNormalAttack()
+{
+
+}
+
+void APlayerCharacter::OnReleasedNormalAttack()
+{
+}
+
+/*
 void APlayerCharacter::OnNormalAttack()
 {
 	if (CanNormalAttack() && PlayerAnimInstance && GetActiveAnimationReferences())
@@ -484,6 +553,7 @@ void APlayerCharacter::OnNormalAttack()
 		}
 	}
 }
+*/
 
 void APlayerCharacter::OnToggleAutoRun()
 {
@@ -536,10 +606,10 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 
 	if (bRotatePlayer)
 	{
-		DeltaRotatePlayerToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
+		// DeltaRotatePlayerToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
+		DeltaRotateCharacterToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
 	}
 	
-
 	if (ForwardAxisValue < 0)
 	{
 		float Speed = (BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier() * 5) / 16;
@@ -707,10 +777,12 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 			UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
 		}
 
+		/*
 		FEODDamage EODDamage(ActiveSkill);
 		EODDamage.CapsuleHitResult = HitResult;
 		EODDamage.LineHitResult = LineHitResultToHitCharacter;
 		ApplyEODDamage(HitCharacter, EODDamage);
+		*/
 	}
 
 	if (!bEnemiesHit)
@@ -719,12 +791,9 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 	}
 }
 
-void APlayerCharacter::ApplyEODDamage(AEODCharacterBase* HitCharacter, FEODDamage& EODDamage)
+int32 APlayerCharacter::ApplyEODDamage(FEODDamage& EODDamage)
 {
-}
-
-void APlayerCharacter::TakeEODDamage(AEODCharacterBase* HitInstigator, FEODDamage& EODDamage)
-{
+	return 0;
 }
 
 void APlayerCharacter::Destroyed()
@@ -762,7 +831,7 @@ void APlayerCharacter::UpdatePlayerAnimationReferences()
 }
 */
 
-void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(EWeaponType EquippedWeaponType)
+void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType)
 {
 	if (EquippedWeaponAnimationReferences)
 	{
@@ -809,13 +878,6 @@ FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() co
 {
 	return bWeaponSheathed ? SheathedWeaponAnimationReferences : EquippedWeaponAnimationReferences;
 }
-
-/*
-float APlayerCharacter::GetMaxPlayerWalkSpeed() const
-{
-	return BaseWalkSpeed * StatsComp->GetMovementSpeedModifier();
-}
-*/
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
@@ -867,36 +929,6 @@ float APlayerCharacter::GetPlayerControlRotationYaw()
 		return ControlRotationYaw;
 }
 
-bool APlayerCharacter::DeltaRotatePlayerToDesiredYaw(float DesiredYaw, float DeltaTime, float RotationRate)
-{
-	float CurrentYaw = GetActorRotation().Yaw;
-
-	bool Result = FMath::IsNearlyEqual(CurrentYaw, DesiredYaw, 0.1f);
-	if (Result)
-	{
-		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-		return true;
-	}
-	else
-	{
-		float YawDiff = FMath::FindDeltaAngleDegrees(CurrentYaw, DesiredYaw);
-		float Multiplier = YawDiff / FMath::Abs(YawDiff);
-		float RotateBy = Multiplier * RotationRate * DeltaTime;
-
-		if (FMath::Abs(YawDiff) <= FMath::Abs(RotateBy) + 0.5f)
-		{
-			SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-			return true;
-		}
-		else
-		{
-			SetCharacterRotation(FRotator(0.f, CurrentYaw + RotateBy, 0.f));
-			return false;
-		}
-		return false;
-	}
-}
-
 float APlayerCharacter::GetRotationYawFromAxisInput()
 {
 	float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
@@ -933,7 +965,19 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 	return ResultingRotation;
 }
 
-void APlayerCharacter::SetCurrentPrimaryWeapon(FName WeaponID)
+void APlayerCharacter::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
+{
+	if (!bInterrupted)
+	{
+		CharacterState = ECharacterState::IdleWalkRun;
+	}
+}
+
+void APlayerCharacter::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
+{
+}
+
+void APlayerCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
 {
 	if (WeaponID == NAME_None)
 	{
@@ -959,7 +1003,7 @@ void APlayerCharacter::SetCurrentPrimaryWeapon(FName WeaponID)
 	UpdateCurrentWeaponAnimationType();
 }
 
-void APlayerCharacter::SetCurrentSecondaryWeapon(FName WeaponID)
+void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 {
 	if (WeaponID == NAME_None)
 	{

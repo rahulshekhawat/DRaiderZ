@@ -2,6 +2,7 @@
 
 #include "EODCharacterBase.h"
 #include "CharAnimInstance.h"
+#include "Core/EODPreprocessors.h"
 #include "Components/StatsComponentBase.h"
 
 #include "UnrealNetwork.h"
@@ -26,7 +27,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 void AEODCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AEODCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -63,6 +63,11 @@ bool AEODCharacterBase::IsMoving() const
 	return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() != 0);
 }
 
+bool AEODCharacterBase::IsIdleOrMoving() const
+{
+	return CharacterState == ECharacterState::IdleWalkRun;
+}
+
 bool AEODCharacterBase::IsJumping() const
 {
 	return CharacterState == ECharacterState::Jumping;
@@ -85,7 +90,39 @@ bool AEODCharacterBase::IsCastingSpell() const
 
 bool AEODCharacterBase::IsNormalAttacking() const
 {
-	return CharacterState == ECharacterState::Attacking;
+	return CharacterState == ECharacterState::Attacking && CurrentActiveSkill != nullptr;
+}
+
+bool AEODCharacterBase::IsUsingAnySkill() const
+{
+	return CharacterState == ECharacterState::UsingActiveSkill && CurrentActiveSkill != nullptr;
+}
+
+bool AEODCharacterBase::IsUsingSkill(int32 SkillIndex) const
+{
+	return IsUsingAnySkill() && CurrentActiveSkill == GetSkill(SkillIndex);
+}
+
+bool AEODCharacterBase::IsCriticalHit(const FSkill * HitSkill) const
+{
+	bool bCriticalHit = false;
+
+	if (HitSkill)
+	{
+		switch (HitSkill->DamageType)
+		{
+		case EDamageType::Physical:
+			bCriticalHit = StatsComp->GetPhysicalCritRate() >= FMath::RandRange(0.f, 100.f) ? true : false;
+			break;
+		case EDamageType::Magickal:
+			bCriticalHit = StatsComp->GetMagickCritRate() >= FMath::RandRange(0.f, 100.f) ? true : false;
+			break;
+		default:
+			break;
+		}
+	}
+
+	return bCriticalHit;
 }
 
 bool AEODCharacterBase::IsDodging() const
@@ -95,7 +132,7 @@ bool AEODCharacterBase::IsDodging() const
 
 bool AEODCharacterBase::IsDodgingDamage() const
 {
-	return false;
+	return true;
 }
 
 bool AEODCharacterBase::NeedsHeal() const
@@ -103,32 +140,247 @@ bool AEODCharacterBase::NeedsHeal() const
 	return StatsComp->IsLowOnHealth();
 }
 
+bool AEODCharacterBase::IsHealing() const
+{
+	return false;
+}
+
+void AEODCharacterBase::ApplyStatusEffect(const UStatusEffectBase * StatusEffect)
+{
+	// @todo definition
+}
+
+void AEODCharacterBase::RemoveStatusEffect(const UStatusEffectBase * StatusEffect)
+{
+	// @todo definition
+}
+
+void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)
+{
+	FSkill* ActiveSkill = GetCurrentActiveSkill();
+	check(ActiveSkill); // Make sure ActiveSkil is not a nullptr
+
+	TArray<TWeakObjectPtr<AEODCharacterBase>> CharactersSuccessfullyHit;
+	TArray<TWeakObjectPtr<AEODCharacterBase>> CharactersHitWithCriticalDamage;
+
+	for (FHitResult& HitResult : HitResults)
+	{
+		if (!HitResult.Actor.Get())
+		{
+			continue;
+		}
+
+		// @todo handle damage for non AEODCharacterBase actors
+		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
+		if (!HitCharacter)
+		{
+			continue;
+		}
+
+		// If the skill is dodgable and the hit character is currently dodging damage
+		if (HitCharacter->IsDodgingDamage() && !ActiveSkill->SkillLevelUpInfo.bUndodgable)
+		{
+			HitCharacter->OnSuccessfulDodge.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
+			continue;
+		}
+
+		TArray<FHitResult> LineHitResults;
+		FVector LineStart = GetActorLocation();
+		FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
+
+		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
+		GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
+
+		FHitResult LineHitResultToHitCharacter;
+		bool bLineHitResultFound = false;
+
+		for (FHitResult& LineHitResult : LineHitResults)
+		{
+			if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
+			{
+				LineHitResultToHitCharacter = LineHitResult;
+				bLineHitResultFound = true;
+				break;
+			}
+		}
+
+#if DEVSTAGE_CODE_ENABLED
+		if (bLineHitResultFound)
+		{
+			FVector Start = LineHitResultToHitCharacter.ImpactPoint;
+			FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
+			UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::Blue, 5.f, 2.f);
+		}
+#endif
+
+		TWeakObjectPtr<AEODCharacterBase> HitCharacterWeakPtr(HitCharacter);
+		CharactersSuccessfullyHit.Add(HitCharacterWeakPtr);
+
+		bool bCriticalHit = IsCriticalHit(ActiveSkill);
+		if (bCriticalHit)
+		{
+			CharactersHitWithCriticalDamage.Add(HitCharacterWeakPtr);
+		}
+
+		FEODDamage EODDamage;
+		EODDamage.Instigator = this;
+		EODDamage.CollisionHitResult = HitResult;
+		EODDamage.LineHitResult = LineHitResultToHitCharacter;
+		EODDamage.bCriticalHit = bCriticalHit;
+
+		int32 DamageApplied = HitCharacter->ApplyEODDamage(EODDamage);
+	}
+
+	if (CharactersSuccessfullyHit.Num() == 0)
+	{
+		OnUnsuccessfulHit.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
+	}
+	else
+	{
+		OnSuccessfulHit.Broadcast(CharactersSuccessfullyHit);
+
+		switch (ActiveSkill->DamageType)
+		{
+		case EDamageType::Physical:
+			OnSuccessfulPhysicalAttack.Broadcast(CharactersSuccessfullyHit);
+			break;
+		case EDamageType::Magickal:
+			OnSuccessfulMagickAttack.Broadcast(CharactersSuccessfullyHit);
+			break;
+		default:
+			break;
+		}
+
+		if (CharactersHitWithCriticalDamage.Num() > 0)
+		{
+			OnCriticalHit.Broadcast(CharactersHitWithCriticalDamage);
+		}
+	}
+}
+
+int32 AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
+{
+	//~ @todo crowd control effects
+
+	FSkill* HitBySkill = EODDamage.Instigator->GetCurrentActiveSkill();
+	AEODCharacterBase* Instigator = EODDamage.Instigator;
+
+	int32 DamageApplied = 0;
+	if (HitBySkill->DamageType == EDamageType::Physical)
+	{
+		int32 PhysicalAttack = Instigator->StatsComp->GetPhysicalAttack();
+		int32 MyPhysicalResistance = this->StatsComp->GetPhysicalResistance();
+		int32 CritBonus = 0;
+		if (EODDamage.bCriticalHit)
+		{
+			CritBonus = PhysicalAttack * UCombatLibrary::PhysicalCritMultiplier + Instigator->StatsComp->GetPhysicalCritBonus();
+		}
+
+		DamageApplied = UCombatLibrary::CalculateDamage(PhysicalAttack + CritBonus, MyPhysicalResistance);
+		this->StatsComp->ModifyCurrentHealth(-DamageApplied);
+	}
+	else if (HitBySkill->DamageType == EDamageType::Magickal)
+	{
+		int32 MagickAttack = Instigator->StatsComp->GetMagickAttack();
+		int32 MyMagickResistance = this->StatsComp->GetMagickResistance();
+		int32 CritBonus = 0;
+		if (EODDamage.bCriticalHit)
+		{
+			CritBonus = MagickAttack * UCombatLibrary::MagickalCritMultiplier + Instigator->StatsComp->GetMagickCritBonus();
+		}
+
+		DamageApplied = UCombatLibrary::CalculateDamage(MagickAttack + CritBonus, MyMagickResistance);
+		this->StatsComp->ModifyCurrentHealth(-DamageApplied);
+	}
+
+	return DamageApplied;
+}
+
 int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
 {
+	// @todo definition
 	return 0;
 }
 
 bool AEODCharacterBase::UseSkill(int32 SkillIndex)
 {
-	return true;
-	// return false;
+	if (CanUseAnySkill())
+	{
+		FSkill* SkillToUse = GetSkill(SkillIndex);
+
+		if (!SkillToUse)
+		{
+			// unable to use skill - return false
+			return false;
+		}
+
+		// SkillToUse->AnimationMontage
+		PlayAnimationMontage(SkillToUse->AnimationMontage, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		CurrentActiveSkill = SkillToUse;
+		return true;
+	}
+
+	return false;
 }
 
 EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 {
-	return EEODTaskStatus();
+	EEODTaskStatus TaskStatus = EEODTaskStatus::Inactive;
+
+	FSkill* SkillToCheck = GetSkill(SkillIndex);
+	if (SkillToCheck == CurrentActiveSkill)
+	{
+		return EEODTaskStatus::Active;
+	}
+
+	if (GetLastUsedSkill().LastUsedSkill != CurrentActiveSkill)
+	{
+		return EEODTaskStatus::Inactive;
+	}
+
+	if (GetLastUsedSkill().bInterrupted)
+	{
+		return EEODTaskStatus::Aborted;
+	}
+	else
+	{
+		return EEODTaskStatus::Finished;
+	}
 }
 
 void AEODCharacterBase::ApplyStun(float Duration)
 {
 }
 
-FSkill * AEODCharacterBase::GetCurrentActiveSkill()
+FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
 {
 	return CurrentActiveSkill;
 }
 
-void AEODCharacterBase::SetCharacterState(ECharacterState NewState)
+FSkill * AEODCharacterBase::GetSkill(int32 SkillIndex) const
+{
+	if (Skills.Num() > SkillIndex)
+	{
+		return Skills[SkillIndex];
+	}
+
+	return nullptr;
+}
+
+FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
+{
+	return LastUsedSkillInfo;
+}
+
+void AEODCharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
+{
+}
+
+void AEODCharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
+{
+}
+
+void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
 {
 	CharacterState = NewState;
 
@@ -148,7 +400,7 @@ bool AEODCharacterBase::Server_SetCharacterState_Validate(ECharacterState NewSta
 	return true;
 }
 
-void AEODCharacterBase::SetWalkSpeed(float WalkSpeed)
+void AEODCharacterBase::SetWalkSpeed(const float WalkSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	
@@ -158,7 +410,7 @@ void AEODCharacterBase::SetWalkSpeed(float WalkSpeed)
 	}
 }
 
-void AEODCharacterBase::SetCharacterRotation(FRotator NewRotation)
+void AEODCharacterBase::SetCharacterRotation(const FRotator NewRotation)
 {
 	GetCharacterMovement()->FlushServerMoves();
 	SetActorRotation(NewRotation);
@@ -169,7 +421,7 @@ void AEODCharacterBase::SetCharacterRotation(FRotator NewRotation)
 	}
 }
 
-void AEODCharacterBase::SetUseControllerRotationYaw(bool bNewBool)
+void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)
 {
 	bUseControllerRotationYaw = bNewBool;
 
@@ -304,25 +556,66 @@ bool AEODCharacterBase::CanBeStunned() const
 	return false;
 }
 
+bool AEODCharacterBase::CanUseAnySkill() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanUseSkill(int32 SkillIndex) const
+{
+	return false;
+}
+
 bool AEODCharacterBase::CanDodge() const
 {
 	return CharacterState == ECharacterState::IdleWalkRun;
 }
 
-/*
-void AEODCharacterBase::AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo)
+EFaction AEODCharacterBase::GetFaction() const
 {
-	// @todo definition
+	return Faction;
 }
 
-void AEODCharacterBase::RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo)
+ECharacterState AEODCharacterBase::GetCharacterState() const
 {
-	// @todo definition
+	return CharacterState;
 }
-*/
+
+bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision, float RotationRate)
+{
+	float CurrentYaw = GetActorRotation().Yaw;
+	float YawDiff = FMath::FindDeltaAngleDegrees(CurrentYaw, DesiredYaw);
+	if (FMath::Abs(YawDiff) < Precision)
+	{
+		return true;
+	}
+
+	float Multiplier = YawDiff / FMath::Abs(YawDiff);
+	float RotateBy = Multiplier * RotationRate * DeltaTime;
+	if (FMath::Abs(YawDiff) <= FMath::Abs(RotateBy))
+	{
+		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+		return true;
+	}
+	else if (FMath::Abs(YawDiff) <= FMath::Abs(RotateBy) + Precision)
+	{
+		SetCharacterRotation(FRotator(0.f, CurrentYaw + RotateBy, 0.f));
+		return true;
+	}
+	else
+	{
+		SetCharacterRotation(FRotator(0.f, CurrentYaw + RotateBy, 0.f));
+		return false;
+	}
+}
 
 void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+}
+
+void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
+{
+	//~ @todo : Cleanup old state
 }

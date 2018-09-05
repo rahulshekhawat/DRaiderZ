@@ -29,6 +29,29 @@ enum class ECharMovementDirection : uint8
 	BR 		UMETA(DisplayName = "Backward Right"),
 };
 
+/*
+UENUM(BlueprintType)
+enum class ESpecies : uint8
+{
+	Human,
+	Ghoul,
+	Skeleton,
+	Yeti,
+	Troll,
+	Ogre,
+};
+*/
+
+UENUM(BlueprintType)
+enum class EFaction : uint8
+{
+	Rendel_Commoner, // People of rendel kingdom
+	Rendel_Soldier,
+	Undead,
+	Corrupted,
+	Player,
+};
+
 UENUM(BlueprintType)
 enum class ECharacterGender : uint8
 {
@@ -313,9 +336,9 @@ public:
 
 	uint8 CurrentSkillLevel;
 
-	FName SkillID;
+	FName SkillID; // What was this for?
 
-	FName AnimationMontageSectionName;
+	// FName AnimationMontageSectionName;
 
 	UTexture* Icon;
 
@@ -338,6 +361,10 @@ public:
 
 	FSkillLevelUpInfo SkillLevelUpInfo;
 
+	FSkill();
+
+	FSkill(FSkillTableRow* SkillTableRow);
+
 };
 
 /**
@@ -357,11 +384,11 @@ public:
 	/** Returns player animation references based on the EWeaponAnimationType of player */
 	static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType, ECharacterGender Gender = ECharacterGender::Female);
 
-	// static FPlayerAnimationReferences* GetPlayerAnimationReferences(const FName AnimationID);
-
 	/** Attempts to unload player animation references, returns true if successful */
 	static bool UnloadPlayerAnimationReferences(FPlayerAnimationReferences* PlayerAnimationReferences, ECharacterGender Gender = ECharacterGender::Female);
 
 	static bool AreEnemies(AEODCharacterBase* CharacterOne, AEODCharacterBase* CharacterTwo);
+
+	static void GetAllAICharacterSkills(const FString& CharacterName, const UDataTable* SkillsDataTable, TArray<FSkill*> &OutSkills);
 
 };

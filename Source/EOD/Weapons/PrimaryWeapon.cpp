@@ -170,7 +170,7 @@ void APrimaryWeapon::OnUnEquip()
 	// @todo reset weapon stats
 
 	// If owning player doesn't have a dagger equipped as secondary weapon then update player animation references to 'no weapon equipped'
-	if (OwningPlayer && OwningPlayer->SecondaryWeapon && OwningPlayer->SecondaryWeapon->WeaponType != EWeaponType::Dagger)
+	if (OwningPlayer && OwningPlayer->GetSecondaryWeapon() && OwningPlayer->GetSecondaryWeapon()->WeaponType != EWeaponType::Dagger)
 	{
 		OwningPlayer->UpdateEquippedWeaponAnimationReferences(EWeaponType::None);
 	}

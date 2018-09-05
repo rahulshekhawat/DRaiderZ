@@ -16,6 +16,8 @@ class EOD_API UBTTask_EODMoveTo : public UBTTask_MoveTo
 	
 public:
 
+	UBTTask_EODMoveTo(const FObjectInitializer& ObjectInitializer);
+
 	/** Notify called after GameplayTask changes state to Active (initial activation or resuming) */
 	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
 
