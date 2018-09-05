@@ -37,6 +37,8 @@ public:
 	/** Spawn default weapon(s) */
 	virtual void PostInitializeComponents() override;
 
+	virtual void PostInitProperties() override;
+
 #if WITH_EDITOR
 	/**
 	 * Detects changes to EditorArmorID and EditorWeaponID properties.

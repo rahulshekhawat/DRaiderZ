@@ -73,12 +73,6 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	// bIsBlockingDamage = false;
 
 	MaxNumberOfSkills = 30;
-	
-	for (int i = 0; i < MaxNumberOfSkills; i++)
-	{
-		EventsOnSuccessfulSkillAttack.Add(FCombatEvent());
-		EventsOnUsingSkill.Add(FCombatEvent());
-	}
 
 	Faction = EFaction::Player;
 }
@@ -192,6 +186,17 @@ void APlayerCharacter::PostInitializeComponents()
 	if (PrimaryWeaponID != NAME_None)
 	{
 		SetCurrentPrimaryWeapon(PrimaryWeaponID);
+	}
+}
+
+void APlayerCharacter::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	for (int i = 0; i < MaxNumberOfSkills; i++)
+	{
+		EventsOnSuccessfulSkillAttack.Add(FCombatEvent());
+		EventsOnUsingSkill.Add(FCombatEvent());
 	}
 }
 
