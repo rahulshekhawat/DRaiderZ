@@ -222,7 +222,7 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 		HitCharacter->ApplyEODDamage(EODDamage);
 	}
 
-	if (bEnemyHit)
+	if (!bEnemyHit)
 	{
 		OnUnsuccessfulHit.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
 	}
