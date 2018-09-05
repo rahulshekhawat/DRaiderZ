@@ -11,6 +11,8 @@ UStatusEffectBase::UStatusEffectBase(const FObjectInitializer& ObjectInitializer
 {
 	bTriggersOnReceivingHit				= false;
 	bTriggersOnSuccessfulHit			= false;
+	bTriggersOnSuccessfulPhysicalAttack = false;
+	bTriggersOnSuccessfulMagickAttack	= false;
 	bTriggersOnUnsuccessfulHit			= false;
 	bTriggersOnCriticalHit				= false;
 	bTriggersOnSuccessfulDodge			= false;
