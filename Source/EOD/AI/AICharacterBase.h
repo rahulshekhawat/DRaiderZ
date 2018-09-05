@@ -18,6 +18,9 @@ public:
 
 	AAICharacterBase(const FObjectInitializer& ObjectInitializer);
 
+	/** Called once this actor has been deleted */
+	virtual void Destroyed() override;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AIMovement)
 	float MaxWalkSpeedInCombat;
 
