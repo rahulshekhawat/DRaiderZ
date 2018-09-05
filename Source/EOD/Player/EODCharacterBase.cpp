@@ -132,7 +132,7 @@ bool AEODCharacterBase::IsDodging() const
 
 bool AEODCharacterBase::IsDodgingDamage() const
 {
-	return false;
+	return true;
 }
 
 bool AEODCharacterBase::NeedsHeal() const
