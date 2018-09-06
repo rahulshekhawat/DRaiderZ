@@ -257,6 +257,17 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (IsLocallyControlled())
 	{
+		// If block key is pressed but the character is not blocking
+		if (bBlockPressed && !IsBlocking() && CanBlock())
+		{
+			EnableBlock();
+		}
+		// If block is not pressed but character is blocking
+		else if (!bBlockPressed && IsBlocking())
+		{
+			DisableBlock();
+		}
+
 		if (IsIdle())
 		{
 			UpdateIdleState(DeltaTime);
@@ -327,6 +338,12 @@ bool APlayerCharacter::CanDodge() const
 
 	return false;
 	// @todo add UsingSkill, Looting, Interacting, etc. to this too
+}
+
+bool APlayerCharacter::CanBlock() const
+{
+	return (Super::CanBlock() || IsAutoRunning()) &&
+		!(CurrentWeaponAnimationToUse == EWeaponAnimationType::NoWeapon || CurrentWeaponAnimationToUse == EWeaponAnimationType::SheathedWeapon);
 }
 
 bool APlayerCharacter::CanNormalAttack() const
@@ -472,22 +489,15 @@ void APlayerCharacter::OnReleasedBlock()
 
 void APlayerCharacter::EnableBlock()
 {
-	if (CanBlock())
-	{
-		SetCharacterState(ECharacterState::Blocking);
-		SetUseControllerRotationYaw(true);
-		SetWalkSpeed(BaseBlockMovementSpeed * StatsComp->GetMovementSpeedModifier());
-	}
+	SetCharacterState(ECharacterState::Blocking);
+	SetUseControllerRotationYaw(true);
+	SetWalkSpeed(BaseBlockMovementSpeed * StatsComp->GetMovementSpeedModifier());
 }
 
 void APlayerCharacter::DisableBlock()
 {
 	SetUseControllerRotationYaw(false);
-
-	if (IsBlocking())
-	{
-		SetCharacterState(ECharacterState::IdleWalkRun);
-	}
+	SetCharacterState(ECharacterState::IdleWalkRun);
 }
 
 void APlayerCharacter::OnJump()

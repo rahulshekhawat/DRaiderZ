@@ -554,7 +554,7 @@ bool AEODCharacterBase::CanJump() const
 
 bool AEODCharacterBase::CanBlock() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun;
+	return IsIdleOrMoving();
 }
 
 bool AEODCharacterBase::CanRespawn() const

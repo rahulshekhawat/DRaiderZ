@@ -105,6 +105,9 @@ public:
 	/** Returns true if character can dodge */
 	virtual bool CanDodge() const override;
 
+	/** Returns true if character can block */
+	virtual bool CanBlock() const override;
+
 	/** Returns true if character can use normal attack */
 	virtual bool CanNormalAttack() const override;
 
