@@ -22,14 +22,23 @@ void UPlayerStatsComponent::PostInitProperties()
 {
 	Super::PostInitProperties();
 
+	
 }
 
 void UPlayerStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//~ Initialize current variables
 	ModifyMaxHealth(BaseHealth);
 	ModifyCurrentHealth(BaseHealth);
+
+	ModifyMaxMana(BaseMana);
+	ModifyCurrentMana(BaseMana);
+
+	ModifyMaxStamina(BaseStamina);
+	ModifyCurrentStamina(BaseStamina);
+
 }
 
 void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -115,7 +124,7 @@ void UPlayerStatsComponent::ModifyCurrentHealth(int32 Value)
 {
 	CurrentHealth += Value;
 
-	// @todo only modify HUDwidget if the OwningPlayer is local player
+	// Only local player will have HUDWidget
 	if (OwningPlayer && OwningPlayer->GetHUDWidget() && MaxHealth != 0)
 	{
 		float Percent = (float)CurrentHealth / (float)MaxHealth;
@@ -156,6 +165,13 @@ void UPlayerStatsComponent::ModifyMaxMana(int32 Value)
 void UPlayerStatsComponent::ModifyCurrentMana(int32 Value)
 {
 	CurrentMana += Value;
+
+	// Only local player will have HUDWidget
+	if (OwningPlayer && OwningPlayer->GetHUDWidget() && MaxMana != 0)
+	{
+		float Percent = (float)CurrentMana / (float)MaxMana;
+		OwningPlayer->GetHUDWidget()->ManaBar->SetPercent(Percent);
+	}
 }
 
 int32 UPlayerStatsComponent::GetBaseStamina() const
@@ -186,6 +202,13 @@ void UPlayerStatsComponent::ModifyMaxStamina(int32 Value)
 void UPlayerStatsComponent::ModifyCurrentStamina(int32 Value)
 {
 	CurrentStamina += Value;
+
+	// Only local player will have HUDWidget
+	if (OwningPlayer && OwningPlayer->GetHUDWidget() && MaxStamina != 0)
+	{
+		float Percent = (float)CurrentStamina / (float)MaxStamina;
+		OwningPlayer->GetHUDWidget()->StaminaBar->SetPercent(Percent);
+	}
 }
 
 int32 UPlayerStatsComponent::GetHealthRegenRate() const

@@ -189,6 +189,9 @@ private:
 
 	const int CameraArmMaximumLength = 500;
 
+	UPROPERTY(EditDefaultsOnly, Category = ActionCost)
+	int StaminaCost_Dodge;
+
 	// bool bHasActiveiframes;
 
 	// bool bIsBlockingDamage;
@@ -232,6 +235,8 @@ private:
 	/** Determines whether weapon is currently sheathed or not */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_WeaponSheathed)
 	bool bWeaponSheathed;
+
+	FTimerHandle DodgeTimerHandle;
 
 	/** A reference to player anim instance */
 	UPlayerAnimInstance* PlayerAnimInstance;

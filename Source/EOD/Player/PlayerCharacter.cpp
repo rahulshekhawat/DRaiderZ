@@ -73,6 +73,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	// bIsBlockingDamage = false;
 
 	MaxNumberOfSkills = 30;
+	StaminaCost_Dodge = 20;
 
 	Faction = EFaction::Player;
 }
@@ -280,7 +281,7 @@ void APlayerCharacter::BeginPlay()
 	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
 	//~ Player HUD
-	if (Controller && Controller->IsLocalPlayerController() && BP_HUDWidget.Get())
+	if (IsLocallyControlled() && BP_HUDWidget.Get())
 	{
 		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), BP_HUDWidget);
 		if (HUDWidget)
@@ -314,7 +315,15 @@ bool APlayerCharacter::CanJump() const
 
 bool APlayerCharacter::CanDodge() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun || IsBlocking() || IsCastingSpell();
+	int32 DodgeCost = StaminaCost_Dodge / StatsComp->GetStaminaConsumptionModifier();
+
+	if (StatsComp->GetCurrentStamina() >= DodgeCost &&
+		(IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking()))
+	{
+		return true;
+	}
+
+	return false;
 	// @todo add UsingSkill, Looting, Interacting, etc. to this too
 }
 
@@ -394,12 +403,17 @@ void APlayerCharacter::ZoomOutCamera()
 
 void APlayerCharacter::OnDodge()
 {
-	if (CanDodge() && PlayerAnimInstance && GetActiveAnimationReferences())
+	if (CanDodge() && PlayerAnimInstance && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_Dodge)
 	{
+		int32 DodgeCost = StaminaCost_Dodge / StatsComp->GetStaminaConsumptionModifier();
+		StatsComp->ModifyCurrentStamina(-DodgeCost);
+
+		// @todo dodge damage 
+
 		float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
 		float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
 		float DesiredPlayerRotationYaw = GetPlayerControlRotationYaw();
-		
+
 		if (ForwardAxisValue != 0)
 		{
 			DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
