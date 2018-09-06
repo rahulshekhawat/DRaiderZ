@@ -150,6 +150,12 @@ public:
 	UFUNCTION()
 	virtual void DisableiFrames();
 
+	UFUNCTION()
+	virtual void EnableDamageBlocking();
+
+	UFUNCTION()
+	virtual void DisableDamageBlocking();
+
 	/**
 	 * Kills this character 
 	 * @param CauseOfDeath - The reason for death of this character
@@ -294,6 +300,8 @@ protected:
 	FLastUsedSkillInfo LastUsedSkillInfo;
 
 	FTimerHandle DodgeTimerHandle;
+
+	FTimerHandle BlockTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Rotation)
 	float CharacterRotationPrecision;

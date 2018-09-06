@@ -195,6 +195,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dodge)
 	float Dodge_iFrameEndTime;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Block)
+	float BlockDelay;
+
 private:
 
 	const int CameraZoomRate = 15;

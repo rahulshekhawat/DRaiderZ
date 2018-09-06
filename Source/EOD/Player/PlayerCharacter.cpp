@@ -74,8 +74,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	MaxNumberOfSkills = 30;
 	StaminaCost_Dodge = 20;
-	Dodge_iFrameStartTime = 0.1;
-	Dodge_iFrameEndTime = 0.5;
+	Dodge_iFrameStartTime = 0.1f;
+	Dodge_iFrameEndTime = 0.5f;
+	BlockDelay = 0.1f;
 
 	Faction = EFaction::Player;
 }
@@ -492,12 +493,16 @@ void APlayerCharacter::EnableBlock()
 	SetCharacterState(ECharacterState::Blocking);
 	SetUseControllerRotationYaw(true);
 	SetWalkSpeed(BaseBlockMovementSpeed * StatsComp->GetMovementSpeedModifier());
+
+	FTimerHandle TimerDelegate;
+	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, BlockDelay, false);
 }
 
 void APlayerCharacter::DisableBlock()
 {
 	SetUseControllerRotationYaw(false);
 	SetCharacterState(ECharacterState::IdleWalkRun);
+	DisableDamageBlocking();
 }
 
 void APlayerCharacter::OnJump()

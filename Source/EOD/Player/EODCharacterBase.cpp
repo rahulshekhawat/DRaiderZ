@@ -368,6 +368,16 @@ void AEODCharacterBase::DisableiFrames()
 	bHasActiveiFrames = false;
 }
 
+void AEODCharacterBase::EnableDamageBlocking()
+{
+	bIsBlockingDamage = true;
+}
+
+void AEODCharacterBase::DisableDamageBlocking()
+{
+	bIsBlockingDamage = false;
+}
+
 FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
 {
 	return CurrentActiveSkill;
