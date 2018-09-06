@@ -144,6 +144,13 @@ public:
 	/** [server + client] Applies stun to this character */
 	virtual void ApplyStun(float Duration);
 
+	/**
+	 * Kills this character 
+	 * @param CauseOfDeath - The reason for death of this character
+	 * @param Instigator - The character that instigated the death of this character (if any)
+	 */
+	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* Instigator = nullptr);
+
 	/** Set whether character is in combat or not */
 	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; }
 
@@ -285,6 +292,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	EFaction Faction;
+
+	/** True if character is in God Mode */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GodMode)
+	bool bGodMode;
 	
 	/** Character state determines the current action character is doing */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)

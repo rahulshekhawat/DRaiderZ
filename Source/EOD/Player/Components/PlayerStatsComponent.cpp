@@ -13,6 +13,7 @@ UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectIni
 	RemoveCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 
 	MovementSpeedModifier = 1.f;
+	StaminaConsumptionModifier = 1.f;
 
 	OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 }

@@ -22,6 +22,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	CharacterState = ECharacterState::IdleWalkRun;
 
 	CurrentActiveSkill = nullptr;
+	bGodMode = false;
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
@@ -574,6 +575,28 @@ bool AEODCharacterBase::CanDodge() const
 EFaction AEODCharacterBase::GetFaction() const
 {
 	return Faction;
+}
+
+void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * Instigator)
+{
+	if (bGodMode || IsDead())
+	{
+		// cannot die
+		return;
+	}
+
+	if (CauseOfDeath == ECauseOfDeath::ZeroHP)
+	{
+
+	}
+	else
+	{
+		// Set current hp to 0
+		StatsComp->ModifyBaseHealth(-StatsComp->GetMaxHealth());
+		SetCharacterState(ECharacterState::Dead);
+
+		// @todo play death animation and death sound
+	}
 }
 
 ECharacterState AEODCharacterBase::GetCharacterState() const
