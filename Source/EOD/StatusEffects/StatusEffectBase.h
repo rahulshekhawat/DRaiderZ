@@ -162,6 +162,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnSuccessfulPhysicalAttack : 1;
 
+	/** True if the status effect triggers if owner kills an enemy */
+	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	uint32 bTriggersOnKillingEnemy : 1;
+
 	/** True if the status effect triggers on Owner failing to land an attack on enemy */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnUnsuccessfulHit : 1;

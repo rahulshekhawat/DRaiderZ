@@ -255,6 +255,8 @@ protected:
 
 	FCombatEvent OnCriticalHit;
 
+	FCombatEvent OnKillingEnemy;
+
 	FCombatEvent OnSuccessfulDodge;
 
 	FCombatEvent OnSuccessfulBlock;
