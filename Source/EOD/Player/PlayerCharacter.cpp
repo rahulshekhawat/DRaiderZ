@@ -74,6 +74,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	MaxNumberOfSkills = 30;
 	StaminaCost_Dodge = 20;
+	Dodge_iFrameStartTime = 0.1;
+	Dodge_iFrameEndTime = 0.5;
 
 	Faction = EFaction::Player;
 }
@@ -408,8 +410,6 @@ void APlayerCharacter::OnDodge()
 		int32 DodgeCost = StaminaCost_Dodge / StatsComp->GetStaminaConsumptionModifier();
 		StatsComp->ModifyCurrentStamina(-DodgeCost);
 
-		// @todo dodge damage 
-
 		float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
 		float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
 		float DesiredPlayerRotationYaw = GetPlayerControlRotationYaw();
@@ -447,6 +447,16 @@ void APlayerCharacter::OnDodge()
 				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
 			}
 		}
+
+		if (GetWorld()->GetTimerManager().IsTimerActive(DodgeTimerHandle))
+		{
+			DisableiFrames();
+		}
+		
+		FTimerDelegate TimerDelegate;
+		float iFrameDuration = Dodge_iFrameEndTime - Dodge_iFrameStartTime;
+		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), iFrameDuration);
+		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, TimerDelegate, Dodge_iFrameStartTime, false);
 	}
 }
 

@@ -144,6 +144,12 @@ public:
 	/** [server + client] Applies stun to this character */
 	virtual void ApplyStun(float Duration);
 
+	UFUNCTION()
+	virtual void EnableiFrames(float Duration = 0.f);
+
+	UFUNCTION()
+	virtual void DisableiFrames();
+
 	/**
 	 * Kills this character 
 	 * @param CauseOfDeath - The reason for death of this character
@@ -287,6 +293,8 @@ protected:
 
 	FLastUsedSkillInfo LastUsedSkillInfo;
 
+	FTimerHandle DodgeTimerHandle;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Rotation)
 	float CharacterRotationPrecision;
 
@@ -304,6 +312,14 @@ protected:
 	/** Determines whether character is currently engaged in combat or not */
 	UPROPERTY(Transient)
 	bool bInCombat;	
+
+	/** Determines if invincibility frames are active */
+	UPROPERTY(Transient)
+	bool bHasActiveiFrames;
+
+	/** Determines if character is blocking any incoming damage */
+	UPROPERTY(Transient)
+	bool bIsBlockingDamage;
 
 private:
 	

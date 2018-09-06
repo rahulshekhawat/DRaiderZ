@@ -39,6 +39,8 @@ void UPlayerStatsComponent::BeginPlay()
 	ModifyMaxStamina(BaseStamina);
 	ModifyCurrentStamina(BaseStamina);
 
+	// @todo load damage and resistance stats
+
 }
 
 void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

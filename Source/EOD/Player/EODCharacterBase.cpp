@@ -133,7 +133,7 @@ bool AEODCharacterBase::IsDodging() const
 
 bool AEODCharacterBase::IsDodgingDamage() const
 {
-	return false;
+	return bHasActiveiFrames;
 }
 
 bool AEODCharacterBase::NeedsHeal() const
@@ -351,6 +351,21 @@ EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 
 void AEODCharacterBase::ApplyStun(float Duration)
 {
+}
+
+void AEODCharacterBase::EnableiFrames(float Duration)
+{
+	bHasActiveiFrames = true;
+
+	if (Duration > 0)
+	{
+		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, this, &AEODCharacterBase::DisableiFrames, Duration, false);
+	}
+}
+
+void AEODCharacterBase::DisableiFrames()
+{
+	bHasActiveiFrames = false;
 }
 
 FSkill * AEODCharacterBase::GetCurrentActiveSkill() const

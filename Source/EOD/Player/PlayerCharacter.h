@@ -181,6 +181,17 @@ public:
 
 	void UpdateCurrentWeaponAnimationType();
 
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dodge)
+	int StaminaCost_Dodge;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dodge)
+	float Dodge_iFrameStartTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dodge)
+	float Dodge_iFrameEndTime;
+
 private:
 
 	const int CameraZoomRate = 15;
@@ -188,13 +199,6 @@ private:
 	const int CameraArmMinimumLength = 50;
 
 	const int CameraArmMaximumLength = 500;
-
-	UPROPERTY(EditDefaultsOnly, Category = ActionCost)
-	int StaminaCost_Dodge;
-
-	// bool bHasActiveiframes;
-
-	// bool bIsBlockingDamage;
 
 	TArray<FCombatEvent> EventsOnUsingSkill;
 
@@ -235,8 +239,6 @@ private:
 	/** Determines whether weapon is currently sheathed or not */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_WeaponSheathed)
 	bool bWeaponSheathed;
-
-	FTimerHandle DodgeTimerHandle;
 
 	/** A reference to player anim instance */
 	UPlayerAnimInstance* PlayerAnimInstance;
