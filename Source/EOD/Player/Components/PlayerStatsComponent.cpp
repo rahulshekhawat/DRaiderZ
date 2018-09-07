@@ -112,26 +112,24 @@ int32 UPlayerStatsComponent::GetCurrentHealth() const
 	return CurrentHealth;
 }
 
-void UPlayerStatsComponent::ModifyBaseHealth(int32 Value)
+int32 UPlayerStatsComponent::ModifyBaseHealth(int32 Value)
 {
 	BaseHealth += Value;
+	return BaseHealth;
 }
 
-void UPlayerStatsComponent::ModifyMaxHealth(int32 Value)
+int32 UPlayerStatsComponent::ModifyMaxHealth(int32 Value)
 {
 	MaxHealth += Value;
+	return MaxHealth;
 }
 
-void UPlayerStatsComponent::ModifyCurrentHealth(int32 Value)
+int32 UPlayerStatsComponent::ModifyCurrentHealth(int32 Value)
 {
+	// SetCurrentHealth()
 	CurrentHealth += Value;
-
-	// Only local player will have HUDWidget
-	if (OwningPlayer && OwningPlayer->GetHUDWidget() && MaxHealth != 0)
-	{
-		float Percent = (float)CurrentHealth / (float)MaxHealth;
-		OwningPlayer->GetHUDWidget()->HealthBar->SetPercent(Percent);
-	}
+	// UpdatePlayerHealthBar();
+	return CurrentHealth;
 }
 
 bool UPlayerStatsComponent::IsLowOnHealth() const
@@ -154,17 +152,19 @@ int32 UPlayerStatsComponent::GetCurrentMana() const
 	return CurrentMana;
 }
 
-void UPlayerStatsComponent::ModifyBaseMana(int32 Value)
+int32 UPlayerStatsComponent::ModifyBaseMana(int32 Value)
 {
 	BaseMana += Value;
+	return BaseMana;
 }
 
-void UPlayerStatsComponent::ModifyMaxMana(int32 Value)
+int32 UPlayerStatsComponent::ModifyMaxMana(int32 Value)
 {
 	MaxMana += Value;
+	return MaxMana;
 }
 
-void UPlayerStatsComponent::ModifyCurrentMana(int32 Value)
+int32 UPlayerStatsComponent::ModifyCurrentMana(int32 Value)
 {
 	CurrentMana += Value;
 
@@ -174,6 +174,8 @@ void UPlayerStatsComponent::ModifyCurrentMana(int32 Value)
 		float Percent = (float)CurrentMana / (float)MaxMana;
 		OwningPlayer->GetHUDWidget()->ManaBar->SetPercent(Percent);
 	}
+
+	return CurrentMana;
 }
 
 int32 UPlayerStatsComponent::GetBaseStamina() const
@@ -191,17 +193,19 @@ int32 UPlayerStatsComponent::GetCurrentStamina() const
 	return CurrentStamina;
 }
 
-void UPlayerStatsComponent::ModifyBaseStamina(int32 Value)
+int32 UPlayerStatsComponent::ModifyBaseStamina(int32 Value)
 {
 	BaseStamina += Value;
+	return BaseStamina;
 }
 
-void UPlayerStatsComponent::ModifyMaxStamina(int32 Value)
+int32 UPlayerStatsComponent::ModifyMaxStamina(int32 Value)
 {
 	MaxStamina += Value;
+	return MaxStamina;
 }
 
-void UPlayerStatsComponent::ModifyCurrentStamina(int32 Value)
+int32 UPlayerStatsComponent::ModifyCurrentStamina(int32 Value)
 {
 	CurrentStamina += Value;
 
@@ -211,6 +215,8 @@ void UPlayerStatsComponent::ModifyCurrentStamina(int32 Value)
 		float Percent = (float)CurrentStamina / (float)MaxStamina;
 		OwningPlayer->GetHUDWidget()->StaminaBar->SetPercent(Percent);
 	}
+
+	return CurrentStamina;
 }
 
 int32 UPlayerStatsComponent::GetHealthRegenRate() const
@@ -258,12 +264,12 @@ float UPlayerStatsComponent::GetMagickCritRate() const
 	return MagickCritRate;
 }
 
-float UPlayerStatsComponent::GetPhysicalCritBonus() const
+int32 UPlayerStatsComponent::GetPhysicalCritBonus() const
 {
 	return PhysicalCritBonus;
 }
 
-float UPlayerStatsComponent::GetMagickCritBonus() const
+int32 UPlayerStatsComponent::GetMagickCritBonus() const
 {
 	return MagickCritBonus;
 }
@@ -408,9 +414,10 @@ float UPlayerStatsComponent::GetActiveTimeDilation() const
 	return ActiveTimeDilation;
 }
 
-void UPlayerStatsComponent::ModifyActiveTimeDilation(float Value)
+float UPlayerStatsComponent::ModifyActiveTimeDilation(float Value)
 {
 	ActiveTimeDilation += Value;
+	return ActiveTimeDilation;
 }
 
 float UPlayerStatsComponent::GetSpellCastingSpeedModifier() const
@@ -422,3 +429,15 @@ int32 UPlayerStatsComponent::GetDarkness() const
 {
 	return Darkness;
 }
+
+/*
+FORCEINLINE void UPlayerStatsComponent::UpdatePlayerHealthBar() const
+{
+	// Only local player will have HUDWidget
+	if (OwningPlayer && OwningPlayer->GetHUDWidget() && MaxHealth != 0)
+	{
+		float Percent = (float)CurrentHealth / (float)MaxHealth;
+		OwningPlayer->GetHUDWidget()->HealthBar->SetPercent(Percent);
+	}
+}
+*/

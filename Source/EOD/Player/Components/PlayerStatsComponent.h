@@ -34,11 +34,11 @@ public:
 
 	virtual int32 GetCurrentHealth() const override;
 
-	virtual void ModifyBaseHealth(int32 Value) override;
+	virtual int32 ModifyBaseHealth(int32 Value) override;
 
-	virtual void ModifyMaxHealth(int32 Value) override;
+	virtual int32 ModifyMaxHealth(int32 Value) override;
 
-	virtual void ModifyCurrentHealth(int32 Value) override;
+	virtual int32 ModifyCurrentHealth(int32 Value) override;
 
 	virtual bool IsLowOnHealth() const override;
 
@@ -48,11 +48,11 @@ public:
 
 	virtual int32 GetCurrentMana() const override;
 	
-	virtual void ModifyBaseMana(int32 Value) override;
+	virtual int32 ModifyBaseMana(int32 Value) override;
 
-	virtual void ModifyMaxMana(int32 Value) override;
+	virtual int32 ModifyMaxMana(int32 Value) override;
 
-	virtual void ModifyCurrentMana(int32 Value) override;
+	virtual int32 ModifyCurrentMana(int32 Value) override;
 	
 	virtual int32 GetBaseStamina() const override;
 
@@ -60,11 +60,11 @@ public:
 
 	virtual int32 GetCurrentStamina() const override;
 	
-	virtual void ModifyBaseStamina(int32 Value) override;
+	virtual int32 ModifyBaseStamina(int32 Value) override;
 
-	virtual void ModifyMaxStamina(int32 Value) override;
+	virtual int32 ModifyMaxStamina(int32 Value) override;
 
-	virtual void ModifyCurrentStamina(int32 Value) override;
+	virtual int32 ModifyCurrentStamina(int32 Value) override;
 
 	virtual int32 GetHealthRegenRate() const override;
 
@@ -84,9 +84,9 @@ public:
 
 	virtual float GetMagickCritRate() const override;
 
-	virtual float GetPhysicalCritBonus() const override;
+	virtual int32 GetPhysicalCritBonus() const override;
 
-	virtual float GetMagickCritBonus() const override;
+	virtual int32 GetMagickCritBonus() const override;
 
 	virtual int32 GetElementalFireResistance() const override;
 	
@@ -144,7 +144,7 @@ public:
 	
 	virtual float GetActiveTimeDilation() const override;
 
-	virtual void ModifyActiveTimeDilation(float Value) override;
+	virtual float ModifyActiveTimeDilation(float Value) override;
 
 	virtual float GetSpellCastingSpeedModifier() const override;
 
@@ -314,5 +314,7 @@ private:
 	int32 Darkness;
 	
 	APlayerCharacter* OwningPlayer;
+
+	// FORCEINLINE void UpdatePlayerHealthBar() const;
 
 };
