@@ -836,10 +836,12 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 	}
 }
 
+/*
 int32 APlayerCharacter::ApplyEODDamage(FEODDamage& EODDamage)
 {
 	return Super::ApplyEODDamage(EODDamage);
 }
+*/
 
 void APlayerCharacter::Destroyed()
 {

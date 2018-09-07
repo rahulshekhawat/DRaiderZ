@@ -172,7 +172,7 @@ public:
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
 	/** [server] Apply damage to a character */
-	virtual int32 ApplyEODDamage(FEODDamage& EODDamage) override;
+	// virtual int32 ApplyEODDamage(FEODDamage& EODDamage) override;
 
 	/** Called on an animation montage blending out to clean up, reset, or change any state variables */
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted) override;

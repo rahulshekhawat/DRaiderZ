@@ -230,7 +230,7 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 		EODDamage.LineHitResult = LineHitResultToHitCharacter;
 		EODDamage.bCriticalHit = bCriticalHit;
 
-		int32 DamageApplied = HitCharacter->ApplyEODDamage(EODDamage);
+		FEODDamageResult EODDamageResult = HitCharacter->ApplyEODDamage(EODDamage);
 	}
 
 	if (CharactersSuccessfullyHit.Num() == 0)
@@ -260,13 +260,14 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 	}
 }
 
-int32 AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
+FEODDamageResult AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
 {
 	//~ @todo crowd control effects
 
 	FSkill* HitBySkill = EODDamage.Instigator->GetCurrentActiveSkill();
 	AEODCharacterBase* Instigator = EODDamage.Instigator;
 
+	bool bBlockSuccessful = false;
 	float BlockedDamageModifier = 1.f;
 	if (IsBlockingDamage())
 	{
@@ -276,7 +277,7 @@ int32 AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
 		float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
 		if (Angle < 60)
 		{
-			// StatsComp->
+			bBlockSuccessful = true;
 		}
 	}
 
@@ -308,7 +309,8 @@ int32 AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
 		this->StatsComp->ModifyCurrentHealth(-DamageApplied);
 	}
 
-	return DamageApplied;
+	// return DamageApplied;
+	return FEODDamageResult();
 }
 
 int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
