@@ -84,6 +84,16 @@ public:
 	/** Determines whether the hit causes critical damage or not */
 	bool bCriticalHit;
 
+	float CritRate;
+
+	int32 NormalDamage;
+
+	int32 CritDamage;
+
+	EDamageType DamageType;
+
+	ECrowdControlEffect CrowdControlEffect;
+
 	FEODDamage()
 	{
 		bCriticalHit = false;
