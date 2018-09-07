@@ -41,10 +41,10 @@ private:
 
 	static TMap<TWeakObjectPtr<AEODCharacterBase>, float> CharacterToPhysicalDefenseReductionMap;
 
-	static TMap<TWeakObjectPtr<AEODCharacterBase>, float> CharacterToMagickalDefenseReductionMap;
+	static TMap<TWeakObjectPtr<AEODCharacterBase>, float> CharacterToMagickDefenseReductionMap;
 
 	float CalculatePhysicalDefenseReduction(float HolyDamage, float HolyDefense);
 
-	float CalculateMagickalDefenseReduction(float HolyDamage, float HolyDefense);
+	float CalculateMagickDefenseReduction(float HolyDamage, float HolyDefense);
 	
 };
