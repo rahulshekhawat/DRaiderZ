@@ -461,6 +461,4 @@ private:
 	
 	APlayerCharacter* OwningPlayer;
 
-	// FORCEINLINE void UpdatePlayerHealthBar() const;
-
 };
