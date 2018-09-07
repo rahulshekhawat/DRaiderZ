@@ -296,6 +296,18 @@ public:
 
 	virtual void SetDarkness(int32 Value) override;
 
+	virtual float GetPhysicalDamageReductionOnBlock() const override;
+
+	virtual float GetMagickDamageReductionOnBlock() const override;
+
+	virtual float ModifyPhysicalDamageReductionOnBlock(float Value) override;
+
+	virtual float ModifyMagickDamageReductionOnBlock(float Value) override;
+
+	virtual void SetPhysicalDamageReductionOnBlock(float Value) override;
+
+	virtual void SetMagickDamageReductionOnBlock(float Value) override;
+
 private:
 	
 	//~ @note All changes to variables similar to MaxHealth, CurrentHealth, etc. will occur ONLY on server and will automatically get replicated. No RPC needed.
@@ -458,6 +470,12 @@ private:
 
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats)
 	int32 Darkness;
+
+	UPROPERTY(Transient)
+	float PhysicalDamageReductionOnBlock;
+
+	UPROPERTY(Transient)
+	float MagickDamageReductionOnBlock;
 	
 	APlayerCharacter* OwningPlayer;
 

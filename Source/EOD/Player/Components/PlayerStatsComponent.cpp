@@ -914,3 +914,39 @@ void UPlayerStatsComponent::SetDarkness(int32 Value)
 {
 	Darkness = Value;
 }
+
+float UPlayerStatsComponent::GetPhysicalDamageReductionOnBlock() const
+{
+	return PhysicalDamageReductionOnBlock;
+}
+
+float UPlayerStatsComponent::GetMagickDamageReductionOnBlock() const
+{
+	return MagickDamageReductionOnBlock;
+}
+
+float UPlayerStatsComponent::ModifyPhysicalDamageReductionOnBlock(float Value)
+{
+	float Result = PhysicalDamageReductionOnBlock + Value;
+	Result = Result <= 0 ? 0 : Result;
+	SetPhysicalDamageReductionOnBlock(Result);
+	return Result;
+}
+
+float UPlayerStatsComponent::ModifyMagickDamageReductionOnBlock(float Value)
+{
+	float Result = MagickDamageReductionOnBlock + Value;
+	Result = Result <= 0 ? 0 : Result;
+	SetMagickDamageReductionOnBlock(Result);
+	return Result;
+}
+
+void UPlayerStatsComponent::SetPhysicalDamageReductionOnBlock(float Value)
+{
+	PhysicalDamageReductionOnBlock = Value;
+}
+
+void UPlayerStatsComponent::SetMagickDamageReductionOnBlock(float Value)
+{
+	MagickDamageReductionOnBlock = Value;
+}
