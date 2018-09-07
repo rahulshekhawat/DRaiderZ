@@ -40,8 +40,14 @@ public:
 
 	virtual int32 ModifyCurrentHealth(int32 Value) override;
 
-	virtual bool IsLowOnHealth() const override;
+	virtual void SetBaseHealth(int32 Value) override;
 
+	virtual void SetMaxHealth(int32 Value) override;
+
+	virtual void SetCurrentHealth(int32 Value) override;
+
+	virtual bool IsLowOnHealth() const override;
+	
 	virtual int32 GetBaseMana() const override;
 
 	virtual int32 GetMaxMana() const override;
@@ -53,6 +59,12 @@ public:
 	virtual int32 ModifyMaxMana(int32 Value) override;
 
 	virtual int32 ModifyCurrentMana(int32 Value) override;
+
+	virtual void SetBaseMana(int32 Value) override;
+
+	virtual void SetMaxMana(int32 Value) override;
+
+	virtual void SetCurrentMana(int32 Value) override;
 	
 	virtual int32 GetBaseStamina() const override;
 
@@ -66,33 +78,81 @@ public:
 
 	virtual int32 ModifyCurrentStamina(int32 Value) override;
 
+	virtual void SetBaseStamina(int32 Value) override;
+
+	virtual void SetMaxStamina(int32 Value) override;
+
+	virtual void SetCurrentStamina(int32 Value) override;
+
 	virtual int32 GetHealthRegenRate() const override;
+
+	virtual int32 ModifyHealthRegenRate(int32 Value) override;
+
+	virtual void SetHealthRegenRate(int32 Value) override;
 
 	virtual int32 GetManaRegenRate() const override;
 
+	virtual int32 ModifyManaRegenRate(int32 Value) override;
+
+	virtual void SetManaRegenRate(int32 Value) override;
+
 	virtual int32 GetStaminaRegenRate() const override;
+
+	virtual int32 ModifyStaminaRegenRate(int32 Value) override;
+
+	virtual void SetStaminaRegenRate(int32 Value) override;
 
 	virtual int32 GetPhysicalAttack() const override;
 
 	virtual int32 GetMagickAttack() const override;
 
+	virtual int32 ModifyPhysicalAttack(int32 Value) override;
+
+	virtual int32 ModifyMagickAttack(int32 Value) override;
+
+	virtual void SetPhysicalAttack(int32 Value) override;
+
+	virtual void SetMagickAttack(int32 Value) override;
+
 	virtual int32 GetPhysicalResistance() const override;
 
 	virtual int32 GetMagickResistance() const override;
 
+	virtual int32 ModifyPhysicalResistance(int32 Value) override;
+
+	virtual int32 ModifyMagickResistance(int32 Value) override;
+
+	virtual void SetPhysicalResistance(int32 Value) override;
+
+	virtual void SetMagickResistance(int32 Value) override;
+
 	virtual float GetPhysicalCritRate() const override;
 
 	virtual float GetMagickCritRate() const override;
+	
+	virtual float ModifyPhysicalCritRate(float Value) override;
+
+	virtual float ModifyMagickCritRate(float Value) override;
+
+	virtual void SetPhysicalCritRate(float Value) override;
+
+	virtual void SetMagickCritRate(float Value) override;
 
 	virtual int32 GetPhysicalCritBonus() const override;
 
 	virtual int32 GetMagickCritBonus() const override;
+	
+	virtual int32 ModifyPhysicalCritBonus(int32 Value) override;
+
+	virtual int32 ModifyMagickCritBonus(int32 Value) override;
+
+	virtual void SetPhysicalCritBonus(int32 Value) override;
+
+	virtual void SetMagickCritBonus(int32 Value) override;
 
 	virtual int32 GetElementalFireResistance() const override;
 	
 	virtual int32 GetElementalIceResistance() const override;
-	
-	virtual int32 ModifyElementalIceResistance(int32 Value) override;
 	
 	virtual int32 GetElementalLightningResistance() const override;
 	
@@ -101,6 +161,30 @@ public:
 	virtual int32 GetElementalHolyResistance() const override;
 	
 	virtual int32 GetElementalDarkResistance() const override;
+	
+	virtual int32 ModifyElementalFireResistance(int32 Value) override;
+	
+	virtual int32 ModifyElementalIceResistance(int32 Value) override;
+	
+	virtual int32 ModifyElementalLightningResistance(int32 Value) override;
+	
+	virtual int32 ModifyElementalPoisonResistance(int32 Value) override;
+	
+	virtual int32 ModifyElementalHolyResistance(int32 Value) override;
+	
+	virtual int32 ModifyElementalDarkResistance(int32 Value) override;
+	
+	virtual void SetElementalFireResistance(int32 Value) override;
+	
+	virtual void SetElementalIceResistance(int32 Value) override;
+	
+	virtual void SetElementalLightningResistance(int32 Value) override;
+	
+	virtual void SetElementalPoisonResistance(int32 Value) override;
+	
+	virtual void SetElementalHolyResistance(int32 Value) override;
+	
+	virtual void SetElementalDarkResistance(int32 Value) override;
 	
 	virtual int32 GetElementalFireDamage() const override;
 	
@@ -113,17 +197,49 @@ public:
 	virtual int32 GetElementalHolyDamage() const override;
 	
 	virtual int32 GetElementalDarkDamage() const override;
+	
+	virtual int32 ModifyElementalFireDamage(int32 Value) override;
+	
+	virtual int32 ModifyElementalIceDamage(int32 Value) override;
+	
+	virtual int32 ModifyElementalLightningDamage(int32 Value) override;
+	
+	virtual int32 ModifyElementalPoisonDamage(int32 Value) override;
+	
+	virtual int32 ModifyElementalHolyDamage(int32 Value) override;
+	
+	virtual int32 ModifyElementalDarkDamage(int32 Value) override;
+	
+	virtual void SetElementalFireDamage(int32 Value) override;
+	
+	virtual void SetElementalIceDamage(int32 Value) override;
+	
+	virtual void SetElementalLightningDamage(int32 Value) override;
+	
+	virtual void SetElementalPoisonDamage(int32 Value) override;
+	
+	virtual void SetElementalHolyDamage(int32 Value) override;
+	
+	virtual void SetElementalDarkDamage(int32 Value) override;
 
 	virtual int32 GetBleedResistance() const override;
 
 	virtual int32 GetCrowdControlResistance() const override;
 	
+	virtual int32 ModifyBleedResistance(int32 Value) override;
+	
+	virtual int32 ModifyCrowdControlResistance(int32 Value) override;
+	
+	virtual void SetBleedResistance(int32 Value) override;
+	
+	virtual void SetCrowdControlResistance(int32 Value) override;
+
 	virtual void AddCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) override;
-	
+
 	virtual void AddCrowdControlImmunities(uint8 CrowdControlImmunities) override;
-	
+
 	virtual void RemoveCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) override;
-	
+
 	virtual void RemoveCrowdControlImmunities(uint8 CrowdControlImmunities) override;
 
 	virtual void RemoveAllCrowdControlImmunities() override;
@@ -141,14 +257,44 @@ public:
 	virtual float GetStaminaConsumptionModifier() const override;
 
 	virtual float GetMovementSpeedModifier() const override;
-	
+
 	virtual float GetActiveTimeDilation() const override;
-
-	virtual float ModifyActiveTimeDilation(float Value) override;
-
+	
 	virtual float GetSpellCastingSpeedModifier() const override;
+	
+	virtual float ModifyCooldownModifier(float Value) override;
+	
+	virtual float ModifyExpModifier(float Value) override;
+
+	virtual float ModifyDropRateModifier(float Value) override;
+	
+	virtual float ModifyStaminaConsumptionModifier(float Value) override;
+	
+	virtual float ModifyMovementSpeedModifier(float Value) override;
+	
+	virtual float ModifyActiveTimeDilation(float Value) override;
+	
+	virtual float ModifySpellCastingSpeedModifier(float Value) override;
+
+	virtual void SetCooldownModifier(float Value) override;
+	
+	virtual void SetExpModifier(float Value) override;
+	
+	virtual void SetDropRateModifier(float Value) override;
+	
+	virtual void SetStaminaConsumptionModifier(float Value) override;
+	
+	virtual void SetMovementSpeedModifier(float Value) override;
+	
+	virtual void SetActiveTimeDilation(float Value) override;
+	
+	virtual void SetSpellCastingSpeedModifier(float Value) override;
 
 	virtual int32 GetDarkness() const override;
+
+	virtual int32 ModifyDarkness(int32 Value) override;
+
+	virtual void SetDarkness(int32 Value) override;
 
 private:
 	
