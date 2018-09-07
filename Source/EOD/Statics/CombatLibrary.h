@@ -24,6 +24,31 @@ enum class ECrowdControlEffect : uint8
 };
 
 UENUM(BlueprintType)
+enum class ECharacterResponseToDamage : uint8
+{
+	Immune,
+	Blocked,
+	Dodged,
+	Nullified,
+	Damaged
+};
+
+USTRUCT(BlueprintType)
+struct FEODDamageResult
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	ECharacterResponseToDamage CharacterResponseToDamage;
+
+	ECrowdControlEffect CrowdControlEffect;
+
+	uint32 ActualDamage;
+
+};
+
+UENUM(BlueprintType)
 enum class EDamageType : uint8
 {
 	Physical,

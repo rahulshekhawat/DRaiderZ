@@ -29,19 +29,6 @@ enum class ECharMovementDirection : uint8
 	BR 		UMETA(DisplayName = "Backward Right"),
 };
 
-/*
-UENUM(BlueprintType)
-enum class ESpecies : uint8
-{
-	Human,
-	Ghoul,
-	Skeleton,
-	Yeti,
-	Troll,
-	Ogre,
-};
-*/
-
 UENUM(BlueprintType)
 enum class ECauseOfDeath : uint8
 {
@@ -58,6 +45,18 @@ enum class EFaction : uint8
 	Undead,
 	Corrupted,
 	Player,
+};
+
+UENUM(BlueprintType)
+enum class ESpecies : uint8
+{
+	Human,
+	Goblin,
+	Ghoul,
+	Skeleton,
+	Yeti,
+	Troll,
+	Ogre,
 };
 
 UENUM(BlueprintType)
