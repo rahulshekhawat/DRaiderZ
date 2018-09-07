@@ -105,6 +105,9 @@ public:
 	/** Returns true if character can dodge */
 	virtual bool CanDodge() const override;
 
+	/** Returns true if character can block */
+	virtual bool CanBlock() const override;
+
 	/** Returns true if character can use normal attack */
 	virtual bool CanNormalAttack() const override;
 
@@ -123,6 +126,8 @@ public:
 	APrimaryWeapon* GetPrimaryWeapon() const;
 
 	ASecondaryWeapon* GetSecondaryWeapon() const;
+
+	UHUDWidget* GetHUDWidget() const;
 
 	/** Replace primary weapon with a new weapon */
 	void SetCurrentPrimaryWeapon(const FName WeaponID);
@@ -179,6 +184,20 @@ public:
 
 	void UpdateCurrentWeaponAnimationType();
 
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	int StaminaCost_Dodge;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	float Dodge_iFrameStartTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	float Dodge_iFrameEndTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	float BlockDelay;
+
 private:
 
 	const int CameraZoomRate = 15;
@@ -186,10 +205,6 @@ private:
 	const int CameraArmMinimumLength = 50;
 
 	const int CameraArmMaximumLength = 500;
-
-	// bool bHasActiveiframes;
-
-	// bool bIsBlockingDamage;
 
 	TArray<FCombatEvent> EventsOnUsingSkill;
 
@@ -215,11 +230,11 @@ private:
 
 	/** Player HUD class reference */
 	UPROPERTY(Transient)
-	class UHUDWidget* HUDWidget;
+	UHUDWidget* HUDWidget;
 
 	/** The blueprint widget class to use for player HUD */
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
-	TSubclassOf<class UHUDWidget> BP_HUDWidget;
+	TSubclassOf<UHUDWidget> BP_HUDWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	ECharacterGender Gender;

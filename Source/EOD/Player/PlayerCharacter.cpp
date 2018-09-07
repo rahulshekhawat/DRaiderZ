@@ -73,6 +73,10 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	// bIsBlockingDamage = false;
 
 	MaxNumberOfSkills = 30;
+	StaminaCost_Dodge = 20;
+	Dodge_iFrameStartTime = 0.1f;
+	Dodge_iFrameEndTime = 0.5f;
+	BlockDelay = 0.1f;
 
 	Faction = EFaction::Player;
 }
@@ -254,6 +258,17 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (IsLocallyControlled())
 	{
+		// If block key is pressed but the character is not blocking
+		if (bBlockPressed && !IsBlocking() && CanBlock())
+		{
+			EnableBlock();
+		}
+		// If block is not pressed but character is blocking
+		else if (!bBlockPressed && IsBlocking())
+		{
+			DisableBlock();
+		}
+
 		if (IsIdle())
 		{
 			UpdateIdleState(DeltaTime);
@@ -280,7 +295,7 @@ void APlayerCharacter::BeginPlay()
 	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
 	//~ Player HUD
-	if (Controller && Controller->IsLocalPlayerController() && BP_HUDWidget.Get())
+	if (IsLocallyControlled() && BP_HUDWidget.Get())
 	{
 		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), BP_HUDWidget);
 		if (HUDWidget)
@@ -314,8 +329,22 @@ bool APlayerCharacter::CanJump() const
 
 bool APlayerCharacter::CanDodge() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun || IsBlocking() || IsCastingSpell();
+	int32 DodgeCost = StaminaCost_Dodge / StatsComp->GetStaminaConsumptionModifier();
+
+	if (StatsComp->GetCurrentStamina() >= DodgeCost &&
+		(IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking()))
+	{
+		return true;
+	}
+
+	return false;
 	// @todo add UsingSkill, Looting, Interacting, etc. to this too
+}
+
+bool APlayerCharacter::CanBlock() const
+{
+	return (Super::CanBlock() || IsAutoRunning()) &&
+		!(CurrentWeaponAnimationToUse == EWeaponAnimationType::NoWeapon || CurrentWeaponAnimationToUse == EWeaponAnimationType::SheathedWeapon);
 }
 
 bool APlayerCharacter::CanNormalAttack() const
@@ -336,6 +365,12 @@ APrimaryWeapon * APlayerCharacter::GetPrimaryWeapon() const
 ASecondaryWeapon * APlayerCharacter::GetSecondaryWeapon() const
 {
 	return SecondaryWeapon;
+}
+
+UHUDWidget * APlayerCharacter::GetHUDWidget() const
+{
+	return HUDWidget;
+	// return nullptr;
 }
 
 bool APlayerCharacter::CanAutoRun() const
@@ -388,12 +423,15 @@ void APlayerCharacter::ZoomOutCamera()
 
 void APlayerCharacter::OnDodge()
 {
-	if (CanDodge() && PlayerAnimInstance && GetActiveAnimationReferences())
+	if (CanDodge() && PlayerAnimInstance && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_Dodge)
 	{
+		int32 DodgeCost = StaminaCost_Dodge / StatsComp->GetStaminaConsumptionModifier();
+		StatsComp->ModifyCurrentStamina(-DodgeCost);
+
 		float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
 		float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
 		float DesiredPlayerRotationYaw = GetPlayerControlRotationYaw();
-		
+
 		if (ForwardAxisValue != 0)
 		{
 			DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
@@ -427,6 +465,16 @@ void APlayerCharacter::OnDodge()
 				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
 			}
 		}
+
+		if (GetWorld()->GetTimerManager().IsTimerActive(DodgeTimerHandle))
+		{
+			DisableiFrames();
+		}
+		
+		FTimerDelegate TimerDelegate;
+		float iFrameDuration = Dodge_iFrameEndTime - Dodge_iFrameStartTime;
+		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), iFrameDuration);
+		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, TimerDelegate, Dodge_iFrameStartTime, false);
 	}
 }
 
@@ -442,22 +490,19 @@ void APlayerCharacter::OnReleasedBlock()
 
 void APlayerCharacter::EnableBlock()
 {
-	if (CanBlock())
-	{
-		SetCharacterState(ECharacterState::Blocking);
-		SetUseControllerRotationYaw(true);
-		SetWalkSpeed(BaseBlockMovementSpeed * StatsComp->GetMovementSpeedModifier());
-	}
+	SetCharacterState(ECharacterState::Blocking);
+	SetUseControllerRotationYaw(true);
+	SetWalkSpeed(BaseBlockMovementSpeed * StatsComp->GetMovementSpeedModifier());
+
+	FTimerHandle TimerDelegate;
+	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, BlockDelay, false);
 }
 
 void APlayerCharacter::DisableBlock()
 {
 	SetUseControllerRotationYaw(false);
-
-	if (IsBlocking())
-	{
-		SetCharacterState(ECharacterState::IdleWalkRun);
-	}
+	SetCharacterState(ECharacterState::IdleWalkRun);
+	DisableDamageBlocking();
 }
 
 void APlayerCharacter::OnJump()
@@ -793,7 +838,7 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 
 int32 APlayerCharacter::ApplyEODDamage(FEODDamage& EODDamage)
 {
-	return 0;
+	return Super::ApplyEODDamage(EODDamage);
 }
 
 void APlayerCharacter::Destroyed()

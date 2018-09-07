@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/ObjectMacros.h"
 #include "Blueprint/UserWidget.h"
 #include "HUDWidget.generated.h"
 
@@ -18,15 +19,11 @@ public:
 
 	UHUDWidget(const FObjectInitializer& ObjectInitializer);
 
-	bool Initialize() override;
-	
-protected:
+	bool Initialize() override;	
 
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
-
-private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HealthBar;

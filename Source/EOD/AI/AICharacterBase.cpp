@@ -12,6 +12,17 @@ AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer)
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
+void AAICharacterBase::Destroyed()
+{
+	for (FSkill* Skill : Skills)
+	{
+		delete Skill;
+		Skill = nullptr;
+	}
+
+	Skills.Empty();
+}
+
 void AAICharacterBase::SetInCombat(bool bValue)
 {
 	bInCombat = bValue;

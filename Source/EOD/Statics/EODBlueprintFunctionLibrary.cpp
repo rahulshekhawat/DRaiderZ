@@ -13,3 +13,11 @@ float UEODBlueprintFunctionLibrary::CalculateYawDiffBetweenRotators(const FRotat
 {
 	return FMath::FindDeltaAngleDegrees(Rotator1.Yaw, Rotator2.Yaw);
 }
+
+float UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(const FVector & Vector1, const FVector & Vector2)
+{
+	FVector NormalizedVec1 = Vector1.GetSafeNormal();
+	FVector NormalizedVec2 = Vector2.GetSafeNormal();
+	float Angle = FMath::Acos(FVector::DotProduct(NormalizedVec1, NormalizedVec2));
+	return Angle;
+}

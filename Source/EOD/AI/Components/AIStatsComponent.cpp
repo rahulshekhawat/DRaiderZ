@@ -40,19 +40,22 @@ int32 UAIStatsComponent::GetCurrentHealth() const
 	return CurrentHealth;
 }
 
-void UAIStatsComponent::ModifyBaseHealth(int32 Value)
+int32 UAIStatsComponent::ModifyBaseHealth(int32 Value)
 {
 	BaseHealth += Value;
+	return BaseHealth;
 }
 
-void UAIStatsComponent::ModifyMaxHealth(int32 Value)
+int32 UAIStatsComponent::ModifyMaxHealth(int32 Value)
 {
 	MaxHealth += Value;
+	return MaxHealth;
 }
 
-void UAIStatsComponent::ModifyCurrentHealth(int32 Value)
+int32 UAIStatsComponent::ModifyCurrentHealth(int32 Value)
 {
 	CurrentHealth += Value;
+	return CurrentHealth;
 }
 
 bool UAIStatsComponent::IsLowOnHealth() const
@@ -75,19 +78,22 @@ int32 UAIStatsComponent::GetCurrentMana() const
 	return CurrentMana;
 }
 
-void UAIStatsComponent::ModifyBaseMana(int32 Value)
+int32 UAIStatsComponent::ModifyBaseMana(int32 Value)
 {
 	BaseMana += Value;
+	return BaseMana;
 }
 
-void UAIStatsComponent::ModifyMaxMana(int32 Value)
+int32 UAIStatsComponent::ModifyMaxMana(int32 Value)
 {
 	MaxMana += Value;
+	return MaxMana;
 }
 
-void UAIStatsComponent::ModifyCurrentMana(int32 Value)
+int32 UAIStatsComponent::ModifyCurrentMana(int32 Value)
 {
 	CurrentMana += Value;
+	return CurrentMana;
 }
 
 int32 UAIStatsComponent::GetBaseStamina() const
@@ -108,19 +114,22 @@ int32 UAIStatsComponent::GetCurrentStamina() const
 	return 0;
 }
 
-void UAIStatsComponent::ModifyBaseStamina(int32 Value)
+int32 UAIStatsComponent::ModifyBaseStamina(int32 Value)
 {
 	// empty definition
+	return 0;
 }
 
-void UAIStatsComponent::ModifyMaxStamina(int32 Value)
+int32 UAIStatsComponent::ModifyMaxStamina(int32 Value)
 {
 	// empty definition
+	return 0;
 }
 
-void UAIStatsComponent::ModifyCurrentStamina(int32 Value)
+int32 UAIStatsComponent::ModifyCurrentStamina(int32 Value)
 {
 	// empty definition
+	return 0;
 }
 
 int32 UAIStatsComponent::GetHealthRegenRate() const
@@ -169,12 +178,12 @@ float UAIStatsComponent::GetMagickCritRate() const
 	return MagickCritRate;
 }
 
-float UAIStatsComponent::GetPhysicalCritBonus() const
+int32 UAIStatsComponent::GetPhysicalCritBonus() const
 {
 	return PhysicalCritBonus;
 }
 
-float UAIStatsComponent::GetMagickCritBonus() const
+int32 UAIStatsComponent::GetMagickCritBonus() const
 {
 	return MagickCritBonus;
 }
@@ -284,9 +293,10 @@ float UAIStatsComponent::GetActiveTimeDilation() const
 	return ActiveTimeDilation;
 }
 
-void UAIStatsComponent::ModifyActiveTimeDilation(float Value)
+float UAIStatsComponent::ModifyActiveTimeDilation(float Value)
 {
 	ActiveTimeDilation += Value;
+	return ActiveTimeDilation;
 }
 
 float UAIStatsComponent::GetSpellCastingSpeedModifier() const

@@ -43,7 +43,7 @@ FCollisionQueryParams UCombatLibrary::GenerateCombatCollisionQueryParams(AActor 
 float UCombatLibrary::CalculateDamage(float Attack, float Defense)
 {
 	// @todo definition
-	return 0.0f;
+	return Attack;
 }
 
 /*

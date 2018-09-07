@@ -144,6 +144,25 @@ public:
 	/** [server + client] Applies stun to this character */
 	virtual void ApplyStun(float Duration);
 
+	UFUNCTION()
+	virtual void EnableiFrames(float Duration = 0.f);
+
+	UFUNCTION()
+	virtual void DisableiFrames();
+
+	UFUNCTION()
+	virtual void EnableDamageBlocking();
+
+	UFUNCTION()
+	virtual void DisableDamageBlocking();
+
+	/**
+	 * Kills this character 
+	 * @param CauseOfDeath - The reason for death of this character
+	 * @param Instigator - The character that instigated the death of this character (if any)
+	 */
+	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* Instigator = nullptr);
+
 	/** Set whether character is in combat or not */
 	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; }
 
@@ -255,6 +274,8 @@ protected:
 
 	FCombatEvent OnCriticalHit;
 
+	FCombatEvent OnKillingEnemy;
+
 	FCombatEvent OnSuccessfulDodge;
 
 	FCombatEvent OnSuccessfulBlock;
@@ -278,11 +299,19 @@ protected:
 
 	FLastUsedSkillInfo LastUsedSkillInfo;
 
+	FTimerHandle DodgeTimerHandle;
+
+	FTimerHandle BlockTimerHandle;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Rotation)
 	float CharacterRotationPrecision;
 
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	EFaction Faction;
+
+	/** True if character is in God Mode */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GodMode)
+	bool bGodMode;
 	
 	/** Character state determines the current action character is doing */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
@@ -291,6 +320,14 @@ protected:
 	/** Determines whether character is currently engaged in combat or not */
 	UPROPERTY(Transient)
 	bool bInCombat;	
+
+	/** Determines if invincibility frames are active */
+	UPROPERTY(Transient)
+	bool bHasActiveiFrames;
+
+	/** Determines if character is blocking any incoming damage */
+	UPROPERTY(Transient)
+	bool bIsBlockingDamage;
 
 private:
 	

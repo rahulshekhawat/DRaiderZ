@@ -43,6 +43,14 @@ enum class ESpecies : uint8
 */
 
 UENUM(BlueprintType)
+enum class ECauseOfDeath : uint8
+{
+	ZeroHP,
+	Suicide,
+	FellOutOfWorld,
+};
+
+UENUM(BlueprintType)
 enum class EFaction : uint8
 {
 	Rendel_Commoner, // People of rendel kingdom

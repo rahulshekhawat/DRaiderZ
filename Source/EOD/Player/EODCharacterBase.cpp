@@ -4,6 +4,7 @@
 #include "CharAnimInstance.h"
 #include "Core/EODPreprocessors.h"
 #include "Components/StatsComponentBase.h"
+#include "Statics/EODBlueprintFunctionLibrary.h"
 
 #include "UnrealNetwork.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -22,6 +23,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	CharacterState = ECharacterState::IdleWalkRun;
 
 	CurrentActiveSkill = nullptr;
+	bGodMode = false;
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
@@ -132,7 +134,7 @@ bool AEODCharacterBase::IsDodging() const
 
 bool AEODCharacterBase::IsDodgingDamage() const
 {
-	return true;
+	return bHasActiveiFrames;
 }
 
 bool AEODCharacterBase::NeedsHeal() const
@@ -265,6 +267,19 @@ int32 AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
 	FSkill* HitBySkill = EODDamage.Instigator->GetCurrentActiveSkill();
 	AEODCharacterBase* Instigator = EODDamage.Instigator;
 
+	float BlockedDamageModifier = 1.f;
+	if (IsBlockingDamage())
+	{
+		FVector MyDirection = GetActorForwardVector();
+		FVector HitNormal = EODDamage.LineHitResult.ImpactNormal;
+		
+		float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
+		if (Angle < 60)
+		{
+			// StatsComp->
+		}
+	}
+
 	int32 DamageApplied = 0;
 	if (HitBySkill->DamageType == EDamageType::Physical)
 	{
@@ -350,6 +365,31 @@ EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 
 void AEODCharacterBase::ApplyStun(float Duration)
 {
+}
+
+void AEODCharacterBase::EnableiFrames(float Duration)
+{
+	bHasActiveiFrames = true;
+
+	if (Duration > 0)
+	{
+		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, this, &AEODCharacterBase::DisableiFrames, Duration, false);
+	}
+}
+
+void AEODCharacterBase::DisableiFrames()
+{
+	bHasActiveiFrames = false;
+}
+
+void AEODCharacterBase::EnableDamageBlocking()
+{
+	bIsBlockingDamage = true;
+}
+
+void AEODCharacterBase::DisableDamageBlocking()
+{
+	bIsBlockingDamage = false;
 }
 
 FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
@@ -538,7 +578,7 @@ bool AEODCharacterBase::CanJump() const
 
 bool AEODCharacterBase::CanBlock() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun;
+	return IsIdleOrMoving();
 }
 
 bool AEODCharacterBase::CanRespawn() const
@@ -574,6 +614,28 @@ bool AEODCharacterBase::CanDodge() const
 EFaction AEODCharacterBase::GetFaction() const
 {
 	return Faction;
+}
+
+void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * Instigator)
+{
+	if (bGodMode || IsDead())
+	{
+		// cannot die
+		return;
+	}
+
+	if (CauseOfDeath == ECauseOfDeath::ZeroHP)
+	{
+
+	}
+	else
+	{
+		// Set current hp to 0
+		StatsComp->ModifyBaseHealth(-StatsComp->GetMaxHealth());
+		SetCharacterState(ECharacterState::Dead);
+
+		// @todo play death animation and death sound
+	}
 }
 
 ECharacterState AEODCharacterBase::GetCharacterState() const
