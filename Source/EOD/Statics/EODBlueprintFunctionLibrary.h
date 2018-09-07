@@ -22,5 +22,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Angle)
 	static float CalculateYawDiffBetweenRotators(const FRotator& Rotator1, const FRotator& Rotator2);
 
+	UFUNCTION(BlueprintCallable, Category = Angle)
+	static float CalculateAngleBetweenVectors(const FVector& Vector1, const FVector& Vector2);
 
 };
