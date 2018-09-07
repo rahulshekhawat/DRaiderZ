@@ -9,6 +9,10 @@ UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitial
 	PrimaryComponentTick.bCanEverTick = false;
 
 	SetIsReplicated(true);
+
+	bHasHealthRegenration = false;
+	bHasManaRegenration = false;
+	bHasStaminaRegenration = false;
 }
 
 void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
