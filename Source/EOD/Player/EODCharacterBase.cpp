@@ -4,6 +4,7 @@
 #include "CharAnimInstance.h"
 #include "Core/EODPreprocessors.h"
 #include "Components/StatsComponentBase.h"
+#include "Statics/EODBlueprintFunctionLibrary.h"
 
 #include "UnrealNetwork.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -265,6 +266,19 @@ int32 AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
 
 	FSkill* HitBySkill = EODDamage.Instigator->GetCurrentActiveSkill();
 	AEODCharacterBase* Instigator = EODDamage.Instigator;
+
+	float BlockedDamageModifier = 1.f;
+	if (IsBlockingDamage())
+	{
+		FVector MyDirection = GetActorForwardVector();
+		FVector HitNormal = EODDamage.LineHitResult.ImpactNormal;
+		
+		float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
+		if (Angle < 60)
+		{
+			// StatsComp->
+		}
+	}
 
 	int32 DamageApplied = 0;
 	if (HitBySkill->DamageType == EDamageType::Physical)

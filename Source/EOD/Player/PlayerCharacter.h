@@ -186,16 +186,16 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dodge)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
 	int StaminaCost_Dodge;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dodge)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
 	float Dodge_iFrameStartTime;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dodge)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
 	float Dodge_iFrameEndTime;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Block)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
 	float BlockDelay;
 
 private:
