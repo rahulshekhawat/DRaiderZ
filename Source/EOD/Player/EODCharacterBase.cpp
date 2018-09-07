@@ -167,22 +167,10 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 
 	for (FHitResult& HitResult : HitResults)
 	{
-		if (!HitResult.Actor.Get())
-		{
-			continue;
-		}
-
 		// @todo handle damage for non AEODCharacterBase actors
 		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
 		if (!HitCharacter)
 		{
-			continue;
-		}
-
-		// If the skill is dodgable and the hit character is currently dodging damage
-		if (HitCharacter->IsDodgingDamage() && !ActiveSkill->SkillLevelUpInfo.bUndodgable)
-		{
-			HitCharacter->OnSuccessfulDodge.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
 			continue;
 		}
 
@@ -219,10 +207,6 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 		CharactersSuccessfullyHit.Add(HitCharacterWeakPtr);
 
 		bool bCriticalHit = IsCriticalHit(ActiveSkill);
-		if (bCriticalHit)
-		{
-			CharactersHitWithCriticalDamage.Add(HitCharacterWeakPtr);
-		}
 
 		FEODDamage EODDamage;
 		EODDamage.Instigator = this;
@@ -231,6 +215,20 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 		EODDamage.bCriticalHit = bCriticalHit;
 
 		FEODDamageResult EODDamageResult = HitCharacter->ApplyEODDamage(EODDamage);
+	
+		if (EODDamageResult.CharacterResponseToDamage == ECharacterResponseToDamage::Dodged ||
+			EODDamageResult.CharacterResponseToDamage == ECharacterResponseToDamage::Immune)
+		{
+			// pass
+		}
+		else
+		{
+			CharactersSuccessfullyHit.Add(HitCharacterWeakPtr);
+			if (EODDamage.bCriticalHit)
+			{
+				CharactersHitWithCriticalDamage.Add(HitCharacterWeakPtr);
+			}
+		}
 	}
 
 	if (CharactersSuccessfullyHit.Num() == 0)
@@ -266,10 +264,17 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
 
 	FSkill* HitBySkill = EODDamage.Instigator->GetCurrentActiveSkill();
 	AEODCharacterBase* Instigator = EODDamage.Instigator;
+	FEODDamageResult EODDamageResult;
 
-	bool bBlockSuccessful = false;
-	float BlockedDamageModifier = 1.f;
-	if (IsBlockingDamage())
+	// If character is dodging and incoming attack is dodgable
+	if (IsDodgingDamage() && !HitBySkill->SkillLevelUpInfo.bUndodgable)
+	{
+		EODDamageResult.CharacterResponseToDamage = ECharacterResponseToDamage::Dodged;
+		return EODDamageResult;
+	}
+
+	// If character is blocking and incoming damage is blockable
+	if (IsBlockingDamage() && !HitBySkill->SkillLevelUpInfo.bUnblockable)
 	{
 		FVector MyDirection = GetActorForwardVector();
 		FVector HitNormal = EODDamage.LineHitResult.ImpactNormal;
@@ -277,7 +282,21 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
 		float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
 		if (Angle < 60)
 		{
-			bBlockSuccessful = true;
+			EODDamageResult.CharacterResponseToDamage = ECharacterResponseToDamage::Blocked;
+			float DamageReduction;
+			int32 FullDamage;
+
+			if (HitBySkill->DamageType == EDamageType::Magickal)
+			{
+				DamageReduction = StatsComp->GetMagickDamageReductionOnBlock();
+				FullDamage = HitBySkill->SkillLevelUpInfo.DamagePercent * Instigator->StatsComp->GetMagickAttack();
+			}
+			else
+			{
+				DamageReduction = StatsComp->GetPhysicalDamageReductionOnBlock();
+			}
+
+			// uint32 ActualDamage = HitBySkill->
 		}
 	}
 

@@ -46,6 +46,12 @@ public:
 
 	uint32 ActualDamage;
 
+	FEODDamageResult()
+	{
+		CharacterResponseToDamage = ECharacterResponseToDamage::Damaged;
+		ActualDamage = 0;
+	}
+
 };
 
 UENUM(BlueprintType)
