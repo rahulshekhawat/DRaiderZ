@@ -162,6 +162,25 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 	FSkill* ActiveSkill = GetCurrentActiveSkill();
 	check(ActiveSkill); // Make sure ActiveSkil is not a nullptr
 
+	FEODDamage EODDamage;
+	EODDamage.bUnblockable = ActiveSkill->SkillLevelUpInfo.bUnblockable;
+	EODDamage.bUndodgable = ActiveSkill->SkillLevelUpInfo.bUndodgable;
+	EODDamage.DamageType = ActiveSkill->DamageType;
+	EODDamage.CrowdControlEffect = ActiveSkill->SkillLevelUpInfo.CrowdControlEffect;
+
+	if (ActiveSkill->DamageType == EDamageType::Magickal)
+	{
+		EODDamage.NormalDamage = ActiveSkill->SkillLevelUpInfo.DamagePercent * StatsComp->GetMagickAttack();
+		EODDamage.CritDamage = EODDamage.NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComp->GetMagickCritBonus();
+		EODDamage.CritRate = StatsComp->GetMagickCritRate();
+	}
+	else
+	{
+		EODDamage.NormalDamage = ActiveSkill->SkillLevelUpInfo.DamagePercent * StatsComp->GetPhysicalAttack();
+		EODDamage.CritDamage = EODDamage.NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComp->GetPhysicalCritBonus();
+		EODDamage.CritRate = StatsComp->GetPhysicalCritRate();
+	}
+
 	TArray<TWeakObjectPtr<AEODCharacterBase>> CharactersSuccessfullyHit;
 	TArray<TWeakObjectPtr<AEODCharacterBase>> CharactersHitWithCriticalDamage;
 
@@ -174,57 +193,14 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 			continue;
 		}
 
-		TArray<FHitResult> LineHitResults;
-		FVector LineStart = GetActorLocation();
-		FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
+		FEODDamageResult EODDamageResult = HitCharacter->ApplyEODDamage(this, EODDamage, HitResult);
 
-		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
-		GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
-
-		FHitResult LineHitResultToHitCharacter;
-		bool bLineHitResultFound = false;
-
-		for (FHitResult& LineHitResult : LineHitResults)
+		if (EODDamageResult.CharacterResponseToDamage == ECharacterResponseToDamage::Damaged ||
+			EODDamageResult.CharacterResponseToDamage == ECharacterResponseToDamage::Blocked)
 		{
-			if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
-			{
-				LineHitResultToHitCharacter = LineHitResult;
-				bLineHitResultFound = true;
-				break;
-			}
-		}
-
-#if DEVSTAGE_CODE_ENABLED
-		if (bLineHitResultFound)
-		{
-			FVector Start = LineHitResultToHitCharacter.ImpactPoint;
-			FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
-			UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::Blue, 5.f, 2.f);
-		}
-#endif
-
-		TWeakObjectPtr<AEODCharacterBase> HitCharacterWeakPtr(HitCharacter);
-		CharactersSuccessfullyHit.Add(HitCharacterWeakPtr);
-
-		bool bCriticalHit = IsCriticalHit(ActiveSkill);
-
-		FEODDamage EODDamage;
-		EODDamage.Instigator = this;
-		EODDamage.CollisionHitResult = HitResult;
-		EODDamage.LineHitResult = LineHitResultToHitCharacter;
-		EODDamage.bCriticalHit = bCriticalHit;
-
-		FEODDamageResult EODDamageResult = HitCharacter->ApplyEODDamage(EODDamage);
-	
-		if (EODDamageResult.CharacterResponseToDamage == ECharacterResponseToDamage::Dodged ||
-			EODDamageResult.CharacterResponseToDamage == ECharacterResponseToDamage::Immune)
-		{
-			// pass
-		}
-		else
-		{
+			TWeakObjectPtr<AEODCharacterBase> HitCharacterWeakPtr(HitCharacter);
 			CharactersSuccessfullyHit.Add(HitCharacterWeakPtr);
-			if (EODDamage.bCriticalHit)
+			if (EODDamageResult.bCritHit)
 			{
 				CharactersHitWithCriticalDamage.Add(HitCharacterWeakPtr);
 			}
@@ -258,78 +234,120 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 	}
 }
 
-FEODDamageResult AEODCharacterBase::ApplyEODDamage(FEODDamage& EODDamage)
+
+FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * InstigatingChar, const FEODDamage & EODDamage, const FHitResult & CollisionHitResult)
 {
-	//~ @todo crowd control effects
-
-	FSkill* HitBySkill = EODDamage.Instigator->GetCurrentActiveSkill();
-	AEODCharacterBase* Instigator = EODDamage.Instigator;
 	FEODDamageResult EODDamageResult;
-
+	TArray<TWeakObjectPtr<AEODCharacterBase>> WeakPtrsCharArray;
+	TWeakObjectPtr<AEODCharacterBase> WeakPtrToInstigatingChar(InstigatingChar);
+	WeakPtrsCharArray.Add(WeakPtrToInstigatingChar);
+	
 	// If character is dodging and incoming attack is dodgable
-	if (IsDodgingDamage() && !HitBySkill->SkillLevelUpInfo.bUndodgable)
+	if (IsDodgingDamage() && !EODDamage.bUndodgable)
 	{
+		// Trigger OnSuccessfulDodge event
+		OnSuccessfulDodge.Broadcast(WeakPtrsCharArray);
+
 		EODDamageResult.CharacterResponseToDamage = ECharacterResponseToDamage::Dodged;
+		EODDamageResult.ActualDamage = 0;
 		return EODDamageResult;
 	}
 
+
+	TArray<FHitResult> LineHitResults;
+	FVector LineStart = InstigatingChar->GetActorLocation();
+	float LineEnd_Z;
+	if (GetActorLocation().Z < LineStart.Z)
+	{
+		LineEnd_Z = GetActorLocation().Z;
+	}
+	else
+	{
+		LineEnd_Z = LineStart.Z;
+	}
+	FVector LineEnd = FVector(GetActorLocation().X, GetActorLocation().Y, LineEnd_Z);
+
+	FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(InstigatingChar);
+	GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
+
+	FHitResult InstigatorToThisCharLineHitResult;
+
+	for (FHitResult& LineHitResult : LineHitResults)
+	{
+		if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == this)
+		{
+			InstigatorToThisCharLineHitResult = LineHitResult;
+			break;
+		}
+	}
+
+#if DEVSTAGE_CODE_ENABLED
+	FVector Start = InstigatorToThisCharLineHitResult.ImpactPoint;
+	FVector End = InstigatorToThisCharLineHitResult.ImpactPoint + InstigatorToThisCharLineHitResult.ImpactNormal * 50;
+	UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::Blue, 5.f, 2.f);
+#endif
+
+	//~ @todo any incoming crit rate reduction logic
+	bool bCriticalHit = EODDamage.CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
+	EODDamageResult.bCritHit = bCriticalHit;
+	if (bCriticalHit)
+	{
+		EODDamageResult.ActualDamage = EODDamage.CritDamage;
+	}
+	else
+	{
+		EODDamageResult.ActualDamage = EODDamage.NormalDamage;
+	}
+	uint32 Resistance;
+	if (EODDamage.DamageType == EDamageType::Magickal)
+	{
+		Resistance = StatsComp->GetMagickResistance();
+	}
+	else
+	{
+		Resistance = StatsComp->GetPhysicalResistance();
+	}
+
 	// If character is blocking and incoming damage is blockable
-	if (IsBlockingDamage() && !HitBySkill->SkillLevelUpInfo.bUnblockable)
+	if (IsBlockingDamage() && !EODDamage.bUnblockable)
 	{
 		FVector MyDirection = GetActorForwardVector();
-		FVector HitNormal = EODDamage.LineHitResult.ImpactNormal;
-		
+		FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
+
 		float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
+
 		if (Angle < 60)
 		{
-			EODDamageResult.CharacterResponseToDamage = ECharacterResponseToDamage::Blocked;
-			float DamageReduction;
-			int32 FullDamage;
+			// Trigger OnSuccessfulBlock event
+			OnSuccessfulBlock.Broadcast(WeakPtrsCharArray);
 
-			if (HitBySkill->DamageType == EDamageType::Magickal)
+			float DamageReductionOnBlock;
+			if (EODDamage.DamageType == EDamageType::Magickal)
 			{
-				DamageReduction = StatsComp->GetMagickDamageReductionOnBlock();
-				FullDamage = HitBySkill->SkillLevelUpInfo.DamagePercent * Instigator->StatsComp->GetMagickAttack();
+				DamageReductionOnBlock = StatsComp->GetMagickDamageReductionOnBlock();
 			}
 			else
 			{
-				DamageReduction = StatsComp->GetPhysicalDamageReductionOnBlock();
+				DamageReductionOnBlock = StatsComp->GetPhysicalDamageReductionOnBlock();
 			}
 
-			// uint32 ActualDamage = HitBySkill->
+			EODDamageResult.ActualDamage = EODDamageResult.ActualDamage * (1 - DamageReductionOnBlock);
+			EODDamageResult.ActualDamage = UCombatLibrary::CalculateDamage(EODDamageResult.ActualDamage, Resistance);
+			EODDamageResult.CharacterResponseToDamage = ECharacterResponseToDamage::Blocked;
+
+			// Apply real damage
+			StatsComp->ModifyCurrentHealth(-EODDamageResult.ActualDamage);
+
+			return EODDamageResult;
 		}
 	}
 
-	int32 DamageApplied = 0;
-	if (HitBySkill->DamageType == EDamageType::Physical)
-	{
-		int32 PhysicalAttack = Instigator->StatsComp->GetPhysicalAttack();
-		int32 MyPhysicalResistance = this->StatsComp->GetPhysicalResistance();
-		int32 CritBonus = 0;
-		if (EODDamage.bCriticalHit)
-		{
-			CritBonus = PhysicalAttack * UCombatLibrary::PhysicalCritMultiplier + Instigator->StatsComp->GetPhysicalCritBonus();
-		}
+	// Trigger OnReceivingHit event
+	OnReceivingHit.Broadcast(WeakPtrsCharArray);
+	EODDamageResult.ActualDamage = UCombatLibrary::CalculateDamage(EODDamageResult.ActualDamage, Resistance);
+	StatsComp->ModifyCurrentHealth(-EODDamageResult.ActualDamage);
 
-		DamageApplied = UCombatLibrary::CalculateDamage(PhysicalAttack + CritBonus, MyPhysicalResistance);
-		this->StatsComp->ModifyCurrentHealth(-DamageApplied);
-	}
-	else if (HitBySkill->DamageType == EDamageType::Magickal)
-	{
-		int32 MagickAttack = Instigator->StatsComp->GetMagickAttack();
-		int32 MyMagickResistance = this->StatsComp->GetMagickResistance();
-		int32 CritBonus = 0;
-		if (EODDamage.bCriticalHit)
-		{
-			CritBonus = MagickAttack * UCombatLibrary::MagickalCritMultiplier + Instigator->StatsComp->GetMagickCritBonus();
-		}
-
-		DamageApplied = UCombatLibrary::CalculateDamage(MagickAttack + CritBonus, MyMagickResistance);
-		this->StatsComp->ModifyCurrentHealth(-DamageApplied);
-	}
-
-	// return DamageApplied;
-	return FEODDamageResult();
+	return EODDamageResult;
 }
 
 int32 AEODCharacterBase::GetMostWeightedSkillIndex() const

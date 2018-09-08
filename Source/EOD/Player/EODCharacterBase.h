@@ -228,7 +228,11 @@ public:
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
 	/** [server] Apply damage to this character */
-	virtual FEODDamageResult ApplyEODDamage(FEODDamage& EODDamage);
+	// virtual FEODDamageResult ApplyEODDamage(FEODDamage& EODDamage);
+
+	virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult);
+
+	// virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult, const FHitResult& LineHitResult);
 
 	/** Called on an animation montage blending out to clean up, reset, or change any state variables */
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);

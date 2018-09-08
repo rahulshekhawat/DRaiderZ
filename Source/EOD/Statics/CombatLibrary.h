@@ -44,14 +44,15 @@ public:
 
 	ECrowdControlEffect CrowdControlEffect;
 
-	uint32 ActualDamage;
+	int32 ActualDamage;
+
+	bool bCritHit;
 
 	FEODDamageResult()
 	{
 		CharacterResponseToDamage = ECharacterResponseToDamage::Damaged;
 		ActualDamage = 0;
 	}
-
 };
 
 UENUM(BlueprintType)
@@ -70,19 +71,23 @@ struct FEODDamage
 public:
 
 	/** Actual collision hit result */
-	FHitResult CollisionHitResult;
+	// FHitResult CollisionHitResult;
 
 	/** 
 	 * Line hit result from instigator to hit character.
 	 * Impact location and impact normal are used to play hit sound, hit particle effect, and determining whether hit character blocked the attack
 	 */
-	FHitResult LineHitResult;
+	// FHitResult LineHitResult;
 	
 	/** The character that caused damage */
-	AEODCharacterBase* Instigator;
+	// AEODCharacterBase* Instigator;
 
 	/** Determines whether the hit causes critical damage or not */
-	bool bCriticalHit;
+	// bool bCriticalHit;
+
+	bool bUndodgable;
+	
+	bool bUnblockable;
 
 	float CritRate;
 
@@ -96,7 +101,7 @@ public:
 
 	FEODDamage()
 	{
-		bCriticalHit = false;
+		// bCriticalHit = false;
 	}
 };
 
