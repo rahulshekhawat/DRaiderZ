@@ -27,7 +27,7 @@ void ULightningElemental::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>
 
 	if (TargetCharacter->CanBeStunned())
 	{
-		TargetCharacter->ApplyStun(StunDuration);
+		TargetCharacter->Stun(StunDuration);
 	}
 }
 

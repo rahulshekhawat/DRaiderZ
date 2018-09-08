@@ -14,6 +14,8 @@ class ASecondaryWeapon;
 class UPlayerAnimInstance;
 class UStaticMeshComponent;
 class USkeletalMeshComponent;
+class USpringArmComponent;
+class UCameraComponent;
 
 /**
  * PlayerCharacter is the base class for playable characters
@@ -60,7 +62,7 @@ public:
 private:
 	
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+	USpringArmComponent* CameraBoom;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* PlayerCamera;
@@ -89,7 +91,7 @@ private:
 	
 	//~ Inventory component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UInventoryComponent* InventoryComponent;
+	UInventoryComponent* InventoryComponent;
 	
 	/** A helper function that must be called from constructor. Creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);

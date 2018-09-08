@@ -135,14 +135,36 @@ public:
 	/** Returns true if character can use a particular skill at SkillIndex */
 	virtual bool CanUseSkill(int32 SkillIndex) const;
 	
+	FORCEINLINE bool CanFlinch() const;
+
+	FORCEINLINE bool CanStun() const;
+
+	FORCEINLINE bool CanKnockdown() const;
+
+	FORCEINLINE bool CanKnockback() const;
+
+	FORCEINLINE bool CanFreeze() const;
+
+	FORCEINLINE bool CanInterrupt() const;
+
 	/** Returns true if this character requires healing (low on HP) */
 	virtual bool NeedsHeal() const;
 
 	/** Returns true if this character is healing either self or another character */
 	virtual bool IsHealing() const;
 
+	virtual void Interrupt(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Interrupt, );
+
 	/** [server + client] Applies stun to this character */
-	virtual void ApplyStun(float Duration);
+	virtual void Flinch(const EFlinchDirection FlinchDirection) PURE_VIRTUAL(AEODCharacterBase::Flinch, );
+
+	virtual void Stun(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Stun, );
+
+	virtual void Freeze(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Freeze, );
+
+	virtual void Knockdown(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Knockdown, );
+
+	virtual void Knockback(const float Duration, const FVector& Impulse) PURE_VIRTUAL(AEODCharacterBase::Knockback, );
 
 	UFUNCTION()
 	virtual void EnableiFrames(float Duration = 0.f);
@@ -207,10 +229,10 @@ public:
 	virtual int32 GetMostWeightedSkillIndex() const;
 
 	/** Returns the skill that character is using currently. Returns nullptr if character is not using any skill */
-	virtual FSkill* GetCurrentActiveSkill() const;
+	FORCEINLINE FSkill* GetCurrentActiveSkill() const;
 
 	/** Returns the last used skill */
-	virtual FLastUsedSkillInfo& GetLastUsedSkill();
+	FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();
 
 	/**
 	 * Applies status effect on the character

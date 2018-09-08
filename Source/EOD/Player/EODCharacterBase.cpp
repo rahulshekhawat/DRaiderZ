@@ -234,7 +234,6 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 	}
 }
 
-
 FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * InstigatingChar, const FEODDamage & EODDamage, const FHitResult & CollisionHitResult)
 {
 	FEODDamageResult EODDamageResult;
@@ -342,6 +341,40 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * Instigati
 		}
 	}
 
+	switch (EODDamage.CrowdControlEffect)
+	{
+	case ECrowdControlEffect::Flinch:
+		/*
+		// if ()
+		FVector MyDirection = GetActorForwardVector();
+		FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
+
+		float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
+
+		if (Angle <= 90)
+		{
+			Flinch(EFlinchDirection::Forward);
+		}
+		else
+		{
+			Flinch(EFlinchDirection::Backward);
+		}
+		*/
+		break;
+	case ECrowdControlEffect::Interrupt:
+		break;
+	case ECrowdControlEffect::KnockedDown:
+		break;
+	case ECrowdControlEffect::KnockedBack:
+		break;
+	case ECrowdControlEffect::Stunned:
+		break;
+	case ECrowdControlEffect::Crystalized:
+		break;
+	default:
+		break;
+	}
+
 	// Trigger OnReceivingHit event
 	OnReceivingHit.Broadcast(WeakPtrsCharArray);
 	EODDamageResult.ActualDamage = UCombatLibrary::CalculateDamage(EODDamageResult.ActualDamage, Resistance);
@@ -402,10 +435,6 @@ EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 	}
 }
 
-void AEODCharacterBase::ApplyStun(float Duration)
-{
-}
-
 void AEODCharacterBase::EnableiFrames(float Duration)
 {
 	bHasActiveiFrames = true;
@@ -431,7 +460,7 @@ void AEODCharacterBase::DisableDamageBlocking()
 	bIsBlockingDamage = false;
 }
 
-FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
+FORCEINLINE FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
 {
 	return CurrentActiveSkill;
 }
@@ -446,7 +475,7 @@ FSkill * AEODCharacterBase::GetSkill(int32 SkillIndex) const
 	return nullptr;
 }
 
-FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
+FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
 {
 	return LastUsedSkillInfo;
 }
@@ -643,6 +672,37 @@ bool AEODCharacterBase::CanUseAnySkill() const
 bool AEODCharacterBase::CanUseSkill(int32 SkillIndex) const
 {
 	return false;
+}
+
+FORCEINLINE bool AEODCharacterBase::CanFlinch() const
+{
+	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
+	// @todo - GetCurrentActiveSkill()->SkillLevelUpInfo.CrowdControlImmunities
+}
+
+FORCEINLINE bool AEODCharacterBase::CanStun() const
+{
+	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
+{
+	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanKnockback() const
+{
+	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanFreeze() const
+{
+	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
+{
+	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
 }
 
 bool AEODCharacterBase::CanDodge() const
