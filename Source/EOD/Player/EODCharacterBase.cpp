@@ -170,13 +170,13 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 
 	if (ActiveSkill->DamageType == EDamageType::Magickal)
 	{
-		EODDamage.NormalDamage = ActiveSkill->SkillLevelUpInfo.DamagePercent * StatsComp->GetMagickAttack();
+		EODDamage.NormalDamage = (ActiveSkill->SkillLevelUpInfo.DamagePercent * StatsComp->GetMagickAttack()) / 100;
 		EODDamage.CritDamage = EODDamage.NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComp->GetMagickCritBonus();
 		EODDamage.CritRate = StatsComp->GetMagickCritRate();
 	}
 	else
 	{
-		EODDamage.NormalDamage = ActiveSkill->SkillLevelUpInfo.DamagePercent * StatsComp->GetPhysicalAttack();
+		EODDamage.NormalDamage = (ActiveSkill->SkillLevelUpInfo.DamagePercent * StatsComp->GetPhysicalAttack()) / 100;
 		EODDamage.CritDamage = EODDamage.NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComp->GetPhysicalCritBonus();
 		EODDamage.CritRate = StatsComp->GetPhysicalCritRate();
 	}
@@ -298,7 +298,7 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * Instigati
 	{
 		EODDamageResult.ActualDamage = EODDamage.NormalDamage;
 	}
-	uint32 Resistance;
+	int32 Resistance;
 	if (EODDamage.DamageType == EDamageType::Magickal)
 	{
 		Resistance = StatsComp->GetMagickResistance();
