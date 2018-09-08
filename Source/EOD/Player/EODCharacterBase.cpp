@@ -82,7 +82,7 @@ bool AEODCharacterBase::IsBlocking() const
 
 bool AEODCharacterBase::IsBlockingDamage() const
 {
-	return false;
+	return bIsBlockingDamage;
 }
 
 bool AEODCharacterBase::IsCastingSpell() const
