@@ -333,6 +333,11 @@ protected:
 	UPROPERTY(Transient)
 	bool bIsBlockingDamage;
 
+	// @todo
+	// virtual void OnBlockingEnemy()
+
+	// virtual void OnBlockedByEnemy();
+
 private:
 	
 	//~ Begin Multiplayer Code

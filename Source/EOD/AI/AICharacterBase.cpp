@@ -4,12 +4,19 @@
 #include "Core/GameSingleton.h"
 #include "Components/AIStatsComponent.h"
 
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UAIStatsComponent>(FName("Character Stats Component")))
 {
 	// Mob characters don't have strafe animations and so they must be rotated in the direction of their movement.
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	AggroWidgetComp = ObjectInitializer.CreateDefaultSubobject<UWidgetComponent>(this, TEXT("Aggro Indicator"));
+	AggroWidgetComp->SetupAttachment(RootComponent);
+	HealthWidgetComp = ObjectInitializer.CreateDefaultSubobject<UWidgetComponent>(this, TEXT("Health Indicator"));
+	HealthWidgetComp->SetupAttachment(RootComponent);
+
 }
 
 void AAICharacterBase::Destroyed()
@@ -65,7 +72,6 @@ void AAICharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	SetInCombat(false);
-
 
 }
 
