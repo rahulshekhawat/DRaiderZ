@@ -153,7 +153,7 @@ public:
 	/** Returns true if this character is healing either self or another character */
 	virtual bool IsHealing() const;
 
-	virtual void Interrupt(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Interrupt, );
+	virtual void Interrupt() PURE_VIRTUAL(AEODCharacterBase::Interrupt, );
 
 	/** [server + client] Applies stun to this character */
 	virtual void Flinch(const EFlinchDirection FlinchDirection) PURE_VIRTUAL(AEODCharacterBase::Flinch, );
