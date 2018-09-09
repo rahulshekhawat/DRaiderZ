@@ -6,7 +6,7 @@
 #include "Player/EODCharacterBase.h"
 #include "AICharacterBase.generated.h"
 
-class UWidgetComponent;
+class UEODWidgetComponent;
 
 /**
  * AICharacterBase is the base class for AI controlled characters
@@ -51,10 +51,10 @@ public:
 private:
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UWidgetComponent* AggroWidgetComp;
+	UEODWidgetComponent* AggroWidgetComp;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UWidgetComponent* HealthWidgetComp;
+	UEODWidgetComponent* HealthWidgetComp;
 
 	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
 	void UpdateMaxWalkSpeed();

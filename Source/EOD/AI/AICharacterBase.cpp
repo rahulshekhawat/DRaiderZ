@@ -3,8 +3,8 @@
 #include "AICharacterBase.h"
 #include "Core/GameSingleton.h"
 #include "Components/AIStatsComponent.h"
+#include "Player/Components/EODWidgetComponent.h"
 
-#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UAIStatsComponent>(FName("Character Stats Component")))
@@ -12,9 +12,9 @@ AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer)
 	// Mob characters don't have strafe animations and so they must be rotated in the direction of their movement.
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-	AggroWidgetComp = ObjectInitializer.CreateDefaultSubobject<UWidgetComponent>(this, TEXT("Aggro Indicator"));
+	AggroWidgetComp = ObjectInitializer.CreateDefaultSubobject<UEODWidgetComponent>(this, TEXT("Aggro Indicator"));
 	AggroWidgetComp->SetupAttachment(RootComponent);
-	HealthWidgetComp = ObjectInitializer.CreateDefaultSubobject<UWidgetComponent>(this, TEXT("Health Indicator"));
+	HealthWidgetComp = ObjectInitializer.CreateDefaultSubobject<UEODWidgetComponent>(this, TEXT("Health Indicator"));
 	HealthWidgetComp->SetupAttachment(RootComponent);
 
 }
