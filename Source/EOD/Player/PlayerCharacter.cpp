@@ -373,6 +373,25 @@ UHUDWidget * APlayerCharacter::GetHUDWidget() const
 	// return nullptr;
 }
 
+void APlayerCharacter::Flinch(const EFlinchDirection FlinchDirection)
+{
+	if (!PlayerAnimInstance || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->AnimationMontage_Flinch)
+	{
+		return;
+	}
+
+	if (FlinchDirection == EFlinchDirection::Forward)
+	{
+		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
+		PlayerAnimInstance->Montage_JumpToSection(FName("ForwardFlinch"), GetActiveAnimationReferences()->AnimationMontage_Flinch);
+	}
+	else if (FlinchDirection == EFlinchDirection::Backward)
+	{
+		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
+		PlayerAnimInstance->Montage_JumpToSection(FName("BackwardFlinch"), GetActiveAnimationReferences()->AnimationMontage_Flinch);
+	}
+}
+
 bool APlayerCharacter::CanAutoRun() const
 {
 	// The character can auto run only if character is in idle state

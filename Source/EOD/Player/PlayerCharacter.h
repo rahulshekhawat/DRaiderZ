@@ -16,6 +16,7 @@ class UStaticMeshComponent;
 class USkeletalMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
+class UInventoryComponent;
 
 /**
  * PlayerCharacter is the base class for playable characters
@@ -65,7 +66,7 @@ private:
 	USpringArmComponent* CameraBoom;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* PlayerCamera;
+	UCameraComponent* PlayerCamera;
 
 	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player face
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -130,6 +131,9 @@ public:
 	ASecondaryWeapon* GetSecondaryWeapon() const;
 
 	UHUDWidget* GetHUDWidget() const;
+
+	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
+	virtual void Flinch(const EFlinchDirection FlinchDirection) override;
 
 	/** Replace primary weapon with a new weapon */
 	void SetCurrentPrimaryWeapon(const FName WeaponID);
