@@ -153,17 +153,22 @@ public:
 	/** Returns true if this character is healing either self or another character */
 	virtual bool IsHealing() const;
 
+	/** [server + client] Interrupt this character's current action */
 	virtual void Interrupt() PURE_VIRTUAL(AEODCharacterBase::Interrupt, );
 
-	/** [server + client] Applies stun to this character */
+	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
 	virtual void Flinch(const EFlinchDirection FlinchDirection) PURE_VIRTUAL(AEODCharacterBase::Flinch, );
 
+	/** [server + client] Applies stun to this character */
 	virtual void Stun(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Stun, );
 
+	/** [server + client] Freeze this character */
 	virtual void Freeze(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Freeze, );
 
+	/** [server + client] Knockdown this character */
 	virtual void Knockdown(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Knockdown, );
 
+	/** [server + client] Knockback this character */
 	virtual void Knockback(const float Duration, const FVector& Impulse) PURE_VIRTUAL(AEODCharacterBase::Knockback, );
 
 	UFUNCTION()
@@ -183,7 +188,7 @@ public:
 	 * @param CauseOfDeath - The reason for death of this character
 	 * @param Instigator - The character that instigated the death of this character (if any)
 	 */
-	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* Instigator = nullptr);
+	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* InstigatingChar = nullptr);
 
 	/** Set whether character is in combat or not */
 	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; }

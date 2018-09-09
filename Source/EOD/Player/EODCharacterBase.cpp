@@ -344,32 +344,52 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * Instigati
 	switch (EODDamage.CrowdControlEffect)
 	{
 	case ECrowdControlEffect::Flinch:
-		/*
-		// if ()
-		FVector MyDirection = GetActorForwardVector();
-		FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
-
-		float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
-
-		if (Angle <= 90)
+		if (CanFlinch())
 		{
-			Flinch(EFlinchDirection::Forward);
+			FVector MyDirection = GetActorForwardVector();
+			FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
+
+			float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
+
+			if (Angle <= 90)
+			{
+				Flinch(EFlinchDirection::Forward);
+			}
+			else
+			{
+				Flinch(EFlinchDirection::Backward);
+			}
 		}
-		else
-		{
-			Flinch(EFlinchDirection::Backward);
-		}
-		*/
 		break;
 	case ECrowdControlEffect::Interrupt:
+		if (CanInterrupt())
+		{
+			Interrupt();
+		}
 		break;
 	case ECrowdControlEffect::KnockedDown:
+		if (CanKnockdown())
+		{
+			// Knockdown(1.f);
+		}
 		break;
 	case ECrowdControlEffect::KnockedBack:
+		if (CanKnockback())
+		{
+			// Knockback()
+		}
 		break;
 	case ECrowdControlEffect::Stunned:
+		if (CanStun())
+		{
+			// Stun(1.f);
+		}
 		break;
 	case ECrowdControlEffect::Crystalized:
+		if (CanFreeze())
+		{
+			// Freeze();
+		}
 		break;
 	default:
 		break;
@@ -715,7 +735,7 @@ EFaction AEODCharacterBase::GetFaction() const
 	return Faction;
 }
 
-void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * Instigator)
+void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * InstigatingChar)
 {
 	if (bGodMode || IsDead())
 	{
