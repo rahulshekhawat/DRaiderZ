@@ -18,6 +18,7 @@ float UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(const FVector &
 {
 	FVector NormalizedVec1 = Vector1.GetSafeNormal();
 	FVector NormalizedVec2 = Vector2.GetSafeNormal();
-	float Angle = FMath::Acos(FVector::DotProduct(NormalizedVec1, NormalizedVec2));
+	float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(NormalizedVec1, NormalizedVec2)));
+	
 	return Angle;
 }
