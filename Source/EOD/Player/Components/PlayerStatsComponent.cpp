@@ -9,8 +9,8 @@
 
 UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
-	AddCrowdControlImmunity(ECrowdControlEffect::Crystalized);
-	RemoveCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	// AddCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	// RemoveCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 
 	MovementSpeedModifier = 1.f;
 	StaminaConsumptionModifier = 1.f;

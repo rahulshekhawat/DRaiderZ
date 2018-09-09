@@ -1,11 +1,20 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "AIStatsComponent.h"
+#include "AI/AICharacterBase.h"
 
 #include "UnrealNetwork.h"
 
 UAIStatsComponent::UAIStatsComponent(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
+	OwningAIChar = Cast<AAICharacterBase>(GetOwner());
+}
+
+void UAIStatsComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	
 }
 
 void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -58,6 +67,18 @@ int32 UAIStatsComponent::ModifyCurrentHealth(int32 Value)
 	return CurrentHealth;
 }
 
+void UAIStatsComponent::SetBaseHealth(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetMaxHealth(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetCurrentHealth(int32 Value)
+{
+}
+
 bool UAIStatsComponent::IsLowOnHealth() const
 {
 	return (CurrentHealth / MaxHealth) <= 0.25;
@@ -96,6 +117,18 @@ int32 UAIStatsComponent::ModifyCurrentMana(int32 Value)
 	return CurrentMana;
 }
 
+void UAIStatsComponent::SetBaseMana(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetMaxMana(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetCurrentMana(int32 Value)
+{
+}
+
 int32 UAIStatsComponent::GetBaseStamina() const
 {
 	// AI stats component does not implement BaseStamina
@@ -132,9 +165,30 @@ int32 UAIStatsComponent::ModifyCurrentStamina(int32 Value)
 	return 0;
 }
 
+void UAIStatsComponent::SetBaseStamina(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetMaxStamina(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetCurrentStamina(int32 Value)
+{
+}
+
 int32 UAIStatsComponent::GetHealthRegenRate() const
 {
 	return HealthRegenRate;
+}
+
+int32 UAIStatsComponent::ModifyHealthRegenRate(int32 Value)
+{
+	return int32();
+}
+
+void UAIStatsComponent::SetHealthRegenRate(int32 Value)
+{
 }
 
 int32 UAIStatsComponent::GetManaRegenRate() const
@@ -142,10 +196,28 @@ int32 UAIStatsComponent::GetManaRegenRate() const
 	return ManaRegenRate;
 }
 
+int32 UAIStatsComponent::ModifyManaRegenRate(int32 Value)
+{
+	return int32();
+}
+
+void UAIStatsComponent::SetManaRegenRate(int32 Value)
+{
+}
+
 int32 UAIStatsComponent::GetStaminaRegenRate() const
 {
 	// AI stats component does not implement StaminaRegenRate
 	return 0;
+}
+
+int32 UAIStatsComponent::ModifyStaminaRegenRate(int32 Value)
+{
+	return int32();
+}
+
+void UAIStatsComponent::SetStaminaRegenRate(int32 Value)
+{
 }
 
 int32 UAIStatsComponent::GetPhysicalAttack() const
@@ -158,6 +230,24 @@ int32 UAIStatsComponent::GetMagickAttack() const
 	return MagickAttack;
 }
 
+int32 UAIStatsComponent::ModifyPhysicalAttack(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyMagickAttack(int32 Value)
+{
+	return int32();
+}
+
+void UAIStatsComponent::SetPhysicalAttack(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetMagickAttack(int32 Value)
+{
+}
+
 int32 UAIStatsComponent::GetPhysicalResistance() const
 {
 	return PhysicalResistance;
@@ -166,6 +256,24 @@ int32 UAIStatsComponent::GetPhysicalResistance() const
 int32 UAIStatsComponent::GetMagickResistance() const
 {
 	return MagickResistance;
+}
+
+int32 UAIStatsComponent::ModifyPhysicalResistance(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyMagickResistance(int32 Value)
+{
+	return int32();
+}
+
+void UAIStatsComponent::SetPhysicalResistance(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetMagickResistance(int32 Value)
+{
 }
 
 float UAIStatsComponent::GetPhysicalCritRate() const
@@ -178,6 +286,24 @@ float UAIStatsComponent::GetMagickCritRate() const
 	return MagickCritRate;
 }
 
+float UAIStatsComponent::ModifyPhysicalCritRate(float Value)
+{
+	return 0.0f;
+}
+
+float UAIStatsComponent::ModifyMagickCritRate(float Value)
+{
+	return 0.0f;
+}
+
+void UAIStatsComponent::SetPhysicalCritRate(float Value)
+{
+}
+
+void UAIStatsComponent::SetMagickCritRate(float Value)
+{
+}
+
 int32 UAIStatsComponent::GetPhysicalCritBonus() const
 {
 	return PhysicalCritBonus;
@@ -186,6 +312,24 @@ int32 UAIStatsComponent::GetPhysicalCritBonus() const
 int32 UAIStatsComponent::GetMagickCritBonus() const
 {
 	return MagickCritBonus;
+}
+
+int32 UAIStatsComponent::ModifyPhysicalCritBonus(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyMagickCritBonus(int32 Value)
+{
+	return int32();
+}
+
+void UAIStatsComponent::SetPhysicalCritBonus(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetMagickCritBonus(int32 Value)
+{
 }
 
 int32 UAIStatsComponent::GetElementalFireResistance() const
@@ -201,6 +345,50 @@ int32 UAIStatsComponent::GetElementalIceResistance() const
 int32 UAIStatsComponent::ModifyElementalIceResistance(int32 Value)
 {
 	return ElementalIceResistance += Value;
+}
+
+int32 UAIStatsComponent::ModifyElementalLightningResistance(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyElementalPoisonResistance(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyElementalHolyResistance(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyElementalDarkResistance(int32 Value)
+{
+	return int32();
+}
+
+void UAIStatsComponent::SetElementalFireResistance(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetElementalIceResistance(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetElementalLightningResistance(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetElementalPoisonResistance(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetElementalHolyResistance(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetElementalDarkResistance(int32 Value)
+{
 }
 
 int32 UAIStatsComponent::GetElementalLightningResistance() const
@@ -221,6 +409,11 @@ int32 UAIStatsComponent::GetElementalHolyResistance() const
 int32 UAIStatsComponent::GetElementalDarkResistance() const
 {
 	return ElementalDarkResistance;
+}
+
+int32 UAIStatsComponent::ModifyElementalFireResistance(int32 Value)
+{
+	return int32();
 }
 
 int32 UAIStatsComponent::GetElementalFireDamage() const
@@ -253,6 +446,31 @@ int32 UAIStatsComponent::GetElementalDarkDamage() const
 	return ElementalDarkDamage;
 }
 
+int32 UAIStatsComponent::ModifyElementalFireDamage(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyElementalIceDamage(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyElementalLightningDamage(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyElementalPoisonDamage(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyElementalHolyDamage(int32 Value)
+{
+	return int32();
+}
+
 int32 UAIStatsComponent::GetBleedResistance() const
 {
 	return BleedResistance;
@@ -261,6 +479,54 @@ int32 UAIStatsComponent::GetBleedResistance() const
 int32 UAIStatsComponent::GetCrowdControlResistance() const
 {
 	return CrowdControlResistance;
+}
+
+int32 UAIStatsComponent::ModifyBleedResistance(int32 Value)
+{
+	return int32();
+}
+
+int32 UAIStatsComponent::ModifyCrowdControlResistance(int32 Value)
+{
+	return int32();
+}
+
+void UAIStatsComponent::SetBleedResistance(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetCrowdControlResistance(int32 Value)
+{
+}
+
+void UAIStatsComponent::AddCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect)
+{
+}
+
+void UAIStatsComponent::AddCrowdControlImmunities(uint8 CrowdControlImmunities)
+{
+}
+
+void UAIStatsComponent::RemoveCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect)
+{
+}
+
+void UAIStatsComponent::RemoveCrowdControlImmunities(uint8 CrowdControlImmunities)
+{
+}
+
+void UAIStatsComponent::RemoveAllCrowdControlImmunities()
+{
+}
+
+bool UAIStatsComponent::HasCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) const
+{
+	return false;
+}
+
+uint8 UAIStatsComponent::GetCrowdControlImmunities() const
+{
+	return uint8();
 }
 
 float UAIStatsComponent::GetCooldownModifier() const
@@ -299,9 +565,67 @@ float UAIStatsComponent::ModifyActiveTimeDilation(float Value)
 	return ActiveTimeDilation;
 }
 
+float UAIStatsComponent::ModifySpellCastingSpeedModifier(float Value)
+{
+	return 0.0f;
+}
+
+void UAIStatsComponent::SetCooldownModifier(float Value)
+{
+}
+
+void UAIStatsComponent::SetExpModifier(float Value)
+{
+}
+
+void UAIStatsComponent::SetDropRateModifier(float Value)
+{
+}
+
+void UAIStatsComponent::SetStaminaConsumptionModifier(float Value)
+{
+}
+
+void UAIStatsComponent::SetMovementSpeedModifier(float Value)
+{
+}
+
+void UAIStatsComponent::SetActiveTimeDilation(float Value)
+{
+}
+
+void UAIStatsComponent::SetSpellCastingSpeedModifier(float Value)
+{
+}
+
 float UAIStatsComponent::GetSpellCastingSpeedModifier() const
 {
 	return SpellCastingSpeedModifier;
+}
+
+float UAIStatsComponent::ModifyCooldownModifier(float Value)
+{
+	return 0.0f;
+}
+
+float UAIStatsComponent::ModifyExpModifier(float Value)
+{
+	return 0.0f;
+}
+
+float UAIStatsComponent::ModifyDropRateModifier(float Value)
+{
+	return 0.0f;
+}
+
+float UAIStatsComponent::ModifyStaminaConsumptionModifier(float Value)
+{
+	return 0.0f;
+}
+
+float UAIStatsComponent::ModifyMovementSpeedModifier(float Value)
+{
+	return 0.0f;
 }
 
 int32 UAIStatsComponent::GetDarkness() const
@@ -309,3 +633,68 @@ int32 UAIStatsComponent::GetDarkness() const
 	return Darkness;
 }
 
+int32 UAIStatsComponent::ModifyDarkness(int32 Value)
+{
+	return int32();
+}
+
+void UAIStatsComponent::SetDarkness(int32 Value)
+{
+}
+
+float UAIStatsComponent::GetPhysicalDamageReductionOnBlock() const
+{
+	return 0.0f;
+}
+
+float UAIStatsComponent::GetMagickDamageReductionOnBlock() const
+{
+	return 0.0f;
+}
+
+float UAIStatsComponent::ModifyPhysicalDamageReductionOnBlock(float Value)
+{
+	return 0.0f;
+}
+
+float UAIStatsComponent::ModifyMagickDamageReductionOnBlock(float Value)
+{
+	return 0.0f;
+}
+
+void UAIStatsComponent::SetPhysicalDamageReductionOnBlock(float Value)
+{
+}
+
+void UAIStatsComponent::SetMagickDamageReductionOnBlock(float Value)
+{
+}
+
+int32 UAIStatsComponent::ModifyElementalDarkDamage(int32 Value)
+{
+	return int32();
+}
+
+void UAIStatsComponent::SetElementalFireDamage(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetElementalIceDamage(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetElementalLightningDamage(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetElementalPoisonDamage(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetElementalHolyDamage(int32 Value)
+{
+}
+
+void UAIStatsComponent::SetElementalDarkDamage(int32 Value)
+{
+}
