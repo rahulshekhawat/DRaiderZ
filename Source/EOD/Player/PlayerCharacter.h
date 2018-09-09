@@ -132,8 +132,23 @@ public:
 
 	UHUDWidget* GetHUDWidget() const;
 
+	/** [server + client] Interrupt this character's current action */
+	virtual void Interrupt() override;
+
 	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
 	virtual void Flinch(const EFlinchDirection FlinchDirection) override;
+
+	/** [server + client] Applies stun to this character */
+	virtual void Stun(const float Duration) override;
+
+	/** [server + client] Freeze this character */
+	virtual void Freeze(const float Duration) override;
+
+	/** [server + client] Knockdown this character */
+	virtual void Knockdown(const float Duration) override;
+
+	/** [server + client] Knockback this character */
+	virtual void Knockback(const float Duration, const FVector& Impulse) override;
 
 	/** Replace primary weapon with a new weapon */
 	void SetCurrentPrimaryWeapon(const FName WeaponID);

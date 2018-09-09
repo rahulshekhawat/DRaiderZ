@@ -373,6 +373,10 @@ UHUDWidget * APlayerCharacter::GetHUDWidget() const
 	// return nullptr;
 }
 
+void APlayerCharacter::Interrupt()
+{
+}
+
 void APlayerCharacter::Flinch(const EFlinchDirection FlinchDirection)
 {
 	if (!PlayerAnimInstance || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->AnimationMontage_Flinch)
@@ -390,6 +394,22 @@ void APlayerCharacter::Flinch(const EFlinchDirection FlinchDirection)
 		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
 		PlayerAnimInstance->Montage_JumpToSection(FName("BackwardFlinch"), GetActiveAnimationReferences()->AnimationMontage_Flinch);
 	}
+}
+
+void APlayerCharacter::Stun(const float Duration)
+{
+}
+
+void APlayerCharacter::Freeze(const float Duration)
+{
+}
+
+void APlayerCharacter::Knockdown(const float Duration)
+{
+}
+
+void APlayerCharacter::Knockback(const float Duration, const FVector & Impulse)
+{
 }
 
 bool APlayerCharacter::CanAutoRun() const
