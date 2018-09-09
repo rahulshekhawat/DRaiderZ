@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "Blueprint/UserWidget.h"
 #include "Engine/StreamableManager.h"
 #include "UObject/NoExportTypes.h"
 #include "GameSingleton.generated.h"
@@ -30,5 +31,8 @@ public:
 	/** Reference to data table containing weapons data */
 	UPROPERTY(EditDefaultsOnly, Category = Weapons)
 	UDataTable* WeaponDataTable;
+
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<UUserWidget> FloatingDamageNumberWidgetClass;
 
 };
