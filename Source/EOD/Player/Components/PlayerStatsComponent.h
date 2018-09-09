@@ -236,11 +236,11 @@ public:
 
 	virtual void AddCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) override;
 
-	virtual void AddCrowdControlImmunities(uint8 CrowdControlImmunities) override;
+	virtual void AddCrowdControlImmunities(uint8 CCImmunities) override;
 
 	virtual void RemoveCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) override;
 
-	virtual void RemoveCrowdControlImmunities(uint8 CrowdControlImmunities) override;
+	virtual void RemoveCrowdControlImmunities(uint8 CCImmunities) override;
 
 	virtual void RemoveAllCrowdControlImmunities() override;
 

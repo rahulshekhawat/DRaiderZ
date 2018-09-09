@@ -2,6 +2,7 @@
 
 #include "AIStatsComponent.h"
 #include "AI/AICharacterBase.h"
+#include "Player/Components/EODWidgetComponent.h"
 
 #include "UnrealNetwork.h"
 
@@ -14,7 +15,12 @@ void UAIStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	SetMaxHealth(BaseHealth);
+	SetCurrentHealth(BaseHealth);
+
+	SetMaxMana(BaseMana);
+	SetCurrentMana(BaseMana);
+
 }
 
 void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -77,6 +83,16 @@ void UAIStatsComponent::SetMaxHealth(int32 Value)
 
 void UAIStatsComponent::SetCurrentHealth(int32 Value)
 {
+	CurrentHealth = Value;
+
+	// Update HP bar of AI character
+	if (OwningAIChar && OwningAIChar->GetHealthWidgetComp() &&
+		OwningAIChar->GetHealthWidgetComp()->GetUserWidgetObject() &&
+		MaxHealth != 0)
+	{
+		// OwningAIChar->GetHealthWidgetComp()->GetUserWidgetObject()->
+	}
+
 }
 
 bool UAIStatsComponent::IsLowOnHealth() const
@@ -503,7 +519,7 @@ void UAIStatsComponent::AddCrowdControlImmunity(ECrowdControlEffect CrowdControl
 {
 }
 
-void UAIStatsComponent::AddCrowdControlImmunities(uint8 CrowdControlImmunities)
+void UAIStatsComponent::AddCrowdControlImmunities(uint8 CCImmunities)
 {
 }
 
@@ -511,7 +527,7 @@ void UAIStatsComponent::RemoveCrowdControlImmunity(ECrowdControlEffect CrowdCont
 {
 }
 
-void UAIStatsComponent::RemoveCrowdControlImmunities(uint8 CrowdControlImmunities)
+void UAIStatsComponent::RemoveCrowdControlImmunities(uint8 CCImmunities)
 {
 }
 
