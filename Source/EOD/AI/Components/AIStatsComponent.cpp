@@ -2,9 +2,11 @@
 
 #include "AIStatsComponent.h"
 #include "AI/AICharacterBase.h"
+#include "UI/FloatingHealthBarWidget.h"
 #include "Player/Components/EODWidgetComponent.h"
 
 #include "UnrealNetwork.h"
+#include "Components/ProgressBar.h"
 
 UAIStatsComponent::UAIStatsComponent(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
@@ -79,20 +81,19 @@ void UAIStatsComponent::SetBaseHealth(int32 Value)
 
 void UAIStatsComponent::SetMaxHealth(int32 Value)
 {
+	MaxHealth = Value;
 }
 
 void UAIStatsComponent::SetCurrentHealth(int32 Value)
 {
 	CurrentHealth = Value;
 
-	// Update HP bar of AI character
-	if (OwningAIChar && OwningAIChar->GetHealthWidgetComp() &&
-		OwningAIChar->GetHealthWidgetComp()->GetUserWidgetObject() &&
-		MaxHealth != 0)
+	UFloatingHealthBarWidget* HealthWidget = Cast<UFloatingHealthBarWidget>(OwningAIChar->GetHealthWidgetComp()->GetUserWidgetObject());
+	if (HealthWidget && MaxHealth != 0)
 	{
-		// OwningAIChar->GetHealthWidgetComp()->GetUserWidgetObject()->
+		float Percent = (float)CurrentHealth / (float)MaxHealth;
+		HealthWidget->HealthBar->SetPercent(Percent);
 	}
-
 }
 
 bool UAIStatsComponent::IsLowOnHealth() const
