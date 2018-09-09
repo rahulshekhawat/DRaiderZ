@@ -696,33 +696,33 @@ bool AEODCharacterBase::CanUseSkill(int32 SkillIndex) const
 
 FORCEINLINE bool AEODCharacterBase::CanFlinch() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
 	// @todo - GetCurrentActiveSkill()->SkillLevelUpInfo.CrowdControlImmunities
 }
 
 FORCEINLINE bool AEODCharacterBase::CanStun() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockback() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanFreeze() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
 }
 
 bool AEODCharacterBase::CanDodge() const
