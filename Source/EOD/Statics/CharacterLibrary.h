@@ -29,19 +29,6 @@ enum class ECharMovementDirection : uint8
 	BR 		UMETA(DisplayName = "Backward Right"),
 };
 
-/*
-UENUM(BlueprintType)
-enum class ESpecies : uint8
-{
-	Human,
-	Ghoul,
-	Skeleton,
-	Yeti,
-	Troll,
-	Ogre,
-};
-*/
-
 UENUM(BlueprintType)
 enum class ECauseOfDeath : uint8
 {
@@ -58,6 +45,18 @@ enum class EFaction : uint8
 	Undead,
 	Corrupted,
 	Player,
+};
+
+UENUM(BlueprintType)
+enum class ESpecies : uint8
+{
+	Human,
+	Goblin,
+	Ghoul,
+	Skeleton,
+	Yeti,
+	Troll,
+	Ogre,
 };
 
 UENUM(BlueprintType)
@@ -244,11 +243,11 @@ public:
 
 	/** Minimum stamina required to use this skill */
 	UPROPERTY(EditDefaultsOnly)
-	int StaminaRequired;
+	int32 StaminaRequired;
 	
 	/** Minimum mana required to use this skill */
 	UPROPERTY(EditDefaultsOnly)
-	int ManaRequired;
+	int32 ManaRequired;
 	
 	/** Skill cooldown */
 	UPROPERTY(EditDefaultsOnly)
@@ -256,7 +255,7 @@ public:
 
 	/** Damage in percentage of player's magickal or physical attack that will inflicted on enemy */
 	UPROPERTY(EditDefaultsOnly)
-	float DamagePercent;
+	int32 DamagePercent;
 
 	/** Determines if this skill can be blocked */
 	UPROPERTY(EditDefaultsOnly)

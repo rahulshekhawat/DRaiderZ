@@ -6,8 +6,10 @@
 #include "Player/EODCharacterBase.h"
 #include "AICharacterBase.generated.h"
 
+class UEODWidgetComponent;
+
 /**
- * 
+ * AICharacterBase is the base class for AI controlled characters
  */
 UCLASS()
 class EOD_API AAICharacterBase : public AEODCharacterBase
@@ -17,6 +19,9 @@ class EOD_API AAICharacterBase : public AEODCharacterBase
 public:
 
 	AAICharacterBase(const FObjectInitializer& ObjectInitializer);
+
+	/** Called when the game starts or when spawned */
+	virtual void BeginPlay() override;
 
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
@@ -43,12 +48,13 @@ public:
 
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
-protected:
-
-	/** Called when the game starts or when spawned */
-	virtual void BeginPlay() override;
-
 private:
+
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UEODWidgetComponent* AggroWidgetComp;
+
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UEODWidgetComponent* HealthWidgetComp;
 
 	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
 	void UpdateMaxWalkSpeed();

@@ -373,6 +373,45 @@ UHUDWidget * APlayerCharacter::GetHUDWidget() const
 	// return nullptr;
 }
 
+void APlayerCharacter::Interrupt()
+{
+}
+
+void APlayerCharacter::Flinch(const EFlinchDirection FlinchDirection)
+{
+	if (!PlayerAnimInstance || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->AnimationMontage_Flinch)
+	{
+		return;
+	}
+
+	if (FlinchDirection == EFlinchDirection::Forward)
+	{
+		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
+		PlayerAnimInstance->Montage_JumpToSection(FName("ForwardFlinch"), GetActiveAnimationReferences()->AnimationMontage_Flinch);
+	}
+	else if (FlinchDirection == EFlinchDirection::Backward)
+	{
+		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
+		PlayerAnimInstance->Montage_JumpToSection(FName("BackwardFlinch"), GetActiveAnimationReferences()->AnimationMontage_Flinch);
+	}
+}
+
+void APlayerCharacter::Stun(const float Duration)
+{
+}
+
+void APlayerCharacter::Freeze(const float Duration)
+{
+}
+
+void APlayerCharacter::Knockdown(const float Duration)
+{
+}
+
+void APlayerCharacter::Knockback(const float Duration, const FVector & Impulse)
+{
+}
+
 bool APlayerCharacter::CanAutoRun() const
 {
 	// The character can auto run only if character is in idle state
@@ -836,10 +875,12 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 	}
 }
 
+/*
 int32 APlayerCharacter::ApplyEODDamage(FEODDamage& EODDamage)
 {
 	return Super::ApplyEODDamage(EODDamage);
 }
+*/
 
 void APlayerCharacter::Destroyed()
 {

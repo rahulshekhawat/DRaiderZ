@@ -24,6 +24,45 @@ enum class ECrowdControlEffect : uint8
 };
 
 UENUM(BlueprintType)
+enum class EFlinchDirection : uint8
+{
+	Forward,
+	Backward,
+};
+
+UENUM(BlueprintType)
+enum class ECharacterResponseToDamage : uint8
+{
+	Immune,
+	Blocked,
+	Dodged,
+	Nullified,
+	Damaged
+};
+
+USTRUCT(BlueprintType)
+struct FEODDamageResult
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	ECharacterResponseToDamage CharacterResponseToDamage;
+
+	ECrowdControlEffect CrowdControlEffect;
+
+	int32 ActualDamage;
+
+	bool bCritHit;
+
+	FEODDamageResult()
+	{
+		CharacterResponseToDamage = ECharacterResponseToDamage::Damaged;
+		ActualDamage = 0;
+	}
+};
+
+UENUM(BlueprintType)
 enum class EDamageType : uint8
 {
 	Physical,
@@ -39,23 +78,37 @@ struct FEODDamage
 public:
 
 	/** Actual collision hit result */
-	FHitResult CollisionHitResult;
+	// FHitResult CollisionHitResult;
 
 	/** 
 	 * Line hit result from instigator to hit character.
 	 * Impact location and impact normal are used to play hit sound, hit particle effect, and determining whether hit character blocked the attack
 	 */
-	FHitResult LineHitResult;
+	// FHitResult LineHitResult;
 	
 	/** The character that caused damage */
-	AEODCharacterBase* Instigator;
+	// AEODCharacterBase* Instigator;
 
 	/** Determines whether the hit causes critical damage or not */
-	bool bCriticalHit;
+	// bool bCriticalHit;
+
+	bool bUndodgable;
+	
+	bool bUnblockable;
+
+	float CritRate;
+
+	int32 NormalDamage;
+
+	int32 CritDamage;
+
+	EDamageType DamageType;
+
+	ECrowdControlEffect CrowdControlEffect;
 
 	FEODDamage()
 	{
-		bCriticalHit = false;
+		// bCriticalHit = false;
 	}
 };
 

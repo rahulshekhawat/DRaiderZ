@@ -135,14 +135,41 @@ public:
 	/** Returns true if character can use a particular skill at SkillIndex */
 	virtual bool CanUseSkill(int32 SkillIndex) const;
 	
+	FORCEINLINE bool CanFlinch() const;
+
+	FORCEINLINE bool CanStun() const;
+
+	FORCEINLINE bool CanKnockdown() const;
+
+	FORCEINLINE bool CanKnockback() const;
+
+	FORCEINLINE bool CanFreeze() const;
+
+	FORCEINLINE bool CanInterrupt() const;
+
 	/** Returns true if this character requires healing (low on HP) */
 	virtual bool NeedsHeal() const;
 
 	/** Returns true if this character is healing either self or another character */
 	virtual bool IsHealing() const;
 
+	/** [server + client] Interrupt this character's current action */
+	virtual void Interrupt() PURE_VIRTUAL(AEODCharacterBase::Interrupt, );
+
+	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
+	virtual void Flinch(const EFlinchDirection FlinchDirection) PURE_VIRTUAL(AEODCharacterBase::Flinch, );
+
 	/** [server + client] Applies stun to this character */
-	virtual void ApplyStun(float Duration);
+	virtual void Stun(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Stun, );
+
+	/** [server + client] Freeze this character */
+	virtual void Freeze(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Freeze, );
+
+	/** [server + client] Knockdown this character */
+	virtual void Knockdown(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Knockdown, );
+
+	/** [server + client] Knockback this character */
+	virtual void Knockback(const float Duration, const FVector& Impulse) PURE_VIRTUAL(AEODCharacterBase::Knockback, );
 
 	UFUNCTION()
 	virtual void EnableiFrames(float Duration = 0.f);
@@ -161,7 +188,7 @@ public:
 	 * @param CauseOfDeath - The reason for death of this character
 	 * @param Instigator - The character that instigated the death of this character (if any)
 	 */
-	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* Instigator = nullptr);
+	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* InstigatingChar = nullptr);
 
 	/** Set whether character is in combat or not */
 	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; }
@@ -207,10 +234,10 @@ public:
 	virtual int32 GetMostWeightedSkillIndex() const;
 
 	/** Returns the skill that character is using currently. Returns nullptr if character is not using any skill */
-	virtual FSkill* GetCurrentActiveSkill() const;
+	FORCEINLINE FSkill* GetCurrentActiveSkill() const;
 
 	/** Returns the last used skill */
-	virtual FLastUsedSkillInfo& GetLastUsedSkill();
+	FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();
 
 	/**
 	 * Applies status effect on the character
@@ -228,7 +255,11 @@ public:
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
 	/** [server] Apply damage to this character */
-	virtual int32 ApplyEODDamage(FEODDamage& EODDamage);
+	// virtual FEODDamageResult ApplyEODDamage(FEODDamage& EODDamage);
+
+	virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult);
+
+	// virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult, const FHitResult& LineHitResult);
 
 	/** Called on an animation montage blending out to clean up, reset, or change any state variables */
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
@@ -328,6 +359,11 @@ protected:
 	/** Determines if character is blocking any incoming damage */
 	UPROPERTY(Transient)
 	bool bIsBlockingDamage;
+
+	// @todo
+	// virtual void OnBlockingEnemy()
+
+	// virtual void OnBlockedByEnemy();
 
 private:
 	

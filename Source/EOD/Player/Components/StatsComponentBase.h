@@ -291,6 +291,18 @@ public:
 
 	virtual void SetDarkness(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetDarkness, );
 
+	virtual float GetPhysicalDamageReductionOnBlock() const PURE_VIRTUAL(UStatsComponentBase::GetPhysicalDamageReductionOnBlock, return 0.f; );
+
+	virtual float GetMagickDamageReductionOnBlock() const PURE_VIRTUAL(UStatsComponentBase::GetMagickDamageReductionOnBlock, return 0.f; );
+
+	virtual float ModifyPhysicalDamageReductionOnBlock(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyPhysicalDamageReductionOnBlock, return 0.f; );
+
+	virtual float ModifyMagickDamageReductionOnBlock(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyMagickDamageReductionOnBlock, return 0.f; );
+
+	virtual void SetPhysicalDamageReductionOnBlock(float Value) PURE_VIRTUAL(UStatsComponentBase::SetPhysicalDamageReductionOnBlock, );
+
+	virtual void SetMagickDamageReductionOnBlock(float Value) PURE_VIRTUAL(UStatsComponentBase::SetMagickDamageReductionOnBlock, );
+
 protected:
 
 	//~ @note following booleans are used to initialize timers for derived stats components

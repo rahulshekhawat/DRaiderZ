@@ -14,6 +14,9 @@ class ASecondaryWeapon;
 class UPlayerAnimInstance;
 class UStaticMeshComponent;
 class USkeletalMeshComponent;
+class USpringArmComponent;
+class UCameraComponent;
+class UInventoryComponent;
 
 /**
  * PlayerCharacter is the base class for playable characters
@@ -60,10 +63,10 @@ public:
 private:
 	
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+	USpringArmComponent* CameraBoom;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* PlayerCamera;
+	UCameraComponent* PlayerCamera;
 
 	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player face
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -89,7 +92,7 @@ private:
 	
 	//~ Inventory component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UInventoryComponent* InventoryComponent;
+	UInventoryComponent* InventoryComponent;
 	
 	/** A helper function that must be called from constructor. Creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
@@ -128,6 +131,24 @@ public:
 	ASecondaryWeapon* GetSecondaryWeapon() const;
 
 	UHUDWidget* GetHUDWidget() const;
+
+	/** [server + client] Interrupt this character's current action */
+	virtual void Interrupt() override;
+
+	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
+	virtual void Flinch(const EFlinchDirection FlinchDirection) override;
+
+	/** [server + client] Applies stun to this character */
+	virtual void Stun(const float Duration) override;
+
+	/** [server + client] Freeze this character */
+	virtual void Freeze(const float Duration) override;
+
+	/** [server + client] Knockdown this character */
+	virtual void Knockdown(const float Duration) override;
+
+	/** [server + client] Knockback this character */
+	virtual void Knockback(const float Duration, const FVector& Impulse) override;
 
 	/** Replace primary weapon with a new weapon */
 	void SetCurrentPrimaryWeapon(const FName WeaponID);
@@ -172,7 +193,7 @@ public:
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
 	/** [server] Apply damage to a character */
-	virtual int32 ApplyEODDamage(FEODDamage& EODDamage) override;
+	// virtual int32 ApplyEODDamage(FEODDamage& EODDamage) override;
 
 	/** Called on an animation montage blending out to clean up, reset, or change any state variables */
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted) override;
