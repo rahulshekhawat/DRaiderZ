@@ -736,6 +736,16 @@ EFaction AEODCharacterBase::GetFaction() const
 	return Faction;
 }
 
+FSkill * AEODCharacterBase::GetSkill(FName SkillID) const
+{
+	if (IDToSkillMap.Contains(SkillID))
+	{
+		return IDToSkillMap[SkillID];
+	}
+
+	return nullptr;
+}
+
 void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * InstigatingChar)
 {
 	if (bGodMode || IsDead())

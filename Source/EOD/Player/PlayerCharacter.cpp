@@ -11,9 +11,11 @@
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
 #include "Core/EODPreprocessors.h"
+#include "Core/EODSaveGame.h"
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/StreamableManager.h"
@@ -191,6 +193,14 @@ void APlayerCharacter::PostInitializeComponents()
 	{
 		SetCurrentPrimaryWeapon(PrimaryWeaponID);
 	}
+
+	// Initialize skills
+	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(FString("DefaultSlot"), 0));
+	if (EODSaveGame)
+	{
+		InitializeSkills(EODSaveGame->UnlockedSkills);
+	}
+
 }
 
 void APlayerCharacter::PostInitProperties()
@@ -978,6 +988,19 @@ void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(const EWeaponType
 FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() const
 {
 	return bWeaponSheathed ? SheathedWeaponAnimationReferences : EquippedWeaponAnimationReferences;
+}
+
+void APlayerCharacter::InitializeSkills(TArray<FName> UnlockedSKillsID)
+{
+	for (FName& SkillID : UnlockedSKillsID)
+	{
+		FSkill* Skill = UCharacterLibrary::GetPlayerSkill(SkillID);
+
+		if (Skill)
+		{
+			IDToSkillMap.Add(SkillID, Skill);
+		}
+	}
 }
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)

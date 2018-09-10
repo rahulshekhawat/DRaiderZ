@@ -211,6 +211,8 @@ public:
 	/** Returns character faction */
 	EFaction GetFaction() const;
 
+	virtual FSkill* GetSkill(FName SkillID) const;
+
 	/** Returns the skill at given SkillIndex */
 	virtual FSkill* GetSkill(int32 SkillIndex) const;
 
@@ -327,6 +329,8 @@ protected:
 	TMap<uint8, FCombatEvent> OnUsingSkillEventMap;
 
 	TArray<FSkill*> Skills;
+
+	TMap<FName, FSkill*> IDToSkillMap;
 
 	FSkill* CurrentActiveSkill;
 

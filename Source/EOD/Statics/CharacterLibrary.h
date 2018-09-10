@@ -391,6 +391,8 @@ public:
 	/** Returns player animation references based on the EWeaponAnimationType of player */
 	static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType, ECharacterGender Gender = ECharacterGender::Female);
 
+	static FSkill* GetPlayerSkill(FName SKillID);
+
 	/** Attempts to unload player animation references, returns true if successful */
 	static bool UnloadPlayerAnimationReferences(FPlayerAnimationReferences* PlayerAnimationReferences, ECharacterGender Gender = ECharacterGender::Female);
 

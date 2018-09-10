@@ -361,6 +361,8 @@ private:
 
 	FPlayerAnimationReferences* GetActiveAnimationReferences() const;
 
+	void InitializeSkills(TArray<FName> UnlockedSKillsID);
+
 	/** Called when player presses a skill key */
 	template<uint32 SkillButtonIndex>
 	void PressedSkillKey();

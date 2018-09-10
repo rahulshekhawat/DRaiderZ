@@ -246,6 +246,27 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 	return PlayerAnimationReferences;
 }
 
+FSkill * UCharacterLibrary::GetPlayerSkill(FName SKillID)
+{
+	FSkill* Skill = nullptr;
+
+	if (GEngine && GEngine->GameSingleton)
+	{
+		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+		if (GameSingleton && GameSingleton->PlayerSkillsTable)
+		{
+			FSkillTableRow* SkillTableRow = GameSingleton->PlayerSkillsTable->FindRow<FSkillTableRow>(SKillID, FString("Looking up player skill"));
+
+			if (SkillTableRow)
+			{
+				Skill = new FSkill(SkillTableRow);
+			}
+		}
+	}
+
+	return Skill;
+}
+
 bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferences * PlayerAnimationReferences, ECharacterGender Gender)
 {
 	if (!(PlayerAnimationReferences && GEngine && GEngine->GameSingleton))

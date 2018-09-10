@@ -25,12 +25,15 @@ public:
 	FStreamableManager StreamableManager;
 	
 	/** Reference to data table containing player animation references data */
-	UPROPERTY(EditDefaultsOnly, Category = PlayerAnimationsReferences)
+	UPROPERTY(EditDefaultsOnly, Category = DataTable)
 	UDataTable* PlayerAnimationReferencesDataTable;
 	
 	/** Reference to data table containing weapons data */
-	UPROPERTY(EditDefaultsOnly, Category = Weapons)
+	UPROPERTY(EditDefaultsOnly, Category = DataTable)
 	UDataTable* WeaponDataTable;
+
+	UPROPERTY(EditDefaultsOnly, Category = DataTable)
+	UDataTable* PlayerSkillsTable;
 
 	UPROPERTY(EditDefaultsOnly, Category = UI)
 	TSubclassOf<UUserWidget> FloatingDamageNumberWidgetClass;
