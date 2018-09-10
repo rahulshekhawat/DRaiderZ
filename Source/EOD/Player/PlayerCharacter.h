@@ -99,6 +99,12 @@ private:
 	
 public:
 
+	UPROPERTY(Transient)
+	bool bRotateSmoothly;
+
+	UPROPERTY(Transient)
+	float DesiredSmoothRotationYaw;
+
 	/** Returns true if character can move */
 	virtual bool CanMove() const override;
 

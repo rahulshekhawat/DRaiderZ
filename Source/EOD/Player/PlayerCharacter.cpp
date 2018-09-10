@@ -285,6 +285,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			UpdateBlockState(DeltaTime);
 		}
+
+		if (bRotateSmoothly)
+		{
+			bRotateSmoothly = !DeltaRotateCharacterToDesiredYaw(DesiredSmoothRotationYaw, DeltaTime);
+		}
 	}
 }
 
