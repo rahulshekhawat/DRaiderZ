@@ -58,52 +58,52 @@ public:
 	virtual void BeginPlay() override;
 
 	/** Returns true if character is alive */
-	virtual bool IsAlive() const;
+	FORCEINLINE bool IsAlive() const;
 
 	/** Returns true if character is dead */
-	virtual bool IsDead() const;
+	FORCEINLINE bool IsDead() const;
 	
 	/** Returns true if character is idling */
-	virtual bool IsIdle() const;
+	FORCEINLINE bool IsIdle() const;
 
 	/** Returns true if character is moving around */
-	virtual bool IsMoving() const;
+	FORCEINLINE bool IsMoving() const;
 
 	/** Returns true if character is in idle-walk-run state */
-	virtual bool IsIdleOrMoving() const;
+	FORCEINLINE bool IsIdleOrMoving() const;
 
 	/** Returns true if character is jumping */
-	virtual bool IsJumping() const;
+	FORCEINLINE bool IsJumping() const;
 
 	/** Determines if the character is in dodge state. Used to trigger dodge animation */
-	virtual bool IsDodging() const;	
+	FORCEINLINE virtual bool IsDodging() const;
 	
 	/** Determines if the character is dodging incoming damage */
-	virtual bool IsDodgingDamage() const;
+	FORCEINLINE virtual bool IsDodgingDamage() const;
 
 	/**
 	 * Detemines if the character is in block state. Used to trigger block animation.
 	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
 	 */
-	virtual bool IsBlocking() const;
+	FORCEINLINE bool IsBlocking() const;
 
 	/** 
 	 * Determines if the character is actively blocking any incoming damage
 	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
 	 */
-	virtual bool IsBlockingDamage() const;
+	FORCEINLINE bool IsBlockingDamage() const;
 
 	/** Returns true if character is currently casting a spell */
-	virtual bool IsCastingSpell() const;
+	FORCEINLINE bool IsCastingSpell() const;
 	
 	/** Returns true if character is using a normal attack */
-	virtual bool IsNormalAttacking() const;
+	FORCEINLINE bool IsNormalAttacking() const;
 
 	/** Returns true if character is using any skill */
-	virtual bool IsUsingAnySkill() const;
+	FORCEINLINE bool IsUsingAnySkill() const;
 
 	/** Returns true if character is using skill at SkillIndex */
-	virtual bool IsUsingSkill(int32 SkillIndex) const;
+	FORCEINLINE bool IsUsingSkill(int32 SkillIndex) const;
 
 	/** Returns true if a hit from HitSkill was critical */
 	virtual bool IsCriticalHit(const FSkill* HitSkill) const;
