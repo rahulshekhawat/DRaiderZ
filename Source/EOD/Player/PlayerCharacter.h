@@ -181,6 +181,8 @@ public:
 	/** [server + client] Change player's weapon sheath state */
 	void SetWeaponSheathed(bool bNewValue);
 
+	virtual void SetCurrentActiveSkill(FName SkillID) override;
+
 	/**
 	 * Returns player controller rotation yaw in -180/180 range.
 	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable

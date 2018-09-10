@@ -583,7 +583,18 @@ void APlayerCharacter::OnToggleMouseCursor()
 
 void APlayerCharacter::OnPressedNormalAttack()
 {
+	if (CanNormalAttack() && GetActiveAnimationReferences()->AnimationMontage_NormalAttacks)
+	{
+		if (IsNormalAttacking())
+		{
 
+		}
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
+
+
+
+
+	}
 }
 
 void APlayerCharacter::OnReleasedNormalAttack()
@@ -717,7 +728,6 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 			SetWalkSpeed(Speed);
 		}
 	}
-
 	
 	if (ForwardAxisValue == 0)
 	{
@@ -1270,6 +1280,13 @@ void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 	{
 		Server_SetWeaponSheathed(bNewValue);
 	}
+}
+
+void APlayerCharacter::SetCurrentActiveSkill(FName SkillID)
+{
+	// FSkillTableRow* SkillTableRow
+
+	// @todo definition
 }
 
 void APlayerCharacter::OnRep_WeaponSheathed()

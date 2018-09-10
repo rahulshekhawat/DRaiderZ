@@ -236,6 +236,8 @@ public:
 	/** Returns the skill that character is using currently. Returns nullptr if character is not using any skill */
 	FORCEINLINE FSkill* GetCurrentActiveSkill() const;
 
+	virtual void SetCurrentActiveSkill(FName SkillID) PURE_VIRTUAL(AEODCharacterBase::SetCurrentActiveSkill, );
+
 	/** Returns the last used skill */
 	FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();
 

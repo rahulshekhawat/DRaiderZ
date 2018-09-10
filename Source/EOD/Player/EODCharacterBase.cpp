@@ -92,7 +92,8 @@ FORCEINLINE bool AEODCharacterBase::IsCastingSpell() const
 
 FORCEINLINE bool AEODCharacterBase::IsNormalAttacking() const
 {
-	return CharacterState == ECharacterState::Attacking && CurrentActiveSkill != nullptr;
+	// return CharacterState == ECharacterState::Attacking && CurrentActiveSkill != nullptr;
+	return CharacterState == ECharacterState::Attacking;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsUsingAnySkill() const
