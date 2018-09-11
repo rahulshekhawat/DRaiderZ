@@ -136,6 +136,8 @@ public:
 
 	ASecondaryWeapon* GetSecondaryWeapon() const;
 
+	EWeaponType GetEquippedWeaponType() const;
+
 	UHUDWidget* GetHUDWidget() const;
 
 	/** [server + client] Interrupt this character's current action */
@@ -168,6 +170,8 @@ public:
 	/** Removes secondary weapon if it is currently equipped */
 	void RemoveSecondaryWeapon();
 
+	// FORCEINLINE void OnSecondaryWeaponFailedToEquip(FName WeaponID, FWeaponTableRow * NewWeaponData);
+
 	/** [server + client] Change idle-walk-run direction of character */
 	void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
@@ -183,9 +187,11 @@ public:
 
 	// virtual void SetCurrentActiveSkill(FName SkillID) override;
 
-	virtual void OnNormalAttackSectionStart(FName NormalAttackSection) override;
+	virtual void OnNormalAttackSectionStart(FName SectionName) override;
 
-	virtual void UpdateNormalAttackSectionToSkillMap(EWeaponAnimationType NewAnimationType, EWeaponAnimationType OldAnimationType) override;
+	void CleanupNormalAttackSectionToSkillMap();
+
+	void UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeaponType);
 
 	/**
 	 * Returns player controller rotation yaw in -180/180 range.
@@ -387,6 +393,8 @@ private:
 	FPlayerAnimationReferences* GetActiveAnimationReferences() const;
 
 	FName GetNextNormalAttackSectionName(const FName& CurrentSection) const;
+
+	// EWeaponType GetCurrentEquippedWeaponType()
 
 	void InitializeSkills(TArray<FName> UnlockedSKillsID);
 

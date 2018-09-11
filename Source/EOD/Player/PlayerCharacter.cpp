@@ -178,10 +178,10 @@ void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
+
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
 
 	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
@@ -189,15 +189,9 @@ void APlayerCharacter::PostInitializeComponents()
 	PrimaryWeapon->SetOwningCharacter(this);
 	SecondaryWeapon->SetOwningCharacter(this);
 
-	// @note please set secondary weapon first and primary weapon later.
-	if (SecondaryWeaponID != NAME_None)
-	{
-		SetCurrentSecondaryWeapon(SecondaryWeaponID);
-	}
-	if (PrimaryWeaponID != NAME_None)
-	{
-		SetCurrentPrimaryWeapon(PrimaryWeaponID);
-	}
+	// @note Set secondary weapon first and primary weapon later during initialization
+	SetCurrentSecondaryWeapon(SecondaryWeaponID);
+	SetCurrentPrimaryWeapon(PrimaryWeaponID);
 
 	// Initialize skills
 	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(FString("DefaultSlot"), 0));
@@ -205,7 +199,6 @@ void APlayerCharacter::PostInitializeComponents()
 	{
 		InitializeSkills(EODSaveGame->UnlockedSkills);
 	}
-
 }
 
 void APlayerCharacter::PostInitProperties()
@@ -385,6 +378,11 @@ APrimaryWeapon * APlayerCharacter::GetPrimaryWeapon() const
 ASecondaryWeapon * APlayerCharacter::GetSecondaryWeapon() const
 {
 	return SecondaryWeapon;
+}
+
+EWeaponType APlayerCharacter::GetEquippedWeaponType() const
+{
+	return PrimaryWeapon->WeaponType;
 }
 
 UHUDWidget * APlayerCharacter::GetHUDWidget() const
@@ -1170,8 +1168,8 @@ void APlayerCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
 	}
 
 	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
-	// If WeaponID is invalid
-	if (!WeaponData)
+	// If it's an invalid weapon
+	if (!WeaponData || WeaponData->WeaponMesh.IsNull())
 	{
 		return;
 	}
@@ -1183,7 +1181,6 @@ void APlayerCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
 	}
 	PrimaryWeaponID = WeaponID;
 	PrimaryWeapon->OnEquip(WeaponID, WeaponData);
-
 	UpdateCurrentWeaponAnimationType();
 }
 
@@ -1196,8 +1193,8 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 	}
 
 	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
-	// If WeaponID is invalid
-	if (!WeaponData)
+	// If it's an invalid weapon
+	if (!WeaponData || WeaponData->WeaponMesh.IsNull())
 	{
 		return;
 	}
@@ -1210,8 +1207,6 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 	}
 	SecondaryWeaponID = WeaponID;
 	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
-
-	// UpdateCurrentWeaponAnimationType();
 }
 
 void APlayerCharacter::RemovePrimaryWeapon()
@@ -1225,6 +1220,13 @@ void APlayerCharacter::RemoveSecondaryWeapon()
 	SecondaryWeaponID = NAME_None;
 	SecondaryWeapon->OnUnEquip();
 }
+
+/*
+FORCEINLINE void APlayerCharacter::OnSecondaryWeaponFailedToEquip(FName WeaponID, FWeaponTableRow * NewWeaponData)
+{
+	SecondaryWeaponID = NAME_None;
+}
+*/
 
 void APlayerCharacter::UpdateCurrentWeaponAnimationType()
 {
@@ -1314,12 +1316,7 @@ bool APlayerCharacter::Server_SetIWRCharMovementDir_Validate(ECharMovementDirect
 
 void APlayerCharacter::SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType)
 {
-	if (NewWeaponAnimationType != EWeaponAnimationType::NoWeapon &&
-		NewWeaponAnimationType != EWeaponAnimationType::SheathedWeapon)
-	{
-		UpdateNormalAttackSectionToSkillMap(NewWeaponAnimationType, CurrentWeaponAnimationToUse);
-	}
-
+	// UpdateNormalAttackSectionToSkillMap(NewWeaponAnimationType, CurrentWeaponAnimationToUse);
 	CurrentWeaponAnimationToUse = NewWeaponAnimationType;
 	
 	
@@ -1372,98 +1369,113 @@ void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 	}
 }
 
-void APlayerCharacter::OnNormalAttackSectionStart(FName NormalAttackSection)
+void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
-	// CurrentActiveSkill = NormalAttackSectionToSkillMap[NormalAttackSection];
-
-	/*
-	if (CurrentWeaponAnimationToUse == EWeaponAnimationType::GreatSword ||
-		CurrentWeaponAnimationToUse == EWeaponAnimationType::WarHammer ||
-		CurrentWeaponAnimationToUse == EWeaponAnimationType::Staff)
-	{
-		
-
-
-		if (NormalAttackSection == FString("FirstSwing"))
-		{
-			
-			// FSkill
-
-		}
-		else if (NormalAttackSection == FString("SecondSwing"))
-		{
-
-		}
-		else if (NormalAttackSection == FString("ThirdSwing"))
-		{
-
-		}
-	}
-	else if (CurrentWeaponAnimationToUse == EWeaponAnimationType::ShieldAndMace ||
-		CurrentWeaponAnimationToUse == EWeaponAnimationType::ShieldAndSword)
-	{
-		if (NormalAttackSection == FString("FirstSwing"))
-		{
-
-		}
-		else if (NormalAttackSection == FString("SecondSwing"))
-		{
-
-		}
-		else if (NormalAttackSection == FString("ThirdSwing"))
-		{
-
-		}
-	}
-	else if (CurrentWeaponAnimationToUse == EWeaponAnimationType::Daggers)
-	{
-
-	}
-	*/
+	CurrentActiveSkill = NormalAttackSectionToSkillMap[SectionName];
 }
 
-void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponAnimationType NewAnimationType, EWeaponAnimationType OldAnimationType)
+void APlayerCharacter::CleanupNormalAttackSectionToSkillMap()
 {
-	// @todo optimize
-	if (OldAnimationType == EWeaponAnimationType::GreatSword ||
-		OldAnimationType == EWeaponAnimationType::WarHammer)
+	TArray<FName> Keys;
+	NormalAttackSectionToSkillMap.GetKeys(Keys);
+	for (FName& Key : Keys)
 	{
-		/*
-		FSkill* Skill = NormalAttackSectionToSkillMap[FName("FirstSwing")];
+		FSkill* Skill = NormalAttackSectionToSkillMap[Key];
 		delete Skill;
-		Skill = NormalAttackSectionToSkillMap[FName("SecondSwing")];
-		delete Skill;
-		Skill = NormalAttackSectionToSkillMap[FName("ThirdSwing")];
-		delete Skill;
-		NormalAttackSectionToSkillMap.Empty();
-		*/
-		
 	}
-	else if (OldAnimationType == EWeaponAnimationType::Staff)
-	{
+	NormalAttackSectionToSkillMap.Empty();
+}
 
+void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeaponType)
+{
+	CleanupNormalAttackSectionToSkillMap();
+
+	if (NewWeaponType == EWeaponType::GreatSword ||
+		NewWeaponType == EWeaponType::WarHammer)
+	{
+		FSkill* Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("FirstSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("SecondSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 200;
+		NormalAttackSectionToSkillMap.Add(FName("ThirdSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 150;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("ForwardSPSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 150;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("BackwardSPSwing"), Skill);
 	}
-	else if (OldAnimationType == EWeaponAnimationType::Daggers ||
-		OldAnimationType == EWeaponAnimationType::ShieldAndMace ||
-		OldAnimationType == EWeaponAnimationType::ShieldAndSword)
+	else if (NewWeaponType == EWeaponType::Staff)
 	{
+		FSkill* Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("FirstSwing"), Skill);
 
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("SecondSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 120;
+		NormalAttackSectionToSkillMap.Add(FName("ThirdSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 150;
+		NormalAttackSectionToSkillMap.Add(FName("FourthSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 125;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("ForwardSPSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 125;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("BackwardSPSwing"), Skill);
 	}
-
-	if (NewAnimationType == EWeaponAnimationType::GreatSword ||
-		NewAnimationType == EWeaponAnimationType::WarHammer)
+	else if (NewWeaponType == EWeaponType::Dagger ||
+			 NewWeaponType == EWeaponType::LongSword ||
+			 NewWeaponType == EWeaponType::Mace)
 	{
+		FSkill* Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("FirstSwing"), Skill);
 
-	}
-	else if (NewAnimationType == EWeaponAnimationType::Staff)
-	{
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("SecondSwing"), Skill);
 
-	}
-	else if (NewAnimationType == EWeaponAnimationType::Daggers ||
-		NewAnimationType == EWeaponAnimationType::ShieldAndMace ||
-		NewAnimationType == EWeaponAnimationType::ShieldAndSword)
-	{
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 120;
+		NormalAttackSectionToSkillMap.Add(FName("ThirdSwing"), Skill);
 
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 120;
+		NormalAttackSectionToSkillMap.Add(FName("FourthSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 150;
+		NormalAttackSectionToSkillMap.Add(FName("FifthSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 125;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("ForwardSPSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 125;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("BackwardSPSwing"), Skill);
 	}
 }
 

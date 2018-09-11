@@ -44,14 +44,7 @@ void ASecondaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponDat
 {
 	check(NewWeaponData && OwningPlayer);
 
-	if (NewWeaponData->WeaponMesh.IsNull())
-	{
-		// @todo handle failed to equip
-		return;
-	}
-
 	USkeletalMesh* NewSkeletalMesh = nullptr;
-
 	if (NewWeaponData->WeaponMesh.IsPending())
 	{
 		NewSkeletalMesh = NewWeaponData->WeaponMesh.LoadSynchronous();
@@ -81,16 +74,15 @@ void ASecondaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponDat
 		SheathedWeaponMeshComp->AttachToComponent(OwningPlayer->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD_b"));
 		FallenWeaponMeshComp->AttachToComponent(OwningPlayer->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD_w"));
 	}
-	else
-	{
-		// pass
-	}
 
+	/*
 	// Change player animation references if the newer weapon type is different from previous weapon type
 	if (NewWeaponData->WeaponType != WeaponType && NewWeaponData->WeaponType == EWeaponType::Dagger)
 	{
 		OwningPlayer->UpdateEquippedWeaponAnimationReferences(NewWeaponData->WeaponType);
+		// OwningPlayer->UpdateNormalAttackSectionToSkillMap();
 	}
+	*/
 
 	bEquipped = true;
 	WeaponID = NewWeaponID;
@@ -119,9 +111,11 @@ void ASecondaryWeapon::OnUnEquip()
 	WeaponType = EWeaponType::None;
 	// @todo reset weapon stats
 
+	/*
 	// If no primary weapon is equipped by owning player then update player animation references to 'no weapon equipped'
 	if (OwningPlayer && OwningPlayer->GetPrimaryWeapon() && !OwningPlayer->GetPrimaryWeapon()->bEquipped)
 	{
 		OwningPlayer->UpdateEquippedWeaponAnimationReferences(EWeaponType::None);
 	}
+	*/
 }

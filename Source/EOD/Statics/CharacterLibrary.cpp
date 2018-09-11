@@ -346,9 +346,8 @@ FSkill::FSkill()
 	this->CurrentSkillLevel = 0;
 }
 
-FSkill::FSkill(FSkillTableRow * SkillTableRow)
+FSkill::FSkill(FSkillTableRow * SkillTableRow, uint8 SkillLevel)
 {
-	this->CurrentSkillLevel 				= 1;	// Always one when initializing from SkillTableRow pointer
 	this->InGameName 						= SkillTableRow->InGameName;
 	this->Description 						= SkillTableRow->Description;
 	this->SupportedWeapons 					= SkillTableRow->SupportedWeapons;
@@ -357,9 +356,19 @@ FSkill::FSkill(FSkillTableRow * SkillTableRow)
 	this->SkillEndMontageSectionName 		= SkillTableRow->SkillEndMontageSectionName;
 	this->DamageType 						= SkillTableRow->DamageType;
 
-	if (SkillTableRow->SkillLevelUpsInfo.Num() > 0)
+	if (SkillTableRow->SkillLevelUpsInfo.Num() >= SkillLevel)
 	{
+		this->CurrentSkillLevel = SkillLevel;
+		this->SkillLevelUpInfo = SkillTableRow->SkillLevelUpsInfo[SkillLevel - 1];
+	}
+	else if (SkillTableRow->SkillLevelUpsInfo.Num() > 0)
+	{
+		this->CurrentSkillLevel = 1;
 		this->SkillLevelUpInfo = SkillTableRow->SkillLevelUpsInfo[0];
+	}
+	else
+	{
+		this->CurrentSkillLevel = 0;
 	}
 
 	if (SkillTableRow->Icon.IsNull())

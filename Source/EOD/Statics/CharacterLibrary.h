@@ -370,7 +370,7 @@ public:
 
 	FSkill();
 
-	FSkill(FSkillTableRow* SkillTableRow);
+	FSkill(FSkillTableRow* SkillTableRow, uint8 SkillLevel = 1);
 
 };
 

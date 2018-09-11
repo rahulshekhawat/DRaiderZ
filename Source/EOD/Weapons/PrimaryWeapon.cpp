@@ -130,13 +130,8 @@ void APrimaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponData)
 		break;
 	}
 
-	// Change player animation references if the newer weapon type is different from previous weapon type
-	if (NewWeaponData->WeaponType != WeaponType)
-	{
-		OwningPlayer->UpdateEquippedWeaponAnimationReferences(NewWeaponData->WeaponType);
-	}
-
 	OwningPlayer->UpdateEquippedWeaponAnimationReferences(NewWeaponData->WeaponType);
+	OwningPlayer->UpdateNormalAttackSectionToSkillMap(NewWeaponData->WeaponType);
 
 	bEquipped = true;
 	WeaponID = NewWeaponID;
@@ -169,10 +164,17 @@ void APrimaryWeapon::OnUnEquip()
 	WeaponType = EWeaponType::None;
 	// @todo reset weapon stats
 
+	if (OwningPlayer)
+	{
+		OwningPlayer->UpdateEquippedWeaponAnimationReferences(EWeaponType::None);
+	}
+
+	/*
 	// If owning player doesn't have a dagger equipped as secondary weapon then update player animation references to 'no weapon equipped'
 	if (OwningPlayer && OwningPlayer->GetSecondaryWeapon() && OwningPlayer->GetSecondaryWeapon()->WeaponType != EWeaponType::Dagger)
 	{
 		OwningPlayer->UpdateEquippedWeaponAnimationReferences(EWeaponType::None);
 	}
+	*/
 
 }

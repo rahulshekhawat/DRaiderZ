@@ -240,9 +240,7 @@ public:
 
 	// virtual void SetCurrentActiveSkill(FName SkillID) PURE_VIRTUAL(AEODCharacterBase::SetCurrentActiveSkill, );
 
-	virtual void OnNormalAttackSectionStart(FName NormalAttackSection) PURE_VIRTUAL(AEODCharacterBase::OnNormalAttackSectionStart, );
-
-	virtual void UpdateNormalAttackSectionToSkillMap(EWeaponAnimationType NewAnimationType, EWeaponAnimationType OldAnimationType) PURE_VIRTUAL(AEODCharacterBase::UpdateNormalAttackSectionToSkillMap, );
+	virtual void OnNormalAttackSectionStart(FName SectionName) PURE_VIRTUAL(AEODCharacterBase::OnNormalAttackSectionStart, );
 
 	/** Returns the last used skill */
 	FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();

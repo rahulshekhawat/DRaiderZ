@@ -16,6 +16,6 @@ void UAnimNotify_NormalAttack::Notify(USkeletalMeshComponent * MeshComp, UAnimSe
 	PlayerCharacter->bRotateSmoothly = true;
 	PlayerCharacter->DesiredSmoothRotationYaw = PlayerCharacter->GetPlayerControlRotationYaw();
 
-	PlayerCharacter->OnNormalAttackSectionStart(AttackSectionName);
+	PlayerCharacter->OnNormalAttackSectionStart(SectionName);
 
 }
