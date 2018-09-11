@@ -608,6 +608,7 @@ void APlayerCharacter::OnJump()
 
 void APlayerCharacter::OnInteract()
 {
+	// @todo definition
 }
 
 void APlayerCharacter::OnToggleSheathe()
@@ -618,10 +619,12 @@ void APlayerCharacter::OnToggleSheathe()
 
 void APlayerCharacter::OnToggleCharacterStatsUI()
 {
+	// @todo definition
 }
 
 void APlayerCharacter::OnToggleMouseCursor()
 {
+	// @todo definition
 }
 
 void APlayerCharacter::OnPressedNormalAttack()
@@ -663,105 +666,13 @@ void APlayerCharacter::OnPressedNormalAttack()
 				SetNextMontageSection(CurrentSection, NextSection);
 			}
 		}
-
-		/*
-		if (CurrentSection == FName("FirstSwingEnd"))
-		{
-			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("SecondSwing"), ECharacterState::Attacking);
-			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-		}
-		else if (CurrentSection == FName("SecondSwingEnd"))
-		{
-			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("ThirdSwing"), ECharacterState::Attacking);
-			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-		}
-		else if (CurrentSection == FName("ThirdSwingEnd"))
-		{
-			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FourthSwing"), ECharacterState::Attacking);
-			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-		}
-		else if (CurrentSection == FName("FourthSwingEnd"))
-		{
-			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FifthSwing"), ECharacterState::Attacking);
-			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-		}
-		else if (CurrentSection == FName("FirstSwing"))
-		{
-			SetNextMontageSection(FName("FirstSwing"), FName("SecondSwing"));
-		}
-		else if (CurrentSection == FName("SecondSwing"))
-		{
-			SetNextMontageSection(FName("SecondSwing"), FName("ThirdSwing"));
-		}
-		else if (CurrentSection == FName("ThirdSwing"))
-		{
-			SetNextMontageSection(FName("ThirdSwing"), FName("FourthSwing"));
-		}
-		else if (CurrentSection == FName("FourthSwing"))
-		{
-			SetNextMontageSection(FName("FourthSwing"), FName("FifthSwing"));
-		}
-		*/
 	}
 }
 
 void APlayerCharacter::OnReleasedNormalAttack()
 {
+	// empty 
 }
-
-/*
-void APlayerCharacter::OnNormalAttack()
-{
-	if (CanNormalAttack() && PlayerAnimInstance && GetActiveAnimationReferences())
-	{
-		if (IsNormalAttacking())
-		{
-			FName CurrentSection = PlayerAnimInstance->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
-			if (CurrentSection == FName("FirstSwingEnd"))
-			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("SecondSwing"), ECharacterState::Attacking);
-				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-			}
-			else if (CurrentSection == FName("SecondSwingEnd"))
-			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("ThirdSwing"), ECharacterState::Attacking);
-				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-			}
-			else if (CurrentSection == FName("ThirdSwingEnd"))
-			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FourthSwing"), ECharacterState::Attacking);
-				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-			}
-			else if (CurrentSection == FName("FourthSwingEnd"))
-			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FifthSwing"), ECharacterState::Attacking);
-				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-			}
-			else if (CurrentSection == FName("FirstSwing"))
-			{
-				SetNextMontageSection(FName("FirstSwing"), FName("SecondSwing"));
-			}
-			else if (CurrentSection == FName("SecondSwing"))
-			{
-				SetNextMontageSection(FName("SecondSwing"), FName("ThirdSwing"));
-			}
-			else if (CurrentSection == FName("ThirdSwing"))
-			{
-				SetNextMontageSection(FName("ThirdSwing"), FName("FourthSwing"));
-			}
-			else if (CurrentSection == FName("FourthSwing"))
-			{
-				SetNextMontageSection(FName("FourthSwing"), FName("FifthSwing"));
-			}
-		}
-		else
-		{
-			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
-			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-		}
-	}
-}
-*/
 
 void APlayerCharacter::OnToggleAutoRun()
 {
