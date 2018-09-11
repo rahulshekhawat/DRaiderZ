@@ -386,6 +386,8 @@ private:
 
 	FPlayerAnimationReferences* GetActiveAnimationReferences() const;
 
+	FName GetNextNormalAttackSectionName(const FName& CurrentSection) const;
+
 	void InitializeSkills(TArray<FName> UnlockedSKillsID);
 
 	/** Called when player presses a skill key */

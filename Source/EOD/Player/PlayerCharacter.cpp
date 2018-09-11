@@ -645,12 +645,26 @@ void APlayerCharacter::OnPressedNormalAttack()
 	else if (!IsNormalAttacking())
 	{
 		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
-		SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
 	}
 	else if (IsNormalAttacking())
 	{
 		FName CurrentSection = PlayerAnimInstance->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
+		FName NextSection = GetNextNormalAttackSectionName(CurrentSection);
 
+		if (NextSection != NAME_None)
+		{
+			FString CurrentSectionString = CurrentSection.ToString();
+			if (CurrentSectionString.EndsWith("End"))
+			{
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, NextSection, ECharacterState::Attacking);
+			}
+			else
+			{
+				SetNextMontageSection(CurrentSection, NextSection);
+			}
+		}
+
+		/*
 		if (CurrentSection == FName("FirstSwingEnd"))
 		{
 			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("SecondSwing"), ECharacterState::Attacking);
@@ -687,6 +701,7 @@ void APlayerCharacter::OnPressedNormalAttack()
 		{
 			SetNextMontageSection(FName("FourthSwing"), FName("FifthSwing"));
 		}
+		*/
 	}
 }
 
@@ -1081,6 +1096,47 @@ void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(const EWeaponType
 FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() const
 {
 	return bWeaponSheathed ? SheathedWeaponAnimationReferences : EquippedWeaponAnimationReferences;
+}
+
+FName APlayerCharacter::GetNextNormalAttackSectionName(const FName & CurrentSection) const
+{
+	if (CurrentSection == FName("FirstSwing") ||
+		CurrentSection == FName("FirstSwingEnd"))
+	{
+		return FName("SecondSwing");
+	}
+	else if (CurrentSection == FName("SecondSwing") ||
+		CurrentSection == FName("SecondSwingEnd"))
+	{
+		return FName("ThirdSwing");
+	}
+	else if (CurrentSection == FName("ThirdSwing") ||
+		CurrentSection == FName("ThirdSwingEnd"))
+	{
+		if (CurrentWeaponAnimationToUse == EWeaponAnimationType::GreatSword ||
+			CurrentWeaponAnimationToUse == EWeaponAnimationType::WarHammer)
+		{
+			return NAME_None;
+		}
+		else
+		{
+			return FName("FourthSwing");
+		}
+	}
+	else if (CurrentSection == FName("FourthSwing") ||
+		CurrentSection == FName("FourthSwingEnd"))
+	{
+		if (CurrentWeaponAnimationToUse == EWeaponAnimationType::Staff)
+		{
+			return NAME_None;
+		}
+		else
+		{
+			return FName("FifthSwing");
+		}
+	}
+
+	return NAME_None;
 }
 
 void APlayerCharacter::InitializeSkills(TArray<FName> UnlockedSKillsID)
