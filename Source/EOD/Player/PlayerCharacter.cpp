@@ -96,6 +96,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &APlayerCharacter::ZoomInCamera);
 	PlayerInputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &APlayerCharacter::ZoomOutCamera);
 
+	PlayerInputComponent->BindAction("Forward", IE_Pressed, this, &APlayerCharacter::OnPressedForward);
+	PlayerInputComponent->BindAction("Forward", IE_Released, this, &APlayerCharacter::OnReleasedForward);
+	PlayerInputComponent->BindAction("Backward", IE_Pressed, this, &APlayerCharacter::OnPressedBackward);
+	PlayerInputComponent->BindAction("Backward", IE_Released, this, &APlayerCharacter::OnReleasedBackward);
+
 	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
 	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
 
@@ -358,7 +363,7 @@ bool APlayerCharacter::CanDodge() const
 
 bool APlayerCharacter::CanBlock() const
 {
-	return (Super::CanBlock() || IsAutoRunning()) &&
+	return (Super::CanBlock() || IsAutoRunning() || IsNormalAttacking()) &&
 		!(CurrentWeaponAnimationToUse == EWeaponAnimationType::NoWeapon || CurrentWeaponAnimationToUse == EWeaponAnimationType::SheathedWeapon);
 }
 
@@ -532,6 +537,29 @@ void APlayerCharacter::OnDodge()
 	}
 }
 
+void APlayerCharacter::OnPressedForward()
+{
+	bBackwardPressed = false;
+	bForwardPressed = true;
+	GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableForwardPressed, 0.1f, false);
+}
+
+void APlayerCharacter::OnPressedBackward()
+{
+	bForwardPressed = false;
+	bBackwardPressed = true;
+	GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableBackwardPressed, 0.1f, false);
+}
+
+void APlayerCharacter::OnReleasedForward()
+{
+	// GetWorld()->GetTimerManager().SetTimer()
+}
+
+void APlayerCharacter::OnReleasedBackward()
+{
+}
+
 void APlayerCharacter::OnPressedBlock()
 {
 	bBlockPressed = true;
@@ -544,6 +572,11 @@ void APlayerCharacter::OnReleasedBlock()
 
 void APlayerCharacter::EnableBlock()
 {
+	if (IsNormalAttacking())
+	{
+		PlayerAnimInstance->Montage_Stop(0.2, GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
+	}
+
 	SetCharacterState(ECharacterState::Blocking);
 	SetUseControllerRotationYaw(true);
 	SetWalkSpeed(BaseBlockMovementSpeed * StatsComp->GetMovementSpeedModifier());
@@ -593,17 +626,67 @@ void APlayerCharacter::OnToggleMouseCursor()
 
 void APlayerCharacter::OnPressedNormalAttack()
 {
-	if (CanNormalAttack() && GetActiveAnimationReferences()->AnimationMontage_NormalAttacks)
+	if (!CanNormalAttack() || !GetActiveAnimationReferences()->AnimationMontage_NormalAttacks)
 	{
-		if (IsNormalAttacking())
-		{
+		return;
+	}
 
-		}
+	// @todo maybe change character state to using skill when using SP attacks?s
+	if (!IsNormalAttacking() && bForwardPressed)
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("ForwardSPSwing"), ECharacterState::Attacking);
+		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
+	}
+	else if (!IsNormalAttacking() && bBackwardPressed)
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("BackwardSPSwing"), ECharacterState::Attacking);
+		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
+	}
+	else if (!IsNormalAttacking())
+	{
 		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
+		SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
+	}
+	else if (IsNormalAttacking())
+	{
+		FName CurrentSection = PlayerAnimInstance->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
 
-
-
-
+		if (CurrentSection == FName("FirstSwingEnd"))
+		{
+			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("SecondSwing"), ECharacterState::Attacking);
+			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
+		}
+		else if (CurrentSection == FName("SecondSwingEnd"))
+		{
+			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("ThirdSwing"), ECharacterState::Attacking);
+			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
+		}
+		else if (CurrentSection == FName("ThirdSwingEnd"))
+		{
+			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FourthSwing"), ECharacterState::Attacking);
+			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
+		}
+		else if (CurrentSection == FName("FourthSwingEnd"))
+		{
+			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FifthSwing"), ECharacterState::Attacking);
+			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
+		}
+		else if (CurrentSection == FName("FirstSwing"))
+		{
+			SetNextMontageSection(FName("FirstSwing"), FName("SecondSwing"));
+		}
+		else if (CurrentSection == FName("SecondSwing"))
+		{
+			SetNextMontageSection(FName("SecondSwing"), FName("ThirdSwing"));
+		}
+		else if (CurrentSection == FName("ThirdSwing"))
+		{
+			SetNextMontageSection(FName("ThirdSwing"), FName("FourthSwing"));
+		}
+		else if (CurrentSection == FName("FourthSwing"))
+		{
+			SetNextMontageSection(FName("FourthSwing"), FName("FifthSwing"));
+		}
 	}
 }
 
@@ -690,6 +773,16 @@ void APlayerCharacter::DisableAutoRun()
 
 	SetCharacterState(ECharacterState::IdleWalkRun);
 	SetUseControllerRotationYaw(false);
+}
+
+void APlayerCharacter::DisableForwardPressed()
+{
+	bForwardPressed = false;
+}
+
+void APlayerCharacter::DisableBackwardPressed()
+{
+	bBackwardPressed = false;
 }
 
 void APlayerCharacter::UpdateIdleState(float DeltaTime)
@@ -1254,7 +1347,14 @@ bool APlayerCharacter::Server_SetIWRCharMovementDir_Validate(ECharMovementDirect
 
 void APlayerCharacter::SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType)
 {
+	if (NewWeaponAnimationType != EWeaponAnimationType::NoWeapon &&
+		NewWeaponAnimationType != EWeaponAnimationType::SheathedWeapon)
+	{
+		UpdateNormalAttackSectionToSkillMap(NewWeaponAnimationType, CurrentWeaponAnimationToUse);
+	}
+
 	CurrentWeaponAnimationToUse = NewWeaponAnimationType;
+	
 	
 	/*
 	if (Role < ROLE_Authority)
@@ -1305,11 +1405,99 @@ void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 	}
 }
 
-void APlayerCharacter::SetCurrentActiveSkill(FName SkillID)
+void APlayerCharacter::OnNormalAttackSectionStart(FName NormalAttackSection)
 {
-	// FSkillTableRow* SkillTableRow
+	// CurrentActiveSkill = NormalAttackSectionToSkillMap[NormalAttackSection];
 
-	// @todo definition
+	/*
+	if (CurrentWeaponAnimationToUse == EWeaponAnimationType::GreatSword ||
+		CurrentWeaponAnimationToUse == EWeaponAnimationType::WarHammer ||
+		CurrentWeaponAnimationToUse == EWeaponAnimationType::Staff)
+	{
+		
+
+
+		if (NormalAttackSection == FString("FirstSwing"))
+		{
+			
+			// FSkill
+
+		}
+		else if (NormalAttackSection == FString("SecondSwing"))
+		{
+
+		}
+		else if (NormalAttackSection == FString("ThirdSwing"))
+		{
+
+		}
+	}
+	else if (CurrentWeaponAnimationToUse == EWeaponAnimationType::ShieldAndMace ||
+		CurrentWeaponAnimationToUse == EWeaponAnimationType::ShieldAndSword)
+	{
+		if (NormalAttackSection == FString("FirstSwing"))
+		{
+
+		}
+		else if (NormalAttackSection == FString("SecondSwing"))
+		{
+
+		}
+		else if (NormalAttackSection == FString("ThirdSwing"))
+		{
+
+		}
+	}
+	else if (CurrentWeaponAnimationToUse == EWeaponAnimationType::Daggers)
+	{
+
+	}
+	*/
+}
+
+void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponAnimationType NewAnimationType, EWeaponAnimationType OldAnimationType)
+{
+	// @todo optimize
+	if (OldAnimationType == EWeaponAnimationType::GreatSword ||
+		OldAnimationType == EWeaponAnimationType::WarHammer)
+	{
+		/*
+		FSkill* Skill = NormalAttackSectionToSkillMap[FName("FirstSwing")];
+		delete Skill;
+		Skill = NormalAttackSectionToSkillMap[FName("SecondSwing")];
+		delete Skill;
+		Skill = NormalAttackSectionToSkillMap[FName("ThirdSwing")];
+		delete Skill;
+		NormalAttackSectionToSkillMap.Empty();
+		*/
+		
+	}
+	else if (OldAnimationType == EWeaponAnimationType::Staff)
+	{
+
+	}
+	else if (OldAnimationType == EWeaponAnimationType::Daggers ||
+		OldAnimationType == EWeaponAnimationType::ShieldAndMace ||
+		OldAnimationType == EWeaponAnimationType::ShieldAndSword)
+	{
+
+	}
+
+	if (NewAnimationType == EWeaponAnimationType::GreatSword ||
+		NewAnimationType == EWeaponAnimationType::WarHammer)
+	{
+
+	}
+	else if (NewAnimationType == EWeaponAnimationType::Staff)
+	{
+
+	}
+	else if (NewAnimationType == EWeaponAnimationType::Daggers ||
+		NewAnimationType == EWeaponAnimationType::ShieldAndMace ||
+		NewAnimationType == EWeaponAnimationType::ShieldAndSword)
+	{
+
+	}
 }
 
 void APlayerCharacter::OnRep_WeaponSheathed()
@@ -1317,7 +1505,7 @@ void APlayerCharacter::OnRep_WeaponSheathed()
 	UpdateCurrentWeaponAnimationType();	
 }
 
-void APlayerCharacter::OnRep_CurrentWeaponAnimationToUse()
+void APlayerCharacter::OnRep_CurrentWeaponAnimationToUse(EWeaponAnimationType OldAnimationType)
 {
 }
 

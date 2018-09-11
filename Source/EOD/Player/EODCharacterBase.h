@@ -238,7 +238,11 @@ public:
 	/** Returns the skill that character is using currently. Returns nullptr if character is not using any skill */
 	FORCEINLINE FSkill* GetCurrentActiveSkill() const;
 
-	virtual void SetCurrentActiveSkill(FName SkillID) PURE_VIRTUAL(AEODCharacterBase::SetCurrentActiveSkill, );
+	// virtual void SetCurrentActiveSkill(FName SkillID) PURE_VIRTUAL(AEODCharacterBase::SetCurrentActiveSkill, );
+
+	virtual void OnNormalAttackSectionStart(FName NormalAttackSection) PURE_VIRTUAL(AEODCharacterBase::OnNormalAttackSectionStart, );
+
+	virtual void UpdateNormalAttackSectionToSkillMap(EWeaponAnimationType NewAnimationType, EWeaponAnimationType OldAnimationType) PURE_VIRTUAL(AEODCharacterBase::UpdateNormalAttackSectionToSkillMap, );
 
 	/** Returns the last used skill */
 	FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();
@@ -331,6 +335,8 @@ protected:
 	TArray<FSkill*> Skills;
 
 	TMap<FName, FSkill*> IDToSkillMap;
+
+	TMap<FName, FSkill*> NormalAttackSectionToSkillMap;
 
 	FSkill* CurrentActiveSkill;
 

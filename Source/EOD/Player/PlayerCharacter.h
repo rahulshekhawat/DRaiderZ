@@ -181,7 +181,11 @@ public:
 	/** [server + client] Change player's weapon sheath state */
 	void SetWeaponSheathed(bool bNewValue);
 
-	virtual void SetCurrentActiveSkill(FName SkillID) override;
+	// virtual void SetCurrentActiveSkill(FName SkillID) override;
+
+	virtual void OnNormalAttackSectionStart(FName NormalAttackSection) override;
+
+	virtual void UpdateNormalAttackSectionToSkillMap(EWeaponAnimationType NewAnimationType, EWeaponAnimationType OldAnimationType) override;
 
 	/**
 	 * Returns player controller rotation yaw in -180/180 range.
@@ -239,6 +243,9 @@ private:
 
 	TArray<FCombatEvent> EventsOnSuccessfulSkillAttack;
 
+	/** Timer handle needed for executing SP normal attacks */
+	FTimerHandle SPAttackTimerHandle;
+
 	UPROPERTY(Transient)
 	APrimaryWeapon* PrimaryWeapon;
 
@@ -250,6 +257,12 @@ private:
 
 	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FName SecondaryWeaponID;
+
+	UPROPERTY(Transient)
+	bool bForwardPressed;
+
+	UPROPERTY(Transient)
+	bool bBackwardPressed;
 
 	UPROPERTY(Transient)
 	bool bBlockPressed;
@@ -315,6 +328,14 @@ private:
 
 	void OnDodge();
 
+	void OnPressedForward();
+
+	void OnPressedBackward();
+
+	void OnReleasedForward();
+
+	void OnReleasedBackward();
+
 	/** Sets the boolean used to enable block to true */
 	void OnPressedBlock();
 	
@@ -359,6 +380,10 @@ private:
 
 	void DisableAutoRun();
 
+	void DisableForwardPressed();
+
+	void DisableBackwardPressed();
+
 	FPlayerAnimationReferences* GetActiveAnimationReferences() const;
 
 	void InitializeSkills(TArray<FName> UnlockedSKillsID);
@@ -392,7 +417,7 @@ private:
 	void OnRep_WeaponSheathed();
 
 	UFUNCTION()
-	void OnRep_CurrentWeaponAnimationToUse();
+	void OnRep_CurrentWeaponAnimationToUse(EWeaponAnimationType OldAnimationType);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);
