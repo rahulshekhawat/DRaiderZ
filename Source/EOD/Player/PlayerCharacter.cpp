@@ -837,6 +837,7 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 
 void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
+	Super::OnMeleeCollision(Animation, HitResults, bHit);
 	/*
 	// @note intentionally commented out. If player animation references are null when a collision event is triggered, we want it to crash.
 	if (!PlayerAnimationReferences || !(Animation == PlayerAnimationReferences->AnimationMontage_NormalAttacks || 

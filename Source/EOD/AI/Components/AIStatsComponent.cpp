@@ -71,8 +71,10 @@ int32 UAIStatsComponent::ModifyMaxHealth(int32 Value)
 
 int32 UAIStatsComponent::ModifyCurrentHealth(int32 Value)
 {
-	CurrentHealth += Value;
-	return CurrentHealth;
+	int32 Result = CurrentHealth + Value;
+	Result = Result <= 0 ? 0 : Result;
+	SetCurrentHealth(Result);
+	return Result;
 }
 
 void UAIStatsComponent::SetBaseHealth(int32 Value)
