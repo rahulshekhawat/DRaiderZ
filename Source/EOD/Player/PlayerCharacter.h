@@ -99,6 +99,12 @@ private:
 	
 public:
 
+	UPROPERTY(Transient)
+	bool bRotateSmoothly;
+
+	UPROPERTY(Transient)
+	float DesiredSmoothRotationYaw;
+
 	/** Returns true if character can move */
 	virtual bool CanMove() const override;
 
@@ -129,6 +135,8 @@ public:
 	APrimaryWeapon* GetPrimaryWeapon() const;
 
 	ASecondaryWeapon* GetSecondaryWeapon() const;
+
+	EWeaponType GetEquippedWeaponType() const;
 
 	UHUDWidget* GetHUDWidget() const;
 
@@ -162,6 +170,8 @@ public:
 	/** Removes secondary weapon if it is currently equipped */
 	void RemoveSecondaryWeapon();
 
+	// FORCEINLINE void OnSecondaryWeaponFailedToEquip(FName WeaponID, FWeaponTableRow * NewWeaponData);
+
 	/** [server + client] Change idle-walk-run direction of character */
 	void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
@@ -174,6 +184,14 @@ public:
 
 	/** [server + client] Change player's weapon sheath state */
 	void SetWeaponSheathed(bool bNewValue);
+
+	// virtual void SetCurrentActiveSkill(FName SkillID) override;
+
+	virtual void OnNormalAttackSectionStart(FName SectionName) override;
+
+	void CleanupNormalAttackSectionToSkillMap();
+
+	void UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeaponType);
 
 	/**
 	 * Returns player controller rotation yaw in -180/180 range.
@@ -231,6 +249,9 @@ private:
 
 	TArray<FCombatEvent> EventsOnSuccessfulSkillAttack;
 
+	/** Timer handle needed for executing SP normal attacks */
+	FTimerHandle SPAttackTimerHandle;
+
 	UPROPERTY(Transient)
 	APrimaryWeapon* PrimaryWeapon;
 
@@ -242,6 +263,12 @@ private:
 
 	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FName SecondaryWeaponID;
+
+	UPROPERTY(Transient)
+	bool bForwardPressed;
+
+	UPROPERTY(Transient)
+	bool bBackwardPressed;
 
 	UPROPERTY(Transient)
 	bool bBlockPressed;
@@ -307,6 +334,14 @@ private:
 
 	void OnDodge();
 
+	void OnPressedForward();
+
+	void OnPressedBackward();
+
+	void OnReleasedForward();
+
+	void OnReleasedBackward();
+
 	/** Sets the boolean used to enable block to true */
 	void OnPressedBlock();
 	
@@ -351,7 +386,17 @@ private:
 
 	void DisableAutoRun();
 
+	void DisableForwardPressed();
+
+	void DisableBackwardPressed();
+
 	FPlayerAnimationReferences* GetActiveAnimationReferences() const;
+
+	FName GetNextNormalAttackSectionName(const FName& CurrentSection) const;
+
+	// EWeaponType GetCurrentEquippedWeaponType()
+
+	void InitializeSkills(TArray<FName> UnlockedSKillsID);
 
 	/** Called when player presses a skill key */
 	template<uint32 SkillButtonIndex>
@@ -382,7 +427,7 @@ private:
 	void OnRep_WeaponSheathed();
 
 	UFUNCTION()
-	void OnRep_CurrentWeaponAnimationToUse();
+	void OnRep_CurrentWeaponAnimationToUse(EWeaponAnimationType OldAnimationType);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);

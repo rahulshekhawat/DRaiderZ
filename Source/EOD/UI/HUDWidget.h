@@ -7,6 +7,9 @@
 #include "Blueprint/UserWidget.h"
 #include "HUDWidget.generated.h"
 
+class UProgressBar;
+class UTextBlock;
+
 /**
  * HUDWidget is used to display player HUD
  */
@@ -26,16 +29,16 @@ public:
 	virtual void NativeDestruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-	class UProgressBar* HealthBar;
+	UProgressBar* HealthBar;
 
 	UPROPERTY(meta = (BindWidget))
-	class UProgressBar* ManaBar;
+	UProgressBar* ManaBar;
 
 	UPROPERTY(meta = (BindWidget))
-	class UProgressBar* StaminaBar;
+	UProgressBar* StaminaBar;
 	
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* LevelText;
+	UTextBlock* LevelText;
 
 	
 	/** TextBlock to display current/max health */

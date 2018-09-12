@@ -11,9 +11,11 @@
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
 #include "Core/EODPreprocessors.h"
+#include "Core/EODSaveGame.h"
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/StreamableManager.h"
@@ -94,6 +96,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &APlayerCharacter::ZoomInCamera);
 	PlayerInputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &APlayerCharacter::ZoomOutCamera);
 
+	PlayerInputComponent->BindAction("Forward", IE_Pressed, this, &APlayerCharacter::OnPressedForward);
+	PlayerInputComponent->BindAction("Forward", IE_Released, this, &APlayerCharacter::OnReleasedForward);
+	PlayerInputComponent->BindAction("Backward", IE_Pressed, this, &APlayerCharacter::OnPressedBackward);
+	PlayerInputComponent->BindAction("Backward", IE_Released, this, &APlayerCharacter::OnReleasedBackward);
+
 	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
 	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
 
@@ -171,10 +178,10 @@ void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
+
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
 
 	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
@@ -182,14 +189,15 @@ void APlayerCharacter::PostInitializeComponents()
 	PrimaryWeapon->SetOwningCharacter(this);
 	SecondaryWeapon->SetOwningCharacter(this);
 
-	// @note please set secondary weapon first and primary weapon later.
-	if (SecondaryWeaponID != NAME_None)
+	// @note Set secondary weapon first and primary weapon later during initialization
+	SetCurrentSecondaryWeapon(SecondaryWeaponID);
+	SetCurrentPrimaryWeapon(PrimaryWeaponID);
+
+	// Initialize skills
+	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(FString("DefaultSlot"), 0));
+	if (EODSaveGame)
 	{
-		SetCurrentSecondaryWeapon(SecondaryWeaponID);
-	}
-	if (PrimaryWeaponID != NAME_None)
-	{
-		SetCurrentPrimaryWeapon(PrimaryWeaponID);
+		InitializeSkills(EODSaveGame->UnlockedSkills);
 	}
 }
 
@@ -285,6 +293,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			UpdateBlockState(DeltaTime);
 		}
+
+		if (bRotateSmoothly)
+		{
+			bRotateSmoothly = !DeltaRotateCharacterToDesiredYaw(DesiredSmoothRotationYaw, DeltaTime);
+		}
 	}
 }
 
@@ -343,7 +356,7 @@ bool APlayerCharacter::CanDodge() const
 
 bool APlayerCharacter::CanBlock() const
 {
-	return (Super::CanBlock() || IsAutoRunning()) &&
+	return (Super::CanBlock() || IsAutoRunning() || IsNormalAttacking()) &&
 		!(CurrentWeaponAnimationToUse == EWeaponAnimationType::NoWeapon || CurrentWeaponAnimationToUse == EWeaponAnimationType::SheathedWeapon);
 }
 
@@ -365,6 +378,11 @@ APrimaryWeapon * APlayerCharacter::GetPrimaryWeapon() const
 ASecondaryWeapon * APlayerCharacter::GetSecondaryWeapon() const
 {
 	return SecondaryWeapon;
+}
+
+EWeaponType APlayerCharacter::GetEquippedWeaponType() const
+{
+	return PrimaryWeapon->WeaponType;
 }
 
 UHUDWidget * APlayerCharacter::GetHUDWidget() const
@@ -517,6 +535,29 @@ void APlayerCharacter::OnDodge()
 	}
 }
 
+void APlayerCharacter::OnPressedForward()
+{
+	bBackwardPressed = false;
+	bForwardPressed = true;
+	GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableForwardPressed, 0.1f, false);
+}
+
+void APlayerCharacter::OnPressedBackward()
+{
+	bForwardPressed = false;
+	bBackwardPressed = true;
+	GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableBackwardPressed, 0.1f, false);
+}
+
+void APlayerCharacter::OnReleasedForward()
+{
+	// GetWorld()->GetTimerManager().SetTimer()
+}
+
+void APlayerCharacter::OnReleasedBackward()
+{
+}
+
 void APlayerCharacter::OnPressedBlock()
 {
 	bBlockPressed = true;
@@ -529,6 +570,11 @@ void APlayerCharacter::OnReleasedBlock()
 
 void APlayerCharacter::EnableBlock()
 {
+	if (IsNormalAttacking())
+	{
+		PlayerAnimInstance->Montage_Stop(0.2, GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
+	}
+
 	SetCharacterState(ECharacterState::Blocking);
 	SetUseControllerRotationYaw(true);
 	SetWalkSpeed(BaseBlockMovementSpeed * StatsComp->GetMovementSpeedModifier());
@@ -560,6 +606,7 @@ void APlayerCharacter::OnJump()
 
 void APlayerCharacter::OnInteract()
 {
+	// @todo definition
 }
 
 void APlayerCharacter::OnToggleSheathe()
@@ -570,74 +617,60 @@ void APlayerCharacter::OnToggleSheathe()
 
 void APlayerCharacter::OnToggleCharacterStatsUI()
 {
+	// @todo definition
 }
 
 void APlayerCharacter::OnToggleMouseCursor()
 {
+	// @todo definition
 }
 
 void APlayerCharacter::OnPressedNormalAttack()
 {
+	if (!CanNormalAttack() || !GetActiveAnimationReferences()->AnimationMontage_NormalAttacks)
+	{
+		return;
+	}
 
+	// @todo maybe change character state to using skill when using SP attacks?s
+	if (!IsNormalAttacking() && bForwardPressed)
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("ForwardSPSwing"), ECharacterState::Attacking);
+		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
+	}
+	else if (!IsNormalAttacking() && bBackwardPressed)
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("BackwardSPSwing"), ECharacterState::Attacking);
+		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
+	}
+	else if (!IsNormalAttacking())
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
+	}
+	else if (IsNormalAttacking())
+	{
+		FName CurrentSection = PlayerAnimInstance->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
+		FName NextSection = GetNextNormalAttackSectionName(CurrentSection);
+
+		if (NextSection != NAME_None)
+		{
+			FString CurrentSectionString = CurrentSection.ToString();
+			if (CurrentSectionString.EndsWith("End"))
+			{
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, NextSection, ECharacterState::Attacking);
+			}
+			else
+			{
+				SetNextMontageSection(CurrentSection, NextSection);
+			}
+		}
+	}
 }
 
 void APlayerCharacter::OnReleasedNormalAttack()
 {
+	// empty 
 }
-
-/*
-void APlayerCharacter::OnNormalAttack()
-{
-	if (CanNormalAttack() && PlayerAnimInstance && GetActiveAnimationReferences())
-	{
-		if (IsNormalAttacking())
-		{
-			FName CurrentSection = PlayerAnimInstance->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
-			if (CurrentSection == FName("FirstSwingEnd"))
-			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("SecondSwing"), ECharacterState::Attacking);
-				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-			}
-			else if (CurrentSection == FName("SecondSwingEnd"))
-			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("ThirdSwing"), ECharacterState::Attacking);
-				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-			}
-			else if (CurrentSection == FName("ThirdSwingEnd"))
-			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FourthSwing"), ECharacterState::Attacking);
-				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-			}
-			else if (CurrentSection == FName("FourthSwingEnd"))
-			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FifthSwing"), ECharacterState::Attacking);
-				SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-			}
-			else if (CurrentSection == FName("FirstSwing"))
-			{
-				SetNextMontageSection(FName("FirstSwing"), FName("SecondSwing"));
-			}
-			else if (CurrentSection == FName("SecondSwing"))
-			{
-				SetNextMontageSection(FName("SecondSwing"), FName("ThirdSwing"));
-			}
-			else if (CurrentSection == FName("ThirdSwing"))
-			{
-				SetNextMontageSection(FName("ThirdSwing"), FName("FourthSwing"));
-			}
-			else if (CurrentSection == FName("FourthSwing"))
-			{
-				SetNextMontageSection(FName("FourthSwing"), FName("FifthSwing"));
-			}
-		}
-		else
-		{
-			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
-			SetCharacterRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-		}
-	}
-}
-*/
 
 void APlayerCharacter::OnToggleAutoRun()
 {
@@ -664,6 +697,16 @@ void APlayerCharacter::DisableAutoRun()
 
 	SetCharacterState(ECharacterState::IdleWalkRun);
 	SetUseControllerRotationYaw(false);
+}
+
+void APlayerCharacter::DisableForwardPressed()
+{
+	bForwardPressed = false;
+}
+
+void APlayerCharacter::DisableBackwardPressed()
+{
+	bBackwardPressed = false;
 }
 
 void APlayerCharacter::UpdateIdleState(float DeltaTime)
@@ -712,7 +755,6 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 			SetWalkSpeed(Speed);
 		}
 	}
-
 	
 	if (ForwardAxisValue == 0)
 	{
@@ -795,6 +837,7 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 
 void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
+	Super::OnMeleeCollision(Animation, HitResults, bHit);
 	/*
 	// @note intentionally commented out. If player animation references are null when a collision event is triggered, we want it to crash.
 	if (!PlayerAnimationReferences || !(Animation == PlayerAnimationReferences->AnimationMontage_NormalAttacks || 
@@ -965,6 +1008,60 @@ FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() co
 	return bWeaponSheathed ? SheathedWeaponAnimationReferences : EquippedWeaponAnimationReferences;
 }
 
+FName APlayerCharacter::GetNextNormalAttackSectionName(const FName & CurrentSection) const
+{
+	if (CurrentSection == FName("FirstSwing") ||
+		CurrentSection == FName("FirstSwingEnd"))
+	{
+		return FName("SecondSwing");
+	}
+	else if (CurrentSection == FName("SecondSwing") ||
+		CurrentSection == FName("SecondSwingEnd"))
+	{
+		return FName("ThirdSwing");
+	}
+	else if (CurrentSection == FName("ThirdSwing") ||
+		CurrentSection == FName("ThirdSwingEnd"))
+	{
+		if (CurrentWeaponAnimationToUse == EWeaponAnimationType::GreatSword ||
+			CurrentWeaponAnimationToUse == EWeaponAnimationType::WarHammer)
+		{
+			return NAME_None;
+		}
+		else
+		{
+			return FName("FourthSwing");
+		}
+	}
+	else if (CurrentSection == FName("FourthSwing") ||
+		CurrentSection == FName("FourthSwingEnd"))
+	{
+		if (CurrentWeaponAnimationToUse == EWeaponAnimationType::Staff)
+		{
+			return NAME_None;
+		}
+		else
+		{
+			return FName("FifthSwing");
+		}
+	}
+
+	return NAME_None;
+}
+
+void APlayerCharacter::InitializeSkills(TArray<FName> UnlockedSKillsID)
+{
+	for (FName& SkillID : UnlockedSKillsID)
+	{
+		FSkill* Skill = UCharacterLibrary::GetPlayerSkill(SkillID);
+
+		if (Skill)
+		{
+			IDToSkillMap.Add(SkillID, Skill);
+		}
+	}
+}
+
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
 #if DEVSTAGE_CODE_ENABLED
@@ -1072,8 +1169,8 @@ void APlayerCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
 	}
 
 	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
-	// If WeaponID is invalid
-	if (!WeaponData)
+	// If it's an invalid weapon
+	if (!WeaponData || WeaponData->WeaponMesh.IsNull())
 	{
 		return;
 	}
@@ -1085,7 +1182,6 @@ void APlayerCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
 	}
 	PrimaryWeaponID = WeaponID;
 	PrimaryWeapon->OnEquip(WeaponID, WeaponData);
-
 	UpdateCurrentWeaponAnimationType();
 }
 
@@ -1098,8 +1194,8 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 	}
 
 	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
-	// If WeaponID is invalid
-	if (!WeaponData)
+	// If it's an invalid weapon
+	if (!WeaponData || WeaponData->WeaponMesh.IsNull())
 	{
 		return;
 	}
@@ -1112,8 +1208,6 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 	}
 	SecondaryWeaponID = WeaponID;
 	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
-
-	// UpdateCurrentWeaponAnimationType();
 }
 
 void APlayerCharacter::RemovePrimaryWeapon()
@@ -1127,6 +1221,13 @@ void APlayerCharacter::RemoveSecondaryWeapon()
 	SecondaryWeaponID = NAME_None;
 	SecondaryWeapon->OnUnEquip();
 }
+
+/*
+FORCEINLINE void APlayerCharacter::OnSecondaryWeaponFailedToEquip(FName WeaponID, FWeaponTableRow * NewWeaponData)
+{
+	SecondaryWeaponID = NAME_None;
+}
+*/
 
 void APlayerCharacter::UpdateCurrentWeaponAnimationType()
 {
@@ -1216,7 +1317,9 @@ bool APlayerCharacter::Server_SetIWRCharMovementDir_Validate(ECharMovementDirect
 
 void APlayerCharacter::SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType)
 {
+	// UpdateNormalAttackSectionToSkillMap(NewWeaponAnimationType, CurrentWeaponAnimationToUse);
 	CurrentWeaponAnimationToUse = NewWeaponAnimationType;
+	
 	
 	/*
 	if (Role < ROLE_Authority)
@@ -1267,12 +1370,122 @@ void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 	}
 }
 
+void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
+{
+	CurrentActiveSkill = NormalAttackSectionToSkillMap[SectionName];
+}
+
+void APlayerCharacter::CleanupNormalAttackSectionToSkillMap()
+{
+	TArray<FName> Keys;
+	NormalAttackSectionToSkillMap.GetKeys(Keys);
+	for (FName& Key : Keys)
+	{
+		FSkill* Skill = NormalAttackSectionToSkillMap[Key];
+		delete Skill;
+	}
+	NormalAttackSectionToSkillMap.Empty();
+}
+
+void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeaponType)
+{
+	CleanupNormalAttackSectionToSkillMap();
+
+	if (NewWeaponType == EWeaponType::GreatSword ||
+		NewWeaponType == EWeaponType::WarHammer)
+	{
+		FSkill* Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("FirstSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("SecondSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 200;
+		NormalAttackSectionToSkillMap.Add(FName("ThirdSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 150;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("ForwardSPSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 150;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("BackwardSPSwing"), Skill);
+	}
+	else if (NewWeaponType == EWeaponType::Staff)
+	{
+		FSkill* Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("FirstSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("SecondSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 120;
+		NormalAttackSectionToSkillMap.Add(FName("ThirdSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 150;
+		NormalAttackSectionToSkillMap.Add(FName("FourthSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 125;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("ForwardSPSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 125;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("BackwardSPSwing"), Skill);
+	}
+	else if (NewWeaponType == EWeaponType::Dagger ||
+			 NewWeaponType == EWeaponType::LongSword ||
+			 NewWeaponType == EWeaponType::Mace)
+	{
+		FSkill* Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("FirstSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 100;
+		NormalAttackSectionToSkillMap.Add(FName("SecondSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 120;
+		NormalAttackSectionToSkillMap.Add(FName("ThirdSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 120;
+		NormalAttackSectionToSkillMap.Add(FName("FourthSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 150;
+		NormalAttackSectionToSkillMap.Add(FName("FifthSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 125;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("ForwardSPSwing"), Skill);
+
+		Skill = new FSkill();
+		Skill->SkillLevelUpInfo.DamagePercent = 125;
+		Skill->SkillLevelUpInfo.StaminaRequired = 10;
+		NormalAttackSectionToSkillMap.Add(FName("BackwardSPSwing"), Skill);
+	}
+}
+
 void APlayerCharacter::OnRep_WeaponSheathed()
 {
 	UpdateCurrentWeaponAnimationType();	
 }
 
-void APlayerCharacter::OnRep_CurrentWeaponAnimationToUse()
+void APlayerCharacter::OnRep_CurrentWeaponAnimationToUse(EWeaponAnimationType OldAnimationType)
 {
 }
 

@@ -45,62 +45,63 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 }
 
-bool AEODCharacterBase::IsAlive() const
+FORCEINLINE bool AEODCharacterBase::IsAlive() const
 {
 	return StatsComp->GetCurrentHealth() > 0;
 }
 
-bool AEODCharacterBase::IsDead() const
+FORCEINLINE bool AEODCharacterBase::IsDead() const
 {
 	return StatsComp->GetCurrentHealth() <= 0;
 }
 
-bool AEODCharacterBase::IsIdle() const
+FORCEINLINE bool AEODCharacterBase::IsIdle() const
 {
 	return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0);
 }
 
-bool AEODCharacterBase::IsMoving() const
+FORCEINLINE bool AEODCharacterBase::IsMoving() const
 {
 	return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() != 0);
 }
 
-bool AEODCharacterBase::IsIdleOrMoving() const
+FORCEINLINE bool AEODCharacterBase::IsIdleOrMoving() const
 {
 	return CharacterState == ECharacterState::IdleWalkRun;
 }
 
-bool AEODCharacterBase::IsJumping() const
+FORCEINLINE bool AEODCharacterBase::IsJumping() const
 {
 	return CharacterState == ECharacterState::Jumping;
 }
 
-bool AEODCharacterBase::IsBlocking() const
+FORCEINLINE bool AEODCharacterBase::IsBlocking() const
 {
 	return CharacterState == ECharacterState::Blocking;
 }
 
-bool AEODCharacterBase::IsBlockingDamage() const
+FORCEINLINE bool AEODCharacterBase::IsBlockingDamage() const
 {
 	return bIsBlockingDamage;
 }
 
-bool AEODCharacterBase::IsCastingSpell() const
+FORCEINLINE bool AEODCharacterBase::IsCastingSpell() const
 {
 	return CharacterState == ECharacterState::CastingSpell;
 }
 
-bool AEODCharacterBase::IsNormalAttacking() const
+FORCEINLINE bool AEODCharacterBase::IsNormalAttacking() const
 {
-	return CharacterState == ECharacterState::Attacking && CurrentActiveSkill != nullptr;
+	// return CharacterState == ECharacterState::Attacking && CurrentActiveSkill != nullptr;
+	return CharacterState == ECharacterState::Attacking;
 }
 
-bool AEODCharacterBase::IsUsingAnySkill() const
+FORCEINLINE bool AEODCharacterBase::IsUsingAnySkill() const
 {
 	return CharacterState == ECharacterState::UsingActiveSkill && CurrentActiveSkill != nullptr;
 }
 
-bool AEODCharacterBase::IsUsingSkill(int32 SkillIndex) const
+FORCEINLINE bool AEODCharacterBase::IsUsingSkill(int32 SkillIndex) const
 {
 	return IsUsingAnySkill() && CurrentActiveSkill == GetSkill(SkillIndex);
 }
@@ -127,12 +128,12 @@ bool AEODCharacterBase::IsCriticalHit(const FSkill * HitSkill) const
 	return bCriticalHit;
 }
 
-bool AEODCharacterBase::IsDodging() const
+FORCEINLINE bool AEODCharacterBase::IsDodging() const
 {
 	return CharacterState == ECharacterState::Dodging;
 }
 
-bool AEODCharacterBase::IsDodgingDamage() const
+FORCEINLINE bool AEODCharacterBase::IsDodgingDamage() const
 {
 	return bHasActiveiFrames;
 }
@@ -696,33 +697,33 @@ bool AEODCharacterBase::CanUseSkill(int32 SkillIndex) const
 
 FORCEINLINE bool AEODCharacterBase::CanFlinch() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
 	// @todo - GetCurrentActiveSkill()->SkillLevelUpInfo.CrowdControlImmunities
 }
 
 FORCEINLINE bool AEODCharacterBase::CanStun() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockback() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanFreeze() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
 {
-	return StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
 }
 
 bool AEODCharacterBase::CanDodge() const
@@ -733,6 +734,16 @@ bool AEODCharacterBase::CanDodge() const
 EFaction AEODCharacterBase::GetFaction() const
 {
 	return Faction;
+}
+
+FSkill * AEODCharacterBase::GetSkill(FName SkillID) const
+{
+	if (IDToSkillMap.Contains(SkillID))
+	{
+		return IDToSkillMap[SkillID];
+	}
+
+	return nullptr;
 }
 
 void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * InstigatingChar)

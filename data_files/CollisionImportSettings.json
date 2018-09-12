@@ -1,6 +1,0 @@
-{
-    "XmlFile_TalentHitInfo" : "F:/Game Dev/asset_src/XMLFiles/talent_hit_info.xml",
-    "XmlFile_Talent" : "F:/Game Dev/asset_src/XMLFiles/talent.xml",
-    "XmlFile_NPC" : "F:/Game Dev/asset_src/XMLFiles/npc.xml",
-    "NumberOfCollisionsToParse" : 100
-}

@@ -9,8 +9,8 @@
 
 UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
-	AddCrowdControlImmunity(ECrowdControlEffect::Crystalized);
-	RemoveCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	// AddCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	// RemoveCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 
 	MovementSpeedModifier = 1.f;
 	StaminaConsumptionModifier = 1.f;
@@ -741,7 +741,7 @@ void UPlayerStatsComponent::AddCrowdControlImmunity(ECrowdControlEffect CrowdCon
 	CrowdControlImmunities |= (1 << (uint8)CrowdControlEffect);
 }
 
-void UPlayerStatsComponent::AddCrowdControlImmunities(uint8 CrowdControlImmunities)
+void UPlayerStatsComponent::AddCrowdControlImmunities(uint8 CCImmunities)
 {
 	this->CrowdControlImmunities |= CrowdControlImmunities;
 }
@@ -751,7 +751,7 @@ void UPlayerStatsComponent::RemoveCrowdControlImmunity(ECrowdControlEffect Crowd
 	CrowdControlImmunities ^= (1 << (uint8)CrowdControlEffect);
 }
 
-void UPlayerStatsComponent::RemoveCrowdControlImmunities(uint8 CrowdControlImmunities)
+void UPlayerStatsComponent::RemoveCrowdControlImmunities(uint8 CCImmunities)
 {
 	this->CrowdControlImmunities ^= CrowdControlImmunities;
 }

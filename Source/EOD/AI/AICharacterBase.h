@@ -23,23 +23,17 @@ public:
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
+	/** Initialize TArray<FSkill*> */
+	virtual void PostInitializeComponents() override;
+
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AIMovement)
-	float MaxWalkSpeedInCombat;
+	FORCEINLINE UEODWidgetComponent* GetAggroWidgetComp() const { return AggroWidgetComp; }
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AIMovement)
-	float MaxWalkSpeedOutsideCombat;
+	FORCEINLINE UEODWidgetComponent* GetHealthWidgetComp() const { return HealthWidgetComp; }
 
 	virtual void SetInCombat(bool bValue) override;
-
-	bool HasGreetingAnimation() const { bool bResult = GetGreetingMontageSectionName() == NAME_None ? false : true; return bResult; }
-
-	FName GetGreetingMontageSectionName() const { return GreetingMontageSectionName; }
-
-	/** Initialize TArray<FSkill*> */
-	virtual void PostInitializeComponents() override;
 
 	/** [server] Handle melee collision */
 	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) override;
@@ -56,11 +50,17 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UEODWidgetComponent* HealthWidgetComp;
 
-	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
-	void UpdateMaxWalkSpeed();
+	UPROPERTY(Category = AIMovement, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float MaxWalkSpeedInCombat;
 
-	UPROPERTY(EditDefaultsOnly, Category = Animations)
-	FName GreetingMontageSectionName;
+	UPROPERTY(Category = AIMovement, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float MaxWalkSpeedOutsideCombat;
+
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FString InGameName;
+
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	FString InGameDescription;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animations)
 	UAnimMontage* AnimationMontage_HitEffects;
@@ -74,10 +74,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Skills)
 	UDataTable* DataTable_Skills;
 
-	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
-	FString InGameName;
-
-	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
-	FString InGameDescription;
+	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
+	void UpdateMaxWalkSpeed();
 
 };
