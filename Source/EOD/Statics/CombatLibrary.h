@@ -106,6 +106,8 @@ public:
 
 	ECrowdControlEffect CrowdControlEffect;
 
+	float CrowdControlEffectDuration;
+
 	FEODDamage()
 	{
 		// bCriticalHit = false;

@@ -162,6 +162,8 @@ public:
 	/** [server + client] Applies stun to this character */
 	virtual void Stun(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Stun, );
 
+	virtual void EndStun() PURE_VIRTUAL(AEODCharacterBase::EndStun, );
+
 	/** [server + client] Freeze this character */
 	virtual void Freeze(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Freeze, );
 
@@ -343,6 +345,8 @@ protected:
 	FTimerHandle DodgeTimerHandle;
 
 	FTimerHandle BlockTimerHandle;
+
+	FTimerHandle CrowdControlTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Rotation)
 	float CharacterRotationPrecision;

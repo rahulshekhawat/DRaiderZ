@@ -265,9 +265,17 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	bool bUndodgable;
 
+	/** Only applicable if skill can be blocked */
+	UPROPERTY(EditDefaultsOnly)
+	bool bRespondsToBlock;
+
 	/** Crowd control effect on hit */
 	UPROPERTY(EditDefaultsOnly)
 	ECrowdControlEffect CrowdControlEffect;
+
+	/** The duration for which the crowd control effect should last (if applicable) */
+	UPROPERTY(EditDefaultsOnly)
+	float CrowdControlEffectDuration;
 
 	/** Immunities from crowd control effects granted on using this skill */
 	UPROPERTY(EditDefaultsOnly, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
@@ -399,5 +407,71 @@ public:
 	static bool AreEnemies(AEODCharacterBase* CharacterOne, AEODCharacterBase* CharacterTwo);
 
 	static void GetAllAICharacterSkills(const FString& CharacterName, const UDataTable* SkillsDataTable, TArray<FSkill*> &OutSkills);
+
+	static FName SectionName_ForwardFlinch;
+	
+	static FName SectionName_BackwardFlinch;
+
+	static FName SectionName_AttackBlocked;
+
+	static FName SectionName_Interrupted;
+
+	static FName SectionName_KnockdownStart;
+
+	static FName SectionName_KnockdownIdle;
+
+	static FName SectionName_KnockdownEnd;
+
+	static FName SectionName_LavitationStart;
+
+	static FName SectionName_LavitationEnd;
+
+	static FName SectionName_StunStart;
+
+	static FName SectionName_StunLoop;
+
+	static FName SectionName_StunEnd;
+
+	static FName SectionName_JumpStart;
+
+	static FName SectionName_JumpLoop;
+
+	static FName SectionName_JumpEnd;
+
+	static FName SectionName_FirstSwing;
+
+	static FName SectionName_FirstSwingEnd;
+
+	static FName SectionName_SecondSwing;
+
+	static FName SectionName_SecondSwingEnd;
+
+	static FName SectionName_ThirdSwing;
+
+	static FName SectionName_ThirdSwingEnd;
+
+	static FName SectionName_FourthSwing;
+
+	static FName SectionName_FourthSwingEnd;
+
+	static FName SectionName_FifthSwing;
+
+	static FName SectionName_FifthSwingEnd;
+
+	static FName SectionName_ForwardSPSwing;
+
+	static FName SectionName_ForwardSPSwingEnd;
+
+	static FName SectionName_BackwardSPSwing;
+
+	static FName SectionName_BackwardSPSwingEnd;
+
+	static FName SectionName_ForwardDodge;
+
+	static FName SectionName_BackwardDodge;
+
+	static FName SectionName_LeftDodge;
+
+	static FName SectionName_RightDodge;
 
 };

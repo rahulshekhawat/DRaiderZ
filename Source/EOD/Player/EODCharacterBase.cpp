@@ -168,6 +168,7 @@ void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FH
 	EODDamage.bUndodgable = ActiveSkill->SkillLevelUpInfo.bUndodgable;
 	EODDamage.DamageType = ActiveSkill->DamageType;
 	EODDamage.CrowdControlEffect = ActiveSkill->SkillLevelUpInfo.CrowdControlEffect;
+	EODDamage.CrowdControlEffectDuration = ActiveSkill->SkillLevelUpInfo.CrowdControlEffectDuration;
 
 	if (ActiveSkill->DamageType == EDamageType::Magickal)
 	{
@@ -371,25 +372,26 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * Instigati
 	case ECrowdControlEffect::KnockedDown:
 		if (CanKnockdown())
 		{
-			// Knockdown(1.f);
+			Knockdown(EODDamage.CrowdControlEffectDuration);
 		}
 		break;
 	case ECrowdControlEffect::KnockedBack:
 		if (CanKnockback())
 		{
-			// Knockback()
+			// @todo knockback impulse
+			// Knockback(EODDamage.CrowdControlEffectDuration, );
 		}
 		break;
 	case ECrowdControlEffect::Stunned:
 		if (CanStun())
 		{
-			// Stun(1.f);
+			Stun(EODDamage.CrowdControlEffectDuration);
 		}
 		break;
 	case ECrowdControlEffect::Crystalized:
 		if (CanFreeze())
 		{
-			// Freeze();
+			Freeze(EODDamage.CrowdControlEffectDuration);
 		}
 		break;
 	default:

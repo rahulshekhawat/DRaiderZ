@@ -251,16 +251,18 @@ void APlayerCharacter::Tick(float DeltaTime)
 		// This case is an exception to CharacterState replication
 		CharacterState = ECharacterState::Jumping;
 		GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Jump);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpLoop"), GetActiveAnimationReferences()->AnimationMontage_Jump);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_JumpLoop,
+			GetActiveAnimationReferences()->AnimationMontage_Jump);
 	}
 	// It is necessary to test if jump montage is playing, or else the "JumpEnd" section ends up playing twice because of montage blending out
 	else if (!GetCharacterMovement()->IsFalling() && IsJumping() && GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetActiveAnimationReferences()->AnimationMontage_Jump))
 	{
 		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_Jump);
-		if (CurrentSection != FName("JumpEnd"))
+		if (CurrentSection != UCharacterLibrary::SectionName_JumpEnd)
 		{
 			GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Jump);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName("JumpEnd"), GetActiveAnimationReferences()->AnimationMontage_Jump);
+			GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_JumpEnd,
+				GetActiveAnimationReferences()->AnimationMontage_Jump);
 		}
 	}
 
@@ -393,6 +395,9 @@ UHUDWidget * APlayerCharacter::GetHUDWidget() const
 
 void APlayerCharacter::Interrupt()
 {
+	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+		UCharacterLibrary::SectionName_Interrupted,
+		ECharacterState::GotHit);
 }
 
 void APlayerCharacter::Flinch(const EFlinchDirection FlinchDirection)
@@ -405,16 +410,24 @@ void APlayerCharacter::Flinch(const EFlinchDirection FlinchDirection)
 	if (FlinchDirection == EFlinchDirection::Forward)
 	{
 		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
-		PlayerAnimInstance->Montage_JumpToSection(FName("ForwardFlinch"), GetActiveAnimationReferences()->AnimationMontage_Flinch);
+		PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_ForwardFlinch,
+			GetActiveAnimationReferences()->AnimationMontage_Flinch);
 	}
 	else if (FlinchDirection == EFlinchDirection::Backward)
 	{
 		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
-		PlayerAnimInstance->Montage_JumpToSection(FName("BackwardFlinch"), GetActiveAnimationReferences()->AnimationMontage_Flinch);
+		PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_BackwardFlinch,
+			GetActiveAnimationReferences()->AnimationMontage_Flinch);
 	}
 }
 
 void APlayerCharacter::Stun(const float Duration)
+{
+
+	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndStun, Duration, false);
+}
+
+void APlayerCharacter::EndStun()
 {
 }
 
@@ -424,6 +437,7 @@ void APlayerCharacter::Freeze(const float Duration)
 
 void APlayerCharacter::Knockdown(const float Duration)
 {
+
 }
 
 void APlayerCharacter::Knockback(const float Duration, const FVector & Impulse)
@@ -500,26 +514,36 @@ void APlayerCharacter::OnDodge()
 		{
 			if (RightAxisValue > 0)
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("RightDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge,
+					UCharacterLibrary::SectionName_RightDodge,
+					ECharacterState::Dodging);
 			}
 			else if (RightAxisValue < 0)
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("LeftDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge,
+					UCharacterLibrary::SectionName_LeftDodge,
+					ECharacterState::Dodging);
 			}
 			else
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge,
+					UCharacterLibrary::SectionName_BackwardDodge,
+					ECharacterState::Dodging);
 			}
 		}
 		else
 		{
 			if (ForwardAxisValue > 0)
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("ForwardDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge,
+					UCharacterLibrary::SectionName_ForwardDodge,
+					ECharacterState::Dodging);
 			}
 			else if (ForwardAxisValue < 0)
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge, FName("BackwardDodge"), ECharacterState::Dodging);
+				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge,
+					UCharacterLibrary::SectionName_BackwardDodge,
+					ECharacterState::Dodging);
 			}
 		}
 
@@ -600,7 +624,9 @@ void APlayerCharacter::OnJump()
 		}
 
 		Jump();
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Jump, FName("JumpStart"), ECharacterState::Jumping);
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Jump,
+			UCharacterLibrary::SectionName_JumpStart,
+			ECharacterState::Jumping);
 	}
 }
 
@@ -635,17 +661,23 @@ void APlayerCharacter::OnPressedNormalAttack()
 	// @todo maybe change character state to using skill when using SP attacks?s
 	if (!IsNormalAttacking() && bForwardPressed)
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("ForwardSPSwing"), ECharacterState::Attacking);
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks,
+			UCharacterLibrary::SectionName_ForwardSPSwing,
+			ECharacterState::Attacking);
 		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
 	}
 	else if (!IsNormalAttacking() && bBackwardPressed)
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("BackwardSPSwing"), ECharacterState::Attacking);
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks,
+			UCharacterLibrary::SectionName_BackwardSPSwing,
+			ECharacterState::Attacking);
 		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
 	}
 	else if (!IsNormalAttacking())
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, FName("FirstSwing"), ECharacterState::Attacking);
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks,
+			UCharacterLibrary::SectionName_FirstSwing,
+			ECharacterState::Attacking);
 	}
 	else if (IsNormalAttacking())
 	{
@@ -1010,18 +1042,18 @@ FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() co
 
 FName APlayerCharacter::GetNextNormalAttackSectionName(const FName & CurrentSection) const
 {
-	if (CurrentSection == FName("FirstSwing") ||
-		CurrentSection == FName("FirstSwingEnd"))
+	if (CurrentSection == UCharacterLibrary::SectionName_FirstSwing ||
+		CurrentSection == UCharacterLibrary::SectionName_FirstSwingEnd)
 	{
-		return FName("SecondSwing");
+		return UCharacterLibrary::SectionName_SecondSwing;
 	}
-	else if (CurrentSection == FName("SecondSwing") ||
-		CurrentSection == FName("SecondSwingEnd"))
+	else if (CurrentSection == UCharacterLibrary::SectionName_SecondSwing ||
+			 CurrentSection == UCharacterLibrary::SectionName_SecondSwingEnd)
 	{
-		return FName("ThirdSwing");
+		return UCharacterLibrary::SectionName_ThirdSwing;
 	}
-	else if (CurrentSection == FName("ThirdSwing") ||
-		CurrentSection == FName("ThirdSwingEnd"))
+	else if (CurrentSection == UCharacterLibrary::SectionName_ThirdSwing ||
+	 		 CurrentSection == UCharacterLibrary::SectionName_ThirdSwingEnd)
 	{
 		if (CurrentWeaponAnimationToUse == EWeaponAnimationType::GreatSword ||
 			CurrentWeaponAnimationToUse == EWeaponAnimationType::WarHammer)
@@ -1030,11 +1062,11 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName & CurrentSect
 		}
 		else
 		{
-			return FName("FourthSwing");
+			return UCharacterLibrary::SectionName_FourthSwing;
 		}
 	}
-	else if (CurrentSection == FName("FourthSwing") ||
-		CurrentSection == FName("FourthSwingEnd"))
+	else if (CurrentSection == UCharacterLibrary::SectionName_FourthSwing ||
+			 CurrentSection == UCharacterLibrary::SectionName_FourthSwingEnd)
 	{
 		if (CurrentWeaponAnimationToUse == EWeaponAnimationType::Staff)
 		{
@@ -1042,7 +1074,7 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName & CurrentSect
 		}
 		else
 		{
-			return FName("FifthSwing");
+			return UCharacterLibrary::SectionName_FifthSwing;
 		}
 	}
 
@@ -1396,53 +1428,53 @@ void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeapon
 	{
 		FSkill* Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(FName("FirstSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FirstSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(FName("SecondSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_SecondSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 200;
-		NormalAttackSectionToSkillMap.Add(FName("ThirdSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ThirdSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 150;
 		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(FName("ForwardSPSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ForwardSPSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 150;
 		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(FName("BackwardSPSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_BackwardSPSwing, Skill);
 	}
 	else if (NewWeaponType == EWeaponType::Staff)
 	{
 		FSkill* Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(FName("FirstSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FirstSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(FName("SecondSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_SecondSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 120;
-		NormalAttackSectionToSkillMap.Add(FName("ThirdSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ThirdSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 150;
-		NormalAttackSectionToSkillMap.Add(FName("FourthSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FourthSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 125;
 		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(FName("ForwardSPSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ForwardSPSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 125;
 		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(FName("BackwardSPSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_BackwardSPSwing, Skill);
 	}
 	else if (NewWeaponType == EWeaponType::Dagger ||
 			 NewWeaponType == EWeaponType::LongSword ||
@@ -1450,33 +1482,33 @@ void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeapon
 	{
 		FSkill* Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(FName("FirstSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FirstSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(FName("SecondSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_SecondSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 120;
-		NormalAttackSectionToSkillMap.Add(FName("ThirdSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ThirdSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 120;
-		NormalAttackSectionToSkillMap.Add(FName("FourthSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FourthSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 150;
-		NormalAttackSectionToSkillMap.Add(FName("FifthSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FifthSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 125;
 		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(FName("ForwardSPSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ForwardSPSwing, Skill);
 
 		Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 125;
 		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(FName("BackwardSPSwing"), Skill);
+		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_BackwardSPSwing, Skill);
 	}
 }
 
