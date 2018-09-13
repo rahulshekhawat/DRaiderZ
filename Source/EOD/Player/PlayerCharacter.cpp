@@ -78,7 +78,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	StaminaCost_Dodge = 20;
 	Dodge_iFrameStartTime = 0.1f;
 	Dodge_iFrameEndTime = 0.5f;
-	BlockDelay = 0.1f;
+	BlockDelay = 0.2f;
 
 	Faction = EFaction::Player;
 }
