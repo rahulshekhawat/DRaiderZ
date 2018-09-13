@@ -147,7 +147,15 @@ int32 UPlayerStatsComponent::ModifyMaxHealth(int32 Value)
 int32 UPlayerStatsComponent::ModifyCurrentHealth(int32 Value)
 {
 	int32 Result = CurrentHealth + Value;
-	Result = Result <= 0 ? 0 : Result;
+	if (Result < 0)
+	{
+		Result = 0;
+	}
+	else if (Result > MaxHealth)
+	{
+		Result = MaxHealth;
+	}
+
 	SetCurrentHealth(Result);
 	return Result;
 }
@@ -172,6 +180,11 @@ void UPlayerStatsComponent::SetCurrentHealth(int32 Value)
 	{
 		float Percent = (float)CurrentHealth / (float)MaxHealth;
 		OwningPlayer->GetHUDWidget()->HealthBar->SetPercent(Percent);
+	}
+
+	if (CurrentHealth < MaxHealth && !bIsRegeneratingHealth)
+	{
+		ActivateHealthRegeneration();
 	}
 }
 
@@ -214,7 +227,15 @@ int32 UPlayerStatsComponent::ModifyMaxMana(int32 Value)
 int32 UPlayerStatsComponent::ModifyCurrentMana(int32 Value)
 {
 	int32 Result = CurrentMana + Value;
-	Result = Result <= 0 ? 0 : Result;
+	if (Result < 0)
+	{
+		Result = 0;
+	}
+	else if (Result > MaxMana)
+	{
+		Result = MaxMana;
+	}
+
 	SetCurrentMana(Result);
 	return Result;
 }
@@ -238,6 +259,11 @@ void UPlayerStatsComponent::SetCurrentMana(int32 Value)
 	{
 		float Percent = (float)CurrentMana / (float)MaxMana;
 		OwningPlayer->GetHUDWidget()->ManaBar->SetPercent(Percent);
+	}
+
+	if (CurrentMana < MaxMana && !bIsRegeneratingMana)
+	{
+		ActivateManaRegeneration();
 	}
 }
 
@@ -275,7 +301,15 @@ int32 UPlayerStatsComponent::ModifyMaxStamina(int32 Value)
 int32 UPlayerStatsComponent::ModifyCurrentStamina(int32 Value)
 {
 	int32 Result = CurrentStamina + Value;
-	Result = Result <= 0 ? 0 : Result;
+	if (Result < 0)
+	{
+		Result = 0;
+	}
+	else if (Result > MaxStamina)
+	{
+		Result = MaxStamina;
+	}
+
 	SetCurrentStamina(Result);
 	return Result;
 }
@@ -299,6 +333,11 @@ void UPlayerStatsComponent::SetCurrentStamina(int32 Value)
 	{
 		float Percent = (float)CurrentStamina / (float)MaxStamina;
 		OwningPlayer->GetHUDWidget()->StaminaBar->SetPercent(Percent);
+	}
+
+	if (CurrentStamina < MaxStamina && !bIsRegeneratingStamina)
+	{
+		ActivateStaminaRegeneration();
 	}
 }
 
@@ -974,6 +1013,7 @@ void UPlayerStatsComponent::ActivateHealthRegeneration()
 		&UPlayerStatsComponent::RegenerateHealth,
 		HealthRegenTickInterval,
 		true);
+	bIsRegeneratingHealth = true;
 }
 
 void UPlayerStatsComponent::ActivateManaRegeneration()
@@ -983,6 +1023,7 @@ void UPlayerStatsComponent::ActivateManaRegeneration()
 		&UPlayerStatsComponent::RegenerateMana,
 		ManaRegenTickInterval,
 		true);
+	bIsRegeneratingMana = true;
 }
 
 void UPlayerStatsComponent::ActivateStaminaRegeneration()
@@ -992,21 +1033,25 @@ void UPlayerStatsComponent::ActivateStaminaRegeneration()
 		&UPlayerStatsComponent::RegenerateStamina,
 		StaminaRegenTickInterval,
 		true);
+	bIsRegeneratingStamina = true;
 }
 
 void UPlayerStatsComponent::DeactivateHealthRegeneration()
 {
 	GetWorld()->GetTimerManager().ClearTimer(HealthRegenTimerHandle);
+	bIsRegeneratingHealth = false;
 }
 
 void UPlayerStatsComponent::DeactivateManaRegeneration()
 {
 	GetWorld()->GetTimerManager().ClearTimer(ManaRegenTimerHandle);
+	bIsRegeneratingMana = false;
 }
 
 void UPlayerStatsComponent::DeactivateStaminaRegeneration()
 {
 	GetWorld()->GetTimerManager().ClearTimer(StaminaRegenTimerHandle);
+	bIsRegeneratingStamina = false;
 }
 
 void UPlayerStatsComponent::RegenerateHealth()

@@ -486,6 +486,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
 	float StaminaRegenTickInterval;
 
+	UPROPERTY(Transient)
+	bool bIsRegeneratingHealth;
+
+	UPROPERTY(Transient)
+	bool bIsRegeneratingMana;
+
+	UPROPERTY(Transient)
+	bool bIsRegeneratingStamina;
+
 	FTimerHandle HealthRegenTimerHandle;
 
 	FTimerHandle ManaRegenTimerHandle;
