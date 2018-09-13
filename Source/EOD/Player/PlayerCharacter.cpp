@@ -423,12 +423,17 @@ void APlayerCharacter::Flinch(const EFlinchDirection FlinchDirection)
 
 void APlayerCharacter::Stun(const float Duration)
 {
-
+	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+		UCharacterLibrary::SectionName_StunStart,
+		ECharacterState::GotHit);
 	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndStun, Duration, false);
 }
 
 void APlayerCharacter::EndStun()
 {
+	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+		UCharacterLibrary::SectionName_StunEnd,
+		ECharacterState::GotHit);
 }
 
 void APlayerCharacter::Freeze(const float Duration)

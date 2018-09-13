@@ -10,41 +10,41 @@
 #include "Animation/AnimMontage.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
 
-FName UCharacterLibrary::SectionName_AttackBlocked 			= FName("AttackBlocked");
-FName UCharacterLibrary::SectionName_BackwardFlinch 		= FName("BackwardFlinch");
-FName UCharacterLibrary::SectionName_ForwardFlinch 			= FName("ForwardFlinch");
-FName UCharacterLibrary::SectionName_Interrupted 			= FName("Interrupted");
-FName UCharacterLibrary::SectionName_KnockdownEnd 			= FName("KnockedDownEnd");
-FName UCharacterLibrary::SectionName_KnockdownIdle 			= FName("KnockedDownIdle");
-FName UCharacterLibrary::SectionName_KnockdownStart 		= FName("KnockedDownStart");
-FName UCharacterLibrary::SectionName_LavitationEnd 			= FName("LavitationEnd");
-FName UCharacterLibrary::SectionName_LavitationStart 		= FName("LavitationStart");
-FName UCharacterLibrary::SectionName_StunEnd 				= FName("StunEnd");
-FName UCharacterLibrary::SectionName_StunLoop 				= FName("StunLoop");
-FName UCharacterLibrary::SectionName_StunStart 				= FName("StunStart");
-FName UCharacterLibrary::SectionName_JumpEnd				= FName("JumpEnd");
-FName UCharacterLibrary::SectionName_JumpLoop				= FName("JumpLoop");
-FName UCharacterLibrary::SectionName_JumpStart				= FName("JumpStart");
+const FName UCharacterLibrary::SectionName_AttackBlocked 			= FName("AttackBlocked");
+const FName UCharacterLibrary::SectionName_BackwardFlinch 			= FName("BackwardFlinch");
+const FName UCharacterLibrary::SectionName_ForwardFlinch 			= FName("ForwardFlinch");
+const FName UCharacterLibrary::SectionName_Interrupted 				= FName("Interrupted");
+const FName UCharacterLibrary::SectionName_KnockdownEnd 			= FName("KnockedDownEnd");
+const FName UCharacterLibrary::SectionName_KnockdownIdle 			= FName("KnockedDownIdle");
+const FName UCharacterLibrary::SectionName_KnockdownStart 			= FName("KnockedDownStart");
+const FName UCharacterLibrary::SectionName_LavitationEnd 			= FName("LavitationEnd");
+const FName UCharacterLibrary::SectionName_LavitationStart 			= FName("LavitationStart");
+const FName UCharacterLibrary::SectionName_StunEnd 					= FName("StunEnd");
+const FName UCharacterLibrary::SectionName_StunLoop 				= FName("StunLoop");
+const FName UCharacterLibrary::SectionName_StunStart 				= FName("StunStart");
+const FName UCharacterLibrary::SectionName_JumpEnd					= FName("JumpEnd");
+const FName UCharacterLibrary::SectionName_JumpLoop					= FName("JumpLoop");
+const FName UCharacterLibrary::SectionName_JumpStart				= FName("JumpStart");
 
-FName UCharacterLibrary::SectionName_FirstSwing 			= FName("FirstSwing");
-FName UCharacterLibrary::SectionName_FirstSwingEnd 			= FName("FirstSwingEnd");
-FName UCharacterLibrary::SectionName_SecondSwing 			= FName("SecondSwing");
-FName UCharacterLibrary::SectionName_SecondSwingEnd 		= FName("SecondSwingEnd");
-FName UCharacterLibrary::SectionName_ThirdSwing 			= FName("ThirdSwing");
-FName UCharacterLibrary::SectionName_ThirdSwingEnd 			= FName("ThirdSwingEnd");
-FName UCharacterLibrary::SectionName_FourthSwing 			= FName("FourthSwing");
-FName UCharacterLibrary::SectionName_FourthSwingEnd 		= FName("FourthSwingEnd");
-FName UCharacterLibrary::SectionName_FifthSwing 			= FName("FifthSwing");
-FName UCharacterLibrary::SectionName_FifthSwingEnd 			= FName("FifthSwingEnd");
-FName UCharacterLibrary::SectionName_ForwardSPSwing 		= FName("ForwardSPSwing");
-FName UCharacterLibrary::SectionName_ForwardSPSwingEnd 		= FName("ForwardSPSwingEnd");
-FName UCharacterLibrary::SectionName_BackwardSPSwing 		= FName("BackwardSPSwing");
-FName UCharacterLibrary::SectionName_BackwardSPSwingEnd 	= FName("BackwardSPSwingEnd");
+const FName UCharacterLibrary::SectionName_FirstSwing 				= FName("FirstSwing");
+const FName UCharacterLibrary::SectionName_FirstSwingEnd 			= FName("FirstSwingEnd");
+const FName UCharacterLibrary::SectionName_SecondSwing 				= FName("SecondSwing");
+const FName UCharacterLibrary::SectionName_SecondSwingEnd 			= FName("SecondSwingEnd");
+const FName UCharacterLibrary::SectionName_ThirdSwing 				= FName("ThirdSwing");
+const FName UCharacterLibrary::SectionName_ThirdSwingEnd 			= FName("ThirdSwingEnd");
+const FName UCharacterLibrary::SectionName_FourthSwing 				= FName("FourthSwing");
+const FName UCharacterLibrary::SectionName_FourthSwingEnd 			= FName("FourthSwingEnd");
+const FName UCharacterLibrary::SectionName_FifthSwing 				= FName("FifthSwing");
+const FName UCharacterLibrary::SectionName_FifthSwingEnd 			= FName("FifthSwingEnd");
+const FName UCharacterLibrary::SectionName_ForwardSPSwing 			= FName("ForwardSPSwing");
+const FName UCharacterLibrary::SectionName_ForwardSPSwingEnd 		= FName("ForwardSPSwingEnd");
+const FName UCharacterLibrary::SectionName_BackwardSPSwing 			= FName("BackwardSPSwing");
+const FName UCharacterLibrary::SectionName_BackwardSPSwingEnd 		= FName("BackwardSPSwingEnd");
 
-FName UCharacterLibrary::SectionName_ForwardDodge 			= FName("ForwardDodge");
-FName UCharacterLibrary::SectionName_BackwardDodge 			= FName("BackwardDodge");
-FName UCharacterLibrary::SectionName_LeftDodge 				= FName("LeftDodge");
-FName UCharacterLibrary::SectionName_RightDodge 			= FName("RightDodge");
+const FName UCharacterLibrary::SectionName_ForwardDodge 			= FName("ForwardDodge");
+const FName UCharacterLibrary::SectionName_BackwardDodge 			= FName("BackwardDodge");
+const FName UCharacterLibrary::SectionName_LeftDodge 				= FName("LeftDodge");
+const FName UCharacterLibrary::SectionName_RightDodge 				= FName("RightDodge");
 
 UCharacterLibrary::UCharacterLibrary(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {

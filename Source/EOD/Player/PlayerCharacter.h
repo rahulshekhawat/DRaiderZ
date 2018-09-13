@@ -149,6 +149,7 @@ public:
 	/** [server + client] Applies stun to this character */
 	virtual void Stun(const float Duration) override;
 
+	/** End stun if character is stunned */
 	virtual void EndStun() override;
 
 	/** [server + client] Freeze this character */
