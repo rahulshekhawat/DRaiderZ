@@ -307,13 +307,13 @@ protected:
 
 	//~ @note following booleans are used to initialize timers for derived stats components
 
-	UPROPERTY(EditDefaultsOnly, Category = Conditionals)
+	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
 	uint32 bHasHealthRegenration : 1;
-	
-	UPROPERTY(EditDefaultsOnly, Category = Conditionals)
+
+	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
 	uint32 bHasManaRegenration : 1;
-	
-	UPROPERTY(EditDefaultsOnly, Category = Conditionals)
+
+	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
 	uint32 bHasStaminaRegenration : 1;
 
 		

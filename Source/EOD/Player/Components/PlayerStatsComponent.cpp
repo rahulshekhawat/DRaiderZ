@@ -12,8 +12,20 @@ UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectIni
 	// AddCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 	// RemoveCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 
-	MovementSpeedModifier = 1.f;
-	StaminaConsumptionModifier = 1.f;
+	MovementSpeedModifier			= 1.f;
+	StaminaConsumptionModifier		= 1.f;
+
+	bHasHealthRegenration			= true;
+	bHasManaRegenration				= true;
+	bHasStaminaRegenration			= true;
+
+	HealthRegenRate					= 10;
+	ManaRegenRate					= 10;
+	StaminaRegenRate				= 10;
+
+	HealthRegenTickInterval			= 1.f;
+	ManaRegenTickInterval			= 1.f;
+	StaminaRegenTickInterval		= 1.f;
 
 	OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 }
@@ -40,6 +52,10 @@ void UPlayerStatsComponent::BeginPlay()
 	SetCurrentStamina(BaseStamina);
 
 	// @todo load damage and resistance stats
+
+	ActivateHealthRegeneration();
+	ActivateManaRegeneration();
+	ActivateStaminaRegeneration();
 
 }
 
@@ -949,4 +965,73 @@ void UPlayerStatsComponent::SetPhysicalDamageReductionOnBlock(float Value)
 void UPlayerStatsComponent::SetMagickDamageReductionOnBlock(float Value)
 {
 	MagickDamageReductionOnBlock = Value;
+}
+
+void UPlayerStatsComponent::ActivateHealthRegeneration()
+{
+	GetWorld()->GetTimerManager().SetTimer(HealthRegenTimerHandle,
+		this,
+		&UPlayerStatsComponent::RegenerateHealth,
+		HealthRegenTickInterval,
+		true);
+}
+
+void UPlayerStatsComponent::ActivateManaRegeneration()
+{
+	GetWorld()->GetTimerManager().SetTimer(ManaRegenTimerHandle,
+		this,
+		&UPlayerStatsComponent::RegenerateMana,
+		ManaRegenTickInterval,
+		true);
+}
+
+void UPlayerStatsComponent::ActivateStaminaRegeneration()
+{
+	GetWorld()->GetTimerManager().SetTimer(StaminaRegenTimerHandle,
+		this,
+		&UPlayerStatsComponent::RegenerateStamina,
+		StaminaRegenTickInterval,
+		true);
+}
+
+void UPlayerStatsComponent::DeactivateHealthRegeneration()
+{
+	GetWorld()->GetTimerManager().ClearTimer(HealthRegenTimerHandle);
+}
+
+void UPlayerStatsComponent::DeactivateManaRegeneration()
+{
+	GetWorld()->GetTimerManager().ClearTimer(ManaRegenTimerHandle);
+}
+
+void UPlayerStatsComponent::DeactivateStaminaRegeneration()
+{
+	GetWorld()->GetTimerManager().ClearTimer(StaminaRegenTimerHandle);
+}
+
+void UPlayerStatsComponent::RegenerateHealth()
+{
+	int32 CurrentHealth = ModifyCurrentHealth(HealthRegenRate);
+	if (CurrentHealth >= MaxHealth)
+	{
+		DeactivateHealthRegeneration();
+	}
+}
+
+void UPlayerStatsComponent::RegenerateMana()
+{
+	int32 CurrentMana = ModifyCurrentMana(ManaRegenRate);
+	if (CurrentMana >= MaxMana)
+	{
+		DeactivateManaRegeneration();
+	}
+}
+
+void UPlayerStatsComponent::RegenerateStamina()
+{
+	int32 CurrentStamina = ModifyCurrentStamina(StaminaRegenRate);
+	if (CurrentStamina >= MaxStamina)
+	{
+		DeactivateStaminaRegeneration();
+	}
 }

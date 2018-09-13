@@ -476,7 +476,47 @@ private:
 
 	UPROPERTY(Transient)
 	float MagickDamageReductionOnBlock;
-	
+
+	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
+	float HealthRegenTickInterval;
+
+	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
+	float ManaRegenTickInterval;
+
+	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
+	float StaminaRegenTickInterval;
+
+	FTimerHandle HealthRegenTimerHandle;
+
+	FTimerHandle ManaRegenTimerHandle;
+
+	FTimerHandle StaminaRegenTimerHandle;
+
 	APlayerCharacter* OwningPlayer;
+
+	/** Starts health regeneration on player. Automatically stops once the health is full or if manually stopped */
+	void ActivateHealthRegeneration();
+
+	/** Starts health regeneration on player. Automatically stops once the mana is full or if manually stopped */
+	void ActivateManaRegeneration();
+
+	//~ @note maybe its better to never stop stamina regeneration
+	/** Starts health regeneration on player. Automatically stops once the stamina is full or if manually stopped */
+	void ActivateStaminaRegeneration();
+
+	/** Stops health regeneration */
+	void DeactivateHealthRegeneration();
+
+	/** Stops mana regeneration */
+	void DeactivateManaRegeneration();
+
+	/** Stops stamina regeneration */
+	void DeactivateStaminaRegeneration();
+
+	void RegenerateHealth();
+
+	void RegenerateMana();
+
+	void RegenerateStamina();
 
 };
