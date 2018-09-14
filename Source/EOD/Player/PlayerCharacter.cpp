@@ -393,27 +393,41 @@ UHUDWidget * APlayerCharacter::GetHUDWidget() const
 	// return nullptr;
 }
 
-void APlayerCharacter::Interrupt()
+void APlayerCharacter::Interrupt(const EHitDirection InterruptDirection)
 {
-	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
-		UCharacterLibrary::SectionName_Interrupted,
-		ECharacterState::GotHit);
+	if (!PlayerAnimInstance || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->AnimationMontage_HitEffects)
+	{
+		return;
+	}
+
+	if (InterruptDirection == EHitDirection::Forward)
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+			UCharacterLibrary::SectionName_ForwardInterrupt,
+			ECharacterState::GotHit);
+	}
+	else if (InterruptDirection == EHitDirection::Backward)
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+			UCharacterLibrary::SectionName_BackwardInterrupt,
+			ECharacterState::GotHit);
+	}
 }
 
-void APlayerCharacter::Flinch(const EFlinchDirection FlinchDirection)
+void APlayerCharacter::Flinch(const EHitDirection FlinchDirection)
 {
 	if (!PlayerAnimInstance || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->AnimationMontage_Flinch)
 	{
 		return;
 	}
 
-	if (FlinchDirection == EFlinchDirection::Forward)
+	if (FlinchDirection == EHitDirection::Forward)
 	{
 		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
 		PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_ForwardFlinch,
 			GetActiveAnimationReferences()->AnimationMontage_Flinch);
 	}
-	else if (FlinchDirection == EFlinchDirection::Backward)
+	else if (FlinchDirection == EHitDirection::Backward)
 	{
 		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
 		PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_BackwardFlinch,

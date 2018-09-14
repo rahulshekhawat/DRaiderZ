@@ -13,7 +13,8 @@
 const FName UCharacterLibrary::SectionName_AttackBlocked 			= FName("AttackBlocked");
 const FName UCharacterLibrary::SectionName_BackwardFlinch 			= FName("BackwardFlinch");
 const FName UCharacterLibrary::SectionName_ForwardFlinch 			= FName("ForwardFlinch");
-const FName UCharacterLibrary::SectionName_Interrupted 				= FName("Interrupted");
+const FName UCharacterLibrary::SectionName_BackwardInterrupt		= FName("BackwardInterrupt");
+const FName UCharacterLibrary::SectionName_ForwardInterrupt			= FName("ForwardInterrupt");
 const FName UCharacterLibrary::SectionName_KnockdownEnd 			= FName("KnockedDownEnd");
 const FName UCharacterLibrary::SectionName_KnockdownIdle 			= FName("KnockedDownIdle");
 const FName UCharacterLibrary::SectionName_KnockdownStart 			= FName("KnockedDownStart");

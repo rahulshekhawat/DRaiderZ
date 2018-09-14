@@ -154,10 +154,10 @@ public:
 	virtual bool IsHealing() const;
 
 	/** [server + client] Interrupt this character's current action */
-	virtual void Interrupt() PURE_VIRTUAL(AEODCharacterBase::Interrupt, );
+	virtual void Interrupt(const EHitDirection InterruptDirection) PURE_VIRTUAL(AEODCharacterBase::Interrupt, );
 
 	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
-	virtual void Flinch(const EFlinchDirection FlinchDirection) PURE_VIRTUAL(AEODCharacterBase::Flinch, );
+	virtual void Flinch(const EHitDirection FlinchDirection) PURE_VIRTUAL(AEODCharacterBase::Flinch, );
 
 	/** [server + client] Applies stun to this character */
 	virtual void Stun(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Stun, );

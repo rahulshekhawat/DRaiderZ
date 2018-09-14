@@ -24,7 +24,7 @@ enum class ECrowdControlEffect : uint8
 };
 
 UENUM(BlueprintType)
-enum class EFlinchDirection : uint8
+enum class EHitDirection : uint8
 {
 	Forward,
 	Backward,

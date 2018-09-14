@@ -412,9 +412,11 @@ public:
 	
 	static const FName SectionName_BackwardFlinch;
 
-	static const FName SectionName_AttackBlocked;
+	static const FName SectionName_ForwardInterrupt;
 
-	static const FName SectionName_Interrupted;
+	static const FName SectionName_BackwardInterrupt;
+
+	static const FName SectionName_AttackBlocked;
 
 	static const FName SectionName_KnockdownStart;
 

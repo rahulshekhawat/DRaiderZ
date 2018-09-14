@@ -355,18 +355,30 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * Instigati
 
 			if (Angle <= 90)
 			{
-				Flinch(EFlinchDirection::Forward);
+				Flinch(EHitDirection::Forward);
 			}
 			else
 			{
-				Flinch(EFlinchDirection::Backward);
+				Flinch(EHitDirection::Backward);
 			}
 		}
 		break;
 	case ECrowdControlEffect::Interrupt:
 		if (CanInterrupt())
 		{
-			Interrupt();
+			FVector MyDirection = GetActorForwardVector();
+			FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
+
+			float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
+
+			if (Angle <= 90)
+			{
+				Interrupt(EHitDirection::Forward);
+			}
+			else
+			{
+				Interrupt(EHitDirection::Backward);
+			}
 		}
 		break;
 	case ECrowdControlEffect::KnockedDown:

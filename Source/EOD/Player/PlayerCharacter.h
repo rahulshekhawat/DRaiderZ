@@ -141,10 +141,10 @@ public:
 	UHUDWidget* GetHUDWidget() const;
 
 	/** [server + client] Interrupt this character's current action */
-	virtual void Interrupt() override;
+	virtual void Interrupt(const EHitDirection InterruptDirection) override;
 
 	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
-	virtual void Flinch(const EFlinchDirection FlinchDirection) override;
+	virtual void Flinch(const EHitDirection FlinchDirection) override;
 
 	/** [server + client] Applies stun to this character */
 	virtual void Stun(const float Duration) override;
