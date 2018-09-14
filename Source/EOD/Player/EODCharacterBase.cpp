@@ -390,8 +390,11 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * Instigati
 	case ECrowdControlEffect::KnockedBack:
 		if (CanKnockback())
 		{
-			// @todo knockback impulse
-			// Knockback(EODDamage.CrowdControlEffectDuration, );
+			// @todo for later. Adding impulse to character movement component doesn't have any effect because of ground friction
+			/* 
+			FVector ImpulseDirection = -(InstigatorToThisCharLineHitResult.ImpactNormal);
+			Knockback(EODDamage.CrowdControlEffectDuration, Impulse);
+			*/
 		}
 		break;
 	case ECrowdControlEffect::Stunned:

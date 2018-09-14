@@ -167,8 +167,12 @@ public:
 	/** [server + client] Freeze this character */
 	virtual void Freeze(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Freeze, );
 
+	virtual void EndFreeze() PURE_VIRTUAL(AEODCharacterBase::EndFreeze, );
+
 	/** [server + client] Knockdown this character */
 	virtual void Knockdown(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Knockdown, );
+
+	virtual void EndKnockdown() PURE_VIRTUAL(AEODCharacterBase::EndKnockdown, );
 
 	/** [server + client] Knockback this character */
 	virtual void Knockback(const float Duration, const FVector& Impulse) PURE_VIRTUAL(AEODCharacterBase::Knockback, );

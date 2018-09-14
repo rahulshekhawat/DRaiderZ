@@ -27,6 +27,8 @@ UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectIni
 	ManaRegenTickInterval			= 1.f;
 	StaminaRegenTickInterval		= 1.f;
 
+	ActiveTimeDilation = 1.f;
+
 	OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 }
 

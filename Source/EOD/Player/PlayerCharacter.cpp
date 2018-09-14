@@ -437,30 +437,58 @@ void APlayerCharacter::Flinch(const EHitDirection FlinchDirection)
 
 void APlayerCharacter::Stun(const float Duration)
 {
-	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
-		UCharacterLibrary::SectionName_StunStart,
-		ECharacterState::GotHit);
+	PlayStunAnimation();
+
+	PlayerAnimInstance->Montage_Play(SheathedWeaponAnimationReferences->AnimationMontage_Flinch);
+	PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_ForwardFlinch);
+
 	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndStun, Duration, false);
+	
+	// @todo change character state to got hit
 }
 
 void APlayerCharacter::EndStun()
 {
-	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
-		UCharacterLibrary::SectionName_StunEnd,
-		ECharacterState::GotHit);
+	StopStunAnimation();
+	
+	// @todo Restore character state to IdleWalkRun if necessary (if OnMontageBlendingOut event doesn't restore character state to IdleWalkRun)
 }
 
 void APlayerCharacter::Freeze(const float Duration)
 {
+	CustomTimeDilation = 0;
+	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndFreeze, Duration, false);
+}
+
+void APlayerCharacter::EndFreeze()
+{
+	CustomTimeDilation = StatsComp->GetActiveTimeDilation();
 }
 
 void APlayerCharacter::Knockdown(const float Duration)
 {
+	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+		UCharacterLibrary::SectionName_KnockdownStart,
+		ECharacterState::GotHit);
+	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
+}
 
+void APlayerCharacter::EndKnockdown()
+{
+	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+		UCharacterLibrary::SectionName_KnockdownEnd,
+		ECharacterState::GotHit);
 }
 
 void APlayerCharacter::Knockback(const float Duration, const FVector & Impulse)
 {
+	// @todo for later. Adding impulse to character movement component doesn't have any effect because of ground friction
+	/*
+	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+		UCharacterLibrary::SectionName_KnockdownStart,
+		ECharacterState::GotHit);
+	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
+	*/
 }
 
 bool APlayerCharacter::CanAutoRun() const

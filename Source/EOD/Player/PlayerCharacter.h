@@ -149,14 +149,24 @@ public:
 	/** [server + client] Applies stun to this character */
 	virtual void Stun(const float Duration) override;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
+	void PlayStunAnimation();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
+	void StopStunAnimation();
+
 	/** End stun if character is stunned */
 	virtual void EndStun() override;
 
 	/** [server + client] Freeze this character */
 	virtual void Freeze(const float Duration) override;
 
+	virtual void EndFreeze() override;
+
 	/** [server + client] Knockdown this character */
 	virtual void Knockdown(const float Duration) override;
+
+	virtual void EndKnockdown() override;
 
 	/** [server + client] Knockback this character */
 	virtual void Knockback(const float Duration, const FVector& Impulse) override;
