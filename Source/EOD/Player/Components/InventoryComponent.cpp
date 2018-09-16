@@ -24,6 +24,8 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 void UInventoryComponent::ToggleInventoryUI()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Inventory Toggled"));
+
+	// @todo definition
 }
 
 void UInventoryComponent::BeginPlay()
@@ -31,6 +33,36 @@ void UInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	
+}
+
+void UInventoryComponent::AddItem(FName ItemID)
+{
+	// @todo definition
+}
+
+void UInventoryComponent::RemoveItem(FName ItemID)
+{
+	// @todo definition
+}
+
+void UInventoryComponent::UseItem(FName ItemID)
+{
+	// @todo definition
+}
+
+void UInventoryComponent::UseItem(int32 ItemIndex)
+{
+	// @todo definition
+}
+
+void UInventoryComponent::SaveInventory()
+{
+	// @todo definition
+}
+
+void UInventoryComponent::LoadInventory()
+{
+	// @todo definition
 }
 
 
