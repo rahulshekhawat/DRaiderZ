@@ -105,6 +105,8 @@ public:
 	/** Returns true if character is using skill at SkillIndex */
 	FORCEINLINE bool IsUsingSkill(int32 SkillIndex) const;
 
+	FORCEINLINE bool HasBeenHit() const;
+
 	/** Returns true if a hit from HitSkill was critical */
 	virtual bool IsCriticalHit(const FSkill* HitSkill) const;
 

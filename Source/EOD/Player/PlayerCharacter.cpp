@@ -482,13 +482,12 @@ void APlayerCharacter::EndKnockdown()
 
 void APlayerCharacter::Knockback(const float Duration, const FVector & Impulse)
 {
-	// @todo for later. Adding impulse to character movement component doesn't have any effect because of ground friction
-	/*
 	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
 		UCharacterLibrary::SectionName_KnockdownStart,
 		ECharacterState::GotHit);
 	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
-	*/
+
+	PushPlayer(Impulse);
 }
 
 bool APlayerCharacter::CanAutoRun() const

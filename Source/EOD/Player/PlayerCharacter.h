@@ -171,6 +171,9 @@ public:
 	/** [server + client] Knockback this character */
 	virtual void Knockback(const float Duration, const FVector& Impulse) override;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Motion)
+	void PushPlayer(FVector PushDirection);
+
 	/** Replace primary weapon with a new weapon */
 	void SetCurrentPrimaryWeapon(const FName WeaponID);
 

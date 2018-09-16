@@ -106,6 +106,11 @@ FORCEINLINE bool AEODCharacterBase::IsUsingSkill(int32 SkillIndex) const
 	return IsUsingAnySkill() && CurrentActiveSkill == GetSkill(SkillIndex);
 }
 
+FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
+{
+	return CharacterState == ECharacterState::GotHit;
+}
+
 bool AEODCharacterBase::IsCriticalHit(const FSkill * HitSkill) const
 {
 	bool bCriticalHit = false;
@@ -390,11 +395,8 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * Instigati
 	case ECrowdControlEffect::KnockedBack:
 		if (CanKnockback())
 		{
-			// @todo for later. Adding impulse to character movement component doesn't have any effect because of ground friction
-			/* 
 			FVector ImpulseDirection = -(InstigatorToThisCharLineHitResult.ImpactNormal);
-			Knockback(EODDamage.CrowdControlEffectDuration, Impulse);
-			*/
+			Knockback(EODDamage.CrowdControlEffectDuration, ImpulseDirection);
 		}
 		break;
 	case ECrowdControlEffect::Stunned:
