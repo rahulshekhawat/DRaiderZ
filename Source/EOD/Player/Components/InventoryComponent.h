@@ -51,6 +51,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	uint32 MaxSlots;
 
+	// FInventoryItem& GetItem(int32 ItemIndex) const;
 
 private:
 

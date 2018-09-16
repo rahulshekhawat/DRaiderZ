@@ -31,8 +31,6 @@ void UInventoryComponent::ToggleInventoryUI()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
 }
 
 void UInventoryComponent::AddItem(FName ItemID)
