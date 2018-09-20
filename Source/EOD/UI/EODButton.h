@@ -18,6 +18,11 @@ public:
 
 	UEODButton(const FObjectInitializer& ObjectInitializer);
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = ItemData)
+		FName ItemID;
+
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = InGameData)
+		
 
 
 

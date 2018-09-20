@@ -8,6 +8,7 @@
 #include "Weapons/SecondaryWeapon.h"
 #include "Statics/WeaponLibrary.h"
 #include "UI/HUDWidget.h"
+#include "UI/SkillBarWidget.h"
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
 #include "Core/EODPreprocessors.h"
@@ -309,13 +310,25 @@ void APlayerCharacter::BeginPlay()
 
 	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
-	//~ Player HUD
-	if (IsLocallyControlled() && BP_HUDWidget.Get())
+	//~ Player widgets
+	if (IsLocallyControlled())
 	{
-		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), BP_HUDWidget);
-		if (HUDWidget)
+		if (BP_HUDWidget.Get())
 		{
-			HUDWidget->AddToViewport();
+			HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), BP_HUDWidget);
+			if (HUDWidget)
+			{
+				HUDWidget->AddToViewport();
+			}
+		}
+
+		if (BP_SkillBarWidget.Get())
+		{
+			SkillBarWidget = CreateWidget<USkillBarWidget>(GetGameInstance(), BP_SkillBarWidget);
+			if (SkillBarWidget)
+			{
+				SkillBarWidget->AddToViewport();
+			}
 		}
 	}
 }

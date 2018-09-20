@@ -14,6 +14,9 @@ class EOD_API USkillTreeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+
+
 	
 	
 	
