@@ -227,7 +227,13 @@ public:
 	/** [server + client] Use a skill and play it's animation */
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual bool UseSkill(int32 SkillIndex);
-	
+
+	UFUNCTION(BlueprintCallable, Category = Skills)
+	virtual void StartSkill(FName SkillID);
+
+	UFUNCTION(BlueprintCallable, Category = Skills)
+	virtual void StopSkill(FName SkillID);
+
 	/** 
 	 * Determines and returns the status of skill at a given SkillIndex
 	 * Returns EEODTaskStatus::Active if character is currently using skill

@@ -450,6 +450,14 @@ bool AEODCharacterBase::UseSkill(int32 SkillIndex)
 	return false;
 }
 
+void AEODCharacterBase::StartSkill(FName SkillID)
+{
+}
+
+void AEODCharacterBase::StopSkill(FName SkillID)
+{
+}
+
 EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 {
 	EEODTaskStatus TaskStatus = EEODTaskStatus::Inactive;

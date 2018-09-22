@@ -325,6 +325,7 @@ void APlayerCharacter::BeginPlay()
 		if (BP_SkillBarWidget.Get())
 		{
 			SkillBarWidget = CreateWidget<USkillBarWidget>(GetGameInstance(), BP_SkillBarWidget);
+			SkillBarWidget->SetOwningEODPlayer(this);
 			if (SkillBarWidget)
 			{
 				SkillBarWidget->AddToViewport();
@@ -1160,9 +1161,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		return;
 	}
 
-	// SkillBarWidget->UseSkill
-
-
+	SkillBarWidget->PressSkillButton(SkillButtonIndex);
 
 	/*
 #if DEVSTAGE_CODE_ENABLED
@@ -1196,6 +1195,12 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
 {
+	if (!SkillBarWidget)
+	{
+		return;
+	}
+
+	SkillBarWidget->ReleaseSkillButton(SkillButtonIndex);
 }
 
 float APlayerCharacter::GetPlayerControlRotationYaw()
