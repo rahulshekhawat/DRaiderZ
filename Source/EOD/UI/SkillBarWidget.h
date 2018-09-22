@@ -6,7 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "SkillBarWidget.generated.h"
 
-class UEODButton;
+class UEODItemContainer;
+class APlayerCharacter;
 
 /**
  * 
@@ -27,70 +28,81 @@ public:
 	virtual void NativeDestruct() override;
 
 	// UPROPERTY(meta = (BindWidget))
+	// TArray<UEODItemContainer*> Skills;
+
+	// UPROPERTY(meta = (BindWidget))
 	// TArray<UEODButton*> Skills;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_1;
+	UEODItemContainer* Skill_1;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_2;
+	UEODItemContainer* Skill_2;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_3;
+	UEODItemContainer* Skill_3;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_4;
+	UEODItemContainer* Skill_4;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_5;
+	UEODItemContainer* Skill_5;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_6;
+	UEODItemContainer* Skill_6;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_7;
+	UEODItemContainer* Skill_7;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_8;
+	UEODItemContainer* Skill_8;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_9;
+	UEODItemContainer* Skill_9;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_10;
+	UEODItemContainer* Skill_10;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_11;
+	UEODItemContainer* Skill_11;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_12;
+	UEODItemContainer* Skill_12;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_13;
+	UEODItemContainer* Skill_13;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_14;
+	UEODItemContainer* Skill_14;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_15;
+	UEODItemContainer* Skill_15;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_16;
+	UEODItemContainer* Skill_16;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_17;
+	UEODItemContainer* Skill_17;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_18;
+	UEODItemContainer* Skill_18;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_19;
+	UEODItemContainer* Skill_19;
 
 	UPROPERTY(meta = (BindWidget))
-	UEODButton* Skill_20;
+	UEODItemContainer* Skill_20;
 
 	void PressSkillButton(uint32 SkillIndex);
 
 	void ReleaseSkillButton(uint32 SkillIndex);
-	
+
+	void SetOwningEODPlayer(APlayerCharacter* NewOwner);
+
+	APlayerCharacter* GetOwningEODPlayer() const;
+
+private:
+
+	APlayerCharacter* OwningEODPlayer;
+
 };
