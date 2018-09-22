@@ -28,16 +28,16 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UProgressBar* HealthBar;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UProgressBar* ManaBar;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UProgressBar* StaminaBar;
-	
-	UPROPERTY(meta = (BindWidget))
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* LevelText;
 
 	

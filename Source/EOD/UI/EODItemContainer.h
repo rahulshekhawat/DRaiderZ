@@ -26,7 +26,7 @@ enum class EEODItemType : uint8
 };
 
 class UTextBlock;
-
+class UImage;
 /**
  * 
  */
@@ -54,6 +54,12 @@ public:
 	UPROPERTY(Transient, BlueprintReadWrite, Category = EODItemInfo)
 	bool bInCooldown;
 
+	UPROPERTY(Transient)
+	float CooldownTimeRemaining;
+
+	UPROPERTY(Transient)
+	float CooldownInterval;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
 	FName EODItemID;
 
@@ -64,15 +70,26 @@ public:
 	UTexture* EODItemIcon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UImage* ItemImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* Text_StackCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* Text_Cooldown;
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void StartCooldown(float Duration);
+	UFUNCTION(BlueprintCallable, Category = EODItemContainer)
+	void StartCooldown(float Duration, float Interval = 1.f);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = EODItemContainer)
 	void StopCooldown();
+
+private:
+
+	FTimerHandle CooldownTimerHandle;
+
+	void UpdateItemImage();
 	
+	void UpdateCooldown();
+
 };
