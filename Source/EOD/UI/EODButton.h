@@ -17,9 +17,23 @@ class EOD_API UEODButton : public UButton
 public:
 
 	UEODButton(const FObjectInitializer& ObjectInitializer);
+
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODButtonInfo)
+	// EEODItemType EODItemType;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = ItemData)
-		FName ItemID;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODButtonInfo)
+	bool bCanBeClicked;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODButtonInfo)
+	bool bCanBeDragged;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODButtonInfo)
+	FName EODItemID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODButtonInfo)
+	UTexture* EODItemIcon;
+
+	// void ButtonClicked();
 
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = InGameData)
 		

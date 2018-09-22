@@ -2,6 +2,7 @@
 
 #include "EODButton.h"
 
-UEODButton::UEODButton(const FObjectInitializer & ObjectInitializer)
+UEODButton::UEODButton(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
 }
+
