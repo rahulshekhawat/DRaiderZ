@@ -26,7 +26,7 @@ enum class EEODItemType : uint8
 };
 
 class UTextBlock;
-class UImage;
+class UButton;
 /**
  * 
  */
@@ -69,8 +69,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
 	UTexture* EODItemIcon;
 
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	// UImage* ItemImage;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UImage* ItemImage;
+	UButton* ItemButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* Text_StackCount;
@@ -88,8 +91,10 @@ private:
 
 	FTimerHandle CooldownTimerHandle;
 
-	void UpdateItemImage();
+	// void UpdateItemImage();
 	
+	void UpdateItemButton();
+
 	void UpdateCooldown();
 
 };

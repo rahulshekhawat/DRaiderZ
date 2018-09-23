@@ -1,9 +1,11 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODItemContainer.h"
-#include "TextBlock.h"
-#include "Image.h"
 
+#include "Button.h"
+#include "Engine/Texture.h"
+#include "SlateTypes.h"
+#include "TextBlock.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
@@ -15,7 +17,7 @@ UEODItemContainer::UEODItemContainer(const FObjectInitializer & ObjectInitialize
 
 bool UEODItemContainer::Initialize()
 {
-	if (Super::Initialize() && Text_StackCount && Text_Cooldown && ItemImage)
+	if (Super::Initialize() && Text_StackCount && Text_Cooldown && ItemButton)
 	{
 		Text_StackCount->SetVisibility(ESlateVisibility::Hidden);
 		Text_Cooldown->SetVisibility(ESlateVisibility::Hidden);
@@ -30,8 +32,9 @@ void UEODItemContainer::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// StartCooldown(10);
-	
+	// UpdateItemImage();
+	UpdateItemButton();
+
 }
 
 void UEODItemContainer::NativeDestruct()
@@ -46,7 +49,7 @@ void UEODItemContainer::StartCooldown(float Duration, float Interval)
 		return;
 	}
 
-	UWorld* World = GEngine->GetWorldFromContextObject(this);
+	UWorld* World = GEngine->GetWorldFromContextObjectChecked(this);
 	if (!World)
 	{
 		return;
@@ -57,7 +60,8 @@ void UEODItemContainer::StartCooldown(float Duration, float Interval)
 	CooldownTimeRemaining = Duration;
 	CooldownInterval = Interval;
 	bInCooldown = true;
-	ItemImage->SetIsEnabled(false);
+	ItemButton->SetIsEnabled(false);
+	// ItemImage->SetIsEnabled(false);
 	Text_Cooldown->SetVisibility(ESlateVisibility::Visible);
 }
 
@@ -68,7 +72,7 @@ void UEODItemContainer::StopCooldown()
 		return;
 	}
 
-	UWorld* World = GEngine->GetWorldFromContextObject(this);
+	UWorld* World = GEngine->GetWorldFromContextObjectChecked(this);
 	if (!World)
 	{
 		return;
@@ -77,10 +81,12 @@ void UEODItemContainer::StopCooldown()
 	World->GetTimerManager().ClearTimer(CooldownTimerHandle);
 
 	bInCooldown = false;
-	ItemImage->SetIsEnabled(true);
+	ItemButton->SetIsEnabled(true);
+	// ItemImage->SetIsEnabled(true);
 	Text_Cooldown->SetVisibility(ESlateVisibility::Hidden);
 }
 
+/*
 void UEODItemContainer::UpdateItemImage()
 {
 	if (EODItemIcon)
@@ -100,6 +106,44 @@ void UEODItemContainer::UpdateItemImage()
 		SlateBrush.ImageType = ESlateBrushImageType::NoImage;
 		ItemImage->SetBrush(SlateBrush);
 	}
+}
+*/
+
+void UEODItemContainer::UpdateItemButton()
+{
+	if (EODItemIcon)
+	{
+		FSlateBrush SlateBrush;
+		// SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
+		SlateBrush.SetResourceObject(EODItemIcon);
+
+		FButtonStyle ButtonStyle;
+		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+		ButtonStyle.SetNormal(SlateBrush);
+		SlateBrush.ImageSize = FVector2D(54.0, 54.0);
+		ButtonStyle.SetHovered(SlateBrush);
+		SlateBrush.ImageSize = FVector2D(50.0, 50.0);
+		ButtonStyle.SetPressed(SlateBrush);
+
+		ItemButton->SetStyle(ButtonStyle);
+	}
+	else
+	{
+		FSlateBrush SlateBrush;
+		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+		SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
+		SlateBrush.ImageType = ESlateBrushImageType::NoImage;
+
+		FButtonStyle ButtonStyle;
+		ButtonStyle.SetNormal(SlateBrush);
+		ButtonStyle.SetHovered (SlateBrush);
+		ButtonStyle.SetPressed(SlateBrush);
+
+		ItemButton->SetStyle(ButtonStyle);
+	}
+
 }
 
 void UEODItemContainer::UpdateCooldown()
