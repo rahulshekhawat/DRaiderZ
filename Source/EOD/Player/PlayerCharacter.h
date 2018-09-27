@@ -297,16 +297,16 @@ private:
 	UPROPERTY(Transient)
 	UHUDWidget* HUDWidget;
 
-	UPROPERTY(Transient)
-	USkillBarWidget* SkillBarWidget;
+	// UPROPERTY(Transient)
+	// USkillBarWidget* SkillBarWidget;
 
 	/** The blueprint widget class to use for player HUD */
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	TSubclassOf<UHUDWidget> BP_HUDWidget;
 
 	/** The blueprint widget class for skill class */
-	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
-	TSubclassOf<USkillBarWidget> BP_SkillBarWidget;
+	// UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
+	// TSubclassOf<USkillBarWidget> BP_SkillBarWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	ECharacterGender Gender;

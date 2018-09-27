@@ -7,7 +7,9 @@
 #include "Blueprint/UserWidget.h"
 #include "HUDWidget.generated.h"
 
-class UProgressBar;
+class UStatusIndicatorWidget;
+class USkillBarWidget;
+class UInventoryWidget;
 class UTextBlock;
 
 /**
@@ -28,6 +30,7 @@ public:
 
 	virtual void NativeDestruct() override;
 
+	/*
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UProgressBar* HealthBar;
 
@@ -39,8 +42,24 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* LevelText;
+	*/
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UStatusIndicatorWidget* StatusIndicatorWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillBarWidget* SkillBarWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UInventoryWidget* InventoryWidget;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+
+
+	FORCEINLINE void UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth);
+
+	// FORCEINLINE void SetCurrentHealthPercent();
+
 	/** TextBlock to display current/max health */
 	// UPROPERTY(meta = (BindWidget))
 	// class UTextBlock* HealthText;

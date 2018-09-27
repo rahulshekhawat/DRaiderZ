@@ -322,6 +322,7 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 
+		/*
 		if (BP_SkillBarWidget.Get())
 		{
 			SkillBarWidget = CreateWidget<USkillBarWidget>(GetGameInstance(), BP_SkillBarWidget);
@@ -331,6 +332,7 @@ void APlayerCharacter::BeginPlay()
 				SkillBarWidget->AddToViewport();
 			}
 		}
+		*/
 	}
 }
 
@@ -1156,12 +1158,14 @@ void APlayerCharacter::InitializeSkills(TArray<FName> UnlockedSKillsID)
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
+	/*
 	if (!SkillBarWidget)
 	{
 		return;
 	}
 
 	SkillBarWidget->PressSkillButton(SkillButtonIndex);
+	8/
 
 	/*
 #if DEVSTAGE_CODE_ENABLED
@@ -1195,12 +1199,14 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
 {
+	/*
 	if (!SkillBarWidget)
 	{
 		return;
 	}
 
 	SkillBarWidget->ReleaseSkillButton(SkillButtonIndex);
+	*/
 }
 
 float APlayerCharacter::GetPlayerControlRotationYaw()

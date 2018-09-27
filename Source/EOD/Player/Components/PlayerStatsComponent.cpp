@@ -181,7 +181,7 @@ void UPlayerStatsComponent::SetCurrentHealth(int32 Value)
 	if (OwningPlayer && OwningPlayer->GetHUDWidget() && MaxHealth != 0)
 	{
 		float Percent = (float)CurrentHealth / (float)MaxHealth;
-		OwningPlayer->GetHUDWidget()->HealthBar->SetPercent(Percent);
+		// OwningPlayer->GetHUDWidget()->HealthBar->SetPercent(Percent);
 	}
 
 	if (CurrentHealth < MaxHealth && !bIsRegeneratingHealth)
@@ -260,7 +260,7 @@ void UPlayerStatsComponent::SetCurrentMana(int32 Value)
 	if (OwningPlayer && OwningPlayer->GetHUDWidget() && MaxMana != 0)
 	{
 		float Percent = (float)CurrentMana / (float)MaxMana;
-		OwningPlayer->GetHUDWidget()->ManaBar->SetPercent(Percent);
+		// OwningPlayer->GetHUDWidget()->ManaBar->SetPercent(Percent);
 	}
 
 	if (CurrentMana < MaxMana && !bIsRegeneratingMana)
@@ -334,7 +334,7 @@ void UPlayerStatsComponent::SetCurrentStamina(int32 Value)
 	if (OwningPlayer && OwningPlayer->GetHUDWidget() && MaxStamina != 0)
 	{
 		float Percent = (float)CurrentStamina / (float)MaxStamina;
-		OwningPlayer->GetHUDWidget()->StaminaBar->SetPercent(Percent);
+		// OwningPlayer->GetHUDWidget()->StaminaBar->SetPercent(Percent);
 	}
 
 	if (CurrentStamina < MaxStamina && !bIsRegeneratingStamina)

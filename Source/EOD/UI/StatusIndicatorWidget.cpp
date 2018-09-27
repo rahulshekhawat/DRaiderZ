@@ -8,13 +8,29 @@ UStatusIndicatorWidget::UStatusIndicatorWidget(const FObjectInitializer & Object
 
 bool UStatusIndicatorWidget::Initialize()
 {
+	if (Super::Initialize())
+	{
+		return true;
+	}
+
 	return false;
 }
 
 void UStatusIndicatorWidget::NativeConstruct()
 {
+	Super::NativeConstruct();
 }
 
 void UStatusIndicatorWidget::NativeDestruct()
 {
+	Super::NativeDestruct();
+}
+
+void UStatusIndicatorWidget::UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth)
+{
+	if (BaseHealth == 0)
+	{
+		return;
+	}
+
 }

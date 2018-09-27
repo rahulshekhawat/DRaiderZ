@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "StatusIndicatorWidget.generated.h"
 
-class UProgressBar;
+class UImage;
 class UTextBlock;
 
 /**
@@ -28,13 +28,29 @@ public:
 	virtual void NativeDestruct() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UProgressBar* HealthBar;
+	UImage* HealthBarEmpty;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UProgressBar* ManaBar;
+	UImage* HealthBarFill;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UProgressBar* StaminaBar;
+	UImage* HealthBarBlocked;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProgressBar)
+	// float Percent;
+
+	FORCEINLINE void UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth);
+
+	// FORCEINLINE SetHealthPercent(float Value);
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	// UProgressBar* HealthBar;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	// UProgressBar* ManaBar;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	// UProgressBar* StaminaBar;
 
 	// @todo Class icon
 

@@ -8,7 +8,8 @@ UHUDWidget::UHUDWidget(const FObjectInitializer & ObjectInitializer) : Super(Obj
 
 bool UHUDWidget::Initialize()
 {
-	if (Super::Initialize() && HealthBar && ManaBar && StaminaBar && LevelText) // && HealthText && ManaText && StaminaText)
+
+	if (Super::Initialize() && StatusIndicatorWidget && SkillBarWidget && InventoryWidget) // && HealthBar && ManaBar && StaminaBar && LevelText) // && HealthText && ManaText && StaminaText)
 	{
 		return true;
 	}
@@ -25,3 +26,14 @@ void UHUDWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 }
+
+FORCEINLINE void UHUDWidget::UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth)
+{
+	
+}
+
+/*
+FORCEINLINE void UHUDWidget::SetCurrentHealthPercent()
+{
+}
+*/

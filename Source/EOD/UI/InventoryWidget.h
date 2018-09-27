@@ -29,6 +29,7 @@ public:
 
 	virtual void NativeDestruct() override;
 
+	/*
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* BackgroundImage;
 
@@ -37,7 +38,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UGridPanel* GridPanel;
-
+	*/
 	
 
 	
