@@ -213,6 +213,7 @@ public:
 
 };
 
+/*
 UENUM(BlueprintType)
 enum class ESkillCastType : uint8
 {
@@ -223,6 +224,7 @@ enum class ESkillCastType : uint8
 	// Passives skill that can't be cast
 	NoCast
 };
+*/
 
 UENUM(BlueprintType)
 enum class EEODTaskStatus : uint8
@@ -231,6 +233,13 @@ enum class EEODTaskStatus : uint8
 	Inactive,
 	Finished,
 	Aborted
+};
+
+UENUM(BlueprintType)
+enum class ESkillType : uint8
+{
+	PassiveSkill,
+	ActiveSkill,
 };
 
 /** Struct containing level specific info for an in-game skill */
@@ -252,6 +261,9 @@ public:
 	/** Skill cooldown */
 	UPROPERTY(EditDefaultsOnly)
 	float Cooldown;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CastDuration;
 
 	/** Damage in percentage of player's magickal or physical attack that will inflicted on enemy */
 	UPROPERTY(EditDefaultsOnly)
@@ -323,6 +335,9 @@ public:
 	/** Type of damage inflicted from this skill */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	EDamageType DamageType;
+
+	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	ESkillType SkillType;
 	
 	//~ Maximum number of level ups = SkillLevelUpsInfo.Num()
 	UPROPERTY(EditAnywhere, Category = SkillInfo)
@@ -347,13 +362,9 @@ struct FSkill
 
 public:
 
-	// uint8 SkillSlotIndex;
+	// FName SkillID; // What was this for?
 
 	uint8 CurrentSkillLevel;
-
-	FName SkillID; // What was this for?
-
-	// FName AnimationMontageSectionName;
 
 	UTexture* Icon;
 
