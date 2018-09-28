@@ -200,6 +200,14 @@ void APlayerCharacter::PostInitializeComponents()
 	{
 		InitializeSkills(EODSaveGame->UnlockedSkills);
 	}
+
+#if DEVSTAGE_CODE_ENABLED
+	FSkill* Skill = UCharacterLibrary::GetPlayerSkill(FName("TestSkill"));
+	if (Skill)
+	{
+		IDToSkillMap.Add(FName("TestSkill"), Skill);
+	}
+#endif
 }
 
 void APlayerCharacter::PostInitProperties()
@@ -1158,43 +1166,67 @@ void APlayerCharacter::InitializeSkills(TArray<FName> UnlockedSKillsID)
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
-	/*
-	if (!SkillBarWidget)
+	// If HUDWidget is nullptr or if player can't currently use any skill
+	// @todo - do not use skill if player weapon is sheathed.
+	if (!HUDWidget || !CanUseAnySkill())
 	{
 		return;
 	}
 
-	SkillBarWidget->PressSkillButton(SkillButtonIndex);
-	8/
+	// Skill is in cooldown, can't use skill. @note Empty skill slot will return false
+	if (HUDWidget->IsSkillInCooldown(SkillButtonIndex))
+	{
+		return;
+	}
 
-	/*
-#if DEVSTAGE_CODE_ENABLED
-	if (SkillButtonIndex == 0)
+	FName SkillID = HUDWidget->GetSkillAtIndex(SkillButtonIndex);
+	// If no skill is equipped in the given slot
+	if (SkillID == NAME_None)
 	{
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
+		return;
 	}
-	else if (SkillButtonIndex == 1)
+
+	// @note no need to check for active or passive skill since only active skills can be placed in skill bar slot.
+	// In fact, only active skills can be dragged out of skill tree widget.
+
+	FSkill* Skill = IDToSkillMap[SkillID];	// Crash if SkillID is not present in IDToSkillMap
+
+	// If the skill doesn't support currently equipped weapon
+	if (!(Skill->SupportedWeapons & (1 << (uint8)PrimaryWeapon->WeaponType)))
 	{
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndSword);
+		return;
 	}
-	else if (SkillButtonIndex == 2)
+
+	// check if player has enough stamina or energy for the skill
+	if (Skill->SkillLevelUpInfo.ManaRequired > StatsComp->GetCurrentMana())
 	{
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::GreatSword);
+		StatsComp->ModifyCurrentMana(-Skill->SkillLevelUpInfo.ManaRequired);
 	}
-	else if (SkillButtonIndex == 3)
+	else
 	{
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::WarHammer);
+		// @todo not enough mana message
+		return;
 	}
-	else if (SkillButtonIndex == 4)
+
+	if (Skill->SkillLevelUpInfo.StaminaRequired > StatsComp->GetCurrentStamina())
 	{
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Staff);
+		StatsComp->ModifyCurrentStamina(-Skill->SkillLevelUpInfo.StaminaRequired);
 	}
-	else if (SkillButtonIndex == 5)
+	else
 	{
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
+		// @todo not enough stamina message
+		return;
 	}
-#endif
-	*/
+
+	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Skills, Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+	// @todo set current active skill
+
+	// Check if skill can be used with currently equipped weapon
+
+	// Trigger status effects on using this skill? 
+
+
+	// HUDWidget->PutSkillOnCooldownTimer()
 }
 
 void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
