@@ -99,6 +99,13 @@ public:
 
 	void SetOwningEODPlayer(APlayerCharacter* NewOwner);
 
+	/** Get SkillID of skill placed at SkillIndex */
+	FORCEINLINE FName GetSkillAtIndex(int32 SkillIndex);
+
+	FORCEINLINE void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);
+
+	FORCEINLINE bool IsSkillInCooldown(int32 SkillIndex);
+
 	APlayerCharacter* GetOwningEODPlayer() const;
 
 private:

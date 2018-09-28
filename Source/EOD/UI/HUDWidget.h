@@ -58,6 +58,13 @@ public:
 
 	FORCEINLINE void UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth);
 
+	/** Get SkillID of skill placed at SkillIndex of skill bar */
+	FORCEINLINE FName GetSkillAtIndex(int32 SkillIndex);
+
+	FORCEINLINE void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);
+
+	FORCEINLINE bool IsSkillInCooldown(int32 SkillIndex);
+
 	// FORCEINLINE void SetCurrentHealthPercent();
 
 	/** TextBlock to display current/max health */
