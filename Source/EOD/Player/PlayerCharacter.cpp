@@ -1198,7 +1198,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	}
 
 	// check if player has enough stamina or energy for the skill
-	if (Skill->SkillLevelUpInfo.ManaRequired > StatsComp->GetCurrentMana())
+	if (Skill->SkillLevelUpInfo.ManaRequired < StatsComp->GetCurrentMana())
 	{
 		StatsComp->ModifyCurrentMana(-Skill->SkillLevelUpInfo.ManaRequired);
 	}
@@ -1208,7 +1208,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		return;
 	}
 
-	if (Skill->SkillLevelUpInfo.StaminaRequired > StatsComp->GetCurrentStamina())
+	if (Skill->SkillLevelUpInfo.StaminaRequired < StatsComp->GetCurrentStamina())
 	{
 		StatsComp->ModifyCurrentStamina(-Skill->SkillLevelUpInfo.StaminaRequired);
 	}
