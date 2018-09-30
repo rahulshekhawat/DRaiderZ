@@ -17,6 +17,10 @@ AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer)
 	HealthWidgetComp = ObjectInitializer.CreateDefaultSubobject<UEODWidgetComponent>(this, TEXT("Health Indicator"));
 	HealthWidgetComp->SetupAttachment(RootComponent);
 
+	AggroWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HealthWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AggroWidgetComp->SetCollisionProfileName(FName("NoCollision"));
+	HealthWidgetComp->SetCollisionProfileName(FName("NoCollision"));
 }
 
 void AAICharacterBase::Destroyed()
