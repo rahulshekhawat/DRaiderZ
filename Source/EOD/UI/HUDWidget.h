@@ -10,7 +10,7 @@
 class UStatusIndicatorWidget;
 class USkillBarWidget;
 class UInventoryWidget;
-class UTextBlock;
+class USkillTreeWidget;
 
 /**
  * HUDWidget is used to display player HUD
@@ -52,6 +52,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UInventoryWidget* InventoryWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeWidget* SkillTreeWidget;
 
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 

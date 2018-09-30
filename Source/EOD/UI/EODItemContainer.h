@@ -45,6 +45,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
 	FEODItemInfo EODItemInfo;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
+	EEODContainerType ContainerType;
 
 	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
 	// FName EODItemID;

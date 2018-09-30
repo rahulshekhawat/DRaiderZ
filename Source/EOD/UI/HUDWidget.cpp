@@ -2,6 +2,7 @@
 
 #include "HUDWidget.h"
 #include "SkillBarWidget.h"
+#include "SkillTreeWidget.h"
 
 UHUDWidget::UHUDWidget(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -10,7 +11,7 @@ UHUDWidget::UHUDWidget(const FObjectInitializer & ObjectInitializer) : Super(Obj
 bool UHUDWidget::Initialize()
 {
 
-	if (Super::Initialize() && StatusIndicatorWidget && SkillBarWidget && InventoryWidget) // && HealthBar && ManaBar && StaminaBar && LevelText) // && HealthText && ManaText && StaminaText)
+	if (Super::Initialize() && StatusIndicatorWidget && SkillBarWidget && InventoryWidget && SkillTreeWidget) // && HealthBar && ManaBar && StaminaBar && LevelText) // && HealthText && ManaText && StaminaText)
 	{
 		return true;
 	}
@@ -21,6 +22,7 @@ bool UHUDWidget::Initialize()
 void UHUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UHUDWidget::NativeDestruct()
