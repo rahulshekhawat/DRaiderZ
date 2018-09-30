@@ -2,7 +2,7 @@
 
 #include "EODItemContainer.h"
 
-#include "Button.h"
+#include "Image.h"
 #include "Engine/Texture.h"
 #include "SlateTypes.h"
 #include "TextBlock.h"
@@ -17,7 +17,7 @@ UEODItemContainer::UEODItemContainer(const FObjectInitializer & ObjectInitialize
 
 bool UEODItemContainer::Initialize()
 {
-	if (Super::Initialize() && Text_StackCount && Text_Cooldown && ItemButton)
+	if (Super::Initialize() && Text_StackCount && Text_Cooldown && ItemImage)
 	{
 		Text_StackCount->SetVisibility(ESlateVisibility::Hidden);
 		Text_Cooldown->SetVisibility(ESlateVisibility::Hidden);
@@ -60,8 +60,7 @@ void UEODItemContainer::StartCooldown(float Duration, float Interval)
 	CooldownTimeRemaining = Duration;
 	CooldownInterval = Interval;
 	bInCooldown = true;
-	ItemButton->SetIsEnabled(false);
-	// ItemImage->SetIsEnabled(false);
+	ItemImage->SetIsEnabled(false);
 	Text_Cooldown->SetVisibility(ESlateVisibility::Visible);
 }
 
@@ -81,8 +80,7 @@ void UEODItemContainer::StopCooldown()
 	World->GetTimerManager().ClearTimer(CooldownTimerHandle);
 
 	bInCooldown = false;
-	ItemButton->SetIsEnabled(true);
-	// ItemImage->SetIsEnabled(true);
+	ItemImage->SetIsEnabled(true);
 	Text_Cooldown->SetVisibility(ESlateVisibility::Hidden);
 }
 
@@ -111,13 +109,14 @@ void UEODItemContainer::UpdateItemImage()
 
 void UEODItemContainer::UpdateItemButton()
 {
-	if (EODItemIcon)
+	if (EODItemInfo.Icon)
 	{
+		/*
 		FSlateBrush SlateBrush;
 		// SlateBrush.ImageSize = FVector2D(52.0, 52.0);
 		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
 		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
-		SlateBrush.SetResourceObject(EODItemIcon);
+		SlateBrush.SetResourceObject(EODItemInfo.Icon);
 
 		FButtonStyle ButtonStyle;
 		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
@@ -128,9 +127,11 @@ void UEODItemContainer::UpdateItemButton()
 		ButtonStyle.SetPressed(SlateBrush);
 
 		ItemButton->SetStyle(ButtonStyle);
+		*/
 	}
 	else
 	{
+		/*
 		FSlateBrush SlateBrush;
 		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
 		SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
@@ -142,6 +143,7 @@ void UEODItemContainer::UpdateItemButton()
 		ButtonStyle.SetPressed(SlateBrush);
 
 		ItemButton->SetStyle(ButtonStyle);
+		*/
 	}
 
 }

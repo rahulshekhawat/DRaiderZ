@@ -3,30 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Statics/EODLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "EODItemContainer.generated.h"
 
-UENUM(BlueprintType)
-enum class EEODItemType : uint8
-{
-	None,
-	ActiveSkill,
-	PassiveSkill,
-	Armor,
-	Weapon,
-	Necklace,
-	Belt,
-	Ring,
-	Earring,
-	Ingredient,
-	Consumable,
-	QuestItem,
-	Potion,
-	Scrap,
-};
-
 class UTextBlock;
-class UButton;
+class UImage;
 /**
  * 
  */
@@ -45,13 +27,13 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Behavior)
 	bool bCanBeClicked;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Behavior)
 	bool bCanBeDragged;
 
-	UPROPERTY(Transient, BlueprintReadWrite, Category = EODItemInfo)
+	UPROPERTY(Transient, BlueprintReadWrite, Category = Behavior)
 	bool bInCooldown;
 
 	UPROPERTY(Transient)
@@ -60,20 +42,27 @@ public:
 	UPROPERTY(Transient)
 	float CooldownInterval;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
-	FName EODItemID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
+	FEODItemInfo EODItemInfo;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
-	EEODItemType EODItemType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
-	UTexture* EODItemIcon;
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
+	// FName EODItemID;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
+	// EEODItemType EODItemType;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
+	// UTexture* EODItemIcon;
 
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	// UImage* ItemImage;
 
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	// UButton* ItemButton;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UButton* ItemButton;
+	UImage* ItemImage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* Text_StackCount;
