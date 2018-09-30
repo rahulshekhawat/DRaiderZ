@@ -9,6 +9,15 @@
 class UTexture;
 
 UENUM(BlueprintType)
+enum class EEODContainerType : uint8
+{
+	None,
+	Inventory,
+	SkillTree,
+	SkillBar,
+};
+
+UENUM(BlueprintType)
 enum class EEODItemType : uint8
 {
 	None,
