@@ -139,6 +139,7 @@ public:
 
 	EWeaponType GetEquippedWeaponType() const;
 
+	UFUNCTION(BlueprintCallable)
 	UHUDWidget* GetHUDWidget() const;
 
 	/** [server + client] Interrupt this character's current action */

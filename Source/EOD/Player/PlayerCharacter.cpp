@@ -1218,6 +1218,8 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		return;
 	}
 
+	CurrentActiveSkill = Skill;
+
 	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Skills, Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	// @todo set current active skill
 
