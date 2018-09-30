@@ -392,6 +392,8 @@ private:
 	/** Display or hide mouse cursor */
 	void OnToggleMouseCursor();
 
+	void OnToggleSkillTree();
+
 	void OnPressedNormalAttack();
 
 	void OnReleasedNormalAttack();

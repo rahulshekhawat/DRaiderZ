@@ -13,6 +13,7 @@
 #include "Components/PlayerStatsComponent.h"
 #include "Core/EODPreprocessors.h"
 #include "Core/EODSaveGame.h"
+#include "UI/SkillTreeWidget.h"
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
@@ -114,9 +115,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &APlayerCharacter::OnToggleSheathe);
 	PlayerInputComponent->BindAction("ToggleStats", IE_Pressed, this, &APlayerCharacter::OnToggleCharacterStatsUI);
 	PlayerInputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &APlayerCharacter::OnToggleMouseCursor);
+	PlayerInputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &APlayerCharacter::OnToggleSkillTree);
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
 	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
-
 
 	PlayerInputComponent->BindAction("Skill_1", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<1>);
 	PlayerInputComponent->BindAction("Skill_2", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<2>);
@@ -718,7 +719,36 @@ void APlayerCharacter::OnToggleCharacterStatsUI()
 
 void APlayerCharacter::OnToggleMouseCursor()
 {
-	// @todo definition
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC->bShowMouseCursor)
+	{
+		PC->bShowMouseCursor = false;
+		FInputModeGameOnly GameOnlyInputMode;
+		GameOnlyInputMode.SetConsumeCaptureMouseDown(true);
+		PC->SetInputMode(GameOnlyInputMode);
+	}
+	else
+	{
+		PC->bShowMouseCursor = true;
+		FInputModeGameAndUI GameAndUIInputMode;
+		GameAndUIInputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+		PC->SetInputMode(GameAndUIInputMode);
+	}
+}
+
+void APlayerCharacter::OnToggleSkillTree()
+{
+	if (HUDWidget)
+	{
+		if (HUDWidget->SkillTreeWidget->IsVisible())
+		{
+			HUDWidget->SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			HUDWidget->SkillTreeWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
 }
 
 void APlayerCharacter::OnPressedNormalAttack()
