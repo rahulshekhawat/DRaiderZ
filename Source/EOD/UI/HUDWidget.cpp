@@ -3,6 +3,7 @@
 #include "HUDWidget.h"
 #include "SkillBarWidget.h"
 #include "SkillTreeWidget.h"
+#include "InventoryWidget.h"
 
 UHUDWidget::UHUDWidget(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -23,6 +24,7 @@ void UHUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+	InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UHUDWidget::NativeDestruct()

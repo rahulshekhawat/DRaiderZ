@@ -7,6 +7,7 @@
 #include "InventoryComponent.generated.h"
 
 class UTexture;
+class APlayerCharacter;
 
 USTRUCT(BlueprintType)
 struct EOD_API FInventoryItem
@@ -53,6 +54,8 @@ public:
 
 	// FInventoryItem& GetItem(int32 ItemIndex) const;
 
+	void SetOwningPlayer(APlayerCharacter* PlayerCharacter);
+
 private:
 
 	void AddItem(FName ItemID);
@@ -68,6 +71,8 @@ private:
 	void LoadInventory();
 	
 	TArray<FInventoryItem> Items;
+
+	APlayerCharacter* OwningPlayer;
 
 
 };

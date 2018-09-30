@@ -1,6 +1,9 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "InventoryComponent.h"
+#include "Player/PlayerCharacter.h"
+#include "UI/HUDWidget.h"
+#include "UI/InventoryWidget.h"
 
 
 // Sets default values for this component's properties
@@ -23,14 +26,24 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UInventoryComponent::ToggleInventoryUI()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Inventory Toggled"));
-
-	// @todo definition
+	if (OwningPlayer->GetHUDWidget()->InventoryWidget->IsVisible())
+	{
+		OwningPlayer->GetHUDWidget()->InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		OwningPlayer->GetHUDWidget()->InventoryWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void UInventoryComponent::SetOwningPlayer(APlayerCharacter * PlayerCharacter)
+{
+	OwningPlayer = PlayerCharacter;
 }
 
 void UInventoryComponent::AddItem(FName ItemID)
