@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SlateTypes.h"
 #include "Blueprint/UserWidget.h"
 #include "SkillTreeWidget.generated.h"
 
+class UButton;
+class UWidgetSwitcher;
 /**
  * 
  */
@@ -16,8 +19,42 @@ class EOD_API USkillTreeWidget : public UUserWidget
 	
 public:
 
+	USkillTreeWidget(const FObjectInitializer& ObjectInitializer);
 
+	bool Initialize() override;
+
+	virtual void NativeConstruct() override;
+
+	virtual void NativeDestruct() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* AssassinTab;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* BerserkerTab;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* ClericTab;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* DefenderTab;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* SorcererTab;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UWidgetSwitcher* SkillTreeSwitcher;
+
+	FButtonStyle DefaultButtonStyle;
+
+private:
+
+	void ResetAllTabButtonsStyle();
+
+	void ResetButtonStyle(UButton* Button);
+
+	void SetButtonStyleToSelected(UButton* Button);
 	
-	
-	
+
+
 };
