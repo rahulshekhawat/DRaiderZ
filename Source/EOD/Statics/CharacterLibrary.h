@@ -316,7 +316,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	FString Description;
 	
-	/** The montage that contains the animation(s) for this skill */
+	/**
+	 * The montage that contains the animation(s) for this skill.
+	 * This can be NULL for player character but shouldn't be NULL for AI character
+	 */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	TSoftObjectPtr<UAnimMontage> AnimMontage;
 

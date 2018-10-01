@@ -82,7 +82,7 @@ private:
 
 	FTimerHandle CooldownTimerHandle;
 
-	// void UpdateItemImage();
+	void UpdateItemImage();
 	
 	void UpdateItemButton();
 

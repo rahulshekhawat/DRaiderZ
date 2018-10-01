@@ -22,6 +22,7 @@ bool UEODItemContainer::Initialize()
 		Text_StackCount->SetVisibility(ESlateVisibility::Hidden);
 		Text_Cooldown->SetVisibility(ESlateVisibility::Hidden);
 
+		UpdateItemImage();
 		return true;
 	}
 
@@ -32,8 +33,8 @@ void UEODItemContainer::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// UpdateItemImage();
-	UpdateItemButton();
+	UpdateItemImage();
+	// UpdateItemButton();
 
 }
 
@@ -84,16 +85,15 @@ void UEODItemContainer::StopCooldown()
 	Text_Cooldown->SetVisibility(ESlateVisibility::Hidden);
 }
 
-/*
 void UEODItemContainer::UpdateItemImage()
 {
-	if (EODItemIcon)
+	if (EODItemInfo.Icon)
 	{
 		FSlateBrush SlateBrush;
 		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
 		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
 		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
-		SlateBrush.SetResourceObject(EODItemIcon);
+		SlateBrush.SetResourceObject(EODItemInfo.Icon);
 		ItemImage->SetBrush(SlateBrush);
 	}
 	else
@@ -105,7 +105,6 @@ void UEODItemContainer::UpdateItemImage()
 		ItemImage->SetBrush(SlateBrush);
 	}
 }
-*/
 
 void UEODItemContainer::UpdateItemButton()
 {
