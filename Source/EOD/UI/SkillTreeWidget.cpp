@@ -25,7 +25,11 @@ bool USkillTreeWidget::Initialize()
 		SetButtonStyleToSelected(BerserkerTab);
 		SkillTreeSwitcher->SetActiveWidgetIndex(1);
 
-		// AssassinTab.AddDynamic()
+		AssassinTab->OnClicked.AddDynamic(this, &USkillTreeWidget::ActivateAssassinTab);
+		BerserkerTab->OnClicked.AddDynamic(this, &USkillTreeWidget::ActivateBerserkerTab);
+		ClericTab->OnClicked.AddDynamic(this, &USkillTreeWidget::ActivateClericTab);
+		DefenderTab->OnClicked.AddDynamic(this, &USkillTreeWidget::ActivateDefenderTab);
+		SorcererTab->OnClicked.AddDynamic(this, &USkillTreeWidget::ActivateSorcererTab);
 
 		return true;
 	}
@@ -43,8 +47,48 @@ void USkillTreeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void USkillTreeWidget::ActivateAssassinTab()
+{
+	ResetAllTabButtonsStyle();
+	SetButtonStyleToSelected(AssassinTab);
+	SkillTreeSwitcher->SetActiveWidgetIndex(0);
+}
+
+void USkillTreeWidget::ActivateBerserkerTab()
+{
+	ResetAllTabButtonsStyle();
+	SetButtonStyleToSelected(BerserkerTab);
+	SkillTreeSwitcher->SetActiveWidgetIndex(1);
+}
+
+void USkillTreeWidget::ActivateClericTab()
+{
+	ResetAllTabButtonsStyle();
+	SetButtonStyleToSelected(ClericTab);
+	SkillTreeSwitcher->SetActiveWidgetIndex(2);
+}
+
+void USkillTreeWidget::ActivateDefenderTab()
+{
+	ResetAllTabButtonsStyle();
+	SetButtonStyleToSelected(DefenderTab);
+	SkillTreeSwitcher->SetActiveWidgetIndex(3);
+}
+
+void USkillTreeWidget::ActivateSorcererTab()
+{
+	ResetAllTabButtonsStyle();
+	SetButtonStyleToSelected(SorcererTab);
+	SkillTreeSwitcher->SetActiveWidgetIndex(4);
+}
+
 void USkillTreeWidget::ResetAllTabButtonsStyle()
 {
+	ResetButtonStyle(AssassinTab);
+	ResetButtonStyle(BerserkerTab);
+	ResetButtonStyle(ClericTab);
+	ResetButtonStyle(DefenderTab);
+	ResetButtonStyle(SorcererTab);
 }
 
 void USkillTreeWidget::ResetButtonStyle(UButton * Button)

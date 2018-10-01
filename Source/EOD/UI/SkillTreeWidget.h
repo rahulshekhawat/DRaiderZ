@@ -49,6 +49,21 @@ public:
 
 private:
 
+	UFUNCTION()
+	void ActivateAssassinTab();
+
+	UFUNCTION()
+	void ActivateBerserkerTab();
+
+	UFUNCTION()
+	void ActivateClericTab();
+
+	UFUNCTION()
+	void ActivateDefenderTab();
+
+	UFUNCTION()
+	void ActivateSorcererTab();
+
 	void ResetAllTabButtonsStyle();
 
 	void ResetButtonStyle(UButton* Button);
