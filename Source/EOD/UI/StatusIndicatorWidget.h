@@ -7,8 +7,8 @@
 #include "StatusIndicatorWidget.generated.h"
 
 class UImage;
-class UTextBlock;
-
+class USpacer;
+class UOverlay;
 /**
  * 
  */
@@ -36,10 +36,55 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* HealthBarBlocked;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UOverlay* HealthOverlay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USpacer* HealthSpacer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UImage* ManaBarEmpty;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UImage* ManaBarFill;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UImage* ManaBarBlocked;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UOverlay* ManaOverlay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USpacer* ManaSpacer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UImage* StaminaBarEmpty;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UImage* StaminaBarFill;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UImage* StaminaBarBlocked;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UOverlay* StaminaOverlay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USpacer* StaminaSpacer;
+
+
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProgressBar)
 	// float Percent;
 
 	FORCEINLINE void UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth);
+
+	FORCEINLINE void UpdateManaBar(int32 CurrentMana, int32 MaxMana, int32 BaseMana);
+
+	FORCEINLINE void UpdateStaminaBar(int32 CurrentStamina, int32 MaxStamina, int32 BaseStamina);
+
+private:
+
+	void SetHorizontalSlotSize(class UHorizontalBoxSlot* HBSlot, float FillValue);
 
 	// FORCEINLINE SetHealthPercent(float Value);
 

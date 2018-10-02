@@ -61,6 +61,10 @@ public:
 
 	FORCEINLINE void UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth);
 
+	FORCEINLINE void UpdateManaBar(int32 CurrentMana, int32 MaxMana, int32 BaseMana);
+
+	FORCEINLINE void UpdateStaminaBar(int32 CurrentStamina, int32 MaxStamina, int32 BaseStamina);
+
 	/** Get SkillID of skill placed at SkillIndex of skill bar */
 	FORCEINLINE FName GetSkillAtIndex(int32 SkillIndex);
 

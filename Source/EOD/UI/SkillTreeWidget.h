@@ -9,6 +9,8 @@
 
 class UButton;
 class UWidgetSwitcher;
+class UEODItemContainer;
+
 /**
  * 
  */
