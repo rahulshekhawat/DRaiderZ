@@ -78,6 +78,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = EODItemContainer)
 	void StopCooldown();
 
+	void RefreshContainerVisuals();
+
+protected:
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
 private:
 
 	FTimerHandle CooldownTimerHandle;

@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODItemContainer.h"
+#include "EODItemDragDropOperation.h"
 
 #include "Image.h"
 #include "Engine/Texture.h"
@@ -83,6 +84,82 @@ void UEODItemContainer::StopCooldown()
 	bInCooldown = false;
 	ItemImage->SetIsEnabled(true);
 	Text_Cooldown->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UEODItemContainer::RefreshContainerVisuals()
+{
+	UpdateItemImage();
+}
+
+bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDropEvent & InDragDropEvent, UDragDropOperation * InOperation)
+{
+	// Cannot drop anything on skill tree
+	if (ContainerType == EEODContainerType::SkillTree)
+	{
+		return false;
+	}
+
+	UEODItemDragDropOperation* Operation = Cast<UEODItemDragDropOperation>(InOperation);
+	if (!Operation || !Operation->DraggedEODItemWidget)
+	{
+		return false;
+	}
+
+	if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
+		ContainerType == EEODContainerType::SkillBar)
+	{
+		EODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
+		RefreshContainerVisuals();
+	}
+	else if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
+		ContainerType == EEODContainerType::Inventory)
+	{
+		FEODItemInfo TempEODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
+		
+		Operation->DraggedEODItemWidget->EODItemInfo = this->EODItemInfo;
+		this->EODItemInfo = TempEODItemInfo;
+
+		Operation->DraggedEODItemWidget->RefreshContainerVisuals();
+		this->RefreshContainerVisuals();
+	}
+	else if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillBar &&
+		ContainerType == EEODContainerType::SkillBar)
+	{
+		FEODItemInfo TempEODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
+
+		Operation->DraggedEODItemWidget->EODItemInfo = this->EODItemInfo;
+		this->EODItemInfo = TempEODItemInfo;
+
+		Operation->DraggedEODItemWidget->RefreshContainerVisuals();
+		this->RefreshContainerVisuals();
+	}
+
+	// Cannot drop anything from skill tree to inventory
+	// Cannot drop anything from inventory to skill bar
+	// Cannot drop anything from skill bar to inventory
+
+	/*
+	if ((Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
+		ContainerType == EEODContainerType::Inventory) ||
+		(Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
+		ContainerType == EEODContainerType::SkillBar) ||
+		(Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillBar &&
+		ContainerType == EEODContainerType::Inventory))
+	{
+		return false;
+	}
+
+	if (ContainerType == EEODContainerType::SkillBar)
+	{
+
+	}
+	else if (ContainerType == EEODContainerType::Inventory)
+	{
+
+	}
+	*/
+
+	return false;
 }
 
 void UEODItemContainer::UpdateItemImage()
