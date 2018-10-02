@@ -48,21 +48,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
 	EEODContainerType ContainerType;
 
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
-	// FName EODItemID;
-
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
-	// EEODItemType EODItemType;
-
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = EODItemInfo)
-	// UTexture* EODItemIcon;
-
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	// UImage* ItemImage;
-
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	// UButton* ItemButton;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* ItemImage;
 
@@ -90,7 +75,7 @@ private:
 
 	void UpdateItemImage();
 	
-	void UpdateItemButton();
+	// void UpdateItemButton();
 
 	void UpdateCooldown();
 

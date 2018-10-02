@@ -110,6 +110,8 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 	{
 		EODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
 		RefreshContainerVisuals();
+		
+		return true;
 	}
 	else if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
 		ContainerType == EEODContainerType::Inventory)
@@ -121,6 +123,8 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 
 		Operation->DraggedEODItemWidget->RefreshContainerVisuals();
 		this->RefreshContainerVisuals();
+
+		return true;
 	}
 	else if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillBar &&
 		ContainerType == EEODContainerType::SkillBar)
@@ -132,32 +136,13 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 
 		Operation->DraggedEODItemWidget->RefreshContainerVisuals();
 		this->RefreshContainerVisuals();
+
+		return true;
 	}
 
 	// Cannot drop anything from skill tree to inventory
 	// Cannot drop anything from inventory to skill bar
 	// Cannot drop anything from skill bar to inventory
-
-	/*
-	if ((Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
-		ContainerType == EEODContainerType::Inventory) ||
-		(Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
-		ContainerType == EEODContainerType::SkillBar) ||
-		(Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillBar &&
-		ContainerType == EEODContainerType::Inventory))
-	{
-		return false;
-	}
-
-	if (ContainerType == EEODContainerType::SkillBar)
-	{
-
-	}
-	else if (ContainerType == EEODContainerType::Inventory)
-	{
-
-	}
-	*/
 
 	return false;
 }
@@ -183,11 +168,11 @@ void UEODItemContainer::UpdateItemImage()
 	}
 }
 
+/*
 void UEODItemContainer::UpdateItemButton()
 {
 	if (EODItemInfo.Icon)
 	{
-		/*
 		FSlateBrush SlateBrush;
 		// SlateBrush.ImageSize = FVector2D(52.0, 52.0);
 		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
@@ -203,11 +188,9 @@ void UEODItemContainer::UpdateItemButton()
 		ButtonStyle.SetPressed(SlateBrush);
 
 		ItemButton->SetStyle(ButtonStyle);
-		*/
 	}
 	else
 	{
-		/*
 		FSlateBrush SlateBrush;
 		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
 		SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
@@ -219,10 +202,10 @@ void UEODItemContainer::UpdateItemButton()
 		ButtonStyle.SetPressed(SlateBrush);
 
 		ItemButton->SetStyle(ButtonStyle);
-		*/
 	}
 
 }
+*/
 
 void UEODItemContainer::UpdateCooldown()
 {

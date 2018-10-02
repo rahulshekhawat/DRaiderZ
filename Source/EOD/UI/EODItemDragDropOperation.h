@@ -20,6 +20,7 @@ public:
 
 	UEODItemDragDropOperation(const FObjectInitializer& ObjectInitializer);
 	
+	/** Reference to EOD item that is being dragged */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Payload)
 	UEODItemContainer* DraggedEODItemWidget;
 
