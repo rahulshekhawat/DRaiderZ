@@ -2,6 +2,7 @@
 
 #include "EODItemContainer.h"
 #include "EODItemDragDropOperation.h"
+#include "Player/PlayerCharacter.h"
 
 #include "Image.h"
 #include "Engine/Texture.h"
@@ -105,29 +106,18 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 		return false;
 	}
 
+	bool bResult = false;
 	if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
 		ContainerType == EEODContainerType::SkillBar)
 	{
-		EODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
-		RefreshContainerVisuals();
-		
-		return true;
-	}
-	else if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
-		ContainerType == EEODContainerType::Inventory)
-	{
-		FEODItemInfo TempEODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
-		
-		Operation->DraggedEODItemWidget->EODItemInfo = this->EODItemInfo;
-		this->EODItemInfo = TempEODItemInfo;
-
-		Operation->DraggedEODItemWidget->RefreshContainerVisuals();
+		this->EODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
 		this->RefreshContainerVisuals();
-
-		return true;
+		bResult = true;
 	}
-	else if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillBar &&
-		ContainerType == EEODContainerType::SkillBar)
+	else if ((Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
+		ContainerType == EEODContainerType::Inventory) ||
+		(Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillBar &&
+			ContainerType == EEODContainerType::SkillBar))
 	{
 		FEODItemInfo TempEODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
 
@@ -137,14 +127,14 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 		Operation->DraggedEODItemWidget->RefreshContainerVisuals();
 		this->RefreshContainerVisuals();
 
-		return true;
+		bResult = true;
 	}
 
 	// Cannot drop anything from skill tree to inventory
 	// Cannot drop anything from inventory to skill bar
 	// Cannot drop anything from skill bar to inventory
 
-	return false;
+	return bResult;
 }
 
 void UEODItemContainer::UpdateItemImage()
