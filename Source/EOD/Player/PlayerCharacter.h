@@ -233,6 +233,14 @@ public:
 	/** [server] Apply damage to a character */
 	// virtual int32 ApplyEODDamage(FEODDamage& EODDamage) override;
 
+	virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult) override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void DisplayReceivedDamage(int32 DamageValue);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void DisplayStatusMessage(const FString& Message);
+
 	/** Called on an animation montage blending out to clean up, reset, or change any state variables */
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted) override;
 

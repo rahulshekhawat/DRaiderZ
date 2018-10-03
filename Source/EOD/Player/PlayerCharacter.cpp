@@ -14,6 +14,7 @@
 #include "Core/EODPreprocessors.h"
 #include "Core/EODSaveGame.h"
 #include "UI/SkillTreeWidget.h"
+#include "Statics/EODBlueprintFunctionLibrary.h"
 
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
@@ -1251,6 +1252,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 	CurrentActiveSkill = Skill;
 
+	HUDWidget->PutSkillOnCooldownTimer(SkillButtonIndex, Skill->SkillLevelUpInfo.Cooldown, 1.f);
 	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Skills, Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	// @todo set current active skill
 
@@ -1324,6 +1326,192 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 	}
 
 	return ResultingRotation;
+}
+
+FEODDamageResult APlayerCharacter::ApplyEODDamage(AEODCharacterBase * InstigatingChar, const FEODDamage & EODDamage, const FHitResult & CollisionHitResult)
+{
+	FEODDamageResult EODDamageResult;
+	TArray<TWeakObjectPtr<AEODCharacterBase>> WeakPtrsCharArray;
+	TWeakObjectPtr<AEODCharacterBase> WeakPtrToInstigatingChar(InstigatingChar);
+	WeakPtrsCharArray.Add(WeakPtrToInstigatingChar);
+
+	// If character is dodging and incoming attack is dodgable
+	if (IsDodgingDamage() && !EODDamage.bUndodgable)
+	{
+		// Trigger OnSuccessfulDodge event
+		OnSuccessfulDodge.Broadcast(WeakPtrsCharArray);
+
+		DisplayStatusMessage(FString("Dodge"));
+
+		EODDamageResult.CharacterResponseToDamage = ECharacterResponseToDamage::Dodged;
+		EODDamageResult.ActualDamage = 0;
+		return EODDamageResult;
+	}
+
+
+	TArray<FHitResult> LineHitResults;
+	FVector LineStart = InstigatingChar->GetActorLocation();
+	float LineEnd_Z;
+	if (GetActorLocation().Z < LineStart.Z)
+	{
+		LineEnd_Z = GetActorLocation().Z;
+	}
+	else
+	{
+		LineEnd_Z = LineStart.Z;
+	}
+	FVector LineEnd = FVector(GetActorLocation().X, GetActorLocation().Y, LineEnd_Z);
+
+	FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(InstigatingChar);
+	GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
+
+	FHitResult InstigatorToThisCharLineHitResult;
+
+	for (FHitResult& LineHitResult : LineHitResults)
+	{
+		if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == this)
+		{
+			InstigatorToThisCharLineHitResult = LineHitResult;
+			break;
+		}
+	}
+
+#if DEVSTAGE_CODE_ENABLED
+	FVector Start = InstigatorToThisCharLineHitResult.ImpactPoint;
+	FVector End = InstigatorToThisCharLineHitResult.ImpactPoint + InstigatorToThisCharLineHitResult.ImpactNormal * 50;
+	UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::Blue, 5.f, 2.f);
+#endif
+
+	//~ @todo any incoming crit rate reduction logic
+	bool bCriticalHit = EODDamage.CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
+	EODDamageResult.bCritHit = bCriticalHit;
+	if (bCriticalHit)
+	{
+		EODDamageResult.ActualDamage = EODDamage.CritDamage;
+	}
+	else
+	{
+		EODDamageResult.ActualDamage = EODDamage.NormalDamage;
+	}
+	int32 Resistance;
+	if (EODDamage.DamageType == EDamageType::Magickal)
+	{
+		Resistance = StatsComp->GetMagickResistance();
+	}
+	else
+	{
+		Resistance = StatsComp->GetPhysicalResistance();
+	}
+
+	// If character is blocking and incoming damage is blockable
+	if (IsBlockingDamage() && !EODDamage.bUnblockable)
+	{
+		FVector MyDirection = GetActorForwardVector();
+		FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
+
+		float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
+
+		if (Angle < 60)
+		{
+			// Trigger OnSuccessfulBlock event
+			OnSuccessfulBlock.Broadcast(WeakPtrsCharArray);
+
+			float DamageReductionOnBlock;
+			if (EODDamage.DamageType == EDamageType::Magickal)
+			{
+				DamageReductionOnBlock = StatsComp->GetMagickDamageReductionOnBlock();
+			}
+			else
+			{
+				DamageReductionOnBlock = StatsComp->GetPhysicalDamageReductionOnBlock();
+			}
+
+			EODDamageResult.ActualDamage = EODDamageResult.ActualDamage * (1 - DamageReductionOnBlock);
+			EODDamageResult.ActualDamage = UCombatLibrary::CalculateDamage(EODDamageResult.ActualDamage, Resistance);
+			EODDamageResult.CharacterResponseToDamage = ECharacterResponseToDamage::Blocked;
+
+			// Apply real damage
+			StatsComp->ModifyCurrentHealth(-EODDamageResult.ActualDamage);
+
+			return EODDamageResult;
+		}
+	}
+
+	switch (EODDamage.CrowdControlEffect)
+	{
+	case ECrowdControlEffect::Flinch:
+		if (CanFlinch())
+		{
+			FVector MyDirection = GetActorForwardVector();
+			FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
+
+			float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
+
+			if (Angle <= 90)
+			{
+				Flinch(EHitDirection::Forward);
+			}
+			else
+			{
+				Flinch(EHitDirection::Backward);
+			}
+		}
+		break;
+	case ECrowdControlEffect::Interrupt:
+		if (CanInterrupt())
+		{
+			FVector MyDirection = GetActorForwardVector();
+			FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
+
+			float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
+
+			if (Angle <= 90)
+			{
+				Interrupt(EHitDirection::Forward);
+			}
+			else
+			{
+				Interrupt(EHitDirection::Backward);
+			}
+		}
+		break;
+	case ECrowdControlEffect::KnockedDown:
+		if (CanKnockdown())
+		{
+			Knockdown(EODDamage.CrowdControlEffectDuration);
+		}
+		break;
+	case ECrowdControlEffect::KnockedBack:
+		if (CanKnockback())
+		{
+			FVector ImpulseDirection = -(InstigatorToThisCharLineHitResult.ImpactNormal);
+			Knockback(EODDamage.CrowdControlEffectDuration, ImpulseDirection);
+		}
+		break;
+	case ECrowdControlEffect::Stunned:
+		if (CanStun())
+		{
+			Stun(EODDamage.CrowdControlEffectDuration);
+		}
+		break;
+	case ECrowdControlEffect::Crystalized:
+		if (CanFreeze())
+		{
+			Freeze(EODDamage.CrowdControlEffectDuration);
+		}
+		break;
+	default:
+		break;
+	}
+
+	// Trigger OnReceivingHit event
+	OnReceivingHit.Broadcast(WeakPtrsCharArray);
+	EODDamageResult.ActualDamage = UCombatLibrary::CalculateDamage(EODDamageResult.ActualDamage, Resistance);
+	StatsComp->ModifyCurrentHealth(-EODDamageResult.ActualDamage);
+
+	DisplayReceivedDamage(EODDamageResult.ActualDamage);
+
+	return EODDamageResult;
 }
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
