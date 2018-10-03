@@ -205,6 +205,8 @@ public:
 
 	// virtual void SetCurrentActiveSkill(FName SkillID) override;
 
+	void AddSkill(FName SkillID, uint8 SkillLevel);
+
 	virtual void OnNormalAttackSectionStart(FName SectionName) override;
 
 	void CleanupNormalAttackSectionToSkillMap();

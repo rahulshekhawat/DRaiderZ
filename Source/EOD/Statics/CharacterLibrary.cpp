@@ -283,7 +283,7 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 	return PlayerAnimationReferences;
 }
 
-FSkill * UCharacterLibrary::GetPlayerSkill(FName SKillID)
+FSkill * UCharacterLibrary::GetPlayerSkill(FName SKillID, uint8 SkillLevel)
 {
 	FSkill* Skill = nullptr;
 
@@ -296,7 +296,7 @@ FSkill * UCharacterLibrary::GetPlayerSkill(FName SKillID)
 
 			if (SkillTableRow)
 			{
-				Skill = new FSkill(SkillTableRow);
+				Skill = new FSkill(SkillTableRow, SkillLevel);
 			}
 		}
 	}

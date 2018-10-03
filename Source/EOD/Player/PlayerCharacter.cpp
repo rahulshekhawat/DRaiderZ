@@ -1548,6 +1548,20 @@ void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 	}
 }
 
+void APlayerCharacter::AddSkill(FName SkillID, uint8 SkillLevel)
+{
+	FSkill* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, SkillLevel);
+	if (Skill)
+	{
+		IDToSkillMap.Add(SkillID, Skill);
+		UKismetSystemLibrary::PrintString(this, FString("Added skill"), true, false);
+	}
+	else
+	{
+		UKismetSystemLibrary::PrintString(this, FString("Failed to add"), true, false);
+	}
+}
+
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
 	CurrentActiveSkill = NormalAttackSectionToSkillMap[SectionName];

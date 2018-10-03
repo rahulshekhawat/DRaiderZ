@@ -61,6 +61,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
 	int32 StackCount;
 
+	FEODItemInfo()
+	{
+		StackCount = 1;
+		ItemID = NAME_None;
+		Icon = nullptr;
+	}
+
 };
 
 /**
