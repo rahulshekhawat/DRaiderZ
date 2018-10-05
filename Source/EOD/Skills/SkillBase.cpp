@@ -6,4 +6,7 @@ USkillBase::USkillBase(const FObjectInitializer & ObjectInitializer) : Super(Obj
 {
 }
 
-
+void USkillBase::NativeOnUse()
+{
+	OnUse();
+}
