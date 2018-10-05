@@ -421,6 +421,7 @@ FSkill::FSkill(FSkillTableRow * SkillTableRow, uint8 SkillLevel)
 		this->Icon = SkillTableRow->Icon.Get();
 	}
 
+	/*
 	if (SkillTableRow->AnimMontage.IsNull())
 	{
 		this->AnimationMontage = nullptr;
@@ -433,4 +434,5 @@ FSkill::FSkill(FSkillTableRow * SkillTableRow, uint8 SkillLevel)
 	{
 		this->AnimationMontage = SkillTableRow->AnimMontage.Get();
 	}
+	*/
 }

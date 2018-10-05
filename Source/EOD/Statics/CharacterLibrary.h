@@ -243,7 +243,7 @@ enum class ESkillType : uint8
 };
 
 /** Struct containing level specific info for an in-game skill */
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, Blueprintable)
 struct EOD_API FSkillLevelUpInfo
 {
 	GENERATED_USTRUCT_BODY()
@@ -251,114 +251,123 @@ struct EOD_API FSkillLevelUpInfo
 public:
 
 	/** Minimum stamina required to use this skill */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	int32 StaminaRequired;
 	
 	/** Minimum mana required to use this skill */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	int32 ManaRequired;
 	
 	/** Skill cooldown */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	float Cooldown;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	float CastDuration;
 
 	/** Damage in percentage of player's magickal or physical attack that will inflicted on enemy */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	int32 DamagePercent;
 
 	/** Determines if this skill can be blocked */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	bool bUnblockable;
 
 	/** Determines if this skill can be dodged */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	bool bUndodgable;
 
-	/** Only applicable if skill can be blocked */
-	UPROPERTY(EditDefaultsOnly)
-	bool bRespondsToBlock;
+	/** Determines if the 'skill deflected' animation should play on getting blocked. Only applicable if this skill can be blocked */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bIgnoresBlock;
 
 	/** Crowd control effect on hit */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	ECrowdControlEffect CrowdControlEffect;
 
 	/** The duration for which the crowd control effect should last (if applicable) */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	float CrowdControlEffectDuration;
 
 	/** Immunities from crowd control effects granted on using this skill */
-	UPROPERTY(EditDefaultsOnly, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
 	uint8 CrowdControlImmunities;
 
 	/** Status effect that this skill triggers */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	TSubclassOf<class UStatusEffectBase> StatusEffect;
 
 };
 
 /** Table row struct for in-game skills */
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, Blueprintable)
 struct EOD_API FSkillTableRow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 
-	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FString InGameName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FString Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	TSoftObjectPtr<UTexture> Icon;
 	
-	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	FString InGameName;
-	
-	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	FString Description;
-	
 	/**
-	 * The montage that contains the animation(s) for this skill.
-	 * This can be NULL for player character but shouldn't be NULL for AI character
+	 * The montage that contains the animation(s) of this skill for first gender.
+	 * If the character supports gender (i.e. player character), first gender would be female.
+	 * Otherwise whatever the default gender character is.
 	 */
-	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	TSoftObjectPtr<UAnimMontage> AnimMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	TSoftObjectPtr<UAnimMontage> AnimMontage_GenderOne;
 
-	UPROPERTY(EditAnywhere, Category = BaseInfo, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
+	/** The montage that contains the animation(s) of this skill for second gender */
+	/**
+	 * The montage that contains the animation(s) of this skill for second gender.
+	 * If the character supports gender (i.e. player character), second gender would be female.
+	 * Otherwise NULL.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	TSoftObjectPtr<UAnimMontage> AnimMontage_GenderTwo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
 	uint8 SupportedWeapons;
 
-	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	FName SkillStartMontageSectionName;
-	
-	UPROPERTY(EditAnywhere, Category = BaseInfo)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	FName SkillLoopMontageSectionName;
-	
-	UPROPERTY(EditAnywhere, Category = BaseInfo)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	FName SkillEndMontageSectionName;
 	
 	/** Type of damage inflicted from this skill */
-	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	EDamageType DamageType;
 
-	UPROPERTY(EditAnywhere, Category = BaseInfo)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	ESkillType SkillType;
 	
 	//~ Maximum number of level ups = SkillLevelUpsInfo.Num()
-	UPROPERTY(EditAnywhere, Category = SkillInfo)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	TArray<FSkillLevelUpInfo> SkillLevelUpsInfo;
-
 
 	// @todo What does this skill do (heal/damage/buff)? It will be useful for AI logic
 
 	FSkillTableRow()
 	{
-		SkillStartMontageSectionName = NAME_None;
+		SkillStartMontageSectionName = FName("Default");
 		SkillLoopMontageSectionName = NAME_None;
 		SkillEndMontageSectionName = NAME_None;
 	}
 };
 
 /** In-game skill */
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, Blueprintable)
 struct FSkill
 {
 	GENERATED_USTRUCT_BODY()
@@ -367,6 +376,7 @@ public:
 
 	// FName SkillID; // What was this for?
 
+	
 	uint8 CurrentSkillLevel;
 
 	UTexture* Icon;
