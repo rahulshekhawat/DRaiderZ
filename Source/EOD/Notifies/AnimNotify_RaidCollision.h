@@ -14,13 +14,16 @@ struct FRaidCapsule
 
 public:
 
-	UPROPERTY(EditAnywhere)
+	/** Bottom of the capsule */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = ShapeInfo)
 	FVector Bottom;
-	
-	UPROPERTY(EditAnywhere)
+
+	/** Top of the capsule */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = ShapeInfo)
 	FVector Top;
-	
-	UPROPERTY(EditAnywhere)
+
+	/** Capsule radius */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = ShapeInfo)
 	float Radius;
 
 	FORCEINLINE bool operator == (const FRaidCapsule& Other) const
@@ -31,7 +34,7 @@ public:
 };
 
 /**
- * An anim notify class to handle collisions of RaiderZ's format
+ * An anim notify class to handle collisions of RaiderZ format
  */
 UCLASS()
 class EOD_API UAnimNotify_RaidCollision : public UAnimNotify
