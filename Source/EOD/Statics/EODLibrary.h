@@ -67,7 +67,6 @@ public:
 		ItemID = NAME_None;
 		Icon = nullptr;
 	}
-
 };
 
 /**
@@ -78,7 +77,31 @@ class EOD_API UEODLibrary : public UObject
 {
 	GENERATED_BODY()
 	
-	
+public:
+
+	// template<typename ObjType = UObject>
+	// static ObjType* EODLoadAsset(TSoftObjectPtr<ObjType> SoftAssetPtr);
 	
 	
 };
+
+template<typename ObjType = UObject>
+ObjType* EODLoadAsset(TSoftObjectPtr<ObjType> SoftAssetPtr)
+{
+	ObjType* Obj = nullptr;
+
+	if (SoftAssetPtr.IsNull())
+	{
+		// pass
+	}
+	else if (SoftAssetPtr.IsPending())
+	{
+		Obj = SoftAssetPtr.LoadSynchronous();
+	}
+	else if (SoftAssetPtr.IsValid())
+	{
+		Obj = SoftAssetPtr.Get();
+	}
+
+	return Obj;
+}
