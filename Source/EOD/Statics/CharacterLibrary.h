@@ -351,7 +351,19 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	ESkillType SkillType;
-	
+
+	/** SkillID for skill that MUST be used before using this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FName PrecedingSkillID;
+
+	/** SkillID for skill that can be used after using this skill (skill chaining)  */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FName SupersedingSkillID;
+
+	/** The status effect required to use this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FName RequiredStatusID;
+
 	//~ Maximum number of level ups = SkillLevelUpsInfo.Num()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	TArray<FSkillLevelUpInfo> SkillLevelUpsInfo;
@@ -376,28 +388,52 @@ public:
 
 	// FName SkillID; // What was this for?
 
-	
-	uint8 CurrentSkillLevel;
-
-	UTexture* Icon;
-
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
 	FString InGameName;
-	
+
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
 	FString Description;
 
-	UAnimMontage* AnimationMontage;
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
+	UTexture* Icon;
 
-	UPROPERTY(EditAnywhere, Category = BaseInfo, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
+	uint8 CurrentSkillLevel;
+
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
+	UAnimMontage* AnimationMontage_GenderOne;
+
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
+	UAnimMontage* AnimationMontage_GenderTwo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
 	uint8 SupportedWeapons;
 
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
 	FName SkillStartMontageSectionName;
 
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
 	FName SkillLoopMontageSectionName;
 
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
 	FName SkillEndMontageSectionName;
 
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
 	EDamageType DamageType;
 
+	/** SkillID for skill that MUST be used before using this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FName PrecedingSkillID;
+
+	/** SkillID for skill that can be used after using this skill (skill chaining)  */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FName SupersedingSkillID;
+
+	/** The status effect required to use this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FName RequiredStatusID;
+
+	UPROPERTY(BlueprintReadWrite, Category = Skills)
 	FSkillLevelUpInfo SkillLevelUpInfo;
 
 	FSkill();

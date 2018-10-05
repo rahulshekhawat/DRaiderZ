@@ -3,6 +3,7 @@
 #include "CharacterLibrary.h"
 #include "Core/GameSingleton.h"
 #include "Player/EODCharacterBase.h"
+#include "Statics/EODLibrary.h"
 
 #include "Engine/Engine.h"
 #include "Engine/Texture.h"
@@ -141,7 +142,6 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 				break;
 			}
 		}
-
 
 		// @todo Modify following code to load assets asynchronously
 		if (PlayerAnimationSoftReferences)
@@ -381,6 +381,8 @@ void UCharacterLibrary::GetAllAICharacterSkills(const FString & CharacterName, c
 FSkill::FSkill()
 {
 	this->CurrentSkillLevel = 0;
+	this->AnimationMontage_GenderOne = nullptr;
+	this->AnimationMontage_GenderTwo = nullptr;
 }
 
 FSkill::FSkill(FSkillTableRow * SkillTableRow, uint8 SkillLevel)
@@ -392,6 +394,9 @@ FSkill::FSkill(FSkillTableRow * SkillTableRow, uint8 SkillLevel)
 	this->SkillLoopMontageSectionName 		= SkillTableRow->SkillLoopMontageSectionName;
 	this->SkillEndMontageSectionName 		= SkillTableRow->SkillEndMontageSectionName;
 	this->DamageType 						= SkillTableRow->DamageType;
+	this->PrecedingSkillID					= SkillTableRow->PrecedingSkillID;
+	this->SupersedingSkillID				= SkillTableRow->SupersedingSkillID;
+	this->RequiredStatusID					= SkillTableRow->RequiredStatusID;
 
 	if (SkillTableRow->SkillLevelUpsInfo.Num() >= SkillLevel)
 	{
@@ -408,31 +413,9 @@ FSkill::FSkill(FSkillTableRow * SkillTableRow, uint8 SkillLevel)
 		this->CurrentSkillLevel = 0;
 	}
 
-	if (SkillTableRow->Icon.IsNull())
-	{
-		this->Icon = nullptr;
-	}
-	else if (SkillTableRow->Icon.IsPending())
-	{
-		this->Icon = SkillTableRow->Icon.LoadSynchronous();
-	}
-	else if (SkillTableRow->Icon.IsValid())
-	{
-		this->Icon = SkillTableRow->Icon.Get();
-	}
+	this->Icon = EODLoadAsset<UTexture>(SkillTableRow->Icon);
 
-	/*
-	if (SkillTableRow->AnimMontage.IsNull())
-	{
-		this->AnimationMontage = nullptr;
-	}
-	else if (SkillTableRow->AnimMontage.IsPending())
-	{
-		this->AnimationMontage = SkillTableRow->AnimMontage.LoadSynchronous();
-	}
-	else if (SkillTableRow->AnimMontage.IsValid())
-	{
-		this->AnimationMontage = SkillTableRow->AnimMontage.Get();
-	}
-	*/
+	this->AnimationMontage_GenderOne = EODLoadAsset<UAnimMontage>(SkillTableRow->AnimMontage_GenderOne);
+	this->AnimationMontage_GenderTwo = EODLoadAsset<UAnimMontage>(SkillTableRow->AnimMontage_GenderTwo);
+
 }

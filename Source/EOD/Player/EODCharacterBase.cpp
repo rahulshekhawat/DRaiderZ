@@ -442,7 +442,7 @@ bool AEODCharacterBase::UseSkill(int32 SkillIndex)
 		}
 
 		// SkillToUse->AnimationMontage
-		PlayAnimationMontage(SkillToUse->AnimationMontage, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		// PlayAnimationMontage(SkillToUse->AnimationMontage, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 		CurrentActiveSkill = SkillToUse;
 		return true;
 	}

@@ -55,6 +55,7 @@ void AAICharacterBase::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 
 void AAICharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
 {
+	/*
 	if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimationMontage == AnimMontage && !bInterrupted)
 	{
 		GetLastUsedSkill().LastUsedSkill = CurrentActiveSkill;
@@ -64,6 +65,7 @@ void AAICharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bIn
 		// Revert back to IdleWalkRun state
 		CharacterState = ECharacterState::IdleWalkRun;
 	}
+	*/
 }
 
 void AAICharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
