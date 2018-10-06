@@ -4,21 +4,58 @@
 #include "Core/EODPreprocessors.h"
 #include "Statics/CombatLibrary.h"
 #include "Player/EODCharacterBase.h"
+#include "Core/CombatZoneModeBase.h"
+#include "Core/CombatManager.h"
 
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Kismet/KismetMathLibrary.h"
+// #include "Kismet/KismetMathLibrary.h"
 
 void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
 {
-	// only call from server
+	// Only process from server
 	if (!MeshComp->GetOwner() || MeshComp->GetOwner()->GetNetMode() == NM_Client)
 	{
 		return;
 	}
 
+	// Only process if the game mode is ACombatZoneModeBase
+	ACombatZoneModeBase* CombatZoneGameMode = Cast<ACombatZoneModeBase>(GetWorld()->GetAuthGameMode());
+	if (!CombatZoneGameMode)
+	{
+		return;
+	}
+
+	for (FRaidCapsule& Capsule : CollisionCapsules)
+	{
+		FTransform WorldTransform = MeshComp->GetComponentTransform();
+
+		FVector CorrectedBottom = Capsule.Bottom.RotateAngleAxis(90.f, FVector(0.f, 0.f, 1.f));
+		FVector CorrectedTop = Capsule.Top.RotateAngleAxis(90.f, FVector(0.f, 0.f, 1.f));
+		FVector HalfHeightVector = (CorrectedTop - CorrectedBottom) / 2;
+		FVector NormalizedHeightVector = HalfHeightVector.GetSafeNormal();
+		FVector Center = CorrectedBottom + HalfHeightVector;
+		FRotator CapsuleRotation = FRotationMatrix::MakeFromZ(HalfHeightVector).Rotator();
+
+		// Transformation from object space to world space
+		FVector TransformedCenter = WorldTransform.TransformPosition(Center);
+		FRotator TransformedRotation = WorldTransform.TransformRotation(CapsuleRotation.Quaternion()).Rotator();
+
+		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(Capsule.Radius, HalfHeightVector.Size());
+		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(MeshComp->GetOwner());
+		TArray<FHitResult> HitResults;
+
+		bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, TransformedRotation.Quaternion(), COLLISION_COMBAT, CollisionShape, Params);
+		CombatZoneGameMode->GetCombatManager()->OnMeleeHit(MeshComp->GetOwner(), bHit, HitResults);		
+
+#if WITH_EDITOR // draw debug shapes only if inside editor
+		UKismetSystemLibrary::DrawDebugCapsule(MeshComp, TransformedCenter, HalfHeightVector.Size(), Capsule.Radius, TransformedRotation, FLinearColor::White, 5.f, 1.f);
+#endif // WITH_EDITOR
+	}
+
+	/*
 	for (FRaidCapsule& Capsule : CollisionCapsules)
 	{
 		FTransform WorldTransform = MeshComp->GetComponentTransform();
@@ -98,4 +135,5 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		}
 #endif
 	}
+	*/
 }

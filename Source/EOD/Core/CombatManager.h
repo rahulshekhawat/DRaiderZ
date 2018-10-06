@@ -22,6 +22,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	void OnMeleeHit(const AActor* Instigator, const bool bHit, const TArray<FHitResult>& HitResults);
 	
+	// @todo OnRangedHit
 	
 };
