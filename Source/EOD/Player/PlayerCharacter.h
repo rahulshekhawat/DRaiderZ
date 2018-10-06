@@ -70,6 +70,7 @@ private:
 	UCameraComponent* PlayerCamera;
 
 	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player face
+
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Hair;
 	
@@ -133,11 +134,13 @@ public:
 	/** Returns true if secondary weapon is equipped */
 	bool IsSecondaryWeaponEquipped() const;
 
-	APrimaryWeapon* GetPrimaryWeapon() const;
+	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
 
-	ASecondaryWeapon* GetSecondaryWeapon() const;
+	FORCEINLINE ASecondaryWeapon* GetSecondaryWeapon() const;
 
-	EWeaponType GetEquippedWeaponType() const;
+	FORCEINLINE EWeaponType GetEquippedWeaponType() const;
+
+	FORCEINLINE UHUDWidget* NativeGetHUDWidget() const;
 
 	UFUNCTION(BlueprintCallable)
 	UHUDWidget* GetHUDWidget() const;

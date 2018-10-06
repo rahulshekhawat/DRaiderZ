@@ -399,29 +399,34 @@ bool APlayerCharacter::IsAutoRunning() const
 	return CharacterState == ECharacterState::AutoRun;
 }
 
-APrimaryWeapon * APlayerCharacter::GetPrimaryWeapon() const
+FORCEINLINE APrimaryWeapon * APlayerCharacter::GetPrimaryWeapon() const
 {
 	return PrimaryWeapon;
 }
 
-ASecondaryWeapon * APlayerCharacter::GetSecondaryWeapon() const
+FORCEINLINE ASecondaryWeapon * APlayerCharacter::GetSecondaryWeapon() const
 {
 	return SecondaryWeapon;
 }
 
-EWeaponType APlayerCharacter::GetEquippedWeaponType() const
+FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
 {
 	return PrimaryWeapon->WeaponType;
+}
+
+FORCEINLINE UHUDWidget * APlayerCharacter::NativeGetHUDWidget() const
+{
+	return HUDWidget;
 }
 
 UHUDWidget * APlayerCharacter::GetHUDWidget() const
 {
 	return HUDWidget;
-	// return nullptr;
 }
 
 void APlayerCharacter::Interrupt(const EHitDirection InterruptDirection)
 {
+	// @note Why am I checking for NULL PlayerAnimInstance? Probably should remove it
 	if (!PlayerAnimInstance || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->AnimationMontage_HitEffects)
 	{
 		return;
