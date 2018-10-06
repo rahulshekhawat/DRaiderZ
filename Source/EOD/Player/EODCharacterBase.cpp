@@ -538,6 +538,36 @@ void AEODCharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterru
 {
 }
 
+void AEODCharacterBase::NativePlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay)
+{
+	if (GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
+	}
+
+	// Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
+}
+
+void AEODCharacterBase::NativePlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
+{
+	if (GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
+		CharacterState = NewState;
+	}
+
+	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
+}
+
+/*
+void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay)
+{
+	// NativePlayAnimationMontage
+}
+*/
+
 void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
 {
 	CharacterState = NewState;

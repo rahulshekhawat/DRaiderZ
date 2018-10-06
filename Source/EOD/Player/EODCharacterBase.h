@@ -11,6 +11,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TArray<TWeakObjectPtr<AEODCharacterBase>>, RecipientCharacters);
 
 class UAnimMontage;
+class UInputComponent;
 class UStatusEffectBase;
 class UStatsComponentBase;
 
@@ -50,7 +51,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	/** Called to bind functionality to input */
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -196,17 +197,17 @@ public:
 
 	/** Enables immunity frames for a given duration */
 	UFUNCTION()
-	virtual void EnableiFrames(float Duration = 0.f);
+	void EnableiFrames(float Duration = 0.f);
 
 	/** Disables immunity frames */
 	UFUNCTION()
-	virtual void DisableiFrames();
+	void DisableiFrames();
 
 	UFUNCTION()
-	virtual void EnableDamageBlocking();
+	void EnableDamageBlocking();
 
 	UFUNCTION()
-	virtual void DisableDamageBlocking();
+	void DisableDamageBlocking();
 
 	/**
 	 * Kills this character 
@@ -304,13 +305,24 @@ public:
 	/** Called on an animation montage ending to clean up, reset, or change any state variables */
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
-	// void NativePlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
+	/** [server + client] [Native] Plays an animation montage over network */
+	void NativePlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
 
+	/** [server + client] Plays an animation montage over network and changes character state */
+	void NativePlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+
+	// @note UFUNCTIONS don't support definition overloads
 	/** [server + client] Plays an animation montage over network */
+	// UFUNCTION(BlueprintCallable, Category = Animations)
+	// void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
+
+	/** [server + client] Plays an animation montage over network and changes character state */
 	UFUNCTION(BlueprintCallable, Category = Animations)
 	void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
+	/** [server + client] Set the next montage section to play for a given animation montage */
 	void SetNextMontageSection(FName CurrentSection, FName NextSection);
+	// void SetNextMontageSection(UAnimMontage* Montage, FName CurrentSection, FName NextSection);
 
 	/**
 	 * Rotate a character toward desired yaw based on the rotation rate in a given delta time (Precision based)
@@ -435,10 +447,10 @@ private:
 	void Multicast_SetNextMontageSection(FName CurrentSection, FName NextSection);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_PlayAnimationMontage(class UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+	void Server_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 	
 	UFUNCTION(NetMultiCast, Reliable)
-	void MultiCast_PlayAnimationMontage(class UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+	void MultiCast_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 	//~ End Multiplayer Code
 	
 	
