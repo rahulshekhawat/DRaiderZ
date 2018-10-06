@@ -45,6 +45,12 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 }
 
+void AEODCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+}
+
 FORCEINLINE bool AEODCharacterBase::IsAlive() const
 {
 	return StatsComp->GetCurrentHealth() > 0;
@@ -73,6 +79,16 @@ FORCEINLINE bool AEODCharacterBase::IsIdleOrMoving() const
 FORCEINLINE bool AEODCharacterBase::IsJumping() const
 {
 	return CharacterState == ECharacterState::Jumping;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsDodging() const
+{
+	return CharacterState == ECharacterState::Dodging;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsDodgingDamage() const
+{
+	return bHasActiveiFrames;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsBlocking() const
@@ -133,24 +149,286 @@ FORCEINLINE bool AEODCharacterBase::IsCriticalHit(const FSkill* HitSkill) const
 	return bCriticalHit;
 }
 
-FORCEINLINE bool AEODCharacterBase::IsDodging() const
+bool AEODCharacterBase::CanMove() const
 {
-	return CharacterState == ECharacterState::Dodging;
+	// Mobs can only move in IdleWalkRun state
+	return CharacterState == ECharacterState::IdleWalkRun;
 }
 
-FORCEINLINE bool AEODCharacterBase::IsDodgingDamage() const
+bool AEODCharacterBase::CanJump() const
 {
-	return bHasActiveiFrames;
+	return CharacterState == ECharacterState::IdleWalkRun;
 }
 
-bool AEODCharacterBase::NeedsHeal() const
+bool AEODCharacterBase::CanDodge() const
 {
-	return NativeNeedsHeal();
+	return CharacterState == ECharacterState::IdleWalkRun;
+}
+
+bool AEODCharacterBase::CanBlock() const
+{
+	return IsIdleOrMoving();
+}
+
+bool AEODCharacterBase::CanRespawn() const
+{
+	return false;
+}
+
+bool AEODCharacterBase::CanNormalAttack() const
+{
+	return CharacterState == ECharacterState::IdleWalkRun;
+}
+
+bool AEODCharacterBase::CanBeStunned() const
+{
+	return false;
+}
+
+bool AEODCharacterBase::CanUseAnySkill() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanUseSkill(int32 SkillIndex) const
+{
+	return false;
+}
+
+FORCEINLINE bool AEODCharacterBase::CanFlinch() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
+	// @todo - GetCurrentActiveSkill()->SkillLevelUpInfo.CrowdControlImmunities
+}
+
+FORCEINLINE bool AEODCharacterBase::CanStun() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanKnockback() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanFreeze() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
+}
+
+FORCEINLINE bool AEODCharacterBase::NeedsHealing() const
+{
+	return StatsComp->IsLowOnHealth();
+}
+
+bool AEODCharacterBase::BP_NeedsHealing() const
+{
+	return NeedsHealing();
 }
 
 bool AEODCharacterBase::IsHealing() const
 {
 	return false;
+}
+
+void AEODCharacterBase::EnableiFrames(float Duration)
+{
+	bHasActiveiFrames = true;
+
+	if (Duration > 0)
+	{
+		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, this, &AEODCharacterBase::DisableiFrames, Duration, false);
+	}
+}
+
+void AEODCharacterBase::DisableiFrames()
+{
+	bHasActiveiFrames = false;
+}
+
+void AEODCharacterBase::EnableDamageBlocking()
+{
+	bIsBlockingDamage = true;
+}
+
+void AEODCharacterBase::DisableDamageBlocking()
+{
+	bIsBlockingDamage = false;
+	// Clear block damage timer just in case it is still active
+	GetWorld()->GetTimerManager().ClearTimer(BlockTimerHandle); 
+}
+
+void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * InstigatingChar)
+{
+	if (bGodMode || IsDead())
+	{
+		// cannot die
+		return;
+	}
+
+	if (CauseOfDeath == ECauseOfDeath::ZeroHP)
+	{
+
+	}
+	else
+	{
+		// Set current hp to 0
+		StatsComp->ModifyBaseHealth(-StatsComp->GetMaxHealth());
+		SetCharacterState(ECharacterState::Dead);
+
+		// @todo play death animation and death sound
+	}
+}
+
+ECharacterState AEODCharacterBase::GetCharacterState() const
+{
+	return CharacterState;
+}
+
+void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
+{
+	CharacterState = NewState;
+
+	if (Role < ROLE_Authority)
+	{
+		Server_SetCharacterState(NewState);
+	}
+}
+
+void AEODCharacterBase::SetWalkSpeed(const float WalkSpeed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	
+	if (Role < ROLE_Authority)
+	{
+		Server_SetWalkSpeed(WalkSpeed);
+	}
+}
+
+void AEODCharacterBase::SetCharacterRotation(const FRotator NewRotation)
+{
+	GetCharacterMovement()->FlushServerMoves();
+	SetActorRotation(NewRotation);
+
+	if (Role < ROLE_Authority)
+	{
+		Server_SetCharacterRotation(NewRotation);
+	}
+}
+
+void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)
+{
+	bUseControllerRotationYaw = bNewBool;
+
+	if (Role < ROLE_Authority)
+	{
+		Server_SetUseControllerRotationYaw(bNewBool);
+	}
+}
+
+EFaction AEODCharacterBase::GetFaction() const
+{
+	return Faction;
+}
+
+FSkill * AEODCharacterBase::GetSkill(FName SkillID) const
+{
+	if (IDToSkillMap.Contains(SkillID))
+	{
+		return IDToSkillMap[SkillID];
+	}
+
+	return nullptr;
+}
+
+FSkill * AEODCharacterBase::GetSkill(int32 SkillIndex) const
+{
+	if (Skills.Num() > SkillIndex)
+	{
+		return Skills[SkillIndex];
+	}
+
+	return nullptr;
+}
+
+bool AEODCharacterBase::UseSkill(int32 SkillIndex)
+{
+	if (CanUseAnySkill())
+	{
+		FSkill* SkillToUse = GetSkill(SkillIndex);
+
+		if (!SkillToUse)
+		{
+			// unable to use skill - return false
+			return false;
+		}
+
+		// SkillToUse->AnimationMontage
+		// PlayAnimationMontage(SkillToUse->AnimationMontage, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		CurrentActiveSkill = SkillToUse;
+		return true;
+	}
+
+	return false;
+}
+
+void AEODCharacterBase::StartSkill(FName SkillID)
+{
+}
+
+void AEODCharacterBase::StopSkill(FName SkillID)
+{
+}
+
+EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
+{
+	EEODTaskStatus TaskStatus = EEODTaskStatus::Inactive;
+
+	FSkill* SkillToCheck = GetSkill(SkillIndex);
+	if (SkillToCheck == CurrentActiveSkill)
+	{
+		return EEODTaskStatus::Active;
+	}
+
+	if (GetLastUsedSkill().LastUsedSkill != CurrentActiveSkill)
+	{
+		return EEODTaskStatus::Inactive;
+	}
+
+	if (GetLastUsedSkill().bInterrupted)
+	{
+		return EEODTaskStatus::Aborted;
+	}
+	else
+	{
+		return EEODTaskStatus::Finished;
+	}
+}
+
+int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
+{
+	// @todo definition
+	return 0;
+}
+
+FORCEINLINE FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
+{
+	return CurrentActiveSkill;
+}
+
+FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
+{
+	return LastUsedSkillInfo;
 }
 
 void AEODCharacterBase::ApplyStatusEffect(const UStatusEffectBase * StatusEffect)
@@ -423,113 +701,6 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * Instigati
 	return EODDamageResult;
 }
 
-int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
-{
-	// @todo definition
-	return 0;
-}
-
-bool AEODCharacterBase::UseSkill(int32 SkillIndex)
-{
-	if (CanUseAnySkill())
-	{
-		FSkill* SkillToUse = GetSkill(SkillIndex);
-
-		if (!SkillToUse)
-		{
-			// unable to use skill - return false
-			return false;
-		}
-
-		// SkillToUse->AnimationMontage
-		// PlayAnimationMontage(SkillToUse->AnimationMontage, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-		CurrentActiveSkill = SkillToUse;
-		return true;
-	}
-
-	return false;
-}
-
-void AEODCharacterBase::StartSkill(FName SkillID)
-{
-}
-
-void AEODCharacterBase::StopSkill(FName SkillID)
-{
-}
-
-EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
-{
-	EEODTaskStatus TaskStatus = EEODTaskStatus::Inactive;
-
-	FSkill* SkillToCheck = GetSkill(SkillIndex);
-	if (SkillToCheck == CurrentActiveSkill)
-	{
-		return EEODTaskStatus::Active;
-	}
-
-	if (GetLastUsedSkill().LastUsedSkill != CurrentActiveSkill)
-	{
-		return EEODTaskStatus::Inactive;
-	}
-
-	if (GetLastUsedSkill().bInterrupted)
-	{
-		return EEODTaskStatus::Aborted;
-	}
-	else
-	{
-		return EEODTaskStatus::Finished;
-	}
-}
-
-void AEODCharacterBase::EnableiFrames(float Duration)
-{
-	bHasActiveiFrames = true;
-
-	if (Duration > 0)
-	{
-		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, this, &AEODCharacterBase::DisableiFrames, Duration, false);
-	}
-}
-
-void AEODCharacterBase::DisableiFrames()
-{
-	bHasActiveiFrames = false;
-}
-
-void AEODCharacterBase::EnableDamageBlocking()
-{
-	bIsBlockingDamage = true;
-}
-
-void AEODCharacterBase::DisableDamageBlocking()
-{
-	bIsBlockingDamage = false;
-	// Clear block damage timer just in case it is still active
-	GetWorld()->GetTimerManager().ClearTimer(BlockTimerHandle); 
-}
-
-FORCEINLINE FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
-{
-	return CurrentActiveSkill;
-}
-
-FSkill * AEODCharacterBase::GetSkill(int32 SkillIndex) const
-{
-	if (Skills.Num() > SkillIndex)
-	{
-		return Skills[SkillIndex];
-	}
-
-	return nullptr;
-}
-
-FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
-{
-	return LastUsedSkillInfo;
-}
-
 void AEODCharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
 {
 }
@@ -561,62 +732,16 @@ void AEODCharacterBase::NativePlayAnimationMontage(UAnimMontage * MontageToPlay,
 	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }
 
-/*
-void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay)
+void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
-	// NativePlayAnimationMontage
-}
-*/
-
-void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
-{
-	CharacterState = NewState;
-
-	if (Role < ROLE_Authority)
+	if (GetMesh()->GetAnimInstance())
 	{
-		Server_SetCharacterState(NewState);
+		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
+		CharacterState = NewState;
 	}
-}
 
-void AEODCharacterBase::Server_SetCharacterState_Implementation(ECharacterState NewState)
-{
-	SetCharacterState(NewState);
-}
-
-bool AEODCharacterBase::Server_SetCharacterState_Validate(ECharacterState NewState)
-{
-	return true;
-}
-
-void AEODCharacterBase::SetWalkSpeed(const float WalkSpeed)
-{
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	
-	if (Role < ROLE_Authority)
-	{
-		Server_SetWalkSpeed(WalkSpeed);
-	}
-}
-
-void AEODCharacterBase::SetCharacterRotation(const FRotator NewRotation)
-{
-	GetCharacterMovement()->FlushServerMoves();
-	SetActorRotation(NewRotation);
-
-	if (Role < ROLE_Authority)
-	{
-		Server_SetCharacterRotation(NewRotation);
-	}
-}
-
-void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)
-{
-	bUseControllerRotationYaw = bNewBool;
-
-	if (Role < ROLE_Authority)
-	{
-		Server_SetUseControllerRotationYaw(bNewBool);
-	}
+	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }
 
 void AEODCharacterBase::SetNextMontageSection(FName CurrentSection, FName NextSection)
@@ -627,6 +752,56 @@ void AEODCharacterBase::SetNextMontageSection(FName CurrentSection, FName NextSe
 	}
 
 	Server_SetNextMontageSection(CurrentSection, NextSection);
+}
+
+bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision, float RotationRate)
+{
+	float CurrentYaw = GetActorRotation().Yaw;
+	float YawDiff = FMath::FindDeltaAngleDegrees(CurrentYaw, DesiredYaw);
+	if (FMath::Abs(YawDiff) < Precision)
+	{
+		return true;
+	}
+
+	float Multiplier = YawDiff / FMath::Abs(YawDiff);
+	float RotateBy = Multiplier * RotationRate * DeltaTime;
+	if (FMath::Abs(YawDiff) <= FMath::Abs(RotateBy))
+	{
+		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+		return true;
+	}
+	else if (FMath::Abs(YawDiff) <= FMath::Abs(RotateBy) + Precision)
+	{
+		SetCharacterRotation(FRotator(0.f, CurrentYaw + RotateBy, 0.f));
+		return true;
+	}
+	else
+	{
+		SetCharacterRotation(FRotator(0.f, CurrentYaw + RotateBy, 0.f));
+		return false;
+	}
+}
+
+void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
+{
+	//~ @todo : Cleanup old state
+}
+
+/*
+void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay)
+{
+	// NativePlayAnimationMontage
+}
+*/
+
+void AEODCharacterBase::Server_SetCharacterState_Implementation(ECharacterState NewState)
+{
+	SetCharacterState(NewState);
+}
+
+bool AEODCharacterBase::Server_SetCharacterState_Validate(ECharacterState NewState)
+{
+	return true;
 }
 
 void AEODCharacterBase::Server_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection)
@@ -681,18 +856,6 @@ void AEODCharacterBase::Multicast_SetNextMontageSection_Implementation(FName Cur
 	}
 }
 
-void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
-{
-	if (GetMesh()->GetAnimInstance())
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
-		CharacterState = NewState;
-	}
-
-	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
-}
-
 void AEODCharacterBase::Server_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
 	MultiCast_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
@@ -711,167 +874,4 @@ void AEODCharacterBase::MultiCast_PlayAnimationMontage_Implementation(UAnimMonta
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
 		CharacterState = NewState;
 	}
-}
-
-bool AEODCharacterBase::CanMove() const
-{
-	// Mobs can only move in IdleWalkRun state
-	return CharacterState == ECharacterState::IdleWalkRun;
-}
-
-bool AEODCharacterBase::CanJump() const
-{
-	return CharacterState == ECharacterState::IdleWalkRun;
-}
-
-bool AEODCharacterBase::CanBlock() const
-{
-	return IsIdleOrMoving();
-}
-
-bool AEODCharacterBase::CanRespawn() const
-{
-	return false;
-}
-
-bool AEODCharacterBase::CanNormalAttack() const
-{
-	return CharacterState == ECharacterState::IdleWalkRun;
-}
-
-bool AEODCharacterBase::CanBeStunned() const
-{
-	return false;
-}
-
-bool AEODCharacterBase::CanUseAnySkill() const
-{
-	return true;
-}
-
-bool AEODCharacterBase::CanUseSkill(int32 SkillIndex) const
-{
-	return false;
-}
-
-FORCEINLINE bool AEODCharacterBase::CanFlinch() const
-{
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
-	// @todo - GetCurrentActiveSkill()->SkillLevelUpInfo.CrowdControlImmunities
-}
-
-FORCEINLINE bool AEODCharacterBase::CanStun() const
-{
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
-}
-
-FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
-{
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
-}
-
-FORCEINLINE bool AEODCharacterBase::CanKnockback() const
-{
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
-}
-
-FORCEINLINE bool AEODCharacterBase::CanFreeze() const
-{
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
-}
-
-FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
-{
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
-}
-
-FORCEINLINE bool AEODCharacterBase::NativeNeedsHeal() const
-{
-	return StatsComp->IsLowOnHealth();
-}
-
-bool AEODCharacterBase::CanDodge() const
-{
-	return CharacterState == ECharacterState::IdleWalkRun;
-}
-
-EFaction AEODCharacterBase::GetFaction() const
-{
-	return Faction;
-}
-
-FSkill * AEODCharacterBase::GetSkill(FName SkillID) const
-{
-	if (IDToSkillMap.Contains(SkillID))
-	{
-		return IDToSkillMap[SkillID];
-	}
-
-	return nullptr;
-}
-
-void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * InstigatingChar)
-{
-	if (bGodMode || IsDead())
-	{
-		// cannot die
-		return;
-	}
-
-	if (CauseOfDeath == ECauseOfDeath::ZeroHP)
-	{
-
-	}
-	else
-	{
-		// Set current hp to 0
-		StatsComp->ModifyBaseHealth(-StatsComp->GetMaxHealth());
-		SetCharacterState(ECharacterState::Dead);
-
-		// @todo play death animation and death sound
-	}
-}
-
-ECharacterState AEODCharacterBase::GetCharacterState() const
-{
-	return CharacterState;
-}
-
-bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision, float RotationRate)
-{
-	float CurrentYaw = GetActorRotation().Yaw;
-	float YawDiff = FMath::FindDeltaAngleDegrees(CurrentYaw, DesiredYaw);
-	if (FMath::Abs(YawDiff) < Precision)
-	{
-		return true;
-	}
-
-	float Multiplier = YawDiff / FMath::Abs(YawDiff);
-	float RotateBy = Multiplier * RotationRate * DeltaTime;
-	if (FMath::Abs(YawDiff) <= FMath::Abs(RotateBy))
-	{
-		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-		return true;
-	}
-	else if (FMath::Abs(YawDiff) <= FMath::Abs(RotateBy) + Precision)
-	{
-		SetCharacterRotation(FRotator(0.f, CurrentYaw + RotateBy, 0.f));
-		return true;
-	}
-	else
-	{
-		SetCharacterRotation(FRotator(0.f, CurrentYaw + RotateBy, 0.f));
-		return false;
-	}
-}
-
-void AEODCharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
-{
-	//~ @todo : Cleanup old state
 }

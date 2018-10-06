@@ -158,12 +158,12 @@ public:
 	/** Returns true if character can be interrupted */
 	FORCEINLINE bool CanInterrupt() const;
 
-	/** [Native] Returns true if this character requires healing (low on HP) */
-	FORCEINLINE bool NativeNeedsHeal() const;
+	/** Returns true if this character requires healing (low on HP) */
+	FORCEINLINE bool NeedsHealing() const;
 
-	/** [Blueprint] Returns true if this character requires healing (low on HP) */
-	UFUNCTION(BlueprintCallable, Category = StatusIndicator)
-	bool NeedsHeal() const;
+	/** Returns true if this character requires healing (low on HP) */
+	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Needs Healing"))
+	bool BP_NeedsHealing() const;
 
 	/** Returns true if this character is healing anyone */
 	virtual bool IsHealing() const;
@@ -246,6 +246,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual bool UseSkill(int32 SkillIndex);
 
+	//~ @note might not be needed
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual void StartSkill(FName SkillID);
 
