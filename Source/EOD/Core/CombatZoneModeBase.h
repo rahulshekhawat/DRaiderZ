@@ -6,8 +6,11 @@
 #include "Core/EODGameModeBase.h"
 #include "CombatZoneModeBase.generated.h"
 
+class ACombatManager;
+class AStatusEffectsManager;
+
 /**
- * 
+ * Base class for game modes used in combat areas
  */
 UCLASS()
 class EOD_API ACombatZoneModeBase : public AEODGameModeBase
@@ -17,7 +20,16 @@ class EOD_API ACombatZoneModeBase : public AEODGameModeBase
 public:
 
 	ACombatZoneModeBase(const FObjectInitializer& ObjectInitializer);
+
+	/** Used to spawn combat and status effect manager actors */
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
 	
-	
-	
+private:
+
+	UPROPERTY(Transient)
+	ACombatManager* CombatManager;
+
+	UPROPERTY(Transient)
+	AStatusEffectsManager* StatusEffectsManager;
+
 };
