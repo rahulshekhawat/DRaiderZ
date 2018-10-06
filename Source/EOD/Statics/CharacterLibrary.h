@@ -238,8 +238,8 @@ enum class EEODTaskStatus : uint8
 UENUM(BlueprintType)
 enum class ESkillType : uint8
 {
-	PassiveSkill,
 	ActiveSkill,
+	PassiveSkill
 };
 
 /** Struct containing level specific info for an in-game skill */

@@ -220,7 +220,7 @@ public:
 	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; }
 
 	/** Get current state of character */
-	ECharacterState GetCharacterState() const;
+	FORCEINLINE ECharacterState GetCharacterState() const;
 
 	/** [server + client] Set current state of character */
 	void SetCharacterState(const ECharacterState NewState);
@@ -235,9 +235,10 @@ public:
 	void SetUseControllerRotationYaw(const bool bNewBool);
 
 	/** Returns character faction */
-	EFaction GetFaction() const;
+	FORCEINLINE EFaction GetFaction() const;
 
-	virtual FSkill* GetSkill(FName SkillID) const;
+	/** Get skill info from a given SkillID */
+	FORCEINLINE FSkill* GetSkill(FName SkillID) const;
 
 	/** Returns the skill at given SkillIndex */
 	virtual FSkill* GetSkill(int32 SkillIndex) const;

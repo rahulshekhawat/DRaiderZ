@@ -290,7 +290,7 @@ void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * Inst
 	}
 }
 
-ECharacterState AEODCharacterBase::GetCharacterState() const
+FORCEINLINE ECharacterState AEODCharacterBase::GetCharacterState() const
 {
 	return CharacterState;
 }
@@ -336,12 +336,12 @@ void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)
 	}
 }
 
-EFaction AEODCharacterBase::GetFaction() const
+FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 {
 	return Faction;
 }
 
-FSkill * AEODCharacterBase::GetSkill(FName SkillID) const
+FORCEINLINE FSkill * AEODCharacterBase::GetSkill(FName SkillID) const
 {
 	if (IDToSkillMap.Contains(SkillID))
 	{
@@ -373,8 +373,7 @@ bool AEODCharacterBase::UseSkill(int32 SkillIndex)
 			return false;
 		}
 
-		// SkillToUse->AnimationMontage
-		// PlayAnimationMontage(SkillToUse->AnimationMontage, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		PlayAnimationMontage(SkillToUse->AnimationMontage_GenderOne, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 		CurrentActiveSkill = SkillToUse;
 		return true;
 	}
