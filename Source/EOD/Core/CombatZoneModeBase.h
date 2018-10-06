@@ -24,6 +24,16 @@ public:
 	/** Used to spawn combat and status effect manager actors */
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
 	
+	FORCEINLINE ACombatManager* GetCombatManager() const;
+
+	FORCEINLINE AStatusEffectsManager* GetStatusEffectsManager() const;
+
+	UFUNCTION(BlueprintPure, Category = Managers, meta = (DisplayName = "Get Combat Manager"))
+	ACombatManager* BP_GetCombatManager() const;
+
+	UFUNCTION(BlueprintPure, Category = Managers, meta = (DisplayName = "Get Status Effects Manager"))
+	AStatusEffectsManager* BP_GetStatusEffectsManager() const;
+
 private:
 
 	UPROPERTY(Transient)

@@ -16,6 +16,8 @@ void ACombatZoneModeBase::InitGame(const FString & MapName, const FString & Opti
 
 	UWorld* World = GetWorld();
 
+	// @todo Spawn combat and status effect manager only on server
+
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Instigator = Instigator;
 	// We don't want status effects manager or combat manager to be saved into map
@@ -24,4 +26,24 @@ void ACombatZoneModeBase::InitGame(const FString & MapName, const FString & Opti
     StatusEffectsManager = World->SpawnActor<AStatusEffectsManager>(AStatusEffectsManager::StaticClass(), SpawnInfo);
     CombatManager = World->SpawnActor<ACombatManager>(ACombatManager::StaticClass(), SpawnInfo);
 
+}
+
+FORCEINLINE ACombatManager * ACombatZoneModeBase::GetCombatManager() const
+{
+	return CombatManager;
+}
+
+FORCEINLINE AStatusEffectsManager * ACombatZoneModeBase::GetStatusEffectsManager() const
+{
+	return StatusEffectsManager;
+}
+
+ACombatManager * ACombatZoneModeBase::BP_GetCombatManager() const
+{
+	return GetCombatManager();
+}
+
+AStatusEffectsManager * ACombatZoneModeBase::BP_GetStatusEffectsManager() const
+{
+	return GetStatusEffectsManager();
 }
