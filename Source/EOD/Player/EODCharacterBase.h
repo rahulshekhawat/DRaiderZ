@@ -10,6 +10,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TArray<TWeakObjectPtr<AEODCharacterBase>>, RecipientCharacters);
 
+class UAnimMontage;
 class UStatusEffectBase;
 class UStatsComponentBase;
 
@@ -105,10 +106,11 @@ public:
 	/** Returns true if character is using skill at SkillIndex */
 	FORCEINLINE bool IsUsingSkill(int32 SkillIndex) const;
 
+	/** Returns true if character has just been hit */
 	FORCEINLINE bool HasBeenHit() const;
 
 	/** Returns true if a hit from HitSkill was critical */
-	virtual bool IsCriticalHit(const FSkill* HitSkill) const;
+	FORCEINLINE bool IsCriticalHit(const FSkill* HitSkill) const;
 
 	/** Returns true if character can move */
 	virtual bool CanMove() const;
@@ -137,22 +139,32 @@ public:
 	/** Returns true if character can use a particular skill at SkillIndex */
 	virtual bool CanUseSkill(int32 SkillIndex) const;
 	
+	/** Returns true if character can flinch */
 	FORCEINLINE bool CanFlinch() const;
 
+	/** Returns true if character can stun */
 	FORCEINLINE bool CanStun() const;
 
+	/** Returns true if character can get knocked down */
 	FORCEINLINE bool CanKnockdown() const;
 
+	/** Returns true if character can get knocked back */
 	FORCEINLINE bool CanKnockback() const;
 
+	/** Returns true if character can be frozed/crystalized */
 	FORCEINLINE bool CanFreeze() const;
 
+	/** Returns true if character can be interrupted */
 	FORCEINLINE bool CanInterrupt() const;
 
-	/** Returns true if this character requires healing (low on HP) */
-	virtual bool NeedsHeal() const;
+	/** [Native] Returns true if this character requires healing (low on HP) */
+	FORCEINLINE bool NativeNeedsHeal() const;
 
-	/** Returns true if this character is healing either self or another character */
+	/** [Blueprint] Returns true if this character requires healing (low on HP) */
+	UFUNCTION(BlueprintCallable, Category = StatusIndicator)
+	bool NeedsHeal() const;
+
+	/** Returns true if this character is healing anyone */
 	virtual bool IsHealing() const;
 
 	/** [server + client] Interrupt this character's current action */
@@ -164,24 +176,29 @@ public:
 	/** [server + client] Applies stun to this character */
 	virtual void Stun(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Stun, );
 
+	/** [client] Removes 'stun' crowd control effect from this character */
 	virtual void EndStun() PURE_VIRTUAL(AEODCharacterBase::EndStun, );
 
 	/** [server + client] Freeze this character */
 	virtual void Freeze(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Freeze, );
 
+	/** [client] Removes 'freeze' crowd control effect from this character */
 	virtual void EndFreeze() PURE_VIRTUAL(AEODCharacterBase::EndFreeze, );
 
 	/** [server + client] Knockdown this character */
 	virtual void Knockdown(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Knockdown, );
 
+	/** [client] Removes 'knock-down' crowd control effect from this character */
 	virtual void EndKnockdown() PURE_VIRTUAL(AEODCharacterBase::EndKnockdown, );
 
 	/** [server + client] Knockback this character */
 	virtual void Knockback(const float Duration, const FVector& Impulse) PURE_VIRTUAL(AEODCharacterBase::Knockback, );
 
+	/** Enables immunity frames for a given duration */
 	UFUNCTION()
 	virtual void EnableiFrames(float Duration = 0.f);
 
+	/** Disables immunity frames */
 	UFUNCTION()
 	virtual void DisableiFrames();
 
@@ -287,9 +304,11 @@ public:
 	/** Called on an animation montage ending to clean up, reset, or change any state variables */
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
+	// void NativePlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
+
 	/** [server + client] Plays an animation montage over network */
 	UFUNCTION(BlueprintCallable, Category = Animations)
-	void PlayAnimationMontage(class UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+	void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
 	void SetNextMontageSection(FName CurrentSection, FName NextSection);
 

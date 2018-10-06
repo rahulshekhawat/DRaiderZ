@@ -111,7 +111,7 @@ FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 	return CharacterState == ECharacterState::GotHit;
 }
 
-bool AEODCharacterBase::IsCriticalHit(const FSkill * HitSkill) const
+FORCEINLINE bool AEODCharacterBase::IsCriticalHit(const FSkill* HitSkill) const
 {
 	bool bCriticalHit = false;
 
@@ -145,7 +145,7 @@ FORCEINLINE bool AEODCharacterBase::IsDodgingDamage() const
 
 bool AEODCharacterBase::NeedsHeal() const
 {
-	return StatsComp->IsLowOnHealth();
+	return NativeNeedsHeal();
 }
 
 bool AEODCharacterBase::IsHealing() const
@@ -753,6 +753,11 @@ FORCEINLINE bool AEODCharacterBase::CanFreeze() const
 FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
 {
 	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
+}
+
+FORCEINLINE bool AEODCharacterBase::NativeNeedsHeal() const
+{
+	return StatsComp->IsLowOnHealth();
 }
 
 bool AEODCharacterBase::CanDodge() const
