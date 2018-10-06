@@ -2,6 +2,7 @@
 
 #include "AICharacterBase.h"
 #include "Core/GameSingleton.h"
+#include "Statics/CharacterLibrary.h"
 #include "Components/AIStatsComponent.h"
 #include "Player/Components/EODWidgetComponent.h"
 
@@ -71,6 +72,54 @@ void AAICharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bIn
 void AAICharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
 {
 	// @todo
+}
+
+void AAICharacterBase::Interrupt(const EHitDirection InterruptDirection)
+{
+	if (InterruptDirection == EHitDirection::Forward)
+	{
+		PlayAnimationMontage(AnimationMontage_HitEffects,
+			UCharacterLibrary::SectionName_ForwardInterrupt,
+			ECharacterState::GotHit);
+	}
+	else if (InterruptDirection == EHitDirection::Backward)
+	{
+		PlayAnimationMontage(AnimationMontage_HitEffects,
+			UCharacterLibrary::SectionName_BackwardInterrupt,
+			ECharacterState::GotHit);
+	}
+}
+
+void AAICharacterBase::Flinch(const EHitDirection FlinchDirection)
+{
+}
+
+void AAICharacterBase::Stun(const float Duration)
+{
+}
+
+void AAICharacterBase::EndStun()
+{
+}
+
+void AAICharacterBase::Freeze(const float Duration)
+{
+}
+
+void AAICharacterBase::EndFreeze()
+{
+}
+
+void AAICharacterBase::Knockdown(const float Duration)
+{
+}
+
+void AAICharacterBase::EndKnockdown()
+{
+}
+
+void AAICharacterBase::Knockback(const float Duration, const FVector & Impulse)
+{
 }
 
 void AAICharacterBase::BeginPlay()
