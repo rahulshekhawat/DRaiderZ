@@ -306,20 +306,16 @@ public:
 	/** Called on an animation montage ending to clean up, reset, or change any state variables */
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
-	/** [server + client] [Native] Plays an animation montage over network */
-	void NativePlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
-
-	/** [server + client] Plays an animation montage over network and changes character state */
-	void NativePlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
-
-	// @note UFUNCTIONS don't support definition overloads
 	/** [server + client] Plays an animation montage over network */
-	// UFUNCTION(BlueprintCallable, Category = Animations)
-	// void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
+	FORCEINLINE void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
+	
+	/** [server + client] Plays an animation montage and changes character state over network */
+	FORCEINLINE void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
-	/** [server + client] Plays an animation montage over network and changes character state */
-	UFUNCTION(BlueprintCallable, Category = Animations)
-	void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+	//~ @note UFUNCTIONs don't allow function overloading
+	/** [server + client] Plays an animation montage and changes character state over network */
+	UFUNCTION(BlueprintCallable, Category = Animations, meta = (DisplayName = "Play Animation Montage Over Network"))
+	void BP_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
 	/** [server + client] Set the next montage section to play for a given animation montage */
 	void SetNextMontageSection(FName CurrentSection, FName NextSection);

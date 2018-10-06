@@ -709,39 +709,30 @@ void AEODCharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterru
 {
 }
 
-void AEODCharacterBase::NativePlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay)
+FORCEINLINE void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay)
 {
 	if (GetMesh()->GetAnimInstance())
 	{
 		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
 	}
-
-	// Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }
 
-void AEODCharacterBase::NativePlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
+FORCEINLINE void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
 	if (GetMesh()->GetAnimInstance())
 	{
 		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
 		CharacterState = NewState;
 	}
 
 	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }
 
-void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
+void AEODCharacterBase::BP_PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
-	if (GetMesh()->GetAnimInstance())
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
-		CharacterState = NewState;
-	}
-
-	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
+	PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }
 
 void AEODCharacterBase::SetNextMontageSection(FName CurrentSection, FName NextSection)
@@ -786,13 +777,6 @@ void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
 	//~ @todo : Cleanup old state
 }
-
-/*
-void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay)
-{
-	// NativePlayAnimationMontage
-}
-*/
 
 void AEODCharacterBase::Server_SetCharacterState_Implementation(ECharacterState NewState)
 {
