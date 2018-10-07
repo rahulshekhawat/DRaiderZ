@@ -29,10 +29,21 @@ public:
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
 
+	/** Get aggro widget component */
 	FORCEINLINE UEODWidgetComponent* GetAggroWidgetComp() const { return AggroWidgetComp; }
 
+	/** Get health widget component */
 	FORCEINLINE UEODWidgetComponent* GetHealthWidgetComp() const { return HealthWidgetComp; }
 
+	/** Get aggro widget component */
+	UFUNCTION(BlueprintPure, Category = WidgetComponent, meta = (DisplayName = "Get Aggro Widget Component"))
+	UEODWidgetComponent* BP_GetAggroWidgetComp() const;
+
+	/** Get health widget component */
+	UFUNCTION(BlueprintPure, Category = WidgetComponent, meta = (DisplayName = "Get Health Widget Component"))
+	UEODWidgetComponent* BP_GetHealthWidgetComp() const;
+
+	/** Set whether character is in combat or not */
 	virtual void SetInCombat(bool bValue) override;
 
 	/** [server] Handle melee collision */

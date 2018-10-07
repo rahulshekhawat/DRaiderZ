@@ -22,6 +22,34 @@ AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer)
 	HealthWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AggroWidgetComp->SetCollisionProfileName(FName("NoCollision"));
 	HealthWidgetComp->SetCollisionProfileName(FName("NoCollision"));
+	
+}
+
+void AAICharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SetInCombat(false);
+
+	AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Visible);
+	HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Visible);
+
+	// @note for some reason disabling tick hides the widget component. Maybe it's because it needs to be drawn every tick?
+	// AggroWidgetComp->SetComponentTickEnabled(false);
+	// HealthWidgetComp->SetComponentTickEnabled(false);
+
+}
+
+void AAICharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	UCharacterLibrary::GetAllAICharacterSkills(InGameName, DataTable_Skills, Skills);
+
+	// Initialize skills and load animation montages
+
+	
+
 }
 
 void AAICharacterBase::Destroyed()
@@ -35,19 +63,22 @@ void AAICharacterBase::Destroyed()
 	Skills.Empty();
 }
 
+UEODWidgetComponent * AAICharacterBase::BP_GetAggroWidgetComp() const
+{
+	return GetAggroWidgetComp();
+}
+
+UEODWidgetComponent * AAICharacterBase::BP_GetHealthWidgetComp() const
+{
+	return GetHealthWidgetComp();
+}
+
 void AAICharacterBase::SetInCombat(bool bValue)
 {
 	bInCombat = bValue;
 	UpdateMaxWalkSpeed();
 }
 
-void AAICharacterBase::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	UCharacterLibrary::GetAllAICharacterSkills(InGameName, DataTable_Skills, Skills);
-
-}
 
 void AAICharacterBase::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
@@ -92,6 +123,21 @@ void AAICharacterBase::Interrupt(const EHitDirection InterruptDirection)
 
 void AAICharacterBase::Flinch(const EHitDirection FlinchDirection)
 {
+	/*
+	if (FlinchDirection == EHitDirection::Forward)
+	{
+
+		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
+		PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_ForwardFlinch,
+			GetActiveAnimationReferences()->AnimationMontage_Flinch);
+	}
+	else if (FlinchDirection == EHitDirection::Backward)
+	{
+		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
+		PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_BackwardFlinch,
+			GetActiveAnimationReferences()->AnimationMontage_Flinch);
+	}
+	*/
 }
 
 void AAICharacterBase::Stun(const float Duration)
@@ -120,14 +166,6 @@ void AAICharacterBase::EndKnockdown()
 
 void AAICharacterBase::Knockback(const float Duration, const FVector & Impulse)
 {
-}
-
-void AAICharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-	SetInCombat(false);
-
 }
 
 void AAICharacterBase::UpdateMaxWalkSpeed()
