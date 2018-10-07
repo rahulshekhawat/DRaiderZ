@@ -358,7 +358,7 @@ bool UCharacterLibrary::AreEnemies(AEODCharacterBase * CharacterOne, AEODCharact
 	return true;
 }
 
-void UCharacterLibrary::GetAllAICharacterSkills(const FString & CharacterName, const UDataTable * SkillsDataTable, TArray<FSkill*>& OutSkills)
+void UCharacterLibrary::GetAllAICharacterSkills(const FString& CharacterName, const UDataTable* SkillsDataTable, TArray<FSkill*>& OutSkills)
 {
 	if (!SkillsDataTable)
 	{

@@ -238,8 +238,13 @@ enum class EEODTaskStatus : uint8
 UENUM(BlueprintType)
 enum class ESkillType : uint8
 {
-	ActiveSkill,
-	PassiveSkill
+	DamageMelee,
+	DamageRanged,
+	HealSelf,
+	HealParty,
+	BuffSelf,
+	BuffParty,
+	DebuffEnemy
 };
 
 /** Struct containing level specific info for an in-game skill */
@@ -349,8 +354,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	EDamageType DamageType;
 
+	/** Determines skill type which will be used by AI for calculating most suitable skill to use */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	ESkillType SkillType;
+	
+	/** Determines whether this skill is a passive skill or an active skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bPassiveSkill;
 
 	/** SkillID for skill that MUST be used before using this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
@@ -367,8 +377,6 @@ public:
 	//~ Maximum number of level ups = SkillLevelUpsInfo.Num()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	TArray<FSkillLevelUpInfo> SkillLevelUpsInfo;
-
-	// @todo What does this skill do (heal/damage/buff)? It will be useful for AI logic
 
 	FSkillTableRow()
 	{
