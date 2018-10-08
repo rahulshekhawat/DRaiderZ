@@ -22,7 +22,7 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 	}
 
 	// Only process if the game mode is ACombatZoneModeBase
-	ACombatZoneModeBase* CombatZoneGameMode = Cast<ACombatZoneModeBase>(GetWorld()->GetAuthGameMode());
+	ACombatZoneModeBase* CombatZoneGameMode = Cast<ACombatZoneModeBase>(MeshComp->GetWorld()->GetAuthGameMode());
 	if (!CombatZoneGameMode)
 	{
 		return;
