@@ -22,7 +22,24 @@ AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer)
 	HealthWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AggroWidgetComp->SetCollisionProfileName(FName("NoCollision"));
 	HealthWidgetComp->SetCollisionProfileName(FName("NoCollision"));
+}
+
+void AAICharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	// AnimMontage_HitEffects->IsValidSectionName()
+
+
+	// AnimMontage_HitEffects->
+
+
+	// UCharacterLibrary::GetAllAICharacterSkills(InGameName, DataTable_Skills, Skills);
+
+	// Initialize skills and load animation montages
+
 	
+
 }
 
 void AAICharacterBase::BeginPlay()
@@ -40,20 +57,9 @@ void AAICharacterBase::BeginPlay()
 
 }
 
-void AAICharacterBase::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	UCharacterLibrary::GetAllAICharacterSkills(InGameName, DataTable_Skills, Skills);
-
-	// Initialize skills and load animation montages
-
-	
-
-}
-
 void AAICharacterBase::Destroyed()
 {
+	/*
 	for (FSkill* Skill : Skills)
 	{
 		delete Skill;
@@ -61,6 +67,7 @@ void AAICharacterBase::Destroyed()
 	}
 
 	Skills.Empty();
+	*/
 }
 
 UEODWidgetComponent * AAICharacterBase::BP_GetAggroWidgetComp() const
@@ -107,6 +114,7 @@ void AAICharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrup
 
 void AAICharacterBase::Interrupt(const EHitDirection InterruptDirection)
 {
+	/*
 	if (InterruptDirection == EHitDirection::Forward)
 	{
 		PlayAnimationMontage(AnimationMontage_HitEffects,
@@ -119,6 +127,7 @@ void AAICharacterBase::Interrupt(const EHitDirection InterruptDirection)
 			UCharacterLibrary::SectionName_BackwardInterrupt,
 			ECharacterState::GotHit);
 	}
+	*/
 }
 
 void AAICharacterBase::Flinch(const EHitDirection FlinchDirection)

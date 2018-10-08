@@ -20,11 +20,11 @@ public:
 
 	AAICharacterBase(const FObjectInitializer& ObjectInitializer);
 
-	/** Called when the game starts or when spawned */
-	virtual void BeginPlay() override;
-
 	/** Initialize TArray<FSkill*> */
 	virtual void PostInitializeComponents() override;
+
+	/** Called when the game starts or when spawned */
+	virtual void BeginPlay() override;
 
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
@@ -42,16 +42,6 @@ public:
 	/** Get health widget component */
 	UFUNCTION(BlueprintPure, Category = WidgetComponent, meta = (DisplayName = "Get Health Widget Component"))
 	UEODWidgetComponent* BP_GetHealthWidgetComp() const;
-
-	/** Set whether character is in combat or not */
-	virtual void SetInCombat(bool bValue) override;
-
-	/** [server] Handle melee collision */
-	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) override;
-
-	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
-
-	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
 	/** [server + client] Interrupt this character's current action */
 	virtual void Interrupt(const EHitDirection InterruptDirection) override;
@@ -80,39 +70,59 @@ public:
 	/** [server + client] Knockback this character */
 	virtual void Knockback(const float Duration, const FVector& Impulse) override;
 
+	/** Set whether character is in combat or not */
+	virtual void SetInCombat(bool bValue) override;
+
+	/** [server] Handle melee collision */
+	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) override;
+
+	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
+
+	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
+
 private:
 
+	/** Used to display floating aggro widget above AI character */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UEODWidgetComponent* AggroWidgetComp;
 
+	/** Used to display floating health widget above AI character */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UEODWidgetComponent* HealthWidgetComp;
 
-	UPROPERTY(Category = AIMovement, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float MaxWalkSpeedInCombat;
-
-	UPROPERTY(Category = AIMovement, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float MaxWalkSpeedOutsideCombat;
-
-	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	/** In game name of this AI character. This may or may not differ for each instance of character */
+	UPROPERTY(EditAnywhere, Category = BaseInfo, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FString InGameName;
 
-	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	/** In game description of this AI character. This may or may not differ for each instance of character */
+	UPROPERTY(EditAnywhere, Category = BaseInfo, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FString InGameDescription;
 
-	UPROPERTY(EditDefaultsOnly, Category = Animations)
-	UAnimMontage* AnimationMontage_HitEffects;
+	/** Maximum speed an AI character can walk with inside combat */
+	UPROPERTY(EditDefaultsOnly, Category = AIMovement, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float MaxWalkSpeedInCombat;
 
-	UPROPERTY(EditDefaultsOnly, Category = Animations)
-	UAnimMontage* AnimationMontage_Flinch;
+	/** Maximum speed an AI character can walk with outside combat */
+	UPROPERTY(EditDefaultsOnly, Category = AIMovement, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float MaxWalkSpeedOutsideCombat;
 
-	UPROPERTY(EditDefaultsOnly, Category = Animations)
-	UAnimMontage* AnimationMontage_Skills;
+	/** Animation montage containing animations for hit effects */
+	UPROPERTY(EditDefaultsOnly, Category = Animations, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* AnimMontage_HitEffects;
 
-	UPROPERTY(EditDefaultsOnly, Category = Skills)
+	/** Animation montage containing animations for character flinch */
+	UPROPERTY(EditDefaultsOnly, Category = Animations, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* AnimMontage_Flinch;
+
+	/** Data table for character skills */
+	UPROPERTY(EditDefaultsOnly, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UDataTable* DataTable_Skills;
 
 	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
 	void UpdateMaxWalkSpeed();
+
+	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bHasFlinchAnimations;
+
 
 };

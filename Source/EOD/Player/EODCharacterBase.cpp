@@ -420,6 +420,11 @@ int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
 	return 0;
 }
 
+FName AEODCharacterBase::GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const
+{
+	return FName();
+}
+
 FORCEINLINE FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
 {
 	return CurrentActiveSkill;

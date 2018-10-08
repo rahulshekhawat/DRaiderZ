@@ -265,9 +265,14 @@ public:
 	virtual EEODTaskStatus CheckSkillStatus(int32 SkillIndex);
 
 	//~ @todo modify function parameters to accept enemy target perhaps
+	//~ @todo replace it with GetMostWeightedSkillID()
 	/** [AI] Returns the skill that is more appropriate to use in the given situtation */
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual int32 GetMostWeightedSkillIndex() const;
+		
+	/** [AI] Returns the skill that is more appropriate to use in current state against the given enemy */
+	UFUNCTION(BlueprintCallable, Category = Skills)
+	virtual FName GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const;
 
 	/** Returns the skill that character is using currently. Returns nullptr if character is not using any skill */
 	FORCEINLINE FSkill* GetCurrentActiveSkill() const;
