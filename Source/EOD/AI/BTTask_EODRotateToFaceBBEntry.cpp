@@ -25,6 +25,7 @@ EBTNodeResult::Type UBTTask_EODRotateToFaceBBEntry::ExecuteTask(UBehaviorTreeCom
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
 	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
 
+	// @note if AIController is NULL, the previous line will lead to a crash. Kinda dumb to test for NULL after using it.
 	if (AIController == nullptr || OwningCharacter == nullptr)
 	{
 		return EBTNodeResult::Failed;
