@@ -32,6 +32,8 @@ public:
 	static const FName BBKey_WanderRadius;
 
 	static const FName BBKey_SpawnLocation;
+
+	static const FName BBKey_MostWeightedSkillID;
 	//~ End blackboard key names
 	
 	
