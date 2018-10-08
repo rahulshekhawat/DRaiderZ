@@ -277,6 +277,10 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 			PlayerAnimationReferences->AnimationMontage_HitEffects = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->HitEffects);
 			PlayerAnimationReferences->AnimationMontage_Flinch				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Flinch);
 			*/
+
+			// GameSingleton->StreamableManager.Unload()
+			// GameSingleton->StreamableManager.IsAsyncLoadComplete()
+
 		}
 	}
 

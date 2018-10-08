@@ -247,6 +247,219 @@ enum class ESkillType : uint8
 	DebuffEnemy
 };
 
+/**
+ * Struct containing information for skills that will be used by AI characters
+ * 
+ * An AI skill doesn't have any in-game name, description, and an icon
+ * An AI skill can never be a passive skill
+ * An AI skill doesn't have a preceding or superseding skill
+ * An AI skill may require a status effect for activation (i.e., an skill that a monster can only use when it's in rage state)
+ */
+USTRUCT(BlueprintType)
+struct EOD_API FAISkillTableRow : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	
+	/** Animation montage containing animation for this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	UAnimMontage* AnimMontage;
+
+	/** Section name of skill start animation */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	FName SkillStartMontageSectionName;
+
+	/** Section name of skill loop animation (used in spell casting) */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	FName SkillLoopMontageSectionName;
+
+	/** Section name of skill end animation (used in spell casting) */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	FName SkillEndMontageSectionName;
+	
+	/** Type of damage inflicted from this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	EDamageType DamageType;
+
+	/** Determines skill type which will be used by AI for calculating most suitable skill to use */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	ESkillType SkillType;
+
+	/** The status effect required to use this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	FName RequiredStatusID;
+
+	/** The duration before which the same skill can be used again */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	float Cooldown;
+
+	/** The duration of loop section if the skill has loop section */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	float LoopDuration;
+
+	/** Damage in percentage of player's magickal or physical attack that will be inflicted on enemy */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	int32 DamagePercent;
+
+	/** Determines if this skill can be blocked */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bUnblockable;
+
+	/** Determines if this skill can be dodged */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bUndodgable;
+
+	/** Determines if the 'skill deflected' animation should play on getting blocked. Only applicable if this skill can be blocked */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bIgnoresBlock;
+
+	/** Crowd control effect on hit */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	ECrowdControlEffect CrowdControlEffect;
+
+	/** The duration for which the crowd control effect should last (if applicable) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	float CrowdControlEffectDuration;
+
+	/** Immunities from crowd control effects granted on using this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	uint8 CrowdControlImmunities;
+
+	/** Status effect that this skill triggers */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	TSubclassOf<class UStatusEffectBase> StatusEffect;
+
+	FAISkillTableRow()
+	{
+		SkillStartMontageSectionName = FName("Default");
+		SkillLoopMontageSectionName = NAME_None;
+		SkillEndMontageSectionName = NAME_None;
+	}
+};
+
+/** Struct containing information for skills that will be used by player character */
+USTRUCT(BlueprintType)
+struct EOD_API FPlayerSkillTableRow : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	/** In-game name of this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FString InGameName;
+
+	/** In-game description of this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FString Description;
+
+	/** In-game icon representation of this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	UTexture* Icon;
+
+	/** Animation montage containing animation for this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	TSoftObjectPtr<UAnimMontage> AnimMontage;
+
+	/** Section name of skill start animation */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	FName SkillStartMontageSectionName;
+
+	/** Section name of skill loop animation (used in spell casting) */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	FName SkillLoopMontageSectionName;
+
+	/** Section name of skill end animation (used in spell casting) */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	FName SkillEndMontageSectionName;
+	
+	/** Type of damage inflicted from this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	EDamageType DamageType;
+
+	/** Determines skill type which will be used by AI for calculating most suitable skill to use */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	ESkillType SkillType;
+
+	/** Determines whether this skill is a passive skill or an active skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bPassiveSkill;
+
+	/** SkillID for skill that MUST be used before using this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FName PrecedingSkillID;
+
+	/** SkillID for skill that can be used after using this skill (skill chaining)  */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FName SupersedingSkillID;
+
+	/**
+	 * SkillID for skill that comes on upgrading this skill.
+	 * This will be NAME_None if the skill can't be upgraded any further
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FName UpgradeSkillID;
+	
+	/**
+	 * SkillID for skill from which you can upgrade to this skill.
+	 * This will be NAME_None for a base skill
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	FName DowngradeSkillID;
+
+	/** The status effect required to use this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	FName RequiredStatusID;
+
+	/** The duration before which the same skill can be used again */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	float Cooldown;
+
+	/** The duration of loop section if the skill has loop section */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	float LoopDuration;
+
+	/** Damage in percentage of player's magickal or physical attack that will be inflicted on enemy */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	int32 DamagePercent;
+
+	/** Determines if this skill can be blocked */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bUnblockable;
+
+	/** Determines if this skill can be dodged */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bUndodgable;
+
+	/** Determines if the 'skill deflected' animation should play on getting blocked. Only applicable if this skill can be blocked */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bIgnoresBlock;
+
+	/** Crowd control effect on hit */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	ECrowdControlEffect CrowdControlEffect;
+
+	/** The duration for which the crowd control effect should last (if applicable) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	float CrowdControlEffectDuration;
+
+	/** Immunities from crowd control effects granted on using this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	uint8 CrowdControlImmunities;
+
+	/** Status effect that this skill triggers */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	TSubclassOf<class UStatusEffectBase> StatusEffect;
+
+	FPlayerSkillTableRow()
+	{
+		SkillStartMontageSectionName = FName("Default");
+		SkillLoopMontageSectionName = NAME_None;
+		SkillEndMontageSectionName = NAME_None;
+	}
+};
+
 /** Struct containing level specific info for an in-game skill */
 USTRUCT(BlueprintType, Blueprintable)
 struct EOD_API FSkillLevelUpInfo
@@ -263,14 +476,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	int32 ManaRequired;
 	
-	/** Skill cooldown */
+	/** The duration before which the same skill can be used again */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	float Cooldown;
 
+	/** The duration of loop section if the skill has loop section */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	float CastDuration;
+	float LoopDuration;
 
-	/** Damage in percentage of player's magickal or physical attack that will inflicted on enemy */
+	/** Damage in percentage of player's magickal or physical attack that will be inflicted on enemy */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	int32 DamagePercent;
 
