@@ -73,15 +73,21 @@ public:
 	/** Set whether character is in combat or not */
 	virtual void SetInCombat(bool bValue) override;
 
-	/** [server] Handle melee collision */
-	// virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) override;
-
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
 
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
 	/** Use a skill and play it's animation */
 	virtual bool UseSkill(FName SkillID) override;
+
+	/**
+	 * Determines and returns the status of a skill
+	 * Returns EEODTaskStatus::Active if character is currently using the skill
+	 * Returns EEODTaskStatus::Finished if character has finished using the skill
+	 * Returns EEODTaskStatus::Aborted if the skill was aborted before completion
+	 * Returns EEODTaskStatus::Inactive if the character is using or have used a different skill
+	 */
+	virtual EEODTaskStatus CheckSkillStatus(FName SkillID) override;
 
 	/** [AI] Returns the skill that is more appropriate to use in current state against the given enemy */
 	virtual FName GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const override;

@@ -2,6 +2,7 @@
 
 #include "AICharacterBase.h"
 #include "Core/GameSingleton.h"
+#include "Core/EODPreprocessors.h"
 #include "Statics/CharacterLibrary.h"
 #include "Components/AIStatsComponent.h"
 #include "Player/Components/EODWidgetComponent.h"
@@ -28,6 +29,9 @@ AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer)
 void AAICharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	// Make sure DataTable_Skills is not nullptr
+	check(DataTable_Skills);
 
 	TArray<FName> SkillIDs = DataTable_Skills->GetRowNames();
 	for (const FName& SkillID : SkillIDs)
@@ -70,8 +74,6 @@ void AAICharacterBase::PostInitializeComponents()
 			{
 				StunSkills.Add(SkillID);
 			}
-
-			UKismetSystemLibrary::PrintString(this, FString("Found melee skill"));
 		}
 		else if (AISkill->SkillType == ESkillType::DamageRanged)
 		{
@@ -171,39 +173,32 @@ UEODWidgetComponent * AAICharacterBase::BP_GetHealthWidgetComp() const
 
 void AAICharacterBase::Interrupt(const EHitDirection InterruptDirection)
 {
-	/*
 	if (InterruptDirection == EHitDirection::Forward)
 	{
-		PlayAnimationMontage(AnimationMontage_HitEffects,
+		PlayAnimationMontage(AnimMontage_HitEffects,
 			UCharacterLibrary::SectionName_ForwardInterrupt,
 			ECharacterState::GotHit);
 	}
 	else if (InterruptDirection == EHitDirection::Backward)
 	{
-		PlayAnimationMontage(AnimationMontage_HitEffects,
+		PlayAnimationMontage(AnimMontage_HitEffects,
 			UCharacterLibrary::SectionName_BackwardInterrupt,
 			ECharacterState::GotHit);
 	}
-	*/
 }
 
 void AAICharacterBase::Flinch(const EHitDirection FlinchDirection)
 {
-	/*
 	if (FlinchDirection == EHitDirection::Forward)
 	{
-
-		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
-		PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_ForwardFlinch,
-			GetActiveAnimationReferences()->AnimationMontage_Flinch);
+		PlayAnimationMontage(AnimMontage_Flinch,
+			UCharacterLibrary::SectionName_ForwardFlinch);
 	}
 	else if (FlinchDirection == EHitDirection::Backward)
 	{
-		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
-		PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_BackwardFlinch,
-			GetActiveAnimationReferences()->AnimationMontage_Flinch);
+		PlayAnimationMontage(AnimMontage_Flinch,
+			UCharacterLibrary::SectionName_BackwardFlinch);
 	}
-	*/
 }
 
 void AAICharacterBase::Stun(const float Duration)
@@ -240,26 +235,26 @@ void AAICharacterBase::SetInCombat(bool bValue)
 	UpdateMaxWalkSpeed();
 }
 
-/*
-void AAICharacterBase::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
+void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	Super::OnMeleeCollision(Animation, HitResults, bHit);
-}
-*/
-
-void AAICharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
-{
-	/*
-	if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimationMontage == AnimMontage && !bInterrupted)
+	FAISkillTableRow* AISkill = nullptr;
+	if (GetCurrentActiveSkillID() != NAME_None)
 	{
-		GetLastUsedSkill().LastUsedSkill = CurrentActiveSkill;
-		GetLastUsedSkill().bInterrupted = bInterrupted;
-		CurrentActiveSkill = nullptr;
-
-		// Revert back to IdleWalkRun state
-		CharacterState = ECharacterState::IdleWalkRun;
+		AISkill = DataTable_Skills->FindRow<FAISkillTableRow>(GetCurrentActiveSkillID(), FString("Looking up AI skill"));
 	}
-	*/
+
+	if (AISkill && AISkill->AnimMontage == AnimMontage)
+	{
+		GetLastUsedSkill().LastUsedSkillID = GetCurrentActiveSkillID();
+		GetLastUsedSkill().bInterrupted = bInterrupted;
+
+		// @todo maybe put following code in a function called ResetState
+		SetCharacterState(ECharacterState::IdleWalkRun);
+		SetCurrentActiveSkillID(NAME_None);
+	}
+	else
+	{
+	}
 }
 
 void AAICharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
@@ -280,27 +275,33 @@ bool AAICharacterBase::UseSkill(FName SkillID)
 		}
 
 		PlayAnimationMontage(SkillToUse->AnimMontage, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		SetCurrentActiveSkillID(SkillID);
 		return true;
 	}
 
-
-	/*
-	if (CanUseAnySkill())
-	{
-		FSkill* SkillToUse = GetSkill(SkillIndex);
-
-		if (!SkillToUse)
-		{
-			// unable to use skill - return false
-			return false;
-		}
-
-		PlayAnimationMontage(SkillToUse->AnimationMontage_GenderOne, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-		CurrentActiveSkill = SkillToUse;
-		return true;
-	}
-	*/
 	return false;
+}
+
+EEODTaskStatus AAICharacterBase::CheckSkillStatus(FName SkillID)
+{
+	if (GetCurrentActiveSkillID() == SkillID)
+	{
+		return EEODTaskStatus::Active;
+	}
+	
+	if (GetLastUsedSkill().LastUsedSkillID != SkillID)
+	{
+		return EEODTaskStatus::Inactive;
+	}
+
+	if (GetLastUsedSkill().bInterrupted)
+	{
+		return EEODTaskStatus::Aborted;
+	}
+	else
+	{
+		return EEODTaskStatus::Finished;
+	}
 }
 
 FName AAICharacterBase::GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const

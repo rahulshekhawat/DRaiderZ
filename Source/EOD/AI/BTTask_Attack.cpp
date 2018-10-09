@@ -34,8 +34,34 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerCo
 	return EBTNodeResult::Type();
 }
 
-void UBTTask_Attack::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
+void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
+	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
+	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
+
+	/** The character is supposed to be using most weighted skill during this task */
+	FName MostWeightedSkillID = AIController->GetBlackboardComponent()->GetValueAsName(UAILibrary::BBKey_MostWeightedSkillID);
+
+	EEODTaskStatus TaskStatus = OwningCharacter->CheckSkillStatus(MostWeightedSkillID);
+	if (TaskStatus == EEODTaskStatus::Active)
+	{
+		return;
+	}
+	else if (TaskStatus == EEODTaskStatus::Inactive)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+	}
+	else if (TaskStatus == EEODTaskStatus::Finished)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
+	else if (TaskStatus == EEODTaskStatus::Aborted)
+	{
+		FinishLatentAbort(OwnerComp);
+	}
+
 }
 
 EBTNodeResult::Type UBTTask_Attack::AbortTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
