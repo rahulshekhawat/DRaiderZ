@@ -78,10 +78,10 @@ public:
 	FORCEINLINE bool IsJumping() const;
 
 	/** Determines if the character is in dodge state. Used to trigger dodge animation */
-	FORCEINLINE virtual bool IsDodging() const;
+	FORCEINLINE bool IsDodging() const;
 	
 	/** Determines if the character is dodging incoming damage */
-	FORCEINLINE virtual bool IsDodgingDamage() const;
+	FORCEINLINE bool IsDodgingDamage() const;
 
 	/**
 	 * Detemines if the character is in block state. Used to trigger block animation.
