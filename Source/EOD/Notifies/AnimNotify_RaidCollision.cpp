@@ -15,13 +15,13 @@
 
 void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
 {
-	// Only process from server
+	// only process this notify if called from server (dedicated or listen)
 	if (!MeshComp->GetOwner() || MeshComp->GetOwner()->GetNetMode() == NM_Client)
 	{
 		return;
 	}
 
-	// Only process if the game mode is ACombatZoneModeBase
+	// Only process this notify if the current game mode is ACombatZoneModeBase
 	ACombatZoneModeBase* CombatZoneGameMode = Cast<ACombatZoneModeBase>(MeshComp->GetWorld()->GetAuthGameMode());
 	if (!CombatZoneGameMode)
 	{
@@ -48,7 +48,7 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimS
 		TArray<FHitResult> HitResults;
 
 		bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, TransformedRotation.Quaternion(), COLLISION_COMBAT, CollisionShape, Params);
-		CombatZoneGameMode->GetCombatManager()->OnMeleeHit(MeshComp->GetOwner(), bHit, HitResults);		
+		CombatZoneGameMode->GetCombatManager()->OnMeleeHit(MeshComp->GetOwner(), bHit, HitResults);
 
 #if WITH_EDITOR // draw debug shapes only if inside editor
 		UKismetSystemLibrary::DrawDebugCapsule(MeshComp, TransformedCenter, HalfHeightVector.Size(), Capsule.Radius, TransformedRotation, FLinearColor::White, 5.f, 1.f);
