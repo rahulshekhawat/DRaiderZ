@@ -401,6 +401,11 @@ void AEODCharacterBase::StopSkill(FName SkillID)
 {
 }
 
+EEODTaskStatus AEODCharacterBase::CheckSkillStatus(FName SkillID)
+{
+	return EEODTaskStatus();
+}
+
 /*
 EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 {
@@ -448,10 +453,12 @@ FORCEINLINE FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
 }
 */
 
+/*
 FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
 {
 	return LastUsedSkillInfo;
 }
+*/
 
 void AEODCharacterBase::ApplyStatusEffect(const UStatusEffectBase * StatusEffect)
 {

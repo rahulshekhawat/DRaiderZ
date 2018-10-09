@@ -15,25 +15,6 @@ class UInputComponent;
 class UStatusEffectBase;
 class UStatsComponentBase;
 
-USTRUCT(BlueprintType)
-struct FLastUsedSkillInfo
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	FSkill* LastUsedSkill;
-
-	/** True if the last skill was interrupted */
-	bool bInterrupted;
-
-	FLastUsedSkillInfo()
-	{
-		bInterrupted = false;
-		LastUsedSkill = nullptr;
-	}
-};
-
 /**
  * An abstract base class to handle the behavior of in-game characters.
  * All in-game characters must inherit from this class.
@@ -259,6 +240,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual void StopSkill(FName SkillID);
 
+	/**
+	 * Determines and returns the status of a skill 
+	 * Returns EEODTaskStatus::Active if character is currently using the skill
+	 * Returns EEODTaskStatus::Finished if character has finished using the skill
+	 * Returns EEODTaskStatus::Aborted if the skill was aborted before completion
+	 * Returns EEODTaskStatus::Inactive if the character is using or have used a different skill
+	 */
+	virtual EEODTaskStatus CheckSkillStatus(FName SkillID);
+
 	/** 
 	 * Determines and returns the status of skill at a given SkillIndex
 	 * Returns EEODTaskStatus::Active if character is currently using skill
@@ -287,7 +277,7 @@ public:
 	virtual void OnNormalAttackSectionStart(FName SectionName) PURE_VIRTUAL(AEODCharacterBase::OnNormalAttackSectionStart, );
 
 	/** Returns the last used skill */
-	FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();
+	// FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();
 
 	/**
 	 * Applies status effect on the character
@@ -391,7 +381,7 @@ protected:
 
 	FSkill* CurrentActiveSkill;
 
-	FLastUsedSkillInfo LastUsedSkillInfo;
+	// FLastUsedSkillInfo LastUsedSkillInfo;
 
 	FTimerHandle DodgeTimerHandle;
 

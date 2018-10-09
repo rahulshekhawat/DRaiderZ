@@ -460,6 +460,29 @@ public:
 	}
 };
 
+/** Struct containing information regarding last used character skill */
+USTRUCT(BlueprintType)
+struct FLastUsedSkillInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	/** SkillID of last used skill */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = LastUsedSkill)
+	FName LastUsedSkillID;
+
+	/** True if the last skill was interrupted */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = LastUsedSkill)
+	bool bInterrupted;
+
+	FLastUsedSkillInfo()
+	{
+		bInterrupted = false;
+		LastUsedSkillID = NAME_None;
+	}
+};
+
 /** Struct containing level specific info for an in-game skill */
 USTRUCT(BlueprintType, Blueprintable)
 struct EOD_API FSkillLevelUpInfo
