@@ -244,8 +244,12 @@ public:
 	virtual FSkill* GetSkill(int32 SkillIndex) const;
 
 	/** [server + client] Use a skill and play it's animation */
+	// UFUNCTION(BlueprintCallable, Category = Skills)
+	// virtual bool UseSkill(int32 SkillIndex);
+
+	/** Use a skill and play it's animation */
 	UFUNCTION(BlueprintCallable, Category = Skills)
-	virtual bool UseSkill(int32 SkillIndex);
+	virtual bool UseSkill(FName SkillID);
 
 	//~ @note might not be needed
 	UFUNCTION(BlueprintCallable, Category = Skills)

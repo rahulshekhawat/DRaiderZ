@@ -361,6 +361,7 @@ FSkill * AEODCharacterBase::GetSkill(int32 SkillIndex) const
 	return nullptr;
 }
 
+/*
 bool AEODCharacterBase::UseSkill(int32 SkillIndex)
 {
 	if (CanUseAnySkill())
@@ -378,6 +379,12 @@ bool AEODCharacterBase::UseSkill(int32 SkillIndex)
 		return true;
 	}
 
+	return false;
+}
+*/
+
+bool AEODCharacterBase::UseSkill(FName SkillID)
+{
 	return false;
 }
 
