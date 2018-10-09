@@ -101,6 +101,7 @@ public:
 	/** Returns true if character is using a normal attack */
 	FORCEINLINE bool IsNormalAttacking() const;
 
+	//~ @todo redefinition
 	/** Returns true if character is using any skill */
 	FORCEINLINE bool IsUsingAnySkill() const;
 
@@ -238,10 +239,10 @@ public:
 	FORCEINLINE EFaction GetFaction() const;
 
 	/** Get skill info from a given SkillID */
-	FORCEINLINE FSkill* GetSkill(FName SkillID) const;
+	// FORCEINLINE FSkill* GetSkill(FName SkillID) const;
 
 	/** Returns the skill at given SkillIndex */
-	virtual FSkill* GetSkill(int32 SkillIndex) const;
+	// virtual FSkill* GetSkill(int32 SkillIndex) const;
 
 	/** [server + client] Use a skill and play it's animation */
 	// UFUNCTION(BlueprintCallable, Category = Skills)
@@ -265,21 +266,21 @@ public:
 	 * Returns EEODTaskStatus::Aborted if skill was aborted before completion
 	 * Returns EEODTaskStatus::Inactive if the character is using or have used another skill
 	 */
-	UFUNCTION(BlueprintCallable, Category = Skills)
-	virtual EEODTaskStatus CheckSkillStatus(int32 SkillIndex);
+	// UFUNCTION(BlueprintCallable, Category = Skills)
+	// virtual EEODTaskStatus CheckSkillStatus(int32 SkillIndex);
 
 	//~ @todo modify function parameters to accept enemy target perhaps
 	//~ @todo replace it with GetMostWeightedSkillID()
 	/** [AI] Returns the skill that is more appropriate to use in the given situtation */
-	UFUNCTION(BlueprintCallable, Category = Skills)
-	virtual int32 GetMostWeightedSkillIndex() const;
+	// UFUNCTION(BlueprintCallable, Category = Skills)
+	// virtual int32 GetMostWeightedSkillIndex() const;
 		
 	/** [AI] Returns the skill that is more appropriate to use in current state against the given enemy */
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual FName GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const;
 
 	/** Returns the skill that character is using currently. Returns nullptr if character is not using any skill */
-	FORCEINLINE FSkill* GetCurrentActiveSkill() const;
+	// FORCEINLINE FSkill* GetCurrentActiveSkill() const;
 
 	// virtual void SetCurrentActiveSkill(FName SkillID) PURE_VIRTUAL(AEODCharacterBase::SetCurrentActiveSkill, );
 
@@ -301,12 +302,12 @@ public:
 	virtual void RemoveStatusEffect(const UStatusEffectBase* StatusEffect);
 
 	/** [server] Handle melee collision */
-	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
+	// virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
 	/** [server] Apply damage to this character */
 	// virtual FEODDamageResult ApplyEODDamage(FEODDamage& EODDamage);
 
-	virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult);
+	// virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult);
 
 	// virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult, const FHitResult& LineHitResult);
 

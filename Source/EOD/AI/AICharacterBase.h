@@ -74,7 +74,7 @@ public:
 	virtual void SetInCombat(bool bValue) override;
 
 	/** [server] Handle melee collision */
-	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) override;
+	// virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit) override;
 
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
 

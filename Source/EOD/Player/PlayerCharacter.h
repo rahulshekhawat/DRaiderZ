@@ -231,12 +231,12 @@ public:
 	float GetRotationYawFromAxisInput();
 
 	/** [server] Handle melee collision */
-	virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
+	// virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
 	/** [server] Apply damage to a character */
 	// virtual int32 ApplyEODDamage(FEODDamage& EODDamage) override;
 
-	virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult) override;
+	// virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void DisplayReceivedDamage(int32 DamageValue);

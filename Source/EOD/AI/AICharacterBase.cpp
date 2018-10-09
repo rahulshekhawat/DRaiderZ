@@ -240,11 +240,12 @@ void AAICharacterBase::SetInCombat(bool bValue)
 	UpdateMaxWalkSpeed();
 }
 
-
+/*
 void AAICharacterBase::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
 	Super::OnMeleeCollision(Animation, HitResults, bHit);
 }
+*/
 
 void AAICharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
 {

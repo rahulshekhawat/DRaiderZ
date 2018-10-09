@@ -119,7 +119,8 @@ FORCEINLINE bool AEODCharacterBase::IsUsingAnySkill() const
 
 FORCEINLINE bool AEODCharacterBase::IsUsingSkill(int32 SkillIndex) const
 {
-	return IsUsingAnySkill() && CurrentActiveSkill == GetSkill(SkillIndex);
+	// return IsUsingAnySkill() && CurrentActiveSkill == GetSkill(SkillIndex);
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
@@ -341,6 +342,7 @@ FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 	return Faction;
 }
 
+/*
 FORCEINLINE FSkill * AEODCharacterBase::GetSkill(FName SkillID) const
 {
 	if (IDToSkillMap.Contains(SkillID))
@@ -350,7 +352,9 @@ FORCEINLINE FSkill * AEODCharacterBase::GetSkill(FName SkillID) const
 
 	return nullptr;
 }
+*/
 
+/*
 FSkill * AEODCharacterBase::GetSkill(int32 SkillIndex) const
 {
 	if (Skills.Num() > SkillIndex)
@@ -360,6 +364,7 @@ FSkill * AEODCharacterBase::GetSkill(int32 SkillIndex) const
 
 	return nullptr;
 }
+*/
 
 /*
 bool AEODCharacterBase::UseSkill(int32 SkillIndex)
@@ -396,6 +401,7 @@ void AEODCharacterBase::StopSkill(FName SkillID)
 {
 }
 
+/*
 EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 {
 	EEODTaskStatus TaskStatus = EEODTaskStatus::Inactive;
@@ -420,22 +426,27 @@ EEODTaskStatus AEODCharacterBase::CheckSkillStatus(int32 SkillIndex)
 		return EEODTaskStatus::Finished;
 	}
 }
+*/
 
+/*
 int32 AEODCharacterBase::GetMostWeightedSkillIndex() const
 {
 	// @todo definition
 	return 0;
 }
+*/
 
 FName AEODCharacterBase::GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const
 {
 	return FName();
 }
 
+/*
 FORCEINLINE FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
 {
 	return CurrentActiveSkill;
 }
+*/
 
 FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
 {
@@ -452,6 +463,7 @@ void AEODCharacterBase::RemoveStatusEffect(const UStatusEffectBase * StatusEffec
 	// @todo definition
 }
 
+/*
 void AEODCharacterBase::OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
 	FSkill* ActiveSkill = GetCurrentActiveSkill();
@@ -711,6 +723,7 @@ FEODDamageResult AEODCharacterBase::ApplyEODDamage(AEODCharacterBase * Instigati
 
 	return EODDamageResult;
 }
+*/
 
 void AEODCharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
 {

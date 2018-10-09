@@ -974,10 +974,11 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 	}
 }
 
+/*
 void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
 {
 	Super::OnMeleeCollision(Animation, HitResults, bHit);
-	/*
+	//////
 	// @note intentionally commented out. If player animation references are null when a collision event is triggered, we want it to crash.
 	if (!PlayerAnimationReferences || !(Animation == PlayerAnimationReferences->AnimationMontage_NormalAttacks || 
 										Animation == PlayerAnimationReferences->AnimationMontage_Skills || 
@@ -985,7 +986,7 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 	{
 		return;
 	}
-	*/
+	///////
 
 	bool bEnemiesHit = false;
 	FSkill* ActiveSkill = GetCurrentActiveSkill();
@@ -1043,12 +1044,12 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 			UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
 		}
 
-		/*
+		/////// 
 		FEODDamage EODDamage(ActiveSkill);
 		EODDamage.CapsuleHitResult = HitResult;
 		EODDamage.LineHitResult = LineHitResultToHitCharacter;
 		ApplyEODDamage(HitCharacter, EODDamage);
-		*/
+		//////
 	}
 
 	if (!bEnemiesHit)
@@ -1056,6 +1057,7 @@ void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FH
 		OnUnsuccessfulHit.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
 	}
 }
+*/
 
 /*
 int32 APlayerCharacter::ApplyEODDamage(FEODDamage& EODDamage)
@@ -1333,6 +1335,7 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 	return ResultingRotation;
 }
 
+/*
 FEODDamageResult APlayerCharacter::ApplyEODDamage(AEODCharacterBase * InstigatingChar, const FEODDamage & EODDamage, const FHitResult & CollisionHitResult)
 {
 	FEODDamageResult EODDamageResult;
@@ -1518,6 +1521,7 @@ FEODDamageResult APlayerCharacter::ApplyEODDamage(AEODCharacterBase * Instigatin
 
 	return EODDamageResult;
 }
+*/
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
 {
