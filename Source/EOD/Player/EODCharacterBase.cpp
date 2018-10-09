@@ -22,7 +22,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	// Initialize variables
 	CharacterState = ECharacterState::IdleWalkRun;
 
-	CurrentActiveSkill = nullptr;
+	// CurrentActiveSkill = nullptr;
 	bGodMode = false;
 }
 
@@ -114,7 +114,8 @@ FORCEINLINE bool AEODCharacterBase::IsNormalAttacking() const
 
 FORCEINLINE bool AEODCharacterBase::IsUsingAnySkill() const
 {
-	return CharacterState == ECharacterState::UsingActiveSkill && CurrentActiveSkill != nullptr;
+	// return CharacterState == ECharacterState::UsingActiveSkill && CurrentActiveSkill != nullptr;
+	return CharacterState == ECharacterState::UsingActiveSkill;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsUsingSkill(int32 SkillIndex) const
@@ -446,19 +447,30 @@ FName AEODCharacterBase::GetMostWeightedMeleeSkillID(AEODCharacterBase const * c
 	return FName();
 }
 
-/*
-FORCEINLINE FSkill * AEODCharacterBase::GetCurrentActiveSkill() const
+FName AEODCharacterBase::GetCurrentActiveSkillID() const
 {
-	return CurrentActiveSkill;
+	return CurrentActiveSkillID;
 }
-*/
 
-/*
-FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
+void AEODCharacterBase::SetCurrentActiveSkillID(const FName SkillID)
+{
+	CurrentActiveSkillID = SkillID;
+}
+
+FName AEODCharacterBase::BP_GetCurrentActiveSkillID() const
+{
+	return GetCurrentActiveSkillID();
+}
+
+FORCEINLINE FLastUsedSkillInfo & AEODCharacterBase::GetLastUsedSkill()
 {
 	return LastUsedSkillInfo;
 }
-*/
+
+FLastUsedSkillInfo& AEODCharacterBase::BP_GetLastUsedSkill()
+{
+	return GetLastUsedSkill();
+}
 
 void AEODCharacterBase::ApplyStatusEffect(const UStatusEffectBase * StatusEffect)
 {

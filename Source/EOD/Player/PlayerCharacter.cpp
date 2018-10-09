@@ -1257,7 +1257,8 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		return;
 	}
 
-	CurrentActiveSkill = Skill;
+	// @attention
+	// CurrentActiveSkill = Skill;
 
 	HUDWidget->PutSkillOnCooldownTimer(SkillButtonIndex, Skill->SkillLevelUpInfo.Cooldown, 1.f);
 	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Skills, Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
@@ -1761,7 +1762,8 @@ void APlayerCharacter::AddSkill(FName SkillID, uint8 SkillLevel)
 
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
-	CurrentActiveSkill = NormalAttackSectionToSkillMap[SectionName];
+	// @attention
+	// CurrentActiveSkill = NormalAttackSectionToSkillMap[SectionName];
 }
 
 void APlayerCharacter::CleanupNormalAttackSectionToSkillMap()

@@ -79,10 +79,11 @@ public:
 	/** Returns true if character is currently casting a spell */
 	FORCEINLINE bool IsCastingSpell() const;
 	
+	//~ @todo update definition
 	/** Returns true if character is using a normal attack */
 	FORCEINLINE bool IsNormalAttacking() const;
 
-	//~ @todo redefinition
+	//~ @todo update definition
 	/** Returns true if character is using any skill */
 	FORCEINLINE bool IsUsingAnySkill() const;
 
@@ -247,6 +248,7 @@ public:
 	 * Returns EEODTaskStatus::Aborted if the skill was aborted before completion
 	 * Returns EEODTaskStatus::Inactive if the character is using or have used a different skill
 	 */
+	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual EEODTaskStatus CheckSkillStatus(FName SkillID);
 
 	/** 
@@ -268,16 +270,25 @@ public:
 	/** [AI] Returns the skill that is more appropriate to use in current state against the given enemy */
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual FName GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const;
+	
+	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
+	FORCEINLINE FName GetCurrentActiveSkillID() const;
 
-	/** Returns the skill that character is using currently. Returns nullptr if character is not using any skill */
-	// FORCEINLINE FSkill* GetCurrentActiveSkill() const;
-
-	// virtual void SetCurrentActiveSkill(FName SkillID) PURE_VIRTUAL(AEODCharacterBase::SetCurrentActiveSkill, );
+	/** Set the ID of the skill that is currently being used */
+	FORCEINLINE void SetCurrentActiveSkillID(const FName SkillID);
+	
+	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
+	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Current Active Skill ID"))
+	FName BP_GetCurrentActiveSkillID() const;
 
 	virtual void OnNormalAttackSectionStart(FName SectionName) PURE_VIRTUAL(AEODCharacterBase::OnNormalAttackSectionStart, );
 
 	/** Returns the last used skill */
-	// FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();
+	FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();
+
+	/** Returns the last used skill */
+	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Last Used Skill"))
+	FLastUsedSkillInfo& BP_GetLastUsedSkill();
 
 	/**
 	 * Applies status effect on the character
@@ -379,9 +390,12 @@ protected:
 
 	TMap<FName, FSkill*> NormalAttackSectionToSkillMap;
 
-	FSkill* CurrentActiveSkill;
+	UPROPERTY(Transient)
+	FName CurrentActiveSkillID;
+	// FSkill* CurrentActiveSkill;
 
-	// FLastUsedSkillInfo LastUsedSkillInfo;
+	UPROPERTY(Transient)
+	FLastUsedSkillInfo LastUsedSkillInfo;
 
 	FTimerHandle DodgeTimerHandle;
 
