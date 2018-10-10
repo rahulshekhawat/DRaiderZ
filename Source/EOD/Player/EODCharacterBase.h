@@ -266,8 +266,8 @@ public:
 	/** [AI] Returns the skill that is more appropriate to use in the given situtation */
 	// UFUNCTION(BlueprintCallable, Category = Skills)
 	// virtual int32 GetMostWeightedSkillIndex() const;
-		
-	/** [AI] Returns the skill that is more appropriate to use in current state against the given enemy */
+
+	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual FName GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const;
 	

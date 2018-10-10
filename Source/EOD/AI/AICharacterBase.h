@@ -89,7 +89,7 @@ public:
 	 */
 	virtual EEODTaskStatus CheckSkillStatus(FName SkillID) override;
 
-	/** [AI] Returns the skill that is more appropriate to use in current state against the given enemy */
+	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	virtual FName GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const override;
 
 private:

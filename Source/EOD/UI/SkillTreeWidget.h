@@ -47,9 +47,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UWidgetSwitcher* SkillTreeSwitcher;
 
-	FButtonStyle DefaultButtonStyle;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	// UEODItemContainer* VanquishSkill;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	// UEODItemContainer* VanquishSkill;
 
 private:
+
+	FButtonStyle DefaultButtonStyle;
 
 	UFUNCTION()
 	void ActivateAssassinTab();

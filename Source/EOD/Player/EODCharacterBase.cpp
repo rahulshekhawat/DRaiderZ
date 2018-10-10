@@ -447,12 +447,12 @@ FName AEODCharacterBase::GetMostWeightedMeleeSkillID(AEODCharacterBase const * c
 	return FName();
 }
 
-FName AEODCharacterBase::GetCurrentActiveSkillID() const
+FORCEINLINE FName AEODCharacterBase::GetCurrentActiveSkillID() const
 {
 	return CurrentActiveSkillID;
 }
 
-void AEODCharacterBase::SetCurrentActiveSkillID(const FName SkillID)
+FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkillID(const FName SkillID)
 {
 	CurrentActiveSkillID = SkillID;
 }

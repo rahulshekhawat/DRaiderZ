@@ -276,6 +276,7 @@ bool AAICharacterBase::UseSkill(FName SkillID)
 
 		PlayAnimationMontage(SkillToUse->AnimMontage, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 		SetCurrentActiveSkillID(SkillID);
+		SkillIDToWeightMap[SkillID] = SkillIDToWeightMap[SkillID] - 1;
 		return true;
 	}
 
@@ -306,12 +307,60 @@ EEODTaskStatus AAICharacterBase::CheckSkillStatus(FName SkillID)
 
 FName AAICharacterBase::GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const
 {
-	if (MeleeSkills.Num() > 0)
+	FName MostWeightedSkillID = NAME_None;
+	TArray<FName> EligibleSkills;
+	// TArray<FName> MostWeightedSkills;
+
+	if (TargetCharacter->HasBeenHit())
 	{
-		return MeleeSkills[0];
+		for (FName SkillID : MeleeSkills)
+		{
+			if (FlinchSkills.Contains(SkillID))
+			{
+				EligibleSkills.Add(SkillID);
+			}
+		}
+
+		for (FName SkillID : EligibleSkills)
+		{
+			if (MostWeightedSkillID == NAME_None)
+			{
+				MostWeightedSkillID = SkillID;
+				continue;
+			}
+
+			if (SkillIDToWeightMap[SkillID] > SkillIDToWeightMap[MostWeightedSkillID])
+			{
+				MostWeightedSkillID = SkillID;
+			}
+		}
+	}
+	else
+	{
+		for (FName SkillID : MeleeSkills)
+		{
+			if (!FlinchSkills.Contains(SkillID))
+			{
+				EligibleSkills.Add(SkillID);
+			}
+		}
+
+		for (FName SkillID : EligibleSkills)
+		{
+			if (MostWeightedSkillID == NAME_None)
+			{
+				MostWeightedSkillID = SkillID;
+				continue;
+			}
+
+			if (SkillIDToWeightMap[SkillID] > SkillIDToWeightMap[MostWeightedSkillID])
+			{
+				MostWeightedSkillID = SkillID;
+			}
+		}
 	}
 
-	return FName();
+	return MostWeightedSkillID;
 }
 
 void AAICharacterBase::UpdateMaxWalkSpeed()
