@@ -104,11 +104,11 @@ private:
 	/** Get the owning EOD player of this widget */
 	FORCEINLINE APlayerCharacter* GetOwningEODPlayer() const;
 
-	/** Load skill bar layout from 'skill ID to skill position' map */
-	FORCEINLINE void LoadSkillBarLayout(const TMap<FName, int32>& SkillBarLayout);
+	/** Load previously saved skill bar layout from current save slot */
+	FORCEINLINE void LoadSkillBarLayout();
 
-	/** Save current skill bar layout to disk */
-	void SaveSkillBarLayout();
+	/** Save current skill bar layout to the current save slot */
+	FORCEINLINE void SaveSkillBarLayout();
 
 	// void PressSkillButton(uint32 SkillIndex);
 
