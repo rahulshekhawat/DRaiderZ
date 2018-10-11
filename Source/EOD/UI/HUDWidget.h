@@ -30,61 +30,38 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	/*
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UProgressBar* HealthBar;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UProgressBar* ManaBar;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UProgressBar* StaminaBar;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* LevelText;
-	*/
-
+	/** Widget containing health, mana, and stamina bars */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UStatusIndicatorWidget* StatusIndicatorWidget;
 
+	/** Widget containing skills that can be used by player */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	USkillBarWidget* SkillBarWidget;
 
+	/** Widget containing player inventory items */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UInventoryWidget* InventoryWidget;
 
+	/** Widget containing skill trees of all vocations */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	USkillTreeWidget* SkillTreeWidget;
 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-
-
+	/** Updates health bar in StatusIndicatorWidget */
 	FORCEINLINE void UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth);
 
+	/** Updates mana bar in StatusIndicatorWidget */
 	FORCEINLINE void UpdateManaBar(int32 CurrentMana, int32 MaxMana, int32 BaseMana);
 
+	/** Updates stamina bar in StatusIndicatorWidget */
 	FORCEINLINE void UpdateStaminaBar(int32 CurrentStamina, int32 MaxStamina, int32 BaseStamina);
 
 	/** Get SkillID of skill placed at SkillIndex of skill bar */
-	FORCEINLINE FName GetSkillAtIndex(int32 SkillIndex);
+	FORCEINLINE FName GetSkillAtIndex(int32 SkillIndex) const;
 
-	FORCEINLINE void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);
+	/** Returns true if skill at given skill index of skill bar is in cooldown */
+	FORCEINLINE bool IsSkillInCooldown(int32 SkillIndex) const;
 
-	FORCEINLINE bool IsSkillInCooldown(int32 SkillIndex);
-
-	// FORCEINLINE void SetCurrentHealthPercent();
-
-	/** TextBlock to display current/max health */
-	// UPROPERTY(meta = (BindWidget))
-	// class UTextBlock* HealthText;
-	
-	/** TextBlock to display current/max mana */
-	// UPROPERTY(meta = (BindWidget))
-	// class UTextBlock* ManaText;
-	
-	/** TextBlock to display current/max stamina */
-	// UPROPERTY(meta = (BindWidget))
-	// class UTextBlock* StaminaText;
-	
+	/** Put skill at given skill index of skill bar on cooldown */
+	FORCEINLINE void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);	
 	
 };

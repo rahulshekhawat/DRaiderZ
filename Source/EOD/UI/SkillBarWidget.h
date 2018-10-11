@@ -27,12 +27,6 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	// UPROPERTY(meta = (BindWidget))
-	// TArray<UEODItemContainer*> Skills;
-
-	// UPROPERTY(meta = (BindWidget))
-	// TArray<UEODButton*> Skills;
-
 	UPROPERTY(meta = (BindWidget))
 	UEODItemContainer* Skill_1;
 
@@ -93,23 +87,32 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UEODItemContainer* Skill_20;
 
-	void PressSkillButton(uint32 SkillIndex);
-
-	void ReleaseSkillButton(uint32 SkillIndex);
-
-	void SetOwningEODPlayer(APlayerCharacter* NewOwner);
-
 	/** Get SkillID of skill placed at SkillIndex */
-	FORCEINLINE FName GetSkillAtIndex(int32 SkillIndex);
+	FORCEINLINE FName GetSkillAtIndex(int32 SkillIndex) const;
 
+	/** Returns true if skill at given skill index is in cooldown */
+	FORCEINLINE bool IsSkillInCooldown(int32 SkillIndex) const;
+
+	/** Put skill at given skill index on cooldown */
 	FORCEINLINE void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);
-
-	FORCEINLINE bool IsSkillInCooldown(int32 SkillIndex);
-
-	APlayerCharacter* GetOwningEODPlayer() const;
 
 private:
 
-	APlayerCharacter* OwningEODPlayer;
+	/** Returns EOD item container at given skill index */
+	FORCEINLINE UEODItemContainer* GetSkillButtonAtIndex(int32 ButtonIndex) const;
+
+	/** Get the owning EOD player of this widget */
+	FORCEINLINE APlayerCharacter* GetOwningEODPlayer() const;
+
+	/** Load skill bar layout from 'skill ID to skill position' map */
+	FORCEINLINE void LoadSkillBarLayout(const TMap<FName, int32>& SkillBarLayout);
+
+	/** Save current skill bar layout to disk */
+	void SaveSkillBarLayout();
+
+	// void PressSkillButton(uint32 SkillIndex);
+
+	// void ReleaseSkillButton(uint32 SkillIndex);
+
 
 };

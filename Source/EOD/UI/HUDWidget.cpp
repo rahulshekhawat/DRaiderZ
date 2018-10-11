@@ -48,23 +48,17 @@ FORCEINLINE void UHUDWidget::UpdateStaminaBar(int32 CurrentStamina, int32 MaxSta
 	StatusIndicatorWidget->UpdateStaminaBar(CurrentStamina, MaxStamina, BaseStamina);
 }
 
-FORCEINLINE FName UHUDWidget::GetSkillAtIndex(int32 SkillIndex)
+FORCEINLINE FName UHUDWidget::GetSkillAtIndex(int32 SkillIndex) const
 {
 	return SkillBarWidget->GetSkillAtIndex(SkillIndex);
+}
+
+bool UHUDWidget::IsSkillInCooldown(int32 SkillIndex) const
+{
+	return SkillBarWidget->IsSkillInCooldown(SkillIndex);
 }
 
 FORCEINLINE void UHUDWidget::PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval)
 {
 	SkillBarWidget->PutSkillOnCooldownTimer(SkillIndex, Duration, Interval);
 }
-
-bool UHUDWidget::IsSkillInCooldown(int32 SkillIndex)
-{
-	return SkillBarWidget->IsSkillInCooldown(SkillIndex);
-}
-
-/*
-FORCEINLINE void UHUDWidget::SetCurrentHealthPercent()
-{
-}
-*/

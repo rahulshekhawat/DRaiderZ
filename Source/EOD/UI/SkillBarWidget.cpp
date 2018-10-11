@@ -3,6 +3,12 @@
 #include "SkillBarWidget.h"
 #include "UI/EODItemContainer.h"
 #include "Player/PlayerCharacter.h"
+#include "Core/EODSaveGame.h"
+#include "Core/GameSingleton.h"
+
+#include "Button.h"
+#include "Engine/Engine.h"
+#include "Kismet/GameplayStatics.h"
 
 USkillBarWidget::USkillBarWidget(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
@@ -10,12 +16,49 @@ USkillBarWidget::USkillBarWidget(const FObjectInitializer & ObjectInitializer): 
 
 bool USkillBarWidget::Initialize()
 {
-	if (Super::Initialize())
+	if (!(Super::Initialize() &&
+		Skill_1 &&
+		Skill_2 &&
+		Skill_3 &&
+		Skill_4 &&
+		Skill_5 &&
+		Skill_6 &&
+		Skill_7 &&
+		Skill_8 &&
+		Skill_9 &&
+		Skill_10 &&
+		Skill_11 &&
+		Skill_12 &&
+		Skill_13 &&
+		Skill_14 &&
+		Skill_15 &&
+		Skill_16 &&
+		Skill_17 &&
+		Skill_18 &&
+		Skill_19 &&
+		Skill_20))
 	{
-		return true;
+		return false;
 	}
 
-	return false;
+	UGameSingleton* GameSingleton = nullptr;
+	if (GEngine)
+	{
+		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+	}
+
+	if (!GameSingleton)
+	{
+		return false;
+	}
+
+	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, 0));
+	if (EODSaveGame)
+	{
+		LoadSkillBarLayout(EODSaveGame->SkillBarLayout);
+	}
+
+	return true;
 }
 
 void USkillBarWidget::NativeConstruct()
@@ -28,6 +71,7 @@ void USkillBarWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+/*
 void USkillBarWidget::PressSkillButton(uint32 SkillIndex)
 {
 	if (!OwningEODPlayer)
@@ -102,7 +146,9 @@ void USkillBarWidget::PressSkillButton(uint32 SkillIndex)
 		break;
 	}
 }
+*/
 
+/*
 void USkillBarWidget::ReleaseSkillButton(uint32 SkillIndex)
 {
 	if (!OwningEODPlayer)
@@ -177,13 +223,9 @@ void USkillBarWidget::ReleaseSkillButton(uint32 SkillIndex)
 		break;
 	}
 }
+*/
 
-void USkillBarWidget::SetOwningEODPlayer(APlayerCharacter * NewOwner)
-{
-	OwningEODPlayer = NewOwner;
-}
-
-FORCEINLINE FName USkillBarWidget::GetSkillAtIndex(int32 SkillIndex)
+FORCEINLINE FName USkillBarWidget::GetSkillAtIndex(int32 SkillIndex) const
 {
 	switch (SkillIndex)
 	{
@@ -232,6 +274,57 @@ FORCEINLINE FName USkillBarWidget::GetSkillAtIndex(int32 SkillIndex)
 	}
 
 	return NAME_None;
+}
+
+FORCEINLINE bool USkillBarWidget::IsSkillInCooldown(int32 SkillIndex) const
+{
+	switch (SkillIndex)
+	{
+	case 1:
+		return Skill_1->bInCooldown;
+	case 2:
+		return Skill_2->bInCooldown;
+	case 3:
+		return Skill_3->bInCooldown;
+	case 4:
+		return Skill_4->bInCooldown;
+	case 5:
+		return Skill_5->bInCooldown;
+	case 6:
+		return Skill_6->bInCooldown;
+	case 7:
+		return Skill_7->bInCooldown;
+	case 8:
+		return Skill_8->bInCooldown;
+	case 9:
+		return Skill_9->bInCooldown;
+	case 10:
+		return Skill_10->bInCooldown;
+	case 11:
+		return Skill_11->bInCooldown;
+	case 12:
+		return Skill_12->bInCooldown;
+	case 13:
+		return Skill_13->bInCooldown;
+	case 14:
+		return Skill_14->bInCooldown;
+	case 15:
+		return Skill_15->bInCooldown;
+	case 16:
+		return Skill_16->bInCooldown;
+	case 17:
+		return Skill_17->bInCooldown;
+	case 18:
+		return Skill_18->bInCooldown;
+	case 19:
+		return Skill_19->bInCooldown;
+	case 20:
+		return Skill_20->bInCooldown;
+	default:
+		break;
+	}
+
+	return false;
 }
 
 FORCEINLINE void USkillBarWidget::PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval)
@@ -303,58 +396,94 @@ FORCEINLINE void USkillBarWidget::PutSkillOnCooldownTimer(int32 SkillIndex, floa
 	}
 }
 
-bool USkillBarWidget::IsSkillInCooldown(int32 SkillIndex)
+FORCEINLINE UEODItemContainer * USkillBarWidget::GetSkillButtonAtIndex(int32 ButtonIndex) const
 {
-	switch (SkillIndex)
+	switch (ButtonIndex)
 	{
 	case 1:
-		return Skill_1->bInCooldown;
+		return Skill_1;
 	case 2:
-		return Skill_2->bInCooldown;
+		return Skill_2;
 	case 3:
-		return Skill_3->bInCooldown;
+		return Skill_3;
 	case 4:
-		return Skill_4->bInCooldown;
+		return Skill_4;
 	case 5:
-		return Skill_5->bInCooldown;
+		return Skill_5;
 	case 6:
-		return Skill_6->bInCooldown;
+		return Skill_6;
 	case 7:
-		return Skill_7->bInCooldown;
+		return Skill_7;
 	case 8:
-		return Skill_8->bInCooldown;
+		return Skill_8;
 	case 9:
-		return Skill_9->bInCooldown;
+		return Skill_9;
 	case 10:
-		return Skill_10->bInCooldown;
+		return Skill_10;
 	case 11:
-		return Skill_11->bInCooldown;
+		return Skill_11;
 	case 12:
-		return Skill_12->bInCooldown;
+		return Skill_12;
 	case 13:
-		return Skill_13->bInCooldown;
+		return Skill_13;
 	case 14:
-		return Skill_14->bInCooldown;
+		return Skill_14;
 	case 15:
-		return Skill_15->bInCooldown;
+		return Skill_15;
 	case 16:
-		return Skill_16->bInCooldown;
+		return Skill_16;
 	case 17:
-		return Skill_17->bInCooldown;
+		return Skill_17;
 	case 18:
-		return Skill_18->bInCooldown;
+		return Skill_18;
 	case 19:
-		return Skill_19->bInCooldown;
+		return Skill_19;
 	case 20:
-		return Skill_20->bInCooldown;
+		return Skill_20;
 	default:
 		break;
 	}
 
-	return false;
+	return nullptr;
 }
 
-APlayerCharacter * USkillBarWidget::GetOwningEODPlayer() const
+FORCEINLINE APlayerCharacter* USkillBarWidget::GetOwningEODPlayer() const
 {
+	APlayerCharacter* OwningEODPlayer = Cast<APlayerCharacter>(GetOwningPlayerPawn());
 	return OwningEODPlayer;
+}
+
+FORCEINLINE void USkillBarWidget::LoadSkillBarLayout(const TMap<FName, int32>& SkillBarLayout)
+{
+	TArray<FName> Keys;
+	SkillBarLayout.GetKeys(Keys);
+
+	for (FName Key : Keys)
+	{
+		int32 Position = SkillBarLayout[Key];
+		UEODItemContainer* SkillButton = GetSkillButtonAtIndex(Position);
+		if (!SkillButton)
+		{
+			continue;
+		}
+
+		FPlayerSkillTableRow* Skill = GetOwningEODPlayer()->GetSkill(Key);
+		if (!Skill)
+		{
+			continue;
+		}
+
+		SkillButton->EODItemInfo.ItemID = Key;
+		SkillButton->EODItemInfo.StackCount = 1;
+		SkillButton->EODItemInfo.InGameName = Skill->InGameName;
+		SkillButton->EODItemInfo.Icon = Skill->Icon;
+		SkillButton->EODItemInfo.EODItemType = EEODItemType::ActiveSkill; // It MUST be an active skill
+		SkillButton->EODItemInfo.Description = Skill->Description;
+
+		SkillButton->RefreshContainerVisuals();
+	}
+}
+
+void USkillBarWidget::SaveSkillBarLayout()
+{
 }
