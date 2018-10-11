@@ -33,6 +33,9 @@ void AAICharacterBase::PostInitializeComponents()
 	// Make sure DataTable_Skills is not nullptr
 	check(DataTable_Skills);
 
+	AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+	HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+
 	TArray<FName> SkillIDs = DataTable_Skills->GetRowNames();
 	for (const FName& SkillID : SkillIDs)
 	{
@@ -138,9 +141,6 @@ void AAICharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	SetInCombat(false);
-
-	AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Visible);
-	HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Visible);
 
 	// @note for some reason disabling tick hides the widget component. Maybe it's because it needs to be drawn every tick?
 	// AggroWidgetComp->SetComponentTickEnabled(false);

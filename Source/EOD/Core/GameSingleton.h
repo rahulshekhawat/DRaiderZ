@@ -35,7 +35,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = DataTable)
 	UDataTable* PlayerSkillsTable;
 
-	UPROPERTY(EditDefaultsOnly, Category = UI)
-	TSubclassOf<UUserWidget> FloatingDamageNumberWidgetClass;
+	// UPROPERTY(EditDefaultsOnly, Category = UI)
+	// TSubclassOf<UUserWidget> FloatingDamageNumberWidgetClass;
+
+	UPROPERTY(BlueprintReadOnly, Category = SaveGame)
+	FString CurrentSaveSlotName;
+
+	UPROPERTY(BlueprintReadOnly, Category = SaveGame)
+	int32 UserIndex;
+
+
 
 };

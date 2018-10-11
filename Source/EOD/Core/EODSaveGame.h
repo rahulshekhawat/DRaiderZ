@@ -16,8 +16,13 @@ class EOD_API UEODSaveGame : public USaveGame
 	
 public:
 
-	UPROPERTY(VisibleAnywhere, Category = PlayerSkills)
+	/** A list of all the skills that have been unlocked in skill tree */
+	UPROPERTY()
 	TArray<FName> UnlockedSkills;
 	
+	/** A map of skill ID to skill bar slot index */
+	UPROPERTY()
+	TMap<FName, int32> SkillBarLayout;
+
 	
 };
