@@ -1228,6 +1228,39 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	// @note no need to check for active or passive skill since only active skills can be placed in skill bar slot.
 	// In fact, only active skills can be dragged out of skill tree widget.
 
+	FPlayerSkillTableRow* Skill = DataTable_Skills->FindRow<FPlayerSkillTableRow>(SkillID, FString("Looking for player skill"));
+
+	if (!Skill)
+	{
+		UKismetSystemLibrary::PrintString(this, FString("Couldn't find skill"));
+		return;
+	}
+
+	if (Skill->AnimMontage.IsNull())
+	{
+		UKismetSystemLibrary::PrintString(this, FString("Anim montage of skill is null"));
+		return;
+	}
+	else if (Skill->AnimMontage.IsPending())
+	{
+		double Start = FPlatformTime::Seconds();
+		Skill->AnimMontage.LoadSynchronous();
+		double Stop = FPlatformTime::Seconds();
+
+		double Time = (Stop - Start) * 1000000;
+		FString Message = FString("Time to load animation: ") + FString::SanitizeFloat(Time);
+
+		UKismetSystemLibrary::PrintString(this, Message);
+	}
+	else if (Skill->AnimMontage.IsValid())
+	{
+
+	}
+
+	PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+
+
+	/*
 	FSkill* Skill = IDToSkillMap[SkillID];	// Crash if SkillID is not present in IDToSkillMap
 
 	// If the skill doesn't support currently equipped weapon
@@ -1270,6 +1303,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 
 	// HUDWidget->PutSkillOnCooldownTimer()
+	*/
 }
 
 void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
