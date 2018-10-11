@@ -27,10 +27,10 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Behavior)
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
 	bool bCanBeClicked;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Behavior)
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
 	bool bCanBeDragged;
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = Behavior)
@@ -52,18 +52,30 @@ public:
 	UImage* ItemImage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* Text_StackCount;
+	UTextBlock* StackCountText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* Text_Cooldown;
+	UTextBlock* CooldownText;
 
-	UFUNCTION(BlueprintCallable, Category = EODItemContainer)
-	void StartCooldown(float Duration, float Interval = 1.f);
+	/** Puts this container on cooldown for a given duration */
+	FORCEINLINE void StartCooldown(float Duration, float Interval = 1.f);
 
-	UFUNCTION(BlueprintCallable, Category = EODItemContainer)
-	void StopCooldown();
+	/** Removes cooldown from this container */
+	FORCEINLINE void StopCooldown();
 
-	void RefreshContainerVisuals();
+	/** Puts this container on cooldown for a given duration */
+	UFUNCTION(BlueprintCallable, Category = EODItemContainer, meta = (DisplayName = "Start Cooldown"))
+	void BP_StartCooldown(float Duration, float Interval = 1.f);
+
+	/** Removes cooldown from this container */
+	UFUNCTION(BlueprintCallable, Category = EODItemContainer, meta = (DisplayName = "Stop Cooldown"))
+	void BP_StopCooldown();
+
+	/** Refresh and update the displayed visuals of this container */
+	FORCEINLINE void RefreshContainerVisuals();
+
+	/** Resets and nulls all container variables. Deletes any references */
+	FORCEINLINE void ResetContainer();
 
 protected:
 
@@ -73,10 +85,13 @@ private:
 
 	FTimerHandle CooldownTimerHandle;
 
-	void UpdateItemImage();
-	
-	// void UpdateItemButton();
+	FORCEINLINE void UpdateItemImage();
+
+	FORCEINLINE void UpdateStackCountText();
 
 	void UpdateCooldown();
+
+	// void UpdateItemButton();
+
 
 };

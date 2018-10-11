@@ -19,24 +19,26 @@ UEODItemContainer::UEODItemContainer(const FObjectInitializer & ObjectInitialize
 
 bool UEODItemContainer::Initialize()
 {
-	if (Super::Initialize() && Text_StackCount && Text_Cooldown && ItemImage)
+	if (!(Super::Initialize() &&
+		StackCountText &&
+		CooldownText &&
+		ItemImage))
 	{
-		Text_StackCount->SetVisibility(ESlateVisibility::Hidden);
-		Text_Cooldown->SetVisibility(ESlateVisibility::Hidden);
-
-		UpdateItemImage();
-		return true;
+		return false;
 	}
 
-	return false;
+	StackCountText->SetVisibility(ESlateVisibility::Hidden);
+	CooldownText->SetVisibility(ESlateVisibility::Hidden);
+
+	RefreshContainerVisuals();
+	return true;
 }
 
 void UEODItemContainer::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	UpdateItemImage();
-	// UpdateItemButton();
+	RefreshContainerVisuals();
 
 }
 
@@ -45,14 +47,15 @@ void UEODItemContainer::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UEODItemContainer::StartCooldown(float Duration, float Interval)
+FORCEINLINE void UEODItemContainer::StartCooldown(float Duration, float Interval)
 {
-	if (!GEngine)
+	UWorld* World = nullptr;
+
+	if (GEngine)
 	{
-		return;
+		World = GEngine->GetWorldFromContextObjectChecked(this);
 	}
 
-	UWorld* World = GEngine->GetWorldFromContextObjectChecked(this);
 	if (!World)
 	{
 		return;
@@ -64,17 +67,18 @@ void UEODItemContainer::StartCooldown(float Duration, float Interval)
 	CooldownInterval = Interval;
 	bInCooldown = true;
 	ItemImage->SetIsEnabled(false);
-	Text_Cooldown->SetVisibility(ESlateVisibility::Visible);
+	CooldownText->SetVisibility(ESlateVisibility::Visible);
 }
 
-void UEODItemContainer::StopCooldown()
+FORCEINLINE void UEODItemContainer::StopCooldown()
 {
-	if (!GEngine)
+	UWorld* World = nullptr;
+
+	if (GEngine)
 	{
-		return;
+		World = GEngine->GetWorldFromContextObjectChecked(this);
 	}
 
-	UWorld* World = GEngine->GetWorldFromContextObjectChecked(this);
 	if (!World)
 	{
 		return;
@@ -84,12 +88,36 @@ void UEODItemContainer::StopCooldown()
 
 	bInCooldown = false;
 	ItemImage->SetIsEnabled(true);
-	Text_Cooldown->SetVisibility(ESlateVisibility::Hidden);
+	CooldownText->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void UEODItemContainer::RefreshContainerVisuals()
+void UEODItemContainer::BP_StartCooldown(float Duration, float Interval)
+{
+	StartCooldown(Duration, Interval);
+}
+
+void UEODItemContainer::BP_StopCooldown()
+{
+	StopCooldown();
+}
+
+FORCEINLINE void UEODItemContainer::RefreshContainerVisuals()
 {
 	UpdateItemImage();
+	UpdateStackCountText();
+}
+
+FORCEINLINE void UEODItemContainer::ResetContainer()
+{
+	EODItemInfo 				= FEODItemInfo();
+	EODItemInfo.StackCount 		= 0;
+	bCanBeClicked 				= false;
+	bCanBeDragged 				= false;
+	bInCooldown 				= false;
+	CooldownTimeRemaining 		= 0;
+	CooldownInterval 			= 0;
+	
+	// @note can't and shouldn't reset container type
 }
 
 bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDropEvent & InDragDropEvent, UDragDropOperation * InOperation)
@@ -143,7 +171,7 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 	return bResult;
 }
 
-void UEODItemContainer::UpdateItemImage()
+FORCEINLINE void UEODItemContainer::UpdateItemImage()
 {
 	if (EODItemInfo.Icon)
 	{
@@ -162,6 +190,27 @@ void UEODItemContainer::UpdateItemImage()
 		SlateBrush.ImageType = ESlateBrushImageType::NoImage;
 		ItemImage->SetBrush(SlateBrush);
 	}
+}
+
+FORCEINLINE void UEODItemContainer::UpdateStackCountText()
+{
+	if (EODItemInfo.StackCount > 1)
+	{
+		FText Text = FText::FromString(FString::FromInt(EODItemInfo.StackCount));
+		StackCountText->SetText(Text);
+	}
+}
+
+void UEODItemContainer::UpdateCooldown()
+{
+	if (CooldownTimeRemaining <= 0)
+	{
+		StopCooldown();
+		return;
+	}
+
+	CooldownText->SetText(FText::FromString(FString::FromInt(CooldownTimeRemaining)));
+	CooldownTimeRemaining -= CooldownInterval;
 }
 
 /*
@@ -203,15 +252,3 @@ void UEODItemContainer::UpdateItemButton()
 }
 */
 
-void UEODItemContainer::UpdateCooldown()
-{
-	if (CooldownTimeRemaining <= 0)
-	{
-		StopCooldown();
-		return;
-	}
-
-	// Text_Cooldown->SetText(FText::FromString(FString::SanitizeFloat(CooldownTimeRemaining)));
-	Text_Cooldown->SetText(FText::FromString(FString::FromInt(CooldownTimeRemaining)));
-	CooldownTimeRemaining -= CooldownInterval;
-}
