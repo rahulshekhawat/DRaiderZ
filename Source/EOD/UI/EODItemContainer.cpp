@@ -198,6 +198,13 @@ FORCEINLINE void UEODItemContainer::UpdateStackCountText()
 	{
 		FText Text = FText::FromString(FString::FromInt(EODItemInfo.StackCount));
 		StackCountText->SetText(Text);
+		StackCountText->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		FText Text = FText::FromString(FString(""));
+		StackCountText->SetText(Text);
+		StackCountText->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
