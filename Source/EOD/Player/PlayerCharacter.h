@@ -210,6 +210,8 @@ public:
 
 	void AddSkill(FName SkillID, uint8 SkillLevel);
 
+	FORCEINLINE FPlayerSkillTableRow* GetSkill(FName SkillID);
+
 	virtual void OnNormalAttackSectionStart(FName SectionName) override;
 
 	void CleanupNormalAttackSectionToSkillMap();
@@ -269,6 +271,10 @@ protected:
 	float BlockDelay;
 
 private:
+
+	/** Data table for player skills */
+	UPROPERTY(EditDefaultsOnly, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UDataTable* DataTable_Skills;
 
 	const int CameraZoomRate = 15;
 

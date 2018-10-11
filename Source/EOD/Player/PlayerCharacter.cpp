@@ -1760,6 +1760,12 @@ void APlayerCharacter::AddSkill(FName SkillID, uint8 SkillLevel)
 	}
 }
 
+FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetSkill(FName SkillID)
+{
+	FPlayerSkillTableRow* Skill = DataTable_Skills->FindRow<FPlayerSkillTableRow>(SkillID, FString("Looking for a player skill"));
+	return Skill;
+}
+
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
 	// @attention
