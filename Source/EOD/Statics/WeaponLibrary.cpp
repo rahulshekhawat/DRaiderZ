@@ -61,9 +61,9 @@ FWeaponTableRow * UWeaponLibrary::GetWeaponData(FName WeaponID)
 	if (GEngine && GEngine->GameSingleton)
 	{
 		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-		if (GameSingleton && GameSingleton->WeaponDataTable)
+		if (GameSingleton && GameSingleton->WeaponsDataTable)
 		{
-			WeaponData = GameSingleton->WeaponDataTable->FindRow<FWeaponTableRow>(WeaponID, FString("Weapon data lookup"));
+			WeaponData = GameSingleton->WeaponsDataTable->FindRow<FWeaponTableRow>(WeaponID, FString("Weapon data lookup"));
 		}
 	}
 

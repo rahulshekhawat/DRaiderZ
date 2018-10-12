@@ -291,6 +291,7 @@ FSkill * UCharacterLibrary::GetPlayerSkill(FName SKillID, uint8 SkillLevel)
 {
 	FSkill* Skill = nullptr;
 
+	/*
 	if (GEngine && GEngine->GameSingleton)
 	{
 		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
@@ -304,6 +305,7 @@ FSkill * UCharacterLibrary::GetPlayerSkill(FName SKillID, uint8 SkillLevel)
 			}
 		}
 	}
+	*/
 
 	return Skill;
 }

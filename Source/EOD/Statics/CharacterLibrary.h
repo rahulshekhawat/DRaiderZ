@@ -382,17 +382,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
 	ESkillType SkillType;
 
+	/** Minimum stamina required to use this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	int32 StaminaRequired;
+	
+	/** Minimum mana required to use this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	int32 ManaRequired;
+
 	/** Determines whether this skill is a passive skill or an active skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	bool bPassiveSkill;
 
-	/** SkillID for skill that MUST be used before using this skill */
+	/** Skill family that MUST be used before using this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName PrecedingSkillID;
+	FName PrecedingSkill;
 
-	/** SkillID for skill that can be used after using this skill (skill chaining)  */
+	/** Skill family that can be used after using this skill (skill chaining)  */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName SupersedingSkillID;
+	FName SupersedingSkill;
 
 	/**
 	 * SkillID for skill that comes on upgrading this skill.
@@ -407,6 +415,14 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	FName DowngradeSkillID;
+	
+	/** Current upgrade level of this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	int32 CurrentUpgradeLevel;
+
+	/** Maximum upgrades available for this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	int32 MaxUpgrades;
 
 	/** The status effect required to use this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
