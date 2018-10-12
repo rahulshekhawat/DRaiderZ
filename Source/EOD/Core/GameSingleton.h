@@ -24,19 +24,17 @@ public:
 	/** A singleton instance of FStreamableManager */
 	FStreamableManager StreamableManager;
 	
-	/** Reference to data table containing player animation references data */
-	UPROPERTY(EditDefaultsOnly, Category = DataTable)
+	/** Data table containing player animation references */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* PlayerAnimationReferencesDataTable;
 	
-	/** Reference to data table containing weapons data */
-	UPROPERTY(EditDefaultsOnly, Category = DataTable)
-	UDataTable* WeaponDataTable;
+	/** Data table containing weapons info */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
+	UDataTable* WeaponsDataTable;
 
-	UPROPERTY(EditDefaultsOnly, Category = DataTable)
-	UDataTable* PlayerSkillsTable;
-
-	// UPROPERTY(EditDefaultsOnly, Category = UI)
-	// TSubclassOf<UUserWidget> FloatingDamageNumberWidgetClass;
+	/** Data table containing player skills */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
+	UDataTable* PlayerSkillsDataTable;
 
 	UPROPERTY(BlueprintReadOnly, Category = SaveGame)
 	FString CurrentSaveSlotName;

@@ -4,9 +4,6 @@
 
 UGameSingleton::UGameSingleton(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
-	PlayerAnimationReferencesDataTable = nullptr;
-	WeaponDataTable = nullptr;
-
 	CurrentSaveSlotName = FString("DefaultSlot");
 	UserIndex = 0;
 }
