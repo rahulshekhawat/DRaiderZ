@@ -96,6 +96,9 @@ public:
 	/** Put skill at given skill index on cooldown */
 	FORCEINLINE void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);
 
+	/** Save current skill bar layout to the current save slot */
+	FORCEINLINE void SaveSkillBarLayout();
+
 private:
 
 	/** Returns EOD item container at given skill index */
@@ -106,9 +109,6 @@ private:
 
 	/** Load previously saved skill bar layout from current save slot */
 	FORCEINLINE void LoadSkillBarLayout();
-
-	/** Save current skill bar layout to the current save slot */
-	FORCEINLINE void SaveSkillBarLayout();
 
 	// void PressSkillButton(uint32 SkillIndex);
 

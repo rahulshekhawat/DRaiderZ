@@ -9,6 +9,7 @@
 #include "Button.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 USkillBarWidget::USkillBarWidget(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
@@ -295,7 +296,7 @@ FORCEINLINE void USkillBarWidget::LoadSkillBarLayout()
 		return;
 	}
 
-	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, 0));
+	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex));
 	if (!EODSaveGame)
 	{
 		return;

@@ -62,6 +62,9 @@ public:
 	FORCEINLINE bool IsSkillInCooldown(int32 SkillIndex) const;
 
 	/** Put skill at given skill index of skill bar on cooldown */
-	FORCEINLINE void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);	
+	FORCEINLINE void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);
+
+	/** Save current HUD layout to the current save slot */
+	FORCEINLINE void SaveHUDLayout();
 	
 };

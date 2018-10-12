@@ -62,3 +62,8 @@ FORCEINLINE void UHUDWidget::PutSkillOnCooldownTimer(int32 SkillIndex, float Dur
 {
 	SkillBarWidget->PutSkillOnCooldownTimer(SkillIndex, Duration, Interval);
 }
+
+FORCEINLINE void UHUDWidget::SaveHUDLayout()
+{
+	SkillBarWidget->SaveSkillBarLayout();
+}
