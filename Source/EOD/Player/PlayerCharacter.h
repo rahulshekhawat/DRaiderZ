@@ -61,6 +61,12 @@ public:
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
 
+	/** Saves current player state */
+	FORCEINLINE void SavePlayerState();
+
+	UFUNCTION(BlueprintCallable, Category = SaveSystem, meta = (DisplayName = "Save Player State"))
+	void BP_SavePlayerState();
+
 private:
 	
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -140,10 +146,10 @@ public:
 
 	FORCEINLINE EWeaponType GetEquippedWeaponType() const;
 
-	FORCEINLINE UHUDWidget* NativeGetHUDWidget() const;
+	FORCEINLINE UHUDWidget* GetHUDWidget() const;
 
-	UFUNCTION(BlueprintCallable)
-	UHUDWidget* GetHUDWidget() const;
+	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get HUD Widget"))
+	UHUDWidget* BP_GetHUDWidget() const;
 
 	/** [server + client] Interrupt this character's current action */
 	virtual void Interrupt(const EHitDirection InterruptDirection) override;
@@ -154,27 +160,29 @@ public:
 	/** [server + client] Applies stun to this character */
 	virtual void Stun(const float Duration) override;
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
-	void PlayStunAnimation();
-
-	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
-	void StopStunAnimation();
-
-	/** End stun if character is stunned */
+	/** [client] Removes 'stun' crowd control effect from this character */
 	virtual void EndStun() override;
 
 	/** [server + client] Freeze this character */
 	virtual void Freeze(const float Duration) override;
 
+	/** [client] Removes 'freeze' crowd control effect from this character */
 	virtual void EndFreeze() override;
 
 	/** [server + client] Knockdown this character */
 	virtual void Knockdown(const float Duration) override;
 
+	/** [client] Removes 'knock-down' crowd control effect from this character */
 	virtual void EndKnockdown() override;
 
 	/** [server + client] Knockback this character */
 	virtual void Knockback(const float Duration, const FVector& Impulse) override;
+	
+	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
+	void PlayStunAnimation();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
+	void StopStunAnimation();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Motion)
 	void PushPlayer(FVector PushDirection);
@@ -367,7 +375,7 @@ private:
 	void OnReleasingSkillKey(const uint32 SkillButtonIndex);
 	
 	/** Move player forward/backward */
-	void MoveForward(const float Value);
+ 	void MoveForward(const float Value);
 
 	/** Move player left/right */
 	void MoveRight(const float Value);
@@ -392,9 +400,13 @@ private:
 	/** Sets the boolean used to enable block to false */
 	void OnReleasedBlock();
 
-	void EnableBlock();
+	void OnPressedEscape();
 
-	void DisableBlock();
+	/** Enable damage blocking */
+	FORCEINLINE void EnableBlock();
+
+	/** Disable damage blocking */
+	FORCEINLINE void DisableBlock();
 
 	/** Event triggered when player presses the jump key */
 	void OnJump();
@@ -428,9 +440,9 @@ private:
 	/** Enable or disable auto run */
 	void OnToggleAutoRun();
 
-	void EnableAutoRun();
+	FORCEINLINE void EnableAutoRun();
 
-	void DisableAutoRun();
+	FORCEINLINE void DisableAutoRun();
 
 	void DisableForwardPressed();
 

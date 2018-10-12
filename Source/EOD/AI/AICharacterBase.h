@@ -120,15 +120,15 @@ private:
 
 	/** Animation montage containing animations for hit effects */
 	UPROPERTY(EditDefaultsOnly, Category = Animations, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* AnimMontage_HitEffects;
+	UAnimMontage* HitEffectsAnimMontage;
 
 	/** Animation montage containing animations for character flinch */
 	UPROPERTY(EditDefaultsOnly, Category = Animations, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* AnimMontage_Flinch;
+	UAnimMontage* FlinchAnimMontage;
 
 	/** Data table for character skills */
 	UPROPERTY(EditDefaultsOnly, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UDataTable* DataTable_Skills;
+	UDataTable* SkillsDataTable;
 
 	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
 	void UpdateMaxWalkSpeed();

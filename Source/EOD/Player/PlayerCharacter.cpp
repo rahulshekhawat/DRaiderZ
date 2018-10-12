@@ -72,11 +72,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	SetWalkSpeed(BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier());
 
-	// be default the weapon should be sheathed
+	// By default the weapon should be sheathed
 	bWeaponSheathed = true;
-
-	// bHasActiveiframes = false;
-	// bIsBlockingDamage = false;
 
 	MaxNumberOfSkills = 30;
 	StaminaCost_Dodge = 20;
@@ -120,6 +117,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &APlayerCharacter::OnToggleSkillTree);
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
 	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
+	PlayerInputComponent->BindAction("Escape", IE_Pressed, this, &APlayerCharacter::OnPressedEscape);
 
 	PlayerInputComponent->BindAction("Skill_1", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<1>);
 	PlayerInputComponent->BindAction("Skill_2", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<2>);
@@ -204,6 +202,7 @@ void APlayerCharacter::PostInitializeComponents()
 		InitializeSkills(EODSaveGame->UnlockedSkills);
 	}
 
+	/*
 #if DEVSTAGE_CODE_ENABLED
 	FSkill* Skill = UCharacterLibrary::GetPlayerSkill(FName("TestSkill"));
 	if (Skill)
@@ -211,17 +210,20 @@ void APlayerCharacter::PostInitializeComponents()
 		IDToSkillMap.Add(FName("TestSkill"), Skill);
 	}
 #endif
+	*/
 }
 
 void APlayerCharacter::PostInitProperties()
 {
 	Super::PostInitProperties();
 
+	/*
 	for (int i = 0; i < MaxNumberOfSkills; i++)
 	{
 		EventsOnSuccessfulSkillAttack.Add(FCombatEvent());
 		EventsOnUsingSkill.Add(FCombatEvent());
 	}
+	*/
 }
 
 #if WITH_EDITOR
@@ -414,14 +416,14 @@ FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
 	return PrimaryWeapon->WeaponType;
 }
 
-FORCEINLINE UHUDWidget * APlayerCharacter::NativeGetHUDWidget() const
+FORCEINLINE UHUDWidget * APlayerCharacter::GetHUDWidget() const
 {
 	return HUDWidget;
 }
 
-UHUDWidget * APlayerCharacter::GetHUDWidget() const
+UHUDWidget * APlayerCharacter::BP_GetHUDWidget() const
 {
-	return HUDWidget;
+	return GetHUDWidget();
 }
 
 void APlayerCharacter::Interrupt(const EHitDirection InterruptDirection)
@@ -670,6 +672,11 @@ void APlayerCharacter::OnReleasedBlock()
 	bBlockPressed = false;
 }
 
+void APlayerCharacter::OnPressedEscape()
+{
+	// @todo pause game, show cursor and display pause menu
+}
+
 void APlayerCharacter::EnableBlock()
 {
 	if (IsNormalAttacking())
@@ -823,13 +830,13 @@ void APlayerCharacter::OnToggleAutoRun()
 	}
 }
 
-void APlayerCharacter::EnableAutoRun()
+FORCEINLINE void APlayerCharacter::EnableAutoRun()
 {
 	SetCharacterState(ECharacterState::AutoRun);
 	SetUseControllerRotationYaw(true);
 }
 
-void APlayerCharacter::DisableAutoRun()
+FORCEINLINE void APlayerCharacter::DisableAutoRun()
 {
 	// Make sure that auto run is active before you attempt to disable it
 	check(CharacterState == ECharacterState::AutoRun);
@@ -1084,6 +1091,19 @@ void APlayerCharacter::Destroyed()
 	}
 }
 
+FORCEINLINE void APlayerCharacter::SavePlayerState()
+{
+	if (HUDWidget)
+	{
+		HUDWidget->SaveHUDLayout();
+	}
+}
+
+void APlayerCharacter::BP_SavePlayerState()
+{
+	SavePlayerState();
+}
+
 /*
 void APlayerCharacter::UpdatePlayerAnimationReferences()
 {
@@ -1192,6 +1212,7 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName & CurrentSect
 
 void APlayerCharacter::InitializeSkills(TArray<FName> UnlockedSKillsID)
 {
+	/*
 	for (FName& SkillID : UnlockedSKillsID)
 	{
 		FSkill* Skill = UCharacterLibrary::GetPlayerSkill(SkillID);
@@ -1201,6 +1222,7 @@ void APlayerCharacter::InitializeSkills(TArray<FName> UnlockedSKillsID)
 			IDToSkillMap.Add(SkillID, Skill);
 		}
 	}
+	*/
 }
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
@@ -1782,6 +1804,7 @@ void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 
 void APlayerCharacter::AddSkill(FName SkillID, uint8 SkillLevel)
 {
+	/*
 	FSkill* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, SkillLevel);
 	if (Skill)
 	{
@@ -1792,11 +1815,12 @@ void APlayerCharacter::AddSkill(FName SkillID, uint8 SkillLevel)
 	{
 		UKismetSystemLibrary::PrintString(this, FString("Failed to add"), true, false);
 	}
+	*/
 }
 
 FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetSkill(FName SkillID)
 {
-	FPlayerSkillTableRow* Skill = DataTable_Skills->FindRow<FPlayerSkillTableRow>(SkillID, FString("Looking for a player skill"));
+	FPlayerSkillTableRow* Skill = DataTable_Skills->FindRow<FPlayerSkillTableRow>(SkillID, FString("APlayerCharacter::GetSkill()"));
 	return Skill;
 }
 

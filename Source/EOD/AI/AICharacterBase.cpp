@@ -30,16 +30,16 @@ void AAICharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	// Make sure DataTable_Skills is not nullptr
-	check(DataTable_Skills);
+	// Make sure SkillsDataTable is not nullptr
+	check(SkillsDataTable);
 
 	AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
 	HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
 
-	TArray<FName> SkillIDs = DataTable_Skills->GetRowNames();
+	TArray<FName> SkillIDs = SkillsDataTable->GetRowNames();
 	for (const FName& SkillID : SkillIDs)
 	{
-		FAISkillTableRow* AISkill = DataTable_Skills->FindRow<FAISkillTableRow>(SkillID, FString("Looking up AI skill"), false);
+		FAISkillTableRow* AISkill = SkillsDataTable->FindRow<FAISkillTableRow>(SkillID, FString("Looking up AI skill"), false);
 		check(AISkill);
 
 		if (AISkill->SkillType == ESkillType::BuffParty)
@@ -123,13 +123,13 @@ void AAICharacterBase::PostInitializeComponents()
 	}
 
 
-	// AnimMontage_HitEffects->IsValidSectionName()
+	// HitEffectsAnimMontage->IsValidSectionName()
 
 
-	// AnimMontage_HitEffects->
+	// HitEffectsAnimMontage->
 
 
-	// UCharacterLibrary::GetAllAICharacterSkills(InGameName, DataTable_Skills, Skills);
+	// UCharacterLibrary::GetAllAICharacterSkills(InGameName, SkillsDataTable, Skills);
 
 	// Initialize skills and load animation montages
 
@@ -175,13 +175,13 @@ void AAICharacterBase::Interrupt(const EHitDirection InterruptDirection)
 {
 	if (InterruptDirection == EHitDirection::Forward)
 	{
-		PlayAnimationMontage(AnimMontage_HitEffects,
+		PlayAnimationMontage(HitEffectsAnimMontage,
 			UCharacterLibrary::SectionName_ForwardInterrupt,
 			ECharacterState::GotHit);
 	}
 	else if (InterruptDirection == EHitDirection::Backward)
 	{
-		PlayAnimationMontage(AnimMontage_HitEffects,
+		PlayAnimationMontage(HitEffectsAnimMontage,
 			UCharacterLibrary::SectionName_BackwardInterrupt,
 			ECharacterState::GotHit);
 	}
@@ -191,12 +191,12 @@ void AAICharacterBase::Flinch(const EHitDirection FlinchDirection)
 {
 	if (FlinchDirection == EHitDirection::Forward)
 	{
-		PlayAnimationMontage(AnimMontage_Flinch,
+		PlayAnimationMontage(FlinchAnimMontage,
 			UCharacterLibrary::SectionName_ForwardFlinch);
 	}
 	else if (FlinchDirection == EHitDirection::Backward)
 	{
-		PlayAnimationMontage(AnimMontage_Flinch,
+		PlayAnimationMontage(FlinchAnimMontage,
 			UCharacterLibrary::SectionName_BackwardFlinch);
 	}
 }
@@ -240,7 +240,7 @@ void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	FAISkillTableRow* AISkill = nullptr;
 	if (GetCurrentActiveSkillID() != NAME_None)
 	{
-		AISkill = DataTable_Skills->FindRow<FAISkillTableRow>(GetCurrentActiveSkillID(), FString("Looking up AI skill"));
+		AISkill = SkillsDataTable->FindRow<FAISkillTableRow>(GetCurrentActiveSkillID(), FString("Looking up AI skill"));
 	}
 
 	if (AISkill && AISkill->AnimMontage == AnimMontage)
@@ -266,7 +266,7 @@ bool AAICharacterBase::UseSkill(FName SkillID)
 {
 	if (CanUseAnySkill())
 	{
-		FAISkillTableRow* SkillToUse = DataTable_Skills->FindRow<FAISkillTableRow>(SkillID, FString("Looking up AI skill for use"));
+		FAISkillTableRow* SkillToUse = SkillsDataTable->FindRow<FAISkillTableRow>(SkillID, FString("Looking up AI skill for use"));
 
 		if (!SkillToUse)
 		{
