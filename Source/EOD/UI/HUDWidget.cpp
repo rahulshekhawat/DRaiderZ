@@ -12,13 +12,17 @@ UHUDWidget::UHUDWidget(const FObjectInitializer & ObjectInitializer) : Super(Obj
 
 bool UHUDWidget::Initialize()
 {
-
-	if (Super::Initialize() && StatusIndicatorWidget && SkillBarWidget && InventoryWidget && SkillTreeWidget) // && HealthBar && ManaBar && StaminaBar && LevelText) // && HealthText && ManaText && StaminaText)
+	if (!(Super::Initialize() &&
+		StatusIndicatorWidget &&
+		SkillBarWidget &&
+		InventoryWidget &&
+		SkillTreeWidget))
 	{
-		return true;
+		return false;
 	}
 
-	return false;
+
+	return true;
 }
 
 void UHUDWidget::NativeConstruct()
