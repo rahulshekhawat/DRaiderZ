@@ -9,7 +9,7 @@
 
 class UButton;
 class UWidgetSwitcher;
-class UEODItemContainer;
+class USkillTreeContainer;
 
 /**
  * 
@@ -30,6 +30,9 @@ public:
 	virtual void NativeDestruct() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UWidgetSwitcher* SkillTreeSwitcher;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UButton* AssassinTab;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
@@ -44,8 +47,56 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UButton* SorcererTab;
 
+	//~ Begin berserker skills
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UWidgetSwitcher* SkillTreeSwitcher;
+	USkillTreeContainer* SkillButton_Crush;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_Neutralize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_DodgeAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_ArmaCrush;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_Vanquish;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_UpwardStrike;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_Nocturne;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_BuffaloCharge;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_Bash;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_Tornado;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_Scamper;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_Escape;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_FuriousDash;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_Outrage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_Tranquility;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	USkillTreeContainer* SkillButton_Madness;
+	//~ End berserker skills
+
 
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	// UEODItemContainer* VanquishSkill;
