@@ -5,6 +5,8 @@
 
 #include "Button.h"
 #include "WidgetSwitcher.h"
+#include "CanvasPanelSlot.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 USkillTreeWidget::USkillTreeWidget(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -18,7 +20,23 @@ bool USkillTreeWidget::Initialize()
 		ClericTab &&
 		DefenderTab &&
 		SorcererTab &&
-		SkillTreeSwitcher))
+		SkillTreeSwitcher &&
+		CrushSkillButton &&
+		NeutralizeSkillButton &&
+		DodgeAttackSkillButton &&
+		ArmaCrushSkillButton &&
+		VanquishSkillButton &&
+		UpwardStrikeSkillButton &&
+		NocturneSkillButton &&
+		BuffaloChargeSkillButton &&
+		BashSkillButton &&
+		TornadoSkillButton &&
+		ScamperSkillButton &&
+		EscapeSkillButton &&
+		FuriousDashSkillButton &&
+		OutrageSkillButton &&
+		TranquilitySkillButton &&
+		MadnessSkillButton))
 	{
 		return false;
 	}
@@ -35,7 +53,22 @@ bool USkillTreeWidget::Initialize()
 	DefenderTab->OnClicked.AddDynamic(this, &USkillTreeWidget::ActivateDefenderTab);
 	SorcererTab->OnClicked.AddDynamic(this, &USkillTreeWidget::ActivateSorcererTab);
 
-	SetupContainerPosition(SkillButton_Crush);
+	SetupContainerPosition(CrushSkillButton);
+	SetupContainerPosition(NeutralizeSkillButton);
+	SetupContainerPosition(DodgeAttackSkillButton);
+	SetupContainerPosition(ArmaCrushSkillButton);
+	SetupContainerPosition(VanquishSkillButton);
+	SetupContainerPosition(UpwardStrikeSkillButton);
+	SetupContainerPosition(NocturneSkillButton);
+	SetupContainerPosition(BuffaloChargeSkillButton);
+	SetupContainerPosition(BashSkillButton);
+	SetupContainerPosition(TornadoSkillButton);
+	SetupContainerPosition(ScamperSkillButton);
+	SetupContainerPosition(EscapeSkillButton);
+	SetupContainerPosition(FuriousDashSkillButton);
+	SetupContainerPosition(OutrageSkillButton);
+	SetupContainerPosition(TranquilitySkillButton);
+	SetupContainerPosition(MadnessSkillButton);
 
 	return true;
 }
@@ -50,16 +83,67 @@ void USkillTreeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-FORCEINLINE void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer* Container)
+void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer* Container)
 {
-	/*
+	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(Container->Slot);
+
+	if (!CanvasSlot)
+	{
+		UKismetSystemLibrary::PrintString(this, FString("Failed to set position"));
+		return;
+	}
+
+	FVector2D Position;
 	switch (Container->ColumnPosition)
 	{
+	case 0:
+		Position.X = 540;
+		break;
+	case 1:
+		Position.X = 720;
+		break;
+	case 2:
+		Position.X = 900;
+		break;
+	case 3:
+		Position.X = 1080;
+		break;
+	case 4:
+		Position.X = 1260;
+		break;
 	default:
 		break;
 	}
-	*/
 
+	switch (Container->RowPosition)
+	{
+	case 0:
+		Position.Y = 25;
+		break;
+	case 1:
+		Position.Y = 155;
+		break;
+	case 2:
+		Position.Y = 285;
+		break;
+	case 3:
+		Position.Y = 415;
+		break;
+	case 4:
+		Position.Y = 545;
+		break;
+	case 5:
+		Position.Y = 675;
+		break;
+	case 6:
+		Position.Y = 805;
+		break;
+	default:
+		break;
+	}
+
+	CanvasSlot->SetPosition(Position);
+	UKismetSystemLibrary::PrintString(this, FString("Succesfully set position"));
 }
 
 void USkillTreeWidget::ActivateAssassinTab()

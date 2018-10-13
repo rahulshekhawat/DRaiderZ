@@ -49,60 +49,59 @@ public:
 
 	//~ Begin berserker skills
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Crush;
+	USkillTreeItemContainer* CrushSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Neutralize;
+	USkillTreeItemContainer* NeutralizeSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_DodgeAttack;
+	USkillTreeItemContainer* DodgeAttackSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_ArmaCrush;
+	USkillTreeItemContainer* ArmaCrushSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Vanquish;
+	USkillTreeItemContainer* VanquishSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_UpwardStrike;
+	USkillTreeItemContainer* UpwardStrikeSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Nocturne;
+	USkillTreeItemContainer* NocturneSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_BuffaloCharge;
+	USkillTreeItemContainer* BuffaloChargeSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Bash;
+	USkillTreeItemContainer* BashSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Tornado;
+	USkillTreeItemContainer* TornadoSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Scamper;
+	USkillTreeItemContainer* ScamperSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Escape;
+	USkillTreeItemContainer* EscapeSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_FuriousDash;
+	USkillTreeItemContainer* FuriousDashSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Outrage;
+	USkillTreeItemContainer* OutrageSkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Tranquility;
+	USkillTreeItemContainer* TranquilitySkillButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	USkillTreeItemContainer* SkillButton_Madness;
+	USkillTreeItemContainer* MadnessSkillButton;
 	//~ End berserker skills
 
 
 private:
 
-	FORCEINLINE void SetupContainerPosition(USkillTreeItemContainer* Container);
-
-	FButtonStyle DefaultButtonStyle;
+	/** Move container to it's designated position */
+	void SetupContainerPosition(USkillTreeItemContainer* Container);
 
 	UFUNCTION()
 	void ActivateAssassinTab();
@@ -125,6 +124,6 @@ private:
 
 	void SetButtonStyleToSelected(UButton* Button);
 	
-
+	FButtonStyle DefaultButtonStyle;
 
 };

@@ -51,9 +51,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
 	FString SkillGroupRequiredToUnlock;
 
+	/** The skill tree column that this skill container belongs to */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
 	int32 ColumnPosition;
 
+	/** The skill tree row that this skill container belongs to */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
 	int32 RowPosition;
 	
