@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Statics/CharacterLibrary.h"
 #include "GameFramework/SaveGame.h"
 #include "EODSaveGame.generated.h"
 
@@ -24,5 +25,8 @@ public:
 	UPROPERTY()
 	TMap<FName, int32> SkillBarLayout;
 
+	/** A map of skill to it's state */
+	UPROPERTY()
+	TMap<FString, FSkillState> SkillToStateMap;
 	
 };

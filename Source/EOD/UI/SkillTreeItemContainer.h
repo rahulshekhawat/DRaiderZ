@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Statics/CharacterLibrary.h"
 #include "UI/EODItemContainer.h"
 #include "SkillTreeItemContainer.generated.h"
 
@@ -31,21 +32,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
 	FString SkillGroup;
 
-	/** Text block displaying skill upgrade in the form : CurrentUpgradeLevel / MaxUpgradeLevel */
-	UPROPERTY(Transient, BlueprintReadOnly, meta = (BindWidget))
-	UTextBlock* SkillUpgradeText;
-
-	/** The current level that this skill has been upgraded to */
+	/** Current state of this skill */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillInfo)
-	int32 CurrentUpgradeLevel;
-
-	/** The maximum level that this skill can be upgraded to */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillInfo)
-	int32 MaxUpgradeLevel;
-
-	/** Determines whether this skill has been unlocked on the skill tree */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
-	bool bUnlocked;
+	FSkillState SkillState;
 
 	/** Skill group that must be unlocked before unlocking this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
@@ -58,6 +47,17 @@ public:
 	/** The skill tree row that this skill container belongs to */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
 	int32 RowPosition;
+
+	/** Text block displaying skill upgrade in the form : CurrentUpgradeLevel / MaxUpgradeLevel */
+	UPROPERTY(Transient, BlueprintReadOnly, meta = (BindWidget))
+	UTextBlock* SkillUpgradeText;
 	
+private:
+
+	/** Load previously saved skill state from current save slot */
+	FORCEINLINE void LoadSkillState();
+
+
 	
+
 };

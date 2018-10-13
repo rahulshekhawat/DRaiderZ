@@ -86,6 +86,28 @@ enum class ECharacterState : uint8
 	Dead
 };
 
+/** A struct containing current skill state */
+USTRUCT(BlueprintType)
+struct EOD_API FSkillState
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	/** The current level that this skill has been upgraded to */
+	UPROPERTY()
+	int32 CurrentUpgradeLevel;
+	
+	/** The maximum level that this skill can be upgraded to */
+	UPROPERTY()
+	int32 MaxUpgradeLevel;
+
+	/** Determines whether this skill has been unlocked on the skill tree */
+	UPROPERTY()
+	bool bUnlocked;
+
+};
+
 /**
  * This struct holds strong pointers to animation montages that are compatible with player's current equipped weapon.
  * @note This struct does not contain pointer to facial animations because facial animations are independent of the weapon equipped.
