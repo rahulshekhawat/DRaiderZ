@@ -361,6 +361,9 @@ public:
 	/** Animation montage containing animation for this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
 	TSoftObjectPtr<UAnimMontage> AnimMontage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
+	uint8 SupportedWeapons;
 
 	/** Section name of skill start animation */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
@@ -394,13 +397,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	bool bPassiveSkill;
 
-	/** Skill family that MUST be used before using this skill */
+	/** Skills, any of which MUST be used before using this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName PrecedingSkill;
+	TArray<FString> PrecedingSkillGroups;
 
-	/** Skill family that can be used after using this skill (skill chaining)  */
+	/** Skill that can be used after using this skill (skill chaining) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName SupersedingSkill;
+	FString SupersedingSkillGroup;
 
 	/**
 	 * SkillID for skill that comes on upgrading this skill.
