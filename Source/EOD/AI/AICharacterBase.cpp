@@ -30,11 +30,18 @@ void AAICharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	// Make sure SkillsDataTable is not nullptr
-	check(SkillsDataTable);
-
 	AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
 	HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+
+}
+
+void AAICharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SetInCombat(false);
+
+	check(SkillsDataTable);;
 
 	TArray<FName> SkillIDs = SkillsDataTable->GetRowNames();
 	for (const FName& SkillID : SkillIDs)
@@ -121,44 +128,10 @@ void AAICharacterBase::PostInitializeComponents()
 
 		SkillIDToWeightMap.Add(SkillID, 0);
 	}
-
-
-	// HitEffectsAnimMontage->IsValidSectionName()
-
-
-	// HitEffectsAnimMontage->
-
-
-	// UCharacterLibrary::GetAllAICharacterSkills(InGameName, SkillsDataTable, Skills);
-
-	// Initialize skills and load animation montages
-
-
-}
-
-void AAICharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-	SetInCombat(false);
-
-	// @note for some reason disabling tick hides the widget component. Maybe it's because it needs to be drawn every tick?
-	// AggroWidgetComp->SetComponentTickEnabled(false);
-	// HealthWidgetComp->SetComponentTickEnabled(false);
-
 }
 
 void AAICharacterBase::Destroyed()
 {
-	/*
-	for (FSkill* Skill : Skills)
-	{
-		delete Skill;
-		Skill = nullptr;
-	}
-
-	Skills.Empty();
-	*/
 }
 
 UEODWidgetComponent * AAICharacterBase::BP_GetAggroWidgetComp() const
