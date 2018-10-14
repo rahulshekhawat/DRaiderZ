@@ -5,6 +5,7 @@
 #include "Player/PlayerCharacter.h"
 #include "Core/EODSaveGame.h"
 #include "Core/GameSingleton.h"
+#include "Statics/CharacterLibrary.h"
 
 #include "Button.h"
 #include "Engine/Engine.h"
@@ -41,6 +42,8 @@ bool USkillBarWidget::Initialize()
 	{
 		return false;
 	}
+
+	LoadSkillBarLayout();
 
 	return true;
 }
@@ -314,7 +317,7 @@ FORCEINLINE void USkillBarWidget::LoadSkillBarLayout()
 			continue;
 		}
 
-		FPlayerSkillTableRow* Skill = GetOwningEODPlayer()->GetSkill(Key);
+		FPlayerSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(Key, FString("USkillBarWidget::LoadSkillBarLayout(), looking for player skill"));
 		if (!Skill)
 		{
 			continue;
