@@ -287,11 +287,28 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 	return PlayerAnimationReferences;
 }
 
+FPlayerSkillTableRow * UCharacterLibrary::GetPlayerSkill(const FName SkillID, const FString& ContextString)
+{
+	FPlayerSkillTableRow* Skill = nullptr;
+
+	if (GEngine)
+	{
+		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+
+		if (GameSingleton && GameSingleton->PlayerSkillsDataTable)
+		{
+			Skill = GameSingleton->PlayerSkillsDataTable->FindRow<FPlayerSkillTableRow>(SkillID, ContextString);
+		}
+	}
+
+	return Skill;
+}
+
+/*
 FSkill * UCharacterLibrary::GetPlayerSkill(FName SKillID, uint8 SkillLevel)
 {
 	FSkill* Skill = nullptr;
 
-	/*
 	if (GEngine && GEngine->GameSingleton)
 	{
 		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
@@ -305,10 +322,10 @@ FSkill * UCharacterLibrary::GetPlayerSkill(FName SKillID, uint8 SkillLevel)
 			}
 		}
 	}
-	*/
 
 	return Skill;
 }
+*/
 
 bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferences * PlayerAnimationReferences, ECharacterGender Gender)
 {

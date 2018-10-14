@@ -55,7 +55,9 @@ public:
 private:
 
 	/** Load previously saved skill state from current save slot */
-	FORCEINLINE void LoadSkillState();
+	FORCEINLINE void LoadSkillContainerState();
+
+	FORCEINLINE void LoadEODItemInfo();
 
 
 	

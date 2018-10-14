@@ -11,6 +11,7 @@
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 
 UEODItemContainer::UEODItemContainer(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
@@ -29,6 +30,8 @@ bool UEODItemContainer::Initialize()
 
 	StackCountText->SetVisibility(ESlateVisibility::Hidden);
 	CooldownText->SetVisibility(ESlateVisibility::Hidden);
+
+	SetupEmptyBorderMaterial();
 
 	RefreshContainerVisuals();
 	return true;
@@ -120,8 +123,14 @@ FORCEINLINE void UEODItemContainer::ResetContainer()
 	// @note can't and shouldn't reset container type
 }
 
+void UEODItemContainer::NativeOnDragDetected(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent, UDragDropOperation *& OutOperation)
+{
+}
+
 bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDropEvent & InDragDropEvent, UDragDropOperation * InOperation)
 {
+	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+
 	// Cannot drop anything on skill tree
 	if (ContainerType == EEODContainerType::SkillTree)
 	{
@@ -171,6 +180,62 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 	return bResult;
 }
 
+void UEODItemContainer::NativeOnMouseEnter(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+{
+	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+
+	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
+	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), HoveredBorderColor);
+}
+
+void UEODItemContainer::NativeOnMouseLeave(const FPointerEvent & InMouseEvent)
+{
+	Super::NativeOnMouseLeave(InMouseEvent);
+
+	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
+	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
+}
+
+FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+{
+	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
+	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), PressedBorderColor);
+
+	/*
+	if (InMouseEvent.GetEffectingButton() == FKey(TEXT("LeftMouseButton")))
+	{
+		FEventReply Reply = 
+	}
+
+	if (PointerEvent.GetEffectingButton() == DragKey || PointerEvent.IsTouchEvent())
+	{
+		FEventReply Reply = UWidgetBlueprintLibrary::Handled();
+		return UWidgetBlueprintLibrary::DetectDrag(Reply, WidgetDetectingDrag, DragKey);
+
+
+		if (WidgetDetectingDrag)
+		{
+			TSharedPtr<SWidget> SlateWidgetDetectingDrag = WidgetDetectingDrag->GetCachedWidget();
+			if (SlateWidgetDetectingDrag.IsValid())
+			{
+				Reply.NativeReply = Reply.NativeReply.DetectDrag(SlateWidgetDetectingDrag.ToSharedRef(), DragKey);
+			}
+		}
+
+	}
+	*/
+
+	return FReply::Handled();
+}
+
+FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+{
+	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
+	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), HoveredBorderColor);
+
+	return FReply::Handled();
+}
+
 FORCEINLINE void UEODItemContainer::UpdateItemImage()
 {
 	if (EODItemInfo.Icon)
@@ -206,6 +271,25 @@ FORCEINLINE void UEODItemContainer::UpdateStackCountText()
 		StackCountText->SetText(Text);
 		StackCountText->SetVisibility(ESlateVisibility::Hidden);
 	}
+}
+
+FORCEINLINE void UEODItemContainer::SetupEmptyBorderMaterial()
+{
+	if (!EmptyBorderMaterial)
+	{
+		return;
+	}
+
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(EmptyBorderMaterial, this);
+	// DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), FLinearColor(5.0, 5.0, 5.0, 0.0));
+	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
+
+	FSlateBrush SlateBrush;
+	SlateBrush.ImageSize = FVector2D(64.0, 64.0);
+	SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+	SlateBrush.ImageType = ESlateBrushImageType::FullColor;
+	SlateBrush.SetResourceObject(DynamicMaterial);
+	EmptyBorderImage->SetBrush(SlateBrush);
 }
 
 void UEODItemContainer::UpdateCooldown()

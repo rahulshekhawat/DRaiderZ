@@ -48,6 +48,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
 	EEODContainerType ContainerType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInterface* EmptyBorderMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor NormalBorderColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor HoveredBorderColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor PressedBorderColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UImage* EmptyBorderImage;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* ItemImage;
 
@@ -79,17 +94,29 @@ public:
 
 protected:
 
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
-private:
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 
-	FTimerHandle CooldownTimerHandle;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+private:
 
 	FORCEINLINE void UpdateItemImage();
 
 	FORCEINLINE void UpdateStackCountText();
 
+	FORCEINLINE void SetupEmptyBorderMaterial();
+
 	void UpdateCooldown();
+
+	FTimerHandle CooldownTimerHandle;
 
 	// void UpdateItemButton();
 

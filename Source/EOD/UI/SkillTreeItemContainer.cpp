@@ -21,7 +21,9 @@ bool USkillTreeItemContainer::Initialize()
 		return false;
 	}
 
-	LoadSkillState();
+	LoadSkillContainerState();
+	LoadEODItemInfo();
+	RefreshContainerVisuals();
 
 	return true;
 }
@@ -36,7 +38,7 @@ void USkillTreeItemContainer::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-FORCEINLINE void USkillTreeItemContainer::LoadSkillState()
+FORCEINLINE void USkillTreeItemContainer::LoadSkillContainerState()
 {
 	if (SkillGroup == FString())
 	{
@@ -64,4 +66,42 @@ FORCEINLINE void USkillTreeItemContainer::LoadSkillState()
 	{
 		SkillState = EODSaveGame->SkillToStateMap[SkillGroup];
 	}
+}
+
+FORCEINLINE void USkillTreeItemContainer::LoadEODItemInfo()
+{
+	if (SkillGroup == FString())
+	{
+		return;
+	}
+
+	FString SkillID;
+	if (SkillState.CurrentUpgradeLevel > 0)
+	{
+		SkillID = SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
+	}
+	else
+	{
+		SkillID = SkillGroup + FString("_1");
+	}
+
+	FPlayerSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(FName(*SkillID), FString("USkillTreeItemContainer::LoadEODItemInfo(), looking for player skill"));
+	if (!Skill)
+	{
+		return;
+	}
+
+	EODItemInfo.ItemID = FName(*SkillID);
+	if (Skill->bPassiveSkill)
+	{
+		EODItemInfo.EODItemType = EEODItemType::PassiveSkill;
+	}
+	else
+	{
+		EODItemInfo.EODItemType = EEODItemType::ActiveSkill;
+	}
+	EODItemInfo.Icon = Skill->Icon;
+	EODItemInfo.Description = Skill->Description;
+	EODItemInfo.InGameName = Skill->InGameName;
+	EODItemInfo.StackCount = 1;
 }
