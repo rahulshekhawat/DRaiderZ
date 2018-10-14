@@ -9,6 +9,8 @@
 
 class UTextBlock;
 class UImage;
+class UDragVisualWidget;
+
 /**
  * 
  */
@@ -42,6 +44,9 @@ public:
 	UPROPERTY(Transient)
 	float CooldownInterval;
 
+	UPROPERTY(Transient)
+	UDragVisualWidget* DragVisualWidget;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
 	FEODItemInfo EODItemInfo;
 
@@ -59,6 +64,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FLinearColor PressedBorderColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UDragVisualWidget> DragVisualClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* EmptyBorderImage;
@@ -91,6 +99,9 @@ public:
 
 	/** Resets and nulls all container variables. Deletes any references */
 	FORCEINLINE void ResetContainer();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void CreateDragAndDropOperation();
 
 protected:
 

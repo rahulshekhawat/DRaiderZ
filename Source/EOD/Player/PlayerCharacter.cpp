@@ -334,18 +334,6 @@ void APlayerCharacter::BeginPlay()
 				HUDWidget->AddToViewport();
 			}
 		}
-
-		/*
-		if (BP_SkillBarWidget.Get())
-		{
-			SkillBarWidget = CreateWidget<USkillBarWidget>(GetGameInstance(), BP_SkillBarWidget);
-			SkillBarWidget->SetOwningEODPlayer(this);
-			if (SkillBarWidget)
-			{
-				SkillBarWidget->AddToViewport();
-			}
-		}
-		*/
 	}
 }
 

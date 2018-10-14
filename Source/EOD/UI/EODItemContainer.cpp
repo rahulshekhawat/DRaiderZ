@@ -3,6 +3,7 @@
 #include "EODItemContainer.h"
 #include "EODItemDragDropOperation.h"
 #include "Player/PlayerCharacter.h"
+#include "DragVisualWidget.h"
 
 #include "Image.h"
 #include "Engine/Texture.h"
@@ -125,6 +126,9 @@ FORCEINLINE void UEODItemContainer::ResetContainer()
 
 void UEODItemContainer::NativeOnDragDetected(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent, UDragDropOperation *& OutOperation)
 {
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+	CreateDragAndDropOperation();
 }
 
 bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDropEvent & InDragDropEvent, UDragDropOperation * InOperation)
@@ -198,38 +202,30 @@ void UEODItemContainer::NativeOnMouseLeave(const FPointerEvent & InMouseEvent)
 
 FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
 {
+	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
 	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), PressedBorderColor);
 
-	/*
-	if (InMouseEvent.GetEffectingButton() == FKey(TEXT("LeftMouseButton")))
+	FReply Reply = FReply::Unhandled();
+	FKey DragKey(TEXT("LeftMouseButton"));
+	if (InMouseEvent.GetEffectingButton() == DragKey)
 	{
-		FEventReply Reply = 
-	}
-
-	if (PointerEvent.GetEffectingButton() == DragKey || PointerEvent.IsTouchEvent())
-	{
-		FEventReply Reply = UWidgetBlueprintLibrary::Handled();
-		return UWidgetBlueprintLibrary::DetectDrag(Reply, WidgetDetectingDrag, DragKey);
-
-
-		if (WidgetDetectingDrag)
+		Reply = FReply::Handled();
+		TSharedPtr<SWidget> SlateWidgetDetectingDrag = this->GetCachedWidget();
+		if (SlateWidgetDetectingDrag.IsValid())
 		{
-			TSharedPtr<SWidget> SlateWidgetDetectingDrag = WidgetDetectingDrag->GetCachedWidget();
-			if (SlateWidgetDetectingDrag.IsValid())
-			{
-				Reply.NativeReply = Reply.NativeReply.DetectDrag(SlateWidgetDetectingDrag.ToSharedRef(), DragKey);
-			}
+			Reply = Reply.DetectDrag(SlateWidgetDetectingDrag.ToSharedRef(), DragKey);
 		}
-
 	}
-	*/
 
-	return FReply::Handled();
+	return Reply;
 }
 
 FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
 {
+	Super::NativeOnMouseButtonUp(InGeometry, InMouseEvent);
+
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
 	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), HoveredBorderColor);
 
@@ -281,7 +277,6 @@ FORCEINLINE void UEODItemContainer::SetupEmptyBorderMaterial()
 	}
 
 	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(EmptyBorderMaterial, this);
-	// DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), FLinearColor(5.0, 5.0, 5.0, 0.0));
 	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
 
 	FSlateBrush SlateBrush;
