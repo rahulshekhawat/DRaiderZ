@@ -95,7 +95,7 @@ public:
 	void BP_StopCooldown();
 
 	/** Refresh and update the displayed visuals of this container */
-	FORCEINLINE void RefreshContainerVisuals();
+	virtual void RefreshContainerVisuals();
 
 	/** Resets and nulls all container variables. Deletes any references */
 	FORCEINLINE void ResetContainer();

@@ -105,7 +105,7 @@ void UEODItemContainer::BP_StopCooldown()
 	StopCooldown();
 }
 
-FORCEINLINE void UEODItemContainer::RefreshContainerVisuals()
+void UEODItemContainer::RefreshContainerVisuals()
 {
 	UpdateItemImage();
 	UpdateStackCountText();

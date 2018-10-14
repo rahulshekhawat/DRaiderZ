@@ -67,4 +67,8 @@ public:
 	/** Save current HUD layout to the current save slot */
 	FORCEINLINE void SaveHUDLayout();
 	
+protected:
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
 };

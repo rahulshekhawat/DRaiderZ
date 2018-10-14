@@ -5,6 +5,10 @@
 #include "SkillTreeWidget.h"
 #include "InventoryWidget.h"
 #include "StatusIndicatorWidget.h"
+#include "EODItemDragDropOperation.h"
+#include "EODItemContainer.h"
+
+#include "Kismet/KismetSystemLibrary.h"
 
 UHUDWidget::UHUDWidget(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -70,4 +74,21 @@ FORCEINLINE void UHUDWidget::PutSkillOnCooldownTimer(int32 SkillIndex, float Dur
 FORCEINLINE void UHUDWidget::SaveHUDLayout()
 {
 	SkillBarWidget->SaveSkillBarLayout();
+}
+
+bool UHUDWidget::NativeOnDrop(const FGeometry & InGeometry, const FDragDropEvent & InDragDropEvent, UDragDropOperation * InOperation)
+{
+	UEODItemDragDropOperation* Operation = Cast<UEODItemDragDropOperation>(InOperation);
+	if (!Operation || !Operation->DraggedEODItemWidget)
+	{
+		return false;
+	}
+
+	if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillBar)
+	{
+		Operation->DraggedEODItemWidget->ResetContainer();
+		Operation->DraggedEODItemWidget->RefreshContainerVisuals();
+	}
+
+	return true;
 }

@@ -4,6 +4,7 @@
 #include "Core/EODSaveGame.h"
 #include "Core/GameSingleton.h"
 
+#include "TextBlock.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -36,6 +37,21 @@ void USkillTreeItemContainer::NativeConstruct()
 void USkillTreeItemContainer::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
+
+void USkillTreeItemContainer::RefreshContainerVisuals()
+{
+	Super::RefreshContainerVisuals();
+
+	UpdateSkillUpgradeText();
+}
+
+FORCEINLINE void USkillTreeItemContainer::UpdateSkillUpgradeText()
+{
+	FString String;
+	String = FString::FromInt(SkillState.CurrentUpgradeLevel) + FString("/") + FString::FromInt(SkillState.MaxUpgradeLevel);
+	FText Text = FText::FromString(String);
+	SkillUpgradeText->SetText(Text);
 }
 
 FORCEINLINE void USkillTreeItemContainer::LoadSkillContainerState()
@@ -104,4 +120,6 @@ FORCEINLINE void USkillTreeItemContainer::LoadEODItemInfo()
 	EODItemInfo.Description = Skill->Description;
 	EODItemInfo.InGameName = Skill->InGameName;
 	EODItemInfo.StackCount = 1;
+
+	SkillState.MaxUpgradeLevel = Skill->MaxUpgrades;
 }

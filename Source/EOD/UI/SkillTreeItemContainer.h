@@ -51,8 +51,13 @@ public:
 	/** Text block displaying skill upgrade in the form : CurrentUpgradeLevel / MaxUpgradeLevel */
 	UPROPERTY(Transient, BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* SkillUpgradeText;
+
+	/** Refresh and update the displayed visuals of this container */
+	virtual void RefreshContainerVisuals() override;
 	
 private:
+
+	FORCEINLINE void UpdateSkillUpgradeText();
 
 	/** Load previously saved skill state from current save slot */
 	FORCEINLINE void LoadSkillContainerState();
