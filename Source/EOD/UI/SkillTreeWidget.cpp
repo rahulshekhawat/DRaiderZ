@@ -6,7 +6,6 @@
 #include "Button.h"
 #include "WidgetSwitcher.h"
 #include "CanvasPanelSlot.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 USkillTreeWidget::USkillTreeWidget(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -89,7 +88,6 @@ void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer* Container
 
 	if (!CanvasSlot)
 	{
-		UKismetSystemLibrary::PrintString(this, FString("Failed to set position"));
 		return;
 	}
 
@@ -143,7 +141,6 @@ void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer* Container
 	}
 
 	CanvasSlot->SetPosition(Position);
-	UKismetSystemLibrary::PrintString(this, FString("Succesfully set position"));
 }
 
 void USkillTreeWidget::ActivateAssassinTab()
