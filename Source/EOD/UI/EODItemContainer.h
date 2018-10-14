@@ -100,9 +100,6 @@ public:
 	/** Resets and nulls all container variables. Deletes any references */
 	FORCEINLINE void ResetContainer();
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void CreateDragAndDropOperation();
-
 protected:
 
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;

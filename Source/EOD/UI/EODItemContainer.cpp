@@ -126,15 +126,11 @@ FORCEINLINE void UEODItemContainer::ResetContainer()
 
 void UEODItemContainer::NativeOnDragDetected(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent, UDragDropOperation *& OutOperation)
 {
-	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-
-	CreateDragAndDropOperation();
+	OnDragDetected(InGeometry, InMouseEvent, OutOperation);
 }
 
 bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDropEvent & InDragDropEvent, UDragDropOperation * InOperation)
 {
-	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-
 	// Cannot drop anything on skill tree
 	if (ContainerType == EEODContainerType::SkillTree)
 	{
@@ -186,24 +182,18 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 
 void UEODItemContainer::NativeOnMouseEnter(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
 {
-	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
-
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
 	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), HoveredBorderColor);
 }
 
 void UEODItemContainer::NativeOnMouseLeave(const FPointerEvent & InMouseEvent)
 {
-	Super::NativeOnMouseLeave(InMouseEvent);
-
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
 	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
 }
 
 FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
 {
-	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
 	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), PressedBorderColor);
 
@@ -224,8 +214,6 @@ FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry & InGeometry, 
 
 FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
 {
-	Super::NativeOnMouseButtonUp(InGeometry, InMouseEvent);
-
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
 	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), HoveredBorderColor);
 
