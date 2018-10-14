@@ -64,6 +64,7 @@ public:
 	/** Saves current player state */
 	FORCEINLINE void SavePlayerState();
 
+	/** Saves current player state */
 	UFUNCTION(BlueprintCallable, Category = SaveSystem, meta = (DisplayName = "Save Player State"))
 	void BP_SavePlayerState();
 
@@ -102,7 +103,7 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInventoryComponent* InventoryComponent;
 	
-	/** A helper function that must be called from constructor. Creates and returns new armor skeletal mesh component */
+	/** A helper function that must only be called from constructor. Creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
 	
 public:
@@ -325,16 +326,9 @@ private:
 	UPROPERTY(Transient)
 	UHUDWidget* HUDWidget;
 
-	// UPROPERTY(Transient)
-	// USkillBarWidget* SkillBarWidget;
-
 	/** The blueprint widget class to use for player HUD */
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
-	TSubclassOf<UHUDWidget> BP_HUDWidget;
-
-	/** The blueprint widget class for skill class */
-	// UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
-	// TSubclassOf<USkillBarWidget> BP_SkillBarWidget;
+	TSubclassOf<UHUDWidget> HUDWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	ECharacterGender Gender;

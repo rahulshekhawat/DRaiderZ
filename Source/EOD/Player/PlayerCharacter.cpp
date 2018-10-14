@@ -326,9 +326,9 @@ void APlayerCharacter::BeginPlay()
 	//~ Player widgets
 	if (IsLocallyControlled())
 	{
-		if (BP_HUDWidget.Get())
+		if (HUDWidgetClass.Get())
 		{
-			HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), BP_HUDWidget);
+			HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), HUDWidgetClass);
 			if (HUDWidget)
 			{
 				HUDWidget->AddToViewport();
