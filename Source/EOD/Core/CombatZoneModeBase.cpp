@@ -8,6 +8,7 @@
 
 ACombatZoneModeBase::ACombatZoneModeBase(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
+	CombatManagerClass = ACombatManager::StaticClass();
 }
 
 void ACombatZoneModeBase::InitGame(const FString & MapName, const FString & Options, FString & ErrorMessage)
@@ -24,7 +25,7 @@ void ACombatZoneModeBase::InitGame(const FString & MapName, const FString & Opti
 	SpawnInfo.ObjectFlags |= RF_Transient;
 
     StatusEffectsManager = World->SpawnActor<AStatusEffectsManager>(AStatusEffectsManager::StaticClass(), SpawnInfo);
-    CombatManager = World->SpawnActor<ACombatManager>(ACombatManager::StaticClass(), SpawnInfo);
+    CombatManager = World->SpawnActor<ACombatManager>(CombatManagerClass, SpawnInfo);
 
 }
 

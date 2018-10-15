@@ -42,4 +42,7 @@ private:
 	UPROPERTY(Transient)
 	AStatusEffectsManager* StatusEffectsManager;
 
+	UPROPERTY(EditDefaultsOnly, Category = Classes, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ACombatManager> CombatManagerClass;
+
 };

@@ -66,7 +66,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly)
 	FLinearColor PlayerDamagedTextColor;
 
-	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly)
-	FLinearColor NPCDamagedTextColor;
+	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly, meta = (DisplayName = "NPC Damaged Text Color"))
+	FLinearColor NPCNormalDamagedTextColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly, meta = (DisplayName = "NPC Critically Damaged Text Color"))
+	FLinearColor NPCCritDamagedTextColor;
 
 };
