@@ -167,8 +167,8 @@ protected:
 	uint32 bTriggersOnKillingEnemy : 1;
 
 	/** True if the status effect triggers on Owner failing to land an attack on enemy */
-	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
-	uint32 bTriggersOnUnsuccessfulHit : 1;
+	// UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
+	// uint32 bTriggersOnUnsuccessfulHit : 1;
 
 	/** True if the status effect triggers on Owner successfully landing a critical attack on enemy */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
