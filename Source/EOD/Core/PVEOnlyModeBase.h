@@ -14,7 +14,9 @@ class EOD_API APVEOnlyModeBase : public ACombatZoneModeBase
 {
 	GENERATED_BODY()
 	
-	
+public:
+
+
 	
 	
 };

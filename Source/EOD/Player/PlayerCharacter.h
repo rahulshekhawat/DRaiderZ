@@ -8,7 +8,7 @@
 #include "PlayerCharacter.generated.h"
 
 class UHUDWidget;
-class USkillBarWidget;
+
 class UAnimMontage;
 class APrimaryWeapon;
 class ASecondaryWeapon;
@@ -103,14 +103,16 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInventoryComponent* InventoryComponent;
 	
-	/** A helper function that must only be called from constructor. Creates and returns new armor skeletal mesh component */
+	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
 	
 public:
 
+	/** Determines if this character should be rotated toward DesiredSmoothRotationYaw */
 	UPROPERTY(Transient)
 	bool bRotateSmoothly;
 
+	/** The yaw to which the character needs to be rotated smoothly */
 	UPROPERTY(Transient)
 	float DesiredSmoothRotationYaw;
 
@@ -141,14 +143,19 @@ public:
 	/** Returns true if secondary weapon is equipped */
 	bool IsSecondaryWeaponEquipped() const;
 
+	/** Returns primary weapon actor */
 	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
 
+	/** Returns secondary weapon actor */
 	FORCEINLINE ASecondaryWeapon* GetSecondaryWeapon() const;
 
+	/** Returns the weapon type of primary weapon */
 	FORCEINLINE EWeaponType GetEquippedWeaponType() const;
 
+	/** Returns HUD widget */
 	FORCEINLINE UHUDWidget* GetHUDWidget() const;
 
+	/** Returns HUD widget */
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get HUD Widget"))
 	UHUDWidget* BP_GetHUDWidget() const;
 
@@ -179,12 +186,15 @@ public:
 	/** [server + client] Knockback this character */
 	virtual void Knockback(const float Duration, const FVector& Impulse) override;
 	
+	/** Plays stun animation */
 	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
 	void PlayStunAnimation();
 
+	/** Stops stun animation */
 	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
 	void StopStunAnimation();
 
+	/** Simulates the knock back effect */
 	UFUNCTION(BlueprintImplementableEvent, Category = Motion)
 	void PushPlayer(FVector PushDirection);
 
@@ -219,7 +229,7 @@ public:
 
 	void AddSkill(FName SkillID, uint8 SkillLevel);
 
-	FORCEINLINE FPlayerSkillTableRow* GetSkill(FName SkillID);
+	FORCEINLINE FPlayerSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("APlayerCharacter::GetSkill(), player skill lookup"));
 
 	virtual void OnNormalAttackSectionStart(FName SectionName) override;
 
@@ -282,8 +292,8 @@ protected:
 private:
 
 	/** Data table for player skills */
-	UPROPERTY(EditDefaultsOnly, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UDataTable* DataTable_Skills;
+	// UPROPERTY(EditDefaultsOnly, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UDataTable* DataTable_Skills;
 
 	const int CameraZoomRate = 15;
 
@@ -330,6 +340,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	TSubclassOf<UHUDWidget> HUDWidgetClass;
 
+	/** Player gender : determines the animations and armor meshes to use. */
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	ECharacterGender Gender;
 

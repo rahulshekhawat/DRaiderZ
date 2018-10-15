@@ -17,6 +17,7 @@
 #include "Statics/EODBlueprintFunctionLibrary.h"
 
 #include "Engine/World.h"
+#include "Engine/Engine.h"
 #include "UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -28,7 +29,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "GameFramework/GameUserSettings.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
 {
@@ -341,8 +342,6 @@ USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName N
 {
 	USkeletalMeshComponent* Sk = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, Name);
 	Sk->SetupAttachment(GetMesh());
-	// Sk->AddLocalRotation(FRotator(0.f, -90.f, 0.f));
-	// Sk->AddLocalOffset(FVector(0.f, 0.f, -90.f));
 	Sk->SetMasterPoseComponent(GetMesh());
 	Sk->bUseAttachParentBound = true;
 	return Sk;
@@ -350,13 +349,12 @@ USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName N
 
 bool APlayerCharacter::CanMove() const
 {
-	// return CharacterState == ECharacterState::IdleWalkRun || IsBlocking();
 	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning();
 }
 
 bool APlayerCharacter::CanJump() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun || IsBlocking();
+	return IsIdleOrMoving() || IsBlocking();
 }
 
 bool APlayerCharacter::CanDodge() const
@@ -716,6 +714,7 @@ void APlayerCharacter::OnToggleSheathe()
 
 void APlayerCharacter::OnToggleCharacterStatsUI()
 {
+
 	// @todo definition
 }
 
@@ -1238,7 +1237,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	// @note no need to check for active or passive skill since only active skills can be placed in skill bar slot.
 	// In fact, only active skills can be dragged out of skill tree widget.
 
-	FPlayerSkillTableRow* Skill = DataTable_Skills->FindRow<FPlayerSkillTableRow>(SkillID, FString("Looking for player skill"));
+	FPlayerSkillTableRow* Skill = GetSkill(SkillID, FString("APlayerCharacter::OnPressingSkillKey(), looking for player skill"));
 
 	if (!Skill)
 	{
@@ -1267,6 +1266,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 	}
 
+	SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
 	PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 
 
@@ -1806,10 +1806,9 @@ void APlayerCharacter::AddSkill(FName SkillID, uint8 SkillLevel)
 	*/
 }
 
-FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetSkill(FName SkillID)
+FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetSkill(FName SkillID,  const FString& ContextString)
 {
-	FPlayerSkillTableRow* Skill = DataTable_Skills->FindRow<FPlayerSkillTableRow>(SkillID, FString("APlayerCharacter::GetSkill()"));
-	return Skill;
+	return UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
 }
 
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
