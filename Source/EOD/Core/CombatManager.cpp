@@ -22,9 +22,9 @@ void ACombatManager::Tick(float DeltaTime)
 
 }
 
-void ACombatManager::OnMeleeHit(AActor* Instigator, const bool bHit, const TArray<FHitResult>& HitResults)
+void ACombatManager::OnMeleeHit(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(Instigator);
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(HitInstigator);
 
 	if (PlayerCharacter)
 	{
@@ -32,29 +32,31 @@ void ACombatManager::OnMeleeHit(AActor* Instigator, const bool bHit, const TArra
 	}
 	else
 	{
-		AEODCharacterBase* NPCCharacter = Cast<AEODCharacterBase>(Instigator);
+		AEODCharacterBase* NPCCharacter = Cast<AEODCharacterBase>(HitInstigator);
 		if (NPCCharacter)
 		{
 			ProcessNPCMeleeAttack(NPCCharacter, bHit, HitResults);
 		}
 		else
 		{
-			ProcessActorMeleeAttack(Instigator, bHit, HitResults);
+			ProcessActorMeleeAttack(HitInstigator, bHit, HitResults);
 		}
 	}
 }
 
-void ACombatManager::ProcessActorMeleeAttack(AActor * Instigator, const bool bHit, const TArray<FHitResult>& HitResults)
+void ACombatManager::ProcessActorMeleeAttack(AActor * HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
+	// @todo definition
 }
 
-void ACombatManager::ProcessNPCMeleeAttack(AEODCharacterBase * Instigator, const bool bHit, const TArray<FHitResult>& HitResults)
+void ACombatManager::ProcessNPCMeleeAttack(AEODCharacterBase * HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
+	// @todo definition
 }
 
-void ACombatManager::ProcessPlayerMeleeAttack(APlayerCharacter * Instigator, const bool bHit, const TArray<FHitResult>& HitResults)
+void ACombatManager::ProcessPlayerMeleeAttack(APlayerCharacter * HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
-	FPlayerSkillTableRow* PlayerSkill = Instigator->GetSkill(Instigator->GetCurrentActiveSkillID());
+	FPlayerSkillTableRow* PlayerSkill = HitInstigator->GetSkill(HitInstigator->GetCurrentActiveSkillID());
 	check(PlayerSkill);
 
 	for (const FHitResult& HitResult : HitResults)
@@ -64,21 +66,21 @@ void ACombatManager::ProcessPlayerMeleeAttack(APlayerCharacter * Instigator, con
 
 		if (HitNPC)
 		{
-			PlayerToNPCMeleeAttack(Instigator, HitNPC, PlayerSkill, HitResult);
+			PlayerToNPCMeleeAttack(HitInstigator, HitNPC, PlayerSkill, HitResult);
 		}
 		else
 		{
-			PlayerToActorMeleeAttack(Instigator, HitActor, PlayerSkill, HitResult);
+			PlayerToActorMeleeAttack(HitInstigator, HitActor, PlayerSkill, HitResult);
 		}
 	}
 }
 
-void ACombatManager::PlayerToNPCMeleeAttack(APlayerCharacter* Instigator,
+void ACombatManager::PlayerToNPCMeleeAttack(APlayerCharacter* HitInstigator,
 											AEODCharacterBase* HitCharacter,
 											const FPlayerSkillTableRow* HitSkill,
 											const FHitResult& HitResult)
 {
-	check(Instigator);
+	check(HitInstigator);
 	check(HitCharacter);
 	check(HitSkill);
 
@@ -87,12 +89,18 @@ void ACombatManager::PlayerToNPCMeleeAttack(APlayerCharacter* Instigator,
 		DisplayDamageText(FString("Dodge"));
 	}
 
+	if (!HitSkill->bUnblockable && HitCharacter->IsBlockingDamage())
+	{
 
+
+
+	}
 }
 
-void ACombatManager::PlayerToActorMeleeAttack(APlayerCharacter* Instigator,
+void ACombatManager::PlayerToActorMeleeAttack(APlayerCharacter* HitInstigator,
 											  AActor* HitActor,
 											  const FPlayerSkillTableRow* HitSkill,
 											  const FHitResult& HitResult)
 {
+	// @todo definition
 }

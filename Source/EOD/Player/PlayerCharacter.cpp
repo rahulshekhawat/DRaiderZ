@@ -1811,6 +1811,11 @@ FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetSkill(FName SkillID,  co
 	return UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
 }
 
+FEODDamage APlayerCharacter::GetCurrentActiveSkillDamageInfo()
+{
+	return FEODDamage();
+}
+
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
 	// @attention

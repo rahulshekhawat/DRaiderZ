@@ -281,6 +281,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Current Active Skill ID"))
 	FName BP_GetCurrentActiveSkillID() const;
 
+	virtual FEODDamage GetCurrentActiveSkillDamageInfo() PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkillDamageInfo, return FEODDamage(); );
+
 	virtual void OnNormalAttackSectionStart(FName SectionName) PURE_VIRTUAL(AEODCharacterBase::OnNormalAttackSectionStart, );
 
 	/** Returns the last used skill */

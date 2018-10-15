@@ -231,6 +231,8 @@ public:
 
 	FORCEINLINE FPlayerSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("APlayerCharacter::GetSkill(), player skill lookup"));
 
+	virtual FEODDamage GetCurrentActiveSkillDamageInfo() override;
+
 	virtual void OnNormalAttackSectionStart(FName SectionName) override;
 
 	void CleanupNormalAttackSectionToSkillMap();

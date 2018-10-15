@@ -26,20 +26,20 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	void OnMeleeHit(AActor* Instigator, const bool bHit, const TArray<FHitResult>& HitResults);
+	void OnMeleeHit(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
 
-	void ProcessActorMeleeAttack(AActor* Instigator, const bool bHit, const TArray<FHitResult>& HitResults);
+	void ProcessActorMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
 
-	void ProcessNPCMeleeAttack(AEODCharacterBase* Instigator, const bool bHit, const TArray<FHitResult>& HitResults);
+	void ProcessNPCMeleeAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
 
-	void ProcessPlayerMeleeAttack(APlayerCharacter* Instigator, const bool bHit, const TArray<FHitResult>& HitResults);
+	void ProcessPlayerMeleeAttack(APlayerCharacter* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
 
-	void PlayerToNPCMeleeAttack(APlayerCharacter* Instigator,
+	void PlayerToNPCMeleeAttack(APlayerCharacter* HitInstigator,
 								AEODCharacterBase* HitCharacter,
 								const FPlayerSkillTableRow* HitSkill,
 								const FHitResult& HitResult);
 
-	void PlayerToActorMeleeAttack(APlayerCharacter* Instigator,
+	void PlayerToActorMeleeAttack(APlayerCharacter* HitInstigator,
 								  AActor* HitActor,
 								  const FPlayerSkillTableRow* HitSkill,
 								  const FHitResult& HitResult);
