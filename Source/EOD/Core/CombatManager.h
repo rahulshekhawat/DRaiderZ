@@ -26,33 +26,33 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	void OnMeleeHit(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
-
-	void ProcessActorMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
-
-	void ProcessNPCMeleeAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
-
-	void ProcessPlayerMeleeAttack(APlayerCharacter* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
-
-	void PlayerToNPCMeleeAttack(APlayerCharacter* HitInstigator,
-								AEODCharacterBase* HitCharacter,
-								const FPlayerSkillTableRow* HitSkill,
-								const FHitResult& HitResult);
-
-	void PlayerToActorMeleeAttack(APlayerCharacter* HitInstigator,
-								  AActor* HitActor,
-								  const FPlayerSkillTableRow* HitSkill,
-								  const FHitResult& HitResult);
+	/** Called when an actor attacks another actor */
+	void OnMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
 
 	//~ @todo OnRangedHit
 
+	/** Returns angle between two vectors */
+	FORCEINLINE float CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2);
+
+	/** Displays damage numbers on player screen */
 	UFUNCTION(BlueprintImplementableEvent, Category = WidgetText)
 	void DisplayDamageText(const FString& Message);
 
+	/** Displays status effect text on player screen */
 	UFUNCTION(BlueprintImplementableEvent, Category = WidgetText)
 	void DisplayStatusEffectText(const FString& Message);
 
 protected:
+
+	/** The maximum angle to which an incoming damage can be blocked */
+	UPROPERTY(EditDefaultsOnly, Category = Combat, BlueprintReadOnly)
+	float BlockDetectionAngle;
+
+	UPROPERTY(EditDefaultsOnly, Category = Combat, BlueprintReadOnly)
+	float PhysicalCritMultiplier;
+
+	UPROPERTY(EditDefaultsOnly, Category = Combat, BlueprintReadOnly)
+	float MagickalCritMultiplier;
 
 	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly)
 	FLinearColor BuffTextColor;
@@ -71,5 +71,52 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly, meta = (DisplayName = "NPC Critically Damaged Text Color"))
 	FLinearColor NPCCritDamagedTextColor;
+
+private:
+
+	/** Determines whether the hit actor succesfully blocked an attack based on the positions of itself and the attacking actor */
+	FORCEINLINE bool WasBlockSuccessful(AActor* HitInstigator, AActor* HitActor, bool bLineHitResultFound, const FHitResult& LineHitResult);
+
+	/**
+	 * Generates a random boolean based on HitInstigator's crit rate and HitCharacter's crit resistance,
+	 * that could be used to determine if the attack was a critical attacl
+	 */
+	FORCEINLINE bool GetCritChanceBoolean(const AEODCharacterBase* HitInstigator,
+								  		  const AEODCharacterBase* HitCharacter,
+										  const EDamageType& DamageType) const;
+	
+	float GetActualDamage(const AEODCharacterBase* HitInstigator,
+						  const AEODCharacterBase* HitCharacter,
+						  const FSkillDamageInfo& SkillDamageInfo,
+						  const bool bCriticalHit,
+						  const bool bAttackBlocked);
+
+	/**
+	 * Does a line trace from HitInstigator to HitTarget
+	 * @param HitInstigator The actor that initiated the line trace
+	 * @param HitTarget The supposed target that we want to do line trace to
+	 * @param OutHitResult Outs the hit result of line trace
+	 * @return Returns true if line trace actually hit the HitTarget
+	 */
+	bool GetLineHitResult(const AActor* HitInstigator, const AActor* HitTarget, FHitResult& OutHitResult) const;
+
+	/** Processes an attack from an AActor */
+	void ProcessActorAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
+
+	/** Processes an attack from an AEODCharacterBase */
+	void ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
+
+	/** Handles an attack from one character to another character */
+	void CharacterToCharacterAttack(AEODCharacterBase* HitInstigator,
+									AEODCharacterBase* HitCharacter,
+									const FSkillDamageInfo& SkillDamageInfo,
+									const FHitResult& HitResult);
+
+	/** Handles an attack from a character to an actor */
+	void CharacterToActorAttack(AEODCharacterBase* HitInstigator,
+								AActor* HitActor,
+								const FSkillDamageInfo& SkillDamageInfo,
+								const FHitResult& HitResult);
+
 
 };

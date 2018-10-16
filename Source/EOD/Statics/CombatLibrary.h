@@ -84,6 +84,9 @@ public:
 	bool bUnblockable;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
+	bool bIgnoresBlock;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
 	float DamagePercent;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
@@ -93,7 +96,7 @@ public:
 	ECrowdControlEffect CrowdControlEffect;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
-	float CrowdControlEffectDuration;
+	float CrowdControlEffectDuration;		
 
 };
 

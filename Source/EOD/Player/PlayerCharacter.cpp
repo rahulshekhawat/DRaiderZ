@@ -1817,6 +1817,7 @@ FSkillDamageInfo APlayerCharacter::GetCurrentActiveSkillDamageInfo() const
 	const FPlayerSkillTableRow* Skill = GetSkill(GetCurrentActiveSkillID());
 	SkillDamageInfo.bUnblockable = Skill->bUnblockable;
 	SkillDamageInfo.bUndodgable = Skill->bUndodgable;
+	SkillDamageInfo.bIgnoresBlock = Skill->bIgnoresBlock;
 	SkillDamageInfo.CrowdControlEffect = Skill->CrowdControlEffect;
 	SkillDamageInfo.CrowdControlEffectDuration = Skill->CrowdControlEffectDuration;
 	SkillDamageInfo.DamagePercent = Skill->DamagePercent;

@@ -277,7 +277,7 @@ EEODTaskStatus AAICharacterBase::CheckSkillStatus(FName SkillID)
 	}
 }
 
-FName AAICharacterBase::GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const
+FName AAICharacterBase::GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const
 {
 	FName MostWeightedSkillID = NAME_None;
 	TArray<FName> EligibleSkills;

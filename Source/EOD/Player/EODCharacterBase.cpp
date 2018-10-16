@@ -179,17 +179,12 @@ bool AEODCharacterBase::CanRespawn() const
 
 bool AEODCharacterBase::CanNormalAttack() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun;
-}
-
-bool AEODCharacterBase::CanBeStunned() const
-{
-	return false;
+	return IsIdleOrMoving();
 }
 
 bool AEODCharacterBase::CanUseAnySkill() const
 {
-	return true;
+	return IsIdleOrMoving();
 }
 
 bool AEODCharacterBase::CanUseSkill(int32 SkillIndex) const
@@ -274,6 +269,25 @@ FORCEINLINE void AEODCharacterBase::OnSuccessfulDodge(AEODCharacterBase* AttackI
 {
 	TWeakObjectPtr<AEODCharacterBase> AttackInstigatorWeakPtr(AttackInstigator);
 	OnSuccessfulDodgeEvent.Broadcast(AttackInstigatorWeakPtr);
+}
+
+FORCEINLINE void AEODCharacterBase::OnSuccessfulBlock(AEODCharacterBase * AttackInstigator)
+{
+	TWeakObjectPtr<AEODCharacterBase> AttackInstigatorWeakPtr(AttackInstigator);
+	OnSuccessfulBlockEvent.Broadcast(AttackInstigatorWeakPtr);
+
+	// PlayAnimationMontage()
+}
+
+FORCEINLINE void AEODCharacterBase::OnAttackBlocked(AEODCharacterBase * AttackBlocker, bool bSkillIgnoresBlock)
+{
+	TWeakObjectPtr<AEODCharacterBase> AttackBlockerWeakPtr(AttackBlocker);
+	OnAttackBlockedEvent.Broadcast(AttackBlockerWeakPtr);
+
+	if (!bSkillIgnoresBlock)
+	{
+		// PlayAnimationMontage()
+	}
 }
 
 void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * InstigatingChar)

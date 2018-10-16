@@ -38,6 +38,6 @@ void UAnimNotify_CapsuleCollision::Notify(USkeletalMeshComponent * MeshComp, UAn
 	TArray<FHitResult> HitResults;
 	
 	bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, TransformedQuat, COLLISION_COMBAT, CollisionShape, Params);
-	CombatZoneGameMode->GetCombatManager()->OnMeleeHit(MeshComp->GetOwner(), bHit, HitResults);
+	CombatZoneGameMode->GetCombatManager()->OnMeleeAttack(MeshComp->GetOwner(), bHit, HitResults);
 
 }

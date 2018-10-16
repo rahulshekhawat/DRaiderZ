@@ -114,9 +114,6 @@ public:
 
 	/** Returns true if character can use normal attack */
 	virtual bool CanNormalAttack() const;
-
-	/** Returns true if character can be stunned */
-	virtual bool CanBeStunned() const;
 	
 	/** Returns true if character can use any skill at all */
 	virtual bool CanUseAnySkill() const;
@@ -198,6 +195,18 @@ public:
 	 * @param AttackInstigator Enemy character whose incoming damage this character dodged
 	 */
 	FORCEINLINE void OnSuccessfulDodge(AEODCharacterBase* AttackInstigator);
+
+	/**
+	 * Called on successfully blocking an enemy attack
+	 * @param AttackInstigator Enemy character whose incoming damage this character blocked
+	 */
+	FORCEINLINE void OnSuccessfulBlock(AEODCharacterBase* AttackInstigator);
+
+	/**
+	 * Called on getting an attack of this character blocked by an enemy
+	 * @param AttackBlocker Enemy character that blocked this character's attack
+	 */
+	FORCEINLINE void OnAttackBlocked(AEODCharacterBase* AttackBlocker, bool bSkillIgnoresBlock);
 
 	/**
 	 * Kills this character 
@@ -364,6 +373,13 @@ public:
 
 protected:
 
+	FCombatEvent OnSuccessfulDodgeEvent;
+
+	FCombatEvent OnSuccessfulBlockEvent;
+
+	FCombatEvent OnAttackBlockedEvent;
+
+	//~
 	FCombatEvent OnReceivingHit;
 
 	FCombatEvent OnSuccessfulHit;
@@ -378,10 +394,6 @@ protected:
 
 	FCombatEvent OnKillingEnemy;
 
-	FCombatEvent OnSuccessfulDodgeEvent;
-
-	FCombatEvent OnSuccessfulBlock;
-
 	FCombatEvent OnFullHealth;
 
 	FCombatEvent OnDamageAtFullHealth;
@@ -391,6 +403,7 @@ protected:
 	FCombatEvent OnEnteringCombat;
 
 	FCombatEvent OnLeavingCombat;
+	//~ 
 
 	/** Map of skill index and it's respective combat event */
 	TMap<uint8, FCombatEvent> OnUsingSkillEventMap;
