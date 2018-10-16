@@ -69,7 +69,35 @@ enum class EDamageType : uint8
 	Magickal
 };
 
-/** In-game skill */
+/** Damage info from character skill */
+USTRUCT(BlueprintType)
+struct FSkillDamageInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
+	bool bUndodgable;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
+	bool bUnblockable;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
+	float DamagePercent;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
+	EDamageType DamageType;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
+	ECrowdControlEffect CrowdControlEffect;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
+	float CrowdControlEffectDuration;
+
+};
+
+
 USTRUCT(BlueprintType)
 struct FEODDamage
 {
@@ -129,7 +157,7 @@ public:
 	
 	static void HandleCombatCollision(AActor* Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
 
-	static FCollisionQueryParams GenerateCombatCollisionQueryParams(AActor* ActorToIgnore, EQueryMobilityType MobilityType = EQueryMobilityType::Dynamic, bool bReturnPhysicalMaterial = false, FName TraceTag = FName("CollisionQueryForCombat"));
+	static FCollisionQueryParams GenerateCombatCollisionQueryParams(const AActor* ActorToIgnore, EQueryMobilityType MobilityType = EQueryMobilityType::Dynamic, bool bReturnPhysicalMaterial = false, FName TraceTag = FName("CollisionQueryForCombat"));
 
 	static float CalculateDamage(float Attack, float Defense);
 

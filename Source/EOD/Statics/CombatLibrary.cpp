@@ -24,7 +24,7 @@ void UCombatLibrary::HandleCombatCollision(AActor * Instigator, UAnimSequenceBas
 	// @todo definition
 }
 
-FCollisionQueryParams UCombatLibrary::GenerateCombatCollisionQueryParams(AActor * ActorToIgnore, EQueryMobilityType MobilityType, bool bReturnPhysicalMaterial, FName TraceTag)
+FCollisionQueryParams UCombatLibrary::GenerateCombatCollisionQueryParams(const AActor * ActorToIgnore, EQueryMobilityType MobilityType, bool bReturnPhysicalMaterial, FName TraceTag)
 {
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(ActorToIgnore);
