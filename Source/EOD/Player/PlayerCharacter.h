@@ -229,9 +229,9 @@ public:
 
 	void AddSkill(FName SkillID, uint8 SkillLevel);
 
-	FORCEINLINE FPlayerSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("APlayerCharacter::GetSkill(), player skill lookup"));
+	FORCEINLINE FPlayerSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("APlayerCharacter::GetSkill(), player skill lookup")) const;
 
-	virtual FEODDamage GetCurrentActiveSkillDamageInfo() override;
+	virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const override;
 
 	virtual void OnNormalAttackSectionStart(FName SectionName) override;
 

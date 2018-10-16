@@ -8,7 +8,8 @@
 #include "GameFramework/Character.h"
 #include "EODCharacterBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TArray<TWeakObjectPtr<AEODCharacterBase>>, RecipientCharacters);
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TArray<TWeakObjectPtr<AEODCharacterBase>>, RecipientCharacters);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TWeakObjectPtr<AEODCharacterBase>, RecipientCharacter);
 
 class UAnimMontage;
 class UInputComponent;
@@ -193,6 +194,12 @@ public:
 	void DisableDamageBlocking();
 
 	/**
+	 * Called on successfully dodging an enemy attack
+	 * @param AttackInstigator Enemy character whose incoming damage this character dodged
+	 */
+	FORCEINLINE void OnSuccessfulDodge(AEODCharacterBase* AttackInstigator);
+
+	/**
 	 * Kills this character 
 	 * @param CauseOfDeath - The reason for death of this character
 	 * @param Instigator - The character that instigated the death of this character (if any)
@@ -281,7 +288,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Current Active Skill ID"))
 	FName BP_GetCurrentActiveSkillID() const;
 
-	virtual FEODDamage GetCurrentActiveSkillDamageInfo() PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkillDamageInfo, return FEODDamage(); );
+	virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkillDamageInfo, return FSkillDamageInfo(); );
+
+	// virtual  GetCurrentActiveSkillDamageInfo() const PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkillDamageInfo, return (); );
 
 	virtual void OnNormalAttackSectionStart(FName SectionName) PURE_VIRTUAL(AEODCharacterBase::OnNormalAttackSectionStart, );
 
@@ -369,7 +378,7 @@ protected:
 
 	FCombatEvent OnKillingEnemy;
 
-	FCombatEvent OnSuccessfulDodge;
+	FCombatEvent OnSuccessfulDodgeEvent;
 
 	FCombatEvent OnSuccessfulBlock;
 

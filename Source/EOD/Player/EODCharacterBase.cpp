@@ -270,6 +270,12 @@ void AEODCharacterBase::DisableDamageBlocking()
 	GetWorld()->GetTimerManager().ClearTimer(BlockTimerHandle); 
 }
 
+FORCEINLINE void AEODCharacterBase::OnSuccessfulDodge(AEODCharacterBase* AttackInstigator)
+{
+	TWeakObjectPtr<AEODCharacterBase> AttackInstigatorWeakPtr(AttackInstigator);
+	OnSuccessfulDodgeEvent.Broadcast(AttackInstigatorWeakPtr);
+}
+
 void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * InstigatingChar)
 {
 	if (bGodMode || IsDead())

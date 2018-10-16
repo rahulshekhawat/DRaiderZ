@@ -1806,14 +1806,23 @@ void APlayerCharacter::AddSkill(FName SkillID, uint8 SkillLevel)
 	*/
 }
 
-FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetSkill(FName SkillID,  const FString& ContextString)
+FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetSkill(FName SkillID,  const FString& ContextString) const
 {
 	return UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
 }
 
-FEODDamage APlayerCharacter::GetCurrentActiveSkillDamageInfo()
+FSkillDamageInfo APlayerCharacter::GetCurrentActiveSkillDamageInfo() const
 {
-	return FEODDamage();
+	FSkillDamageInfo SkillDamageInfo;
+	const FPlayerSkillTableRow* Skill = GetSkill(GetCurrentActiveSkillID());
+	SkillDamageInfo.bUnblockable = Skill->bUnblockable;
+	SkillDamageInfo.bUndodgable = Skill->bUndodgable;
+	SkillDamageInfo.CrowdControlEffect = Skill->CrowdControlEffect;
+	SkillDamageInfo.CrowdControlEffectDuration = Skill->CrowdControlEffectDuration;
+	SkillDamageInfo.DamagePercent = Skill->DamagePercent;
+	SkillDamageInfo.DamageType = Skill->DamageType;
+
+	return SkillDamageInfo;
 }
 
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
