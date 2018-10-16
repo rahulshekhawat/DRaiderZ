@@ -185,7 +185,9 @@ public:
 
 	/** [server + client] Knockback this character */
 	virtual void Knockback(const float Duration, const FVector& Impulse) override;
-	
+
+	virtual void BlockedAttack() override;
+
 	/** Plays stun animation */
 	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
 	void PlayStunAnimation();

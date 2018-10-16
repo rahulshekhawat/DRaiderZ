@@ -275,8 +275,7 @@ FORCEINLINE void AEODCharacterBase::OnSuccessfulBlock(AEODCharacterBase * Attack
 {
 	TWeakObjectPtr<AEODCharacterBase> AttackInstigatorWeakPtr(AttackInstigator);
 	OnSuccessfulBlockEvent.Broadcast(AttackInstigatorWeakPtr);
-
-	// PlayAnimationMontage()
+	BlockedAttack();
 }
 
 FORCEINLINE void AEODCharacterBase::OnAttackBlocked(AEODCharacterBase * AttackBlocker, bool bSkillIgnoresBlock)

@@ -510,6 +510,13 @@ void APlayerCharacter::Knockback(const float Duration, const FVector & Impulse)
 	PushPlayer(Impulse);
 }
 
+void APlayerCharacter::BlockedAttack()
+{
+	UKismetSystemLibrary::PrintString(this, FString("Blocked Attack"));
+	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+						 UCharacterLibrary::SectionName_BlockedAttack);
+}
+
 bool APlayerCharacter::CanAutoRun() const
 {
 	// The character can auto run only if character is in idle state
@@ -1268,6 +1275,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 	SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
 	PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+	SetCurrentActiveSkillID(SkillID);
 
 
 	/*

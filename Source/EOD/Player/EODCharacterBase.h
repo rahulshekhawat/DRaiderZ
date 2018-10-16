@@ -176,6 +176,9 @@ public:
 	/** [server + client] Knockback this character */
 	virtual void Knockback(const float Duration, const FVector& Impulse) PURE_VIRTUAL(AEODCharacterBase::Knockback, );
 
+	/** Plays BlockedAttack animation on blocking an incoming attack */
+	virtual void BlockedAttack() PURE_VIRTUAL(AEODCharacterBase::BlockedAttack, );
+
 	/** Enables immunity frames for a given duration */
 	UFUNCTION()
 	void EnableiFrames(float Duration = 0.f);

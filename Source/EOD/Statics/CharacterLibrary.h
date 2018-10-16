@@ -755,6 +755,7 @@ public:
 
 	static void GetAllAICharacterSkills(const FString& CharacterName, const UDataTable* SkillsDataTable, TArray<FSkill*> &OutSkills);
 
+	//~ Begin anim montage section names
 	static const FName SectionName_ForwardFlinch;
 	
 	static const FName SectionName_BackwardFlinch;
@@ -763,7 +764,9 @@ public:
 
 	static const FName SectionName_BackwardInterrupt;
 
-	static const FName SectionName_AttackBlocked;
+	static const FName SectionName_AttackDeflected;
+
+	static const FName SectionName_BlockedAttack;
 
 	static const FName SectionName_KnockdownStart;
 
@@ -822,5 +825,6 @@ public:
 	static const FName SectionName_LeftDodge;
 
 	static const FName SectionName_RightDodge;
+	//~ End anim montage section names
 
 };
