@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Statics/CharacterLibrary.h"
 #include "Player/EODCharacterBase.h"
 #include "AICharacterBase.generated.h"
 
@@ -92,6 +93,7 @@ public:
 	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	virtual FName GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const override;
 
+	virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const override;
 private:
 
 	/** Used to display floating aggro widget above AI character */

@@ -3,7 +3,6 @@
 #include "AICharacterBase.h"
 #include "Core/GameSingleton.h"
 #include "Core/EODPreprocessors.h"
-#include "Statics/CharacterLibrary.h"
 #include "Components/AIStatsComponent.h"
 #include "Player/Components/EODWidgetComponent.h"
 
@@ -334,6 +333,23 @@ FName AAICharacterBase::GetMostWeightedMeleeSkillID(AEODCharacterBase const * co
 	}
 
 	return MostWeightedSkillID;
+}
+
+FSkillDamageInfo AAICharacterBase::GetCurrentActiveSkillDamageInfo() const
+{
+	FSkillDamageInfo SkillDamageInfo;
+
+	FString ContextString = FString("AAICharacterBase::GetCurrentActiveSkillDamageInfo(), looking for AI skill");
+	TSharedRef<FAISkillTableRow> Skill(SkillsDataTable->FindRow<FAISkillTableRow>(GetCurrentActiveSkillID(), ContextString));
+	SkillDamageInfo.bUnblockable = Skill->bUnblockable;
+	SkillDamageInfo.bUndodgable = Skill->bUndodgable;
+	SkillDamageInfo.bIgnoresBlock = Skill->bIgnoresBlock;
+	SkillDamageInfo.CrowdControlEffect = Skill->CrowdControlEffect;
+	SkillDamageInfo.CrowdControlEffectDuration = Skill->CrowdControlEffectDuration;
+	SkillDamageInfo.DamagePercent = Skill->DamagePercent;
+	SkillDamageInfo.DamageType = Skill->DamageType;
+
+	return SkillDamageInfo;
 }
 
 void AAICharacterBase::UpdateMaxWalkSpeed()
