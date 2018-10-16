@@ -57,7 +57,7 @@ FORCEINLINE float ACombatManager::CalculateAngleBetweenVectors(FVector Vec1, FVe
 
 FORCEINLINE bool ACombatManager::WasBlockSuccessful(AActor * HitInstigator, AActor * HitActor, bool bLineHitResultFound, const FHitResult & LineHitResult)
 {
-	FVector HitActorForwardVector = HitInstigator->GetActorForwardVector();
+	FVector HitActorForwardVector = HitActor->GetActorForwardVector();
 	FVector HitNormal = LineHitResult.ImpactNormal;
 	float Angle = CalculateAngleBetweenVectors(HitActorForwardVector, HitNormal);
 	bool bResult = Angle < BlockDetectionAngle ? true : false;
@@ -190,6 +190,7 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 	if (!SkillDamageInfo.bUnblockable && HitCharacter->IsBlockingDamage())
 	{
 		bAttackBlocked = WasBlockSuccessful(HitInstigator, HitCharacter, bLineHitResultFound, LineHitResult);
+
 		if (bAttackBlocked)
 		{
 			HitCharacter->OnSuccessfulBlock(HitInstigator);
