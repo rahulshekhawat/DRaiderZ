@@ -340,7 +340,7 @@ FSkillDamageInfo AAICharacterBase::GetCurrentActiveSkillDamageInfo() const
 	FSkillDamageInfo SkillDamageInfo;
 
 	FString ContextString = FString("AAICharacterBase::GetCurrentActiveSkillDamageInfo(), looking for AI skill");
-	TSharedRef<FAISkillTableRow> Skill(SkillsDataTable->FindRow<FAISkillTableRow>(GetCurrentActiveSkillID(), ContextString));
+	FAISkillTableRow* Skill = SkillsDataTable->FindRow<FAISkillTableRow>(GetCurrentActiveSkillID(), ContextString);
 	SkillDamageInfo.bUnblockable = Skill->bUnblockable;
 	SkillDamageInfo.bUndodgable = Skill->bUndodgable;
 	SkillDamageInfo.bIgnoresBlock = Skill->bIgnoresBlock;
