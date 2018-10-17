@@ -54,7 +54,41 @@ FORCEINLINE float ACombatManager::CalculateAngleBetweenVectors(FVector Vec1, FVe
 	return Angle;
 }
 
-FORCEINLINE bool ACombatManager::WasBlockSuccessful(AActor * HitInstigator, AActor * HitActor, bool bLineHitResultFound, const FHitResult & LineHitResult)
+FORCEINLINE void ACombatManager::NativeDisplayDamage(const AEODCharacterBase* HitInstigator,
+													 const AEODCharacterBase* HitCharacter,
+													 const FHitResult& LineHitResult,
+													 const float ActualDamage,
+													 const bool bCriticalHit)
+{
+	// Do no display anything if none of the involved characters is a player character
+	if (!HitInstigator->IsA(APlayerCharacter::StaticClass()) && !HitCharacter->IsA(APlayerCharacter::StaticClass()))
+	{
+		return;
+	}
+
+	FString DisplayMessage = FString::FromInt(ActualDamage);
+	// If the damaged character was player (@todo change it to check for locally controlled player)
+	if (HitCharacter->IsA(APlayerCharacter::StaticClass()))
+	{
+		DisplayDamageMessage(DisplayMessage, PlayerDamagedTextColor, LineHitResult.ImpactPoint);
+	}
+	else
+	{
+		if (bCriticalHit)
+		{
+			DisplayDamageMessage(DisplayMessage, NPCCritDamagedTextColor, LineHitResult.ImpactPoint);
+		}
+		else
+		{
+			DisplayDamageMessage(DisplayMessage, NPCNormalDamagedTextColor, LineHitResult.ImpactPoint);
+		}
+	}
+}
+
+FORCEINLINE bool ACombatManager::WasBlockSuccessful(const AActor* HitInstigator,
+													const AActor* HitActor,
+													const bool bLineHitResultFound,
+													const FHitResult& LineHitResult)
 {
 	FVector HitActorForwardVector = HitActor->GetActorForwardVector();
 	FVector HitNormal = LineHitResult.ImpactNormal;
@@ -63,14 +97,25 @@ FORCEINLINE bool ACombatManager::WasBlockSuccessful(AActor * HitInstigator, AAct
 	return bResult;
 }
 
-FORCEINLINE bool ACombatManager::GetCritChanceBoolean(const AEODCharacterBase * HitInstigator, const AEODCharacterBase * HitCharacter, const EDamageType& DamageType) const
+FORCEINLINE bool ACombatManager::GetCritChanceBoolean(const AEODCharacterBase* HitInstigator,
+													  const AEODCharacterBase* HitCharacter,
+													  const EDamageType& DamageType) const
 {
 	float CritRate = DamageType == EDamageType::Physical ? HitInstigator->StatsComp->GetPhysicalCritRate() : HitInstigator->StatsComp->GetMagickCritRate();
 	bool bResult = CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
 	return bResult;
 }
 
-float ACombatManager::GetActualDamage(const AEODCharacterBase * HitInstigator, const AEODCharacterBase * HitCharacter, const FSkillDamageInfo& SkillDamageInfo, const bool bCriticalHit, const bool bAttackBlocked)
+FORCEINLINE float ACombatManager::GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult)
+{
+	return CalculateAngleBetweenVectors(HitCharacter->GetActorForwardVector(), LineHitResult.ImpactNormal);
+}
+
+float ACombatManager::GetActualDamage(const AEODCharacterBase* HitInstigator,
+									  const AEODCharacterBase* HitCharacter,
+									  const FSkillDamageInfo& SkillDamageInfo,
+									  const bool bCriticalHit,
+									  const bool bAttackBlocked)
 {
 	float ActualDamage = 0.f;
 	float CritMultiplier = 1.f;
@@ -167,7 +212,10 @@ void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, co
 	}
 }
 
-void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator, AEODCharacterBase* HitCharacter, const FSkillDamageInfo& SkillDamageInfo, const FHitResult& HitResult)
+void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator,
+												AEODCharacterBase* HitCharacter,
+												const FSkillDamageInfo& SkillDamageInfo,
+												const FHitResult& HitResult)
 {
 	check(HitInstigator);
 	check(HitCharacter);
@@ -178,17 +226,15 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 		HitCharacter->OnSuccessfulDodge(HitInstigator);
 	}
 
-	bool bLineHitResultFound = false;
-	bool bCritHit = false;
-	bool bAttackBlocked = false;
-
 	FHitResult LineHitResult;
-	bLineHitResultFound = GetLineHitResult(HitInstigator, HitCharacter, LineHitResult);
-	bCritHit = GetCritChanceBoolean(HitInstigator, HitCharacter, SkillDamageInfo.DamageType);
+	bool bLineHitResultFound = GetLineHitResult(HitInstigator, HitCharacter, LineHitResult);
+	bool bCritHit = GetCritChanceBoolean(HitInstigator, HitCharacter, SkillDamageInfo.DamageType);
+	float BCAngle = GetBCAngle(HitCharacter, LineHitResult);
 
+	bool bAttackBlocked = false;
 	if (!SkillDamageInfo.bUnblockable && HitCharacter->IsBlockingDamage())
 	{
-		bAttackBlocked = WasBlockSuccessful(HitInstigator, HitCharacter, bLineHitResultFound, LineHitResult);
+		bAttackBlocked = BCAngle < BlockDetectionAngle ? true : false;
 
 		if (bAttackBlocked)
 		{
@@ -198,23 +244,7 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 	}
 
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillDamageInfo, bCritHit, bAttackBlocked);
-	FString DisplayMessage = FString::FromInt(ActualDamage);
-
-	if (HitCharacter->IsA(APlayerCharacter::StaticClass()))
-	{
-		DisplayDamageMessage(DisplayMessage, PlayerDamagedTextColor, LineHitResult.ImpactPoint);
-	}
-	else
-	{
-		if (bCritHit)
-		{
-			DisplayDamageMessage(DisplayMessage, NPCCritDamagedTextColor, LineHitResult.ImpactPoint);
-		}
-		else
-		{
-			DisplayDamageMessage(DisplayMessage, NPCNormalDamagedTextColor, LineHitResult.ImpactPoint);
-		}
-	}
+	NativeDisplayDamage(HitInstigator, HitCharacter, LineHitResult, ActualDamage, bCritHit);
 
 	// @todo make camera shake interesting
 	PlayCameraShake(ECameraShakeType::Medium, LineHitResult.ImpactPoint);
@@ -226,6 +256,23 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 
 	HitCharacter->SetOffTargetSwitch();
 
+	ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillDamageInfo, LineHitResult, BCAngle);
+	// Rest of the function definition is inside BP_CharacterToCharacterAttack for now
+	BP_CharacterToCharacterAttack(HitInstigator, HitCharacter, SkillDamageInfo, HitResult, LineHitResult);
+}
+
+void ACombatManager::CharacterToActorAttack(AEODCharacterBase* HitInstigator, AActor* HitActor,
+											const FSkillDamageInfo& SkillDamageInfo,
+											const FHitResult& HitResult)
+{
+}
+
+void ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
+											  AEODCharacterBase* HitCharacter,
+											  const FSkillDamageInfo& SkillDamageInfo,
+											  const FHitResult& LineHitResult,
+											  const float BCAngle)
+{
 	switch (SkillDamageInfo.CrowdControlEffect)
 	{
 	case ECrowdControlEffect::Flinch:
@@ -243,11 +290,4 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 	default:
 		break;
 	}
-
-	// Rest of the function definition is inside BP_CharacterToCharacterAttack for now
-	BP_CharacterToCharacterAttack(HitInstigator, HitCharacter, SkillDamageInfo, HitResult, LineHitResult);
-}
-
-void ACombatManager::CharacterToActorAttack(AEODCharacterBase* HitInstigator, AActor* HitActor, const FSkillDamageInfo& SkillDamageInfo, const FHitResult& HitResult)
-{
 }

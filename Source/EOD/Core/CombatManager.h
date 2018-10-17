@@ -44,6 +44,12 @@ public:
 	/** Returns angle between two vectors */
 	FORCEINLINE float CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2);
 
+	FORCEINLINE void NativeDisplayDamage(const AEODCharacterBase* HitInstigator,
+							 			 const AEODCharacterBase* HitCharacter,
+										 const FHitResult& LineHitResult,
+										 const float ActualDamage,
+							 			 const bool bCriticalHit);
+
 	/** Displays damage numbers on player screen */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
 	void DisplayDamageMessage(const FString& Message, const FLinearColor& MessageColor, const FVector& Location);
@@ -95,7 +101,10 @@ protected:
 private:
 
 	/** Determines whether the hit actor succesfully blocked an attack based on the positions of itself and the attacking actor */
-	FORCEINLINE bool WasBlockSuccessful(AActor* HitInstigator, AActor* HitActor, bool bLineHitResultFound, const FHitResult& LineHitResult);
+	FORCEINLINE bool WasBlockSuccessful(const AActor* HitInstigator,
+										const AActor* HitActor,
+										const bool bLineHitResultFound,
+										const FHitResult& LineHitResult);
 
 	/**
 	 * Generates a random boolean based on HitInstigator's crit rate and HitCharacter's crit resistance,
@@ -104,6 +113,8 @@ private:
 	FORCEINLINE bool GetCritChanceBoolean(const AEODCharacterBase* HitInstigator,
 								  		  const AEODCharacterBase* HitCharacter,
 										  const EDamageType& DamageType) const;
+
+	FORCEINLINE float GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult);
 
 	float GetActualDamage(const AEODCharacterBase* HitInstigator,
 						  const AEODCharacterBase* HitCharacter,
@@ -138,7 +149,10 @@ private:
 								const FSkillDamageInfo& SkillDamageInfo,
 								const FHitResult& HitResult);
 
-	// void HandleFlinch()
-
+	void ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
+						 		  AEODCharacterBase* HitCharacter,
+								  const FSkillDamageInfo& SkillDamageInfo,
+								  const FHitResult& LineHitResult,
+								  const float BCAngle);
 
 };
