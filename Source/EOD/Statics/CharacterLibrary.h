@@ -766,7 +766,7 @@ public:
 
 	static const FName SectionName_AttackDeflected;
 
-	static const FName SectionName_BlockedAttack;
+	static const FName SectionName_BlockAttack;
 
 	static const FName SectionName_KnockdownStart;
 

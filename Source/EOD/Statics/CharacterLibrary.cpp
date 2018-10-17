@@ -11,7 +11,7 @@
 #include "Animation/AnimMontage.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
 
-const FName UCharacterLibrary::SectionName_BlockedAttack 			= FName("BlockedAttack");
+const FName UCharacterLibrary::SectionName_BlockAttack 				= FName("BlockAttack");
 const FName UCharacterLibrary::SectionName_AttackDeflected 			= FName("AttackDeflected");
 const FName UCharacterLibrary::SectionName_BackwardFlinch 			= FName("BackwardFlinch");
 const FName UCharacterLibrary::SectionName_ForwardFlinch 			= FName("ForwardFlinch");

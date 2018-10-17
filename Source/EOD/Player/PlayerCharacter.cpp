@@ -514,11 +514,11 @@ void APlayerCharacter::Knockback(const float Duration, const FVector & Impulse)
 	PushPlayer(Impulse);
 }
 
-void APlayerCharacter::BlockedAttack()
+void APlayerCharacter::BlockAttack()
 {
 	UKismetSystemLibrary::PrintString(this, FString("Blocked Attack"));
 	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
-						 UCharacterLibrary::SectionName_BlockedAttack);
+						 UCharacterLibrary::SectionName_BlockAttack);
 }
 
 bool APlayerCharacter::CanAutoRun() const
