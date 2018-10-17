@@ -209,7 +209,7 @@ public:
 	 * Called on getting an attack of this character blocked by an enemy
 	 * @param AttackBlocker Enemy character that blocked this character's attack
 	 */
-	FORCEINLINE void OnAttackBlocked(AEODCharacterBase* AttackBlocker, bool bSkillIgnoresBlock);
+	FORCEINLINE void OnAttackDeflected(AEODCharacterBase* AttackBlocker, bool bSkillIgnoresBlock);
 
 	FORCEINLINE void SetOffTargetSwitch();
 
@@ -386,7 +386,7 @@ protected:
 
 	FCombatEvent OnSuccessfulBlockEvent;
 
-	FCombatEvent OnAttackBlockedEvent;
+	FCombatEvent OnAttackDeflectedEvent;
 
 	//~
 	FCombatEvent OnReceivingHit;

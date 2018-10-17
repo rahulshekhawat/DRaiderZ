@@ -193,7 +193,7 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 		if (bAttackBlocked)
 		{
 			HitCharacter->OnSuccessfulBlock(HitInstigator);
-			HitInstigator->OnAttackBlocked(HitCharacter, SkillDamageInfo.bIgnoresBlock);
+			HitInstigator->OnAttackDeflected(HitCharacter, SkillDamageInfo.bIgnoresBlock);
 		}
 	}
 
@@ -216,27 +216,15 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 		}
 	}
 
+	// @todo make camera shake interesting
+	PlayCameraShake(ECameraShakeType::Medium, LineHitResult.ImpactPoint);
+
 	if (bAttackBlocked)
 	{
 		return;
 	}
 
 	HitCharacter->SetOffTargetSwitch();
-
-
-	// PlayCameraShake(ECameraShakeType::Weak);
-
-	/*
-	if (!bAttackBlocked)
-	{
-		// PlayCameraShake
-	}
-	else
-	{
-		// PlayBlockedParticleEffect(FVector )
-		// PlayCameraShake
-	}
-	*/
 
 	switch (SkillDamageInfo.CrowdControlEffect)
 	{
@@ -258,7 +246,6 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 
 	// Rest of the function definition is inside BP_CharacterToCharacterAttack for now
 	BP_CharacterToCharacterAttack(HitInstigator, HitCharacter, SkillDamageInfo, HitResult, LineHitResult);
-
 }
 
 void ACombatManager::CharacterToActorAttack(AEODCharacterBase* HitInstigator, AActor* HitActor, const FSkillDamageInfo& SkillDamageInfo, const FHitResult& HitResult)

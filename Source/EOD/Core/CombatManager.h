@@ -55,9 +55,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
 	void PlayCameraShake(ECameraShakeType CameraShakeType, const FVector& EpiCenter);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
-	void PlayCameraShakeFromClass(TSubclassOf<UCameraShake> CameraShakeClass, const FVector& EpiCenter);
-
 	UFUNCTION(BlueprintImplementableEvent, Category = CombatEvent, meta = (DisplayName = "Character To Character Attack"))
 	void BP_CharacterToCharacterAttack(AEODCharacterBase* HitInstigator,
 									   AEODCharacterBase* HitCharacter,
@@ -140,6 +137,8 @@ private:
 								AActor* HitActor,
 								const FSkillDamageInfo& SkillDamageInfo,
 								const FHitResult& HitResult);
+
+	// void HandleFlinch()
 
 
 };

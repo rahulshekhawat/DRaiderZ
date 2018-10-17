@@ -278,10 +278,10 @@ FORCEINLINE void AEODCharacterBase::OnSuccessfulBlock(AEODCharacterBase * Attack
 	BlockedAttack();
 }
 
-FORCEINLINE void AEODCharacterBase::OnAttackBlocked(AEODCharacterBase * AttackBlocker, bool bSkillIgnoresBlock)
+FORCEINLINE void AEODCharacterBase::OnAttackDeflected(AEODCharacterBase * AttackBlocker, bool bSkillIgnoresBlock)
 {
 	TWeakObjectPtr<AEODCharacterBase> AttackBlockerWeakPtr(AttackBlocker);
-	OnAttackBlockedEvent.Broadcast(AttackBlockerWeakPtr);
+	OnAttackDeflectedEvent.Broadcast(AttackBlockerWeakPtr);
 
 	if (!bSkillIgnoresBlock)
 	{
