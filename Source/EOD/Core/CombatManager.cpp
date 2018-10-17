@@ -92,7 +92,7 @@ float ACombatManager::GetActualDamage(const AEODCharacterBase * HitInstigator, c
 		CritMultiplier = MagickalCritMultiplier;
 	}
 
-	ActualDamage = ActualDamage * SkillDamageInfo.DamagePercent;
+	ActualDamage = ActualDamage * SkillDamageInfo.DamagePercent / 100.f;
 
 	if (bCriticalHit)
 	{
@@ -174,7 +174,7 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 
 	if (!SkillDamageInfo.bUndodgable && HitCharacter->IsDodgingDamage())
 	{
-		DisplayDamageText(FString("Dodge"));
+		// DisplayStatusEffectMessage(FString("Dodge"));
 		HitCharacter->OnSuccessfulDodge(HitInstigator);
 	}
 
@@ -198,11 +198,66 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 	}
 
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillDamageInfo, bCritHit, bAttackBlocked);
+	FString DisplayMessage = FString::FromInt(ActualDamage);
 
+	if (HitCharacter->IsA(APlayerCharacter::StaticClass()))
+	{
+		DisplayDamageMessage(DisplayMessage, PlayerDamagedTextColor, LineHitResult.ImpactPoint);
+	}
+	else
+	{
+		if (bCritHit)
+		{
+			DisplayDamageMessage(DisplayMessage, NPCCritDamagedTextColor, LineHitResult.ImpactPoint);
+		}
+		else
+		{
+			DisplayDamageMessage(DisplayMessage, NPCNormalDamagedTextColor, LineHitResult.ImpactPoint);
+		}
+	}
+
+	if (bAttackBlocked)
+	{
+		return;
+	}
+
+	HitCharacter->SetOffTargetSwitch();
+
+
+	// PlayCameraShake(ECameraShakeType::Weak);
+
+	/*
 	if (!bAttackBlocked)
 	{
-		HitCharacter->SetOffTargetSwitch();
+		// PlayCameraShake
 	}
+	else
+	{
+		// PlayBlockedParticleEffect(FVector )
+		// PlayCameraShake
+	}
+	*/
+
+	switch (SkillDamageInfo.CrowdControlEffect)
+	{
+	case ECrowdControlEffect::Flinch:
+		break;
+	case ECrowdControlEffect::Interrupt:
+		break;
+	case ECrowdControlEffect::KnockedDown:
+		break;
+	case ECrowdControlEffect::KnockedBack:
+		break;
+	case ECrowdControlEffect::Stunned:
+		break;
+	case ECrowdControlEffect::Crystalized:
+		break;
+	default:
+		break;
+	}
+
+	// Rest of the function definition is inside BP_CharacterToCharacterAttack for now
+	BP_CharacterToCharacterAttack(HitInstigator, HitCharacter, SkillDamageInfo, HitResult, LineHitResult);
 
 }
 

@@ -4,10 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Statics/CharacterLibrary.h"
+#include "Camera/CameraShake.h"
 #include "GameFramework/Info.h"
 #include "CombatManager.generated.h"
 
+UENUM(BlueprintType)
+enum class ECameraShakeType : uint8
+{
+	Weak,
+	Medium,
+	Strong
+};
+
 class AActor;
+class UCameraShake;
 class AEODCharacterBase;
 class APlayerCharacter;
 /**
@@ -35,12 +45,25 @@ public:
 	FORCEINLINE float CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2);
 
 	/** Displays damage numbers on player screen */
-	UFUNCTION(BlueprintImplementableEvent, Category = WidgetText)
-	void DisplayDamageText(const FString& Message);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
+	void DisplayDamageMessage(const FString& Message, const FLinearColor& MessageColor, const FVector& Location);
 
 	/** Displays status effect text on player screen */
-	UFUNCTION(BlueprintImplementableEvent, Category = WidgetText)
-	void DisplayStatusEffectText(const FString& Message);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
+	void DisplayStatusEffectMessage(const FString& Message, const FLinearColor& MessageColor, const FVector& Location);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
+	void PlayCameraShake(ECameraShakeType CameraShakeType, const FVector& EpiCenter);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
+	void PlayCameraShakeFromClass(TSubclassOf<UCameraShake> CameraShakeClass, const FVector& EpiCenter);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = CombatEvent, meta = (DisplayName = "Character To Character Attack"))
+	void BP_CharacterToCharacterAttack(AEODCharacterBase* HitInstigator,
+									   AEODCharacterBase* HitCharacter,
+									   const FSkillDamageInfo& SkillDamageInfo,
+									   const FHitResult& AttackHitResult,
+									   const FHitResult& LineHitResult);
 
 protected:
 
