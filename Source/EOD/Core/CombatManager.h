@@ -84,7 +84,7 @@ private:
 	FORCEINLINE bool GetCritChanceBoolean(const AEODCharacterBase* HitInstigator,
 								  		  const AEODCharacterBase* HitCharacter,
 										  const EDamageType& DamageType) const;
-	
+
 	float GetActualDamage(const AEODCharacterBase* HitInstigator,
 						  const AEODCharacterBase* HitCharacter,
 						  const FSkillDamageInfo& SkillDamageInfo,

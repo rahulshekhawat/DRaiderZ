@@ -7,7 +7,6 @@
 #include "Player/Components/StatsComponentBase.h"
 
 #include "Engine/World.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 ACombatManager::ACombatManager(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -200,6 +199,10 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillDamageInfo, bCritHit, bAttackBlocked);
 
+	if (!bAttackBlocked)
+	{
+		HitCharacter->SetOffTargetSwitch();
+	}
 
 }
 

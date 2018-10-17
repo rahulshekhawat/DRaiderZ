@@ -21,9 +21,9 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	
 	// Initialize variables
 	CharacterState = ECharacterState::IdleWalkRun;
-
-	// CurrentActiveSkill = nullptr;
 	bGodMode = false;
+	TargetSwitchDuration = 0.1f;
+
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
@@ -287,6 +287,22 @@ FORCEINLINE void AEODCharacterBase::OnAttackBlocked(AEODCharacterBase * AttackBl
 	{
 		// PlayAnimationMontage()
 	}
+}
+
+FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
+{
+	TurnOnTargetSwitch();
+}
+
+void AEODCharacterBase::TurnOnTargetSwitch()
+{
+	GetMesh()->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
+	GetWorld()->GetTimerManager().SetTimer(TargetSwitchTimerHandle, this, &AEODCharacterBase::TurnOffTargetSwitch, TargetSwitchDuration, false);
+}
+
+void AEODCharacterBase::TurnOffTargetSwitch()
+{
+	GetMesh()->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
 }
 
 void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * InstigatingChar)

@@ -211,6 +211,12 @@ public:
 	 */
 	FORCEINLINE void OnAttackBlocked(AEODCharacterBase* AttackBlocker, bool bSkillIgnoresBlock);
 
+	FORCEINLINE void SetOffTargetSwitch();
+
+	virtual void TurnOnTargetSwitch();
+
+ 	virtual void TurnOffTargetSwitch();
+
 	/**
 	 * Kills this character 
 	 * @param CauseOfDeath - The reason for death of this character
@@ -424,6 +430,8 @@ protected:
 	UPROPERTY(Transient)
 	FLastUsedSkillInfo LastUsedSkillInfo;
 
+	FTimerHandle TargetSwitchTimerHandle;
+
 	FTimerHandle DodgeTimerHandle;
 
 	FTimerHandle BlockTimerHandle;
@@ -439,6 +447,9 @@ protected:
 	/** True if character is in God Mode */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GodMode)
 	bool bGodMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GodMode)
+	float TargetSwitchDuration;
 	
 	/** Character state determines the current action character is doing */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
