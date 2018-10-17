@@ -256,7 +256,7 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 
 	HitCharacter->SetOffTargetSwitch();
 
-	ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillDamageInfo, LineHitResult, BCAngle);
+	bool bCCEApplied = ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillDamageInfo, LineHitResult, BCAngle);
 	// Rest of the function definition is inside BP_CharacterToCharacterAttack for now
 	BP_CharacterToCharacterAttack(HitInstigator, HitCharacter, SkillDamageInfo, HitResult, LineHitResult);
 }
@@ -267,27 +267,36 @@ void ACombatManager::CharacterToActorAttack(AEODCharacterBase* HitInstigator, AA
 {
 }
 
-void ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
+bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 											  AEODCharacterBase* HitCharacter,
 											  const FSkillDamageInfo& SkillDamageInfo,
 											  const FHitResult& LineHitResult,
 											  const float BCAngle)
 {
+	bool bCCEApplied = false;
 	switch (SkillDamageInfo.CrowdControlEffect)
 	{
 	case ECrowdControlEffect::Flinch:
+		bCCEApplied = HitCharacter->Flinch(BCAngle);
 		break;
 	case ECrowdControlEffect::Interrupt:
+		bCCEApplied = HitCharacter->Interrupt(BCAngle);
 		break;
 	case ECrowdControlEffect::KnockedDown:
+		bCCEApplied = HitCharacter->Knockdown(SkillDamageInfo.CrowdControlEffectDuration);
 		break;
 	case ECrowdControlEffect::KnockedBack:
+		bCCEApplied = HitCharacter->Knockback(SkillDamageInfo.CrowdControlEffectDuration, -(LineHitResult.ImpactNormal));
 		break;
 	case ECrowdControlEffect::Stunned:
+		bCCEApplied = HitCharacter->Stun(SkillDamageInfo.CrowdControlEffectDuration);
 		break;
 	case ECrowdControlEffect::Crystalized:
+		bCCEApplied = HitCharacter->Freeze(SkillDamageInfo.CrowdControlEffectDuration);
 		break;
 	default:
 		break;
 	}
+
+	return bCCEApplied;
 }

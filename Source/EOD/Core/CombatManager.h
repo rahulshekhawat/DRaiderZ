@@ -149,7 +149,7 @@ private:
 								const FSkillDamageInfo& SkillDamageInfo,
 								const FHitResult& HitResult);
 
-	void ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
+	bool ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 						 		  AEODCharacterBase* HitCharacter,
 								  const FSkillDamageInfo& SkillDamageInfo,
 								  const FHitResult& LineHitResult,
