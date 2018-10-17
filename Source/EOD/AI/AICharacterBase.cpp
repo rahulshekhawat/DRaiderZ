@@ -29,8 +29,8 @@ void AAICharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
-	HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+	// AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+	// HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
 
 }
 

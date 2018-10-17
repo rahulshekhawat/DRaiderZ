@@ -8,7 +8,7 @@
 #include "PlayerCharacter.generated.h"
 
 class UHUDWidget;
-
+class UAudioComponent;
 class UAnimMontage;
 class APrimaryWeapon;
 class ASecondaryWeapon;
@@ -102,6 +102,10 @@ private:
 	//~ Inventory component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInventoryComponent* InventoryComponent;
+
+	//~ Audio component
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAudioComponent* AudioComponent;
 	
 	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
@@ -278,6 +282,10 @@ public:
 	void UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType);
 
 	void UpdateCurrentWeaponAnimationType();
+
+	virtual void TurnOnTargetSwitch() override;
+
+	virtual void TurnOffTargetSwitch() override;
 
 protected:
 

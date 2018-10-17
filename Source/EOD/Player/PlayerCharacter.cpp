@@ -25,6 +25,7 @@
 #include "Engine/StreamableManager.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/AudioComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -70,6 +71,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Player Inventory"));
 	InventoryComponent->SetOwningPlayer(this);
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	AudioComponent->SetupAttachment(RootComponent);
 
 	SetWalkSpeed(BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier());
 
@@ -1711,6 +1715,36 @@ void APlayerCharacter::UpdateCurrentWeaponAnimationType()
 	{
 		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
 	}
+}
+
+void APlayerCharacter::TurnOnTargetSwitch()
+{
+	/*
+	Super::TurnOnTargetSwitch();
+
+	Hair->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
+	HatItem->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
+	FaceItem->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
+	Chest->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
+	Hands->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
+	Legs->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
+	Feet->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
+	*/
+}
+
+void APlayerCharacter::TurnOffTargetSwitch()
+{
+	/*
+	Super::TurnOffTargetSwitch();
+
+	Hair->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
+	HatItem->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
+	FaceItem->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
+	Chest->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
+	Hands->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
+	Legs->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
+	Feet->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
+	*/
 }
 
 bool APlayerCharacter::IsPrimaryWeaponEquippped() const
