@@ -143,62 +143,80 @@ UEODWidgetComponent * AAICharacterBase::BP_GetHealthWidgetComp() const
 	return GetHealthWidgetComp();
 }
 
-void AAICharacterBase::Interrupt(const EHitDirection InterruptDirection)
+bool AAICharacterBase::Interrupt(const float BCAngle)
 {
-	if (InterruptDirection == EHitDirection::Forward)
+	if (CanInterrupt() && HitEffectsAnimMontage)
 	{
-		PlayAnimationMontage(HitEffectsAnimMontage,
-			UCharacterLibrary::SectionName_ForwardInterrupt,
-			ECharacterState::GotHit);
+		if (BCAngle <= 90)
+		{
+			PlayAnimationMontage(HitEffectsAnimMontage,
+				UCharacterLibrary::SectionName_ForwardInterrupt,
+				ECharacterState::GotHit);
+		}
+		else
+		{
+			PlayAnimationMontage(HitEffectsAnimMontage,
+				UCharacterLibrary::SectionName_BackwardInterrupt,
+				ECharacterState::GotHit);
+		}
+
+		return true;
 	}
-	else if (InterruptDirection == EHitDirection::Backward)
-	{
-		PlayAnimationMontage(HitEffectsAnimMontage,
-			UCharacterLibrary::SectionName_BackwardInterrupt,
-			ECharacterState::GotHit);
-	}
+
+	return false;
 }
 
-void AAICharacterBase::Flinch(const EHitDirection FlinchDirection)
+bool AAICharacterBase::Flinch(const float BCAngle)
 {
-	if (FlinchDirection == EHitDirection::Forward)
+	if (CanFlinch() && FlinchAnimMontage)
 	{
-		PlayAnimationMontage(FlinchAnimMontage,
-			UCharacterLibrary::SectionName_ForwardFlinch);
+		if (BCAngle <= 90)
+		{
+			PlayAnimationMontage(FlinchAnimMontage,
+				UCharacterLibrary::SectionName_ForwardFlinch);
+		}
+		else
+		{
+			PlayAnimationMontage(FlinchAnimMontage,
+				UCharacterLibrary::SectionName_BackwardFlinch);
+		}
+
+		return true;
 	}
-	else if (FlinchDirection == EHitDirection::Backward)
-	{
-		PlayAnimationMontage(FlinchAnimMontage,
-			UCharacterLibrary::SectionName_BackwardFlinch);
-	}
+
+	return false;
 }
 
-void AAICharacterBase::Stun(const float Duration)
+bool AAICharacterBase::Stun(const float Duration)
 {
+	return false;
 }
 
 void AAICharacterBase::EndStun()
 {
 }
 
-void AAICharacterBase::Freeze(const float Duration)
+bool AAICharacterBase::Freeze(const float Duration)
 {
+	return false;
 }
 
 void AAICharacterBase::EndFreeze()
 {
 }
 
-void AAICharacterBase::Knockdown(const float Duration)
+bool AAICharacterBase::Knockdown(const float Duration)
 {
+	return false;
 }
 
 void AAICharacterBase::EndKnockdown()
 {
 }
 
-void AAICharacterBase::Knockback(const float Duration, const FVector & Impulse)
+bool AAICharacterBase::Knockback(const float Duration, const FVector & Impulse)
 {
+	return false;
 }
 
 void AAICharacterBase::SetInCombat(bool bValue)

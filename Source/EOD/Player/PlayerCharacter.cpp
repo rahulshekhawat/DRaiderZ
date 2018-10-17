@@ -416,59 +416,61 @@ UHUDWidget * APlayerCharacter::BP_GetHUDWidget() const
 	return GetHUDWidget();
 }
 
-void APlayerCharacter::Interrupt(const EHitDirection InterruptDirection)
+bool APlayerCharacter::Interrupt(const float BCAngle)
 {
-	// @note Why am I checking for NULL PlayerAnimInstance? Probably should remove it
-	if (!PlayerAnimInstance || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->AnimationMontage_HitEffects)
+	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_HitEffects)
 	{
-		return;
+		if (BCAngle <= 90)
+		{
+			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+				UCharacterLibrary::SectionName_ForwardInterrupt,
+				ECharacterState::GotHit);
+		}
+		else
+		{
+			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+				UCharacterLibrary::SectionName_BackwardInterrupt,
+				ECharacterState::GotHit);
+		}
+
+		return true;
 	}
 
-	if (InterruptDirection == EHitDirection::Forward)
-	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
-			UCharacterLibrary::SectionName_ForwardInterrupt,
-			ECharacterState::GotHit);
-	}
-	else if (InterruptDirection == EHitDirection::Backward)
-	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
-			UCharacterLibrary::SectionName_BackwardInterrupt,
-			ECharacterState::GotHit);
-	}
+	return false;
 }
 
-void APlayerCharacter::Flinch(const EHitDirection FlinchDirection)
+bool APlayerCharacter::Flinch(const float BCAngle)
 {
-	if (!PlayerAnimInstance || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->AnimationMontage_Flinch)
+	if (CanFlinch() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_Flinch)
 	{
-		return;
+		if (BCAngle <= 90)
+		{
+			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Flinch,
+				UCharacterLibrary::SectionName_ForwardFlinch);
+		}
+		else
+		{
+			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Flinch,
+				UCharacterLibrary::SectionName_BackwardFlinch);
+		}
+
+		return true;
 	}
 
-	if (FlinchDirection == EHitDirection::Forward)
-	{
-		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
-		PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_ForwardFlinch,
-			GetActiveAnimationReferences()->AnimationMontage_Flinch);
-	}
-	else if (FlinchDirection == EHitDirection::Backward)
-	{
-		PlayerAnimInstance->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Flinch);
-		PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_BackwardFlinch,
-			GetActiveAnimationReferences()->AnimationMontage_Flinch);
-	}
+	return false;
 }
 
-void APlayerCharacter::Stun(const float Duration)
+bool APlayerCharacter::Stun(const float Duration)
 {
-	PlayStunAnimation();
+	if (CanStun())
+	{
+		PlayStunAnimation();
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndStun, Duration, false);
 
-	PlayerAnimInstance->Montage_Play(SheathedWeaponAnimationReferences->AnimationMontage_Flinch);
-	PlayerAnimInstance->Montage_JumpToSection(UCharacterLibrary::SectionName_ForwardFlinch);
+		return true;
+	}
 
-	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndStun, Duration, false);
-	
-	// @todo change character state to got hit
+	return false;
 }
 
 void APlayerCharacter::EndStun()
@@ -478,10 +480,17 @@ void APlayerCharacter::EndStun()
 	// @todo Restore character state to IdleWalkRun if necessary (if OnMontageBlendingOut event doesn't restore character state to IdleWalkRun)
 }
 
-void APlayerCharacter::Freeze(const float Duration)
+bool APlayerCharacter::Freeze(const float Duration)
 {
-	CustomTimeDilation = 0;
-	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndFreeze, Duration, false);
+	if (CanFreeze())
+	{
+		CustomTimeDilation = 0;
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndFreeze, Duration, false);
+
+		return true;
+	}
+
+	return false;
 }
 
 void APlayerCharacter::EndFreeze()
@@ -489,12 +498,19 @@ void APlayerCharacter::EndFreeze()
 	CustomTimeDilation = StatsComp->GetActiveTimeDilation();
 }
 
-void APlayerCharacter::Knockdown(const float Duration)
+bool APlayerCharacter::Knockdown(const float Duration)
 {
-	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
-		UCharacterLibrary::SectionName_KnockdownStart,
-		ECharacterState::GotHit);
-	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
+	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_HitEffects)
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+			UCharacterLibrary::SectionName_KnockdownStart,
+			ECharacterState::GotHit);
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
+
+		return true;
+	}
+
+	return false;
 }
 
 void APlayerCharacter::EndKnockdown()
@@ -504,14 +520,20 @@ void APlayerCharacter::EndKnockdown()
 		ECharacterState::GotHit);
 }
 
-void APlayerCharacter::Knockback(const float Duration, const FVector & Impulse)
+bool APlayerCharacter::Knockback(const float Duration, const FVector& ImpulseDirection)
 {
-	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
-		UCharacterLibrary::SectionName_KnockdownStart,
-		ECharacterState::GotHit);
-	GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
+	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_HitEffects)
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+			UCharacterLibrary::SectionName_KnockdownStart,
+			ECharacterState::GotHit);
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
+		PushPlayer(ImpulseDirection);
 
-	PushPlayer(Impulse);
+		return true;
+	}
+
+	return false;
 }
 
 void APlayerCharacter::BlockAttack()

@@ -45,31 +45,31 @@ public:
 	UEODWidgetComponent* BP_GetHealthWidgetComp() const;
 
 	/** [server + client] Interrupt this character's current action */
-	virtual void Interrupt(const EHitDirection InterruptDirection) override;
+	virtual bool Interrupt(const float BCAngle) override;
 
 	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
-	virtual void Flinch(const EHitDirection FlinchDirection) override;
+	virtual bool Flinch(const float BCAngle) override;
 
 	/** [server + client] Applies stun to this character */
-	virtual void Stun(const float Duration) override;
+	virtual bool Stun(const float Duration) override;
 
 	/** [client] Removes 'stun' crowd control effect from this character */
 	virtual void EndStun() override;
 
 	/** [server + client] Freeze this character */
-	virtual void Freeze(const float Duration) override;
+	virtual bool Freeze(const float Duration) override;
 
 	/** [client] Removes 'freeze' crowd control effect from this character */
 	virtual void EndFreeze() override;
 
 	/** [server + client] Knockdown this character */
-	virtual void Knockdown(const float Duration) override;
+	virtual bool Knockdown(const float Duration) override;
 
 	/** [client] Removes 'knock-down' crowd control effect from this character */
 	virtual void EndKnockdown() override;
 
 	/** [server + client] Knockback this character */
-	virtual void Knockback(const float Duration, const FVector& Impulse) override;
+	virtual bool Knockback(const float Duration, const FVector& Impulse) override;
 
 	/** Set whether character is in combat or not */
 	virtual void SetInCombat(bool bValue) override;

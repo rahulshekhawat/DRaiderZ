@@ -150,31 +150,31 @@ public:
 	virtual bool IsHealing() const;
 
 	/** [server + client] Interrupt this character's current action */
-	virtual void Interrupt(const EHitDirection InterruptDirection) PURE_VIRTUAL(AEODCharacterBase::Interrupt, );
+	virtual bool Interrupt(const float BCAngle) PURE_VIRTUAL(AEODCharacterBase::Interrupt, return false; );
 
 	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
-	virtual void Flinch(const EHitDirection FlinchDirection) PURE_VIRTUAL(AEODCharacterBase::Flinch, );
+	virtual bool Flinch(const float BCAngle) PURE_VIRTUAL(AEODCharacterBase::Flinch, return false; );
 
 	/** [server + client] Applies stun to this character */
-	virtual void Stun(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Stun, );
+	virtual bool Stun(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Stun, return false; );
 
 	/** [client] Removes 'stun' crowd control effect from this character */
 	virtual void EndStun() PURE_VIRTUAL(AEODCharacterBase::EndStun, );
 
 	/** [server + client] Freeze this character */
-	virtual void Freeze(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Freeze, );
+	virtual bool Freeze(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Freeze, return false; );
 
 	/** [client] Removes 'freeze' crowd control effect from this character */
 	virtual void EndFreeze() PURE_VIRTUAL(AEODCharacterBase::EndFreeze, );
 
 	/** [server + client] Knockdown this character */
-	virtual void Knockdown(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Knockdown, );
+	virtual bool Knockdown(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Knockdown, return false; );
 
 	/** [client] Removes 'knock-down' crowd control effect from this character */
 	virtual void EndKnockdown() PURE_VIRTUAL(AEODCharacterBase::EndKnockdown, );
 
 	/** [server + client] Knockback this character */
-	virtual void Knockback(const float Duration, const FVector& Impulse) PURE_VIRTUAL(AEODCharacterBase::Knockback, );
+	virtual bool Knockback(const float Duration, const FVector& ImpulseDirection) PURE_VIRTUAL(AEODCharacterBase::Knockback, return false; );
 
 	/** Plays BlockAttack animation on blocking an incoming attack */
 	virtual void BlockAttack() PURE_VIRTUAL(AEODCharacterBase::BlockedAttack, );
