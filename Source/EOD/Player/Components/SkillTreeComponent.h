@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "SkillTreeComponent.generated.h"
 
+class USkillTreeWidget;
+class APlayerCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EOD_API USkillTreeComponent : public UActorComponent
@@ -16,14 +18,32 @@ public:
 	// Sets default values for this component's properties
 	USkillTreeComponent();
 
-protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	/** Returns skill bar widget */
+	FORCEINLINE USkillTreeWidget* GetSkillTreeWidget() const;
+
+	/** Returns skill bar widget */
+	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Skill Tree Widget"))
+	USkillTreeWidget* BP_GetSkillTreeWidget() const;
+
+	FORCEINLINE APlayerCharacter* GetOwningPlayer() const;
+
+	FORCEINLINE void SetOwningPlayer(APlayerCharacter* NewOwner);
+
+private:
+
+	UPROPERTY(Transient)
+	USkillTreeWidget* SkillTreeWidget;
+
+	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<USkillTreeWidget> SkillTreeWidgetClass;
+
+	UPROPERTY(Transient)
+	APlayerCharacter* OwningPlayer;
 	
 };

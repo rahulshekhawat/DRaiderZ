@@ -2,33 +2,39 @@
 
 #include "SkillTreeComponent.h"
 
-
-// Sets default values for this component's properties
 USkillTreeComponent::USkillTreeComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	SetIsReplicated(false);
 }
 
-
-// Called when the game starts
 void USkillTreeComponent::BeginPlay()
 {
-	Super::BeginPlay();
-
-	// ...
-	
+	Super::BeginPlay();	
 }
 
-
-// Called every frame
 void USkillTreeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
 
-	// ...
+FORCEINLINE USkillTreeWidget * USkillTreeComponent::GetSkillTreeWidget() const
+{
+	return SkillTreeWidget;
+}
+
+USkillTreeWidget * USkillTreeComponent::BP_GetSkillTreeWidget() const
+{
+	return GetSkillTreeWidget();
+}
+
+FORCEINLINE APlayerCharacter * USkillTreeComponent::GetOwningPlayer() const
+{
+	return OwningPlayer;
+}
+
+FORCEINLINE void USkillTreeComponent::SetOwningPlayer(APlayerCharacter * NewOwner)
+{
+	OwningPlayer = NewOwner;
 }
 

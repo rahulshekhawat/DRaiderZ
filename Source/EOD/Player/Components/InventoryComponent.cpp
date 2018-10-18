@@ -18,6 +18,11 @@ UInventoryComponent::UInventoryComponent(const FObjectInitializer& ObjectInitial
 	MaxSlots = 100;
 }
 
+void UInventoryComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -36,12 +41,22 @@ void UInventoryComponent::ToggleInventoryUI()
 	}
 }
 
-void UInventoryComponent::BeginPlay()
+FORCEINLINE UInventoryWidget* UInventoryComponent::GetInventoryWidget() const
 {
-	Super::BeginPlay();
+	return InventoryWidget;
 }
 
-void UInventoryComponent::SetOwningPlayer(APlayerCharacter * PlayerCharacter)
+UInventoryWidget* UInventoryComponent::BP_GetInventoryWidget() const
+{
+	return GetInventoryWidget();
+}
+
+FORCEINLINE APlayerCharacter * UInventoryComponent::GetOwningPlayer() const
+{
+	return OwningPlayer;
+}
+
+FORCEINLINE void UInventoryComponent::SetOwningPlayer(APlayerCharacter * PlayerCharacter)
 {
 	OwningPlayer = PlayerCharacter;
 }

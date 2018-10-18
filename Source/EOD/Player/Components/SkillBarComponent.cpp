@@ -2,33 +2,39 @@
 
 #include "SkillBarComponent.h"
 
-
-// Sets default values for this component's properties
 USkillBarComponent::USkillBarComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	PrimaryComponentTick.bCanEverTick = false;
+	SetIsReplicated(false);
 }
 
-
-// Called when the game starts
 void USkillBarComponent::BeginPlay()
 {
-	Super::BeginPlay();
-
-	// ...
-	
+	Super::BeginPlay();	
 }
 
-
-// Called every frame
 void USkillBarComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
 
-	// ...
+FORCEINLINE USkillBarWidget* USkillBarComponent::GetSkillBarWidget() const
+{
+	return SkillBarWidget;
+}
+
+USkillBarWidget* USkillBarComponent::BP_GetSkillBarWidget() const
+{
+	return GetSkillBarWidget();
+}
+
+FORCEINLINE APlayerCharacter * USkillBarComponent::GetOwningPlayer() const
+{
+	return OwningPlayer;
+}
+
+FORCEINLINE void USkillBarComponent::SetOwningPlayer(APlayerCharacter * NewOwner)
+{
+	OwningPlayer = NewOwner;
 }
 

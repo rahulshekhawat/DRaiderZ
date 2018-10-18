@@ -11,6 +11,8 @@
 #include "UI/SkillBarWidget.h"
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
+#include "Components/SkillBarComponent.h"
+#include "Components/SkillTreeComponent.h"
 #include "Core/EODPreprocessors.h"
 #include "Core/EODSaveGame.h"
 #include "UI/SkillTreeWidget.h"
@@ -71,6 +73,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Player Inventory"));
 	InventoryComponent->SetOwningPlayer(this);
+
+	SkillBarComponent = CreateDefaultSubobject<USkillBarComponent>(TEXT("Skill Bar"));
+	SkillTreeComponent = CreateDefaultSubobject<USkillTreeComponent>(TEXT("Skill Tree"));
 
 	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
 	AudioComponent->SetupAttachment(RootComponent);

@@ -8,6 +8,7 @@
 
 class UTexture;
 class APlayerCharacter;
+class UInventoryWidget;
 
 USTRUCT(BlueprintType)
 struct EOD_API FInventoryItem
@@ -38,25 +39,43 @@ public:
 
 	/** Sets default values for this component's properties */
 	UInventoryComponent(const FObjectInitializer& ObjectInitializer);
-	
+
+	/** Called when the game starts */
+	virtual void BeginPlay() override;	
+
 	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	/** Returns inventory widget */
+	FORCEINLINE UInventoryWidget* GetInventoryWidget() const;
+
+	/** Returns inventory widget */
+	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Inventory Widget"))
+	UInventoryWidget* BP_GetInventoryWidget() const;
+
+	FORCEINLINE APlayerCharacter* GetOwningPlayer() const;
+
+	FORCEINLINE void SetOwningPlayer(APlayerCharacter* NewOwner);
 
 	/** Toggle the display of inventory UI in player viewport */
 	void ToggleInventoryUI();
+	
+private:
 
-	/** Called when the game starts */
-	virtual void BeginPlay() override;
+	UPROPERTY(Transient)
+	UInventoryWidget* InventoryWidget;
+
+	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
+
+	UPROPERTY(Transient)
+	APlayerCharacter* OwningPlayer;
 	
 	/** Maximum number of inventory slots */
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	uint32 MaxSlots;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
+	int32 MaxSlots;
 
 	// FInventoryItem& GetItem(int32 ItemIndex) const;
-
-	void SetOwningPlayer(APlayerCharacter* PlayerCharacter);
-
-private:
 
 	void AddItem(FName ItemID);
 
@@ -71,8 +90,6 @@ private:
 	void LoadInventory();
 	
 	TArray<FInventoryItem> Items;
-
-	APlayerCharacter* OwningPlayer;
 
 
 };
