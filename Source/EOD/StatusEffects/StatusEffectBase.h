@@ -60,7 +60,7 @@ public:
  * equipped by player, the elemental status effect object will persist in memory as long as the weapon is equipped by player and must be
  * destroyed when the weapon is unequipped.
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class EOD_API UStatusEffectBase : public UObject
 {
 	GENERATED_BODY()

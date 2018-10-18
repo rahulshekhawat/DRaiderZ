@@ -146,6 +146,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Needs Healing"))
 	bool BP_NeedsHealing() const;
 
+	/** [server + client] Set current state of character */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
+	void BP_SetCharacterState(const ECharacterState NewState);
+
 	/** Returns true if this character is healing anyone */
 	virtual bool IsHealing() const;
 
@@ -187,9 +191,11 @@ public:
 	UFUNCTION()
 	void DisableiFrames();
 
+	/** Enables blocking of incoming attacks */
 	UFUNCTION()
 	void EnableDamageBlocking();
 
+	/** Disables blocking of incoming attacks */
 	UFUNCTION()
 	void DisableDamageBlocking();
 
@@ -231,9 +237,10 @@ public:
 	FORCEINLINE ECharacterState GetCharacterState() const;
 
 	/** [server + client] Set current state of character */
-	void SetCharacterState(const ECharacterState NewState);
+	FORCEINLINE void SetCharacterState(const ECharacterState NewState);
 
 	/** [server + client] Change character max walk speed */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	void SetWalkSpeed(const float WalkSpeed);
 
 	/** [server + client] Chagne character rotation */

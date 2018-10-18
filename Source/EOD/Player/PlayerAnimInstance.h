@@ -42,7 +42,10 @@ public:
 	//~ Begin functions to update animation blueprint
 	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
 	bool IsBlocking() const;
-	
+
+	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
+	bool IsFastRunning() const;
+
 	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
 	ECharMovementDirection GetIWRCharMovementDir() const;
 	

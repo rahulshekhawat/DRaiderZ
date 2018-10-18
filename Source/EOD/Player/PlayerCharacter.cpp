@@ -1781,6 +1781,11 @@ bool APlayerCharacter::IsSecondaryWeaponEquipped() const
 	return SecondaryWeaponID != NAME_None && SecondaryWeapon->bEquipped;
 }
 
+bool APlayerCharacter::IsFastRunning() const
+{
+	return CharacterState == ECharacterState::SpecialMovement;
+}
+
 void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
 {
 	IWR_CharacterMovementDirection = NewDirection;

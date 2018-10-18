@@ -147,6 +147,8 @@ public:
 	/** Returns true if secondary weapon is equipped */
 	bool IsSecondaryWeaponEquipped() const;
 
+	bool IsFastRunning() const;
+
 	/** Returns primary weapon actor */
 	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
 

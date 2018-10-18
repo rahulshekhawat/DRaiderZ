@@ -48,6 +48,16 @@ bool UPlayerAnimInstance::IsBlocking() const
 	return false;
 }
 
+bool UPlayerAnimInstance::IsFastRunning() const
+{
+	if (OwningPlayer)
+	{
+		// return OwningPlayer->
+	}
+
+	return false;
+}
+
 ECharMovementDirection UPlayerAnimInstance::GetIWRCharMovementDir() const
 {
 	if (OwningPlayer)

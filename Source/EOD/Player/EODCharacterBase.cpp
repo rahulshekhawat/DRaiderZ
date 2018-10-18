@@ -233,6 +233,11 @@ bool AEODCharacterBase::BP_NeedsHealing() const
 	return NeedsHealing();
 }
 
+void AEODCharacterBase::BP_SetCharacterState(const ECharacterState NewState)
+{
+	SetCharacterState(NewState);
+}
+
 bool AEODCharacterBase::IsHealing() const
 {
 	return false;
@@ -332,7 +337,7 @@ FORCEINLINE ECharacterState AEODCharacterBase::GetCharacterState() const
 	return CharacterState;
 }
 
-void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
+FORCEINLINE void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
 {
 	CharacterState = NewState;
 
