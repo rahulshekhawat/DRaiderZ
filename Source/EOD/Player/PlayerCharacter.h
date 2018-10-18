@@ -161,6 +161,8 @@ public:
 	/** Returns HUD widget */
 	FORCEINLINE UHUDWidget* GetHUDWidget() const;
 
+	FORCEINLINE bool IsWeaponSheathed() const;
+
 	/** Returns HUD widget */
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get HUD Widget"))
 	UHUDWidget* BP_GetHUDWidget() const;

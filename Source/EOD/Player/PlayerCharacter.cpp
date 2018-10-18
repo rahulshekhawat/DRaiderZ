@@ -411,6 +411,11 @@ FORCEINLINE UHUDWidget * APlayerCharacter::GetHUDWidget() const
 	return HUDWidget;
 }
 
+bool APlayerCharacter::IsWeaponSheathed() const
+{
+	return bWeaponSheathed;
+}
+
 UHUDWidget * APlayerCharacter::BP_GetHUDWidget() const
 {
 	return GetHUDWidget();
@@ -1249,6 +1254,9 @@ void APlayerCharacter::InitializeSkills(TArray<FName> UnlockedSKillsID)
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
+
+
+
 	// If HUDWidget is nullptr or if player can't currently use any skill
 	// @todo - do not use skill if player weapon is sheathed.
 	if (!HUDWidget || !CanUseAnySkill())
