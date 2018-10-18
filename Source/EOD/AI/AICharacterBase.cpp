@@ -189,6 +189,8 @@ bool AAICharacterBase::Flinch(const float BCAngle)
 
 bool AAICharacterBase::Stun(const float Duration)
 {
+	// @todo definition
+
 	return false;
 }
 
@@ -198,11 +200,22 @@ void AAICharacterBase::EndStun()
 
 bool AAICharacterBase::Freeze(const float Duration)
 {
+	// @todo maybe just freeze animation instead of freezing entire character since it might freeze additional effects like glow
+
+	if (CanFreeze())
+	{
+		CustomTimeDilation = 0;
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::EndFreeze, Duration, false);
+		
+		return true;
+	}
+
 	return false;
 }
 
 void AAICharacterBase::EndFreeze()
 {
+	CustomTimeDilation = StatsComp->GetActiveTimeDilation();
 }
 
 bool AAICharacterBase::Knockdown(const float Duration)

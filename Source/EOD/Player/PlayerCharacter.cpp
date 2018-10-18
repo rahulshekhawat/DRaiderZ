@@ -482,6 +482,8 @@ void APlayerCharacter::EndStun()
 
 bool APlayerCharacter::Freeze(const float Duration)
 {
+	// @todo maybe just freeze animation instead of freezing entire character since it might freeze additional effects like glow
+	
 	if (CanFreeze())
 	{
 		CustomTimeDilation = 0;
