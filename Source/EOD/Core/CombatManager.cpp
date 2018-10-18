@@ -248,6 +248,8 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 
 	// @todo make camera shake interesting
 	PlayCameraShake(ECameraShakeType::Medium, LineHitResult.ImpactPoint);
+	SpawnHitSFX(LineHitResult.ImpactPoint, LineHitResult.ImpactNormal);
+	PlayHitSound(HitInstigator, LineHitResult.ImpactPoint, bCritHit);
 
 	if (bAttackBlocked)
 	{

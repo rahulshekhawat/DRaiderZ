@@ -61,6 +61,15 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
 	void PlayCameraShake(ECameraShakeType CameraShakeType, const FVector& EpiCenter);
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = CombatEvent)
+	void SpawnHitSFX(const FVector& HitLocation, const FVector& HitNormal);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = CombatEvent)
+	void SpawnBloodSpurt(const FVector& HitLocation, const FVector& HitNormal);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = CombatEvent)
+	void PlayHitSound(const AEODCharacterBase* HitInstigator, const FVector& HitLocation, const bool bCriticalHit);
+
 	UFUNCTION(BlueprintImplementableEvent, Category = CombatEvent, meta = (DisplayName = "Character To Character Attack"))
 	void BP_CharacterToCharacterAttack(AEODCharacterBase* HitInstigator,
 									   AEODCharacterBase* HitCharacter,
