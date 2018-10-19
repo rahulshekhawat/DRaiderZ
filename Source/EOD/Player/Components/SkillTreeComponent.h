@@ -33,6 +33,8 @@ public:
 
 	FORCEINLINE void InitializeComponentWidget();
 
+
+
 private:
 
 	UPROPERTY(Transient)

@@ -21,6 +21,8 @@ UInventoryComponent::UInventoryComponent(const FObjectInitializer& ObjectInitial
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitializeComponentWidget();
 }
 
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -69,6 +71,7 @@ FORCEINLINE void UInventoryComponent::InitializeComponentWidget()
 	{
 		InventoryWidget = CreateWidget<UInventoryWidget>(OwningPlayer->GetGameInstance(), InventoryWidgetClass);
 		OwningPlayer->GetHUDWidget()->AddInventoryWidget(InventoryWidget);
+		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
