@@ -33,7 +33,8 @@ public:
 
 	FORCEINLINE void InitializeComponentWidget();
 
-
+	/** Toggle the display of skill tree UI in player viewport */
+	void ToggleSkillTreeUI();
 
 private:
 

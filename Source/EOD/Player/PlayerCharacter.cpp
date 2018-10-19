@@ -122,7 +122,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &APlayerCharacter::OnToggleSheathe);
 	PlayerInputComponent->BindAction("ToggleStats", IE_Pressed, this, &APlayerCharacter::OnToggleCharacterStatsUI);
 	PlayerInputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &APlayerCharacter::OnToggleMouseCursor);
-	PlayerInputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &APlayerCharacter::OnToggleSkillTree);
+	PlayerInputComponent->BindAction("ToggleSkillTree", IE_Pressed, SkillTreeComponent, &USkillTreeComponent::ToggleSkillTreeUI);
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
 	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
 	PlayerInputComponent->BindAction("Escape", IE_Pressed, this, &APlayerCharacter::OnPressedEscape);

@@ -48,3 +48,18 @@ FORCEINLINE void USkillTreeComponent::InitializeComponentWidget()
 		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
+
+void USkillTreeComponent::ToggleSkillTreeUI()
+{
+	if (SkillTreeWidget)
+	{
+		if (SkillTreeWidget->IsVisible())
+		{
+			SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			SkillTreeWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+}
