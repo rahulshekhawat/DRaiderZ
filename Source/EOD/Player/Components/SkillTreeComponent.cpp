@@ -14,6 +14,8 @@ USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitial
 void USkillTreeComponent::BeginPlay()
 {
 	Super::BeginPlay();	
+
+	InitializeComponentWidget();
 }
 
 void USkillTreeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -43,5 +45,6 @@ FORCEINLINE void USkillTreeComponent::InitializeComponentWidget()
 	{
 		SkillTreeWidget = CreateWidget<USkillTreeWidget>(OwningPlayer->GetGameInstance(), SkillTreeWidgetClass);
 		OwningPlayer->GetHUDWidget()->AddSkillTreeWidget(SkillTreeWidget);
+		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

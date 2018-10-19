@@ -313,8 +313,8 @@ void APlayerCharacter::BeginPlay()
 	}
 
 	// SkillBarComponent->InitializeComponentWidget();
-	SkillTreeComponent->InitializeComponentWidget();
-	InventoryComponent->InitializeComponentWidget();
+	// SkillTreeComponent->InitializeComponentWidget();
+	// InventoryComponent->InitializeComponentWidget();
 	// StatsComp->InitializeComponentWidget();
 }
 
