@@ -31,6 +31,12 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UInventoryComponent::ToggleInventoryUI()
 {
+	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
+	if (!OwningPlayer)
+	{
+		return;
+	}
+
 	if (OwningPlayer->GetHUDWidget()->InventoryWidget->IsVisible())
 	{
 		OwningPlayer->GetHUDWidget()->InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -49,16 +55,6 @@ FORCEINLINE UInventoryWidget* UInventoryComponent::GetInventoryWidget() const
 UInventoryWidget* UInventoryComponent::BP_GetInventoryWidget() const
 {
 	return GetInventoryWidget();
-}
-
-FORCEINLINE APlayerCharacter * UInventoryComponent::GetOwningPlayer() const
-{
-	return OwningPlayer;
-}
-
-FORCEINLINE void UInventoryComponent::SetOwningPlayer(APlayerCharacter * PlayerCharacter)
-{
-	OwningPlayer = PlayerCharacter;
 }
 
 void UInventoryComponent::AddItem(FName ItemID)

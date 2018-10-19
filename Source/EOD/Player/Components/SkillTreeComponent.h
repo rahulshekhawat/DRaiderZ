@@ -16,7 +16,7 @@ class EOD_API USkillTreeComponent : public UActorComponent
 
 public:	
 	// Sets default values for this component's properties
-	USkillTreeComponent();
+	USkillTreeComponent(const FObjectInitializer& ObjectInitializer);
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -31,10 +31,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Skill Tree Widget"))
 	USkillTreeWidget* BP_GetSkillTreeWidget() const;
 
-	FORCEINLINE APlayerCharacter* GetOwningPlayer() const;
-
-	FORCEINLINE void SetOwningPlayer(APlayerCharacter* NewOwner);
-
 private:
 
 	UPROPERTY(Transient)
@@ -42,8 +38,5 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<USkillTreeWidget> SkillTreeWidgetClass;
-
-	UPROPERTY(Transient)
-	APlayerCharacter* OwningPlayer;
 	
 };

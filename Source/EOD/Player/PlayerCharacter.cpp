@@ -72,8 +72,6 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	//~ End Camera Components Initialization
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Player Inventory"));
-	InventoryComponent->SetOwningPlayer(this);
-
 	SkillBarComponent = CreateDefaultSubobject<USkillBarComponent>(TEXT("Skill Bar"));
 	SkillTreeComponent = CreateDefaultSubobject<USkillTreeComponent>(TEXT("Skill Tree"));
 
@@ -345,6 +343,8 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 	}
+
+	SkillBarComponent->InitializeComponentWidget();
 }
 
 USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer & ObjectInitializer)
@@ -389,6 +389,11 @@ bool APlayerCharacter::CanBlock() const
 bool APlayerCharacter::CanNormalAttack() const
 {
 	return CharacterState == ECharacterState::IdleWalkRun || CharacterState == ECharacterState::Attacking;
+}
+
+bool APlayerCharacter::CanUseAnySkill() const
+{
+	return !bWeaponSheathed && IsIdleOrMoving();
 }
 
 bool APlayerCharacter::IsAutoRunning() const
@@ -1259,7 +1264,15 @@ void APlayerCharacter::InitializeSkills(TArray<FName> UnlockedSKillsID)
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
+	if (!CanUseAnySkill())
+	{
+		return;
+	}
 
+	if (SkillBarComponent->CanUseSkill(SkillButtonIndex))
+	{
+
+	}
 
 
 	// If HUDWidget is nullptr or if player can't currently use any skill

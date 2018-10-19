@@ -16,7 +16,7 @@ class EOD_API USkillBarComponent : public UActorComponent
 
 public:	
 	// Sets default values for this component's properties
-	USkillBarComponent();
+	USkillBarComponent(const FObjectInitializer& ObjectInitializer);
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -31,9 +31,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Skill Bar Widget"))
 	USkillBarWidget* BP_GetSkillBarWidget() const;
 
-	FORCEINLINE APlayerCharacter* GetOwningPlayer() const;
+	FORCEINLINE void InitializeComponentWidget();
 
-	FORCEINLINE void SetOwningPlayer(APlayerCharacter* NewOwner);
+	/** Returns true if player can use skill placed at given skill slot index */
+	bool CanUseSkill(const int32 SkillSlotIndex);
 
 private:
 
@@ -42,9 +43,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<USkillBarWidget> SkillBarWidgetClass;
-
-	UPROPERTY(Transient)
-	APlayerCharacter* OwningPlayer;
 
 	
 };

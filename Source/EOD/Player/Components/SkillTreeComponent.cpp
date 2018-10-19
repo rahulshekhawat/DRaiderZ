@@ -2,7 +2,7 @@
 
 #include "SkillTreeComponent.h"
 
-USkillTreeComponent::USkillTreeComponent()
+USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicated(false);
@@ -27,14 +27,3 @@ USkillTreeWidget * USkillTreeComponent::BP_GetSkillTreeWidget() const
 {
 	return GetSkillTreeWidget();
 }
-
-FORCEINLINE APlayerCharacter * USkillTreeComponent::GetOwningPlayer() const
-{
-	return OwningPlayer;
-}
-
-FORCEINLINE void USkillTreeComponent::SetOwningPlayer(APlayerCharacter * NewOwner)
-{
-	OwningPlayer = NewOwner;
-}
-

@@ -105,9 +105,11 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInventoryComponent* InventoryComponent;
 
+	//~ Skill bar component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillBarComponent* SkillBarComponent;
 
+	//~ Skill tree component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillTreeComponent* SkillTreeComponent;
 
@@ -142,6 +144,9 @@ public:
 
 	/** Returns true if character can use normal attack */
 	virtual bool CanNormalAttack() const override;
+
+	/** Returns true if character can use any skill at all */
+	virtual bool CanUseAnySkill() const;
 
 	/** Returns true if character can auto run */
 	bool CanAutoRun() const;

@@ -1,8 +1,14 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "SkillBarComponent.h"
+#include "Player/PlayerCharacter.h"
+#include "UI/SkillBarWidget.h"
+#include "UI/HUDWidget.h"
 
-USkillBarComponent::USkillBarComponent()
+#include "Components/CanvasPanel.h"
+#include "Kismet/KismetSystemLibrary.h"
+
+USkillBarComponent::USkillBarComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicated(false);
@@ -28,13 +34,23 @@ USkillBarWidget* USkillBarComponent::BP_GetSkillBarWidget() const
 	return GetSkillBarWidget();
 }
 
-FORCEINLINE APlayerCharacter * USkillBarComponent::GetOwningPlayer() const
+FORCEINLINE void USkillBarComponent::InitializeComponentWidget()
 {
-	return OwningPlayer;
+	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
+
+	if (!(OwningPlayer && OwningPlayer->IsLocallyControlled() && OwningPlayer->GetHUDWidget()))
+	{
+		return;
+	}
+
+	if (SkillBarWidgetClass.Get())
+	{
+		SkillBarWidget = CreateWidget<USkillBarWidget>(OwningPlayer->GetGameInstance(), SkillBarWidgetClass);
+		OwningPlayer->GetHUDWidget()->BP_AddSkillBarWidgetToCanvas(SkillBarWidget);
+	}
 }
 
-FORCEINLINE void USkillBarComponent::SetOwningPlayer(APlayerCharacter * NewOwner)
+bool USkillBarComponent::CanUseSkill(const int32 SkillSlotIndex)
 {
-	OwningPlayer = NewOwner;
+	return false;
 }
-

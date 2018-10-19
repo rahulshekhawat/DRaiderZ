@@ -53,10 +53,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Inventory Widget"))
 	UInventoryWidget* BP_GetInventoryWidget() const;
 
-	FORCEINLINE APlayerCharacter* GetOwningPlayer() const;
-
-	FORCEINLINE void SetOwningPlayer(APlayerCharacter* NewOwner);
-
 	/** Toggle the display of inventory UI in player viewport */
 	void ToggleInventoryUI();
 	
@@ -67,9 +63,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
-
-	UPROPERTY(Transient)
-	APlayerCharacter* OwningPlayer;
 	
 	/** Maximum number of inventory slots */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))

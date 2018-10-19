@@ -11,6 +11,7 @@ class UStatusIndicatorWidget;
 class USkillBarWidget;
 class UInventoryWidget;
 class USkillTreeWidget;
+class UCanvasPanel;
 
 /**
  * HUDWidget is used to display player HUD
@@ -46,6 +47,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	USkillTreeWidget* SkillTreeWidget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UCanvasPanel* MainCanvas;
+
 	/** Updates health bar in StatusIndicatorWidget */
 	FORCEINLINE void UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth);
 
@@ -66,7 +70,19 @@ public:
 
 	/** Save current HUD layout to the current save slot */
 	FORCEINLINE void SaveHUDLayout();
-	
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Skill Bar Widget To Canvas"))
+	void BP_AddSkillBarWidgetToCanvas(USkillBarWidget* NewWidget);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Skill Tree Widget To Canvas"))
+	void BP_AddSkillTreeWidgetToCanvas(USkillBarWidget* NewWidget);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Inventory Widget To Canvas"))
+	void BP_AddInventoryWidgetToCanvas(USkillBarWidget* NewWidget);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Status Indicator Widget To Canvas"))
+	void BP_AddStatusIndicatorWidgetToCanvas(USkillBarWidget* NewWidget);
+
 protected:
 
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
