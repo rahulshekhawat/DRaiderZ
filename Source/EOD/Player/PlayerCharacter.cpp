@@ -71,11 +71,11 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	PlayerCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	//~ End Camera Components Initialization
 
-	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Player Inventory"));
-	SkillBarComponent = CreateDefaultSubobject<USkillBarComponent>(TEXT("Skill Bar"));
-	SkillTreeComponent = CreateDefaultSubobject<USkillTreeComponent>(TEXT("Skill Tree"));
+	InventoryComponent = ObjectInitializer.CreateDefaultSubobject<UInventoryComponent>(this, FName("Player Inventory"));
+	SkillBarComponent = ObjectInitializer.CreateDefaultSubobject<USkillBarComponent>(this, FName("Skill Bar"));
+	SkillTreeComponent = ObjectInitializer.CreateDefaultSubobject<USkillTreeComponent>(this, FName("Skill Tree"));
 
-	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	AudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("Audio Component"));
 	AudioComponent->SetupAttachment(RootComponent);
 
 	SetWalkSpeed(BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier());
@@ -191,15 +191,12 @@ void APlayerCharacter::PostInitializeComponents()
 	SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
 
 	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Instigator = this;
+	SpawnInfo.Owner = this;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
 	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
 
-	// PrimaryWeapon->SetOwner()
-
-	PrimaryWeapon->SetOwningCharacter(this);
-	SecondaryWeapon->SetOwningCharacter(this);
 
 	// @note Set secondary weapon first and primary weapon later during initialization
 	SetCurrentSecondaryWeapon(SecondaryWeaponID);
@@ -1140,13 +1137,13 @@ void APlayerCharacter::Destroyed()
 
 	if (PrimaryWeapon)
 	{
-		PrimaryWeapon->SetOwningCharacter(nullptr);
+		// PrimaryWeapon->SetOwningCharacter(nullptr);
 		PrimaryWeapon->OnUnEquip();
 		PrimaryWeapon->Destroy();
 	}
 	if (SecondaryWeapon)
 	{
-		SecondaryWeapon->SetOwningCharacter(nullptr);
+		// SecondaryWeapon->SetOwningCharacter(nullptr);
 		SecondaryWeapon->OnUnEquip();
 		SecondaryWeapon->Destroy();
 	}

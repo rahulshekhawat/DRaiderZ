@@ -19,16 +19,9 @@ AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer): Super(Obj
 	StatsComp = ObjectInitializer.CreateDefaultSubobject<UWeaponStatsComponent>(this, FName("Weapon Stats Component"));
 }
 
-// Called when the game starts or when spawned
 void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-// Called every frame
-void AWeaponBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void AWeaponBase::OnEquip(FName NewWeaponID)
@@ -38,9 +31,4 @@ void AWeaponBase::OnEquip(FName NewWeaponID)
 	{
 		OnEquip(NewWeaponID, WeaponData);
 	}
-}
-
-void AWeaponBase::SetOwningCharacter(APlayerCharacter* NewPlayer)
-{
-	OwningPlayer = NewPlayer;
 }

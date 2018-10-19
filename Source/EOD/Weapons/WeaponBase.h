@@ -22,15 +22,8 @@ public:
 	/** Create the default stats component */
 	AWeaponBase(const FObjectInitializer& ObjectInitializer);
 
-protected:
-
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
-
-public:	
-
-	/** Dummy declaration. Weapon actors are not supposed to tick */
-	virtual void Tick(float DeltaTime) override;
 	
 	/** Called when a new weapon is equipped by a character */
 	void OnEquip(FName NewWeaponID);
@@ -41,23 +34,13 @@ public:
 	/** Called when this weapon is unequipped by a character */
 	virtual void OnUnEquip() PURE_VIRTUAL(ABaseWeapon::OnUnEquip, );
 	
+	/** Weapon type of equipped weapon */
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	EWeaponType WeaponType;
 
 	bool bEquipped;
 
 	FName WeaponID;
-
-	/** 
-	 * Call this to set the owning player character of this weapon.
-	 * @note It is important to set owner before attempting to equip weapon.
-	 */
-	void SetOwningCharacter(APlayerCharacter* NewPlayer);
-
-protected:
-	
-	//~ @todo network replication
-	APlayerCharacter* OwningPlayer;
 
 private:
 

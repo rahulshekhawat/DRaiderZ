@@ -37,6 +37,7 @@ APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Sup
 	
 	// @todo Render settings
 	// RightHandWeaponMeshComp->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
+
 }
 
 void APrimaryWeapon::Tick(float DeltaTime)
@@ -47,6 +48,7 @@ void APrimaryWeapon::Tick(float DeltaTime)
 
 void APrimaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponData)
 {
+	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 	check(NewWeaponData && OwningPlayer);
 
 	if (NewWeaponData->WeaponMesh.IsNull())
@@ -163,6 +165,8 @@ void APrimaryWeapon::OnUnEquip()
 	WeaponID = NAME_None;
 	WeaponType = EWeaponType::None;
 	// @todo reset weapon stats
+
+	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 
 	if (OwningPlayer)
 	{

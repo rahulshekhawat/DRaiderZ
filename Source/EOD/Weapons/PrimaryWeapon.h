@@ -10,13 +10,14 @@ class USkeletalMeshComponent;
 
 /**
  Determines whether primary weapon is equipped in single hand or both hands
- */
+ 
 UENUM(BlueprintType)
 enum class EPrimaryWeaponType : uint8
 {
 	SingleHanded,
 	DualHanded
 };
+*/
 
 /**
  * A PrimaryWeapon is a either a dual handed weapon or a single handed weapon that can be equipped in right hand

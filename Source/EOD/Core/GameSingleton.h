@@ -27,21 +27,26 @@ public:
 	/** Data table containing player animation references */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* PlayerAnimationReferencesDataTable;
-	
-	/** Data table containing weapons info */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
-	UDataTable* WeaponsDataTable;
 
 	/** Data table containing player skills */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* PlayerSkillsDataTable;
 
+	/** Data table containing weapons info */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
+	UDataTable* WeaponsDataTable;
+
+	/** Default save profile name */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = SaveGame)
+	FString DefaultSaveSlotName;	
+
+	/** Name of current save profile in use */
 	UPROPERTY(BlueprintReadOnly, Category = SaveGame)
 	FString CurrentSaveSlotName;
 
+	/** Always 0 in this game */
 	UPROPERTY(BlueprintReadOnly, Category = SaveGame)
 	int32 UserIndex;
-
 
 
 };

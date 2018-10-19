@@ -42,6 +42,7 @@ void ASecondaryWeapon::Tick(float DeltaTime)
 
 void ASecondaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponData)
 {
+	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 	check(NewWeaponData && OwningPlayer);
 
 	USkeletalMesh* NewSkeletalMesh = nullptr;
