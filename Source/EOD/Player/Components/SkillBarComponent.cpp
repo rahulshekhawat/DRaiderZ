@@ -5,8 +5,6 @@
 #include "UI/SkillBarWidget.h"
 #include "UI/HUDWidget.h"
 
-#include "Components/CanvasPanel.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 USkillBarComponent::USkillBarComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -37,7 +35,6 @@ USkillBarWidget* USkillBarComponent::BP_GetSkillBarWidget() const
 FORCEINLINE void USkillBarComponent::InitializeComponentWidget()
 {
 	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
-
 	if (!(OwningPlayer && OwningPlayer->IsLocallyControlled() && OwningPlayer->GetHUDWidget()))
 	{
 		return;
@@ -46,7 +43,7 @@ FORCEINLINE void USkillBarComponent::InitializeComponentWidget()
 	if (SkillBarWidgetClass.Get())
 	{
 		SkillBarWidget = CreateWidget<USkillBarWidget>(OwningPlayer->GetGameInstance(), SkillBarWidgetClass);
-		OwningPlayer->GetHUDWidget()->BP_AddSkillBarWidgetToCanvas(SkillBarWidget);
+		OwningPlayer->GetHUDWidget()->AddSkillBarWidget(SkillBarWidget);
 	}
 }
 

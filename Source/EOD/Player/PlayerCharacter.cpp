@@ -196,6 +196,8 @@ void APlayerCharacter::PostInitializeComponents()
 	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
 
+	// PrimaryWeapon->SetOwner()
+
 	PrimaryWeapon->SetOwningCharacter(this);
 	SecondaryWeapon->SetOwningCharacter(this);
 
@@ -208,6 +210,23 @@ void APlayerCharacter::PostInitializeComponents()
 	if (EODSaveGame)
 	{
 		InitializeSkills(EODSaveGame->UnlockedSkills);
+	}
+
+	//~ Player widgets
+	if (IsLocallyControlled())
+	{
+		UKismetSystemLibrary::PrintString(this, FString("Locally controlled"));
+
+		if (HUDWidgetClass.Get())
+		{
+			HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), HUDWidgetClass);
+			if (HUDWidget)
+			{
+				HUDWidget->AddToViewport();
+			}
+
+			HUDWidget = nullptr;
+		}
 	}
 
 	/*
@@ -331,6 +350,7 @@ void APlayerCharacter::BeginPlay()
 
 	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
+	/*
 	//~ Player widgets
 	if (IsLocallyControlled())
 	{
@@ -343,8 +363,12 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 	}
+	*/
 
 	SkillBarComponent->InitializeComponentWidget();
+	SkillTreeComponent->InitializeComponentWidget();
+	InventoryComponent->InitializeComponentWidget();
+	// StatsComp->InitializeComponentWidget();
 }
 
 USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer & ObjectInitializer)

@@ -303,6 +303,8 @@ public:
 
 	virtual void SetMagickDamageReductionOnBlock(float Value) PURE_VIRTUAL(UStatsComponentBase::SetMagickDamageReductionOnBlock, );
 
+	virtual void InitializeComponentWidget() PURE_VIRTUAL(UStatsComponentBase::InitializeComponentWidget, );
+
 protected:
 
 	//~ @note following booleans are used to initialize timers for derived stats components

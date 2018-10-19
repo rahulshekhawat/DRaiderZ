@@ -32,19 +32,19 @@ public:
 	virtual void NativeDestruct() override;
 
 	/** Widget containing health, mana, and stamina bars */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(Transient, BlueprintReadWrite)
 	UStatusIndicatorWidget* StatusIndicatorWidget;
 
 	/** Widget containing skills that can be used by player */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(Transient, BlueprintReadWrite)
 	USkillBarWidget* SkillBarWidget;
 
 	/** Widget containing player inventory items */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(Transient, BlueprintReadWrite)
 	UInventoryWidget* InventoryWidget;
 
 	/** Widget containing skill trees of all vocations */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(Transient, BlueprintReadWrite)
 	USkillTreeWidget* SkillTreeWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
@@ -71,20 +71,65 @@ public:
 	/** Save current HUD layout to the current save slot */
 	FORCEINLINE void SaveHUDLayout();
 
+	/** Add skill bar widget as a child to HUD widget */
+	FORCEINLINE void AddSkillBarWidget(USkillBarWidget* NewWidget);
+
+	/** Add skill tree widget as a child to HUD widget */
+	FORCEINLINE void AddSkillTreeWidget(USkillTreeWidget* NewWidget);
+
+	/** Add inventory widget as a child to HUD widget */
+	FORCEINLINE void AddInventoryWidget(UInventoryWidget* NewWidget);
+
+	/** Add status indicator widget as a child to HUD widget */
+	FORCEINLINE void AddStatusIndicatorWidget(UStatusIndicatorWidget* NewWidget);
+
+	/** Add skill bar widget as a child to HUD widget */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Skill Bar Widget To Canvas"))
 	void BP_AddSkillBarWidgetToCanvas(USkillBarWidget* NewWidget);
 
+	/** Add skill tree widget as a child to HUD widget */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Skill Tree Widget To Canvas"))
 	void BP_AddSkillTreeWidgetToCanvas(USkillBarWidget* NewWidget);
 
+	/** Add inventory widget as a child to HUD widget */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Inventory Widget To Canvas"))
 	void BP_AddInventoryWidgetToCanvas(USkillBarWidget* NewWidget);
 
+	/** Add status indicator widget as a child to HUD widget */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Status Indicator Widget To Canvas"))
 	void BP_AddStatusIndicatorWidgetToCanvas(USkillBarWidget* NewWidget);
 
 protected:
 
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+private:
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D SkillBarWidgetSize;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D SkillBarWidgetPosition;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FAnchors SkillBarWidgetAnchor;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D SkillTreeWidgetSize;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D SkillTreeWidgetPosition;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D InventoryWidgetSize;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D InventoryWidgetPosition;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D StatusIndicatorWidgetSize;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D StatusIndicatorWidgetPosition;
 
 };

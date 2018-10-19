@@ -57,6 +57,21 @@ UInventoryWidget* UInventoryComponent::BP_GetInventoryWidget() const
 	return GetInventoryWidget();
 }
 
+FORCEINLINE void UInventoryComponent::InitializeComponentWidget()
+{
+	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
+	if (!(OwningPlayer && OwningPlayer->IsLocallyControlled() && OwningPlayer->GetHUDWidget()))
+	{
+		return;
+	}
+
+	if (InventoryWidgetClass.Get())
+	{
+		InventoryWidget = CreateWidget<UInventoryWidget>(OwningPlayer->GetGameInstance(), InventoryWidgetClass);
+		OwningPlayer->GetHUDWidget()->AddInventoryWidget(InventoryWidget);
+	}
+}
+
 void UInventoryComponent::AddItem(FName ItemID)
 {
 	// @todo definition

@@ -53,6 +53,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Inventory Widget"))
 	UInventoryWidget* BP_GetInventoryWidget() const;
 
+	FORCEINLINE void InitializeComponentWidget();
+
 	/** Toggle the display of inventory UI in player viewport */
 	void ToggleInventoryUI();
 	

@@ -1005,6 +1005,23 @@ void UPlayerStatsComponent::SetMagickDamageReductionOnBlock(float Value)
 	MagickDamageReductionOnBlock = Value;
 }
 
+void UPlayerStatsComponent::InitializeComponentWidget()
+{
+	/*
+	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
+	if (!(OwningPlayer && OwningPlayer->IsLocallyControlled() && OwningPlayer->GetHUDWidget()))
+	{
+		return;
+	}
+
+	if (SkillBarWidgetClass.Get())
+	{
+		SkillBarWidget = CreateWidget<USkillBarWidget>(OwningPlayer->GetGameInstance(), SkillBarWidgetClass);
+		OwningPlayer->GetHUDWidget()->AddSkillBarWidget(SkillBarWidget);
+	}
+	*/
+}
+
 void UPlayerStatsComponent::ActivateHealthRegeneration()
 {
 	GetWorld()->GetTimerManager().SetTimer(HealthRegenTimerHandle,

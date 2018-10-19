@@ -31,6 +31,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Skill Tree Widget"))
 	USkillTreeWidget* BP_GetSkillTreeWidget() const;
 
+	FORCEINLINE void InitializeComponentWidget();
+
 private:
 
 	UPROPERTY(Transient)

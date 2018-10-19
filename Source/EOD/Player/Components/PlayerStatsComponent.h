@@ -7,7 +7,7 @@
 #include "PlayerStatsComponent.generated.h"
 
 class APlayerCharacter;
-
+class USkillBarWidget;
 /**
  * PlayerStatsComponent is used to manage stats of a player controlled character
  */
@@ -308,6 +308,8 @@ public:
 
 	virtual void SetMagickDamageReductionOnBlock(float Value) override;
 
+	virtual void InitializeComponentWidget() override;
+
 private:
 	
 	//~ @note All changes to variables similar to MaxHealth, CurrentHealth, etc. will occur ONLY on server and will automatically get replicated. No RPC needed.
@@ -494,6 +496,12 @@ private:
 
 	UPROPERTY(Transient)
 	bool bIsRegeneratingStamina;
+
+	UPROPERTY(Transient)
+	USkillBarWidget* StatusIndicatorWidget;
+
+	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<USkillBarWidget> StatusIndicatorWidgetClass;
 
 	FTimerHandle HealthRegenTimerHandle;
 
