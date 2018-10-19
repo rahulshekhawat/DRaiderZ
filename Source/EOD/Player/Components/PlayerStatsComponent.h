@@ -7,7 +7,7 @@
 #include "PlayerStatsComponent.generated.h"
 
 class APlayerCharacter;
-class USkillBarWidget;
+class UStatusIndicatorWidget;
 /**
  * PlayerStatsComponent is used to manage stats of a player controlled character
  */
@@ -308,7 +308,7 @@ public:
 
 	virtual void SetMagickDamageReductionOnBlock(float Value) override;
 
-	virtual void InitializeComponentWidget() override;
+	FORCEINLINE void InitializeComponentWidget();
 
 private:
 	
@@ -498,18 +498,16 @@ private:
 	bool bIsRegeneratingStamina;
 
 	UPROPERTY(Transient)
-	USkillBarWidget* StatusIndicatorWidget;
+	UStatusIndicatorWidget* StatusIndicatorWidget;
 
 	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<USkillBarWidget> StatusIndicatorWidgetClass;
+	TSubclassOf<UStatusIndicatorWidget> StatusIndicatorWidgetClass;
 
 	FTimerHandle HealthRegenTimerHandle;
 
 	FTimerHandle ManaRegenTimerHandle;
 
 	FTimerHandle StaminaRegenTimerHandle;
-
-	APlayerCharacter* OwningPlayer;
 
 	/** Starts health regeneration on player. Automatically stops once the health is full or if manually stopped */
 	void ActivateHealthRegeneration();

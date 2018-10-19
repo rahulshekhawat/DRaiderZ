@@ -3,9 +3,11 @@
 #include "PlayerStatsComponent.h"
 #include "Player/PlayerCharacter.h"
 #include "UI/HUDWidget.h"
+#include "UI/StatusIndicatorWidget.h"
 
 #include "UnrealNetwork.h"
 #include "Components/ProgressBar.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
@@ -28,8 +30,6 @@ UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectIni
 	StaminaRegenTickInterval		= 1.f;
 
 	ActiveTimeDilation = 1.f;
-
-	OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 }
 
 void UPlayerStatsComponent::PostInitProperties()
@@ -42,6 +42,8 @@ void UPlayerStatsComponent::PostInitProperties()
 void UPlayerStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitializeComponentWidget();
 
 	//~ Initialize current variables
 	SetMaxHealth(BaseHealth);
@@ -58,7 +60,6 @@ void UPlayerStatsComponent::BeginPlay()
 	ActivateHealthRegeneration();
 	ActivateManaRegeneration();
 	ActivateStaminaRegeneration();
-
 }
 
 void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -177,10 +178,9 @@ void UPlayerStatsComponent::SetCurrentHealth(int32 Value)
 {
 	CurrentHealth = Value;
 
-	// Only local player will have HUDWidget
-	if (OwningPlayer && OwningPlayer->GetHUDWidget())
+	if (StatusIndicatorWidget)
 	{
-		OwningPlayer->GetHUDWidget()->UpdateHealthBar(CurrentHealth, MaxHealth, BaseHealth);
+		StatusIndicatorWidget->UpdateHealthBar(CurrentHealth, MaxHealth, BaseHealth);
 	}
 
 	if (CurrentHealth < MaxHealth && !bIsRegeneratingHealth)
@@ -255,10 +255,9 @@ void UPlayerStatsComponent::SetCurrentMana(int32 Value)
 {
 	CurrentMana = Value;
 
-	// Only local player will have HUDWidget
-	if (OwningPlayer && OwningPlayer->GetHUDWidget())
+	if (StatusIndicatorWidget)
 	{
-		OwningPlayer->GetHUDWidget()->UpdateManaBar(CurrentMana, MaxMana, BaseMana);
+		StatusIndicatorWidget->UpdateManaBar(CurrentMana, MaxMana, BaseMana);
 	}
 
 	if (CurrentMana < MaxMana && !bIsRegeneratingMana)
@@ -328,10 +327,9 @@ void UPlayerStatsComponent::SetCurrentStamina(int32 Value)
 {
 	CurrentStamina = Value;
 
-	// Only local player will have HUDWidget
-	if (OwningPlayer && OwningPlayer->GetHUDWidget())
+	if (StatusIndicatorWidget)
 	{
-		OwningPlayer->GetHUDWidget()->UpdateStaminaBar(CurrentStamina, MaxStamina, BaseStamina);
+		StatusIndicatorWidget->UpdateStaminaBar(CurrentStamina, MaxStamina, BaseStamina);
 	}
 
 	if (CurrentStamina < MaxStamina && !bIsRegeneratingStamina)
@@ -1007,19 +1005,18 @@ void UPlayerStatsComponent::SetMagickDamageReductionOnBlock(float Value)
 
 void UPlayerStatsComponent::InitializeComponentWidget()
 {
-	/*
 	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
-	if (!(OwningPlayer && OwningPlayer->IsLocallyControlled() && OwningPlayer->GetHUDWidget()))
+
+	if (!(OwningPlayer && OwningPlayer->GetHUDWidget()))
 	{
 		return;
 	}
 
-	if (SkillBarWidgetClass.Get())
+	if (StatusIndicatorWidgetClass.Get())
 	{
-		SkillBarWidget = CreateWidget<USkillBarWidget>(OwningPlayer->GetGameInstance(), SkillBarWidgetClass);
-		OwningPlayer->GetHUDWidget()->AddSkillBarWidget(SkillBarWidget);
+		StatusIndicatorWidget = CreateWidget<UStatusIndicatorWidget>(OwningPlayer->GetGameInstance(), StatusIndicatorWidgetClass);
+		OwningPlayer->GetHUDWidget()->AddStatusIndicatorWidget(StatusIndicatorWidget);
 	}
-	*/
 }
 
 void UPlayerStatsComponent::ActivateHealthRegeneration()

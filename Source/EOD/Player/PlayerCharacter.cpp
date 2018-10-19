@@ -197,65 +197,25 @@ void APlayerCharacter::PostInitializeComponents()
 	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
 
-
 	// @note Set secondary weapon first and primary weapon later during initialization
 	SetCurrentSecondaryWeapon(SecondaryWeaponID);
 	SetCurrentPrimaryWeapon(PrimaryWeaponID);
 
-	// Initialize skills
-	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(FString("DefaultSlot"), 0));
-	if (EODSaveGame)
+	if (HUDWidgetClass.Get())
 	{
-		InitializeSkills(EODSaveGame->UnlockedSkills);
+		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), HUDWidgetClass);
 	}
-
-	//~ Player widgets
-	if (IsLocallyControlled())
-	{
-		UKismetSystemLibrary::PrintString(this, FString("Locally controlled"));
-
-		if (HUDWidgetClass.Get())
-		{
-			HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), HUDWidgetClass);
-			if (HUDWidget)
-			{
-				HUDWidget->AddToViewport();
-			}
-
-			HUDWidget = nullptr;
-		}
-	}
-
-	/*
-#if DEVSTAGE_CODE_ENABLED
-	FSkill* Skill = UCharacterLibrary::GetPlayerSkill(FName("TestSkill"));
-	if (Skill)
-	{
-		IDToSkillMap.Add(FName("TestSkill"), Skill);
-	}
-#endif
-	*/
 }
 
 void APlayerCharacter::PostInitProperties()
 {
 	Super::PostInitProperties();
-
-	/*
-	for (int i = 0; i < MaxNumberOfSkills; i++)
-	{
-		EventsOnSuccessfulSkillAttack.Add(FCombatEvent());
-		EventsOnUsingSkill.Add(FCombatEvent());
-	}
-	*/
 }
 
 #if WITH_EDITOR
 void APlayerCharacter::PostEditChangeProperty(FPropertyChangedEvent & PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
-
-	// @todo definition
 }
 #endif
 
@@ -347,22 +307,12 @@ void APlayerCharacter::BeginPlay()
 
 	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
-	/*
-	//~ Player widgets
-	if (IsLocallyControlled())
+	if (IsLocallyControlled() && HUDWidget)
 	{
-		if (HUDWidgetClass.Get())
-		{
-			HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), HUDWidgetClass);
-			if (HUDWidget)
-			{
-				HUDWidget->AddToViewport();
-			}
-		}
+		HUDWidget->AddToViewport();
 	}
-	*/
 
-	SkillBarComponent->InitializeComponentWidget();
+	// SkillBarComponent->InitializeComponentWidget();
 	SkillTreeComponent->InitializeComponentWidget();
 	InventoryComponent->InitializeComponentWidget();
 	// StatsComp->InitializeComponentWidget();

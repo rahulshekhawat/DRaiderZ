@@ -14,7 +14,9 @@ USkillBarComponent::USkillBarComponent(const FObjectInitializer& ObjectInitializ
 
 void USkillBarComponent::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
+
+	InitializeComponentWidget();
 }
 
 void USkillBarComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
