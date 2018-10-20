@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Statics/CharacterLibrary.h"
 #include "Components/ActorComponent.h"
 #include "SkillBarComponent.generated.h"
 
@@ -34,7 +35,11 @@ public:
 	FORCEINLINE void InitializeComponentWidget();
 
 	/** Returns true if player can use skill placed at given skill slot index */
-	bool CanUseSkill(const int32 SkillSlotIndex);
+	FORCEINLINE bool CanUseSkill(const int32 SkillSlotIndex);
+
+	FName GetSkillIDFromSkillSlot(const int32 SkillSlotIndex);
+
+	void OnSkillUsed(FName SkillID, const FPlayerSkillTableRow* Skill);
 
 private:
 
@@ -44,5 +49,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<USkillBarWidget> SkillBarWidgetClass;
 
-	
+	// UPROPERTY(Transient)
+	// TMap<int32, >
+
 };

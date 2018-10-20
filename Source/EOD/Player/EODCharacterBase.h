@@ -30,6 +30,7 @@ public:
 	/** Sets default values for this character's properties */
 	AEODCharacterBase(const FObjectInitializer& ObjectInitializer);
 
+	/** Updates character state every frame */
 	virtual void Tick(float DeltaTime) override;
 
 	/** Called to bind functionality to input */
@@ -80,22 +81,17 @@ public:
 	/** Returns true if character is currently casting a spell */
 	FORCEINLINE bool IsCastingSpell() const;
 	
-	//~ @todo update definition
 	/** Returns true if character is using a normal attack */
 	FORCEINLINE bool IsNormalAttacking() const;
 
-	//~ @todo update definition
 	/** Returns true if character is using any skill */
 	FORCEINLINE bool IsUsingAnySkill() const;
 
 	/** Returns true if character is using skill at SkillIndex */
-	FORCEINLINE bool IsUsingSkill(int32 SkillIndex) const;
+	FORCEINLINE bool IsUsingSkill(FName SkillID) const;
 
 	/** Returns true if character has just been hit */
 	FORCEINLINE bool HasBeenHit() const;
-
-	/** Returns true if a hit from HitSkill was critical */
-	FORCEINLINE bool IsCriticalHit(const FSkill* HitSkill) const;
 
 	/** Returns true if character can move */
 	virtual bool CanMove() const;
@@ -117,9 +113,6 @@ public:
 	
 	/** Returns true if character can use any skill at all */
 	virtual bool CanUseAnySkill() const;
-
-	/** Returns true if character can use a particular skill at SkillIndex */
-	virtual bool CanUseSkill(int32 SkillIndex) const;
 	
 	/** Returns true if character can flinch */
 	FORCEINLINE bool CanFlinch() const;
@@ -145,10 +138,6 @@ public:
 	/** Returns true if this character requires healing (low on HP) */
 	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Needs Healing"))
 	bool BP_NeedsHealing() const;
-
-	/** [server + client] Set current state of character */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
-	void BP_SetCharacterState(const ECharacterState NewState);
 
 	/** Returns true if this character is healing anyone */
 	virtual bool IsHealing() const;
@@ -238,6 +227,10 @@ public:
 
 	/** [server + client] Set current state of character */
 	FORCEINLINE void SetCharacterState(const ECharacterState NewState);
+
+	/** [server + client] Set current state of character */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
+	void BP_SetCharacterState(const ECharacterState NewState);
 
 	/** [server + client] Change character max walk speed */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
@@ -464,15 +457,27 @@ protected:
 	
 	/** Determines whether character is currently engaged in combat or not */
 	UPROPERTY(Transient)
-	bool bInCombat;	
+	bool bInCombat;
 
 	/** Determines if invincibility frames are active */
 	UPROPERTY(Transient)
-	bool bHasActiveiFrames;
+	bool bActiveiFrames;
 
 	/** Determines if character is blocking any incoming damage */
 	UPROPERTY(Transient)
-	bool bIsBlockingDamage;
+	bool bBlockingDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	int DodgeStaminaCost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	float DodgeImmunityTriggerDelay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	float DodgeImmunityDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	float DamageBlockTriggerDelay;
 
 	// @todo
 	// virtual void OnBlockingEnemy()

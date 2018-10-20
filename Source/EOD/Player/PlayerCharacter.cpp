@@ -53,21 +53,21 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	// @note : SetMasterPoseComponent() from constructor doesn't work in packaged game (for some weird reason?!)
 
-	Hair			= CreateNewArmorComponent(TEXT("Hair"), ObjectInitializer);
-	HatItem			= CreateNewArmorComponent(TEXT("Hat Item"), ObjectInitializer);
-	FaceItem		= CreateNewArmorComponent(TEXT("Face Item"), ObjectInitializer);
-	Chest			= CreateNewArmorComponent(TEXT("Chest"), ObjectInitializer);
-	Hands			= CreateNewArmorComponent(TEXT("Hands"), ObjectInitializer);
-	Legs			= CreateNewArmorComponent(TEXT("Legs"), ObjectInitializer);
-	Feet			= CreateNewArmorComponent(TEXT("Feet"), ObjectInitializer);
+	Hair			= CreateNewArmorComponent(FName("Hair"), ObjectInitializer);
+	HatItem			= CreateNewArmorComponent(FName("Hat Item"), ObjectInitializer);
+	FaceItem		= CreateNewArmorComponent(FName("Face Item"), ObjectInitializer);
+	Chest			= CreateNewArmorComponent(FName("Chest"), ObjectInitializer);
+	Hands			= CreateNewArmorComponent(FName("Hands"), ObjectInitializer);
+	Legs			= CreateNewArmorComponent(FName("Legs"), ObjectInitializer);
+	Feet			= CreateNewArmorComponent(FName("Feet"), ObjectInitializer);
 
 	//~ Begin Camera Components Initialization
-	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, TEXT("Camera Boom"));
+	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, FName("Camera Boom"));
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->AddLocalOffset(FVector(0.f, 0.f, 60.f));
 
-	PlayerCamera = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, TEXT("Camera"));
+	PlayerCamera = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, FName("Camera"));
 	PlayerCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	//~ End Camera Components Initialization
 
@@ -82,12 +82,6 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	// By default the weapon should be sheathed
 	bWeaponSheathed = true;
-
-	MaxNumberOfSkills = 30;
-	StaminaCost_Dodge = 20;
-	Dodge_iFrameStartTime = 0.1f;
-	Dodge_iFrameEndTime = 0.5f;
-	BlockDelay = 0.2f;
 
 	Faction = EFaction::Player;
 }
@@ -334,12 +328,12 @@ bool APlayerCharacter::CanMove() const
 
 bool APlayerCharacter::CanJump() const
 {
-	return IsIdleOrMoving() || IsBlocking();
+	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning();
 }
 
 bool APlayerCharacter::CanDodge() const
 {
-	int32 DodgeCost = StaminaCost_Dodge / StatsComp->GetStaminaConsumptionModifier();
+	int32 DodgeCost = DodgeStaminaCost / StatsComp->GetStaminaConsumptionModifier();
 
 	if (StatsComp->GetCurrentStamina() >= DodgeCost &&
 		(IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking()))
@@ -364,7 +358,7 @@ bool APlayerCharacter::CanNormalAttack() const
 
 bool APlayerCharacter::CanUseAnySkill() const
 {
-	return !bWeaponSheathed && IsIdleOrMoving();
+	return GetEquippedWeaponType() != EWeaponType::None && !bWeaponSheathed && IsIdleOrMoving() && IsBlocking();
 }
 
 bool APlayerCharacter::IsAutoRunning() const
@@ -583,11 +577,11 @@ void APlayerCharacter::OnDodge()
 {
 	if (CanDodge() && PlayerAnimInstance && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_Dodge)
 	{
-		int32 DodgeCost = StaminaCost_Dodge / StatsComp->GetStaminaConsumptionModifier();
+		int32 DodgeCost = DodgeStaminaCost / StatsComp->GetStaminaConsumptionModifier();
 		StatsComp->ModifyCurrentStamina(-DodgeCost);
 
-		float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
-		float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
+		float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+		float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
 		float DesiredPlayerRotationYaw = GetPlayerControlRotationYaw();
 
 		if (ForwardAxisValue != 0)
@@ -640,9 +634,8 @@ void APlayerCharacter::OnDodge()
 		}
 		
 		FTimerDelegate TimerDelegate;
-		float iFrameDuration = Dodge_iFrameEndTime - Dodge_iFrameStartTime;
-		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), iFrameDuration);
-		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, TimerDelegate, Dodge_iFrameStartTime, false);
+		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), DodgeImmunityDuration);
+		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
 	}
 }
 
@@ -696,7 +689,7 @@ void APlayerCharacter::EnableBlock()
 	SetWalkSpeed(BaseBlockMovementSpeed * StatsComp->GetMovementSpeedModifier());
 
 	FTimerHandle TimerDelegate;
-	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, BlockDelay, false);
+	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);
 }
 
 void APlayerCharacter::DisableBlock()
@@ -878,8 +871,8 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 			
 	bool bRotatePlayer = DesiredPlayerRotationYaw == ActorRotationYaw ? false : true;
 
-	float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
-	float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
+	float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+	float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
 	if (ForwardAxisValue == 0 && RightAxisValue == 0)
 	{
 		bRotatePlayer = false;
@@ -936,8 +929,8 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 
 void APlayerCharacter::UpdateBlockState(float DeltaTime)
 {
-	float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
-	float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
+	float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+	float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
 	
 	if (ForwardAxisValue == 0)
 	{
@@ -1240,19 +1233,43 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		return;
 	}
 
-	if (SkillBarComponent->CanUseSkill(SkillButtonIndex))
-	{
-
-	}
-
-
-	// If HUDWidget is nullptr or if player can't currently use any skill
-	// @todo - do not use skill if player weapon is sheathed.
-	if (!HUDWidget || !CanUseAnySkill())
+	FName SkillID = SkillBarComponent->GetSkillIDFromSkillSlot(SkillButtonIndex);
+	if (SkillID == NAME_None)
 	{
 		return;
 	}
 
+	FPlayerSkillTableRow* SkillToUse = GetSkill(SkillID);
+	if (!SkillToUse)
+	{
+		return;
+	}
+	/*
+	if (!CanUseSkill(SkillToUse))
+	{
+		return;
+	}
+	*/
+	StatsComp->ModifyCurrentMana(-SkillToUse->ManaRequired);
+	StatsComp->ModifyCurrentStamina(-SkillToUse->StaminaRequired);
+
+	if (SkillToUse->AnimMontage.IsNull())
+	{
+
+	}
+	else
+	{
+
+	}
+
+	SetCurrentActiveSkillID(SkillID);
+	SkillBarComponent->OnSkillUsed(SkillID, SkillToUse);
+
+
+
+
+
+	/*
 	// Skill is in cooldown, can't use skill. @note Empty skill slot will return false
 	if (HUDWidget->IsSkillInCooldown(SkillButtonIndex))
 	{
@@ -1301,37 +1318,9 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
 	PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	SetCurrentActiveSkillID(SkillID);
-
+	*/
 
 	/*
-	FSkill* Skill = IDToSkillMap[SkillID];	// Crash if SkillID is not present in IDToSkillMap
-
-	// If the skill doesn't support currently equipped weapon
-	if (!(Skill->SupportedWeapons & (1 << (uint8)PrimaryWeapon->WeaponType)))
-	{
-		return;
-	}
-
-	// check if player has enough stamina or energy for the skill
-	if (Skill->SkillLevelUpInfo.ManaRequired < StatsComp->GetCurrentMana())
-	{
-		StatsComp->ModifyCurrentMana(-Skill->SkillLevelUpInfo.ManaRequired);
-	}
-	else
-	{
-		// @todo not enough mana message
-		return;
-	}
-
-	if (Skill->SkillLevelUpInfo.StaminaRequired < StatsComp->GetCurrentStamina())
-	{
-		StatsComp->ModifyCurrentStamina(-Skill->SkillLevelUpInfo.StaminaRequired);
-	}
-	else
-	{
-		// @todo not enough stamina message
-		return;
-	}
 
 	// @attention
 	// CurrentActiveSkill = Skill;
@@ -1379,8 +1368,8 @@ float APlayerCharacter::GetPlayerControlRotationYaw()
 
 float APlayerCharacter::GetRotationYawFromAxisInput()
 {
-	float ForwardAxisValue = InputComponent->GetAxisValue(TEXT("MoveForward"));
-	float RightAxisValue = InputComponent->GetAxisValue(TEXT("MoveRight"));
+	float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+	float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
 	
 	float ControlRotationYaw = GetPlayerControlRotationYaw();
 	float ResultingRotation = 0.f;
@@ -1783,6 +1772,23 @@ bool APlayerCharacter::IsFastRunning() const
 	return CharacterState == ECharacterState::SpecialMovement;
 }
 
+/*
+FORCEINLINE bool APlayerCharacter::CanUseSkill(const FPlayerSkillTableRow* Skill)
+{
+	if (Skill)
+	{
+		if ((Skill->SupportedWeapons & (1 << (uint8)GetEquippedWeaponType())) &&
+			StatsComp->GetCurrentMana() >= Skill->ManaRequired &&
+			StatsComp->GetCurrentStamina() >= Skill->StaminaRequired)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+*/
+
 void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
 {
 	IWR_CharacterMovementDirection = NewDirection;
@@ -1879,10 +1885,23 @@ FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetSkill(FName SkillID,  co
 	return UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
 }
 
+FORCEINLINE void APlayerCharacter::SetCurrentActivePlayerSkill(FPlayerSkillTableRow* Skill)
+{
+	// CurrentActivePlayerSkill = Skill;
+}
+
+FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetCurrentActivePlayerSkill() const
+{
+	// return CurrentActivePlayerSkill;
+	return nullptr;
+}
+
 FSkillDamageInfo APlayerCharacter::GetCurrentActiveSkillDamageInfo() const
 {
+	// @todo check for null
+
 	FSkillDamageInfo SkillDamageInfo;
-	const FPlayerSkillTableRow* Skill = GetSkill(GetCurrentActiveSkillID());
+	const FPlayerSkillTableRow* Skill = GetCurrentActivePlayerSkill();
 	SkillDamageInfo.bUnblockable = Skill->bUnblockable;
 	SkillDamageInfo.bUndodgable = Skill->bUndodgable;
 	SkillDamageInfo.bIgnoresBlock = Skill->bIgnoresBlock;

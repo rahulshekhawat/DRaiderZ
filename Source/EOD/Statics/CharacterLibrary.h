@@ -29,6 +29,7 @@ enum class ECharMovementDirection : uint8
 	BR 		UMETA(DisplayName = "Backward Right"),
 };
 
+/** This enum describes the cause of character death */
 UENUM(BlueprintType)
 enum class ECauseOfDeath : uint8
 {
@@ -37,6 +38,7 @@ enum class ECauseOfDeath : uint8
 	FellOutOfWorld,
 };
 
+/** This enum descibes the faction of in-game character */
 UENUM(BlueprintType)
 enum class EFaction : uint8
 {
@@ -59,6 +61,10 @@ enum class ESpecies : uint8
 	Ogre,
 };
 
+/**
+ * This enum describes the gender of human character
+ * Mainly used to determine the armor mesh and animations to use
+ */
 UENUM(BlueprintType)
 enum class ECharacterGender : uint8
 {

@@ -162,6 +162,8 @@ public:
 
 	bool IsFastRunning() const;
 
+	// FORCEINLINE bool CanUseSkill(const FPlayerSkillTableRow* Skill);
+
 	/** Returns primary weapon actor */
 	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
 
@@ -254,6 +256,10 @@ public:
 
 	FORCEINLINE FPlayerSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("APlayerCharacter::GetSkill(), player skill lookup")) const;
 
+	FORCEINLINE void SetCurrentActivePlayerSkill(FPlayerSkillTableRow* Skill);
+
+	FORCEINLINE FPlayerSkillTableRow* GetCurrentActivePlayerSkill() const;
+
 	virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const override;
 
 	virtual void OnNormalAttackSectionStart(FName SectionName) override;
@@ -304,19 +310,6 @@ public:
 
 	virtual void TurnOffTargetSwitch() override;
 
-protected:
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	int StaminaCost_Dodge;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	float Dodge_iFrameStartTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	float Dodge_iFrameEndTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	float BlockDelay;
 
 private:
 
@@ -360,6 +353,9 @@ private:
 
 	UPROPERTY(Transient)
 	bool bNormalAttackPressed;
+
+	// UPROPERTY(Transient)
+	TSharedPtr<FPlayerSkillTableRow> CurrentActivePlayerSkill;
 
 	/** Player HUD class reference */
 	UPROPERTY(Transient)

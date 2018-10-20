@@ -282,6 +282,13 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 			// GameSingleton->StreamableManager.Unload()
 			// GameSingleton->StreamableManager.IsAsyncLoadComplete()
 
+			// PlayerAnimationSoftReferences->HitEffects.LoadSynchronous();
+			// PlayerAnimationSoftReferences->HitEffects.IsPending();
+			// PlayerAnimationSoftReferences->HitEffects.IsNull();
+			// PlayerAnimationSoftReferences->HitEffects.IsValid();
+			// PlayerAnimationSoftReferences->HitEffects.Get();
+
+
 		}
 	}
 

@@ -24,6 +24,11 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	bGodMode = false;
 	TargetSwitchDuration = 0.1f;
 
+	// MaxNumberOfSkills = 30;
+	DodgeStaminaCost = 20;
+	DodgeImmunityTriggerDelay = 0.1f;
+	DodgeImmunityDuration = 0.4;
+	DamageBlockTriggerDelay = 0.2f;
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
@@ -88,7 +93,7 @@ FORCEINLINE bool AEODCharacterBase::IsDodging() const
 
 FORCEINLINE bool AEODCharacterBase::IsDodgingDamage() const
 {
-	return bHasActiveiFrames;
+	return bActiveiFrames;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsBlocking() const
@@ -98,7 +103,7 @@ FORCEINLINE bool AEODCharacterBase::IsBlocking() const
 
 FORCEINLINE bool AEODCharacterBase::IsBlockingDamage() const
 {
-	return bIsBlockingDamage;
+	return bBlockingDamage;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsCastingSpell() const
@@ -108,47 +113,22 @@ FORCEINLINE bool AEODCharacterBase::IsCastingSpell() const
 
 FORCEINLINE bool AEODCharacterBase::IsNormalAttacking() const
 {
-	// return CharacterState == ECharacterState::Attacking && CurrentActiveSkill != nullptr;
-	return CharacterState == ECharacterState::Attacking;
+	return CharacterState == ECharacterState::Attacking && GetCurrentActiveSkillID() != NAME_None;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsUsingAnySkill() const
 {
-	// return CharacterState == ECharacterState::UsingActiveSkill && CurrentActiveSkill != nullptr;
-	return CharacterState == ECharacterState::UsingActiveSkill;
+	return CharacterState == ECharacterState::UsingActiveSkill && GetCurrentActiveSkillID() != NAME_None;
 }
 
-FORCEINLINE bool AEODCharacterBase::IsUsingSkill(int32 SkillIndex) const
+FORCEINLINE bool AEODCharacterBase::IsUsingSkill(FName SkillID) const
 {
-	// return IsUsingAnySkill() && CurrentActiveSkill == GetSkill(SkillIndex);
-	return true;
+	return CharacterState == ECharacterState::UsingActiveSkill && GetCurrentActiveSkillID() == SkillID;
 }
 
 FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 {
 	return CharacterState == ECharacterState::GotHit;
-}
-
-FORCEINLINE bool AEODCharacterBase::IsCriticalHit(const FSkill* HitSkill) const
-{
-	bool bCriticalHit = false;
-
-	if (HitSkill)
-	{
-		switch (HitSkill->DamageType)
-		{
-		case EDamageType::Physical:
-			bCriticalHit = StatsComp->GetPhysicalCritRate() >= FMath::RandRange(0.f, 100.f) ? true : false;
-			break;
-		case EDamageType::Magickal:
-			bCriticalHit = StatsComp->GetMagickCritRate() >= FMath::RandRange(0.f, 100.f) ? true : false;
-			break;
-		default:
-			break;
-		}
-	}
-
-	return bCriticalHit;
 }
 
 bool AEODCharacterBase::CanMove() const
@@ -187,15 +167,9 @@ bool AEODCharacterBase::CanUseAnySkill() const
 	return IsIdleOrMoving();
 }
 
-bool AEODCharacterBase::CanUseSkill(int32 SkillIndex) const
-{
-	return false;
-}
-
 FORCEINLINE bool AEODCharacterBase::CanFlinch() const
 {
 	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
-	// @todo - GetCurrentActiveSkill()->SkillLevelUpInfo.CrowdControlImmunities
 }
 
 FORCEINLINE bool AEODCharacterBase::CanStun() const
@@ -245,7 +219,7 @@ bool AEODCharacterBase::IsHealing() const
 
 void AEODCharacterBase::EnableiFrames(float Duration)
 {
-	bHasActiveiFrames = true;
+	bActiveiFrames = true;
 
 	if (Duration > 0)
 	{
@@ -255,17 +229,17 @@ void AEODCharacterBase::EnableiFrames(float Duration)
 
 void AEODCharacterBase::DisableiFrames()
 {
-	bHasActiveiFrames = false;
+	bActiveiFrames = false;
 }
 
 void AEODCharacterBase::EnableDamageBlocking()
 {
-	bIsBlockingDamage = true;
+	bBlockingDamage = true;
 }
 
 void AEODCharacterBase::DisableDamageBlocking()
 {
-	bIsBlockingDamage = false;
+	bBlockInput = false;
 	// Clear block damage timer just in case it is still active
 	GetWorld()->GetTimerManager().ClearTimer(BlockTimerHandle); 
 }

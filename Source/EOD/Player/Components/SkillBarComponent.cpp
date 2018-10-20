@@ -49,7 +49,30 @@ FORCEINLINE void USkillBarComponent::InitializeComponentWidget()
 	}
 }
 
-bool USkillBarComponent::CanUseSkill(const int32 SkillSlotIndex)
+FORCEINLINE bool USkillBarComponent::CanUseSkill(const int32 SkillSlotIndex)
 {
+	if (!SkillBarWidget || !SkillBarWidget->IsSkillInCooldown(SkillSlotIndex))
+	{
+		return false;
+	}
+
+	// FName SkillID = SkillBarWidget->GetSkillAtIndex(SkillSlotIndex);
+	// FPlayerSkillTableRow* Skill = 
+
 	return false;
+}
+
+FName USkillBarComponent::GetSkillIDFromSkillSlot(const int32 SkillSlotIndex)
+{
+	FName SkillID = NAME_None;
+
+
+
+	return SkillID;
+}
+
+void USkillBarComponent::OnSkillUsed(FName SkillID, const FPlayerSkillTableRow* Skill)
+{
+	// @todo put skill on cooldown
+	// @todo set superseding skill group
 }
