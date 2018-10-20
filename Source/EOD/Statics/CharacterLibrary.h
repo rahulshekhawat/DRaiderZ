@@ -10,6 +10,7 @@
 #include "CharacterLibrary.generated.h"
 
 class UAnimMontage;
+class UStatusEffectBase;
 
 /**
  * This enum describes the character movement direction relative to character's line of sight.
@@ -92,177 +93,7 @@ enum class ECharacterState : uint8
 	Dead
 };
 
-/** A struct containing current skill state */
-USTRUCT(BlueprintType)
-struct EOD_API FSkillState
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	/** The current level that this skill has been upgraded to */
-	UPROPERTY()
-	int32 CurrentUpgradeLevel;
-	
-	/** The maximum level that this skill can be upgraded to */
-	UPROPERTY()
-	int32 MaxUpgradeLevel;
-
-	/** Determines whether this skill has been unlocked on the skill tree */
-	UPROPERTY()
-	bool bUnlocked;
-
-};
-
-/**
- * This struct holds strong pointers to animation montages that are compatible with player's current equipped weapon.
- * @note This struct does not contain pointer to facial animations because facial animations are independent of the weapon equipped.
- */
-USTRUCT(BlueprintType)
-struct EOD_API FPlayerAnimationReferences
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	//~ @note Words like `JumpStart` and `JumpEnd` have been intentionally capitalized because
-	//~ they are animation montage section names
-
-	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	FName FPlayerAnimationReferencesTableRowID;
-
-	/** Contains animations for player JumpStart, JumpLoop, and JumpEnd */
-	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	UAnimMontage* AnimationMontage_Jump;
-	
-	/** Contains animations for ForwardDodge, BackwardDodge, LeftDodge, and RightDodge */
-	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	UAnimMontage* AnimationMontage_Dodge;
-	
-	/** Contains animations for:
-	 * FirstSwing, FirstSwingEnd
-	 * SecondSwing, SecondSwingEnd
-	 * ...
-	 * ForwardSwing, ForwardSwingEnd
-	 * BackwardSwing, BackwardSwingEnd
-	 * ...
-	 */
-	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	UAnimMontage* AnimationMontage_NormalAttacks;
-
-	//~ @note Add AnimationMontage_WeaponChange animations here
-	//~ @todo List montage section names for AnimationMontage_SpecialActions
-	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	UAnimMontage* AnimationMontage_SpecialActions;
-	
-	/**
-	 * Contains animations for instant skills.
-	 * Section name will be same as skill name
-	 */
-	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	UAnimMontage* AnimationMontage_Skills;
-	
-	/**
-	 * Contains animations for spells
-	 * Section name will be same as spell name
-	 */
-	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	UAnimMontage* AnimationMontage_Spells;
-	
-	//~ @todo documentation
-	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	UAnimMontage* AnimationMontage_SpecialMovement;
-	
-	//~ @todo List montage section names for AnimationMontage_CrowdControlEffects
-	/** Contains animations for crowd control effects like interrupted, frozen, etc. */
-	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	UAnimMontage* AnimationMontage_HitEffects;
-	
-	/** Contains animations for player flinching */
-	UPROPERTY(BlueprintReadOnly, Category = AnimationReferences)
-	UAnimMontage* AnimationMontage_Flinch;
-
-	// @todo Death animations
-
-};
-
-
-/**
- * This struct is equivalent of FPlayerAnimationReferences except that it contains
- * string references to animations instead of strong pointers. This will be used to
- * construct the player animation references data table
- * @see FPlayerAnimationReferences
- */
-USTRUCT(BlueprintType)
-struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-	
-	/** Reference to player animation montage that contains animations for jumping */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> Jump;
-	
-	/** Reference to player animation montage that contains animations for dodging */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> Dodge;
-	
-	/** Reference to player animation montage that contains animations for normal attacks */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> NormalAttacks;
-
-	//~ @note Add AnimationMontage_WeaponChange animations here
-	/** Reference to player animation montage that contains animations for special actions (@todo list special actions) */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> SpecialActions;
-	
-	/** Reference to player animation montage that contains animations for using weapon skils */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> Skills;
-	
-	/** Reference to player animation montage that contains animations for spells */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> Spells;
-	
-	/** Reference to player animation montage that contains animations for special movement (@todo more info) */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> SpecialMovement;
-	
-	/** Reference to player animation montage that contains animations for crowd control effects */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> HitEffects;
-	
-	/** Reference to player animation montage that contains animations for flinching */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> Flinch;
-
-	// @todo Death animations
-
-};
-
-/*
-UENUM(BlueprintType)
-enum class ESkillCastType : uint8
-{
-	// Skills that are cast instantly, i.e., almost all physical attacks and magic attacks such as rapid blast and divine punishment
-	InstantCast,
-	// Skills that require time to cast, i.e., spells
-	DelayedCast,
-	// Passives skill that can't be cast
-	NoCast
-};
-*/
-
-UENUM(BlueprintType)
-enum class EEODTaskStatus : uint8
-{
-	Active,
-	Inactive,
-	Finished,
-	Aborted
-};
-
+/** This enum describes the skill type */
 UENUM(BlueprintType)
 enum class ESkillType : uint8
 {
@@ -275,104 +106,117 @@ enum class ESkillType : uint8
 	DebuffEnemy
 };
 
-/**
- * Struct containing information for skills that will be used by AI characters
- * 
- * An AI skill doesn't have any in-game name, description, and an icon
- * An AI skill can never be a passive skill
- * An AI skill doesn't have a preceding or superseding skill
- * An AI skill may require a status effect for activation (i.e., an skill that a monster can only use when it's in rage state)
- */
+/** This enum describes the intensity of camera shake */
+UENUM(BlueprintType)
+enum class ECameraShakeType : uint8
+{
+	Weak,
+	Medium,
+	Strong
+};
+
+/** Struct containing information regarding last used character skill */
 USTRUCT(BlueprintType)
-struct EOD_API FAISkillTableRow : public FTableRowBase
+struct FLastUsedSkillInfo
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	
-	/** Animation montage containing animation for this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
-	UAnimMontage* AnimMontage;
+	/** SkillID of last used skill */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = LastUsedSkill)
+	FName LastUsedSkillID;
 
-	/** Section name of skill start animation */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
-	FName SkillStartMontageSectionName;
+	/** True if the last skill was interrupted */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = LastUsedSkill)
+	bool bInterrupted;
 
-	/** Section name of skill loop animation (used in spell casting) */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
-	FName SkillLoopMontageSectionName;
-
-	/** Section name of skill end animation (used in spell casting) */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
-	FName SkillEndMontageSectionName;
-	
-	/** Type of damage inflicted from this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
-	EDamageType DamageType;
-
-	/** Determines skill type which will be used by AI for calculating most suitable skill to use */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
-	ESkillType SkillType;
-
-	/** The status effect required to use this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
-	FName RequiredStatusID;
-
-	/** The duration before which the same skill can be used again */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	float Cooldown;
-
-	/** The duration of loop section if the skill has loop section */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	float LoopDuration;
-
-	/** Damage in percentage of player's magickal or physical attack that will be inflicted on enemy */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	int32 DamagePercent;
-
-	/** Determines if this skill can be blocked */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	bool bUnblockable;
-
-	/** Determines if this skill can be dodged */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	bool bUndodgable;
-
-	/** Determines if the 'skill deflected' animation should play on getting blocked. Only applicable if this skill can be blocked */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	bool bIgnoresBlock;
-
-	/** Crowd control effect on hit */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	ECrowdControlEffect CrowdControlEffect;
-
-	/** The duration for which the crowd control effect should last (if applicable) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	float CrowdControlEffectDuration;
-
-	/** Immunities from crowd control effects granted on using this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
-	uint8 CrowdControlImmunities;
-
-	/** Status effect that this skill triggers */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	TSubclassOf<class UStatusEffectBase> StatusEffect;
-
-	FAISkillTableRow()
+	FLastUsedSkillInfo()
 	{
-		SkillStartMontageSectionName = FName("Default");
-		SkillLoopMontageSectionName = NAME_None;
-		SkillEndMontageSectionName = NAME_None;
+		bInterrupted = false;
+		LastUsedSkillID = NAME_None;
 	}
 };
 
-/** Struct containing information for skills that will be used by player character */
+/** A struct containing current skill state */
 USTRUCT(BlueprintType)
-struct EOD_API FPlayerSkillTableRow : public FTableRowBase
+struct EOD_API FSkillState
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
+	/** The current level that this skill has been upgraded to */
+	UPROPERTY()
+	int32 CurrentUpgradeLevel;
+
+	/** The maximum level that this skill can be upgraded to */
+	UPROPERTY()
+	int32 MaxUpgradeLevel;
+
+	/** Determines whether this skill has been unlocked on the skill tree */
+	UPROPERTY()
+	bool bUnlocked;
+
+};
+
+/**
+ * This struct contains the references for player animations based on equipped weapon type
+ * and player gender
+ */
+USTRUCT(BlueprintType)
+struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+	
+	/** Reference to player animation montage that contains animations for flinching */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> Flinch;
+
+	/** Reference to player animation montage that contains animations for crowd control effects */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> HitEffects;
+
+	/** Reference to player animation montage that contains animations for normal attacks */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> NormalAttacks;
+
+	/** Reference to player animation montage that contains animations for jumping */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> Jump;
+
+	/** Reference to player animation montage that contains animations for dodging */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> Dodge;
+
+	//~ @note Add AnimationMontage_WeaponChange animations here
+	/** Reference to player animation montage that contains animations for special actions (@todo list special actions) */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> SpecialActions;
+
+	/** Reference to player animation montage that contains animations for using weapon skils */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> Skills;
+
+	/** Reference to player animation montage that contains animations for spells */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> Spells;
+
+	/** Reference to player animation montage that contains animations for blocking an attack */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> BlockAttack;
+
+	/** Reference to player animation montage that contains animations for player death */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> Die;
+
+	/** Reference to player animation montage that contains animations for special movement (@todo more info) */
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	// TSoftObjectPtr<UAnimMontage> SpecialMovement;
+
+};
+
+/** Struct for in-game skills */
+USTRUCT(BlueprintType, Blueprintable)
+struct EOD_API FSkillTableRow : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
 
 	/** In-game name of this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
@@ -389,9 +233,6 @@ public:
 	/** Animation montage containing animation for this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
 	TSoftObjectPtr<UAnimMontage> AnimMontage;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
-	uint8 SupportedWeapons;
 
 	/** Section name of skill start animation */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
@@ -404,6 +245,9 @@ public:
 	/** Section name of skill end animation (used in spell casting) */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
 	FName SkillEndMontageSectionName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
+	uint8 SupportedWeapons;
 	
 	/** Type of damage inflicted from this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
@@ -491,92 +335,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	float CrowdControlEffectDuration;
 
-	/** Immunities from crowd control effects granted on using this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
-	uint8 CrowdControlImmunities;
-
-	/** Status effect that this skill triggers */
+	/** The camera shake type that should play when this skill hits an enemy */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	TSubclassOf<class UStatusEffectBase> StatusEffect;
-
-	FPlayerSkillTableRow()
-	{
-		SkillStartMontageSectionName = FName("Default");
-		SkillLoopMontageSectionName = NAME_None;
-		SkillEndMontageSectionName = NAME_None;
-	}
-};
-
-/** Struct containing information regarding last used character skill */
-USTRUCT(BlueprintType)
-struct FLastUsedSkillInfo
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	/** SkillID of last used skill */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = LastUsedSkill)
-	FName LastUsedSkillID;
-
-	/** True if the last skill was interrupted */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = LastUsedSkill)
-	bool bInterrupted;
-
-	FLastUsedSkillInfo()
-	{
-		bInterrupted = false;
-		LastUsedSkillID = NAME_None;
-	}
-};
-
-/** Struct containing level specific info for an in-game skill */
-USTRUCT(BlueprintType, Blueprintable)
-struct EOD_API FSkillLevelUpInfo
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	/** Minimum stamina required to use this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	int32 StaminaRequired;
-	
-	/** Minimum mana required to use this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	int32 ManaRequired;
-	
-	/** The duration before which the same skill can be used again */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	float Cooldown;
-
-	/** The duration of loop section if the skill has loop section */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	float LoopDuration;
-
-	/** Damage in percentage of player's magickal or physical attack that will be inflicted on enemy */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	int32 DamagePercent;
-
-	/** Determines if this skill can be blocked */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	bool bUnblockable;
-
-	/** Determines if this skill can be dodged */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	bool bUndodgable;
-
-	/** Determines if the 'skill deflected' animation should play on getting blocked. Only applicable if this skill can be blocked */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	bool bIgnoresBlock;
-
-	/** Crowd control effect on hit */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	ECrowdControlEffect CrowdControlEffect;
-
-	/** The duration for which the crowd control effect should last (if applicable) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	float CrowdControlEffectDuration;
+	ECameraShakeType CameraShakeOnHit;
 
 	/** Immunities from crowd control effects granted on using this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
@@ -585,82 +346,6 @@ public:
 	/** Status effect that this skill triggers */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	TSubclassOf<class UStatusEffectBase> StatusEffect;
-
-};
-
-/** Table row struct for in-game skills */
-USTRUCT(BlueprintType, Blueprintable)
-struct EOD_API FSkillTableRow : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FString InGameName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FString Description;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	TSoftObjectPtr<UTexture> Icon;
-	
-	/**
-	 * The montage that contains the animation(s) of this skill for first gender.
-	 * If the character supports gender (i.e. player character), first gender would be female.
-	 * Otherwise whatever the default gender character is.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	TSoftObjectPtr<UAnimMontage> AnimMontage_GenderOne;
-
-	/** The montage that contains the animation(s) of this skill for second gender */
-	/**
-	 * The montage that contains the animation(s) of this skill for second gender.
-	 * If the character supports gender (i.e. player character), second gender would be female.
-	 * Otherwise NULL.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	TSoftObjectPtr<UAnimMontage> AnimMontage_GenderTwo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
-	uint8 SupportedWeapons;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName SkillStartMontageSectionName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName SkillLoopMontageSectionName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName SkillEndMontageSectionName;
-	
-	/** Type of damage inflicted from this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	EDamageType DamageType;
-
-	/** Determines skill type which will be used by AI for calculating most suitable skill to use */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	ESkillType SkillType;
-	
-	/** Determines whether this skill is a passive skill or an active skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	bool bPassiveSkill;
-
-	/** SkillID for skill that MUST be used before using this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName PrecedingSkillID;
-
-	/** SkillID for skill that can be used after using this skill (skill chaining)  */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName SupersedingSkillID;
-
-	/** The status effect required to use this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName RequiredStatusID;
-
-	//~ Maximum number of level ups = SkillLevelUpsInfo.Num()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	TArray<FSkillLevelUpInfo> SkillLevelUpsInfo;
 
 	FSkillTableRow()
 	{
@@ -668,70 +353,6 @@ public:
 		SkillLoopMontageSectionName = NAME_None;
 		SkillEndMontageSectionName = NAME_None;
 	}
-};
-
-/** In-game skill */
-USTRUCT(BlueprintType, Blueprintable)
-struct FSkill
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	// FName SkillID; // What was this for?
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	FString InGameName;
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	FString Description;
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	UTexture* Icon;
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	uint8 CurrentSkillLevel;
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	UAnimMontage* AnimationMontage_GenderOne;
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	UAnimMontage* AnimationMontage_GenderTwo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
-	uint8 SupportedWeapons;
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	FName SkillStartMontageSectionName;
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	FName SkillLoopMontageSectionName;
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	FName SkillEndMontageSectionName;
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	EDamageType DamageType;
-
-	/** SkillID for skill that MUST be used before using this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName PrecedingSkillID;
-
-	/** SkillID for skill that can be used after using this skill (skill chaining)  */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName SupersedingSkillID;
-
-	/** The status effect required to use this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	FName RequiredStatusID;
-
-	UPROPERTY(BlueprintReadWrite, Category = Skills)
-	FSkillLevelUpInfo SkillLevelUpInfo;
-
-	FSkill();
-
-	FSkill(FSkillTableRow* SkillTableRow, uint8 SkillLevel = 1);
-
 };
 
 /**
@@ -749,17 +370,17 @@ public:
 	
 	//~ @note Blueprints don't support raw struct pointers, therefore it can't be BlueprintCallable
 	/** Returns player animation references based on the EWeaponAnimationType of player */
-	static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType, ECharacterGender Gender = ECharacterGender::Female);
+	// static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType, ECharacterGender Gender = ECharacterGender::Female);
 
 	// static FSkill* GetPlayerSkill(FName SKillID, uint8 SkillLevel = 1);
-	static FPlayerSkillTableRow* GetPlayerSkill(const FName SkillID, const FString& ContextString);
+	// static FPlayerSkillTableRow* GetPlayerSkill(const FName SkillID, const FString& ContextString);
 
 	/** Attempts to unload player animation references, returns true if successful */
-	static bool UnloadPlayerAnimationReferences(FPlayerAnimationReferences* PlayerAnimationReferences, ECharacterGender Gender = ECharacterGender::Female);
+	// static bool UnloadPlayerAnimationReferences(FPlayerAnimationReferences* PlayerAnimationReferences, ECharacterGender Gender = ECharacterGender::Female);
 
 	static bool AreEnemies(AEODCharacterBase* CharacterOne, AEODCharacterBase* CharacterTwo);
 
-	static void GetAllAICharacterSkills(const FString& CharacterName, const UDataTable* SkillsDataTable, TArray<FSkill*> &OutSkills);
+	// static void GetAllAICharacterSkills(const FString& CharacterName, const UDataTable* SkillsDataTable, TArray<FSkill*> &OutSkills);
 
 	//~ Begin anim montage section names
 	static const FName SectionName_ForwardFlinch;
@@ -831,6 +452,8 @@ public:
 	static const FName SectionName_LeftDodge;
 
 	static const FName SectionName_RightDodge;
+
+	static const FName SectionName_Default;
 	//~ End anim montage section names
 
 };

@@ -40,6 +40,7 @@ void AAICharacterBase::BeginPlay()
 
 	SetInCombat(false);
 
+	/*
 	check(SkillsDataTable);;
 
 	TArray<FName> SkillIDs = SkillsDataTable->GetRowNames();
@@ -127,6 +128,7 @@ void AAICharacterBase::BeginPlay()
 
 		SkillIDToWeightMap.Add(SkillID, 0);
 	}
+	*/
 }
 
 void AAICharacterBase::Destroyed()
@@ -215,7 +217,7 @@ bool AAICharacterBase::Freeze(const float Duration)
 
 void AAICharacterBase::EndFreeze()
 {
-	CustomTimeDilation = StatsComp->GetActiveTimeDilation();
+	// CustomTimeDilation = StatsComp->GetActiveTimeDilation();
 }
 
 bool AAICharacterBase::Knockdown(const float Duration)
@@ -240,6 +242,7 @@ void AAICharacterBase::SetInCombat(bool bValue)
 
 void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
+	/*
 	FAISkillTableRow* AISkill = nullptr;
 	if (GetCurrentActiveSkillID() != NAME_None)
 	{
@@ -258,6 +261,7 @@ void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	else
 	{
 	}
+	*/
 }
 
 void AAICharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
@@ -267,6 +271,7 @@ void AAICharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrup
 
 bool AAICharacterBase::UseSkill(FName SkillID)
 {
+	/*
 	if (CanUseAnySkill())
 	{
 		FAISkillTableRow* SkillToUse = SkillsDataTable->FindRow<FAISkillTableRow>(SkillID, FString("Looking up AI skill for use"));
@@ -282,6 +287,7 @@ bool AAICharacterBase::UseSkill(FName SkillID)
 		SkillIDToWeightMap[SkillID] = SkillIDToWeightMap[SkillID] - 1;
 		return true;
 	}
+	*/
 
 	return false;
 }
@@ -366,10 +372,10 @@ FName AAICharacterBase::GetMostWeightedMeleeSkillID(const AEODCharacterBase* Tar
 	return MostWeightedSkillID;
 }
 
+/*
 FSkillDamageInfo AAICharacterBase::GetCurrentActiveSkillDamageInfo() const
 {
 	FSkillDamageInfo SkillDamageInfo;
-
 	FString ContextString = FString("AAICharacterBase::GetCurrentActiveSkillDamageInfo(), looking for AI skill");
 	FAISkillTableRow* Skill = SkillsDataTable->FindRow<FAISkillTableRow>(GetCurrentActiveSkillID(), ContextString);
 	SkillDamageInfo.bUnblockable = Skill->bUnblockable;
@@ -382,6 +388,7 @@ FSkillDamageInfo AAICharacterBase::GetCurrentActiveSkillDamageInfo() const
 
 	return SkillDamageInfo;
 }
+*/
 
 void AAICharacterBase::UpdateMaxWalkSpeed()
 {

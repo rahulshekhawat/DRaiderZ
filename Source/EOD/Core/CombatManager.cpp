@@ -101,7 +101,7 @@ FORCEINLINE bool ACombatManager::GetCritChanceBoolean(const AEODCharacterBase* H
 													  const AEODCharacterBase* HitCharacter,
 													  const EDamageType& DamageType) const
 {
-	float CritRate = DamageType == EDamageType::Physical ? HitInstigator->StatsComp->GetPhysicalCritRate() : HitInstigator->StatsComp->GetMagickCritRate();
+	float CritRate = DamageType == EDamageType::Physical ? HitInstigator->GetStatsComponent()->GetPhysicalCritRate() : HitInstigator->GetStatsComponent()->GetMagickCritRate();
 	bool bResult = CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
 	return bResult;
 }
@@ -124,16 +124,16 @@ float ACombatManager::GetActualDamage(const AEODCharacterBase* HitInstigator,
 
 	if (SkillDamageInfo.DamageType == EDamageType::Physical)
 	{
-		ActualDamage = HitInstigator->StatsComp->GetPhysicalAttack();
-		CritBonus = HitInstigator->StatsComp->GetPhysicalCritBonus();
-		DamageReductionOnBlock = HitInstigator->StatsComp->GetPhysicalDamageReductionOnBlock();
+		ActualDamage = HitInstigator->GetStatsComponent()->GetPhysicalAttack();
+		CritBonus = HitInstigator->GetStatsComponent()->GetPhysicalCritBonus();
+		DamageReductionOnBlock = HitInstigator->GetStatsComponent()->GetPhysicalDamageReductionOnBlock();
 		CritMultiplier = PhysicalCritMultiplier;
 	}
 	else if (SkillDamageInfo.DamageType == EDamageType::Magickal)
 	{
-		ActualDamage = HitInstigator->StatsComp->GetMagickAttack();
-		CritBonus = HitInstigator->StatsComp->GetMagickCritBonus();
-		DamageReductionOnBlock = HitInstigator->StatsComp->GetMagickDamageReductionOnBlock();
+		ActualDamage = HitInstigator->GetStatsComponent()->GetMagickAttack();
+		CritBonus = HitInstigator->GetStatsComponent()->GetMagickCritBonus();
+		DamageReductionOnBlock = HitInstigator->GetStatsComponent()->GetMagickDamageReductionOnBlock();
 		CritMultiplier = MagickalCritMultiplier;
 	}
 
@@ -189,7 +189,9 @@ void ACombatManager::ProcessActorAttack(AActor* HitInstigator, const bool bHit, 
 
 void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
-	const FSkillDamageInfo SkillDamageInfo = HitInstigator->GetCurrentActiveSkillDamageInfo();
+	FSkillDamageInfo SkillDamageInfo;
+	// const FSkillDamageInfo SkillDamageInfo;
+		// = HitInstigator->GetCurrentActiveSkillDamageInfo();
 
 	for (const FHitResult& HitResult : HitResults)
 	{

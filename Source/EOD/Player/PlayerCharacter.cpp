@@ -78,12 +78,10 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	AudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("Audio Component"));
 	AudioComponent->SetupAttachment(RootComponent);
 
-	SetWalkSpeed(BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier());
+	SetWalkSpeed(BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier());
 
 	// By default the weapon should be sheathed
 	bWeaponSheathed = true;
-
-	Faction = EFaction::Player;
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -182,14 +180,14 @@ void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	SheathedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType::SheathedWeapon, Gender);
-
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Instigator = this;
 	SpawnInfo.Owner = this;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
+
+	LoadUnequippedWeaponAnimationReferences();
 
 	// @note Set secondary weapon first and primary weapon later during initialization
 	SetCurrentSecondaryWeapon(SecondaryWeaponID);
@@ -217,24 +215,42 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*
-	if (IsDead())
+	if (!GetActiveAnimationReferences())
 	{
 		return;
 	}
-	*/
-	/*
-	if (IsDead() && CharacterState != ECharacterState::Dead)
+	
+	if (IsDead())
 	{
-		CharacterState = ECharacterState::Dead;
-		GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_HitEffects);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(FName(""), GetActiveAnimationReferences()->AnimationMontage_HitEffects);
-	}
-	else if (IsDead() && CharacterState == ECharacterState::Dead)
-	{
+		UAnimMontage* DeathMontage = GetActiveAnimationReferences()->Die.Get();
 
+		if (GetCharacterState() != ECharacterState::Dead)
+		{
+			PlayAnimationMontage(DeathMontage, UCharacterLibrary::SectionName_Default, ECharacterState::Dead);
+		}
+		else
+		{
+			// @todo Revival options when the death animation finishes playing
+		}
+
+		return;
 	}
-	*/
+
+	/*
+	if (GetCharacterMovement()->IsFalling())
+	{
+		UAnimMontage* JumpMontage = GetActiveAnimationReferences()->Jump.Get();
+
+		if (GetCharacterState() != ECharacterState::Jumping)
+		{
+			PlayAnimationMontage(JumpMontage, UCharacterLibrary::SectionName_JumpStart, ECharacterState::Jumping);
+		}
+		else if (GetCharacterState() == ECharacterState::Jumping && GetMesh()->GetAnimInstance()->Montage_IsPlaying(JumpMontage))
+		{
+
+		}
+	}
+
 
 	if (GetCharacterMovement()->IsFalling() && !IsJumping())
 	{
@@ -257,6 +273,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 				GetActiveAnimationReferences()->AnimationMontage_Jump);
 		}
 	}
+	*/
 
 	if (IsLocallyControlled())
 	{
@@ -305,11 +322,6 @@ void APlayerCharacter::BeginPlay()
 	{
 		HUDWidget->AddToViewport();
 	}
-
-	// SkillBarComponent->InitializeComponentWidget();
-	// SkillTreeComponent->InitializeComponentWidget();
-	// InventoryComponent->InitializeComponentWidget();
-	// StatsComp->InitializeComponentWidget();
 }
 
 USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer & ObjectInitializer)
@@ -333,9 +345,9 @@ bool APlayerCharacter::CanJump() const
 
 bool APlayerCharacter::CanDodge() const
 {
-	int32 DodgeCost = DodgeStaminaCost / StatsComp->GetStaminaConsumptionModifier();
+	int32 DodgeCost = DodgeStaminaCost / GetStatsComponent()->GetStaminaConsumptionModifier();
 
-	if (StatsComp->GetCurrentStamina() >= DodgeCost &&
+	if (GetStatsComponent()->GetCurrentStamina() >= DodgeCost &&
 		(IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking()))
 	{
 		return true;
@@ -353,7 +365,9 @@ bool APlayerCharacter::CanBlock() const
 
 bool APlayerCharacter::CanNormalAttack() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun || CharacterState == ECharacterState::Attacking;
+	return IsIdleOrMoving() || IsNormalAttacking();
+
+	// return CharacterState == ECharacterState::IdleWalkRun || CharacterState == ECharacterState::Attacking;
 }
 
 bool APlayerCharacter::CanUseAnySkill() const
@@ -363,15 +377,15 @@ bool APlayerCharacter::CanUseAnySkill() const
 
 bool APlayerCharacter::IsAutoRunning() const
 {
-	return CharacterState == ECharacterState::AutoRun;
+	return GetCharacterState() == ECharacterState::AutoRun;
 }
 
-FORCEINLINE APrimaryWeapon * APlayerCharacter::GetPrimaryWeapon() const
+FORCEINLINE APrimaryWeapon* APlayerCharacter::GetPrimaryWeapon() const
 {
 	return PrimaryWeapon;
 }
 
-FORCEINLINE ASecondaryWeapon * APlayerCharacter::GetSecondaryWeapon() const
+FORCEINLINE ASecondaryWeapon* APlayerCharacter::GetSecondaryWeapon() const
 {
 	return SecondaryWeapon;
 }
@@ -381,7 +395,7 @@ FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
 	return PrimaryWeapon->WeaponType;
 }
 
-FORCEINLINE UHUDWidget * APlayerCharacter::GetHUDWidget() const
+FORCEINLINE UHUDWidget* APlayerCharacter::GetHUDWidget() const
 {
 	return HUDWidget;
 }
@@ -391,13 +405,16 @@ bool APlayerCharacter::IsWeaponSheathed() const
 	return bWeaponSheathed;
 }
 
-UHUDWidget * APlayerCharacter::BP_GetHUDWidget() const
+UHUDWidget* APlayerCharacter::BP_GetHUDWidget() const
 {
 	return GetHUDWidget();
 }
 
 bool APlayerCharacter::Interrupt(const float BCAngle)
 {
+	// if (CanInterrupt() && )
+
+	/*
 	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_HitEffects)
 	{
 		if (BCAngle <= 90)
@@ -415,12 +432,13 @@ bool APlayerCharacter::Interrupt(const float BCAngle)
 
 		return true;
 	}
-
+	*/
 	return false;
 }
 
 bool APlayerCharacter::Flinch(const float BCAngle)
 {
+	/*
 	if (CanFlinch() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_Flinch)
 	{
 		if (BCAngle <= 90)
@@ -436,6 +454,7 @@ bool APlayerCharacter::Flinch(const float BCAngle)
 
 		return true;
 	}
+	*/
 
 	return false;
 }
@@ -477,11 +496,12 @@ bool APlayerCharacter::Freeze(const float Duration)
 
 void APlayerCharacter::EndFreeze()
 {
-	CustomTimeDilation = StatsComp->GetActiveTimeDilation();
+	CustomTimeDilation = GetStatsComponent()->GetActiveTimeDilation();
 }
 
 bool APlayerCharacter::Knockdown(const float Duration)
 {
+	/*
 	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_HitEffects)
 	{
 		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
@@ -491,19 +511,23 @@ bool APlayerCharacter::Knockdown(const float Duration)
 
 		return true;
 	}
+	*/
 
 	return false;
 }
 
 void APlayerCharacter::EndKnockdown()
 {
+	/*
 	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
 		UCharacterLibrary::SectionName_KnockdownEnd,
 		ECharacterState::GotHit);
+		*/
 }
 
 bool APlayerCharacter::Knockback(const float Duration, const FVector& ImpulseDirection)
 {
+	/*
 	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_HitEffects)
 	{
 		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
@@ -514,15 +538,18 @@ bool APlayerCharacter::Knockback(const float Duration, const FVector& ImpulseDir
 
 		return true;
 	}
+	*/
 
 	return false;
 }
 
 void APlayerCharacter::BlockAttack()
 {
+	/*
 	UKismetSystemLibrary::PrintString(this, FString("Blocked Attack"));
 	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
 						 UCharacterLibrary::SectionName_BlockAttack);
+						 */
 }
 
 bool APlayerCharacter::CanAutoRun() const
@@ -575,6 +602,7 @@ void APlayerCharacter::ZoomOutCamera()
 
 void APlayerCharacter::OnDodge()
 {
+	/*
 	if (CanDodge() && PlayerAnimInstance && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_Dodge)
 	{
 		int32 DodgeCost = DodgeStaminaCost / StatsComp->GetStaminaConsumptionModifier();
@@ -637,6 +665,7 @@ void APlayerCharacter::OnDodge()
 		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), DodgeImmunityDuration);
 		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
 	}
+	*/
 }
 
 void APlayerCharacter::OnPressedForward()
@@ -679,6 +708,7 @@ void APlayerCharacter::OnPressedEscape()
 
 void APlayerCharacter::EnableBlock()
 {
+	/*
 	if (IsNormalAttacking())
 	{
 		PlayerAnimInstance->Montage_Stop(0.2, GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
@@ -690,6 +720,7 @@ void APlayerCharacter::EnableBlock()
 
 	FTimerHandle TimerDelegate;
 	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);
+	*/
 }
 
 void APlayerCharacter::DisableBlock()
@@ -701,6 +732,7 @@ void APlayerCharacter::DisableBlock()
 
 void APlayerCharacter::OnJump()
 {
+	/*
 	if (CanJump() && PlayerAnimInstance && GetActiveAnimationReferences())
 	{
 		if (IsBlocking())
@@ -713,6 +745,7 @@ void APlayerCharacter::OnJump()
 			UCharacterLibrary::SectionName_JumpStart,
 			ECharacterState::Jumping);
 	}
+	*/
 }
 
 void APlayerCharacter::OnInteract()
@@ -768,6 +801,7 @@ void APlayerCharacter::OnToggleSkillTree()
 
 void APlayerCharacter::OnPressedNormalAttack()
 {
+	/*
 	if (!CanNormalAttack() || !GetActiveAnimationReferences()->AnimationMontage_NormalAttacks)
 	{
 		return;
@@ -812,6 +846,7 @@ void APlayerCharacter::OnPressedNormalAttack()
 			}
 		}
 	}
+	*/
 }
 
 void APlayerCharacter::OnReleasedNormalAttack()
@@ -821,6 +856,7 @@ void APlayerCharacter::OnReleasedNormalAttack()
 
 void APlayerCharacter::OnToggleAutoRun()
 {
+	/*
 	if (CharacterState == ECharacterState::AutoRun)
 	{
 		DisableAutoRun();
@@ -829,6 +865,7 @@ void APlayerCharacter::OnToggleAutoRun()
 	{
 		EnableAutoRun();
 	}
+	*/
 }
 
 FORCEINLINE void APlayerCharacter::EnableAutoRun()
@@ -840,7 +877,7 @@ FORCEINLINE void APlayerCharacter::EnableAutoRun()
 FORCEINLINE void APlayerCharacter::DisableAutoRun()
 {
 	// Make sure that auto run is active before you attempt to disable it
-	check(CharacterState == ECharacterState::AutoRun);
+	// check(CharacterState == ECharacterState::AutoRun);
 
 	SetCharacterState(ECharacterState::IdleWalkRun);
 	SetUseControllerRotationYaw(false);
@@ -878,6 +915,7 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 		bRotatePlayer = false;
 	}
 
+	/*
 	if (bRotatePlayer)
 	{
 		// DeltaRotatePlayerToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
@@ -902,7 +940,7 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 			SetWalkSpeed(Speed);
 		}
 	}
-	
+	*/
 	if (ForwardAxisValue == 0)
 	{
 		if (RightAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::R)
@@ -975,11 +1013,13 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 		SetIWRCharMovementDir(ECharMovementDirection::F);
 	}
 	
+	/*
 	float Speed = BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier();
 	if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 	{
 		SetWalkSpeed(Speed);
 	}
+	*/
 }
 
 /*
@@ -1090,6 +1130,8 @@ void APlayerCharacter::Destroyed()
 		SecondaryWeapon->OnUnEquip();
 		SecondaryWeapon->Destroy();
 	}
+
+
 }
 
 FORCEINLINE void APlayerCharacter::SavePlayerState()
@@ -1105,28 +1147,11 @@ void APlayerCharacter::BP_SavePlayerState()
 	SavePlayerState();
 }
 
-/*
-void APlayerCharacter::UpdatePlayerAnimationReferences()
-{
-	if (PlayerAnimationReferences)
-	{
-		UCharacterLibrary::UnloadPlayerAnimationReferences(PlayerAnimationReferences, Gender);
-
-		// delete older animation references, prevent memory leak
-		delete PlayerAnimationReferences;
-		PlayerAnimationReferences = nullptr;
-	}
-
-	PlayerAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(CurrentWeaponAnimationToUse, Gender);
-
-}
-*/
-
 void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType)
 {
 	if (EquippedWeaponAnimationReferences)
 	{
-		UCharacterLibrary::UnloadPlayerAnimationReferences(EquippedWeaponAnimationReferences, Gender);
+		// UCharacterLibrary::UnloadPlayerAnimationReferences(EquippedWeaponAnimationReferences, Gender);
 
 		// delete older animation references, prevent memory leak
 		delete EquippedWeaponAnimationReferences;
@@ -1162,13 +1187,15 @@ void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(const EWeaponType
 	}
 
 	SetCurrentWeaponAnimationToUse(WeaponAnimationType);
-	EquippedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(WeaponAnimationType, Gender);
+	// EquippedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(WeaponAnimationType, Gender);
 }
 
+/*
 FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() const
 {
 	return bWeaponSheathed ? SheathedWeaponAnimationReferences : EquippedWeaponAnimationReferences;
 }
+*/
 
 FName APlayerCharacter::GetNextNormalAttackSectionName(const FName & CurrentSection) const
 {
@@ -1211,23 +1238,148 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName & CurrentSect
 	return NAME_None;
 }
 
-void APlayerCharacter::InitializeSkills(TArray<FName> UnlockedSKillsID)
+FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationReferences() const
 {
-	/*
-	for (FName& SkillID : UnlockedSKillsID)
-	{
-		FSkill* Skill = UCharacterLibrary::GetPlayerSkill(SkillID);
+	return nullptr;
+}
 
-		if (Skill)
-		{
-			IDToSkillMap.Add(SkillID, Skill);
-		}
+FName APlayerCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender Gender)
+{
+	FString Prefix;
+	if (Gender == ECharacterGender::Female)
+	{
+		Prefix = FString("Female_");
 	}
-	*/
+	else
+	{
+		Prefix = FString("Male_");
+	}
+
+	FString Postfix;
+	switch (WeaponType)
+	{
+	case EWeaponType::GreatSword:
+		Postfix = FString("GreatSword");
+		break;
+	case EWeaponType::WarHammer:
+		Postfix = FString("WarHammer");
+		break;
+	case EWeaponType::LongSword:
+		Postfix = FString("LongSword");
+		break;
+	case EWeaponType::Mace:
+		Postfix = FString("Mace");
+		break;
+	case EWeaponType::Dagger:
+		Postfix = FString("Dagger");
+		break;
+	case EWeaponType::Staff:
+		Postfix = FString("Staff");
+		break;
+	case EWeaponType::Shield:
+		Postfix = FString("Shield");
+		break;
+	case EWeaponType::None:
+		Postfix = FString("NoWeapon");
+		break;
+	default:
+		Postfix = FString("NoWeapon");
+		break;
+	}
+
+	FString RowIDString = Prefix + Postfix;
+	FName RowID = FName(*RowIDString);
+
+	return RowID;
+}
+
+TSharedPtr<FStreamableHandle> APlayerCharacter::LoadAnimationReferences(FPlayerAnimationReferencesTableRow* AnimationReferences)
+{
+	TSharedPtr<FStreamableHandle> StreamableHandle;
+
+	UGameSingleton* GameSingleton = nullptr;
+	if (GEngine)
+	{
+		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+	}
+
+	if (!GameSingleton)
+	{
+		return StreamableHandle;
+	}
+
+	TArray<FSoftObjectPath> AssetsToLoad;
+	if (AnimationReferences)
+	{
+		AssetsToLoad.Add(AnimationReferences->BlockAttack.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Die.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Dodge.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Flinch.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->HitEffects.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->NormalAttacks.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Skills.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Jump.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->SpecialActions.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Spells.ToSoftObjectPath());
+	}
+
+	StreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AssetsToLoad);
+	return StreamableHandle;
+}
+
+void APlayerCharacter::UnloadUnequippedWeaponAnimationReferences()
+{
+	if (UnequippedWeaponAnimationsStreamableHandle.IsValid())
+	{
+		UnequippedWeaponAnimationsStreamableHandle.Get()->ReleaseHandle();
+		UnequippedWeaponAnimationsStreamableHandle.Reset();
+	}
+}
+
+void APlayerCharacter::LoadUnequippedWeaponAnimationReferences()
+{
+	UnloadUnequippedWeaponAnimationReferences();
+
+	FName RowID = GetAnimationReferencesRowID(EWeaponType::None, Gender);
+	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
+		FString("APlayerCharacter::LoadUnequippedWeaponAnimationReferences(), loading unequipped weapon animation references"));
+
+	if (!PlayerAnimationReferencesDataTable)
+	{
+		return;
+	}
+
+	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
+}
+
+void APlayerCharacter::UnloadEquippedWeaponAnimationReferences()
+{
+	if (EquippedWeaponAnimationsStreamableHandle.IsValid())
+	{
+		EquippedWeaponAnimationsStreamableHandle.Get()->ReleaseHandle();
+		EquippedWeaponAnimationsStreamableHandle.Reset();
+	}
+}
+
+void APlayerCharacter::LoadEquippedWeaponAnimationReferences()
+{
+	UnloadEquippedWeaponAnimationReferences();
+
+	FName RowID = GetAnimationReferencesRowID(GetEquippedWeaponType(), Gender);
+	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
+		FString("APlayerCharacter::LoadUnequippedWeaponAnimationReferences(), loading unequipped weapon animation references"));
+
+	if (!PlayerAnimationReferencesDataTable)
+	{
+		return;
+	}
+
+	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
 }
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
+	/*
 	if (!CanUseAnySkill())
 	{
 		return;
@@ -1244,12 +1396,17 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	{
 		return;
 	}
+
+	*/
+
 	/*
 	if (!CanUseSkill(SkillToUse))
 	{
 		return;
 	}
 	*/
+
+	/*
 	StatsComp->ModifyCurrentMana(-SkillToUse->ManaRequired);
 	StatsComp->ModifyCurrentStamina(-SkillToUse->StaminaRequired);
 
@@ -1265,9 +1422,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	SetCurrentActiveSkillID(SkillID);
 	SkillBarComponent->OnSkillUsed(SkillID, SkillToUse);
 
-
-
-
+	*/
 
 	/*
 	// Skill is in cooldown, can't use skill. @note Empty skill slot will return false
@@ -1594,7 +1749,7 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bIn
 {
 	if (!bInterrupted)
 	{
-		CharacterState = ECharacterState::IdleWalkRun;
+		// CharacterState = ECharacterState::IdleWalkRun;
 	}
 }
 
@@ -1663,13 +1818,6 @@ void APlayerCharacter::RemoveSecondaryWeapon()
 	SecondaryWeaponID = NAME_None;
 	SecondaryWeapon->OnUnEquip();
 }
-
-/*
-FORCEINLINE void APlayerCharacter::OnSecondaryWeaponFailedToEquip(FName WeaponID, FWeaponTableRow * NewWeaponData)
-{
-	SecondaryWeaponID = NAME_None;
-}
-*/
 
 void APlayerCharacter::UpdateCurrentWeaponAnimationType()
 {
@@ -1769,7 +1917,8 @@ bool APlayerCharacter::IsSecondaryWeaponEquipped() const
 
 bool APlayerCharacter::IsFastRunning() const
 {
-	return CharacterState == ECharacterState::SpecialMovement;
+	// return CharacterState == ECharacterState::SpecialMovement;
+	return false;
 }
 
 /*
@@ -1789,7 +1938,7 @@ FORCEINLINE bool APlayerCharacter::CanUseSkill(const FPlayerSkillTableRow* Skill
 }
 */
 
-void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
+FORCEINLINE void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
 {
 	IWR_CharacterMovementDirection = NewDirection;
 
@@ -1880,6 +2029,7 @@ void APlayerCharacter::AddSkill(FName SkillID, uint8 SkillLevel)
 	*/
 }
 
+/*
 FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetSkill(FName SkillID,  const FString& ContextString) const
 {
 	return UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
@@ -1895,7 +2045,9 @@ FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetCurrentActivePlayerSkill
 	// return CurrentActivePlayerSkill;
 	return nullptr;
 }
+*/
 
+/*
 FSkillDamageInfo APlayerCharacter::GetCurrentActiveSkillDamageInfo() const
 {
 	// @todo check for null
@@ -1913,6 +2065,8 @@ FSkillDamageInfo APlayerCharacter::GetCurrentActiveSkillDamageInfo() const
 	return SkillDamageInfo;
 }
 
+*/
+
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
 	// @attention
@@ -1921,6 +2075,7 @@ void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 
 void APlayerCharacter::CleanupNormalAttackSectionToSkillMap()
 {
+	/*
 	TArray<FName> Keys;
 	NormalAttackSectionToSkillMap.GetKeys(Keys);
 	for (FName& Key : Keys)
@@ -1929,10 +2084,12 @@ void APlayerCharacter::CleanupNormalAttackSectionToSkillMap()
 		delete Skill;
 	}
 	NormalAttackSectionToSkillMap.Empty();
+	*/
 }
 
 void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeaponType)
 {
+	/*
 	CleanupNormalAttackSectionToSkillMap();
 
 	if (NewWeaponType == EWeaponType::GreatSword ||
@@ -1989,8 +2146,8 @@ void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeapon
 		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_BackwardSPSwing, Skill);
 	}
 	else if (NewWeaponType == EWeaponType::Dagger ||
-			 NewWeaponType == EWeaponType::LongSword ||
-			 NewWeaponType == EWeaponType::Mace)
+		NewWeaponType == EWeaponType::LongSword ||
+		NewWeaponType == EWeaponType::Mace)
 	{
 		FSkill* Skill = new FSkill();
 		Skill->SkillLevelUpInfo.DamagePercent = 100;
@@ -2022,6 +2179,7 @@ void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeapon
 		Skill->SkillLevelUpInfo.StaminaRequired = 10;
 		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_BackwardSPSwing, Skill);
 	}
+	*/
 }
 
 void APlayerCharacter::OnRep_WeaponSheathed()

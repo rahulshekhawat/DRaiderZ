@@ -8,14 +8,6 @@
 #include "GameFramework/Info.h"
 #include "CombatManager.generated.h"
 
-UENUM(BlueprintType)
-enum class ECameraShakeType : uint8
-{
-	Weak,
-	Medium,
-	Strong
-};
-
 class AActor;
 class UCameraShake;
 class AEODCharacterBase;

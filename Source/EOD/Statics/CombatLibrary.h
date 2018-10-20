@@ -91,6 +91,11 @@ public:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
 	float CrowdControlEffectDuration;		
 
+	FSkillDamageInfo()
+	{
+
+	}
+
 };
 
 

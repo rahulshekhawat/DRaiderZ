@@ -49,10 +49,13 @@ const FName UCharacterLibrary::SectionName_BackwardDodge 			= FName("BackwardDod
 const FName UCharacterLibrary::SectionName_LeftDodge 				= FName("LeftDodge");
 const FName UCharacterLibrary::SectionName_RightDodge 				= FName("RightDodge");
 
+const FName UCharacterLibrary::SectionName_Default 					= FName("Default");
+
 UCharacterLibrary::UCharacterLibrary(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 }
 
+/*
 FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType, ECharacterGender Gender)
 {
 	FPlayerAnimationReferences* PlayerAnimationReferences = nullptr;
@@ -266,7 +269,8 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 				PlayerAnimationReferences->AnimationMontage_Flinch = PlayerAnimationSoftReferences->Flinch.Get();
 			}
 
-			/*
+			///////////////////////////
+
 			PlayerAnimationReferences->FPlayerAnimationReferencesTableRowID = PlayerAnimationReferencesTableRowID;
 			PlayerAnimationReferences->AnimationMontage_Dodge				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Dodge);
 			PlayerAnimationReferences->AnimationMontage_Jump				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Jump);
@@ -277,7 +281,8 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 			PlayerAnimationReferences->AnimationMontage_SpecialMovement		= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->SpecialMovement);
 			PlayerAnimationReferences->AnimationMontage_HitEffects = GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->HitEffects);
 			PlayerAnimationReferences->AnimationMontage_Flinch				= GameSingleton->StreamableManager.LoadSynchronous<UAnimMontage>(PlayerAnimationSoftReferences->Flinch);
-			*/
+			
+			/////////////////////////////
 
 			// GameSingleton->StreamableManager.Unload()
 			// GameSingleton->StreamableManager.IsAsyncLoadComplete()
@@ -294,7 +299,9 @@ FPlayerAnimationReferences * UCharacterLibrary::GetPlayerAnimationReferences(EWe
 
 	return PlayerAnimationReferences;
 }
+*/
 
+/*
 FPlayerSkillTableRow * UCharacterLibrary::GetPlayerSkill(const FName SkillID, const FString& ContextString)
 {
 	FPlayerSkillTableRow* Skill = nullptr;
@@ -311,6 +318,7 @@ FPlayerSkillTableRow * UCharacterLibrary::GetPlayerSkill(const FName SkillID, co
 
 	return Skill;
 }
+*/
 
 /*
 FSkill * UCharacterLibrary::GetPlayerSkill(FName SKillID, uint8 SkillLevel)
@@ -335,6 +343,7 @@ FSkill * UCharacterLibrary::GetPlayerSkill(FName SKillID, uint8 SkillLevel)
 }
 */
 
+/*
 bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferences * PlayerAnimationReferences, ECharacterGender Gender)
 {
 	if (!(PlayerAnimationReferences && GEngine && GEngine->GameSingleton))
@@ -378,6 +387,7 @@ bool UCharacterLibrary::UnloadPlayerAnimationReferences(FPlayerAnimationReferenc
 
 	return true;
 }
+*/
 
 bool UCharacterLibrary::AreEnemies(AEODCharacterBase * CharacterOne, AEODCharacterBase * CharacterTwo)
 {
@@ -389,6 +399,7 @@ bool UCharacterLibrary::AreEnemies(AEODCharacterBase * CharacterOne, AEODCharact
 	return true;
 }
 
+/*
 void UCharacterLibrary::GetAllAICharacterSkills(const FString& CharacterName, const UDataTable* SkillsDataTable, TArray<FSkill*>& OutSkills)
 {
 	if (!SkillsDataTable)
@@ -408,14 +419,18 @@ void UCharacterLibrary::GetAllAICharacterSkills(const FString& CharacterName, co
 
 	return;
 }
+*/
 
+/*
 FSkill::FSkill()
 {
 	this->CurrentSkillLevel = 0;
 	this->AnimationMontage_GenderOne = nullptr;
 	this->AnimationMontage_GenderTwo = nullptr;
 }
+*/
 
+/*
 FSkill::FSkill(FSkillTableRow * SkillTableRow, uint8 SkillLevel)
 {
 	this->InGameName 						= SkillTableRow->InGameName;
@@ -450,3 +465,4 @@ FSkill::FSkill(FSkillTableRow * SkillTableRow, uint8 SkillLevel)
 	this->AnimationMontage_GenderTwo = EODLoadAsset<UAnimMontage>(SkillTableRow->AnimMontage_GenderTwo);
 
 }
+*/

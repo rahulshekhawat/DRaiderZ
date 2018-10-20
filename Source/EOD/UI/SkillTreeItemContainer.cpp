@@ -101,7 +101,8 @@ FORCEINLINE void USkillTreeItemContainer::LoadEODItemInfo()
 		SkillID = SkillGroup + FString("_1");
 	}
 
-	FPlayerSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(FName(*SkillID), FString("USkillTreeItemContainer::LoadEODItemInfo(), looking for player skill"));
+	// FPlayerSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(FName(*SkillID), FString("USkillTreeItemContainer::LoadEODItemInfo(), looking for player skill"));
+	FSkillTableRow* Skill = nullptr;
 	if (!Skill)
 	{
 		return;

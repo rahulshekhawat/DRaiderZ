@@ -36,6 +36,15 @@ enum class EEODItemType : uint8
 	Scrap,
 };
 
+UENUM(BlueprintType)
+enum class EEODTaskStatus : uint8
+{
+	Inactive,
+	Active,
+	Finished,
+	Aborted
+};
+
 USTRUCT(BlueprintType)
 struct EOD_API FEODItemInfo
 {
@@ -79,8 +88,6 @@ class EOD_API UEODLibrary : public UObject
 	
 public:
 
-	// template<typename ObjType = UObject>
-	// static ObjType* EODLoadAsset(TSoftObjectPtr<ObjType> SoftAssetPtr);
 	
 	
 };

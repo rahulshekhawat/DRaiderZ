@@ -170,7 +170,7 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 	if (bResult && this->ContainerType == EEODContainerType::SkillBar)
 	{
 		APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwningPlayerPawn());
-		OwningPlayer->AddSkill(EODItemInfo.ItemID, EODItemInfo.StackCount);
+		// OwningPlayer->AddSkill(EODItemInfo.ItemID, EODItemInfo.StackCount);
 	}
 
 	// Cannot drop anything from skill tree to inventory

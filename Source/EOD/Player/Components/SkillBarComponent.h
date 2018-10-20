@@ -39,7 +39,7 @@ public:
 
 	FName GetSkillIDFromSkillSlot(const int32 SkillSlotIndex);
 
-	void OnSkillUsed(FName SkillID, const FPlayerSkillTableRow* Skill);
+	// void OnSkillUsed(FName SkillID, const FPlayerSkillTableRow* Skill);
 
 private:
 

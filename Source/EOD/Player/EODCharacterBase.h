@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StatusEffects/StatusEffectBase.h"
+#include "Statics/EODLibrary.h"
 #include "Statics/CharacterLibrary.h"
+#include "StatusEffects/StatusEffectBase.h"
 #include "GameFramework/Character.h"
 #include "EODCharacterBase.generated.h"
 
-// DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TArray<TWeakObjectPtr<AEODCharacterBase>>, RecipientCharacters);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TWeakObjectPtr<AEODCharacterBase>, RecipientCharacter);
 
 class UAnimMontage;
@@ -142,35 +142,35 @@ public:
 	/** Returns true if this character is healing anyone */
 	virtual bool IsHealing() const;
 
-	/** [server + client] Interrupt this character's current action */
-	virtual bool Interrupt(const float BCAngle) PURE_VIRTUAL(AEODCharacterBase::Interrupt, return false; );
+	/** Interrupt this character's current action */
+	virtual bool Interrupt(const float BCAngle);
 
-	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
-	virtual bool Flinch(const float BCAngle) PURE_VIRTUAL(AEODCharacterBase::Flinch, return false; );
+	/** Flinch this character. This is nothing more than a visual feedback to getting attacked */
+	virtual bool Flinch(const float BCAngle);
 
-	/** [server + client] Applies stun to this character */
-	virtual bool Stun(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Stun, return false; );
+	/** Applies stun to this character */
+	virtual bool Stun(const float Duration);
 
 	/** [client] Removes 'stun' crowd control effect from this character */
-	virtual void EndStun() PURE_VIRTUAL(AEODCharacterBase::EndStun, );
+	virtual void EndStun();
 
-	/** [server + client] Freeze this character */
-	virtual bool Freeze(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Freeze, return false; );
+	/** Freeze this character */
+	virtual bool Freeze(const float Duration);
 
 	/** [client] Removes 'freeze' crowd control effect from this character */
-	virtual void EndFreeze() PURE_VIRTUAL(AEODCharacterBase::EndFreeze, );
+	virtual void EndFreeze();
 
-	/** [server + client] Knockdown this character */
-	virtual bool Knockdown(const float Duration) PURE_VIRTUAL(AEODCharacterBase::Knockdown, return false; );
+	/** Knockdown this character */
+	virtual bool Knockdown(const float Duration);
 
 	/** [client] Removes 'knock-down' crowd control effect from this character */
-	virtual void EndKnockdown() PURE_VIRTUAL(AEODCharacterBase::EndKnockdown, );
+	virtual void EndKnockdown();
 
-	/** [server + client] Knockback this character */
-	virtual bool Knockback(const float Duration, const FVector& ImpulseDirection) PURE_VIRTUAL(AEODCharacterBase::Knockback, return false; );
+	/** Knockback this character */
+	virtual bool Knockback(const float Duration, const FVector& ImpulseDirection);
 
 	/** Plays BlockAttack animation on blocking an incoming attack */
-	virtual void BlockAttack() PURE_VIRTUAL(AEODCharacterBase::BlockedAttack, );
+	virtual void BlockAttack();
 
 	/** Enables immunity frames for a given duration */
 	UFUNCTION()
@@ -206,24 +206,18 @@ public:
 	 */
 	FORCEINLINE void OnAttackDeflected(AEODCharacterBase* AttackBlocker, bool bSkillIgnoresBlock);
 
+	/** Temporarily trigger 'Target_Switch' material parameter to make the character glow */
 	FORCEINLINE void SetOffTargetSwitch();
 
-	virtual void TurnOnTargetSwitch();
+	/** Set whether character is engaged in combat or not */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character")
+	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; };
+	
+	/** Returns true if character is engaged in combat */
+	FORCEINLINE bool GetInCombat() const;
 
- 	virtual void TurnOffTargetSwitch();
-
-	/**
-	 * Kills this character 
-	 * @param CauseOfDeath - The reason for death of this character
-	 * @param Instigator - The character that instigated the death of this character (if any)
-	 */
-	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* InstigatingChar = nullptr);
-
-	/** Set whether character is in combat or not */
-	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; }
-
-	/** Get current state of character */
-	FORCEINLINE ECharacterState GetCharacterState() const;
+	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get In Combat"))
+	bool BP_GetInCombat() const;
 
 	/** [server + client] Set current state of character */
 	FORCEINLINE void SetCharacterState(const ECharacterState NewState);
@@ -232,42 +226,40 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
 	void BP_SetCharacterState(const ECharacterState NewState);
 
+	/** Get current state of character */
+	FORCEINLINE ECharacterState GetCharacterState() const;
+
+	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get Character State"))
+	ECharacterState BP_GetCharacterState() const;
+
+	FORCEINLINE UStatsComponentBase* GetStatsComponent() const;
+
 	/** [server + client] Change character max walk speed */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	void SetWalkSpeed(const float WalkSpeed);
 
 	/** [server + client] Chagne character rotation */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	void SetCharacterRotation(const FRotator NewRotation);
 
 	/** [server + client] Set whether character should use controller rotation yaw or not */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	void SetUseControllerRotationYaw(const bool bNewBool);
 
 	/** Returns character faction */
 	FORCEINLINE EFaction GetFaction() const;
 
-	/** Get skill info from a given SkillID */
-	// FORCEINLINE FSkill* GetSkill(FName SkillID) const;
+	FORCEINLINE FSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
 
-	/** Returns the skill at given SkillIndex */
-	// virtual FSkill* GetSkill(int32 SkillIndex) const;
-
-	/** [server + client] Use a skill and play it's animation */
-	// UFUNCTION(BlueprintCallable, Category = Skills)
-	// virtual bool UseSkill(int32 SkillIndex);
-
-	/** Use a skill and play it's animation */
+	/**
+	 * Use a skill and play it's animation
+	 * This method is primarily intended to be used by AI characters
+	 */
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual bool UseSkill(FName SkillID);
 
-	//~ @note might not be needed
-	UFUNCTION(BlueprintCallable, Category = Skills)
-	virtual void StartSkill(FName SkillID);
-
-	UFUNCTION(BlueprintCallable, Category = Skills)
-	virtual void StopSkill(FName SkillID);
-
 	/**
-	 * Determines and returns the status of a skill 
+	 * Determines and returns the status of a skill
 	 * Returns EEODTaskStatus::Active if character is currently using the skill
 	 * Returns EEODTaskStatus::Finished if character has finished using the skill
 	 * Returns EEODTaskStatus::Aborted if the skill was aborted before completion
@@ -276,41 +268,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual EEODTaskStatus CheckSkillStatus(FName SkillID);
 
-	/** 
-	 * Determines and returns the status of skill at a given SkillIndex
-	 * Returns EEODTaskStatus::Active if character is currently using skill
-	 * Returns EEODTaskStatus::Finished if character has finished using skill
-	 * Returns EEODTaskStatus::Aborted if skill was aborted before completion
-	 * Returns EEODTaskStatus::Inactive if the character is using or have used another skill
-	 */
-	// UFUNCTION(BlueprintCallable, Category = Skills)
-	// virtual EEODTaskStatus CheckSkillStatus(int32 SkillIndex);
-
-	//~ @todo modify function parameters to accept enemy target perhaps
-	//~ @todo replace it with GetMostWeightedSkillID()
-	/** [AI] Returns the skill that is more appropriate to use in the given situtation */
-	// UFUNCTION(BlueprintCallable, Category = Skills)
-	// virtual int32 GetMostWeightedSkillIndex() const;
-
 	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	UFUNCTION(BlueprintCallable, Category = Skills)
-	virtual FName GetMostWeightedMeleeSkillID(AEODCharacterBase const * const TargetCharacter) const;
-	
+	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const;
+
 	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
 	FORCEINLINE FName GetCurrentActiveSkillID() const;
 
-	/** Set the ID of the skill that is currently being used */
-	FORCEINLINE void SetCurrentActiveSkillID(const FName SkillID);
-	
 	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
 	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Current Active Skill ID"))
 	FName BP_GetCurrentActiveSkillID() const;
 
-	virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkillDamageInfo, return FSkillDamageInfo(); );
+	/** Set the ID of the skill that is currently being used */
+	FORCEINLINE void SetCurrentActiveSkillID(FName SkillID);
 
-	// virtual  GetCurrentActiveSkillDamageInfo() const PURE_VIRTUAL(AEODCharacterBase::GetCurrentActiveSkillDamageInfo, return (); );
-
-	virtual void OnNormalAttackSectionStart(FName SectionName) PURE_VIRTUAL(AEODCharacterBase::OnNormalAttackSectionStart, );
+	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
+	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Current Active Skill ID"))
+	void BP_SetCurrentActiveSkillID(FName SkillID);
 
 	/** Returns the last used skill */
 	FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();
@@ -331,20 +305,10 @@ public:
 	 */
 	virtual void RemoveStatusEffect(const UStatusEffectBase* StatusEffect);
 
-	/** [server] Handle melee collision */
-	// virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
-
-	/** [server] Apply damage to this character */
-	// virtual FEODDamageResult ApplyEODDamage(FEODDamage& EODDamage);
-
-	// virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult);
-
-	// virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult, const FHitResult& LineHitResult);
-
-	/** Called on an animation montage blending out to clean up, reset, or change any state variables */
+	/** Called when an animation montage is blending out out to clean up, reset, or change any state variables */
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
 
-	/** Called on an animation montage ending to clean up, reset, or change any state variables */
+	/** Called when an animation montage is ending to clean up, reset, or change any state variables */
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
 	/** [server + client] Plays an animation montage over network */
@@ -373,14 +337,74 @@ public:
 	UFUNCTION(BlueprintCallable, category = Rotation)
 	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision = 0.1f, float RotationRate = 600.f);
 
+	/**
+	 * Kills this character 
+	 * @param CauseOfDeath - The reason for death of this character
+	 * @param Instigator - The character that instigated the death of this character (if any)
+	 */
+	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* InstigatingChar = nullptr);
+
+private:
+
 	/** StatsComp contains and manages the stats info of this character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UStatsComponentBase* StatsComp;
 
-	//~ @todo Combat State: Damaged, running, waiting, engaged in combat with enemy, healing etc.?
-	//~ @todo Ranged collision
+	/** In game faction of your character */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character", meta = (AllowPrivateAccess = "true"))
+	EFaction Faction;
+
+	/** SkillID of skill that character is currently using */
+	UPROPERTY(Transient)
+	FName CurrentActiveSkillID;
+
+	/** Information of last used skill */
+	UPROPERTY(Transient)
+	FLastUsedSkillInfo LastUsedSkillInfo;
+
+	/** Character state determines the current action character is doing */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
+	ECharacterState CharacterState;
 
 protected:
+
+	/** Data table for character skills */
+	UPROPERTY(EditDefaultsOnly, Category = Skills)
+	UDataTable* SkillsDataTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Rotation)
+	float CharacterRotationPrecision;
+
+	/** True if character is in God Mode */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EOD Character")
+	bool bGodMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EOD Character")
+	float TargetSwitchDuration;
+
+	/** Determines if invincibility frames are active */
+	UPROPERTY(Transient)
+	bool bActiveiFrames;
+
+	/** Determines if character is blocking any incoming damage */
+	UPROPERTY(Transient)
+	bool bBlockingDamage;
+
+	/** Determines whether character is currently engaged in combat or not */
+	UPROPERTY(Transient)
+	bool bInCombat;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	int DodgeStaminaCost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	float DodgeImmunityTriggerDelay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	float DodgeImmunityDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
+	float DamageBlockTriggerDelay;
 
 	FCombatEvent OnSuccessfulDodgeEvent;
 
@@ -414,22 +438,6 @@ protected:
 	FCombatEvent OnLeavingCombat;
 	//~ 
 
-	/** Map of skill index and it's respective combat event */
-	TMap<uint8, FCombatEvent> OnUsingSkillEventMap;
-
-	TArray<FSkill*> Skills;
-
-	TMap<FName, FSkill*> IDToSkillMap;
-
-	TMap<FName, FSkill*> NormalAttackSectionToSkillMap;
-
-	UPROPERTY(Transient)
-	FName CurrentActiveSkillID;
-	// FSkill* CurrentActiveSkill;
-
-	UPROPERTY(Transient)
-	FLastUsedSkillInfo LastUsedSkillInfo;
-
 	FTimerHandle TargetSwitchTimerHandle;
 
 	FTimerHandle DodgeTimerHandle;
@@ -438,51 +446,11 @@ protected:
 
 	FTimerHandle CrowdControlTimerHandle;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Rotation)
-	float CharacterRotationPrecision;
+	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CombatEvents)
+	virtual void TurnOnTargetSwitch();
 
-	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
-	EFaction Faction;
-
-	/** True if character is in God Mode */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GodMode)
-	bool bGodMode;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GodMode)
-	float TargetSwitchDuration;
-	
-	/** Character state determines the current action character is doing */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
-	ECharacterState CharacterState;
-	
-	/** Determines whether character is currently engaged in combat or not */
-	UPROPERTY(Transient)
-	bool bInCombat;
-
-	/** Determines if invincibility frames are active */
-	UPROPERTY(Transient)
-	bool bActiveiFrames;
-
-	/** Determines if character is blocking any incoming damage */
-	UPROPERTY(Transient)
-	bool bBlockingDamage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	int DodgeStaminaCost;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	float DodgeImmunityTriggerDelay;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	float DodgeImmunityDuration;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	float DamageBlockTriggerDelay;
-
-	// @todo
-	// virtual void OnBlockingEnemy()
-
-	// virtual void OnBlockedByEnemy();
+	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CombatEvents)
+	virtual void TurnOffTargetSwitch();
 
 private:
 	

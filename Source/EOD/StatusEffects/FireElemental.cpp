@@ -38,11 +38,11 @@ void UFireElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper & Wrapp
 	FStatusInfo& StatusInfo = (*GetCharacterToStatusInfoMap())[WrappedRecipientCharacter.RecipientCharacter];
 	StatusInfo.TotalElapsedTime += GetWorld()->GetTimerManager().GetTimerElapsed(*StatusInfo.TimerHandle);
 
-	float OwnerFireDamage = GetOwningCharacter()->StatsComp->GetElementalFireDamage();
-	float TargetFireResistance = TargetCharacter->StatsComp->GetElementalFireResistance();
+	float OwnerFireDamage = GetOwningCharacter()->GetStatsComponent()->GetElementalFireDamage();
+	float TargetFireResistance = TargetCharacter->GetStatsComponent()->GetElementalFireResistance();
 
 	float Damage = UCombatLibrary::CalculateDamage(OwnerFireDamage, TargetFireResistance);
-	TargetCharacter->StatsComp->ModifyMaxHealth(-Damage);
+	TargetCharacter->GetStatsComponent()->ModifyMaxHealth(-Damage);
 
 	if (StatusInfo.TotalElapsedTime >= StatusEffectDuration)
 	{

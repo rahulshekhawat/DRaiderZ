@@ -317,7 +317,8 @@ FORCEINLINE void USkillBarWidget::LoadSkillBarLayout()
 			continue;
 		}
 
-		FPlayerSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(Key, FString("USkillBarWidget::LoadSkillBarLayout(), looking for player skill"));
+		// FPlayerSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(Key, FString("USkillBarWidget::LoadSkillBarLayout(), looking for player skill"));
+		FSkillTableRow* Skill = nullptr;
 		if (!Skill)
 		{
 			continue;

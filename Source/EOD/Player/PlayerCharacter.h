@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "Engine/StreamableManager.h"
 #include "Player/EODCharacterBase.h"
 #include "PlayerCharacter.generated.h"
 
@@ -162,7 +163,7 @@ public:
 
 	bool IsFastRunning() const;
 
-	// FORCEINLINE bool CanUseSkill(const FPlayerSkillTableRow* Skill);
+	FORCEINLINE bool IsWeaponSheathed() const;
 
 	/** Returns primary weapon actor */
 	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
@@ -175,8 +176,6 @@ public:
 
 	/** Returns HUD widget */
 	FORCEINLINE UHUDWidget* GetHUDWidget() const;
-
-	FORCEINLINE bool IsWeaponSheathed() const;
 
 	/** Returns HUD widget */
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get HUD Widget"))
@@ -211,18 +210,6 @@ public:
 
 	virtual void BlockAttack() override;
 
-	/** Plays stun animation */
-	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
-	void PlayStunAnimation();
-
-	/** Stops stun animation */
-	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
-	void StopStunAnimation();
-
-	/** Simulates the knock back effect */
-	UFUNCTION(BlueprintImplementableEvent, Category = Motion)
-	void PushPlayer(FVector ImpulseDirection);
-
 	/** Replace primary weapon with a new weapon */
 	void SetCurrentPrimaryWeapon(const FName WeaponID);
 
@@ -235,10 +222,21 @@ public:
 	/** Removes secondary weapon if it is currently equipped */
 	void RemoveSecondaryWeapon();
 
-	// FORCEINLINE void OnSecondaryWeaponFailedToEquip(FName WeaponID, FWeaponTableRow * NewWeaponData);
+
+	/** Plays stun animation */
+	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
+	void PlayStunAnimation();
+
+	/** Stops stun animation */
+	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
+	void StopStunAnimation();
+
+	/** Simulates the knock back effect */
+	UFUNCTION(BlueprintImplementableEvent, Category = Motion)
+	void PushPlayer(FVector ImpulseDirection); // @todo const parameter?
 
 	/** [server + client] Change idle-walk-run direction of character */
-	void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
+	FORCEINLINE void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
 	//~ DEPRECATED
 	/** [server + client] Change current weapon animation to use */
@@ -254,15 +252,16 @@ public:
 
 	void AddSkill(FName SkillID, uint8 SkillLevel);
 
-	FORCEINLINE FPlayerSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("APlayerCharacter::GetSkill(), player skill lookup")) const;
-
+	/*
 	FORCEINLINE void SetCurrentActivePlayerSkill(FPlayerSkillTableRow* Skill);
 
 	FORCEINLINE FPlayerSkillTableRow* GetCurrentActivePlayerSkill() const;
 
 	virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const override;
 
-	virtual void OnNormalAttackSectionStart(FName SectionName) override;
+	*/
+
+	void OnNormalAttackSectionStart(FName SectionName);
 
 	void CleanupNormalAttackSectionToSkillMap();
 
@@ -310,7 +309,6 @@ public:
 
 	virtual void TurnOffTargetSwitch() override;
 
-
 private:
 
 	/** Data table for player skills */
@@ -354,9 +352,6 @@ private:
 	UPROPERTY(Transient)
 	bool bNormalAttackPressed;
 
-	// UPROPERTY(Transient)
-	TSharedPtr<FPlayerSkillTableRow> CurrentActivePlayerSkill;
-
 	/** Player HUD class reference */
 	UPROPERTY(Transient)
 	UHUDWidget* HUDWidget;
@@ -369,8 +364,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	ECharacterGender Gender;
 
-	UPROPERTY(Category = Skills, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills, meta = (AllowPrivateAccess = "true"))
 	uint8 MaxNumberOfSkills;
+
+	/** Data table containing player animation references */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable, meta = (AllowPrivateAccess = "true"))
+	UDataTable* PlayerAnimationReferencesDataTable;
 
 	/** Determines whether weapon is currently sheathed or not */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_WeaponSheathed)
@@ -379,17 +378,34 @@ private:
 	/** A reference to player anim instance */
 	UPlayerAnimInstance* PlayerAnimInstance;
 
-	/** Animation montage references for currently equipped weapon */
-	FPlayerAnimationReferences* EquippedWeaponAnimationReferences;
+	/** Animations for this player when it has a weapon equipped */
+	FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
 
-	/** Animations references for sheathed weapon */
-	FPlayerAnimationReferences* SheathedWeaponAnimationReferences;
+	/** Animations for this player when it does not have a weapon equipped */
+	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
+
+	TSharedPtr<FStreamableHandle> EquippedWeaponAnimationsStreamableHandle;
+
+	TSharedPtr<FStreamableHandle> UnequippedWeaponAnimationsStreamableHandle;
+
+	FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
+
+	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender Gender);
+
+	TSharedPtr<FStreamableHandle> LoadAnimationReferences(FPlayerAnimationReferencesTableRow* AnimationReferences);
+
+	void UnloadUnequippedWeaponAnimationReferences();
+
+	void LoadUnequippedWeaponAnimationReferences();
+
+	void UnloadEquippedWeaponAnimationReferences();
+
+	void LoadEquippedWeaponAnimationReferences();
 
 	/** This indicates the base maximum value of player's normal movement speed without any status effects */
 	const float BaseNormalMovementSpeed = 400;
 
 	//~ @todo test special movement speed (current value has been set untested and set on a guess)
-
 	/** This indicates the base maximum value of player's special movement speed without any status effects */
 	const float BaseSpecialMovementSpeed = 600;
 
@@ -478,13 +494,9 @@ private:
 
 	void DisableBackwardPressed();
 
-	FPlayerAnimationReferences* GetActiveAnimationReferences() const;
+	// FPlayerAnimationReferences* GetActiveAnimationReferences() const;
 
 	FName GetNextNormalAttackSectionName(const FName& CurrentSection) const;
-
-	// EWeaponType GetCurrentEquippedWeaponType()
-
-	void InitializeSkills(TArray<FName> UnlockedSKillsID);
 
 	/** Called when player presses a skill key */
 	template<uint32 SkillButtonIndex>

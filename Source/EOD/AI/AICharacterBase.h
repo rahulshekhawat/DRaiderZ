@@ -93,7 +93,7 @@ public:
 	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const override;
 
-	virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const override;
+	// virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const override;
 private:
 
 	/** Used to display floating aggro widget above AI character */
@@ -129,8 +129,8 @@ private:
 	UAnimMontage* FlinchAnimMontage;
 
 	/** Data table for character skills */
-	UPROPERTY(EditDefaultsOnly, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UDataTable* SkillsDataTable;
+	// UPROPERTY(EditDefaultsOnly, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UDataTable* SkillsDataTable;
 
 	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
 	void UpdateMaxWalkSpeed();
