@@ -50,6 +50,7 @@ enum class EFaction : uint8
 	Player,
 };
 
+/** Species of in-game character */
 UENUM(BlueprintType)
 enum class ESpecies : uint8
 {
@@ -368,19 +369,14 @@ public:
 
 	UCharacterLibrary(const FObjectInitializer& ObjectInitializer);
 	
-	//~ @note Blueprints don't support raw struct pointers, therefore it can't be BlueprintCallable
-	/** Returns player animation references based on the EWeaponAnimationType of player */
-	// static FPlayerAnimationReferences* GetPlayerAnimationReferences(EWeaponAnimationType PlayerWeaponAnimationType, ECharacterGender Gender = ECharacterGender::Female);
+	/** Returns player skill */
+	static FSkillTableRow* GetPlayerSkill(const FName SkillID, const FString& ContextString);
 
-	// static FSkill* GetPlayerSkill(FName SKillID, uint8 SkillLevel = 1);
-	// static FPlayerSkillTableRow* GetPlayerSkill(const FName SkillID, const FString& ContextString);
-
-	/** Attempts to unload player animation references, returns true if successful */
-	// static bool UnloadPlayerAnimationReferences(FPlayerAnimationReferences* PlayerAnimationReferences, ECharacterGender Gender = ECharacterGender::Female);
+	/** Returns player skill */
+	UFUNCTION(BlueprintCallable, Category = "Character Library", meta = (DisplayName = "Get Player Skill"))
+	static FSkillTableRow BP_GetPlayerSkill(const FName SkillID, const FString& ContextString, bool& bOutSkillFound);
 
 	static bool AreEnemies(AEODCharacterBase* CharacterOne, AEODCharacterBase* CharacterTwo);
-
-	// static void GetAllAICharacterSkills(const FString& CharacterName, const UDataTable* SkillsDataTable, TArray<FSkill*> &OutSkills);
 
 	//~ Begin anim montage section names
 	static const FName SectionName_ForwardFlinch;
