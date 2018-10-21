@@ -5,7 +5,7 @@
 
 #include "Components/SkeletalMeshComponent.h"
 
-void UAnimNotify_SoftRotationMarker::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UAnimNotify_SoftRotationMarker::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(MeshComp->GetOwner());
 	if (!PlayerCharacter)
@@ -13,6 +13,6 @@ void UAnimNotify_SoftRotationMarker::Notify(USkeletalMeshComponent * MeshComp, U
 		return;
 	}
 
-	PlayerCharacter->bRotateSmoothly = true;
-	PlayerCharacter->DesiredSmoothRotationYaw = PlayerCharacter->GetPlayerControlRotationYaw();
+	PlayerCharacter->SetOffSmoothRotation(PlayerCharacter->GetPlayerControlRotationYaw());
+
 }

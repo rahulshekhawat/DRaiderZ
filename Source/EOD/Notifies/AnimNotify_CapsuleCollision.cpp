@@ -7,10 +7,10 @@
 #include "Core/CombatZoneModeBase.h"
 #include "Core/CombatManager.h"
 
-#include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/SkeletalMeshComponent.h"
 
-void UAnimNotify_CapsuleCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UAnimNotify_CapsuleCollision::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	// only process this notify if called from server (dedicated or listen)
 	if (!MeshComp->GetOwner() || MeshComp->GetOwner()->GetNetMode() == NM_Client)
@@ -22,9 +22,9 @@ void UAnimNotify_CapsuleCollision::Notify(USkeletalMeshComponent * MeshComp, UAn
 	FVector TransformedCenter 	= WorldTransform.TransformPosition(Center);
 	FQuat TransformedQuat 		= WorldTransform.TransformRotation(Rotation.Quaternion());
 
-#if WITH_EDITOR // draw debug shapes only if inside editor
+#if DEBUG_SHAPES_ENABLED
 	UKismetSystemLibrary::DrawDebugCapsule(MeshComp, TransformedCenter, HalfHeight, Radius, TransformedQuat.Rotator(), FLinearColor::White, 5.f, 1.f);
-#endif // WITH_EDITOR
+#endif // DEBUG_SHAPES_ENABLED
 
 	// Only process this notify if the current game mode is ACombatZoneModeBase
 	ACombatZoneModeBase* CombatZoneGameMode = Cast<ACombatZoneModeBase>(MeshComp->GetWorld()->GetAuthGameMode());

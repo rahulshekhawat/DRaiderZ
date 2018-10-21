@@ -1243,10 +1243,10 @@ FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationReferenc
 	return nullptr;
 }
 
-FName APlayerCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender Gender)
+FName APlayerCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender)
 {
 	FString Prefix;
-	if (Gender == ECharacterGender::Female)
+	if (CharGender == ECharacterGender::Female)
 	{
 		Prefix = FString("Female_");
 	}
@@ -1903,6 +1903,12 @@ void APlayerCharacter::TurnOffTargetSwitch()
 	Legs->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
 	Feet->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
 	*/
+}
+
+FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
+{
+	bRotateSmoothly = true;
+	DesiredSmoothRotationYaw = DesiredYaw;
 }
 
 bool APlayerCharacter::IsPrimaryWeaponEquippped() const

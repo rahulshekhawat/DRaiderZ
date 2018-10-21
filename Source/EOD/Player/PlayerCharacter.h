@@ -309,6 +309,8 @@ public:
 
 	virtual void TurnOffTargetSwitch() override;
 
+	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
+
 private:
 
 	/** Data table for player skills */
@@ -390,7 +392,7 @@ private:
 
 	FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
 
-	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender Gender);
+	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender);
 
 	TSharedPtr<FStreamableHandle> LoadAnimationReferences(FPlayerAnimationReferencesTableRow* AnimationReferences);
 

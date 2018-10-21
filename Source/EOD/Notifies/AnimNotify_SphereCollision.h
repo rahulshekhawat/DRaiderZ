@@ -19,11 +19,11 @@ public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 	
 	/** Position of collision sphere's center */
-	UPROPERTY(EditAnywhere, Category = SphereInfo)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SphereInfo)
 	FVector Center;
 	
 	/** Radius of collision sphere */
-	UPROPERTY(EditAnywhere, Category = SphereInfo)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SphereInfo)
 	float Radius;
 	
 };
