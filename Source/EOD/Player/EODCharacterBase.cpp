@@ -266,7 +266,7 @@ void AEODCharacterBase::EnableiFrames(float Duration)
 
 	if (Duration > 0)
 	{
-		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, this, &AEODCharacterBase::DisableiFrames, Duration, false);
+		GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, this, &AEODCharacterBase::DisableiFrames, Duration, false);
 	}
 }
 

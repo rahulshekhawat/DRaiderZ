@@ -82,6 +82,10 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	// By default the weapon should be sheathed
 	bWeaponSheathed = true;
+
+	BaseNormalMovementSpeed = 400.f;
+	BaseSpecialMovementSpeed = 600.f;
+	BaseBlockMovementSpeed = 150.f;
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -343,8 +347,9 @@ bool APlayerCharacter::CanJump() const
 
 bool APlayerCharacter::CanDodge() const
 {
-	int32 DodgeCost = DodgeStaminaCost / GetStatsComponent()->GetStaminaConsumptionModifier();
+	int32 DodgeCost = DodgeStaminaCost * GetStatsComponent()->GetStaminaConsumptionModifier();
 
+	// @todo add UsingSkill, Looting, Interacting, etc. to this too
 	if (GetStatsComponent()->GetCurrentStamina() >= DodgeCost &&
 		(IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking()))
 	{
@@ -352,20 +357,17 @@ bool APlayerCharacter::CanDodge() const
 	}
 
 	return false;
-	// @todo add UsingSkill, Looting, Interacting, etc. to this too
 }
 
 bool APlayerCharacter::CanBlock() const
 {
-	return (Super::CanBlock() || IsAutoRunning() || IsNormalAttacking()) &&
-		!(CurrentWeaponAnimationToUse == EWeaponAnimationType::NoWeapon || CurrentWeaponAnimationToUse == EWeaponAnimationType::SheathedWeapon);
+	return (IsIdleOrMoving() || IsAutoRunning() || IsNormalAttacking()) &&
+		!(GetEquippedWeaponType() == EWeaponType::None || IsWeaponSheathed());
 }
 
 bool APlayerCharacter::CanNormalAttack() const
 {
 	return IsIdleOrMoving() || IsNormalAttacking();
-
-	// return CharacterState == ECharacterState::IdleWalkRun || CharacterState == ECharacterState::Attacking;
 }
 
 bool APlayerCharacter::CanUseAnySkill() const
@@ -410,49 +412,48 @@ UHUDWidget* APlayerCharacter::BP_GetHUDWidget() const
 
 bool APlayerCharacter::Interrupt(const float BCAngle)
 {
-	// if (CanInterrupt() && )
-
-	/*
-	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_HitEffects)
+	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
 	{
+		UAnimMontage* HitMontage = GetActiveAnimationReferences()->HitEffects.Get();
+
 		if (BCAngle <= 90)
 		{
-			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+			PlayAnimationMontage(HitMontage,
 				UCharacterLibrary::SectionName_ForwardInterrupt,
 				ECharacterState::GotHit);
 		}
 		else
 		{
-			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+			PlayAnimationMontage(HitMontage,
 				UCharacterLibrary::SectionName_BackwardInterrupt,
 				ECharacterState::GotHit);
 		}
 
 		return true;
 	}
-	*/
+
 	return false;
 }
 
 bool APlayerCharacter::Flinch(const float BCAngle)
 {
-	/*
-	if (CanFlinch() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_Flinch)
+	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Flinch.Get())
 	{
+		UAnimMontage* FlinchMontage = GetActiveAnimationReferences()->Flinch.Get();
+
 		if (BCAngle <= 90)
 		{
-			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Flinch,
+			PlayAnimationMontage(FlinchMontage,
 				UCharacterLibrary::SectionName_ForwardFlinch);
 		}
 		else
 		{
-			PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Flinch,
+			PlayAnimationMontage(FlinchMontage,
 				UCharacterLibrary::SectionName_BackwardFlinch);
 		}
 
 		return true;
 	}
-	*/
 
 	return false;
 }
@@ -473,14 +474,12 @@ bool APlayerCharacter::Stun(const float Duration)
 void APlayerCharacter::EndStun()
 {
 	StopStunAnimation();
-	
 	// @todo Restore character state to IdleWalkRun if necessary (if OnMontageBlendingOut event doesn't restore character state to IdleWalkRun)
 }
 
 bool APlayerCharacter::Freeze(const float Duration)
 {
 	// @todo maybe just freeze animation instead of freezing entire character since it might freeze additional effects like glow
-	
 	if (CanFreeze())
 	{
 		CustomTimeDilation = 0;
@@ -499,36 +498,31 @@ void APlayerCharacter::EndFreeze()
 
 bool APlayerCharacter::Knockdown(const float Duration)
 {
-	/*
-	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_HitEffects)
+	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+		PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
 			UCharacterLibrary::SectionName_KnockdownStart,
 			ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
 
 		return true;
 	}
-	*/
 
 	return false;
 }
 
 void APlayerCharacter::EndKnockdown()
 {
-	/*
-	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+	PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
 		UCharacterLibrary::SectionName_KnockdownEnd,
 		ECharacterState::GotHit);
-		*/
 }
 
 bool APlayerCharacter::Knockback(const float Duration, const FVector& ImpulseDirection)
 {
-	/*
-	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_HitEffects)
+	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
+		PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
 			UCharacterLibrary::SectionName_KnockdownStart,
 			ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
@@ -536,24 +530,21 @@ bool APlayerCharacter::Knockback(const float Duration, const FVector& ImpulseDir
 
 		return true;
 	}
-	*/
 
 	return false;
 }
 
 void APlayerCharacter::BlockAttack()
 {
-	/*
-	UKismetSystemLibrary::PrintString(this, FString("Blocked Attack"));
-	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_HitEffects,
-						 UCharacterLibrary::SectionName_BlockAttack);
-						 */
+	if (GetActiveAnimationReferences() && GetActiveAnimationReferences()->BlockAttack.Get())
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->BlockAttack.Get(),
+			UCharacterLibrary::SectionName_BlockAttack);
+	}
 }
 
 bool APlayerCharacter::CanAutoRun() const
 {
-	// The character can auto run only if character is in idle state
-	// return CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0;
 	return IsIdleOrMoving();
 }
 
@@ -566,8 +557,8 @@ void APlayerCharacter::MoveForward(const float Value)
 			DisableAutoRun();
 		}
 
-		FRotator rot = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
-		FVector Direction = FRotationMatrix(rot).GetScaledAxis(EAxis::X);
+		FRotator Rotation = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
+		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -600,40 +591,44 @@ void APlayerCharacter::ZoomOutCamera()
 
 void APlayerCharacter::OnDodge()
 {
-	/*
-	if (CanDodge() && PlayerAnimInstance && GetActiveAnimationReferences() && GetActiveAnimationReferences()->AnimationMontage_Dodge)
+	if (IsAutoRunning())
 	{
-		int32 DodgeCost = DodgeStaminaCost / StatsComp->GetStaminaConsumptionModifier();
-		StatsComp->ModifyCurrentStamina(-DodgeCost);
+		DisableAutoRun();
+	}
+
+	if (CanDodge() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Dodge.Get())
+	{
+		int32 DodgeCost = DodgeStaminaCost * GetStatsComponent()->GetStaminaConsumptionModifier();
+		GetStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 
 		float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
 		float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
-		float DesiredPlayerRotationYaw = GetPlayerControlRotationYaw();
+		float DesiredYaw = GetPlayerControlRotationYaw();
 
 		if (ForwardAxisValue != 0)
 		{
-			DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
+			DesiredYaw = GetRotationYawFromAxisInput();
 		}
 
-		SetCharacterRotation(FRotator(0.f, DesiredPlayerRotationYaw, 0.f));
-
+		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+		UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
 		if (ForwardAxisValue == 0)
 		{
 			if (RightAxisValue > 0)
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge,
+				PlayAnimationMontage(DodgeMontage,
 					UCharacterLibrary::SectionName_RightDodge,
 					ECharacterState::Dodging);
 			}
 			else if (RightAxisValue < 0)
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge,
+				PlayAnimationMontage(DodgeMontage,
 					UCharacterLibrary::SectionName_LeftDodge,
 					ECharacterState::Dodging);
 			}
 			else
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge,
+				PlayAnimationMontage(DodgeMontage,
 					UCharacterLibrary::SectionName_BackwardDodge,
 					ECharacterState::Dodging);
 			}
@@ -642,28 +637,30 @@ void APlayerCharacter::OnDodge()
 		{
 			if (ForwardAxisValue > 0)
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge,
+				PlayAnimationMontage(DodgeMontage,
 					UCharacterLibrary::SectionName_ForwardDodge,
 					ECharacterState::Dodging);
 			}
 			else if (ForwardAxisValue < 0)
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Dodge,
+				PlayAnimationMontage(DodgeMontage,
 					UCharacterLibrary::SectionName_BackwardDodge,
 					ECharacterState::Dodging);
 			}
 		}
 
-		if (GetWorld()->GetTimerManager().IsTimerActive(DodgeTimerHandle))
+		// @note Why would DodgeImmunityTimerHandle be active here?. Uncommented for now
+		/*
+		if (GetWorld()->GetTimerManager().IsTimerActive(DodgeImmunityTimerHandle))
 		{
 			DisableiFrames();
 		}
-		
+		*/
+
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), DodgeImmunityDuration);
-		GetWorld()->GetTimerManager().SetTimer(DodgeTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
+		GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
 	}
-	*/
 }
 
 void APlayerCharacter::OnPressedForward()
@@ -706,6 +703,16 @@ void APlayerCharacter::OnPressedEscape()
 
 void APlayerCharacter::EnableBlock()
 {
+	if (IsAutoRunning())
+	{
+		DisableAutoRun();
+	}
+
+	if (IsNormalAttacking())
+	{
+		
+	}
+
 	/*
 	if (IsNormalAttacking())
 	{
@@ -881,6 +888,11 @@ FORCEINLINE void APlayerCharacter::DisableAutoRun()
 	SetUseControllerRotationYaw(false);
 }
 
+void APlayerCharacter::StopNormalAttacking()
+{
+	GetMesh()->GetAnimInstance()->Montage_Stop(0.2, GetActiveAnimationReferences()->NormalAttacks.Get());
+}
+
 void APlayerCharacter::DisableForwardPressed()
 {
 	bForwardPressed = false;
@@ -913,32 +925,28 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 		bRotatePlayer = false;
 	}
 
-	/*
 	if (bRotatePlayer)
 	{
-		// DeltaRotatePlayerToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
 		DeltaRotateCharacterToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
 	}
 	
 	if (ForwardAxisValue < 0)
 	{
-		float Speed = (BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier() * 5) / 16;
+		float Speed = (BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
-			// SetWalkSpeed calls an RPC every frame and we want to avoid the overhead of RPC
 			SetWalkSpeed(Speed);
 		}
 	}
 	else
 	{
-		float Speed = BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier();
+		float Speed = BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier();
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
-			// SetWalkSpeed calls an RPC every frame and we want to avoid the overhead of RPC
 			SetWalkSpeed(Speed);
 		}
 	}
-	*/
+
 	if (ForwardAxisValue == 0)
 	{
 		if (RightAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::R)
@@ -1011,106 +1019,12 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 		SetIWRCharMovementDir(ECharMovementDirection::F);
 	}
 	
-	/*
-	float Speed = BaseNormalMovementSpeed * StatsComp->GetMovementSpeedModifier();
+	float Speed = BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier();
 	if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 	{
 		SetWalkSpeed(Speed);
 	}
-	*/
 }
-
-/*
-void APlayerCharacter::OnMeleeCollision(UAnimSequenceBase * Animation, TArray<FHitResult>& HitResults, bool bHit)
-{
-	Super::OnMeleeCollision(Animation, HitResults, bHit);
-	//////
-	// @note intentionally commented out. If player animation references are null when a collision event is triggered, we want it to crash.
-	if (!PlayerAnimationReferences || !(Animation == PlayerAnimationReferences->AnimationMontage_NormalAttacks || 
-										Animation == PlayerAnimationReferences->AnimationMontage_Skills || 
-										Animation == PlayerAnimationReferences->AnimationMontage_Spells))
-	{
-		return;
-	}
-	///////
-
-	bool bEnemiesHit = false;
-	FSkill* ActiveSkill = GetCurrentActiveSkill();
-
-#if DEVSTAGE_CODE_ENABLED
-	if (!ActiveSkill)
-	{
-		return;
-	}
-#endif // DEVSTAGE_CODE_ENABLED
-
-	check(ActiveSkill);
-
-	for (FHitResult& HitResult : HitResults)
-	{
-		if (!HitResult.Actor.Get())
-		{
-			continue;
-		}
-
-		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.Actor.Get());
-		
-		if (!HitCharacter || (HitCharacter->IsDodgingDamage() && !ActiveSkill->SkillLevelUpInfo.bUndodgable))
-		{
-			// @todo handle damage for non AEODCharacterBase actors
-			continue;
-		}
-
-		bEnemiesHit = true;
-
-		TArray<FHitResult> LineHitResults;
-		FVector LineStart = GetActorLocation();
-		FVector LineEnd = FVector(HitCharacter->GetActorLocation().X, HitCharacter->GetActorLocation().Y, LineStart.Z);
-
-		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(this);
-		GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
-
-		FHitResult LineHitResultToHitCharacter;
-		bool bLineHitResultFound = false;
-
-		for (FHitResult& LineHitResult : LineHitResults)
-		{
-			if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == HitCharacter)
-			{
-				LineHitResultToHitCharacter = LineHitResult;
-				bLineHitResultFound = true;
-				break;
-			}
-		}
-
-		if (bLineHitResultFound)
-		{
-			FVector Start = LineHitResultToHitCharacter.ImpactPoint;
-			FVector End = LineHitResultToHitCharacter.ImpactPoint + LineHitResultToHitCharacter.ImpactNormal * 50;
-			UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::White, 5.f, 2.f);
-		}
-
-		/////// 
-		FEODDamage EODDamage(ActiveSkill);
-		EODDamage.CapsuleHitResult = HitResult;
-		EODDamage.LineHitResult = LineHitResultToHitCharacter;
-		ApplyEODDamage(HitCharacter, EODDamage);
-		//////
-	}
-
-	if (!bEnemiesHit)
-	{
-		OnUnsuccessfulHit.Broadcast(TArray<TWeakObjectPtr<AEODCharacterBase>>());
-	}
-}
-*/
-
-/*
-int32 APlayerCharacter::ApplyEODDamage(FEODDamage& EODDamage)
-{
-	return Super::ApplyEODDamage(EODDamage);
-}
-*/
 
 void APlayerCharacter::Destroyed()
 {
@@ -1118,18 +1032,17 @@ void APlayerCharacter::Destroyed()
 
 	if (PrimaryWeapon)
 	{
-		// PrimaryWeapon->SetOwningCharacter(nullptr);
 		PrimaryWeapon->OnUnEquip();
 		PrimaryWeapon->Destroy();
 	}
 	if (SecondaryWeapon)
 	{
-		// SecondaryWeapon->SetOwningCharacter(nullptr);
 		SecondaryWeapon->OnUnEquip();
 		SecondaryWeapon->Destroy();
 	}
 
-
+	UnloadUnequippedWeaponAnimationReferences();
+	UnloadEquippedWeaponAnimationReferences();
 }
 
 FORCEINLINE void APlayerCharacter::SavePlayerState()
@@ -1145,6 +1058,7 @@ void APlayerCharacter::BP_SavePlayerState()
 	SavePlayerState();
 }
 
+/*
 void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType)
 {
 	if (EquippedWeaponAnimationReferences)
@@ -1187,15 +1101,9 @@ void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(const EWeaponType
 	SetCurrentWeaponAnimationToUse(WeaponAnimationType);
 	// EquippedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(WeaponAnimationType, Gender);
 }
-
-/*
-FPlayerAnimationReferences * APlayerCharacter::GetActiveAnimationReferences() const
-{
-	return bWeaponSheathed ? SheathedWeaponAnimationReferences : EquippedWeaponAnimationReferences;
-}
 */
 
-FName APlayerCharacter::GetNextNormalAttackSectionName(const FName & CurrentSection) const
+FName APlayerCharacter::GetNextNormalAttackSectionName(const FName& CurrentSection) const
 {
 	if (CurrentSection == UCharacterLibrary::SectionName_FirstSwing ||
 		CurrentSection == UCharacterLibrary::SectionName_FirstSwingEnd)
@@ -1238,7 +1146,12 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName & CurrentSect
 
 FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationReferences() const
 {
-	return nullptr;
+	if (IsWeaponSheathed() || GetEquippedWeaponType() == EWeaponType::None)
+	{
+		return UnequippedWeaponAnimationReferences;
+	}
+
+	return EquippedWeaponAnimationReferences;
 }
 
 FName APlayerCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender)
@@ -1757,7 +1670,7 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bIn
 {
 	if (!bInterrupted)
 	{
-		// CharacterState = ECharacterState::IdleWalkRun;
+		SetCharacterState(ECharacterState::IdleWalkRun);
 	}
 }
 
@@ -1931,8 +1844,7 @@ bool APlayerCharacter::IsSecondaryWeaponEquipped() const
 
 bool APlayerCharacter::IsFastRunning() const
 {
-	// return CharacterState == ECharacterState::SpecialMovement;
-	return false;
+	return GetCharacterState() == ECharacterState::SpecialMovement;
 }
 
 /*

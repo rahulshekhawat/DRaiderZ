@@ -301,7 +301,7 @@ public:
 	/** Called on an animation montage ending to clean up, reset, or change any state variables */
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted) override;
 
-	void UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType);
+	// void UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType);
 
 	void UpdateCurrentWeaponAnimationType();
 
@@ -402,14 +402,17 @@ private:
 	void LoadEquippedWeaponAnimationReferences();
 
 	/** This indicates the base maximum value of player's normal movement speed without any status effects */
-	const float BaseNormalMovementSpeed = 400;
+	UPROPERTY(Category = Movement, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float BaseNormalMovementSpeed;
 
 	//~ @todo test special movement speed (current value has been set untested and set on a guess)
 	/** This indicates the base maximum value of player's special movement speed without any status effects */
-	const float BaseSpecialMovementSpeed = 600;
+	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float BaseSpecialMovementSpeed;
 
 	/** This indicates the base maximum value of player's movement speed when it's blocking damage */
-	const float BaseBlockMovementSpeed = 150;
+	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float BaseBlockMovementSpeed;
 
 	//~ @note Pressing and releasing skill keys are separate events to support charge events (e.g. charge rage)
 
@@ -489,11 +492,11 @@ private:
 
 	FORCEINLINE void DisableAutoRun();
 
+	FORCEINLINE void StopNormalAttacking();
+
 	void DisableForwardPressed();
 
 	void DisableBackwardPressed();
-
-	// FPlayerAnimationReferences* GetActiveAnimationReferences() const;
 
 	FName GetNextNormalAttackSectionName(const FName& CurrentSection) const;
 

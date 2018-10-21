@@ -440,7 +440,7 @@ protected:
 
 	FTimerHandle TargetSwitchTimerHandle;
 
-	FTimerHandle DodgeTimerHandle;
+	FTimerHandle DodgeImmunityTimerHandle;
 
 	FTimerHandle BlockTimerHandle;
 
