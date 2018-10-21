@@ -55,8 +55,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
 	float GetBlockMovementDirectionYaw() const;
 	
+	// UFUNCTION(BlueprintCallable, Category = MasterStateUpdate, meta = (BlueprintThreadSafe))
+	// EWeaponAnimationType GetWeaponAnimationType() const;
+
 	UFUNCTION(BlueprintCallable, Category = MasterStateUpdate, meta = (BlueprintThreadSafe))
-	EWeaponAnimationType GetWeaponAnimationType() const;
+	EWeaponType GetWeaponAnimationType() const;
 	//~ End functions to update animation blueprint
 
 private:

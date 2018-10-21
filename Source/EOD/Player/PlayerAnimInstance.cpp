@@ -88,6 +88,17 @@ float UPlayerAnimInstance::GetBlockMovementDirectionYaw() const
 	return 0.f;
 }
 
+EWeaponType UPlayerAnimInstance::GetWeaponAnimationType() const
+{
+	if (OwningPlayer && !OwningPlayer->IsWeaponSheathed())
+	{
+		return OwningPlayer->GetEquippedWeaponType();
+	}
+
+	return EWeaponType::None;
+}
+
+/*
 EWeaponAnimationType UPlayerAnimInstance::GetWeaponAnimationType() const
 {
 	if (OwningPlayer)
@@ -97,6 +108,7 @@ EWeaponAnimationType UPlayerAnimInstance::GetWeaponAnimationType() const
 
 	return EWeaponAnimationType();
 }
+*/
 
 void UPlayerAnimInstance::HandleMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
 {
