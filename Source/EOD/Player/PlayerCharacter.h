@@ -377,9 +377,6 @@ private:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_WeaponSheathed)
 	bool bWeaponSheathed;
 
-	/** A reference to player anim instance */
-	UPlayerAnimInstance* PlayerAnimInstance;
-
 	/** Animations for this player when it has a weapon equipped */
 	FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
 

@@ -316,9 +316,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-
-	if (IsLocallyControlled() && HUDWidget)
+	if (IsPlayerControlled() && HUDWidget)
 	{
 		HUDWidget->AddToViewport();
 	}
@@ -1340,11 +1338,16 @@ void APlayerCharacter::LoadUnequippedWeaponAnimationReferences()
 {
 	UnloadUnequippedWeaponAnimationReferences();
 
+	if (!PlayerAnimationReferencesDataTable)
+	{
+		return;
+	}
+
 	FName RowID = GetAnimationReferencesRowID(EWeaponType::None, Gender);
 	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
 		FString("APlayerCharacter::LoadUnequippedWeaponAnimationReferences(), loading unequipped weapon animation references"));
 
-	if (!PlayerAnimationReferencesDataTable)
+	if (!PlayerAnimationReferences)
 	{
 		return;
 	}
@@ -1365,11 +1368,16 @@ void APlayerCharacter::LoadEquippedWeaponAnimationReferences()
 {
 	UnloadEquippedWeaponAnimationReferences();
 
+	if (!PlayerAnimationReferencesDataTable)
+	{
+		return;
+	}
+
 	FName RowID = GetAnimationReferencesRowID(GetEquippedWeaponType(), Gender);
 	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
-		FString("APlayerCharacter::LoadUnequippedWeaponAnimationReferences(), loading unequipped weapon animation references"));
+		FString("APlayerCharacter::LoadEquippedWeaponAnimationReferences(), loading equipped weapon animation references"));
 
-	if (!PlayerAnimationReferencesDataTable)
+	if (!PlayerAnimationReferences)
 	{
 		return;
 	}
