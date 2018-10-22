@@ -6,6 +6,9 @@
 #include "Statics/EODLibrary.h"
 #include "Statics/CharacterLibrary.h"
 #include "StatusEffects/StatusEffectBase.h"
+#include "Components/StatsComponentBase.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Animation/AnimInstance.h"
 #include "GameFramework/Character.h"
 #include "EODCharacterBase.generated.h"
 
@@ -192,19 +195,19 @@ public:
 	 * Called on successfully dodging an enemy attack
 	 * @param AttackInstigator Enemy character whose incoming damage this character dodged
 	 */
-	FORCEINLINE void OnSuccessfulDodge(AEODCharacterBase* AttackInstigator);
+	void OnSuccessfulDodge(AEODCharacterBase* AttackInstigator);
 
 	/**
 	 * Called on successfully blocking an enemy attack
 	 * @param AttackInstigator Enemy character whose incoming damage this character blocked
 	 */
-	FORCEINLINE void OnSuccessfulBlock(AEODCharacterBase* AttackInstigator);
+	void OnSuccessfulBlock(AEODCharacterBase* AttackInstigator);
 
 	/**
 	 * Called on getting an attack of this character blocked by an enemy
 	 * @param AttackBlocker Enemy character that blocked this character's attack
 	 */
-	FORCEINLINE void OnAttackDeflected(AEODCharacterBase* AttackBlocker, bool bSkillIgnoresBlock);
+	void OnAttackDeflected(AEODCharacterBase* AttackBlocker, bool bSkillIgnoresBlock);
 
 	/** Temporarily trigger 'Target_Switch' material parameter to make the character glow */
 	FORCEINLINE void SetOffTargetSwitch();
@@ -220,7 +223,7 @@ public:
 	bool BP_GetInCombat() const;
 
 	/** [server + client] Set current state of character */
-	FORCEINLINE void SetCharacterState(const ECharacterState NewState);
+	inline void SetCharacterState(const ECharacterState NewState);
 
 	/** [server + client] Set current state of character */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
@@ -249,7 +252,7 @@ public:
 	/** Returns character faction */
 	FORCEINLINE EFaction GetFaction() const;
 
-	FORCEINLINE FSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
+	inline FSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
 
 	/**
 	 * Use a skill and play it's animation
@@ -312,10 +315,10 @@ public:
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
 	/** [server + client] Plays an animation montage over network */
-	FORCEINLINE void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
+	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
 	
 	/** [server + client] Plays an animation montage and changes character state over network */
-	FORCEINLINE void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
 	//~ @note UFUNCTIONs don't allow function overloading
 	/** [server + client] Plays an animation montage and changes character state over network */
@@ -485,3 +488,196 @@ private:
 	
 	
 };
+
+FORCEINLINE bool AEODCharacterBase::IsAlive() const
+{
+	return StatsComp->GetCurrentHealth() > 0;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsDead() const
+{
+	return StatsComp->GetCurrentHealth() <= 0;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsIdle() const
+{
+	return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0);
+}
+
+FORCEINLINE bool AEODCharacterBase::IsMoving() const
+{
+	return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() != 0);
+}
+
+FORCEINLINE bool AEODCharacterBase::IsIdleOrMoving() const
+{
+	return CharacterState == ECharacterState::IdleWalkRun;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsJumping() const
+{
+	return CharacterState == ECharacterState::Jumping;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsDodging() const
+{
+	return CharacterState == ECharacterState::Dodging;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsDodgingDamage() const
+{
+	return bActiveiFrames;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsBlocking() const
+{
+	return CharacterState == ECharacterState::Blocking;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsBlockingDamage() const
+{
+	return bBlockingDamage;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsCastingSpell() const
+{
+	return CharacterState == ECharacterState::CastingSpell;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsNormalAttacking() const
+{
+	return CharacterState == ECharacterState::Attacking && GetCurrentActiveSkillID() != NAME_None;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsUsingAnySkill() const
+{
+	return CharacterState == ECharacterState::UsingActiveSkill && GetCurrentActiveSkillID() != NAME_None;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsUsingSkill(FName SkillID) const
+{
+	return CharacterState == ECharacterState::UsingActiveSkill && GetCurrentActiveSkillID() == SkillID;
+}
+
+FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
+{
+	return CharacterState == ECharacterState::GotHit;
+}
+
+FORCEINLINE bool AEODCharacterBase::CanFlinch() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanStun() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanKnockback() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanFreeze() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+}
+
+FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
+{
+	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
+}
+
+FORCEINLINE bool AEODCharacterBase::NeedsHealing() const
+{
+	return StatsComp->IsLowOnHealth();
+}
+
+FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
+{
+	TurnOnTargetSwitch();
+}
+
+FORCEINLINE bool AEODCharacterBase::GetInCombat() const
+{
+	return bInCombat;
+}
+
+inline void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
+{
+	CharacterState = NewState;
+
+	if (Role < ROLE_Authority)
+	{
+		Server_SetCharacterState(NewState);
+	}
+}
+
+FORCEINLINE ECharacterState AEODCharacterBase::GetCharacterState() const
+{
+	return CharacterState;
+}
+
+FORCEINLINE UStatsComponentBase* AEODCharacterBase::GetStatsComponent() const
+{
+	return StatsComp;
+}
+
+FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
+{
+	return Faction;
+}
+
+inline FSkillTableRow* AEODCharacterBase::GetSkill(FName SkillID, const FString& ContextString) const
+{
+	FSkillTableRow* Skill = nullptr;
+
+	if (SkillsDataTable)
+	{
+		Skill = SkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString);
+	}
+
+	return Skill;
+}
+
+FORCEINLINE FName AEODCharacterBase::GetCurrentActiveSkillID() const
+{
+	return CurrentActiveSkillID;
+}
+
+FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkillID(FName SkillID)
+{
+	CurrentActiveSkillID = SkillID;
+}
+
+FORCEINLINE FLastUsedSkillInfo & AEODCharacterBase::GetLastUsedSkill()
+{
+	return LastUsedSkillInfo;
+}
+
+inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay)
+{
+	if (GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
+	}
+}
+
+inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
+{
+	if (GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
+		CharacterState = NewState;
+	}
+
+	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
+}

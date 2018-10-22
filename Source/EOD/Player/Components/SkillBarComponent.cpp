@@ -24,17 +24,12 @@ void USkillBarComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-FORCEINLINE USkillBarWidget* USkillBarComponent::GetSkillBarWidget() const
-{
-	return SkillBarWidget;
-}
-
 USkillBarWidget* USkillBarComponent::BP_GetSkillBarWidget() const
 {
 	return GetSkillBarWidget();
 }
 
-FORCEINLINE void USkillBarComponent::InitializeComponentWidget()
+void USkillBarComponent::InitializeComponentWidget()
 {
 	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 	if (!(OwningPlayer && OwningPlayer->IsLocallyControlled() && OwningPlayer->GetHUDWidget()))
@@ -49,7 +44,7 @@ FORCEINLINE void USkillBarComponent::InitializeComponentWidget()
 	}
 }
 
-FORCEINLINE bool USkillBarComponent::CanUseSkill(const int32 SkillSlotIndex)
+bool USkillBarComponent::CanUseSkill(const int32 SkillSlotIndex)
 {
 	if (!SkillBarWidget || !SkillBarWidget->IsSkillInCooldown(SkillSlotIndex))
 	{

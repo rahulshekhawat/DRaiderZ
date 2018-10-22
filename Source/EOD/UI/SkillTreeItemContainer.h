@@ -3,8 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/CharacterLibrary.h"
+
+#include "Core/EODSaveGame.h"
+#include "Core/GameSingleton.h"
 #include "UI/EODItemContainer.h"
+#include "Statics/CharacterLibrary.h"
+
+#include "TextBlock.h"
+#include "Engine/Engine.h"
+#include "Kismet/GameplayStatics.h"
 #include "SkillTreeItemContainer.generated.h"
 
 /**
@@ -57,14 +64,93 @@ public:
 	
 private:
 
-	FORCEINLINE void UpdateSkillUpgradeText();
+	inline void UpdateSkillUpgradeText();
 
 	/** Load previously saved skill state from current save slot */
-	FORCEINLINE void LoadSkillContainerState();
+	inline void LoadSkillContainerState();
 
-	FORCEINLINE void LoadEODItemInfo();
+	inline void LoadEODItemInfo();
 
 
 	
 
 };
+
+inline void USkillTreeItemContainer::UpdateSkillUpgradeText()
+{
+	FString String;
+	String = FString::FromInt(SkillState.CurrentUpgradeLevel) + FString("/") + FString::FromInt(SkillState.MaxUpgradeLevel);
+	FText Text = FText::FromString(String);
+	SkillUpgradeText->SetText(Text);
+}
+
+inline void USkillTreeItemContainer::LoadSkillContainerState()
+{
+	if (SkillGroup == FString())
+	{
+		return;
+	}
+
+	UGameSingleton* GameSingleton = nullptr;
+	if (GEngine)
+	{
+		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+	}
+
+	if (!GameSingleton)
+	{
+		return;
+	}
+
+	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex));
+	if (!EODSaveGame)
+	{
+		return;
+	}
+
+	if (EODSaveGame->SkillToStateMap.Contains(SkillGroup))
+	{
+		SkillState = EODSaveGame->SkillToStateMap[SkillGroup];
+	}
+}
+
+inline void USkillTreeItemContainer::LoadEODItemInfo()
+{
+	if (SkillGroup == FString())
+	{
+		return;
+	}
+
+	FString SkillID;
+	if (SkillState.CurrentUpgradeLevel > 0)
+	{
+		SkillID = SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
+	}
+	else
+	{
+		SkillID = SkillGroup + FString("_1");
+	}
+
+	// FPlayerSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(FName(*SkillID), FString("USkillTreeItemContainer::LoadEODItemInfo(), looking for player skill"));
+	FSkillTableRow* Skill = nullptr;
+	if (!Skill)
+	{
+		return;
+	}
+
+	EODItemInfo.ItemID = FName(*SkillID);
+	if (Skill->bPassiveSkill)
+	{
+		EODItemInfo.EODItemType = EEODItemType::PassiveSkill;
+	}
+	else
+	{
+		EODItemInfo.EODItemType = EEODItemType::ActiveSkill;
+	}
+	EODItemInfo.Icon = Skill->Icon;
+	EODItemInfo.Description = Skill->Description;
+	EODItemInfo.InGameName = Skill->InGameName;
+	EODItemInfo.StackCount = 1;
+
+	SkillState.MaxUpgradeLevel = Skill->MaxUpgrades;
+}

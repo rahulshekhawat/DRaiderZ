@@ -4,8 +4,6 @@
 #include "EODPlayerController.h"
 #include "Core/GameSingleton.h"
 #include "PlayerAnimInstance.h"
-#include "Weapons/PrimaryWeapon.h"
-#include "Weapons/SecondaryWeapon.h"
 #include "Statics/WeaponLibrary.h"
 #include "UI/HUDWidget.h"
 #include "UI/SkillBarWidget.h"
@@ -379,31 +377,6 @@ bool APlayerCharacter::CanUseAnySkill() const
 bool APlayerCharacter::IsAutoRunning() const
 {
 	return GetCharacterState() == ECharacterState::AutoRun;
-}
-
-FORCEINLINE APrimaryWeapon* APlayerCharacter::GetPrimaryWeapon() const
-{
-	return PrimaryWeapon;
-}
-
-FORCEINLINE ASecondaryWeapon* APlayerCharacter::GetSecondaryWeapon() const
-{
-	return SecondaryWeapon;
-}
-
-FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
-{
-	return PrimaryWeapon->WeaponType;
-}
-
-FORCEINLINE UHUDWidget* APlayerCharacter::GetHUDWidget() const
-{
-	return HUDWidget;
-}
-
-bool APlayerCharacter::IsWeaponSheathed() const
-{
-	return bWeaponSheathed;
 }
 
 UHUDWidget* APlayerCharacter::BP_GetHUDWidget() const
@@ -855,21 +828,6 @@ void APlayerCharacter::OnToggleAutoRun()
 	}
 }
 
-FORCEINLINE void APlayerCharacter::EnableAutoRun()
-{
-	SetCharacterState(ECharacterState::AutoRun);
-	SetUseControllerRotationYaw(true);
-}
-
-FORCEINLINE void APlayerCharacter::DisableAutoRun()
-{
-	// Make sure that auto run is active before you attempt to disable it
-	// check(CharacterState == ECharacterState::AutoRun);
-
-	SetCharacterState(ECharacterState::IdleWalkRun);
-	SetUseControllerRotationYaw(false);
-}
-
 void APlayerCharacter::StopNormalAttacking()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.2, GetActiveAnimationReferences()->NormalAttacks.Get());
@@ -1028,17 +986,12 @@ void APlayerCharacter::Destroyed()
 	UnloadEquippedWeaponAnimationReferences();
 }
 
-FORCEINLINE void APlayerCharacter::SavePlayerState()
+void APlayerCharacter::SavePlayerState()
 {
 	if (HUDWidget)
 	{
 		HUDWidget->SaveHUDLayout();
 	}
-}
-
-void APlayerCharacter::BP_SavePlayerState()
-{
-	SavePlayerState();
 }
 
 /*
@@ -1622,12 +1575,6 @@ void APlayerCharacter::TurnOffTargetSwitch()
 	*/
 }
 
-FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
-{
-	bRotateSmoothly = true;
-	DesiredSmoothRotationYaw = DesiredYaw;
-}
-
 bool APlayerCharacter::IsPrimaryWeaponEquippped() const
 {
 	return PrimaryWeaponID != NAME_None && PrimaryWeapon->bEquipped;
@@ -1659,16 +1606,6 @@ FORCEINLINE bool APlayerCharacter::CanUseSkill(const FPlayerSkillTableRow* Skill
 	return false;
 }
 */
-
-FORCEINLINE void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
-{
-	IWR_CharacterMovementDirection = NewDirection;
-
-	if (Role < ROLE_Authority)
-	{
-		Server_SetIWRCharMovementDir(NewDirection);
-	}
-}
 
 void APlayerCharacter::Server_SetIWRCharMovementDir_Implementation(ECharMovementDirection NewDirection)
 {

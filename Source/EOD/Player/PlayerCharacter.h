@@ -6,13 +6,13 @@
 #include "Engine/DataTable.h"
 #include "Engine/StreamableManager.h"
 #include "Player/EODCharacterBase.h"
+#include "Weapons/PrimaryWeapon.h"
+#include "Weapons/SecondaryWeapon.h"
 #include "PlayerCharacter.generated.h"
 
 class UHUDWidget;
 class UAudioComponent;
 class UAnimMontage;
-class APrimaryWeapon;
-class ASecondaryWeapon;
 class UPlayerAnimInstance;
 class UStaticMeshComponent;
 class USkeletalMeshComponent;
@@ -65,11 +65,8 @@ public:
 	virtual void Destroyed() override;
 
 	/** Saves current player state */
-	FORCEINLINE void SavePlayerState();
-
-	/** Saves current player state */
-	UFUNCTION(BlueprintCallable, Category = SaveSystem, meta = (DisplayName = "Save Player State"))
-	void BP_SavePlayerState();
+	UFUNCTION(BlueprintCallable, Category = "EOD Character")
+	void SavePlayerState();
 
 private:
 	
@@ -235,7 +232,7 @@ public:
 	void PushPlayer(FVector ImpulseDirection); // @todo const parameter?
 
 	/** [server + client] Change idle-walk-run direction of character */
-	FORCEINLINE void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
+	inline void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
 	//~ DEPRECATED
 	/** [server + client] Change current weapon animation to use */
@@ -477,9 +474,9 @@ private:
 	/** Enable or disable auto run */
 	void OnToggleAutoRun();
 
-	FORCEINLINE void EnableAutoRun();
+	inline void EnableAutoRun();
 
-	FORCEINLINE void DisableAutoRun();
+	inline void DisableAutoRun();
 
 	FORCEINLINE void StopNormalAttacking();
 
@@ -545,4 +542,59 @@ template<uint32 SkillButtonIndex>
 inline void APlayerCharacter::ReleasedSkillKey()
 {
 	OnReleasingSkillKey(SkillButtonIndex);
+}
+
+inline void APlayerCharacter::EnableAutoRun()
+{
+	SetCharacterState(ECharacterState::AutoRun);
+	SetUseControllerRotationYaw(true);
+}
+
+inline void APlayerCharacter::DisableAutoRun()
+{
+	// @todo put a test to check if the player is really auto running
+
+	SetCharacterState(ECharacterState::IdleWalkRun);
+	SetUseControllerRotationYaw(false);
+}
+
+FORCEINLINE bool APlayerCharacter::IsWeaponSheathed() const
+{
+	return bWeaponSheathed;
+}
+
+FORCEINLINE APrimaryWeapon* APlayerCharacter::GetPrimaryWeapon() const
+{
+	return PrimaryWeapon;
+}
+
+FORCEINLINE ASecondaryWeapon* APlayerCharacter::GetSecondaryWeapon() const
+{
+	return SecondaryWeapon;
+}
+
+FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
+{
+	return PrimaryWeapon->WeaponType;
+}
+
+FORCEINLINE UHUDWidget* APlayerCharacter::GetHUDWidget() const
+{
+	return HUDWidget;
+}
+
+FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
+{
+	bRotateSmoothly = true;
+	DesiredSmoothRotationYaw = DesiredYaw;
+}
+
+inline void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
+{
+	IWR_CharacterMovementDirection = NewDirection;
+
+	if (Role < ROLE_Authority)
+	{
+		Server_SetIWRCharMovementDir(NewDirection);
+	}
 }

@@ -1,18 +1,12 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODItemContainer.h"
-#include "EODItemDragDropOperation.h"
-#include "Player/PlayerCharacter.h"
 #include "DragVisualWidget.h"
+#include "Player/PlayerCharacter.h"
+#include "EODItemDragDropOperation.h"
 
-#include "Image.h"
-#include "Engine/Texture.h"
 #include "SlateTypes.h"
-#include "TextBlock.h"
-#include "Engine/Engine.h"
-#include "Engine/World.h"
-#include "TimerManager.h"
-#include "Materials/MaterialInstanceDynamic.h"
+#include "Engine/Texture.h"
 
 
 UEODItemContainer::UEODItemContainer(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
@@ -51,50 +45,6 @@ void UEODItemContainer::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-FORCEINLINE void UEODItemContainer::StartCooldown(float Duration, float Interval)
-{
-	UWorld* World = nullptr;
-
-	if (GEngine)
-	{
-		World = GEngine->GetWorldFromContextObjectChecked(this);
-	}
-
-	if (!World)
-	{
-		return;
-	}
-
-	World->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UEODItemContainer::UpdateCooldown, Interval, true, 0.f);
-
-	CooldownTimeRemaining = Duration;
-	CooldownInterval = Interval;
-	bInCooldown = true;
-	ItemImage->SetIsEnabled(false);
-	CooldownText->SetVisibility(ESlateVisibility::Visible);
-}
-
-FORCEINLINE void UEODItemContainer::StopCooldown()
-{
-	UWorld* World = nullptr;
-
-	if (GEngine)
-	{
-		World = GEngine->GetWorldFromContextObjectChecked(this);
-	}
-
-	if (!World)
-	{
-		return;
-	}
-
-	World->GetTimerManager().ClearTimer(CooldownTimerHandle);
-
-	bInCooldown = false;
-	ItemImage->SetIsEnabled(true);
-	CooldownText->SetVisibility(ESlateVisibility::Hidden);
-}
-
 void UEODItemContainer::BP_StartCooldown(float Duration, float Interval)
 {
 	StartCooldown(Duration, Interval);
@@ -109,19 +59,6 @@ void UEODItemContainer::RefreshContainerVisuals()
 {
 	UpdateItemImage();
 	UpdateStackCountText();
-}
-
-FORCEINLINE void UEODItemContainer::ResetContainer()
-{
-	EODItemInfo 				= FEODItemInfo();
-	EODItemInfo.StackCount 		= 0;
-	bCanBeClicked 				= false;
-	bCanBeDragged 				= false;
-	bInCooldown 				= false;
-	CooldownTimeRemaining 		= 0;
-	CooldownInterval 			= 0;
-	
-	// @note can't and shouldn't reset container type
 }
 
 void UEODItemContainer::NativeOnDragDetected(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent, UDragDropOperation *& OutOperation)
@@ -218,61 +155,6 @@ FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry & InGeometry, co
 	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), HoveredBorderColor);
 
 	return FReply::Handled();
-}
-
-FORCEINLINE void UEODItemContainer::UpdateItemImage()
-{
-	if (EODItemInfo.Icon)
-	{
-		FSlateBrush SlateBrush;
-		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
-		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
-		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
-		SlateBrush.SetResourceObject(EODItemInfo.Icon);
-		ItemImage->SetBrush(SlateBrush);
-	}
-	else
-	{
-		FSlateBrush SlateBrush;
-		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
-		SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
-		SlateBrush.ImageType = ESlateBrushImageType::NoImage;
-		ItemImage->SetBrush(SlateBrush);
-	}
-}
-
-FORCEINLINE void UEODItemContainer::UpdateStackCountText()
-{
-	if (EODItemInfo.StackCount > 1)
-	{
-		FText Text = FText::FromString(FString::FromInt(EODItemInfo.StackCount));
-		StackCountText->SetText(Text);
-		StackCountText->SetVisibility(ESlateVisibility::Visible);
-	}
-	else
-	{
-		FText Text = FText::FromString(FString(""));
-		StackCountText->SetText(Text);
-		StackCountText->SetVisibility(ESlateVisibility::Hidden);
-	}
-}
-
-FORCEINLINE void UEODItemContainer::SetupEmptyBorderMaterial()
-{
-	if (!EmptyBorderMaterial)
-	{
-		return;
-	}
-
-	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(EmptyBorderMaterial, this);
-	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
-
-	FSlateBrush SlateBrush;
-	SlateBrush.ImageSize = FVector2D(64.0, 64.0);
-	SlateBrush.DrawAs = ESlateBrushDrawType::Image;
-	SlateBrush.ImageType = ESlateBrushImageType::FullColor;
-	SlateBrush.SetResourceObject(DynamicMaterial);
-	EmptyBorderImage->SetBrush(SlateBrush);
 }
 
 void UEODItemContainer::UpdateCooldown()

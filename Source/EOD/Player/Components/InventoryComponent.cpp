@@ -46,17 +46,12 @@ void UInventoryComponent::ToggleInventoryUI()
 	}
 }
 
-FORCEINLINE UInventoryWidget* UInventoryComponent::GetInventoryWidget() const
-{
-	return InventoryWidget;
-}
-
 UInventoryWidget* UInventoryComponent::BP_GetInventoryWidget() const
 {
 	return GetInventoryWidget();
 }
 
-FORCEINLINE void UInventoryComponent::InitializeComponentWidget()
+void UInventoryComponent::InitializeComponentWidget()
 {
 	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 	if (!(OwningPlayer && OwningPlayer->IsLocallyControlled() && OwningPlayer->GetHUDWidget()))

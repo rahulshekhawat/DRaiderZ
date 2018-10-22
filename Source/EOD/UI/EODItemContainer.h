@@ -3,8 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "Statics/EODLibrary.h"
+
+#include "Image.h"
+#include "TextBlock.h"
+#include "TimerManager.h"
+#include "Engine/World.h"
+#include "Engine/Engine.h"
 #include "Blueprint/UserWidget.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "EODItemContainer.generated.h"
 
 class UTextBlock;
@@ -81,10 +89,10 @@ public:
 	UTextBlock* CooldownText;
 
 	/** Puts this container on cooldown for a given duration */
-	FORCEINLINE void StartCooldown(float Duration, float Interval = 1.f);
+	inline void StartCooldown(float Duration, float Interval = 1.f);
 
 	/** Removes cooldown from this container */
-	FORCEINLINE void StopCooldown();
+	inline void StopCooldown();
 
 	/** Puts this container on cooldown for a given duration */
 	UFUNCTION(BlueprintCallable, Category = EODItemContainer, meta = (DisplayName = "Start Cooldown"))
@@ -98,7 +106,7 @@ public:
 	virtual void RefreshContainerVisuals();
 
 	/** Resets and nulls all container variables. Deletes any references */
-	FORCEINLINE void ResetContainer();
+	inline void ResetContainer();
 
 protected:
 
@@ -116,11 +124,11 @@ protected:
 
 private:
 
-	FORCEINLINE void UpdateItemImage();
+	inline void UpdateItemImage();
 
-	FORCEINLINE void UpdateStackCountText();
+	inline void UpdateStackCountText();
 
-	FORCEINLINE void SetupEmptyBorderMaterial();
+	inline void SetupEmptyBorderMaterial();
 
 	void UpdateCooldown();
 
@@ -130,3 +138,115 @@ private:
 
 
 };
+
+inline void UEODItemContainer::ResetContainer()
+{
+	EODItemInfo 				= FEODItemInfo();
+	EODItemInfo.StackCount 		= 0;
+	bCanBeClicked 				= false;
+	bCanBeDragged 				= false;
+	bInCooldown 				= false;
+	CooldownTimeRemaining 		= 0;
+	CooldownInterval 			= 0;
+	
+	// @note can't and shouldn't reset container type
+}
+
+inline void UEODItemContainer::StartCooldown(float Duration, float Interval)
+{
+	UWorld* World = nullptr;
+
+	if (GEngine)
+	{
+		World = GEngine->GetWorldFromContextObjectChecked(this);
+	}
+
+	if (!World)
+	{
+		return;
+	}
+
+	World->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UEODItemContainer::UpdateCooldown, Interval, true, 0.f);
+
+	CooldownTimeRemaining = Duration;
+	CooldownInterval = Interval;
+	bInCooldown = true;
+	ItemImage->SetIsEnabled(false);
+	CooldownText->SetVisibility(ESlateVisibility::Visible);
+}
+
+inline void UEODItemContainer::StopCooldown()
+{
+	UWorld* World = nullptr;
+
+	if (GEngine)
+	{
+		World = GEngine->GetWorldFromContextObjectChecked(this);
+	}
+
+	if (!World)
+	{
+		return;
+	}
+
+	World->GetTimerManager().ClearTimer(CooldownTimerHandle);
+
+	bInCooldown = false;
+	ItemImage->SetIsEnabled(true);
+	CooldownText->SetVisibility(ESlateVisibility::Hidden);
+}
+
+inline void UEODItemContainer::UpdateItemImage()
+{
+	if (EODItemInfo.Icon)
+	{
+		FSlateBrush SlateBrush;
+		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
+		SlateBrush.SetResourceObject(EODItemInfo.Icon);
+		ItemImage->SetBrush(SlateBrush);
+	}
+	else
+	{
+		FSlateBrush SlateBrush;
+		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+		SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
+		SlateBrush.ImageType = ESlateBrushImageType::NoImage;
+		ItemImage->SetBrush(SlateBrush);
+	}
+}
+
+inline void UEODItemContainer::UpdateStackCountText()
+{
+	if (EODItemInfo.StackCount > 1)
+	{
+		FText Text = FText::FromString(FString::FromInt(EODItemInfo.StackCount));
+		StackCountText->SetText(Text);
+		StackCountText->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		FText Text = FText::FromString(FString(""));
+		StackCountText->SetText(Text);
+		StackCountText->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+inline void UEODItemContainer::SetupEmptyBorderMaterial()
+{
+	if (!EmptyBorderMaterial)
+	{
+		return;
+	}
+
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(EmptyBorderMaterial, this);
+	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
+
+	FSlateBrush SlateBrush;
+	SlateBrush.ImageSize = FVector2D(64.0, 64.0);
+	SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+	SlateBrush.ImageType = ESlateBrushImageType::FullColor;
+	SlateBrush.SetResourceObject(DynamicMaterial);
+	EmptyBorderImage->SetBrush(SlateBrush);
+}

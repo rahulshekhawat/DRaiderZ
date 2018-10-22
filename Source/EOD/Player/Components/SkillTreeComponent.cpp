@@ -23,17 +23,12 @@ void USkillTreeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-FORCEINLINE USkillTreeWidget * USkillTreeComponent::GetSkillTreeWidget() const
-{
-	return SkillTreeWidget;
-}
-
 USkillTreeWidget * USkillTreeComponent::BP_GetSkillTreeWidget() const
 {
 	return GetSkillTreeWidget();
 }
 
-FORCEINLINE void USkillTreeComponent::InitializeComponentWidget()
+void USkillTreeComponent::InitializeComponentWidget()
 {
 	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 	if (!(OwningPlayer && OwningPlayer->IsLocallyControlled() && OwningPlayer->GetHUDWidget()))

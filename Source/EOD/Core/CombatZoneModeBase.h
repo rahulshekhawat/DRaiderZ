@@ -46,3 +46,13 @@ private:
 	TSubclassOf<ACombatManager> CombatManagerClass;
 
 };
+
+FORCEINLINE ACombatManager* ACombatZoneModeBase::GetCombatManager() const
+{
+	return CombatManager;
+}
+
+FORCEINLINE AStatusEffectsManager* ACombatZoneModeBase::GetStatusEffectsManager() const
+{
+	return StatusEffectsManager;
+}
