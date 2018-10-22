@@ -2,7 +2,6 @@
 
 #include "CombatManager.h"
 #include "EODPreprocessors.h"
-#include "Player/EODCharacterBase.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/Components/StatsComponentBase.h"
 
@@ -45,16 +44,7 @@ void ACombatManager::OnMeleeAttack(AActor * HitInstigator, const bool bHit, cons
 	}
 }
 
-FORCEINLINE float ACombatManager::CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2)
-{
-	FVector NormalizedVec1 = Vec1.GetSafeNormal();
-	FVector NormalizedVec2 = Vec2.GetSafeNormal();
-	float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(NormalizedVec1, NormalizedVec2)));
-
-	return Angle;
-}
-
-FORCEINLINE void ACombatManager::NativeDisplayDamage(const AEODCharacterBase* HitInstigator,
+void ACombatManager::NativeDisplayDamage(const AEODCharacterBase* HitInstigator,
 													 const AEODCharacterBase* HitCharacter,
 													 const FHitResult& LineHitResult,
 													 const float ActualDamage,
@@ -85,32 +75,6 @@ FORCEINLINE void ACombatManager::NativeDisplayDamage(const AEODCharacterBase* Hi
 	}
 }
 
-FORCEINLINE bool ACombatManager::WasBlockSuccessful(const AActor* HitInstigator,
-													const AActor* HitActor,
-													const bool bLineHitResultFound,
-													const FHitResult& LineHitResult)
-{
-	FVector HitActorForwardVector = HitActor->GetActorForwardVector();
-	FVector HitNormal = LineHitResult.ImpactNormal;
-	float Angle = CalculateAngleBetweenVectors(HitActorForwardVector, HitNormal);
-	bool bResult = Angle < BlockDetectionAngle ? true : false;
-	return bResult;
-}
-
-FORCEINLINE bool ACombatManager::GetCritChanceBoolean(const AEODCharacterBase* HitInstigator,
-													  const AEODCharacterBase* HitCharacter,
-													  const EDamageType& DamageType) const
-{
-	float CritRate = DamageType == EDamageType::Physical ? HitInstigator->StatsComp->GetPhysicalCritRate() : HitInstigator->StatsComp->GetMagickCritRate();
-	bool bResult = CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
-	return bResult;
-}
-
-FORCEINLINE float ACombatManager::GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult)
-{
-	return CalculateAngleBetweenVectors(HitCharacter->GetActorForwardVector(), LineHitResult.ImpactNormal);
-}
-
 float ACombatManager::GetActualDamage(const AEODCharacterBase* HitInstigator,
 									  const AEODCharacterBase* HitCharacter,
 									  const FSkillDamageInfo& SkillDamageInfo,
@@ -124,16 +88,16 @@ float ACombatManager::GetActualDamage(const AEODCharacterBase* HitInstigator,
 
 	if (SkillDamageInfo.DamageType == EDamageType::Physical)
 	{
-		ActualDamage = HitInstigator->StatsComp->GetPhysicalAttack();
-		CritBonus = HitInstigator->StatsComp->GetPhysicalCritBonus();
-		DamageReductionOnBlock = HitInstigator->StatsComp->GetPhysicalDamageReductionOnBlock();
+		ActualDamage = HitInstigator->GetStatsComponent()->GetPhysicalAttack();
+		CritBonus = HitInstigator->GetStatsComponent()->GetPhysicalCritBonus();
+		DamageReductionOnBlock = HitInstigator->GetStatsComponent()->GetPhysicalDamageReductionOnBlock();
 		CritMultiplier = PhysicalCritMultiplier;
 	}
 	else if (SkillDamageInfo.DamageType == EDamageType::Magickal)
 	{
-		ActualDamage = HitInstigator->StatsComp->GetMagickAttack();
-		CritBonus = HitInstigator->StatsComp->GetMagickCritBonus();
-		DamageReductionOnBlock = HitInstigator->StatsComp->GetMagickDamageReductionOnBlock();
+		ActualDamage = HitInstigator->GetStatsComponent()->GetMagickAttack();
+		CritBonus = HitInstigator->GetStatsComponent()->GetMagickCritBonus();
+		DamageReductionOnBlock = HitInstigator->GetStatsComponent()->GetMagickDamageReductionOnBlock();
 		CritMultiplier = MagickalCritMultiplier;
 	}
 
@@ -189,7 +153,9 @@ void ACombatManager::ProcessActorAttack(AActor* HitInstigator, const bool bHit, 
 
 void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
-	const FSkillDamageInfo SkillDamageInfo = HitInstigator->GetCurrentActiveSkillDamageInfo();
+	FSkillDamageInfo SkillDamageInfo;
+	// const FSkillDamageInfo SkillDamageInfo;
+		// = HitInstigator->GetCurrentActiveSkillDamageInfo();
 
 	for (const FHitResult& HitResult : HitResults)
 	{

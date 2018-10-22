@@ -3,15 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "EODItemContainer.h"
+#include "SkillBarWidget.h"
+#include "SkillTreeWidget.h"
+#include "InventoryWidget.h"
+#include "StatusIndicatorWidget.h"
+
 #include "UObject/ObjectMacros.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
 #include "HUDWidget.generated.h"
-
-class UStatusIndicatorWidget;
-class USkillBarWidget;
-class UInventoryWidget;
-class USkillTreeWidget;
-class UCanvasPanel;
 
 /**
  * HUDWidget is used to display player HUD
@@ -50,38 +53,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UCanvasPanel* MainCanvas;
 
-	/** Updates health bar in StatusIndicatorWidget */
-	FORCEINLINE void UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth);
-
-	/** Updates mana bar in StatusIndicatorWidget */
-	FORCEINLINE void UpdateManaBar(int32 CurrentMana, int32 MaxMana, int32 BaseMana);
-
-	/** Updates stamina bar in StatusIndicatorWidget */
-	FORCEINLINE void UpdateStaminaBar(int32 CurrentStamina, int32 MaxStamina, int32 BaseStamina);
-
-	/** Get SkillID of skill placed at SkillIndex of skill bar */
-	FORCEINLINE FName GetSkillAtIndex(int32 SkillIndex) const;
-
-	/** Returns true if skill at given skill index of skill bar is in cooldown */
-	FORCEINLINE bool IsSkillInCooldown(int32 SkillIndex) const;
-
-	/** Put skill at given skill index of skill bar on cooldown */
-	FORCEINLINE void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);
-
 	/** Save current HUD layout to the current save slot */
-	FORCEINLINE void SaveHUDLayout();
+	void SaveHUDLayout();
 
 	/** Add skill bar widget as a child to HUD widget */
-	FORCEINLINE void AddSkillBarWidget(USkillBarWidget* NewWidget);
+	inline void AddSkillBarWidget(USkillBarWidget* NewWidget);
 
 	/** Add skill tree widget as a child to HUD widget */
-	FORCEINLINE void AddSkillTreeWidget(USkillTreeWidget* NewWidget);
+	inline void AddSkillTreeWidget(USkillTreeWidget* NewWidget);
 
 	/** Add inventory widget as a child to HUD widget */
-	FORCEINLINE void AddInventoryWidget(UInventoryWidget* NewWidget);
+	inline void AddInventoryWidget(UInventoryWidget* NewWidget);
 
 	/** Add status indicator widget as a child to HUD widget */
-	FORCEINLINE void AddStatusIndicatorWidget(UStatusIndicatorWidget* NewWidget);
+	inline void AddStatusIndicatorWidget(UStatusIndicatorWidget* NewWidget);
 
 	/** Add skill bar widget as a child to HUD widget */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Skill Bar Widget To Canvas"))
@@ -133,3 +118,40 @@ private:
 	FVector2D StatusIndicatorWidgetPosition;
 
 };
+
+inline void UHUDWidget::AddSkillBarWidget(USkillBarWidget * NewWidget)
+{
+	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
+	CPSlot->SetSize(SkillBarWidgetSize);
+	CPSlot->SetPosition(SkillBarWidgetPosition);
+	CPSlot->SetAnchors(SkillBarWidgetAnchor);
+
+	SkillBarWidget = NewWidget;
+}
+
+inline void UHUDWidget::AddSkillTreeWidget(USkillTreeWidget * NewWidget)
+{
+	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
+	CPSlot->SetSize(SkillTreeWidgetSize);
+	CPSlot->SetPosition(SkillTreeWidgetPosition);
+
+	SkillTreeWidget = NewWidget;
+}
+
+inline void UHUDWidget::AddInventoryWidget(UInventoryWidget * NewWidget)
+{
+	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
+	CPSlot->SetSize(InventoryWidgetSize);
+	CPSlot->SetPosition(InventoryWidgetPosition);
+
+	InventoryWidget = NewWidget;
+}
+
+inline void UHUDWidget::AddStatusIndicatorWidget(UStatusIndicatorWidget * NewWidget)
+{
+	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
+	CPSlot->SetSize(StatusIndicatorWidgetSize);
+	CPSlot->SetPosition(StatusIndicatorWidgetPosition);
+
+	StatusIndicatorWidget = NewWidget;
+}

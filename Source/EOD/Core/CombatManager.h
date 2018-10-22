@@ -3,22 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Player/EODCharacterBase.h"
 #include "Statics/CharacterLibrary.h"
 #include "Camera/CameraShake.h"
 #include "GameFramework/Info.h"
 #include "CombatManager.generated.h"
 
-UENUM(BlueprintType)
-enum class ECameraShakeType : uint8
-{
-	Weak,
-	Medium,
-	Strong
-};
-
 class AActor;
 class UCameraShake;
-class AEODCharacterBase;
 class APlayerCharacter;
 /**
  * 
@@ -44,11 +36,11 @@ public:
 	/** Returns angle between two vectors */
 	FORCEINLINE float CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2);
 
-	FORCEINLINE void NativeDisplayDamage(const AEODCharacterBase* HitInstigator,
-							 			 const AEODCharacterBase* HitCharacter,
-										 const FHitResult& LineHitResult,
-										 const float ActualDamage,
-							 			 const bool bCriticalHit);
+	void NativeDisplayDamage(const AEODCharacterBase* HitInstigator,
+				 			 const AEODCharacterBase* HitCharacter,
+							 const FHitResult& LineHitResult,
+							 const float ActualDamage,
+				 			 const bool bCriticalHit);
 
 	/** Displays damage numbers on player screen */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
@@ -110,18 +102,18 @@ protected:
 private:
 
 	/** Determines whether the hit actor succesfully blocked an attack based on the positions of itself and the attacking actor */
-	FORCEINLINE bool WasBlockSuccessful(const AActor* HitInstigator,
-										const AActor* HitActor,
-										const bool bLineHitResultFound,
-										const FHitResult& LineHitResult);
+	inline bool WasBlockSuccessful(const AActor* HitInstigator,
+								   const AActor* HitActor,
+								   const bool bLineHitResultFound,
+								   const FHitResult& LineHitResult);
 
 	/**
 	 * Generates a random boolean based on HitInstigator's crit rate and HitCharacter's crit resistance,
 	 * that could be used to determine if the attack was a critical attacl
 	 */
-	FORCEINLINE bool GetCritChanceBoolean(const AEODCharacterBase* HitInstigator,
-								  		  const AEODCharacterBase* HitCharacter,
-										  const EDamageType& DamageType) const;
+	inline bool GetCritChanceBoolean(const AEODCharacterBase* HitInstigator,
+				    		  		 const AEODCharacterBase* HitCharacter,
+									 const EDamageType& DamageType) const;
 
 	FORCEINLINE float GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult);
 
@@ -165,3 +157,38 @@ private:
 								  const float BCAngle);
 
 };
+
+FORCEINLINE float ACombatManager::CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2)
+{
+	FVector NormalizedVec1 = Vec1.GetSafeNormal();
+	FVector NormalizedVec2 = Vec2.GetSafeNormal();
+	float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(NormalizedVec1, NormalizedVec2)));
+
+	return Angle;
+}
+
+inline bool ACombatManager::WasBlockSuccessful(const AActor* HitInstigator,
+											   const AActor* HitActor,
+											   const bool bLineHitResultFound,
+											   const FHitResult& LineHitResult)
+{
+	FVector HitActorForwardVector = HitActor->GetActorForwardVector();
+	FVector HitNormal = LineHitResult.ImpactNormal;
+	float Angle = CalculateAngleBetweenVectors(HitActorForwardVector, HitNormal);
+	bool bResult = Angle < BlockDetectionAngle ? true : false;
+	return bResult;
+}
+
+inline bool ACombatManager::GetCritChanceBoolean(const AEODCharacterBase* HitInstigator,
+												 const AEODCharacterBase* HitCharacter,
+												 const EDamageType& DamageType) const
+{
+	float CritRate = DamageType == EDamageType::Physical ? HitInstigator->GetStatsComponent()->GetPhysicalCritRate() : HitInstigator->GetStatsComponent()->GetMagickCritRate();
+	bool bResult = CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
+	return bResult;
+}
+
+FORCEINLINE float ACombatManager::GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult)
+{
+	return CalculateAngleBetweenVectors(HitCharacter->GetActorForwardVector(), LineHitResult.ImpactNormal);
+}

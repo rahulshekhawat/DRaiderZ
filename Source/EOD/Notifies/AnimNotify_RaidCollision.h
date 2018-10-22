@@ -46,7 +46,7 @@ public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	/** Capsules that will be used for doing collision tests */
-	UPROPERTY(EditAnywhere, Category = CollisionInfo)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CollisionInfo)
 	TArray<FRaidCapsule> CollisionCapsules;	
 	
 };

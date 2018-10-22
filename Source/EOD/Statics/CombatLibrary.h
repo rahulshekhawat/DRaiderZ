@@ -23,6 +23,7 @@ enum class ECrowdControlEffect : uint8
 	Crystalized
 };
 
+/** This enum descibes how the hit character responded to an attack */
 UENUM(BlueprintType)
 enum class ECharacterResponseToDamage : uint8
 {
@@ -33,19 +34,22 @@ enum class ECharacterResponseToDamage : uint8
 	Damaged
 };
 
+/** Struct containing information for damage result */
 USTRUCT(BlueprintType)
 struct FEODDamageResult
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	ECharacterResponseToDamage CharacterResponseToDamage;
-
+	
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	ECrowdControlEffect CrowdControlEffect;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	int32 ActualDamage;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	bool bCritHit;
 
 	FEODDamageResult()
@@ -55,6 +59,7 @@ public:
 	}
 };
 
+/** This enum describes the type of damage inflicted */
 UENUM(BlueprintType)
 enum class EDamageType : uint8
 {
@@ -67,8 +72,6 @@ USTRUCT(BlueprintType)
 struct FSkillDamageInfo
 {
 	GENERATED_USTRUCT_BODY()
-
-public:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
 	bool bUndodgable;
@@ -89,53 +92,38 @@ public:
 	ECrowdControlEffect CrowdControlEffect;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = SkillDamageInfo)
-	float CrowdControlEffectDuration;		
-
+	float CrowdControlEffectDuration;
 };
-
 
 USTRUCT(BlueprintType)
 struct FEODDamage
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-
-	/** Actual collision hit result */
-	// FHitResult CollisionHitResult;
-
-	/** 
-	 * Line hit result from instigator to hit character.
-	 * Impact location and impact normal are used to play hit sound, hit particle effect, and determining whether hit character blocked the attack
-	 */
-	// FHitResult LineHitResult;
-	
-	/** The character that caused damage */
-	// AEODCharacterBase* Instigator;
-
-	/** Determines whether the hit causes critical damage or not */
-	// bool bCriticalHit;
-
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	bool bUndodgable;
-	
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	bool bUnblockable;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	float CritRate;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	int32 NormalDamage;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	int32 CritDamage;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	EDamageType DamageType;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	ECrowdControlEffect CrowdControlEffect;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Damage")
 	float CrowdControlEffectDuration;
 
-	FEODDamage()
-	{
-		// bCriticalHit = false;
-	}
 };
 
 /**
@@ -149,16 +137,10 @@ class EOD_API UCombatLibrary : public UObject
 	
 public:
 
-	static void HandleCombatCollision(AEODCharacterBase* Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
-	
-	static void HandleCombatCollision(AActor* Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
+	UCombatLibrary(const FObjectInitializer& ObjectInitializer);
 
 	static FCollisionQueryParams GenerateCombatCollisionQueryParams(const AActor* ActorToIgnore, EQueryMobilityType MobilityType = EQueryMobilityType::Dynamic, bool bReturnPhysicalMaterial = false, FName TraceTag = FName("CollisionQueryForCombat"));
 
 	static float CalculateDamage(float Attack, float Defense);
-
-	static int PhysicalCritMultiplier;
-
-	static int MagickalCritMultiplier;
 
 };

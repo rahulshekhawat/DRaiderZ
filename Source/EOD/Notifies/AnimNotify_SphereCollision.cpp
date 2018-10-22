@@ -7,11 +7,10 @@
 #include "Core/CombatManager.h"
 #include "Player/EODCharacterBase.h"
 
-
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
 
-void UAnimNotify_SphereCollision::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UAnimNotify_SphereCollision::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	// only process this notify if called from server (dedicated or listen)
 	if (!MeshComp->GetOwner() || MeshComp->GetOwner()->GetNetMode() == NM_Client)
@@ -22,9 +21,9 @@ void UAnimNotify_SphereCollision::Notify(USkeletalMeshComponent * MeshComp, UAni
 	FTransform WorldTransform = MeshComp->GetComponentTransform();
 	FVector TransformedCenter = WorldTransform.TransformPosition(Center);
 	
-#if WITH_EDITOR
+#if DEBUG_SHAPES_ENABLED
 	UKismetSystemLibrary::DrawDebugSphere(MeshComp, TransformedCenter, Radius, 12, FLinearColor::White, 5.f, 1.f);
-#endif // WITH_EDITOR
+#endif // DEBUG_SHAPES_ENABLED
 
 	// Only process this notify if the current game mode is ACombatZoneModeBase
 	ACombatZoneModeBase* CombatZoneGameMode = Cast<ACombatZoneModeBase>(MeshComp->GetWorld()->GetAuthGameMode());

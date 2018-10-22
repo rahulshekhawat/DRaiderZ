@@ -60,15 +60,15 @@ void UHolyElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper & Wrapp
 	else if (CharacterToMagickDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter) &&
 		CharacterToPhysicalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter))
 	{
-		float OwnerHolyDamage = GetOwningCharacter()->StatsComp->GetElementalHolyDamage();
-		float TargetHolyResistance = TargetCharacter->StatsComp->GetElementalHolyResistance();
+		float OwnerHolyDamage = GetOwningCharacter()->GetStatsComponent()->GetElementalHolyDamage();
+		float TargetHolyResistance = TargetCharacter->GetStatsComponent()->GetElementalHolyResistance();
 
 		float PhysicalDefenseReduction = CalculatePhysicalDefenseReduction(OwnerHolyDamage, TargetHolyResistance);
 		float MagickDefenseReduction = CalculateMagickDefenseReduction(OwnerHolyDamage, TargetHolyResistance);
 
-		TargetCharacter->StatsComp->ModifyPhysicalResistance(-PhysicalDefenseReduction);
-		// TargetCharacter->StatsComp->ModifyMagickalResistance(-MagickalDefenseReduction);
-		TargetCharacter->StatsComp->ModifyMagickResistance(-MagickDefenseReduction);
+		TargetCharacter->GetStatsComponent()->ModifyPhysicalResistance(-PhysicalDefenseReduction);
+		// TargetCharacter->GetStatsComponent()->ModifyMagickalResistance(-MagickalDefenseReduction);
+		TargetCharacter->GetStatsComponent()->ModifyMagickResistance(-MagickDefenseReduction);
 		
 		CharacterToPhysicalDefenseReductionMap.Add(WrappedRecipientCharacter.RecipientCharacter, PhysicalDefenseReduction);
 		CharacterToMagickDefenseReductionMap.Add(WrappedRecipientCharacter.RecipientCharacter, MagickDefenseReduction);
@@ -84,8 +84,8 @@ void UHolyElemental::DeactivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& R
 	AEODCharacterBase* TargetCharacter = RecipientCharacter.Get();
 	if (TargetCharacter)
 	{
-		TargetCharacter->StatsComp->ModifyPhysicalResistance(PhysicalDefenseReduction);
-		TargetCharacter->StatsComp->ModifyMagickResistance(MagickDefenseReduction);
+		TargetCharacter->GetStatsComponent()->ModifyPhysicalResistance(PhysicalDefenseReduction);
+		TargetCharacter->GetStatsComponent()->ModifyMagickResistance(MagickDefenseReduction);
 	}
 
 	CharacterToPhysicalDefenseReductionMap.Remove(RecipientCharacter);

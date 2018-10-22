@@ -62,7 +62,7 @@ void UIceElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& Wrapped
 	/*
 	if (StatusInfo.TotalElapsedTime >= StatusEffectDuration)
 	{
-		TargetCharacter->StatsComp->ModifyActiveTimeDilation(SlowDownModifier);
+		TargetCharacter->GetStatsComponent()->ModifyActiveTimeDilation(SlowDownModifier);
 		DeactivateStatusEffect(WrappedRecipientCharacter.RecipientCharacter);
 		return;
 	}
@@ -73,22 +73,22 @@ void UIceElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& Wrapped
 		float PhysicalDefenseReduction = CharacterToPhysicalDefenseReductionMap[WrappedRecipientCharacter.RecipientCharacter];
 		float MagickalDefenseReduction = CharacterToMagickalDefenseReductionMap[WrappedRecipientCharacter.RecipientCharacter];
 
-		TargetCharacter->StatsComp->ModifyPhysicalResistance(PhysicalDefenseReduction);
-		TargetCharacter->StatsComp->ModifyMagickalResistance(MagickalDefenseReduction);
+		TargetCharacter->GetStatsComponent()->ModifyPhysicalResistance(PhysicalDefenseReduction);
+		TargetCharacter->GetStatsComponent()->ModifyMagickalResistance(MagickalDefenseReduction);
 
 		DeactivateStatusEffect(WrappedRecipientCharacter.RecipientCharacter);
 	}
 	else if (CharacterToMagickalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter) &&
 		CharacterToPhysicalDefenseReductionMap.Contains(WrappedRecipientCharacter.RecipientCharacter))
 	{
-		float OwnerHolyDamage = GetOwningCharacter()->StatsComp->GetElementalHolyDamage();
-		float TargetHolyResistance = TargetCharacter->StatsComp->GetElementalHolyResistance();
+		float OwnerHolyDamage = GetOwningCharacter()->GetStatsComponent()->GetElementalHolyDamage();
+		float TargetHolyResistance = TargetCharacter->GetStatsComponent()->GetElementalHolyResistance();
 
 		float PhysicalDefenseReduction = CalculatePhysicalDefenseReduction(OwnerHolyDamage, TargetHolyResistance);
 		float MagickalDefenseReduction = CalculateMagickalDefenseReduction(OwnerHolyDamage, TargetHolyResistance);
 
-		TargetCharacter->StatsComp->ModifyPhysicalResistance(-PhysicalDefenseReduction);
-		TargetCharacter->StatsComp->ModifyMagickalResistance(-MagickalDefenseReduction);
+		TargetCharacter->GetStatsComponent()->ModifyPhysicalResistance(-PhysicalDefenseReduction);
+		TargetCharacter->GetStatsComponent()->ModifyMagickalResistance(-MagickalDefenseReduction);
 
 		CharacterToPhysicalDefenseReductionMap.Add(WrappedRecipientCharacter.RecipientCharacter, PhysicalDefenseReduction);
 		CharacterToMagickalDefenseReductionMap.Add(WrappedRecipientCharacter.RecipientCharacter, MagickalDefenseReduction);
@@ -96,7 +96,7 @@ void UIceElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& Wrapped
 	*/
 
 	// @todo
-	// Character->StatsComp->ModifyActiveTimeDilation()
+	// Character->GetStatsComponent()->ModifyActiveTimeDilation()
 
 }
 

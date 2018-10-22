@@ -39,10 +39,10 @@ void UDarkElemental::OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper & Wrapp
 	FStatusInfo& StatusInfo = (*GetCharacterToStatusInfoMap())[WrappedRecipientCharacter.RecipientCharacter];
 	StatusInfo.TotalElapsedTime += GetWorld()->GetTimerManager().GetTimerElapsed(*StatusInfo.TimerHandle);
 
-	float OwnerDarkDamage = GetOwningCharacter()->StatsComp->GetElementalDarkDamage();
-	float TargetDarkResistance = GetOwningCharacter()->StatsComp->GetElementalDarkResistance();
+	float OwnerDarkDamage = GetOwningCharacter()->GetStatsComponent()->GetElementalDarkDamage();
+	float TargetDarkResistance = GetOwningCharacter()->GetStatsComponent()->GetElementalDarkResistance();
 
 	float Damage = UCombatLibrary::CalculateDamage(OwnerDarkDamage, TargetDarkResistance);
-	TargetCharacter->StatsComp->ModifyMaxHealth(-Damage);
+	TargetCharacter->GetStatsComponent()->ModifyMaxHealth(-Damage);
 
 }

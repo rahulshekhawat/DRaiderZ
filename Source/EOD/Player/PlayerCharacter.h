@@ -4,14 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "Engine/StreamableManager.h"
 #include "Player/EODCharacterBase.h"
+#include "Weapons/PrimaryWeapon.h"
+#include "Weapons/SecondaryWeapon.h"
 #include "PlayerCharacter.generated.h"
 
 class UHUDWidget;
 class UAudioComponent;
 class UAnimMontage;
-class APrimaryWeapon;
-class ASecondaryWeapon;
 class UPlayerAnimInstance;
 class UStaticMeshComponent;
 class USkeletalMeshComponent;
@@ -64,11 +65,8 @@ public:
 	virtual void Destroyed() override;
 
 	/** Saves current player state */
-	FORCEINLINE void SavePlayerState();
-
-	/** Saves current player state */
-	UFUNCTION(BlueprintCallable, Category = SaveSystem, meta = (DisplayName = "Save Player State"))
-	void BP_SavePlayerState();
+	UFUNCTION(BlueprintCallable, Category = "EOD Character")
+	void SavePlayerState();
 
 private:
 	
@@ -162,7 +160,7 @@ public:
 
 	bool IsFastRunning() const;
 
-	// FORCEINLINE bool CanUseSkill(const FPlayerSkillTableRow* Skill);
+	FORCEINLINE bool IsWeaponSheathed() const;
 
 	/** Returns primary weapon actor */
 	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
@@ -175,8 +173,6 @@ public:
 
 	/** Returns HUD widget */
 	FORCEINLINE UHUDWidget* GetHUDWidget() const;
-
-	FORCEINLINE bool IsWeaponSheathed() const;
 
 	/** Returns HUD widget */
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get HUD Widget"))
@@ -211,18 +207,6 @@ public:
 
 	virtual void BlockAttack() override;
 
-	/** Plays stun animation */
-	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
-	void PlayStunAnimation();
-
-	/** Stops stun animation */
-	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
-	void StopStunAnimation();
-
-	/** Simulates the knock back effect */
-	UFUNCTION(BlueprintImplementableEvent, Category = Motion)
-	void PushPlayer(FVector ImpulseDirection);
-
 	/** Replace primary weapon with a new weapon */
 	void SetCurrentPrimaryWeapon(const FName WeaponID);
 
@@ -235,10 +219,20 @@ public:
 	/** Removes secondary weapon if it is currently equipped */
 	void RemoveSecondaryWeapon();
 
-	// FORCEINLINE void OnSecondaryWeaponFailedToEquip(FName WeaponID, FWeaponTableRow * NewWeaponData);
+	/** Plays stun animation */
+	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
+	void PlayStunAnimation();
+
+	/** Stops stun animation */
+	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
+	void StopStunAnimation();
+
+	/** Simulates the knock back effect */
+	UFUNCTION(BlueprintImplementableEvent, Category = Motion)
+	void PushPlayer(FVector ImpulseDirection); // @todo const parameter?
 
 	/** [server + client] Change idle-walk-run direction of character */
-	void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
+	inline void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
 	//~ DEPRECATED
 	/** [server + client] Change current weapon animation to use */
@@ -254,15 +248,16 @@ public:
 
 	void AddSkill(FName SkillID, uint8 SkillLevel);
 
-	FORCEINLINE FPlayerSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("APlayerCharacter::GetSkill(), player skill lookup")) const;
-
+	/*
 	FORCEINLINE void SetCurrentActivePlayerSkill(FPlayerSkillTableRow* Skill);
 
 	FORCEINLINE FPlayerSkillTableRow* GetCurrentActivePlayerSkill() const;
 
 	virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const override;
 
-	virtual void OnNormalAttackSectionStart(FName SectionName) override;
+	*/
+
+	void OnNormalAttackSectionStart(FName SectionName);
 
 	void CleanupNormalAttackSectionToSkillMap();
 
@@ -272,23 +267,15 @@ public:
 	 * Returns player controller rotation yaw in -180/180 range.
 	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
 	 */
-	UFUNCTION(BlueprintCallable, category = Rotation)
+	UFUNCTION(BlueprintCallable, category = "EOD Character")
 	float GetPlayerControlRotationYaw();
 
 	/**
 	 * Returns the expected rotation yaw of character based on current Axis Input.
 	 * @warning Only call for locally controlled character otherwise it would lead to crash (intentional)
 	 */
-	UFUNCTION(BlueprintCallable, category = Rotation)
+	UFUNCTION(BlueprintCallable, category = "EOD Character")
 	float GetRotationYawFromAxisInput();
-
-	/** [server] Handle melee collision */
-	// virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
-
-	/** [server] Apply damage to a character */
-	// virtual int32 ApplyEODDamage(FEODDamage& EODDamage) override;
-
-	// virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void DisplayReceivedDamage(int32 DamageValue);
@@ -302,7 +289,7 @@ public:
 	/** Called on an animation montage ending to clean up, reset, or change any state variables */
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted) override;
 
-	void UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType);
+	// void UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType);
 
 	void UpdateCurrentWeaponAnimationType();
 
@@ -310,6 +297,7 @@ public:
 
 	virtual void TurnOffTargetSwitch() override;
 
+	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
 
 private:
 
@@ -354,9 +342,6 @@ private:
 	UPROPERTY(Transient)
 	bool bNormalAttackPressed;
 
-	// UPROPERTY(Transient)
-	TSharedPtr<FPlayerSkillTableRow> CurrentActivePlayerSkill;
-
 	/** Player HUD class reference */
 	UPROPERTY(Transient)
 	UHUDWidget* HUDWidget;
@@ -369,32 +354,53 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	ECharacterGender Gender;
 
-	UPROPERTY(Category = Skills, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills, meta = (AllowPrivateAccess = "true"))
 	uint8 MaxNumberOfSkills;
+
+	/** Data table containing player animation references */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable, meta = (AllowPrivateAccess = "true"))
+	UDataTable* PlayerAnimationReferencesDataTable;
 
 	/** Determines whether weapon is currently sheathed or not */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_WeaponSheathed)
 	bool bWeaponSheathed;
 
-	/** A reference to player anim instance */
-	UPlayerAnimInstance* PlayerAnimInstance;
+	/** Animations for this player when it has a weapon equipped */
+	FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
 
-	/** Animation montage references for currently equipped weapon */
-	FPlayerAnimationReferences* EquippedWeaponAnimationReferences;
+	/** Animations for this player when it does not have a weapon equipped */
+	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
 
-	/** Animations references for sheathed weapon */
-	FPlayerAnimationReferences* SheathedWeaponAnimationReferences;
+	TSharedPtr<FStreamableHandle> EquippedWeaponAnimationsStreamableHandle;
+
+	TSharedPtr<FStreamableHandle> UnequippedWeaponAnimationsStreamableHandle;
+
+	FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
+
+	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender);
+
+	TSharedPtr<FStreamableHandle> LoadAnimationReferences(FPlayerAnimationReferencesTableRow* AnimationReferences);
+
+	void UnloadUnequippedWeaponAnimationReferences();
+
+	void LoadUnequippedWeaponAnimationReferences();
+
+	void UnloadEquippedWeaponAnimationReferences();
+
+	void LoadEquippedWeaponAnimationReferences();
 
 	/** This indicates the base maximum value of player's normal movement speed without any status effects */
-	const float BaseNormalMovementSpeed = 400;
+	UPROPERTY(Category = Movement, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float BaseNormalMovementSpeed;
 
 	//~ @todo test special movement speed (current value has been set untested and set on a guess)
-
 	/** This indicates the base maximum value of player's special movement speed without any status effects */
-	const float BaseSpecialMovementSpeed = 600;
+	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float BaseSpecialMovementSpeed;
 
 	/** This indicates the base maximum value of player's movement speed when it's blocking damage */
-	const float BaseBlockMovementSpeed = 150;
+	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float BaseBlockMovementSpeed;
 
 	//~ @note Pressing and releasing skill keys are separate events to support charge events (e.g. charge rage)
 
@@ -453,8 +459,6 @@ private:
 	/** Display or hide mouse cursor */
 	void OnToggleMouseCursor();
 
-	void OnToggleSkillTree();
-
 	void OnPressedNormalAttack();
 
 	void OnReleasedNormalAttack();
@@ -470,21 +474,17 @@ private:
 	/** Enable or disable auto run */
 	void OnToggleAutoRun();
 
-	FORCEINLINE void EnableAutoRun();
+	inline void EnableAutoRun();
 
-	FORCEINLINE void DisableAutoRun();
+	inline void DisableAutoRun();
+
+	FORCEINLINE void StopNormalAttacking();
 
 	void DisableForwardPressed();
 
 	void DisableBackwardPressed();
 
-	FPlayerAnimationReferences* GetActiveAnimationReferences() const;
-
 	FName GetNextNormalAttackSectionName(const FName& CurrentSection) const;
-
-	// EWeaponType GetCurrentEquippedWeaponType()
-
-	void InitializeSkills(TArray<FName> UnlockedSKillsID);
 
 	/** Called when player presses a skill key */
 	template<uint32 SkillButtonIndex>
@@ -542,4 +542,59 @@ template<uint32 SkillButtonIndex>
 inline void APlayerCharacter::ReleasedSkillKey()
 {
 	OnReleasingSkillKey(SkillButtonIndex);
+}
+
+inline void APlayerCharacter::EnableAutoRun()
+{
+	SetCharacterState(ECharacterState::AutoRun);
+	SetUseControllerRotationYaw(true);
+}
+
+inline void APlayerCharacter::DisableAutoRun()
+{
+	// @todo put a test to check if the player is really auto running
+
+	SetCharacterState(ECharacterState::IdleWalkRun);
+	SetUseControllerRotationYaw(false);
+}
+
+FORCEINLINE bool APlayerCharacter::IsWeaponSheathed() const
+{
+	return bWeaponSheathed;
+}
+
+FORCEINLINE APrimaryWeapon* APlayerCharacter::GetPrimaryWeapon() const
+{
+	return PrimaryWeapon;
+}
+
+FORCEINLINE ASecondaryWeapon* APlayerCharacter::GetSecondaryWeapon() const
+{
+	return SecondaryWeapon;
+}
+
+FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
+{
+	return PrimaryWeapon->WeaponType;
+}
+
+FORCEINLINE UHUDWidget* APlayerCharacter::GetHUDWidget() const
+{
+	return HUDWidget;
+}
+
+FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
+{
+	bRotateSmoothly = true;
+	DesiredSmoothRotationYaw = DesiredYaw;
+}
+
+inline void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
+{
+	IWR_CharacterMovementDirection = NewDirection;
+
+	if (Role < ROLE_Authority)
+	{
+		Server_SetIWRCharMovementDir(NewDirection);
+	}
 }

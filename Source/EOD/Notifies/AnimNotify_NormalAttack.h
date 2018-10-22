@@ -18,7 +18,7 @@ public:
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
-	UPROPERTY(EditAnywhere, Category = Skill)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = RequiredInfo)
 	FName SectionName;
 	
 };

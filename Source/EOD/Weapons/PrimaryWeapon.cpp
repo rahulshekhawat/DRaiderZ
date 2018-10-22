@@ -132,7 +132,8 @@ void APrimaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponData)
 		break;
 	}
 
-	OwningPlayer->UpdateEquippedWeaponAnimationReferences(NewWeaponData->WeaponType);
+	// @anchor
+	// OwningPlayer->UpdateEquippedWeaponAnimationReferences(NewWeaponData->WeaponType);
 	OwningPlayer->UpdateNormalAttackSectionToSkillMap(NewWeaponData->WeaponType);
 
 	bEquipped = true;
@@ -170,7 +171,8 @@ void APrimaryWeapon::OnUnEquip()
 
 	if (OwningPlayer)
 	{
-		OwningPlayer->UpdateEquippedWeaponAnimationReferences(EWeaponType::None);
+		// @anchor
+		// OwningPlayer->UpdateEquippedWeaponAnimationReferences(EWeaponType::None);
 	}
 
 	/*

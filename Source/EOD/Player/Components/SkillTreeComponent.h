@@ -31,7 +31,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Skill Tree Widget"))
 	USkillTreeWidget* BP_GetSkillTreeWidget() const;
 
-	FORCEINLINE void InitializeComponentWidget();
+	void InitializeComponentWidget();
 
 	/** Toggle the display of skill tree UI in player viewport */
 	void ToggleSkillTreeUI();
@@ -45,3 +45,8 @@ private:
 	TSubclassOf<USkillTreeWidget> SkillTreeWidgetClass;
 	
 };
+
+FORCEINLINE USkillTreeWidget * USkillTreeComponent::GetSkillTreeWidget() const
+{
+	return SkillTreeWidget;
+}

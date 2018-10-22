@@ -4,27 +4,11 @@
 #include "CharacterLibrary.h"
 #include "Player/EODCharacterBase.h"
 
-int UCombatLibrary::PhysicalCritMultiplier = 2;
-int UCombatLibrary::MagickalCritMultiplier = 2;
-
-void UCombatLibrary::HandleCombatCollision(AEODCharacterBase * Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)
+UCombatLibrary::UCombatLibrary(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
-	if (!IsValid(Instigator))
-	{
-		return;
-	}
-
-	// Instigator->OnMeleeCollision(Animation, HitResults, bHit);
-	// FActiveSkill ActiveSkill = Instigator->GetCurrentActiveSkillInfo();
-	
 }
 
-void UCombatLibrary::HandleCombatCollision(AActor * Instigator, UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit)
-{
-	// @todo definition
-}
-
-FCollisionQueryParams UCombatLibrary::GenerateCombatCollisionQueryParams(const AActor * ActorToIgnore, EQueryMobilityType MobilityType, bool bReturnPhysicalMaterial, FName TraceTag)
+FCollisionQueryParams UCombatLibrary::GenerateCombatCollisionQueryParams(const AActor* ActorToIgnore, EQueryMobilityType MobilityType, bool bReturnPhysicalMaterial, FName TraceTag)
 {
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(ActorToIgnore);
@@ -45,21 +29,3 @@ float UCombatLibrary::CalculateDamage(float Attack, float Defense)
 	// @todo definition
 	return Attack;
 }
-
-/*
-FEODDamage::FEODDamage(FSkill * Skill)
-{
-	if (Skill)
-	{
-		DamageType				= Skill->DamageType;
-		bUndodgable				= Skill->SkillLevelUpInfo.bUndodgable;
-		bUnblockable			= Skill->SkillLevelUpInfo.bUnblockable;
-		DamagePercent			= Skill->SkillLevelUpInfo.DamagePercent;
-		CrowdControlEffect		= Skill->SkillLevelUpInfo.CrowdControlEffect;		
-	}
-	else
-	{
-		FEODDamage();
-	}
-}
-*/

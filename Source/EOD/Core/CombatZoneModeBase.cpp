@@ -29,16 +29,6 @@ void ACombatZoneModeBase::InitGame(const FString & MapName, const FString & Opti
 
 }
 
-FORCEINLINE ACombatManager * ACombatZoneModeBase::GetCombatManager() const
-{
-	return CombatManager;
-}
-
-FORCEINLINE AStatusEffectsManager * ACombatZoneModeBase::GetStatusEffectsManager() const
-{
-	return StatusEffectsManager;
-}
-
 ACombatManager * ACombatZoneModeBase::BP_GetCombatManager() const
 {
 	return GetCombatManager();
