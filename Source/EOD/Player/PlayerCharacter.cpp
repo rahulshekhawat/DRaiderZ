@@ -78,14 +78,13 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	AudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("Audio Component"));
 	AudioComponent->SetupAttachment(RootComponent);
 
-	SetWalkSpeed(BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier());
-
 	// By default the weapon should be sheathed
 	bWeaponSheathed = true;
 
 	BaseNormalMovementSpeed = 400.f;
 	BaseSpecialMovementSpeed = 600.f;
 	BaseBlockMovementSpeed = 150.f;
+
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -201,6 +200,8 @@ void APlayerCharacter::PostInitializeComponents()
 	{
 		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), HUDWidgetClass);
 	}
+
+	SetWalkSpeed(BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier());
 }
 
 void APlayerCharacter::PostInitProperties()
@@ -279,7 +280,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 	*/
 
-	if (IsLocallyControlled())
+	if (Controller && Controller->IsLocalPlayerController())
 	{
 		// If block key is pressed but the character is not blocking
 		if (bBlockPressed && !IsBlocking() && CanBlock())
@@ -320,7 +321,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IsPlayerControlled() && HUDWidget)
+	if (Controller && Controller->IsLocalPlayerController() && HUDWidget)
 	{
 		HUDWidget->AddToViewport();
 	}
@@ -710,22 +711,15 @@ void APlayerCharacter::EnableBlock()
 
 	if (IsNormalAttacking())
 	{
-		
-	}
-
-	/*
-	if (IsNormalAttacking())
-	{
-		PlayerAnimInstance->Montage_Stop(0.2, GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
+		StopNormalAttacking();
 	}
 
 	SetCharacterState(ECharacterState::Blocking);
 	SetUseControllerRotationYaw(true);
-	SetWalkSpeed(BaseBlockMovementSpeed * StatsComp->GetMovementSpeedModifier());
+	SetWalkSpeed(BaseBlockMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier());
 
 	FTimerHandle TimerDelegate;
 	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);
-	*/
 }
 
 void APlayerCharacter::DisableBlock()
@@ -737,20 +731,24 @@ void APlayerCharacter::DisableBlock()
 
 void APlayerCharacter::OnJump()
 {
-	/*
-	if (CanJump() && PlayerAnimInstance && GetActiveAnimationReferences())
+	if (CanJump() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Jump.Get())
 	{
 		if (IsBlocking())
 		{
 			DisableBlock();
 		}
 
+		if (IsAutoRunning())
+		{
+			DisableAutoRun();
+		}
+
 		Jump();
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Jump,
+
+		PlayAnimationMontage(GetActiveAnimationReferences()->Jump.Get(),
 			UCharacterLibrary::SectionName_JumpStart,
 			ECharacterState::Jumping);
 	}
-	*/
 }
 
 void APlayerCharacter::OnInteract()
@@ -762,11 +760,12 @@ void APlayerCharacter::OnToggleSheathe()
 {
 	bool bNewValue = !bWeaponSheathed;
 	SetWeaponSheathed(bNewValue);
+	
+	// @todo play sheathe animation
 }
 
 void APlayerCharacter::OnToggleCharacterStatsUI()
 {
-
 	// @todo definition
 }
 
@@ -789,53 +788,39 @@ void APlayerCharacter::OnToggleMouseCursor()
 	}
 }
 
-void APlayerCharacter::OnToggleSkillTree()
-{
-	if (HUDWidget)
-	{
-		if (HUDWidget->SkillTreeWidget->IsVisible())
-		{
-			HUDWidget->SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
-		}
-		else
-		{
-			HUDWidget->SkillTreeWidget->SetVisibility(ESlateVisibility::Visible);
-		}
-	}
-}
-
 void APlayerCharacter::OnPressedNormalAttack()
 {
-	/*
-	if (!CanNormalAttack() || !GetActiveAnimationReferences()->AnimationMontage_NormalAttacks)
+	if (!CanNormalAttack() || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
 	{
 		return;
 	}
 
+	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
+
 	// @todo maybe change character state to using skill when using SP attacks?s
 	if (!IsNormalAttacking() && bForwardPressed)
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks,
+		PlayAnimationMontage(NormalAttackMontage,
 			UCharacterLibrary::SectionName_ForwardSPSwing,
 			ECharacterState::Attacking);
 		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
 	}
 	else if (!IsNormalAttacking() && bBackwardPressed)
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks,
+		PlayAnimationMontage(NormalAttackMontage,
 			UCharacterLibrary::SectionName_BackwardSPSwing,
 			ECharacterState::Attacking);
 		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
 	}
 	else if (!IsNormalAttacking())
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks,
+		PlayAnimationMontage(NormalAttackMontage,
 			UCharacterLibrary::SectionName_FirstSwing,
 			ECharacterState::Attacking);
 	}
 	else if (IsNormalAttacking())
 	{
-		FName CurrentSection = PlayerAnimInstance->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks);
+		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(NormalAttackMontage);
 		FName NextSection = GetNextNormalAttackSectionName(CurrentSection);
 
 		if (NextSection != NAME_None)
@@ -843,7 +828,7 @@ void APlayerCharacter::OnPressedNormalAttack()
 			FString CurrentSectionString = CurrentSection.ToString();
 			if (CurrentSectionString.EndsWith("End"))
 			{
-				PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_NormalAttacks, NextSection, ECharacterState::Attacking);
+				PlayAnimationMontage(NormalAttackMontage, NextSection, ECharacterState::Attacking);
 			}
 			else
 			{
@@ -851,7 +836,6 @@ void APlayerCharacter::OnPressedNormalAttack()
 			}
 		}
 	}
-	*/
 }
 
 void APlayerCharacter::OnReleasedNormalAttack()
@@ -861,8 +845,7 @@ void APlayerCharacter::OnReleasedNormalAttack()
 
 void APlayerCharacter::OnToggleAutoRun()
 {
-	/*
-	if (CharacterState == ECharacterState::AutoRun)
+	if (GetCharacterState() == ECharacterState::AutoRun)
 	{
 		DisableAutoRun();
 	}
@@ -870,7 +853,6 @@ void APlayerCharacter::OnToggleAutoRun()
 	{
 		EnableAutoRun();
 	}
-	*/
 }
 
 FORCEINLINE void APlayerCharacter::EnableAutoRun()
@@ -1014,6 +996,7 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 		AddMovementInput(Direction, 1.f);
 	}
 
+	// @todo Why isn't following code inside Enable Auto Run? Un-necessarily repetitive condition checks
 	if (IWR_CharacterMovementDirection != ECharMovementDirection::F)
 	{
 		SetIWRCharMovementDir(ECharMovementDirection::F);
@@ -1265,6 +1248,7 @@ void APlayerCharacter::LoadUnequippedWeaponAnimationReferences()
 		return;
 	}
 
+	UnequippedWeaponAnimationReferences = PlayerAnimationReferences;
 	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
 }
 
@@ -1477,194 +1461,6 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 
 	return ResultingRotation;
 }
-
-/*
-FEODDamageResult APlayerCharacter::ApplyEODDamage(AEODCharacterBase * InstigatingChar, const FEODDamage & EODDamage, const FHitResult & CollisionHitResult)
-{
-	FEODDamageResult EODDamageResult;
-	TArray<TWeakObjectPtr<AEODCharacterBase>> WeakPtrsCharArray;
-	TWeakObjectPtr<AEODCharacterBase> WeakPtrToInstigatingChar(InstigatingChar);
-	WeakPtrsCharArray.Add(WeakPtrToInstigatingChar);
-
-	// If character is dodging and incoming attack is dodgable
-	if (IsDodgingDamage() && !EODDamage.bUndodgable)
-	{
-		// Trigger OnSuccessfulDodge event
-		OnSuccessfulDodge.Broadcast(WeakPtrsCharArray);
-
-		DisplayStatusMessage(FString("Dodge"));
-
-		EODDamageResult.CharacterResponseToDamage = ECharacterResponseToDamage::Dodged;
-		EODDamageResult.ActualDamage = 0;
-		return EODDamageResult;
-	}
-
-
-	TArray<FHitResult> LineHitResults;
-	FVector LineStart = InstigatingChar->GetActorLocation();
-	float LineEnd_Z;
-	if (GetActorLocation().Z < LineStart.Z)
-	{
-		LineEnd_Z = GetActorLocation().Z;
-	}
-	else
-	{
-		LineEnd_Z = LineStart.Z;
-	}
-	FVector LineEnd = FVector(GetActorLocation().X, GetActorLocation().Y, LineEnd_Z);
-
-	FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(InstigatingChar);
-	GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
-
-	FHitResult InstigatorToThisCharLineHitResult;
-
-	for (FHitResult& LineHitResult : LineHitResults)
-	{
-		if (LineHitResult.Actor.Get() && LineHitResult.Actor.Get() == this)
-		{
-			InstigatorToThisCharLineHitResult = LineHitResult;
-			break;
-		}
-	}
-
-#if DEVSTAGE_CODE_ENABLED
-	FVector Start = InstigatorToThisCharLineHitResult.ImpactPoint;
-	FVector End = InstigatorToThisCharLineHitResult.ImpactPoint + InstigatorToThisCharLineHitResult.ImpactNormal * 50;
-	UKismetSystemLibrary::DrawDebugArrow(this, Start, End, 200, FLinearColor::Blue, 5.f, 2.f);
-#endif
-
-	//~ @todo any incoming crit rate reduction logic
-	bool bCriticalHit = EODDamage.CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
-	EODDamageResult.bCritHit = bCriticalHit;
-	if (bCriticalHit)
-	{
-		EODDamageResult.ActualDamage = EODDamage.CritDamage;
-	}
-	else
-	{
-		EODDamageResult.ActualDamage = EODDamage.NormalDamage;
-	}
-	int32 Resistance;
-	if (EODDamage.DamageType == EDamageType::Magickal)
-	{
-		Resistance = StatsComp->GetMagickResistance();
-	}
-	else
-	{
-		Resistance = StatsComp->GetPhysicalResistance();
-	}
-
-	// If character is blocking and incoming damage is blockable
-	if (IsBlockingDamage() && !EODDamage.bUnblockable)
-	{
-		FVector MyDirection = GetActorForwardVector();
-		FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
-
-		float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
-
-		if (Angle < 60)
-		{
-			// Trigger OnSuccessfulBlock event
-			OnSuccessfulBlock.Broadcast(WeakPtrsCharArray);
-
-			float DamageReductionOnBlock;
-			if (EODDamage.DamageType == EDamageType::Magickal)
-			{
-				DamageReductionOnBlock = StatsComp->GetMagickDamageReductionOnBlock();
-			}
-			else
-			{
-				DamageReductionOnBlock = StatsComp->GetPhysicalDamageReductionOnBlock();
-			}
-
-			EODDamageResult.ActualDamage = EODDamageResult.ActualDamage * (1 - DamageReductionOnBlock);
-			EODDamageResult.ActualDamage = UCombatLibrary::CalculateDamage(EODDamageResult.ActualDamage, Resistance);
-			EODDamageResult.CharacterResponseToDamage = ECharacterResponseToDamage::Blocked;
-
-			// Apply real damage
-			StatsComp->ModifyCurrentHealth(-EODDamageResult.ActualDamage);
-
-			return EODDamageResult;
-		}
-	}
-
-	switch (EODDamage.CrowdControlEffect)
-	{
-	case ECrowdControlEffect::Flinch:
-		if (CanFlinch())
-		{
-			FVector MyDirection = GetActorForwardVector();
-			FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
-
-			float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
-
-			if (Angle <= 90)
-			{
-				Flinch(EHitDirection::Forward);
-			}
-			else
-			{
-				Flinch(EHitDirection::Backward);
-			}
-		}
-		break;
-	case ECrowdControlEffect::Interrupt:
-		if (CanInterrupt())
-		{
-			FVector MyDirection = GetActorForwardVector();
-			FVector HitNormal = InstigatorToThisCharLineHitResult.ImpactNormal;
-
-			float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(MyDirection, HitNormal);
-
-			if (Angle <= 90)
-			{
-				Interrupt(EHitDirection::Forward);
-			}
-			else
-			{
-				Interrupt(EHitDirection::Backward);
-			}
-		}
-		break;
-	case ECrowdControlEffect::KnockedDown:
-		if (CanKnockdown())
-		{
-			Knockdown(EODDamage.CrowdControlEffectDuration);
-		}
-		break;
-	case ECrowdControlEffect::KnockedBack:
-		if (CanKnockback())
-		{
-			FVector ImpulseDirection = -(InstigatorToThisCharLineHitResult.ImpactNormal);
-			Knockback(EODDamage.CrowdControlEffectDuration, ImpulseDirection);
-		}
-		break;
-	case ECrowdControlEffect::Stunned:
-		if (CanStun())
-		{
-			Stun(EODDamage.CrowdControlEffectDuration);
-		}
-		break;
-	case ECrowdControlEffect::Crystalized:
-		if (CanFreeze())
-		{
-			Freeze(EODDamage.CrowdControlEffectDuration);
-		}
-		break;
-	default:
-		break;
-	}
-
-	// Trigger OnReceivingHit event
-	OnReceivingHit.Broadcast(WeakPtrsCharArray);
-	EODDamageResult.ActualDamage = UCombatLibrary::CalculateDamage(EODDamageResult.ActualDamage, Resistance);
-	StatsComp->ModifyCurrentHealth(-EODDamageResult.ActualDamage);
-
-	DisplayReceivedDamage(EODDamageResult.ActualDamage);
-
-	return EODDamageResult;
-}
-*/
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
 {

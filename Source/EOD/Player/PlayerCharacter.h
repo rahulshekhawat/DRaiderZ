@@ -222,7 +222,6 @@ public:
 	/** Removes secondary weapon if it is currently equipped */
 	void RemoveSecondaryWeapon();
 
-
 	/** Plays stun animation */
 	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
 	void PlayStunAnimation();
@@ -271,23 +270,15 @@ public:
 	 * Returns player controller rotation yaw in -180/180 range.
 	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
 	 */
-	UFUNCTION(BlueprintCallable, category = Rotation)
+	UFUNCTION(BlueprintCallable, category = "EOD Character")
 	float GetPlayerControlRotationYaw();
 
 	/**
 	 * Returns the expected rotation yaw of character based on current Axis Input.
 	 * @warning Only call for locally controlled character otherwise it would lead to crash (intentional)
 	 */
-	UFUNCTION(BlueprintCallable, category = Rotation)
+	UFUNCTION(BlueprintCallable, category = "EOD Character")
 	float GetRotationYawFromAxisInput();
-
-	/** [server] Handle melee collision */
-	// virtual void OnMeleeCollision(UAnimSequenceBase* Animation, TArray<FHitResult>& HitResults, bool bHit);
-
-	/** [server] Apply damage to a character */
-	// virtual int32 ApplyEODDamage(FEODDamage& EODDamage) override;
-
-	// virtual FEODDamageResult ApplyEODDamage(AEODCharacterBase* InstigatingChar, const FEODDamage& EODDamage, const FHitResult& CollisionHitResult) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void DisplayReceivedDamage(int32 DamageValue);
@@ -470,8 +461,6 @@ private:
 
 	/** Display or hide mouse cursor */
 	void OnToggleMouseCursor();
-
-	void OnToggleSkillTree();
 
 	void OnPressedNormalAttack();
 
