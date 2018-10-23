@@ -116,6 +116,9 @@ public:
 	
 	/** Returns true if character can use any skill at all */
 	virtual bool CanUseAnySkill() const;
+
+	/** Returns true if character can use a particular skill */
+	virtual bool CanUseSkill(FSkillTableRow* Skill);
 	
 	/** Returns true if character can flinch */
 	FORCEINLINE bool CanFlinch() const;
@@ -275,8 +278,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Skills)
 	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const;
 
-	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
+	/** Returns the ID of skill that character is currently using. Returns NAME_None if character is not using any skill */
 	FORCEINLINE FName GetCurrentActiveSkillID() const;
+
+	/** Returns the skill that character is currently using. Returns nullptr if character is not using any skill */
+	FORCEINLINE FSkillTableRow* GetCurrentActiveSkill() const;
 
 	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
 	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Current Active Skill ID"))
@@ -284,6 +290,8 @@ public:
 
 	/** Set the ID of the skill that is currently being used */
 	FORCEINLINE void SetCurrentActiveSkillID(FName SkillID);
+
+	FORCEINLINE void SetCurrentActiveSkill(FSkillTableRow* Skill);
 
 	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
 	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Current Active Skill ID"))
@@ -357,9 +365,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character", meta = (AllowPrivateAccess = "true"))
 	EFaction Faction;
 
-	/** SkillID of skill that character is currently using */
+	/** SkillID of skill that this character is currently using */
 	UPROPERTY(Transient)
 	FName CurrentActiveSkillID;
+
+	/** The skill that this character is currently using */
+	FSkillTableRow* CurrentActiveSkill;
 
 	/** Information of last used skill */
 	UPROPERTY(Transient)
@@ -651,9 +662,19 @@ FORCEINLINE FName AEODCharacterBase::GetCurrentActiveSkillID() const
 	return CurrentActiveSkillID;
 }
 
+FORCEINLINE FSkillTableRow* AEODCharacterBase::GetCurrentActiveSkill() const
+{
+	return CurrentActiveSkill;
+}
+
 FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkillID(FName SkillID)
 {
 	CurrentActiveSkillID = SkillID;
+}
+
+FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkill(FSkillTableRow* Skill)
+{
+	CurrentActiveSkill = Skill;
 }
 
 FORCEINLINE FLastUsedSkillInfo & AEODCharacterBase::GetLastUsedSkill()

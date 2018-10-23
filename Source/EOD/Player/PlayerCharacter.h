@@ -146,6 +146,9 @@ public:
 	/** Returns true if character can use any skill at all */
 	virtual bool CanUseAnySkill() const;
 
+	/** Returns true if character can use a particular skill */
+	virtual bool CanUseSkill(FSkillTableRow* Skill);
+
 	/** Returns true if character can auto run */
 	bool CanAutoRun() const;
 
@@ -234,19 +237,11 @@ public:
 	/** [server + client] Change idle-walk-run direction of character */
 	inline void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
-	//~ DEPRECATED
-	/** [server + client] Change current weapon animation to use */
-	void SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType);
-
 	/** [server + client] Set the yaw for player's movement direction relative to player's forward direction */
 	void SetBlockMovementDirectionYaw(float NewYaw);
 
 	/** [server + client] Change player's weapon sheath state */
 	void SetWeaponSheathed(bool bNewValue);
-
-	// virtual void SetCurrentActiveSkill(FName SkillID) override;
-
-	void AddSkill(FName SkillID, uint8 SkillLevel);
 
 	/*
 	FORCEINLINE void SetCurrentActivePlayerSkill(FPlayerSkillTableRow* Skill);
@@ -258,10 +253,6 @@ public:
 	*/
 
 	void OnNormalAttackSectionStart(FName SectionName);
-
-	void CleanupNormalAttackSectionToSkillMap();
-
-	void UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeaponType);
 
 	/**
 	 * Returns player controller rotation yaw in -180/180 range.
@@ -496,24 +487,17 @@ public:
 	UPROPERTY(Replicated)
 	ECharMovementDirection IWR_CharacterMovementDirection;
 
-	/** Animations to use based on that is determined by equipped weapon */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeaponAnimationToUse)
-	EWeaponAnimationType CurrentWeaponAnimationToUse;
-
 private:
 	
 	//~ Begin multiplayer code
 	UFUNCTION()
 	void OnRep_WeaponSheathed();
 
-	UFUNCTION()
-	void OnRep_CurrentWeaponAnimationToUse(EWeaponAnimationType OldAnimationType);
+	// UFUNCTION()
+	// void OnRep_CurrentWeaponAnimationToUse(EWeaponAnimationType OldAnimationType);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);
-	
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);

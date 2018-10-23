@@ -66,10 +66,7 @@ FName USkillBarComponent::GetSkillIDFromSkillSlot(const int32 SkillSlotIndex)
 	return SkillID;
 }
 
-/*
-void USkillBarComponent::OnSkillUsed(FName SkillID, const FPlayerSkillTableRow* Skill)
+void USkillBarComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, const FSkillTableRow* Skill)
 {
-	// @todo put skill on cooldown
-	// @todo set superseding skill group
 }
-*/
+

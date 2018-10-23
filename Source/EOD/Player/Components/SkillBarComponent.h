@@ -37,9 +37,14 @@ public:
 	/** Returns true if player can use skill placed at given skill slot index */
 	bool CanUseSkill(const int32 SkillSlotIndex);
 
+	/**
+	 * Returns SkillID of skill at given skill slot index
+	 * This will return NAME_None if no skill is equipped in given skill slot or if the skill is in cooldown (skill unavailable for use)
+	 * However it will return the SkillID for chain skill if it available for use
+	 */
 	FName GetSkillIDFromSkillSlot(const int32 SkillSlotIndex);
 
-	// void OnSkillUsed(FName SkillID, const FPlayerSkillTableRow* Skill);
+	void OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, const FSkillTableRow* Skill);
 
 private:
 

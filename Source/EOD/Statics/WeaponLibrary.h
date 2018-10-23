@@ -8,24 +8,6 @@
 #include "StatusEffects/ElementalBase.h"
 #include "WeaponLibrary.generated.h"
 
-/**
- * This enum lists all the types of animations available to the human character,
- * categorized based on type of weapon equipped (because human character animation is
- * dependent on the weapon equipped)
- */
-UENUM(BlueprintType)
-enum class EWeaponAnimationType : uint8
-{
-	NoWeapon,
-	SheathedWeapon,
-	ShieldAndSword,
-	ShieldAndMace,
-	GreatSword,
-	WarHammer,
-	Staff,
-	Daggers
-};
-
 /** This enum describes all the types of weapons available in-game */
 UENUM(BlueprintType)
 enum class EWeaponType : uint8

@@ -171,7 +171,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(APlayerCharacter, IWR_CharacterMovementDirection, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(APlayerCharacter, CurrentWeaponAnimationToUse, COND_SkipOwner);
+	// DOREPLIFETIME_CONDITION(APlayerCharacter, CurrentWeaponAnimationToUse, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, bWeaponSheathed, COND_SkipOwner);
 
@@ -360,6 +360,21 @@ bool APlayerCharacter::CanNormalAttack() const
 bool APlayerCharacter::CanUseAnySkill() const
 {
 	return GetEquippedWeaponType() != EWeaponType::None && !bWeaponSheathed && IsIdleOrMoving() && IsBlocking();
+}
+
+bool APlayerCharacter::CanUseSkill(FSkillTableRow * Skill)
+{
+	if (Skill)
+	{
+		if ((Skill->SupportedWeapons & (1 << (uint8)GetEquippedWeaponType())) &&
+			GetStatsComponent()->GetCurrentMana() > Skill->ManaRequired &&
+			GetStatsComponent()->GetCurrentStamina() > Skill->StaminaRequired)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool APlayerCharacter::IsAutoRunning() const
@@ -978,51 +993,6 @@ void APlayerCharacter::SavePlayerState()
 	}
 }
 
-/*
-void APlayerCharacter::UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType)
-{
-	if (EquippedWeaponAnimationReferences)
-	{
-		// UCharacterLibrary::UnloadPlayerAnimationReferences(EquippedWeaponAnimationReferences, Gender);
-
-		// delete older animation references, prevent memory leak
-		delete EquippedWeaponAnimationReferences;
-		EquippedWeaponAnimationReferences = nullptr;
-	}
-
-	EWeaponAnimationType WeaponAnimationType;
-	switch (EquippedWeaponType)
-	{
-	case EWeaponType::GreatSword:
-		WeaponAnimationType = EWeaponAnimationType::GreatSword;
-		break;
-	case EWeaponType::WarHammer:
-		WeaponAnimationType = EWeaponAnimationType::WarHammer;
-		break;
-	case EWeaponType::LongSword:
-		WeaponAnimationType = EWeaponAnimationType::ShieldAndSword;
-		break;
-	case EWeaponType::Mace:
-		WeaponAnimationType = EWeaponAnimationType::ShieldAndMace;
-		break;
-	case EWeaponType::Dagger:
-		WeaponAnimationType = EWeaponAnimationType::Daggers;
-		break;
-	case EWeaponType::Staff:
-		WeaponAnimationType = EWeaponAnimationType::Staff;
-		break;
-	case EWeaponType::Shield:
-	case EWeaponType::None:
-	default:
-		WeaponAnimationType = EWeaponAnimationType::NoWeapon;
-		break;
-	}
-
-	SetCurrentWeaponAnimationToUse(WeaponAnimationType);
-	// EquippedWeaponAnimationReferences = UCharacterLibrary::GetPlayerAnimationReferences(WeaponAnimationType, Gender);
-}
-*/
-
 FName APlayerCharacter::GetNextNormalAttackSectionName(const FName& CurrentSection) const
 {
 	if (CurrentSection == UCharacterLibrary::SectionName_FirstSwing ||
@@ -1038,8 +1008,8 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName& CurrentSecti
 	else if (CurrentSection == UCharacterLibrary::SectionName_ThirdSwing ||
 	 		 CurrentSection == UCharacterLibrary::SectionName_ThirdSwingEnd)
 	{
-		if (CurrentWeaponAnimationToUse == EWeaponAnimationType::GreatSword ||
-			CurrentWeaponAnimationToUse == EWeaponAnimationType::WarHammer)
+		if (GetEquippedWeaponType() == EWeaponType::GreatSword ||
+			GetEquippedWeaponType() == EWeaponType::WarHammer)
 		{
 			return NAME_None;
 		}
@@ -1051,7 +1021,7 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName& CurrentSecti
 	else if (CurrentSection == UCharacterLibrary::SectionName_FourthSwing ||
 			 CurrentSection == UCharacterLibrary::SectionName_FourthSwingEnd)
 	{
-		if (CurrentWeaponAnimationToUse == EWeaponAnimationType::Staff)
+		if (GetEquippedWeaponType() == EWeaponType::Staff)
 		{
 			return NAME_None;
 		}
@@ -1222,130 +1192,41 @@ void APlayerCharacter::LoadEquippedWeaponAnimationReferences()
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
-	/*
 	if (!CanUseAnySkill())
 	{
 		return;
 	}
-
+	
 	FName SkillID = SkillBarComponent->GetSkillIDFromSkillSlot(SkillButtonIndex);
+	// There isn't any skill to use
 	if (SkillID == NAME_None)
 	{
 		return;
 	}
 
-	FPlayerSkillTableRow* SkillToUse = GetSkill(SkillID);
-	if (!SkillToUse)
+	FSkillTableRow* SkillToUse = GetSkill(SkillID, FString("APlayerCharacter::OnPressingSkillKey()"));
+	// If the skill is invalid
+	if (!SkillToUse || CanUseSkill(SkillToUse))
 	{
 		return;
 	}
 
-	*/
-
-	/*
-	if (!CanUseSkill(SkillToUse))
-	{
-		return;
-	}
-	*/
-
-	/*
-	StatsComp->ModifyCurrentMana(-SkillToUse->ManaRequired);
-	StatsComp->ModifyCurrentStamina(-SkillToUse->StaminaRequired);
-
-	if (SkillToUse->AnimMontage.IsNull())
-	{
-
-	}
-	else
-	{
-
-	}
+	GetStatsComponent()->ModifyCurrentMana(-SkillToUse->ManaRequired);
+	GetStatsComponent()->ModifyCurrentStamina(-SkillToUse->StaminaRequired);
 
 	SetCurrentActiveSkillID(SkillID);
-	SkillBarComponent->OnSkillUsed(SkillID, SkillToUse);
+	SetCurrentActiveSkill(SkillToUse);
+	SkillBarComponent->OnSkillUsed(SkillButtonIndex, SkillID, SkillToUse);
 
-	*/
-
-	/*
-	// Skill is in cooldown, can't use skill. @note Empty skill slot will return false
-	if (HUDWidget->IsSkillInCooldown(SkillButtonIndex))
+	if (SkillToUse->AnimMontage.Get())
 	{
-		return;
+		SetOffSmoothRotation(GetPlayerControlRotationYaw());
+		PlayAnimationMontage(SkillToUse->AnimMontage.Get(), SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	}
-
-	FName SkillID = HUDWidget->GetSkillAtIndex(SkillButtonIndex);
-	// If no skill is equipped in the given slot
-	if (SkillID == NAME_None)
-	{
-		return;
-	}
-
-	// @note no need to check for active or passive skill since only active skills can be placed in skill bar slot.
-	// In fact, only active skills can be dragged out of skill tree widget.
-
-	FPlayerSkillTableRow* Skill = GetSkill(SkillID, FString("APlayerCharacter::OnPressingSkillKey(), looking for player skill"));
-
-	if (!Skill)
-	{
-		UKismetSystemLibrary::PrintString(this, FString("Couldn't find skill"));
-		return;
-	}
-
-	if (Skill->AnimMontage.IsNull())
-	{
-		UKismetSystemLibrary::PrintString(this, FString("Anim montage of skill is null"));
-		return;
-	}
-	else if (Skill->AnimMontage.IsPending())
-	{
-		double Start = FPlatformTime::Seconds();
-		Skill->AnimMontage.LoadSynchronous();
-		double Stop = FPlatformTime::Seconds();
-
-		double Time = (Stop - Start) * 1000000;
-		FString Message = FString("Time to load animation: ") + FString::SanitizeFloat(Time);
-
-		UKismetSystemLibrary::PrintString(this, Message);
-	}
-	else if (Skill->AnimMontage.IsValid())
-	{
-
-	}
-
-	SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
-	PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-	SetCurrentActiveSkillID(SkillID);
-	*/
-
-	/*
-
-	// @attention
-	// CurrentActiveSkill = Skill;
-
-	HUDWidget->PutSkillOnCooldownTimer(SkillButtonIndex, Skill->SkillLevelUpInfo.Cooldown, 1.f);
-	PlayAnimationMontage(GetActiveAnimationReferences()->AnimationMontage_Skills, Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-	// @todo set current active skill
-
-	// Check if skill can be used with currently equipped weapon
-
-	// Trigger status effects on using this skill? 
-
-
-	// HUDWidget->PutSkillOnCooldownTimer()
-	*/
 }
 
 void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
 {
-	/*
-	if (!SkillBarWidget)
-	{
-		return;
-	}
-
-	SkillBarWidget->ReleaseSkillButton(SkillButtonIndex);
-	*/
 }
 
 float APlayerCharacter::GetPlayerControlRotationYaw()
@@ -1532,53 +1413,12 @@ bool APlayerCharacter::IsFastRunning() const
 	return GetCharacterState() == ECharacterState::SpecialMovement;
 }
 
-/*
-FORCEINLINE bool APlayerCharacter::CanUseSkill(const FPlayerSkillTableRow* Skill)
-{
-	if (Skill)
-	{
-		if ((Skill->SupportedWeapons & (1 << (uint8)GetEquippedWeaponType())) &&
-			StatsComp->GetCurrentMana() >= Skill->ManaRequired &&
-			StatsComp->GetCurrentStamina() >= Skill->StaminaRequired)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-*/
-
 void APlayerCharacter::Server_SetIWRCharMovementDir_Implementation(ECharMovementDirection NewDirection)
 {
 	SetIWRCharMovementDir(NewDirection);
 }
 
 bool APlayerCharacter::Server_SetIWRCharMovementDir_Validate(ECharMovementDirection NewDirection)
-{
-	return true;
-}
-
-void APlayerCharacter::SetCurrentWeaponAnimationToUse(EWeaponAnimationType NewWeaponAnimationType)
-{
-	// UpdateNormalAttackSectionToSkillMap(NewWeaponAnimationType, CurrentWeaponAnimationToUse);
-	CurrentWeaponAnimationToUse = NewWeaponAnimationType;
-	
-	
-	/*
-	if (Role < ROLE_Authority)
-	{
-		Server_SetCurrentWeaponAnimationToUse(NewWeaponAnimationType);
-	}
-	*/
-}
-
-void APlayerCharacter::Server_SetCurrentWeaponAnimationToUse_Implementation(EWeaponAnimationType NewWeaponAnimationType)
-{
-	SetCurrentWeaponAnimationToUse(NewWeaponAnimationType);
-}
-
-bool APlayerCharacter::Server_SetCurrentWeaponAnimationToUse_Validate(EWeaponAnimationType NewWeaponAnimationType)
 {
 	return true;
 }
@@ -1614,181 +1454,82 @@ void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 	}
 }
 
-void APlayerCharacter::AddSkill(FName SkillID, uint8 SkillLevel)
+void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
-	/*
-	FSkill* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, SkillLevel);
-	if (Skill)
+	FString SkillIDString = FString("");
+	if (Gender == ECharacterGender::Male)
 	{
-		IDToSkillMap.Add(SkillID, Skill);
-		UKismetSystemLibrary::PrintString(this, FString("Added skill"), true, false);
+		SkillIDString += FString("M_");
 	}
 	else
 	{
-		UKismetSystemLibrary::PrintString(this, FString("Failed to add"), true, false);
+		SkillIDString += FString("F_");
 	}
-	*/
-}
 
-/*
-FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetSkill(FName SkillID,  const FString& ContextString) const
-{
-	return UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
-}
-
-FORCEINLINE void APlayerCharacter::SetCurrentActivePlayerSkill(FPlayerSkillTableRow* Skill)
-{
-	// CurrentActivePlayerSkill = Skill;
-}
-
-FORCEINLINE FPlayerSkillTableRow * APlayerCharacter::GetCurrentActivePlayerSkill() const
-{
-	// return CurrentActivePlayerSkill;
-	return nullptr;
-}
-*/
-
-/*
-FSkillDamageInfo APlayerCharacter::GetCurrentActiveSkillDamageInfo() const
-{
-	// @todo check for null
-
-	FSkillDamageInfo SkillDamageInfo;
-	const FPlayerSkillTableRow* Skill = GetCurrentActivePlayerSkill();
-	SkillDamageInfo.bUnblockable = Skill->bUnblockable;
-	SkillDamageInfo.bUndodgable = Skill->bUndodgable;
-	SkillDamageInfo.bIgnoresBlock = Skill->bIgnoresBlock;
-	SkillDamageInfo.CrowdControlEffect = Skill->CrowdControlEffect;
-	SkillDamageInfo.CrowdControlEffectDuration = Skill->CrowdControlEffectDuration;
-	SkillDamageInfo.DamagePercent = Skill->DamagePercent;
-	SkillDamageInfo.DamageType = Skill->DamageType;
-
-	return SkillDamageInfo;
-}
-
-*/
-
-void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
-{
-	// @attention
-	// CurrentActiveSkill = NormalAttackSectionToSkillMap[SectionName];
-}
-
-void APlayerCharacter::CleanupNormalAttackSectionToSkillMap()
-{
-	/*
-	TArray<FName> Keys;
-	NormalAttackSectionToSkillMap.GetKeys(Keys);
-	for (FName& Key : Keys)
+	switch (GetEquippedWeaponType())
 	{
-		FSkill* Skill = NormalAttackSectionToSkillMap[Key];
-		delete Skill;
+	case EWeaponType::GreatSword:
+		SkillIDString += FString("GS_");
+		break;
+	case EWeaponType::WarHammer:
+		SkillIDString += FString("WH_");
+		break;
+	case EWeaponType::LongSword:
+		SkillIDString += FString("LS_");
+		break;
+	case EWeaponType::Mace:
+		SkillIDString += FString("MC_");
+		break;
+	case EWeaponType::Dagger:
+		SkillIDString += FString("DG_");
+		break;
+	case EWeaponType::Staff:
+		SkillIDString += FString("ST_");
+		break;
+	case EWeaponType::Shield:
+		break;
+	case EWeaponType::None:
+		break;
+	default:
+		break;
 	}
-	NormalAttackSectionToSkillMap.Empty();
-	*/
-}
 
-void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeaponType)
-{
-	/*
-	CleanupNormalAttackSectionToSkillMap();
-
-	if (NewWeaponType == EWeaponType::GreatSword ||
-		NewWeaponType == EWeaponType::WarHammer)
+	if (SectionName == UCharacterLibrary::SectionName_FirstSwing)
 	{
-		FSkill* Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FirstSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_SecondSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 200;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ThirdSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 150;
-		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ForwardSPSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 150;
-		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_BackwardSPSwing, Skill);
+		SkillIDString += FString("1");
 	}
-	else if (NewWeaponType == EWeaponType::Staff)
+	else if (SectionName == UCharacterLibrary::SectionName_SecondSwing)
 	{
-		FSkill* Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FirstSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_SecondSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 120;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ThirdSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 150;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FourthSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 125;
-		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ForwardSPSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 125;
-		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_BackwardSPSwing, Skill);
+		SkillIDString += FString("2");
 	}
-	else if (NewWeaponType == EWeaponType::Dagger ||
-		NewWeaponType == EWeaponType::LongSword ||
-		NewWeaponType == EWeaponType::Mace)
+	else if (SectionName == UCharacterLibrary::SectionName_ThirdSwing)
 	{
-		FSkill* Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FirstSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 100;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_SecondSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 120;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ThirdSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 120;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FourthSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 150;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_FifthSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 125;
-		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_ForwardSPSwing, Skill);
-
-		Skill = new FSkill();
-		Skill->SkillLevelUpInfo.DamagePercent = 125;
-		Skill->SkillLevelUpInfo.StaminaRequired = 10;
-		NormalAttackSectionToSkillMap.Add(UCharacterLibrary::SectionName_BackwardSPSwing, Skill);
+		SkillIDString += FString("3");
 	}
-	*/
+	else if (SectionName == UCharacterLibrary::SectionName_FourthSwing)
+	{
+		SkillIDString += FString("4");
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_FifthSwing)
+	{
+		SkillIDString += FString("5");
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_BackwardSPSwing)
+	{
+		SkillIDString += FString("BSP");
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_ForwardSPSwing)
+	{
+		SkillIDString += FString("FSP");
+	}
+	
+	FName SkillID = FName(*SkillIDString);
+	SetCurrentActiveSkillID(SkillID);
+
+	// @todo set current active skill
 }
 
 void APlayerCharacter::OnRep_WeaponSheathed()
-{
-	// UpdateCurrentWeaponAnimationType();	
-}
-
-void APlayerCharacter::OnRep_CurrentWeaponAnimationToUse(EWeaponAnimationType OldAnimationType)
 {
 }
 

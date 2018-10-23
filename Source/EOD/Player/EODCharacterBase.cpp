@@ -93,6 +93,11 @@ bool AEODCharacterBase::CanUseAnySkill() const
 	return IsIdleOrMoving();
 }
 
+bool AEODCharacterBase::CanUseSkill(FSkillTableRow * Skill)
+{
+	return false;
+}
+
 bool AEODCharacterBase::BP_NeedsHealing() const
 {
 	return NeedsHealing();
