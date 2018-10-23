@@ -220,6 +220,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (!GetActiveAnimationReferences())
 	{
+#if MESSAGE_LOGGING_ENABLED
+		UKismetSystemLibrary::PrintString(this, FString("Animation references are NULL"));
+#endif // MESSAGE_LOGGING_ENABLED
 		return;
 	}
 	
@@ -239,44 +242,29 @@ void APlayerCharacter::Tick(float DeltaTime)
 		return;
 	}
 
-	/*
-	if (GetCharacterMovement()->IsFalling())
+	if (GetCharacterMovement()->IsFalling() && !(GetCharacterState() == ECharacterState::Jumping))
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->Jump.Get(),
+			UCharacterLibrary::SectionName_JumpStart,
+			ECharacterState::Jumping);
+	}
+	else if (!GetCharacterMovement()->IsFalling() && GetCharacterState() == ECharacterState::Jumping)
 	{
 		UAnimMontage* JumpMontage = GetActiveAnimationReferences()->Jump.Get();
 
-		if (GetCharacterState() != ECharacterState::Jumping)
+		/**
+		 * @note not checking whether JumpMontage is playing or not will make the jump end section play twice 
+		 * (CharacterState is still set to Jumping when JumpMontage is blending out)
+		 */
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(JumpMontage))
 		{
-			PlayAnimationMontage(JumpMontage, UCharacterLibrary::SectionName_JumpStart, ECharacterState::Jumping);
-		}
-		else if (GetCharacterState() == ECharacterState::Jumping && GetMesh()->GetAnimInstance()->Montage_IsPlaying(JumpMontage))
-		{
-
-		}
-	}
-
-
-	if (GetCharacterMovement()->IsFalling() && !IsJumping())
-	{
-		// SetCharacterState(ECharacterState::Jumping);
-
-		// This case is an exception to CharacterState replication
-		CharacterState = ECharacterState::Jumping;
-		GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Jump);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_JumpLoop,
-			GetActiveAnimationReferences()->AnimationMontage_Jump);
-	}
-	// It is necessary to test if jump montage is playing, or else the "JumpEnd" section ends up playing twice because of montage blending out
-	else if (!GetCharacterMovement()->IsFalling() && IsJumping() && GetMesh()->GetAnimInstance()->Montage_IsPlaying(GetActiveAnimationReferences()->AnimationMontage_Jump))
-	{
-		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(GetActiveAnimationReferences()->AnimationMontage_Jump);
-		if (CurrentSection != UCharacterLibrary::SectionName_JumpEnd)
-		{
-			GetMesh()->GetAnimInstance()->Montage_Play(GetActiveAnimationReferences()->AnimationMontage_Jump);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_JumpEnd,
-				GetActiveAnimationReferences()->AnimationMontage_Jump);
+			FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(JumpMontage);
+			if (CurrentSection != UCharacterLibrary::SectionName_JumpEnd)
+			{
+				PlayAnimationMontage(JumpMontage, UCharacterLibrary::SectionName_JumpEnd);
+			}
 		}
 	}
-	*/
 
 	if (Controller && Controller->IsLocalPlayerController())
 	{
@@ -717,10 +705,6 @@ void APlayerCharacter::OnJump()
 		}
 
 		Jump();
-
-		PlayAnimationMontage(GetActiveAnimationReferences()->Jump.Get(),
-			UCharacterLibrary::SectionName_JumpStart,
-			ECharacterState::Jumping);
 	}
 }
 
@@ -1231,7 +1215,8 @@ void APlayerCharacter::LoadEquippedWeaponAnimationReferences()
 	{
 		return;
 	}
-
+	
+	EquippedWeaponAnimationReferences = PlayerAnimationReferences;
 	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
 }
 
@@ -1429,6 +1414,7 @@ void APlayerCharacter::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrup
 
 void APlayerCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
 {
+	//  You would call SetCurrentPrimaryWeapon(NAME_None) when you want to remove equipped primary weapon
 	if (WeaponID == NAME_None)
 	{
 		RemovePrimaryWeapon();
@@ -1447,13 +1433,18 @@ void APlayerCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
 	{
 		RemoveSecondaryWeapon();
 	}
-	PrimaryWeaponID = WeaponID;
 	PrimaryWeapon->OnEquip(WeaponID, WeaponData);
-	UpdateCurrentWeaponAnimationType();
+	PrimaryWeaponID = WeaponID;
+
+	LoadEquippedWeaponAnimationReferences();
+	// UpdateCurrentWeaponAnimationType();
+
+	// @todo add weapon stats
 }
 
 void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 {
+	//  You would call SetCurrentSecondaryWeapon(NAME_None) when you want to remove equipped secondary weapon
 	if (WeaponID == NAME_None)
 	{
 		RemoveSecondaryWeapon();
@@ -1475,74 +1466,25 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 	}
 	SecondaryWeaponID = WeaponID;
 	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
+
+	// @todo add weapon stats
 }
 
 void APlayerCharacter::RemovePrimaryWeapon()
 {
-	PrimaryWeaponID = NAME_None;
 	PrimaryWeapon->OnUnEquip();
+	PrimaryWeaponID = NAME_None;
+	UnloadEquippedWeaponAnimationReferences();
+
+	// @todo remove weapon stats
 }
 
 void APlayerCharacter::RemoveSecondaryWeapon()
 {
 	SecondaryWeaponID = NAME_None;
 	SecondaryWeapon->OnUnEquip();
-}
 
-void APlayerCharacter::UpdateCurrentWeaponAnimationType()
-{
-	if (bWeaponSheathed)
-	{
-		if (CurrentWeaponAnimationToUse != EWeaponAnimationType::SheathedWeapon)
-		{
-			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::SheathedWeapon);
-		}
-
-		return;
-	}
-
-	if (IsPrimaryWeaponEquippped())
-	{
-		switch (PrimaryWeapon->WeaponType)
-		{
-		case EWeaponType::GreatSword:
-			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::GreatSword);
-			break;
-		case EWeaponType::WarHammer:
-			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::WarHammer);
-			break;
-		case EWeaponType::LongSword:
-			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndSword);
-			break;
-		case EWeaponType::Mace:
-			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::ShieldAndMace);
-			break;
-		case EWeaponType::Dagger:
-			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
-			break;
-		case EWeaponType::Staff:
-			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Staff);
-			break;
-		default:
-			// SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
-			break;
-		}
-	}
-	else if (IsSecondaryWeaponEquipped())
-	{
-		if (SecondaryWeapon->WeaponType == EWeaponType::Dagger)
-		{
-			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::Daggers);
-		}
-		else
-		{
-			SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
-		}
-	}
-	else
-	{
-		SetCurrentWeaponAnimationToUse(EWeaponAnimationType::NoWeapon);
-	}
+	// @todo remove weapon stats
 }
 
 void APlayerCharacter::TurnOnTargetSwitch()
@@ -1664,7 +1606,7 @@ bool APlayerCharacter::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw
 void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 {
 	bWeaponSheathed = bNewValue;
-	UpdateCurrentWeaponAnimationType();
+	// UpdateCurrentWeaponAnimationType();
 
 	if (Role < ROLE_Authority)
 	{
@@ -1843,7 +1785,7 @@ void APlayerCharacter::UpdateNormalAttackSectionToSkillMap(EWeaponType NewWeapon
 
 void APlayerCharacter::OnRep_WeaponSheathed()
 {
-	UpdateCurrentWeaponAnimationType();	
+	// UpdateCurrentWeaponAnimationType();	
 }
 
 void APlayerCharacter::OnRep_CurrentWeaponAnimationToUse(EWeaponAnimationType OldAnimationType)

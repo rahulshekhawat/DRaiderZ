@@ -289,10 +289,6 @@ public:
 	/** Called on an animation montage ending to clean up, reset, or change any state variables */
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted) override;
 
-	// void UpdateEquippedWeaponAnimationReferences(const EWeaponType EquippedWeaponType);
-
-	void UpdateCurrentWeaponAnimationType();
-
 	virtual void TurnOnTargetSwitch() override;
 
 	virtual void TurnOffTargetSwitch() override;
@@ -300,10 +296,6 @@ public:
 	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
 
 private:
-
-	/** Data table for player skills */
-	// UPROPERTY(EditDefaultsOnly, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UDataTable* DataTable_Skills;
 
 	const int CameraZoomRate = 15;
 

@@ -76,15 +76,6 @@ void ASecondaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow * NewWeaponDat
 		FallenWeaponMeshComp->AttachToComponent(OwningPlayer->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SLD_w"));
 	}
 
-	/*
-	// Change player animation references if the newer weapon type is different from previous weapon type
-	if (NewWeaponData->WeaponType != WeaponType && NewWeaponData->WeaponType == EWeaponType::Dagger)
-	{
-		OwningPlayer->UpdateEquippedWeaponAnimationReferences(NewWeaponData->WeaponType);
-		// OwningPlayer->UpdateNormalAttackSectionToSkillMap();
-	}
-	*/
-
 	bEquipped = true;
 	WeaponID = NewWeaponID;
 	WeaponType = NewWeaponData->WeaponType;
@@ -110,13 +101,7 @@ void ASecondaryWeapon::OnUnEquip()
 	bEquipped = false;
 	WeaponID = NAME_None;
 	WeaponType = EWeaponType::None;
+
 	// @todo reset weapon stats
 
-	/*
-	// If no primary weapon is equipped by owning player then update player animation references to 'no weapon equipped'
-	if (OwningPlayer && OwningPlayer->GetPrimaryWeapon() && !OwningPlayer->GetPrimaryWeapon()->bEquipped)
-	{
-		OwningPlayer->UpdateEquippedWeaponAnimationReferences(EWeaponType::None);
-	}
-	*/
 }
