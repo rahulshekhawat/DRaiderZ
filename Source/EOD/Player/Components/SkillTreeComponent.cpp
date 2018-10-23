@@ -9,6 +9,24 @@ USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitial
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicated(false);
+
+	SkillGroupMap.Add(FString("BZ0"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ1"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ2"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ3"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ4"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ5"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ6"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ7"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ8"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ9"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ10"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ11"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ12"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ13"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ14"), FSkillGroup());
+	SkillGroupMap.Add(FString("BZ15"), FSkillGroup());
+
 }
 
 void USkillTreeComponent::BeginPlay()

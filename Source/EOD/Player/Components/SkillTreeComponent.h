@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Statics/CharacterLibrary.h"
 #include "Components/ActorComponent.h"
 #include "SkillTreeComponent.generated.h"
 
@@ -36,14 +37,20 @@ public:
 	/** Toggle the display of skill tree UI in player viewport */
 	void ToggleSkillTreeUI();
 
+protected:
+
+	UPROPERTY(BlueprintReadOnly, Category = SkillGroups)
+	TMap<FString, FSkillGroup> SkillGroupMap;
+
 private:
 
 	UPROPERTY(Transient)
 	USkillTreeWidget* SkillTreeWidget;
 
-	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = Widgets)
 	TSubclassOf<USkillTreeWidget> SkillTreeWidgetClass;
-	
+
+
 };
 
 FORCEINLINE USkillTreeWidget * USkillTreeComponent::GetSkillTreeWidget() const

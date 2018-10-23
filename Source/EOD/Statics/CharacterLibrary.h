@@ -163,9 +163,6 @@ struct EOD_API FSkillGroup
 {
 	GENERATED_USTRUCT_BODY()
 
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	// FString SkillGroupID;
-
 	/** The current level that this skill has been upgraded to */
 	UPROPERTY(BlueprintReadOnly)
 	int32 CurrentUpgradeLevel;
@@ -180,7 +177,6 @@ struct EOD_API FSkillGroup
 
 	FSkillGroup()
 	{
-		// SkillGroupID = FString("");
 		CurrentUpgradeLevel = 0;
 		MaxUpgradeLevel = 1;
 		bUnlocked = false;
