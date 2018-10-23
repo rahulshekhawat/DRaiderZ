@@ -261,9 +261,6 @@ public:
 	float GetRotationYawFromAxisInput();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void DisplayReceivedDamage(int32 DamageValue);
-
-	UFUNCTION(BlueprintImplementableEvent)
 	void DisplayStatusMessage(const FString& Message);
 
 	/** Called on an animation montage blending out to clean up, reset, or change any state variables */

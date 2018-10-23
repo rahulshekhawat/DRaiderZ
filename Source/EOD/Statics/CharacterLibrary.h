@@ -157,6 +157,36 @@ struct EOD_API FSkillState
 
 };
 
+/** A struct containing current skill state */
+USTRUCT(BlueprintType)
+struct EOD_API FSkillGroup
+{
+	GENERATED_USTRUCT_BODY()
+
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	// FString SkillGroupID;
+
+	/** The current level that this skill has been upgraded to */
+	UPROPERTY(BlueprintReadOnly)
+	int32 CurrentUpgradeLevel;
+
+	/** The maximum level that this skill can be upgraded to */
+	UPROPERTY(BlueprintReadOnly)
+	int32 MaxUpgradeLevel;
+
+	/** Determines whether this skill has been unlocked on the skill tree */
+	UPROPERTY(BlueprintReadOnly)
+	bool bUnlocked;
+
+	FSkillGroup()
+	{
+		// SkillGroupID = FString("");
+		CurrentUpgradeLevel = 0;
+		MaxUpgradeLevel = 1;
+		bUnlocked = false;
+	}
+};
+
 /**
  * This struct contains the references for player animations based on equipped weapon type
  * and player gender

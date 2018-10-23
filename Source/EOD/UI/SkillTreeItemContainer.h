@@ -124,15 +124,14 @@ inline void USkillTreeItemContainer::LoadEODItemInfo()
 	FString SkillID;
 	if (SkillState.CurrentUpgradeLevel > 0)
 	{
-		SkillID = SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
+		SkillID = FString("F_") + SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
 	}
 	else
 	{
-		SkillID = SkillGroup + FString("_1");
+		SkillID = FString("F_") + SkillGroup + FString("_1");
 	}
 
-	// FPlayerSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(FName(*SkillID), FString("USkillTreeItemContainer::LoadEODItemInfo(), looking for player skill"));
-	FSkillTableRow* Skill = nullptr;
+	FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(FName(*SkillID), FString("USkillTreeItemContainer::LoadEODItemInfo(), looking for player skill"));
 	if (!Skill)
 	{
 		return;

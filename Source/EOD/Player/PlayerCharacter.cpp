@@ -1205,8 +1205,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	}
 
 	FSkillTableRow* SkillToUse = GetSkill(SkillID, FString("APlayerCharacter::OnPressingSkillKey()"));
-	// If the skill is invalid
-	if (!SkillToUse || CanUseSkill(SkillToUse))
+	if (!SkillToUse || !CanUseSkill(SkillToUse))
 	{
 		return;
 	}

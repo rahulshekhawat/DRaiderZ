@@ -1,7 +1,9 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "SkillTreeWidget.h"
+#include "Core/EODPreprocessors.h"
 #include "SkillTreeItemContainer.h"
+#include "Player/PlayerCharacter.h"
 
 #include "Button.h"
 #include "WidgetSwitcher.h"
