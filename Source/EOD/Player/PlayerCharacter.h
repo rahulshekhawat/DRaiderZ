@@ -243,15 +243,7 @@ public:
 	/** [server + client] Change player's weapon sheath state */
 	void SetWeaponSheathed(bool bNewValue);
 
-	/*
-	FORCEINLINE void SetCurrentActivePlayerSkill(FPlayerSkillTableRow* Skill);
-
-	FORCEINLINE FPlayerSkillTableRow* GetCurrentActivePlayerSkill() const;
-
-	virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const override;
-
-	*/
-
+	/** Event called when a new normal attack section starts playing */
 	void OnNormalAttackSectionStart(FName SectionName);
 
 	/**
