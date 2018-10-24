@@ -478,9 +478,6 @@ private:
 	UFUNCTION()
 	void OnRep_WeaponSheathed();
 
-	// UFUNCTION()
-	// void OnRep_CurrentWeaponAnimationToUse(EWeaponAnimationType OldAnimationType);
-
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 	
