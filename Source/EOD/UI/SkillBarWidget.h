@@ -113,11 +113,6 @@ private:
 	/** Load previously saved skill bar layout from current save slot */
 	void LoadSkillBarLayout();
 
-	// void PressSkillButton(uint32 SkillIndex);
-
-	// void ReleaseSkillButton(uint32 SkillIndex);
-
-
 };
 
 inline FName USkillBarWidget::GetSkillAtIndex(int32 SkillIndex) const

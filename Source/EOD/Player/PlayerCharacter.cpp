@@ -352,7 +352,7 @@ bool APlayerCharacter::CanNormalAttack() const
 
 bool APlayerCharacter::CanUseAnySkill() const
 {
-	return GetEquippedWeaponType() != EWeaponType::None && !bWeaponSheathed && IsIdleOrMoving() && IsBlocking();
+	return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking());
 }
 
 bool APlayerCharacter::CanUseSkill(FSkillTableRow * Skill)
@@ -1187,6 +1187,9 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
 	if (!CanUseAnySkill())
 	{
+#if MESSAGE_LOGGING_ENABLED
+		UKismetSystemLibrary::PrintString(this, FString("Can't use any skill right now"));
+#endif // MESSAGE_LOGGING_ENABLED
 		return;
 	}
 	

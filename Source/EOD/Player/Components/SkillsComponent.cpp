@@ -9,6 +9,7 @@
 #include "Player/PlayerCharacter.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 
 USkillsComponent::USkillsComponent(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
@@ -83,7 +84,21 @@ bool USkillsComponent::CanUseSkill(const int32 SkillSlotIndex)
 
 FName USkillsComponent::GetSkillIDFromSkillSlot(const int32 SkillSlotIndex)
 {
-	return FName();
+	FName SkillID = NAME_None;
+
+	if (SkillBarWidget)
+	{
+		SkillID = SkillBarWidget->GetSkillAtIndex(SkillSlotIndex);
+		FString SkillIDString = SkillID.ToString();
+		FString SkillGroup = SkillIDString.Mid(2, 3);
+
+#if MESSAGE_LOGGING_ENABLED
+		UKismetSystemLibrary::PrintString(this, SkillGroup);
+#endif // MESSAGE_LOGGING_ENABLED
+
+	}
+
+	return SkillID;
 }
 
 void USkillsComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, const FSkillTableRow* Skill)
