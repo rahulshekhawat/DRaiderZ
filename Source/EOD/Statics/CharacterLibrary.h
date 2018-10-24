@@ -116,6 +116,16 @@ enum class ECameraShakeType : uint8
 	Strong
 };
 
+UENUM(BlueprintType)
+enum class EVocations : uint8
+{
+	Assassin,
+	Berserker,
+	Cleric,
+	Defender,
+	Sorcerer
+};
+
 /** Struct containing information regarding last used character skill */
 USTRUCT(BlueprintType)
 struct FLastUsedSkillInfo
@@ -155,32 +165,13 @@ struct EOD_API FSkillState
 	UPROPERTY()
 	bool bUnlocked;
 
-};
-
-/** A struct containing current skill state */
-USTRUCT(BlueprintType)
-struct EOD_API FSkillGroup
-{
-	GENERATED_USTRUCT_BODY()
-
-	/** The current level that this skill has been upgraded to */
-	UPROPERTY(BlueprintReadOnly)
-	int32 CurrentUpgradeLevel;
-
-	/** The maximum level that this skill can be upgraded to */
-	UPROPERTY(BlueprintReadOnly)
-	int32 MaxUpgradeLevel;
-
-	/** Determines whether this skill has been unlocked on the skill tree */
-	UPROPERTY(BlueprintReadOnly)
-	bool bUnlocked;
-
-	FSkillGroup()
+	FSkillState()
 	{
 		CurrentUpgradeLevel = 0;
 		MaxUpgradeLevel = 1;
 		bUnlocked = false;
 	}
+
 };
 
 /**

@@ -1,25 +1,19 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "PlayerCharacter.h"
-#include "EODPlayerController.h"
-#include "Core/GameSingleton.h"
 #include "PlayerAnimInstance.h"
+#include "Core/GameSingleton.h"
 #include "Statics/WeaponLibrary.h"
-#include "UI/HUDWidget.h"
-#include "UI/SkillBarWidget.h"
+#include "Components/SkillsComponent.h"
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
-#include "Components/SkillBarComponent.h"
-#include "Components/SkillTreeComponent.h"
 #include "Core/EODPreprocessors.h"
 #include "Core/EODSaveGame.h"
-#include "UI/SkillTreeWidget.h"
-#include "Statics/EODBlueprintFunctionLibrary.h"
+#include "UI/HUDWidget.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"
 #include "UnrealNetwork.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/StreamableManager.h"
@@ -27,10 +21,10 @@
 #include "Components/InputComponent.h"
 #include "Components/AudioComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "GameFramework/GameUserSettings.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/GameUserSettings.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
 {
@@ -70,8 +64,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	//~ End Camera Components Initialization
 
 	InventoryComponent = ObjectInitializer.CreateDefaultSubobject<UInventoryComponent>(this, FName("Player Inventory"));
-	SkillBarComponent = ObjectInitializer.CreateDefaultSubobject<USkillBarComponent>(this, FName("Skill Bar"));
-	SkillTreeComponent = ObjectInitializer.CreateDefaultSubobject<USkillTreeComponent>(this, FName("Skill Tree"));
+	SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
 
 	AudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("Audio Component"));
 	AudioComponent->SetupAttachment(RootComponent);
@@ -115,7 +108,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &APlayerCharacter::OnToggleSheathe);
 	PlayerInputComponent->BindAction("ToggleStats", IE_Pressed, this, &APlayerCharacter::OnToggleCharacterStatsUI);
 	PlayerInputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &APlayerCharacter::OnToggleMouseCursor);
-	PlayerInputComponent->BindAction("ToggleSkillTree", IE_Pressed, SkillTreeComponent, &USkillTreeComponent::ToggleSkillTreeUI);
+	PlayerInputComponent->BindAction("ToggleSkillTree", IE_Pressed, SkillsComponent, &USkillsComponent::ToggleSkillTreeUI);
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
 	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
 	PlayerInputComponent->BindAction("Escape", IE_Pressed, this, &APlayerCharacter::OnPressedEscape);
@@ -1197,7 +1190,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		return;
 	}
 	
-	FName SkillID = SkillBarComponent->GetSkillIDFromSkillSlot(SkillButtonIndex);
+	FName SkillID = SkillsComponent->GetSkillIDFromSkillSlot(SkillButtonIndex);
 	// There isn't any skill to use
 	if (SkillID == NAME_None)
 	{
@@ -1215,7 +1208,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 	SetCurrentActiveSkillID(SkillID);
 	SetCurrentActiveSkill(SkillToUse);
-	SkillBarComponent->OnSkillUsed(SkillButtonIndex, SkillID, SkillToUse);
+	SkillsComponent->OnSkillUsed(SkillButtonIndex, SkillID, SkillToUse);
 
 	if (SkillToUse->AnimMontage.Get())
 	{

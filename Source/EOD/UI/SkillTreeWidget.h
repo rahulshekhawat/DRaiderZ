@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Statics/CharacterLibrary.h"
+
 #include "SlateTypes.h"
 #include "Blueprint/UserWidget.h"
 #include "SkillTreeWidget.generated.h"
@@ -97,6 +99,7 @@ public:
 	USkillTreeItemContainer* MadnessSkillButton;
 	//~ End berserker skills
 
+	// void UpdateSkillTree(TMap<FString, FSkillGroup> SkillGroupMap);
 
 private:
 
@@ -125,5 +128,7 @@ private:
 	void SetButtonStyleToSelected(UButton* Button);
 	
 	FButtonStyle DefaultButtonStyle;
+
+	USkillTreeItemContainer* GetSkillTreeSlotFromSkillGroupID(const FString& SkillGroupID);
 
 };

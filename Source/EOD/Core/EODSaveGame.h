@@ -28,5 +28,8 @@ public:
 	/** A map of skill to it's state */
 	UPROPERTY()
 	TMap<FString, FSkillState> SkillToStateMap;
+
+	// UPROPERTY()
+	// TMap<FString, FSkillGroup> SkillGroupMap;
 	
 };

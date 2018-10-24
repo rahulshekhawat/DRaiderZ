@@ -19,8 +19,8 @@ class USkeletalMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInventoryComponent;
-class USkillBarComponent;
-class USkillTreeComponent;
+class USkillsComponent;
+
 
 /**
  * PlayerCharacter is the base class for playable characters
@@ -103,13 +103,17 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInventoryComponent* InventoryComponent;
 
-	//~ Skill bar component
+	//~ Skills component - manages both skill bar and skill tree of player
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkillBarComponent* SkillBarComponent;
+	USkillsComponent* SkillsComponent;
+
+	//~ Skill bar component
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// USkillBarComponent* SkillBarComponent;
 
 	//~ Skill tree component
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkillTreeComponent* SkillTreeComponent;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// USkillTreeComponent* SkillTreeComponent;
 
 	//~ Audio component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

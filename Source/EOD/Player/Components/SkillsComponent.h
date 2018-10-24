@@ -5,19 +5,21 @@
 #include "CoreMinimal.h"
 #include "Statics/CharacterLibrary.h"
 #include "Components/ActorComponent.h"
-#include "SkillBarComponent.generated.h"
+#include "SkillsComponent.generated.h"
 
 class USkillBarWidget;
+class USkillTreeWidget;
 class APlayerCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class EOD_API USkillBarComponent : public UActorComponent
+class EOD_API USkillsComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
+
 	// Sets default values for this component's properties
-	USkillBarComponent(const FObjectInitializer& ObjectInitializer);
+	USkillsComponent(const FObjectInitializer& ObjectInitializer);
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -32,7 +34,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Skill Bar Widget"))
 	USkillBarWidget* BP_GetSkillBarWidget() const;
 
-	void InitializeComponentWidget();
+	/** Returns skill bar widget */
+	FORCEINLINE USkillTreeWidget* GetSkillTreeWidget() const;
+
+	/** Returns skill bar widget */
+	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Skill Tree Widget"))
+	USkillTreeWidget* BP_GetSkillTreeWidget() const;
+
+	/** Toggle the display of skill tree UI in player viewport */
+	void ToggleSkillTreeUI();
+
+	void InitializeComponentWidgets();
 
 	/** Returns true if player can use skill placed at given skill slot index */
 	bool CanUseSkill(const int32 SkillSlotIndex);
@@ -51,15 +63,24 @@ private:
 	UPROPERTY(Transient)
 	USkillBarWidget* SkillBarWidget;
 
-	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = Widgets)
 	TSubclassOf<USkillBarWidget> SkillBarWidgetClass;
 
-	// UPROPERTY(Transient)
-	// TMap<int32, >
+	UPROPERTY(Transient)
+	USkillTreeWidget* SkillTreeWidget;
+
+	UPROPERTY(EditAnywhere, Category = Widgets)
+	TSubclassOf<USkillTreeWidget> SkillTreeWidgetClass;
+
 
 };
 
-FORCEINLINE USkillBarWidget* USkillBarComponent::GetSkillBarWidget() const
+FORCEINLINE USkillBarWidget* USkillsComponent::GetSkillBarWidget() const
 {
 	return SkillBarWidget;
+}
+
+FORCEINLINE USkillTreeWidget* USkillsComponent::GetSkillTreeWidget() const
+{
+	return SkillTreeWidget;
 }
