@@ -107,14 +107,6 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillsComponent* SkillsComponent;
 
-	//~ Skill bar component
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// USkillBarComponent* SkillBarComponent;
-
-	//~ Skill tree component
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// USkillTreeComponent* SkillTreeComponent;
-
 	//~ Audio component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* AudioComponent;

@@ -16,10 +16,6 @@ class EOD_API UEODSaveGame : public USaveGame
 	GENERATED_BODY()
 	
 public:
-
-	/** A list of all the skills that have been unlocked in skill tree */
-	UPROPERTY()
-	TArray<FName> UnlockedSkills;
 	
 	/** A map of skill ID to skill bar slot index */
 	UPROPERTY()
@@ -28,8 +24,5 @@ public:
 	/** A map of skill to it's state */
 	UPROPERTY()
 	TMap<FString, FSkillState> SkillToStateMap;
-
-	// UPROPERTY()
-	// TMap<FString, FSkillGroup> SkillGroupMap;
 	
 };

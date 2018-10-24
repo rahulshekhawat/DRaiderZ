@@ -99,8 +99,6 @@ public:
 	USkillTreeItemContainer* MadnessSkillButton;
 	//~ End berserker skills
 
-	// void UpdateSkillTree(TMap<FString, FSkillGroup> SkillGroupMap);
-
 private:
 
 	/** Move container to it's designated position */

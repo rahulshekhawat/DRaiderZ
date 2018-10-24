@@ -84,24 +84,6 @@ void USkillTreeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-/*
-void USkillTreeWidget::UpdateSkillTree(TMap<FString, FSkillGroup> SkillGroupMap)
-{
-	TArray<FString> Keys;
-	SkillGroupMap.GetKeys(Keys);
-
-	for (const FString& Key : Keys)
-	{
-		USkillTreeItemContainer* Container = GetSkillTreeSlotFromSkillGroupID(Key);
-		if (Container)
-		{
-			// Container->
-
-		}
-	}
-}
-*/
-
 void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer* Container)
 {
 	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(Container->Slot);
@@ -222,7 +204,7 @@ void USkillTreeWidget::SetButtonStyleToSelected(UButton * Button)
 	Button->SetStyle(ButtonStyle);
 }
 
-USkillTreeItemContainer * USkillTreeWidget::GetSkillTreeSlotFromSkillGroupID(const FString & SkillGroupID)
+USkillTreeItemContainer* USkillTreeWidget::GetSkillTreeSlotFromSkillGroupID(const FString & SkillGroupID)
 {
 	return nullptr;
 }
