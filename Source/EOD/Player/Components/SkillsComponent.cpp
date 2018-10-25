@@ -102,6 +102,10 @@ TPair<FName, FSkillTableRow*> USkillsComponent::GetSkillFromSkillSlot(const int3
 	FString SkillGroupToUse;
 	if (ActiveSupersedingChainSkillGroup.Key == SkillSlotIndex)
 	{
+#if MESSAGE_LOGGING_ENABLED
+		FString LogMessage = FString("Chain key found. Skill group: ") + ActiveSupersedingChainSkillGroup.Value;
+		UKismetSystemLibrary::PrintString(this, LogMessage);
+#endif // MESSAGE_LOGGING_ENABLED
 		SkillGroupToUse = ActiveSupersedingChainSkillGroup.Value;
 	}
 	else
@@ -196,7 +200,7 @@ void USkillsComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, co
 		ActiveSupersedingChainSkillGroup.Value = Skill->SupersedingSkillGroup;
 	}
 
-
+	// @todo Change following because the player might not end up using previous skill by the time chain skill is resetted (e.g., skill chain reset before player finished nocturne's animation)
 	GetWorld()->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &USkillsComponent::ResetChainSkill, ChainSkillResetDelay, false);
 
 	SkillBarWidget->PutSkillOnCooldownTimer(SkillGroup, Skill->Cooldown, 0.5f);

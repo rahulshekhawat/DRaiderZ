@@ -280,7 +280,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			UpdateAutoRun(DeltaTime);
 		}
-		else if (IsMoving())
+		else if (IsMoving() || (IsUsingAnySkill() && bSkillAllowsMovement))
 		{
 			UpdateMovement(DeltaTime);
 		}
@@ -317,7 +317,7 @@ USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName N
 
 bool APlayerCharacter::CanMove() const
 {
-	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning();
+	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement);
 }
 
 bool APlayerCharacter::CanJump() const
@@ -1209,7 +1209,11 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 	if (SkillPair.Value->AnimMontage.Get())
 	{
-		SetOffSmoothRotation(GetPlayerControlRotationYaw());
+		bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
+		if (!bSkillAllowsMovement)
+		{
+			SetOffSmoothRotation(GetPlayerControlRotationYaw());
+		}
 		PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value ->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	}
 }
@@ -1435,7 +1439,6 @@ bool APlayerCharacter::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw
 void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 {
 	bWeaponSheathed = bNewValue;
-	// UpdateCurrentWeaponAnimationType();
 
 	if (Role < ROLE_Authority)
 	{

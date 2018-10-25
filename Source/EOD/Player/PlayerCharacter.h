@@ -312,6 +312,9 @@ private:
 	UPROPERTY(Transient)
 	bool bNormalAttackPressed;
 
+	UPROPERTY(Transient)
+	bool bSkillAllowsMovement;
+
 	/** Player HUD class reference */
 	UPROPERTY(Transient)
 	UHUDWidget* HUDWidget;

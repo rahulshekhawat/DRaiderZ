@@ -283,6 +283,10 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	int32 ManaRequired;
 
+	/** Determines whether this skill can be used while moving */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bAllowsMovement;
+
 	/** Determines whether this skill is a passive skill or an active skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	bool bPassiveSkill;
