@@ -8,6 +8,8 @@
 #include "Core/GameSingleton.h"
 #include "Player/PlayerCharacter.h"
 
+#include "Engine/World.h"
+#include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -15,6 +17,8 @@
 USkillsComponent::USkillsComponent(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
+
+	ChainSkillResetDelay = 2.f;
 
 	APlayerCharacter* PC = Cast<APlayerCharacter>(GetOwner());
 	if (PC)
@@ -88,46 +92,40 @@ bool USkillsComponent::CanUseSkill(const int32 SkillSlotIndex)
 	return false;
 }
 
-FName USkillsComponent::GetSkillIDFromSkillSlot(const int32 SkillSlotIndex)
+TPair<FName, FSkillTableRow*> USkillsComponent::GetSkillFromSkillSlot(const int32 SkillSlotIndex)
 {
 	if (!SkillBarWidget || !SkillTreeWidget)
 	{
-		return NAME_None;
+		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
 	}
 
-	//~~ TEST CODE START
-	FString SkillGroup = SkillBarWidget->GetSkillGroupAtIndex(SkillSlotIndex);
+	FString SkillGroupToUse;
+	if (ActiveSupersedingChainSkillGroup.Key == SkillSlotIndex)
+	{
+		SkillGroupToUse = ActiveSupersedingChainSkillGroup.Value;
+	}
+	else
+	{
+		FString SlotSkillGroup = SkillBarWidget->GetSkillGroupAtIndex(SkillSlotIndex);
+		// If no skill is equipped in current slot
+		if (SlotSkillGroup == "" || SkillBarWidget->IsSkillInCooldown(SkillSlotIndex))
+		{
+			return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
+		}
+
+		SkillGroupToUse = SlotSkillGroup;
+	}
 
 #if MESSAGE_LOGGING_ENABLED
-	FString LogMessage = FString("Skill group is: ") + SkillGroup;
+	FString LogMessage = FString("Skill group is: ") + SkillGroupToUse;
 	UKismetSystemLibrary::PrintString(this, LogMessage);
 #endif // MESSAGE_LOGGING_ENABLED
 
-	return NAME_None;
-	//~~ TEST CODE END
-
-
-	/*
-	FName SkillInSlot = SkillBarWidget->GetSkillIDAtIndex(SkillSlotIndex);
-	if (SkillInSlot == NAME_None)
+	FSkillState SkillState = SkillTreeWidget->GetSkillState(SkillGroupToUse);
+	if (SkillState.CurrentUpgradeLevel == 0)
 	{
-		return NAME_None;
-
-		// @todo
-		if (SkillSlotIndex == ChainSkillOnHold.Key)
-		{
-
-		}
+		SkillState.CurrentUpgradeLevel = 1;
 	}
-
-	FString SkillIDSlotString = SkillInSlot.ToString();
-	FString SkillGroup = SkillIDSlotString.Mid(2, 3);
-
-#if MESSAGE_LOGGING_ENABLED
-	UKismetSystemLibrary::PrintString(this, SkillGroup);
-#endif // MESSAGE_LOGGING_ENABLED
-
-	FSkillState SkillState = SkillTreeWidget->GetSkillState(SkillGroup);
 
 	FString GenderPrefix;
 	if (OwnerGender == ECharacterGender::Female)
@@ -139,32 +137,60 @@ FName USkillsComponent::GetSkillIDFromSkillSlot(const int32 SkillSlotIndex)
 		GenderPrefix = FString("M_");
 	}
 
-	if (SkillState.CurrentUpgradeLevel == 0)
+	FString SkillIDString = GenderPrefix + SkillGroupToUse + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
+	FName SkillID = FName(*SkillIDString);
+	FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, FString("USkillsComponent::GetSkillIDFromSkillSlot"));
+	if (!Skill)
 	{
-		SkillState.CurrentUpgradeLevel = 1;
+		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
 	}
 
-	FString SkillIDString = GenderPrefix + SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
-	return FName(*SkillIDString);
-	*/
-}
-
-TPair<FName, FSkillTableRow*> USkillsComponent::GetSkillFromSkillSlot(const int32 SkillSlotIndex)
-{
-	FName SkillID = NAME_None;
-	FSkillTableRow* Skill = nullptr;
-
-	if (!SkillBarWidget || !SkillTreeWidget)
+	if (Skill->PrecedingSkillGroups.Num() == 0)
 	{
 		return TPair<FName, FSkillTableRow*>(SkillID, Skill);
 	}
 
+	bool bUsedPrecedingSkill = false;
+	for (const FString& SkillGroup : Skill->PrecedingSkillGroups)
+	{
+		if (SkillGroup == ActivePrecedingChainSkillGroup)
+		{
+			bUsedPrecedingSkill = true;
+			break;
+		}
+	}
 
-
-
-	return TPair<FName, FSkillTableRow*>(SkillID, Skill);
+	if (bUsedPrecedingSkill)
+	{
+		return TPair<FName, FSkillTableRow*>(SkillID, Skill);
+	}
+	else
+	{
+		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
+	}
 }
 
 void USkillsComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, const FSkillTableRow* Skill)
 {
+	if (SkillID == NAME_None || Skill == nullptr)
+	{
+		return;
+	}
+
+	FString SkillIDString = SkillID.ToString();
+	FString SkillGroup = SkillIDString.Mid(2, 3);
+
+	ActivePrecedingChainSkillGroup = SkillGroup;
+	ActiveSupersedingChainSkillGroup.Key = SkillSlotIndex;
+	ActiveSupersedingChainSkillGroup.Value = Skill->SupersedingSkillGroup;
+
+	GetWorld()->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &USkillsComponent::ResetChainSkill, ChainSkillResetDelay, false);
+
+	SkillBarWidget->PutSkillOnCooldownTimer(SkillGroup, Skill->Cooldown, 0.5f);
+}
+
+void USkillsComponent::ResetChainSkill()
+{
+	ActivePrecedingChainSkillGroup = FString("");
+	ActiveSupersedingChainSkillGroup = TPair<int32, FString>(-1, FString(""));
 }

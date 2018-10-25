@@ -1193,30 +1193,24 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		return;
 	}
 	
-	FName SkillID = SkillsComponent->GetSkillIDFromSkillSlot(SkillButtonIndex);
+	TPair<FName, FSkillTableRow*> SkillPair = SkillsComponent->GetSkillFromSkillSlot(SkillButtonIndex);
 	// There isn't any skill to use
-	if (SkillID == NAME_None)
+	if (SkillPair.Key == NAME_None || SkillPair.Value == nullptr)
 	{
 		return;
 	}
 
-	FSkillTableRow* SkillToUse = GetSkill(SkillID, FString("APlayerCharacter::OnPressingSkillKey()"));
-	if (!SkillToUse || !CanUseSkill(SkillToUse))
-	{
-		return;
-	}
+	GetStatsComponent()->ModifyCurrentMana(-SkillPair.Value->ManaRequired);
+	GetStatsComponent()->ModifyCurrentStamina(-SkillPair.Value->StaminaRequired);
 
-	GetStatsComponent()->ModifyCurrentMana(-SkillToUse->ManaRequired);
-	GetStatsComponent()->ModifyCurrentStamina(-SkillToUse->StaminaRequired);
+	SetCurrentActiveSkillID(SkillPair.Key);
+	SetCurrentActiveSkill(SkillPair.Value);
+	SkillsComponent->OnSkillUsed(SkillButtonIndex, SkillPair.Key, SkillPair.Value);
 
-	SetCurrentActiveSkillID(SkillID);
-	SetCurrentActiveSkill(SkillToUse);
-	SkillsComponent->OnSkillUsed(SkillButtonIndex, SkillID, SkillToUse);
-
-	if (SkillToUse->AnimMontage.Get())
+	if (SkillPair.Value->AnimMontage.Get())
 	{
 		SetOffSmoothRotation(GetPlayerControlRotationYaw());
-		PlayAnimationMontage(SkillToUse->AnimMontage.Get(), SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value ->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	}
 }
 

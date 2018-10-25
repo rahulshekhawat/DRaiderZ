@@ -115,6 +115,34 @@ void USkillBarWidget::LoadSkillBarLayout()
 	}
 }
 
+void USkillBarWidget::PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval)
+{
+	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
+	if (Skill)
+	{
+		Skill->StartCooldown(Duration, Interval);
+	}
+}
+
+void USkillBarWidget::PutSkillOnCooldownTimer(FString SkillGroup, float Duration, float Interval)
+{
+	UEODItemContainer* SkillContainer = nullptr;
+	for (int i = 1; i <= 20; i++)
+	{
+		if (SkillGroup == GetSkillGroupAtIndex(i))
+		{
+			SkillContainer = GetSkillButtonAtIndex(i);
+			break;
+		}
+	}
+
+	if (SkillContainer)
+	{
+		SkillContainer->StartCooldown(Duration, Interval);
+	}
+}
+
+
 void USkillBarWidget::SaveSkillBarLayout()
 {
 	UGameSingleton* GameSingleton = nullptr;

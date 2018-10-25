@@ -101,7 +101,9 @@ public:
 	inline bool IsSkillInCooldown(int32 SkillIndex) const;
 
 	/** Put skill at given skill index on cooldown */
-	inline void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);
+	void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);
+
+	void PutSkillOnCooldownTimer(FString SkillGroup, float Duration, float Interval);
 
 	/** Save current skill bar layout to the current save slot */
 	void SaveSkillBarLayout();
@@ -161,15 +163,6 @@ inline bool USkillBarWidget::IsSkillInCooldown(int32 SkillIndex) const
 	}
 
 	return false;
-}
-
-inline void USkillBarWidget::PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval)
-{
-	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
-	if (Skill)
-	{
-		Skill->StartCooldown(Duration, Interval);
-	}
 }
 
 inline UEODItemContainer * USkillBarWidget::GetSkillButtonAtIndex(int32 ButtonIndex) const
