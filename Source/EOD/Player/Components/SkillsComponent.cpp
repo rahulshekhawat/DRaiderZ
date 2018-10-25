@@ -178,11 +178,24 @@ void USkillsComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, co
 	}
 
 	FString SkillIDString = SkillID.ToString();
-	FString SkillGroup = SkillIDString.Mid(2, 3);
+	FString SkillGroup = SkillIDString.Mid(2, 4);
+	if (SkillGroup.EndsWith(FString("_")))
+	{
+		SkillGroup = SkillIDString.Mid(2, 3);
+	}
 
 	ActivePrecedingChainSkillGroup = SkillGroup;
-	ActiveSupersedingChainSkillGroup.Key = SkillSlotIndex;
-	ActiveSupersedingChainSkillGroup.Value = Skill->SupersedingSkillGroup;
+	if (Skill->SupersedingSkillGroup == FString(""))
+	{
+		ActiveSupersedingChainSkillGroup.Key = -1;
+		ActiveSupersedingChainSkillGroup.Value = FString("");
+	}
+	else
+	{
+		ActiveSupersedingChainSkillGroup.Key = SkillSlotIndex;
+		ActiveSupersedingChainSkillGroup.Value = Skill->SupersedingSkillGroup;
+	}
+
 
 	GetWorld()->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &USkillsComponent::ResetChainSkill, ChainSkillResetDelay, false);
 
