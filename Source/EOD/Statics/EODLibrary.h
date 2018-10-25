@@ -56,6 +56,9 @@ public:
 	FName ItemID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
+	FString ItemGroup;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
 	UTexture* Icon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
@@ -73,8 +76,6 @@ public:
 	FEODItemInfo()
 	{
 		StackCount = 1;
-		ItemID = NAME_None;
-		Icon = nullptr;
 	}
 };
 

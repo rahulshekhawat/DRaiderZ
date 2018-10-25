@@ -84,6 +84,11 @@ void USkillTreeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+FSkillState USkillTreeWidget::GetSkillState(const FString & SkillGroup) const
+{
+	return FSkillState();
+}
+
 void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer* Container)
 {
 	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(Container->Slot);

@@ -56,6 +56,8 @@ public:
 	 */
 	FName GetSkillIDFromSkillSlot(const int32 SkillSlotIndex);
 
+	TPair<FName, FSkillTableRow*> GetSkillFromSkillSlot(const int32 SkillSlotIndex);
+
 	void OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, const FSkillTableRow* Skill);
 
 private:
@@ -72,6 +74,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = Widgets)
 	TSubclassOf<USkillTreeWidget> SkillTreeWidgetClass;
 
+	UPROPERTY(Transient)
+	ECharacterGender OwnerGender;
+
+	TPair<int32, FString> ChainSkillOnHold;
 
 };
 

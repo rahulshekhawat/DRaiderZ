@@ -147,6 +147,7 @@ inline void USkillTreeItemContainer::LoadEODItemInfo()
 		EODItemInfo.EODItemType = EEODItemType::ActiveSkill;
 	}
 	EODItemInfo.Icon = Skill->Icon;
+	EODItemInfo.ItemGroup = SkillGroup;
 	EODItemInfo.Description = Skill->Description;
 	EODItemInfo.InGameName = Skill->InGameName;
 	EODItemInfo.StackCount = 1;

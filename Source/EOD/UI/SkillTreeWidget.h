@@ -99,6 +99,8 @@ public:
 	USkillTreeItemContainer* MadnessSkillButton;
 	//~ End berserker skills
 
+	FSkillState GetSkillState(const FString& SkillGroup) const;
+
 private:
 
 	/** Move container to it's designated position */

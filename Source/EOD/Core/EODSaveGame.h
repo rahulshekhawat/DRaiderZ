@@ -19,7 +19,7 @@ public:
 	
 	/** A map of skill ID to skill bar slot index */
 	UPROPERTY()
-	TMap<FName, int32> SkillBarLayout;
+	TMap<FString, int32> SkillBarLayout;
 
 	/** A map of skill to it's state */
 	UPROPERTY()

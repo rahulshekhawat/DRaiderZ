@@ -15,8 +15,8 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "EODItemContainer.generated.h"
 
-class UTextBlock;
 class UImage;
+class UTextBlock;
 class UDragVisualWidget;
 
 /**

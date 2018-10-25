@@ -15,6 +15,12 @@
 USkillsComponent::USkillsComponent(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
+
+	APlayerCharacter* PC = Cast<APlayerCharacter>(GetOwner());
+	if (PC)
+	{
+		OwnerGender = PC->GetCharacterGender();
+	}
 }
 
 void USkillsComponent::BeginPlay()
@@ -84,21 +90,79 @@ bool USkillsComponent::CanUseSkill(const int32 SkillSlotIndex)
 
 FName USkillsComponent::GetSkillIDFromSkillSlot(const int32 SkillSlotIndex)
 {
-	FName SkillID = NAME_None;
-
-	if (SkillBarWidget)
+	if (!SkillBarWidget || !SkillTreeWidget)
 	{
-		SkillID = SkillBarWidget->GetSkillAtIndex(SkillSlotIndex);
-		FString SkillIDString = SkillID.ToString();
-		FString SkillGroup = SkillIDString.Mid(2, 3);
-
-#if MESSAGE_LOGGING_ENABLED
-		UKismetSystemLibrary::PrintString(this, SkillGroup);
-#endif // MESSAGE_LOGGING_ENABLED
-
+		return NAME_None;
 	}
 
-	return SkillID;
+	//~~ TEST CODE START
+	FString SkillGroup = SkillBarWidget->GetSkillGroupAtIndex(SkillSlotIndex);
+
+#if MESSAGE_LOGGING_ENABLED
+	FString LogMessage = FString("Skill group is: ") + SkillGroup;
+	UKismetSystemLibrary::PrintString(this, LogMessage);
+#endif // MESSAGE_LOGGING_ENABLED
+
+	return NAME_None;
+	//~~ TEST CODE END
+
+
+	/*
+	FName SkillInSlot = SkillBarWidget->GetSkillIDAtIndex(SkillSlotIndex);
+	if (SkillInSlot == NAME_None)
+	{
+		return NAME_None;
+
+		// @todo
+		if (SkillSlotIndex == ChainSkillOnHold.Key)
+		{
+
+		}
+	}
+
+	FString SkillIDSlotString = SkillInSlot.ToString();
+	FString SkillGroup = SkillIDSlotString.Mid(2, 3);
+
+#if MESSAGE_LOGGING_ENABLED
+	UKismetSystemLibrary::PrintString(this, SkillGroup);
+#endif // MESSAGE_LOGGING_ENABLED
+
+	FSkillState SkillState = SkillTreeWidget->GetSkillState(SkillGroup);
+
+	FString GenderPrefix;
+	if (OwnerGender == ECharacterGender::Female)
+	{
+		GenderPrefix = FString("F_");
+	}
+	else
+	{
+		GenderPrefix = FString("M_");
+	}
+
+	if (SkillState.CurrentUpgradeLevel == 0)
+	{
+		SkillState.CurrentUpgradeLevel = 1;
+	}
+
+	FString SkillIDString = GenderPrefix + SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
+	return FName(*SkillIDString);
+	*/
+}
+
+TPair<FName, FSkillTableRow*> USkillsComponent::GetSkillFromSkillSlot(const int32 SkillSlotIndex)
+{
+	FName SkillID = NAME_None;
+	FSkillTableRow* Skill = nullptr;
+
+	if (!SkillBarWidget || !SkillTreeWidget)
+	{
+		return TPair<FName, FSkillTableRow*>(SkillID, Skill);
+	}
+
+
+
+
+	return TPair<FName, FSkillTableRow*>(SkillID, Skill);
 }
 
 void USkillsComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, const FSkillTableRow* Skill)

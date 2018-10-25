@@ -173,6 +173,8 @@ public:
 	/** Returns HUD widget */
 	FORCEINLINE UHUDWidget* GetHUDWidget() const;
 
+	FORCEINLINE ECharacterGender GetCharacterGender() const;
+
 	/** Returns HUD widget */
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get HUD Widget"))
 	UHUDWidget* BP_GetHUDWidget() const;
@@ -539,6 +541,11 @@ FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
 FORCEINLINE UHUDWidget* APlayerCharacter::GetHUDWidget() const
 {
 	return HUDWidget;
+}
+
+FORCEINLINE ECharacterGender APlayerCharacter::GetCharacterGender() const
+{
+	return Gender;
 }
 
 FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)

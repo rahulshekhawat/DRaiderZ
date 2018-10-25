@@ -77,30 +77,34 @@ void USkillBarWidget::LoadSkillBarLayout()
 		return;
 	}
 
-	TArray<FName> Keys;
-	EODSaveGame->SkillBarLayout.GetKeys(Keys);
+	TArray<FString> SkillGroups;
+	EODSaveGame->SkillBarLayout.GetKeys(SkillGroups);
 
-	for (FName Key : Keys)
+	for (const FString& SkillGroup : SkillGroups)
 	{
-		int32 Position = EODSaveGame->SkillBarLayout[Key];
+		int32 Position = EODSaveGame->SkillBarLayout[SkillGroup];
 		UEODItemContainer* SkillButton = GetSkillButtonAtIndex(Position);
 		if (!SkillButton)
 		{
 			continue;
 		}
 
+		FString SkillIDString = "F_" + SkillGroup + "_1";
+		FName SkillID = FName(*SkillIDString);
 
-		FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(Key, FString("USkillBarWidget::LoadSkillBarLayout(), looking for player skill"));
+		FString ContextString = "USkillBarWidget::LoadSkillBarLayout(), looking for player skill : " + SkillIDString;
+		FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
 		if (!Skill)
 		{
 #if MESSAGE_LOGGING_ENABLED
-			FString Message = FString("Couldn't find skill : ") + Key.ToString();
+			FString Message = FString("Couldn't find skill : ") + SkillIDString;
 			UKismetSystemLibrary::PrintString(this, Message);
 #endif // MESSAGE_LOGGING_ENABLED
 			continue;
 		}
 
-		SkillButton->EODItemInfo.ItemID = Key;
+		SkillButton->EODItemInfo.ItemID = SkillID;
+		SkillButton->EODItemInfo.ItemGroup = SkillGroup;
 		SkillButton->EODItemInfo.StackCount = 1;
 		SkillButton->EODItemInfo.InGameName = Skill->InGameName;
 		SkillButton->EODItemInfo.Icon = Skill->Icon;
@@ -130,13 +134,13 @@ void USkillBarWidget::SaveSkillBarLayout()
 		return;
 	}
 
-	TMap<FName, int32> SkillBarLayout;
+	TMap<FString, int32> SkillBarLayout;
 	for (int i = 1; i <= 20; i++)
 	{
-		FName SkillID = GetSkillAtIndex(i);
-		if (SkillID != NAME_None)
+		FEODItemInfo EODItemInfo = GetEODItemInfoAtIndex(i);
+		if (EODItemInfo.ItemID != NAME_None)
 		{
-			SkillBarLayout.Add(SkillID, i);
+			SkillBarLayout.Add(EODItemInfo.ItemGroup, i);
 		}
 	}
 

@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "UI/EODItemContainer.h"
 #include "Player/PlayerCharacter.h"
+#include "Statics/CharacterLibrary.h"
 
 #include "Blueprint/UserWidget.h"
 #include "SkillBarWidget.generated.h"
@@ -91,7 +91,11 @@ public:
 	UEODItemContainer* Skill_20;
 
 	/** Get SkillID of skill placed at SkillIndex */
-	inline FName GetSkillAtIndex(int32 SkillIndex) const;
+	inline FName GetSkillIDAtIndex(const int32 SkillIndex) const;
+
+	inline FString GetSkillGroupAtIndex(const int32 SkillIdex) const;
+
+	inline FEODItemInfo GetEODItemInfoAtIndex(const int32 SkillIndex) const;
 
 	/** Returns true if skill at given skill index is in cooldown */
 	inline bool IsSkillInCooldown(int32 SkillIndex) const;
@@ -115,7 +119,7 @@ private:
 
 };
 
-inline FName USkillBarWidget::GetSkillAtIndex(int32 SkillIndex) const
+inline FName USkillBarWidget::GetSkillIDAtIndex(const int32 SkillIndex) const
 {
 	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
 	if (Skill)
@@ -124,6 +128,28 @@ inline FName USkillBarWidget::GetSkillAtIndex(int32 SkillIndex) const
 	}
 
 	return NAME_None;
+}
+
+inline FString USkillBarWidget::GetSkillGroupAtIndex(const int32 SkillIndex) const
+{
+	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
+	if (Skill)
+	{
+		return Skill->EODItemInfo.ItemGroup;
+	}
+
+	return FString("");
+}
+
+inline FEODItemInfo USkillBarWidget::GetEODItemInfoAtIndex(const int32 SkillIndex) const
+{
+	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
+	if (Skill)
+	{
+		return Skill->EODItemInfo;
+	}
+
+	return FEODItemInfo();
 }
 
 inline bool USkillBarWidget::IsSkillInCooldown(int32 SkillIndex) const
