@@ -75,6 +75,12 @@ public:
 
 	FEODItemInfo()
 	{
+		ItemID = NAME_None;
+		ItemGroup = FString("");
+		Icon = nullptr;
+		InGameName = FString("");
+		Description = FString("");
+		EODItemType = EEODItemType::None;
 		StackCount = 1;
 	}
 };
