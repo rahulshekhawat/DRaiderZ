@@ -58,6 +58,8 @@ public:
 
 	void OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, const FSkillTableRow* Skill);
 
+	void SetOffChainSkillReset();
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = Skills)

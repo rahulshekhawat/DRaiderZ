@@ -1274,11 +1274,16 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 	return ResultingRotation;
 }
 
-void APlayerCharacter::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
+void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
 	if (!bInterrupted)
 	{
 		SetCharacterState(ECharacterState::IdleWalkRun);
+	}
+
+	if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
+	{
+		SkillsComponent->SetOffChainSkillReset();
 	}
 }
 
