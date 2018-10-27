@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "EODGameModeBase.generated.h"
 
+class AStatusEffectsManager;
+
 /**
  * 
  */
@@ -20,7 +22,21 @@ public:
 
 	/** Used to spawn combat and status effect manager actors */
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
-	
-	
-	
+
+	FORCEINLINE AStatusEffectsManager* GetStatusEffectsManager() const;
+
+	UFUNCTION(BlueprintPure, Category = Managers, meta = (DisplayName = "Get Status Effects Manager"))
+	AStatusEffectsManager* BP_GetStatusEffectsManager() const;
+
+private:
+
+	UPROPERTY(Transient)
+	AStatusEffectsManager* StatusEffectsManager;
+		
 };
+
+
+FORCEINLINE AStatusEffectsManager* AEODGameModeBase::GetStatusEffectsManager() const
+{
+	return StatusEffectsManager;
+}

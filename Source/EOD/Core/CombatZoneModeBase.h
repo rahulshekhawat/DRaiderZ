@@ -7,7 +7,6 @@
 #include "CombatZoneModeBase.generated.h"
 
 class ACombatManager;
-class AStatusEffectsManager;
 
 /**
  * Base class for game modes used in combat areas
@@ -26,21 +25,13 @@ public:
 	
 	FORCEINLINE ACombatManager* GetCombatManager() const;
 
-	FORCEINLINE AStatusEffectsManager* GetStatusEffectsManager() const;
-
 	UFUNCTION(BlueprintPure, Category = Managers, meta = (DisplayName = "Get Combat Manager"))
 	ACombatManager* BP_GetCombatManager() const;
-
-	UFUNCTION(BlueprintPure, Category = Managers, meta = (DisplayName = "Get Status Effects Manager"))
-	AStatusEffectsManager* BP_GetStatusEffectsManager() const;
 
 private:
 
 	UPROPERTY(Transient)
 	ACombatManager* CombatManager;
-
-	UPROPERTY(Transient)
-	AStatusEffectsManager* StatusEffectsManager;
 
 	UPROPERTY(EditDefaultsOnly, Category = Classes, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ACombatManager> CombatManagerClass;
@@ -50,9 +41,4 @@ private:
 FORCEINLINE ACombatManager* ACombatZoneModeBase::GetCombatManager() const
 {
 	return CombatManager;
-}
-
-FORCEINLINE AStatusEffectsManager* ACombatZoneModeBase::GetStatusEffectsManager() const
-{
-	return StatusEffectsManager;
 }

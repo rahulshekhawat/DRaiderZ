@@ -2,7 +2,6 @@
 
 #include "CombatZoneModeBase.h"
 #include "CombatManager.h"
-#include "StatusEffectsManager.h"
 
 #include "Engine/World.h"
 
@@ -11,7 +10,7 @@ ACombatZoneModeBase::ACombatZoneModeBase(const FObjectInitializer & ObjectInitia
 	CombatManagerClass = ACombatManager::StaticClass();
 }
 
-void ACombatZoneModeBase::InitGame(const FString & MapName, const FString & Options, FString & ErrorMessage)
+void ACombatZoneModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
@@ -24,7 +23,6 @@ void ACombatZoneModeBase::InitGame(const FString & MapName, const FString & Opti
 	// We don't want status effects manager or combat manager to be saved into map
 	SpawnInfo.ObjectFlags |= RF_Transient;
 
-    StatusEffectsManager = World->SpawnActor<AStatusEffectsManager>(AStatusEffectsManager::StaticClass(), SpawnInfo);
     CombatManager = World->SpawnActor<ACombatManager>(CombatManagerClass, SpawnInfo);
 
 }
@@ -32,9 +30,4 @@ void ACombatZoneModeBase::InitGame(const FString & MapName, const FString & Opti
 ACombatManager * ACombatZoneModeBase::BP_GetCombatManager() const
 {
 	return GetCombatManager();
-}
-
-AStatusEffectsManager * ACombatZoneModeBase::BP_GetStatusEffectsManager() const
-{
-	return GetStatusEffectsManager();
 }
