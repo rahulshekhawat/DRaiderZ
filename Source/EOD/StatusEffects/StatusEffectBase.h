@@ -137,7 +137,7 @@ public:
 
 	void SetInstigator(AActor* NewInstigator);
 
-	virtual TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* GetCharacterToStatusInfoMap() PURE_VIRTUAL(UStatusEffect::OnStatusEffectTick, return nullptr; );
+	virtual TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* GetCharacterToStatusInfoMap() PURE_VIRTUAL(UStatusEffectBase::GetCharacterToStatusInfoMap , return nullptr; );
 
 protected:
 
@@ -229,7 +229,7 @@ protected:
 
 	/** Called to process the ticking of this status effect. Must be overridden in inherited classes */
 	UFUNCTION()
-	virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter) PURE_VIRTUAL(UStatusEffect::OnStatusEffectTick, );
+	virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter) PURE_VIRTUAL(UStatusEffectBase::OnStatusEffectTick, );
 
 private:
 
