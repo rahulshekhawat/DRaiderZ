@@ -448,6 +448,8 @@ private:
 
 	void UpdateBlockState(float DeltaTime);
 
+	void UpdateFastMovementState(float DeltaTime);
+
 	void UpdateAutoRun(float DeltaTime);
 
 	/** Enable or disable auto run */

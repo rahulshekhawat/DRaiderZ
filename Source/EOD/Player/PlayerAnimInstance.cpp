@@ -52,7 +52,7 @@ bool UPlayerAnimInstance::IsFastRunning() const
 {
 	if (OwningPlayer)
 	{
-		// return OwningPlayer->
+		return OwningPlayer->IsFastRunning();
 	}
 
 	return false;

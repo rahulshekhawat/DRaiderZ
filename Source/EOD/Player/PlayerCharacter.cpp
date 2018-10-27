@@ -287,6 +287,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			UpdateBlockState(DeltaTime);
 		}
+		else if (IsFastRunning())
+		{
+			UpdateFastMovementState(DeltaTime);
+		}
 
 		if (bRotateSmoothly)
 		{
@@ -316,7 +320,7 @@ USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName N
 
 bool APlayerCharacter::CanMove() const
 {
-	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement);
+	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning();
 }
 
 bool APlayerCharacter::CanJump() const
@@ -936,6 +940,66 @@ void APlayerCharacter::UpdateBlockState(float DeltaTime)
 	}
 }
 
+void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
+{
+	float ActorRotationYaw = GetActorRotation().Yaw;
+	float DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
+
+	bool bRotatePlayer = DesiredPlayerRotationYaw == ActorRotationYaw ? false : true;
+
+	float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+	float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
+	if (ForwardAxisValue == 0 && RightAxisValue == 0)
+	{
+		bRotatePlayer = false;
+	}
+
+	if (bRotatePlayer)
+	{
+		DeltaRotateCharacterToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
+	}
+
+	if (ForwardAxisValue < 0)
+	{
+		float Speed = (BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
+		{
+			SetWalkSpeed(Speed);
+		}
+	}
+	else
+	{
+		float Speed = BaseSpecialMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
+		{
+			SetWalkSpeed(Speed);
+		}
+	}
+
+	if (ForwardAxisValue == 0)
+	{
+		if (RightAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::R)
+		{
+			SetIWRCharMovementDir(ECharMovementDirection::R);
+		}
+		else if (RightAxisValue < 0 && IWR_CharacterMovementDirection != ECharMovementDirection::L)
+		{
+			SetIWRCharMovementDir(ECharMovementDirection::L);
+		}
+	}
+	else
+	{
+		if (ForwardAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::F)
+		{
+			SetIWRCharMovementDir(ECharMovementDirection::F);
+		}
+		else if (ForwardAxisValue < 0 && IWR_CharacterMovementDirection != ECharMovementDirection::B)
+		{
+			SetIWRCharMovementDir(ECharMovementDirection::B);
+		}
+	}
+}
+
 void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 {
 	if (Controller && Controller->IsLocalPlayerController())
@@ -1180,6 +1244,11 @@ void APlayerCharacter::LoadEquippedWeaponAnimationReferences()
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
+	if (!IsBlocking())
+	{
+		DisableBlock();
+	}
+
 	if (!CanUseAnySkill())
 	{
 #if MESSAGE_LOGGING_ENABLED

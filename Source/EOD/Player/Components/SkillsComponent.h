@@ -12,6 +12,7 @@
 class USkillBarWidget;
 class USkillTreeWidget;
 class APlayerCharacter;
+class UStatusEffectBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EOD_API USkillsComponent : public UActorComponent
@@ -97,6 +98,8 @@ private:
 	FTimerHandle ChainSkillTimerHandle;
 
 	TMap<FString, TSharedPtr<FStreamableHandle>> SkillGroupAnimationStreamableHandles;
+
+	TMap<FString, UStatusEffectBase*> SkillGroupToStatusEffectMap;
 
 	void ResetChainSkill();
 

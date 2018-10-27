@@ -80,8 +80,13 @@ public:
 	/** Called to deinitialize this status effect on a character */
 	virtual void Deinitialize();
 
+	UFUNCTION(BlueprintNativeEvent, Category = StatusEffects)
+	void OnTriggerEvent(AEODCharacterBase* RecipientCharacter);
+
+	virtual void OnTriggerEvent_Implementation(AEODCharacterBase* RecipientCharacter);
+
 	/** Called when an event that triggers this status effect occurs */
-	virtual void OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>& RecipientCharacters);
+	// virtual void OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>& RecipientCharacters);
 
 	/** Called for recipient character to deactivate this status effect, i.e., using a potion to stop bleed effect */
 	virtual void RequestDeactivation(AEODCharacterBase* Character);

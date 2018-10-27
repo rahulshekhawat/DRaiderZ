@@ -7,6 +7,7 @@
 #include "Core/EODSaveGame.h"
 #include "Core/GameSingleton.h"
 #include "Player/PlayerCharacter.h"
+#include "StatusEffects/StatusEffectBase.h"
 
 #include "Engine/Engine.h"
 #include "Engine/World.h"
@@ -216,6 +217,15 @@ void USkillsComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, co
 	SkillBarWidget->PutSkillOnCooldownTimer(SkillGroup, Skill->Cooldown, 0.5f);
 
 	GetWorld()->GetTimerManager().ClearTimer(ChainSkillTimerHandle);
+
+	if (SkillGroupToStatusEffectMap.Contains(SkillGroup))
+	{
+		UStatusEffectBase* StatusEffect = SkillGroupToStatusEffectMap[SkillGroup];
+		if (StatusEffect)
+		{
+			StatusEffect->OnTriggerEvent(GetOwningEODPlayer());
+		}
+	}
 }
 
 void USkillsComponent::SetOffChainSkillReset()
@@ -279,11 +289,42 @@ void USkillsComponent::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
 		{
 			OnSkillGroupAddedToSkillBar(Skill->SupersedingSkillGroup);
 		}
+
+		if (SkillGroupToStatusEffectMap.Contains(SkillGroup))
+		{
+			SkillGroupToStatusEffectMap[SkillGroup]->MarkPendingKill();
+			SkillGroupToStatusEffectMap.Remove(SkillGroup);
+		}
+
+		if (Skill->StatusEffect.Get())
+		{
+			// UStatusEffectBase* StatusEffect = NewObject<UStatusEffectBase>(nullptr, Skill->StatusEffect.Get(), NAME_None, RF_Transient);
+			UStatusEffectBase* StatusEffect = NewObject<UStatusEffectBase>(GetTransientPackage(), Skill->StatusEffect.Get(), NAME_None, RF_Transient);
+			if (StatusEffect)
+			{
+				SkillGroupToStatusEffectMap.Add(SkillGroup, StatusEffect);
+			}
+		}
 	}
 }
 
 void USkillsComponent::OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup)
 {
+	if (SkillGroupAnimationStreamableHandles.Contains(SkillGroup))
+	{
+		TSharedPtr<FStreamableHandle>& AnimHandle = SkillGroupAnimationStreamableHandles[SkillGroup];
+		if (AnimHandle.IsValid())
+		{
+			AnimHandle.Get()->ReleaseHandle();
+			SkillGroupAnimationStreamableHandles.Remove(SkillGroup);
+		}
+	}
+
+	if (SkillGroupToStatusEffectMap.Contains(SkillGroup))
+	{
+		SkillGroupToStatusEffectMap[SkillGroup]->MarkPendingKill();
+		SkillGroupToStatusEffectMap.Remove(SkillGroup);
+	}
 }
 
 void USkillsComponent::ResetChainSkill()

@@ -51,6 +51,11 @@ void UStatusEffectBase::Deinitialize()
 	GetCharacterToStatusInfoMap()->Empty();
 }
 
+void UStatusEffectBase::OnTriggerEvent_Implementation(AEODCharacterBase* RecipientCharacter)
+{
+}
+
+/*
 void UStatusEffectBase::OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>& RecipientCharacters)
 {
 	for (TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter : RecipientCharacters)
@@ -65,6 +70,7 @@ void UStatusEffectBase::OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>
 		ActivateStatusEffect(RecipientCharacter);
 	}
 }
+*/
 
 void UStatusEffectBase::RequestDeactivation(AEODCharacterBase * Character)
 {
