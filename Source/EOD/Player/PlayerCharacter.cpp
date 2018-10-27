@@ -1070,11 +1070,7 @@ FName APlayerCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECha
 		Postfix = FString("Staff");
 		break;
 	case EWeaponType::Shield:
-		Postfix = FString("Shield");
-		break;
 	case EWeaponType::None:
-		Postfix = FString("NoWeapon");
-		break;
 	default:
 		Postfix = FString("NoWeapon");
 		break;

@@ -224,6 +224,12 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
 	TSoftObjectPtr<UAnimMontage> Die;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SoundEffects)
+	TArray<TSoftObjectPtr<USoundBase>> NormalHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SoundEffects)
+	TArray<TSoftObjectPtr<USoundBase>> CriticalHitSounds;
+
 	/** Reference to player animation montage that contains animations for special movement (@todo more info) */
 	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	// TSoftObjectPtr<UAnimMontage> SpecialMovement;

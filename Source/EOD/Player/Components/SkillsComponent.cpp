@@ -252,10 +252,10 @@ void USkillsComponent::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
 
 		if (SkillGroupAnimationStreamableHandles.Contains(SkillGroup))
 		{
-			TSharedPtr<FStreamableHandle>& Handle = SkillGroupAnimationStreamableHandles[SkillGroup];
-			if (Handle.IsValid())
+			TSharedPtr<FStreamableHandle>& AnimHandle = SkillGroupAnimationStreamableHandles[SkillGroup];
+			if (AnimHandle.IsValid())
 			{
-				Handle.Get()->ReleaseHandle();
+				AnimHandle.Get()->ReleaseHandle();
 				SkillGroupAnimationStreamableHandles.Remove(SkillGroup);
 			}
 		}
@@ -268,10 +268,10 @@ void USkillsComponent::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
 		
 		if (GameSingleton)
 		{
-			TSharedPtr<FStreamableHandle> Handle = GameSingleton->StreamableManager.RequestSyncLoad(Skill->AnimMontage.ToSoftObjectPath());
-			if (Handle.IsValid())
+			TSharedPtr<FStreamableHandle> AnimHandle = GameSingleton->StreamableManager.RequestSyncLoad(Skill->AnimMontage.ToSoftObjectPath());
+			if (AnimHandle.IsValid())
 			{
-				SkillGroupAnimationStreamableHandles.Add(SkillGroup, Handle);
+				SkillGroupAnimationStreamableHandles.Add(SkillGroup, AnimHandle);
 			}
 		}
 
