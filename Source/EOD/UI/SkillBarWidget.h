@@ -165,7 +165,7 @@ inline bool USkillBarWidget::IsSkillInCooldown(int32 SkillIndex) const
 	return false;
 }
 
-inline UEODItemContainer * USkillBarWidget::GetSkillButtonAtIndex(int32 ButtonIndex) const
+inline UEODItemContainer* USkillBarWidget::GetSkillButtonAtIndex(int32 ButtonIndex) const
 {
 	switch (ButtonIndex)
 	{

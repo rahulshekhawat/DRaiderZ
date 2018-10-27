@@ -4,7 +4,6 @@
 #include "PlayerAnimInstance.h"
 #include "Core/GameSingleton.h"
 #include "Statics/WeaponLibrary.h"
-#include "Components/SkillsComponent.h"
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
 #include "Core/EODPreprocessors.h"

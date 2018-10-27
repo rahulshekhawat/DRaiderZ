@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataTable.h"
-#include "Engine/StreamableManager.h"
-#include "Player/EODCharacterBase.h"
 #include "Weapons/PrimaryWeapon.h"
 #include "Weapons/SecondaryWeapon.h"
+#include "Player/EODCharacterBase.h"
+#include "Components/SkillsComponent.h"
+
+#include "Engine/DataTable.h"
+#include "Engine/StreamableManager.h"
 #include "PlayerCharacter.generated.h"
 
 class UHUDWidget;
@@ -272,6 +274,10 @@ public:
 	virtual void TurnOffTargetSwitch() override;
 
 	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
+
+	FORCEINLINE void OnSkillGroupAddedToSkillBar(const FString& SkillGroup);
+
+	FORCEINLINE void OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup);
 
 private:
 
@@ -555,6 +561,16 @@ FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
 {
 	bRotateSmoothly = true;
 	DesiredSmoothRotationYaw = DesiredYaw;
+}
+
+FORCEINLINE void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
+{
+	SkillsComponent->OnSkillGroupAddedToSkillBar(SkillGroup);
+}
+
+FORCEINLINE void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup)
+{
+	SkillsComponent->OnSkillGroupRemovedFromSkillBar(SkillGroup);
 }
 
 inline void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)

@@ -132,9 +132,6 @@ private:
 
 	FTimerHandle CooldownTimerHandle;
 
-	// void UpdateItemButton();
-
-
 };
 
 inline void UEODItemContainer::ResetContainer()

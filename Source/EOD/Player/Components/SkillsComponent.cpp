@@ -8,6 +8,7 @@
 #include "Core/GameSingleton.h"
 #include "Player/PlayerCharacter.h"
 
+#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -32,6 +33,7 @@ void USkillsComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	InitializeComponentWidgets();
+	InitializeSkillBar();
 }
 
 void USkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -84,6 +86,17 @@ void USkillsComponent::InitializeComponentWidgets()
 	{
 		SkillBarWidget = CreateWidget<USkillBarWidget>(OwningPlayer->GetGameInstance(), SkillBarWidgetClass);
 		OwningPlayer->GetHUDWidget()->AddSkillBarWidget(SkillBarWidget);
+	}
+}
+
+void USkillsComponent::InitializeSkillBar()
+{
+	check(SkillBarWidget);
+
+	for (int i = 1; i <= 20; i++)
+	{
+		FString SkillGroup = SkillBarWidget->GetSkillGroupAtIndex(i);
+		OnSkillGroupAddedToSkillBar(SkillGroup);
 	}
 }
 
@@ -208,6 +221,69 @@ void USkillsComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, co
 void USkillsComponent::SetOffChainSkillReset()
 {
 	GetWorld()->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &USkillsComponent::ResetChainSkill, ChainSkillResetDelay, false);
+}
+
+void USkillsComponent::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
+{
+	APlayerCharacter* PlayerPawn = GetOwningEODPlayer();
+	if (!PlayerPawn || SkillGroup == FString(""))
+	{
+		return;
+	}
+
+	if (SkillTreeWidget)
+	{
+		FSkillState SkillState = SkillTreeWidget->GetSkillState(SkillGroup);
+
+#if TEST_CODE_ENABLED
+		if (SkillState.CurrentUpgradeLevel == 0)
+		{
+			SkillState.CurrentUpgradeLevel = 1;
+		}
+#endif // TEST_CODE_ENABLED
+
+		FString SkillIDString = GetGenderPrefix() + SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
+		FSkillTableRow* Skill = PlayerPawn->GetSkill(FName(*SkillIDString));
+
+		if (!Skill)
+		{
+			return;
+		}
+
+		if (SkillGroupAnimationStreamableHandles.Contains(SkillGroup))
+		{
+			TSharedPtr<FStreamableHandle>& Handle = SkillGroupAnimationStreamableHandles[SkillGroup];
+			if (Handle.IsValid())
+			{
+				Handle.Get()->ReleaseHandle();
+				SkillGroupAnimationStreamableHandles.Remove(SkillGroup);
+			}
+		}
+
+		UGameSingleton* GameSingleton = nullptr;
+		if (GEngine)
+		{
+			GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+		}
+		
+		if (GameSingleton)
+		{
+			TSharedPtr<FStreamableHandle> Handle = GameSingleton->StreamableManager.RequestSyncLoad(Skill->AnimMontage.ToSoftObjectPath());
+			if (Handle.IsValid())
+			{
+				SkillGroupAnimationStreamableHandles.Add(SkillGroup, Handle);
+			}
+		}
+
+		if (Skill->SupersedingSkillGroup != FString(""))
+		{
+			OnSkillGroupAddedToSkillBar(Skill->SupersedingSkillGroup);
+		}
+	}
+}
+
+void USkillsComponent::OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup)
+{
 }
 
 void USkillsComponent::ResetChainSkill()

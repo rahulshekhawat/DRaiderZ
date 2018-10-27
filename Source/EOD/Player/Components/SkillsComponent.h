@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Statics/CharacterLibrary.h"
+
+#include "Engine/StreamableManager.h"
 #include "Components/ActorComponent.h"
 #include "SkillsComponent.generated.h"
 
@@ -46,6 +48,8 @@ public:
 
 	void InitializeComponentWidgets();
 
+	void InitializeSkillBar();
+
 	/** Returns true if player can use skill placed at given skill slot index */
 	bool CanUseSkill(const int32 SkillSlotIndex);
 
@@ -59,6 +63,10 @@ public:
 	void OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, const FSkillTableRow* Skill);
 
 	void SetOffChainSkillReset();
+
+	void OnSkillGroupAddedToSkillBar(const FString& SkillGroup);
+
+	void OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup);
 
 protected:
 
@@ -86,9 +94,16 @@ private:
 
 	FString ActivePrecedingChainSkillGroup;
 
+	FTimerHandle ChainSkillTimerHandle;
+
+	TMap<FString, TSharedPtr<FStreamableHandle>> SkillGroupAnimationStreamableHandles;
+
 	void ResetChainSkill();
 
-	FTimerHandle ChainSkillTimerHandle;
+	/** Get the owning EOD player of this component */
+	FORCEINLINE APlayerCharacter* GetOwningEODPlayer() const;
+
+	FORCEINLINE FString GetGenderPrefix() const;
 
 };
 
@@ -100,4 +115,22 @@ FORCEINLINE USkillBarWidget* USkillsComponent::GetSkillBarWidget() const
 FORCEINLINE USkillTreeWidget* USkillsComponent::GetSkillTreeWidget() const
 {
 	return SkillTreeWidget;
+}
+
+FORCEINLINE APlayerCharacter* USkillsComponent::GetOwningEODPlayer() const
+{
+	APlayerCharacter* EODOwner = Cast<APlayerCharacter>(GetOwner());
+	return EODOwner;
+}
+
+FORCEINLINE FString USkillsComponent::GetGenderPrefix() const
+{
+	if (OwnerGender == ECharacterGender::Female)
+	{
+		return FString("F_");
+	}
+	else
+	{
+		return FString("M_");
+	}
 }

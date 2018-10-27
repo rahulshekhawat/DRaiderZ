@@ -27,7 +27,6 @@ bool UEODItemContainer::Initialize()
 	CooldownText->SetVisibility(ESlateVisibility::Hidden);
 
 	SetupEmptyBorderMaterial();
-
 	RefreshContainerVisuals();
 	return true;
 }
@@ -168,43 +167,3 @@ void UEODItemContainer::UpdateCooldown()
 	CooldownText->SetText(FText::FromString(FString::FromInt(CooldownTimeRemaining)));
 	CooldownTimeRemaining -= CooldownInterval;
 }
-
-/*
-void UEODItemContainer::UpdateItemButton()
-{
-	if (EODItemInfo.Icon)
-	{
-		FSlateBrush SlateBrush;
-		// SlateBrush.ImageSize = FVector2D(52.0, 52.0);
-		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
-		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
-		SlateBrush.SetResourceObject(EODItemInfo.Icon);
-
-		FButtonStyle ButtonStyle;
-		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
-		ButtonStyle.SetNormal(SlateBrush);
-		SlateBrush.ImageSize = FVector2D(54.0, 54.0);
-		ButtonStyle.SetHovered(SlateBrush);
-		SlateBrush.ImageSize = FVector2D(50.0, 50.0);
-		ButtonStyle.SetPressed(SlateBrush);
-
-		ItemButton->SetStyle(ButtonStyle);
-	}
-	else
-	{
-		FSlateBrush SlateBrush;
-		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
-		SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
-		SlateBrush.ImageType = ESlateBrushImageType::NoImage;
-
-		FButtonStyle ButtonStyle;
-		ButtonStyle.SetNormal(SlateBrush);
-		ButtonStyle.SetHovered (SlateBrush);
-		ButtonStyle.SetPressed(SlateBrush);
-
-		ItemButton->SetStyle(ButtonStyle);
-	}
-
-}
-*/
-
