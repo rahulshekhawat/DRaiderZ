@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TimerManager.h"
-#include "UObject/NoExportTypes.h"
+#include "Engine/DataAsset.h"
 #include "StatusEffectBase.generated.h"
 
 class AEODCharacterBase;
@@ -61,7 +61,7 @@ public:
  * destroyed when the weapon is unequipped.
  */
 UCLASS(BlueprintType, Blueprintable)
-class EOD_API UStatusEffectBase : public UObject
+class EOD_API UStatusEffectBase : public UDataAsset
 {
 	GENERATED_BODY()
 	
