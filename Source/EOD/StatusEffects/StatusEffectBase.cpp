@@ -32,10 +32,10 @@ UStatusEffectBase::UStatusEffectBase(const FObjectInitializer& ObjectInitializer
 	ActivationChance = 1.f;
 }
 
-void UStatusEffectBase::Initialize(AEODCharacterBase* Owner, AActor* Instigator)
+void UStatusEffectBase::Initialize(AEODCharacterBase* NewOwner, AActor* NewInstigator)
 {
-	SetOwningCharacter(Owner);
-	SetInstigator(Instigator);
+	SetOwningCharacter(NewOwner);
+	SetInstigator(NewInstigator);
 }
 
 void UStatusEffectBase::Deinitialize()
@@ -51,9 +51,40 @@ void UStatusEffectBase::Deinitialize()
 	GetCharacterToStatusInfoMap()->Empty();
 }
 
-void UStatusEffectBase::OnTriggerEvent_Implementation(AEODCharacterBase* RecipientCharacter)
+void UStatusEffectBase::OnTriggerEvent_Implementation(AEODCharacterBase * RecipientCharacter)
 {
 }
+
+void UStatusEffectBase::RequestDeactivation(AEODCharacterBase* Character)
+{
+	// TWeakObjectPtr<AEODCharacterBase> RecipientCharacter(Character);
+	// DeactivateStatusEffect(RecipientCharacter);
+}
+
+void UStatusEffectBase::ActivateStatusEffect_Implementation(AEODCharacterBase * TargetCharacter)
+{
+}
+
+void UStatusEffectBase::DeactivateStatusEffect_Implementation(AEODCharacterBase* TargetCharacter)
+{
+}
+
+void UStatusEffectBase::OnStatusEffectTick_Implementation(AEODCharacterBase* TargetCharacter)
+{
+}
+
+/*
+void UStatusEffectBase::OnTriggerEvent(AEODCharacterBase* RecipientCharacter)
+{
+	bool bShouldActivate = ActivationChance >= FMath::RandRange(0.f, 1.f) ? true : false;
+	if (bShouldActivate && RecipientCharacter)
+	{
+		ActivateStatusEffect(RecipientCharacter);
+	}
+}
+*/
+
+
 
 /*
 void UStatusEffectBase::OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>& RecipientCharacters)
@@ -72,12 +103,7 @@ void UStatusEffectBase::OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>
 }
 */
 
-void UStatusEffectBase::RequestDeactivation(AEODCharacterBase * Character)
-{
-	TWeakObjectPtr<AEODCharacterBase> RecipientCharacter(Character);
-	DeactivateStatusEffect(RecipientCharacter);
-}
-
+/*
 void UStatusEffectBase::ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter)
 {
 	if (GetCharacterToStatusInfoMap()->Contains(RecipientCharacter))
@@ -114,23 +140,4 @@ void UStatusEffectBase::DeactivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>
 	StatusInfo.TimerHandle = nullptr;
 	GetCharacterToStatusInfoMap()->Remove(RecipientCharacter);
 }
-
-AEODCharacterBase* UStatusEffectBase::GetOwningCharacter() const
-{
-	return OwningCharacter;
-}
-
-AActor* UStatusEffectBase::GetInstigator() const
-{
-	return Instigator;
-}
-
-void UStatusEffectBase::SetOwningCharacter(AEODCharacterBase* NewCharacter)
-{
-	OwningCharacter = NewCharacter;
-}
-
-void UStatusEffectBase::SetInstigator(AActor * NewInstigator)
-{
-	Instigator = NewInstigator;
-}
+*/

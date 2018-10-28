@@ -298,8 +298,8 @@ void USkillsComponent::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
 
 		if (Skill->StatusEffect.Get())
 		{
-			// UStatusEffectBase* StatusEffect = NewObject<UStatusEffectBase>(nullptr, Skill->StatusEffect.Get(), NAME_None, RF_Transient);
-			UStatusEffectBase* StatusEffect = NewObject<UStatusEffectBase>(GetTransientPackage(), Skill->StatusEffect.Get(), NAME_None, RF_Transient);
+			// UStatusEffectBase* StatusEffect = NewObject<UStatusEffectBase>(GetTransientPackage(), Skill->StatusEffect.Get(), NAME_None, RF_Transient);
+			UStatusEffectBase* StatusEffect = NewObject<UStatusEffectBase>(PlayerPawn, Skill->StatusEffect.Get(), NAME_None, RF_Transient);
 			if (StatusEffect)
 			{
 				SkillGroupToStatusEffectMap.Add(SkillGroup, StatusEffect);

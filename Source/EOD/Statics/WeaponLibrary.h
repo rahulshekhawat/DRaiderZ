@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "UObject/NoExportTypes.h"
-#include "StatusEffects/ElementalBase.h"
+// #include "StatusEffects/ElementalBase.h"
 #include "WeaponLibrary.generated.h"
 
 /** This enum describes all the types of weapons available in-game */
@@ -133,8 +133,8 @@ public:
 	 * Default elemental affinity of this weapon
 	 * @note The weapon won't support elemental enchant if the elemental affinity is not none
 	 */
-	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	TSubclassOf<UElementalBase> ElementalAffinity;
+	// UPROPERTY(EditAnywhere, Category = AdditionalInfo)
+	// TSubclassOf<UElementalBase> ElementalAffinity;
 };
 
 

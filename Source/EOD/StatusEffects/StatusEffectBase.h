@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "TimerManager.h"
-#include "Engine/DataAsset.h"
+#include "UObject/NoExportTypes.h"
 #include "StatusEffectBase.generated.h"
 
+class UTexture;
+class UParticleSystem;
 class AEODCharacterBase;
 
 /** This USTRUCT is just a wrapper around TWeakObjectPtr<AEODCharacterBase> so that it can be passed as a parameter for UFUNCTION */
@@ -14,8 +16,6 @@ USTRUCT()
 struct EOD_API FBaseCharacter_WeakObjPtrWrapper
 {
 	GENERATED_USTRUCT_BODY()
-
-public:
 
 	TWeakObjectPtr<AEODCharacterBase> RecipientCharacter;
 
@@ -27,12 +27,14 @@ struct EOD_API FStatusInfo
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-
+	/** Current stack level of this status effect */
 	int CurrentStackLevel;
 
+	/** Total duration status effect has been active */
 	float TotalElapsedTime;
 
+	/** Pointer to timer handle managing the status effect */
+	TSharedPtr<FTimerHandle> TimerHandlePtr;
 	FTimerHandle* TimerHandle;
 
 	FTimerDelegate TimerDelegate;
@@ -41,7 +43,6 @@ public:
 	{
 		CurrentStackLevel = 0;
 		TotalElapsedTime = 0.f;
-		TimerHandle = nullptr;
 	}
 };
 
@@ -61,7 +62,7 @@ public:
  * destroyed when the weapon is unequipped.
  */
 UCLASS(BlueprintType, Blueprintable)
-class EOD_API UStatusEffectBase : public UDataAsset
+class EOD_API UStatusEffectBase : public UObject
 {
 	GENERATED_BODY()
 	
@@ -75,7 +76,7 @@ public:
 	 * @param Owner The character that owns the status effect
 	 * @param Instigator The actor that initiated the status effect. Can be nullptr. For a weapon with elemental enchant, the Instigator would be the weapon.
 	 */
-	virtual void Initialize(class AEODCharacterBase* Owner, class AActor* Instigator);
+	virtual void Initialize(AEODCharacterBase* NewOwner, AActor* NewInstigator);
 	
 	/** Called to deinitialize this status effect on a character */
 	virtual void Deinitialize();
@@ -84,9 +85,6 @@ public:
 	void OnTriggerEvent(AEODCharacterBase* RecipientCharacter);
 
 	virtual void OnTriggerEvent_Implementation(AEODCharacterBase* RecipientCharacter);
-
-	/** Called when an event that triggers this status effect occurs */
-	// virtual void OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>& RecipientCharacters);
 
 	/** Called for recipient character to deactivate this status effect, i.e., using a potion to stop bleed effect */
 	virtual void RequestDeactivation(AEODCharacterBase* Character);
@@ -108,17 +106,18 @@ public:
 
 	/** Icon associated with this status effect */
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
-	class UTexture* Icon;
+	UTexture* Icon;
 	
 	/** Particle system associated with this status effect */
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
-	class UParticleSystem* ParticleSystem;
+	UParticleSystem* ParticleSystem;
 
 	/** Character bone that the particle effect should attach to */	
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	FName ParticleEffectAttachBone;
 	
-	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
+	/** Chance for this status effect to activate (0.f to 1.f) */
+	UPROPERTY(EditDefaultsOnly, Category = BaseInfo, meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
 	float ActivationChance;
 	
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
@@ -127,22 +126,24 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	float StatusEffectDuration;
 	
-	// @todo Add a boolean to follow particle effect attach bone if needed
-	
-	AEODCharacterBase* GetOwningCharacter() const;
+	FORCEINLINE AEODCharacterBase* GetOwningCharacter() const;
 
-	AActor* GetInstigator() const;
+	FORCEINLINE AActor* GetInstigator() const;
 
-	void SetOwningCharacter(AEODCharacterBase* NewCharacter);
+	FORCEINLINE void SetOwningCharacter(AEODCharacterBase* NewCharacter);
 
-	void SetInstigator(AActor* NewInstigator);
+	FORCEINLINE void SetInstigator(AActor* NewInstigator);
 
 	virtual TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* GetCharacterToStatusInfoMap() PURE_VIRTUAL(UStatusEffectBase::GetCharacterToStatusInfoMap , return nullptr; );
 
-protected:
+	// @todo Add a boolean to follow particle effect attach bone if needed
 
-	/** Map of characters affected by this status effect */
-	// static TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CharacterToStatusInfoMap;
+	// virtual void OnTriggerEvent(AEODCharacterBase* RecipientCharacter);
+
+	/** Called when an event that triggers this status effect occurs */
+	// virtual void OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>& RecipientCharacters);
+
+protected:
 
 	/**
 	 * Determines if this status effect should reset on reactivation.
@@ -170,10 +171,6 @@ protected:
 	/** True if the status effect triggers if owner kills an enemy */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
 	uint32 bTriggersOnKillingEnemy : 1;
-
-	/** True if the status effect triggers on Owner failing to land an attack on enemy */
-	// UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
-	// uint32 bTriggersOnUnsuccessfulHit : 1;
 
 	/** True if the status effect triggers on Owner successfully landing a critical attack on enemy */
 	UPROPERTY(EditDefaultsOnly, Category = ActivationCondition)
@@ -219,17 +216,39 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
 	int32 StackLimit;
 
-	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc.
-	
 	/** Called to activate this status effect on a recipient character */
-	virtual void ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter);
-	
+	UFUNCTION(BlueprintNativeEvent, Category = StatusEffects)
+	void ActivateStatusEffect(AEODCharacterBase* TargetCharacter);
+
 	/** Called to deactivate this status effect on a recipient character */
-	virtual void DeactivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter);
+	UFUNCTION(BlueprintNativeEvent, Category = StatusEffects)
+	void DeactivateStatusEffect(AEODCharacterBase* TargetCharacter);
 
 	/** Called to process the ticking of this status effect. Must be overridden in inherited classes */
-	UFUNCTION()
-	virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter) PURE_VIRTUAL(UStatusEffectBase::OnStatusEffectTick, );
+	UFUNCTION(BlueprintNativeEvent, Category = StatusEffects)
+	void OnStatusEffectTick(AEODCharacterBase* TargetCharacter);
+
+	virtual void ActivateStatusEffect_Implementation(AEODCharacterBase* TargetCharacter);
+
+	virtual void DeactivateStatusEffect_Implementation(AEODCharacterBase* TargetCharacter);
+
+	virtual void OnStatusEffectTick_Implementation(AEODCharacterBase* TargetCharacter);
+
+
+	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc. - if that is even practical
+
+	/** Called to activate this status effect on a recipient character */
+	// virtual void ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter);
+
+	/** Called to deactivate this status effect on a recipient character */
+	// virtual void DeactivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter);
+
+	/** Map of characters affected by this status effect */
+	// static TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CharacterToStatusInfoMap;
+
+	/** Called to process the ticking of this status effect. Must be overridden in inherited classes */
+	// UFUNCTION()
+	// virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter) PURE_VIRTUAL(UStatusEffectBase::OnStatusEffectTick, );
 
 private:
 
@@ -248,3 +267,23 @@ private:
 	
 	
 };
+
+FORCEINLINE AEODCharacterBase* UStatusEffectBase::GetOwningCharacter() const
+{
+	return OwningCharacter;
+}
+
+FORCEINLINE AActor* UStatusEffectBase::GetInstigator() const
+{
+	return Instigator;
+}
+
+FORCEINLINE void UStatusEffectBase::SetOwningCharacter(AEODCharacterBase* NewCharacter)
+{
+	OwningCharacter = NewCharacter;
+}
+
+FORCEINLINE void UStatusEffectBase::SetInstigator(AActor* NewInstigator)
+{
+	Instigator = NewInstigator;
+}
