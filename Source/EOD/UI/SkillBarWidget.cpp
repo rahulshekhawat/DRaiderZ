@@ -115,6 +115,26 @@ void USkillBarWidget::LoadSkillBarLayout()
 	}
 }
 
+bool USkillBarWidget::IsSkillGroupInCooldown(const FString& SkillGroup) const
+{
+	UEODItemContainer* SkillContainer = nullptr;
+	for (int i = 1; i <= 20; i++)
+	{
+		if (SkillGroup == GetSkillGroupAtIndex(i))
+		{
+			SkillContainer = GetSkillButtonAtIndex(i);
+			break;
+		}
+	}
+
+	if (SkillContainer)
+	{
+		return SkillContainer->bInCooldown;
+	}
+
+	return true;
+}
+
 void USkillBarWidget::PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval)
 {
 	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);

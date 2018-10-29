@@ -116,28 +116,17 @@ TPair<FName, FSkillTableRow*> USkillsComponent::GetSkillFromSkillSlot(const int3
 	FString SkillGroupToUse;
 	if (ActiveSupersedingChainSkillGroup.Key == SkillSlotIndex)
 	{
-#if MESSAGE_LOGGING_ENABLED
-		FString LogMessage = FString("Chain key found. Skill group: ") + ActiveSupersedingChainSkillGroup.Value;
-		UKismetSystemLibrary::PrintString(this, LogMessage);
-#endif // MESSAGE_LOGGING_ENABLED
 		SkillGroupToUse = ActiveSupersedingChainSkillGroup.Value;
 	}
 	else
 	{
-		FString SlotSkillGroup = SkillBarWidget->GetSkillGroupAtIndex(SkillSlotIndex);
-		// If no skill is equipped in current slot
-		if (SlotSkillGroup == "" || SkillBarWidget->IsSkillInCooldown(SkillSlotIndex))
-		{
-			return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
-		}
-
-		SkillGroupToUse = SlotSkillGroup;
+		SkillGroupToUse = SkillBarWidget->GetSkillGroupAtIndex(SkillSlotIndex);
 	}
 
-#if MESSAGE_LOGGING_ENABLED
-	FString LogMessage = FString("Skill group is: ") + SkillGroupToUse;
-	UKismetSystemLibrary::PrintString(this, LogMessage);
-#endif // MESSAGE_LOGGING_ENABLED
+	if (SkillGroupToUse == FString("") || SkillBarWidget->IsSkillGroupInCooldown(SkillGroupToUse))
+	{
+		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
+	}
 
 	FSkillState SkillState = SkillTreeWidget->GetSkillState(SkillGroupToUse);
 	if (SkillState.CurrentUpgradeLevel == 0)

@@ -100,6 +100,8 @@ public:
 	/** Returns true if skill at given skill index is in cooldown */
 	inline bool IsSkillInCooldown(int32 SkillIndex) const;
 
+	bool IsSkillGroupInCooldown(const FString& SkillGroup) const;
+
 	/** Put skill at given skill index on cooldown */
 	void PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval);
 
