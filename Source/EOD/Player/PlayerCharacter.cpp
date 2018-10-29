@@ -355,7 +355,7 @@ bool APlayerCharacter::CanNormalAttack() const
 
 bool APlayerCharacter::CanUseAnySkill() const
 {
-	return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking());
+	return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsFastRunning());
 }
 
 bool APlayerCharacter::CanUseSkill(FSkillTableRow * Skill)
