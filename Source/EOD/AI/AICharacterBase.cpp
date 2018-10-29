@@ -165,19 +165,24 @@ void AAICharacterBase::SetInCombat(bool bValue)
 
 void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	FSkillTableRow* ActiveSkill = GetCurrentActiveSkill();
-	if (ActiveSkill && ActiveSkill->AnimMontage.Get() == AnimMontage)
+	if (AnimMontage == FlinchAnimMontage)
+	{
+		return;
+	}
+
+	if (IsUsingAnySkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
 	{
 		GetLastUsedSkill().LastUsedSkillID = GetCurrentActiveSkillID();
 		GetLastUsedSkill().bInterrupted = bInterrupted;
 
-		SetCharacterState(ECharacterState::IdleWalkRun);
 		SetCurrentActiveSkillID(NAME_None);
 		SetCurrentActiveSkill(nullptr);
 	}
+
+	SetCharacterState(ECharacterState::IdleWalkRun);
 }
 
-void AAICharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
+void AAICharacterBase::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted)
 {
 	// @todo
 }
