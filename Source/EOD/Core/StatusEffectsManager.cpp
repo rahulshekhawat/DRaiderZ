@@ -9,6 +9,7 @@ AStatusEffectsManager::AStatusEffectsManager(const FObjectInitializer & ObjectIn
 void AStatusEffectsManager::BeginPlay()
 {
     Super::BeginPlay();
+
 }
 
 void AStatusEffectsManager::Tick(float DeltaTime)

@@ -203,7 +203,7 @@ void USkillsComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, co
 	}
 
 	ActivePrecedingChainSkillGroup = SkillGroup;
-	if (Skill->SupersedingSkillGroup == FString(""))
+	if (Skill->SupersedingSkillGroup == FString("") || Skill->SupersedingSkillGroup == FString("None"))
 	{
 		ActiveSupersedingChainSkillGroup.Key = -1;
 		ActiveSupersedingChainSkillGroup.Value = FString("");
@@ -221,7 +221,7 @@ void USkillsComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, co
 	if (SkillGroupToStatusEffectMap.Contains(SkillGroup))
 	{
 		UStatusEffectBase* StatusEffect = SkillGroupToStatusEffectMap[SkillGroup];
-		if (StatusEffect)
+		if (IsValid(StatusEffect))
 		{
 			StatusEffect->OnTriggerEvent(GetOwningEODPlayer());
 		}
@@ -302,6 +302,7 @@ void USkillsComponent::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
 			UStatusEffectBase* StatusEffect = NewObject<UStatusEffectBase>(PlayerPawn, Skill->StatusEffect.Get(), NAME_None, RF_Transient);
 			if (StatusEffect)
 			{
+				StatusEffect->Initialize(GetOwningEODPlayer(), nullptr);
 				SkillGroupToStatusEffectMap.Add(SkillGroup, StatusEffect);
 			}
 		}

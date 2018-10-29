@@ -35,7 +35,7 @@ struct EOD_API FStatusInfo
 
 	/** Pointer to timer handle managing the status effect */
 	TSharedPtr<FTimerHandle> TimerHandlePtr;
-	FTimerHandle* TimerHandle;
+	// FTimerHandle* TimerHandle;
 
 	FTimerDelegate TimerDelegate;
 
@@ -88,7 +88,7 @@ public:
 
 	/** Called for recipient character to deactivate this status effect, i.e., using a potion to stop bleed effect */
 	virtual void RequestDeactivation(AEODCharacterBase* Character);
-	
+
 	/** Status effect name that will be visible to player inside game */
 	UPROPERTY(EditDefaultsOnly, Category = BaseInfo)
 	FString InGameName;
@@ -134,14 +134,7 @@ public:
 
 	FORCEINLINE void SetInstigator(AActor* NewInstigator);
 
-	virtual TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo>* GetCharacterToStatusInfoMap() PURE_VIRTUAL(UStatusEffectBase::GetCharacterToStatusInfoMap , return nullptr; );
-
 	// @todo Add a boolean to follow particle effect attach bone if needed
-
-	// virtual void OnTriggerEvent(AEODCharacterBase* RecipientCharacter);
-
-	/** Called when an event that triggers this status effect occurs */
-	// virtual void OnTriggerEvent(TArray<TWeakObjectPtr<AEODCharacterBase>>& RecipientCharacters);
 
 protected:
 
@@ -216,6 +209,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
 	int32 StackLimit;
 
+	// TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CharacterToStatusInfoMap;
+
+	TMap<AEODCharacterBase*, FStatusInfo> CharacterToStatusInfoMap;
+
 	/** Called to activate this status effect on a recipient character */
 	UFUNCTION(BlueprintNativeEvent, Category = StatusEffects)
 	void ActivateStatusEffect(AEODCharacterBase* TargetCharacter);
@@ -234,21 +231,7 @@ protected:
 
 	virtual void OnStatusEffectTick_Implementation(AEODCharacterBase* TargetCharacter);
 
-
 	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc. - if that is even practical
-
-	/** Called to activate this status effect on a recipient character */
-	// virtual void ActivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter);
-
-	/** Called to deactivate this status effect on a recipient character */
-	// virtual void DeactivateStatusEffect(TWeakObjectPtr<AEODCharacterBase>& RecipientCharacter);
-
-	/** Map of characters affected by this status effect */
-	// static TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CharacterToStatusInfoMap;
-
-	/** Called to process the ticking of this status effect. Must be overridden in inherited classes */
-	// UFUNCTION()
-	// virtual void OnStatusEffectTick(FBaseCharacter_WeakObjPtrWrapper& WrappedRecipientCharacter) PURE_VIRTUAL(UStatusEffectBase::OnStatusEffectTick, );
 
 private:
 
@@ -257,14 +240,9 @@ private:
 
 	UPROPERTY(Transient)
 	AActor* Instigator;
-	
-	// @todo Add flags to determine allies and enemies (for buff and debuff effects)
-	// @note better to handle allies from ABaseCharacter class and add/use a function like TArray<ABaseCharacter*> GetAllies();
-	// int AllyFlag;
+
 	// @todo add boolean to check if this status effects deactives on death
 	// @todo add boolean to determine whether the status effect is currently active or not
-	
-	
 	
 };
 

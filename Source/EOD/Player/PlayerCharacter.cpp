@@ -674,33 +674,6 @@ void APlayerCharacter::OnPressedEscape()
 	// @todo pause game, show cursor and display pause menu
 }
 
-void APlayerCharacter::EnableBlock()
-{
-	if (IsAutoRunning())
-	{
-		DisableAutoRun();
-	}
-
-	if (IsNormalAttacking())
-	{
-		StopNormalAttacking();
-	}
-
-	SetCharacterState(ECharacterState::Blocking);
-	SetUseControllerRotationYaw(true);
-	SetWalkSpeed(BaseBlockMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier());
-
-	FTimerHandle TimerDelegate;
-	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);
-}
-
-void APlayerCharacter::DisableBlock()
-{
-	SetUseControllerRotationYaw(false);
-	SetCharacterState(ECharacterState::IdleWalkRun);
-	DisableDamageBlocking();
-}
-
 void APlayerCharacter::OnJump()
 {
 	if (CanJump() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Jump.Get())
@@ -1244,7 +1217,7 @@ void APlayerCharacter::LoadEquippedWeaponAnimationReferences()
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
-	if (!IsBlocking())
+	if (IsBlocking())
 	{
 		DisableBlock();
 	}

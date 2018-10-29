@@ -279,6 +279,10 @@ public:
 
 	FORCEINLINE void OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup);
 
+	inline void EnableFastRun();
+
+	inline void DisableFastRun();
+
 private:
 
 	const int CameraZoomRate = 15;
@@ -418,10 +422,10 @@ private:
 	void OnPressedEscape();
 
 	/** Enable damage blocking */
-	FORCEINLINE void EnableBlock();
+	inline void EnableBlock();
 
 	/** Disable damage blocking */
-	FORCEINLINE void DisableBlock();
+	inline void DisableBlock();
 
 	/** Event triggered when player presses the jump key */
 	void OnJump();
@@ -584,3 +588,47 @@ inline void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDi
 		Server_SetIWRCharMovementDir(NewDirection);
 	}
 }
+
+inline void APlayerCharacter::EnableBlock()
+{
+	if (IsAutoRunning())
+	{
+		DisableAutoRun();
+	}
+
+	if (IsNormalAttacking())
+	{
+		StopNormalAttacking();
+	}
+
+	SetCharacterState(ECharacterState::Blocking);
+	SetUseControllerRotationYaw(true);
+	SetWalkSpeed(BaseBlockMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier());
+
+	FTimerHandle TimerDelegate;
+	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);
+}
+
+inline void APlayerCharacter::DisableBlock()
+{
+	SetUseControllerRotationYaw(false);
+	SetCharacterState(ECharacterState::IdleWalkRun);
+	DisableDamageBlocking();
+}
+
+inline void APlayerCharacter::EnableFastRun()
+{
+	if (IsIdleOrMoving())
+	{
+		SetCharacterState(ECharacterState::SpecialMovement);
+	}
+}
+
+inline void APlayerCharacter::DisableFastRun()
+{
+	if (IsFastRunning())
+	{
+		SetCharacterState(ECharacterState::IdleWalkRun);
+	}
+}
+

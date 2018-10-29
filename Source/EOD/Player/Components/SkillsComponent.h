@@ -99,6 +99,8 @@ private:
 
 	TMap<FString, TSharedPtr<FStreamableHandle>> SkillGroupAnimationStreamableHandles;
 
+	//~ Marked upropert to prevent garbage collection
+	UPROPERTY()
 	TMap<FString, UStatusEffectBase*> SkillGroupToStatusEffectMap;
 
 	void ResetChainSkill();

@@ -17,8 +17,9 @@ class EOD_API UFuriousDashBase : public UStatusEffectBase
 public:
 
 	UFuriousDashBase(const FObjectInitializer& ObjectInitializer);
+	
+protected:
 
-	virtual void OnTriggerEvent_Implementation(AEODCharacterBase* RecipientCharacter) override;
-	
-	
+	virtual void OnStatusEffectTick_Implementation(AEODCharacterBase* TargetCharacter) override;
+
 };
