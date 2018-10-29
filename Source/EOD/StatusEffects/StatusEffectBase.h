@@ -209,8 +209,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Reactivation)
 	int32 StackLimit;
 
-	// TMap<TWeakObjectPtr<AEODCharacterBase>, FStatusInfo> CharacterToStatusInfoMap;
-
+	UPROPERTY()
 	TMap<AEODCharacterBase*, FStatusInfo> CharacterToStatusInfoMap;
 
 	/** Called to activate this status effect on a recipient character */

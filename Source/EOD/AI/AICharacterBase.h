@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Statics/CharacterLibrary.h"
 #include "Player/EODCharacterBase.h"
+
+#include "Engine/StreamableManager.h"
 #include "AICharacterBase.generated.h"
 
 class UEODWidgetComponent;
@@ -93,7 +95,6 @@ public:
 	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const override;
 
-	// virtual FSkillDamageInfo GetCurrentActiveSkillDamageInfo() const override;
 private:
 
 	/** Used to display floating aggro widget above AI character */
@@ -127,10 +128,6 @@ private:
 	/** Animation montage containing animations for character flinch */
 	UPROPERTY(EditDefaultsOnly, Category = Animations, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* FlinchAnimMontage;
-
-	/** Data table for character skills */
-	// UPROPERTY(EditDefaultsOnly, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UDataTable* SkillsDataTable;
 
 	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
 	void UpdateMaxWalkSpeed();
@@ -192,7 +189,15 @@ private:
 	TArray<FName> PartyBuffSkills;
 
 	/** A map of skills to their usability weight */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TMap<FName, int32> SkillIDToWeightMap;
+	// UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// TMap<FName, int32> SkillPriorityMap;
+
+	/** A map of skills to their usability weight */
+	// UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// TMap<FName, int32> SkillWeightMap;
+
+	TSharedPtr<FStreamableHandle> SkillAnimationsStreamableHandle;
+
+	void InitializeSkills();
 
 };

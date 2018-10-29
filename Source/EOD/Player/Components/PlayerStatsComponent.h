@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Statics/WeaponLibrary.h"
 #include "Player/Components/StatsComponentBase.h"
 #include "PlayerStatsComponent.generated.h"
 
@@ -310,6 +311,14 @@ public:
 
 	FORCEINLINE void InitializeComponentWidget();
 
+	void AddPrimaryWeaponStats(FWeaponTableRow* WeaponData);
+
+	void AddSecondaryWeaponStats(FWeaponTableRow* WeaponData);
+
+	void RemovePrimaryWeaponStats();
+
+	void RemoveSecondaryWeaponStats();
+
 private:
 	
 	//~ @note All changes to variables similar to MaxHealth, CurrentHealth, etc. will occur ONLY on server and will automatically get replicated. No RPC needed.
@@ -508,6 +517,10 @@ private:
 	FTimerHandle ManaRegenTimerHandle;
 
 	FTimerHandle StaminaRegenTimerHandle;
+
+	FWeaponTableRow* PrimaryWeaponData;
+
+	FWeaponTableRow* SecondaryWeaponData;
 
 	/** Starts health regeneration on player. Automatically stops once the health is full or if manually stopped */
 	void ActivateHealthRegeneration();

@@ -1019,6 +1019,44 @@ void UPlayerStatsComponent::InitializeComponentWidget()
 	}
 }
 
+void UPlayerStatsComponent::AddPrimaryWeaponStats(FWeaponTableRow* WeaponData)
+{
+	if (PrimaryWeaponData && PrimaryWeaponData == WeaponData)
+	{
+		return;
+	}
+	else if (PrimaryWeaponData && PrimaryWeaponData != WeaponData)
+	{
+		RemovePrimaryWeaponStats();
+	}
+
+	PrimaryWeaponData = WeaponData;
+}
+
+void UPlayerStatsComponent::AddSecondaryWeaponStats(FWeaponTableRow* WeaponData)
+{
+	if (SecondaryWeaponData && SecondaryWeaponData == WeaponData)
+	{
+		return;
+	}
+	else if (SecondaryWeaponData && SecondaryWeaponData != WeaponData)
+	{
+		RemoveSecondaryWeaponStats();
+	}
+
+	SecondaryWeaponData = WeaponData;
+}
+
+void UPlayerStatsComponent::RemovePrimaryWeaponStats()
+{
+	PrimaryWeaponData = nullptr;
+}
+
+void UPlayerStatsComponent::RemoveSecondaryWeaponStats()
+{
+	SecondaryWeaponData = nullptr;
+}
+
 void UPlayerStatsComponent::ActivateHealthRegeneration()
 {
 	GetWorld()->GetTimerManager().SetTimer(HealthRegenTimerHandle,

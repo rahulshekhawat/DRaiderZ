@@ -1383,6 +1383,7 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 	SecondaryWeaponID = WeaponID;
 	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
 
+	
 	// @todo add weapon stats
 }
 

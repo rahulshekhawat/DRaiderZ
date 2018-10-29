@@ -6,6 +6,7 @@
 #include "Components/AIStatsComponent.h"
 #include "Player/Components/EODWidgetComponent.h"
 
+#include "Engine/Engine.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -29,9 +30,16 @@ void AAICharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	// AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
-	// HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+	if (AggroWidgetComp->GetUserWidgetObject())
+	{
+		AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+	}
+	if (HealthWidgetComp->GetUserWidgetObject())
+	{
+		HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+	}
 
+	InitializeSkills();
 }
 
 void AAICharacterBase::BeginPlay()
@@ -39,100 +47,15 @@ void AAICharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	SetInCombat(false);
-
-	/*
-	check(SkillsDataTable);;
-
-	TArray<FName> SkillIDs = SkillsDataTable->GetRowNames();
-	for (const FName& SkillID : SkillIDs)
-	{
-		FAISkillTableRow* AISkill = SkillsDataTable->FindRow<FAISkillTableRow>(SkillID, FString("Looking up AI skill"), false);
-		check(AISkill);
-
-		if (AISkill->SkillType == ESkillType::BuffParty)
-		{
-			PartyBuffSkills.Add(SkillID);
-		}
-		else if (AISkill->SkillType == ESkillType::BuffSelf)
-		{
-			SelfBuffSkills.Add(SkillID);
-		}
-		else if (AISkill->SkillType == ESkillType::DamageMelee)
-		{
-			MeleeSkills.Add(SkillID);
-			if (AISkill->CrowdControlEffect == ECrowdControlEffect::Crystalized)
-			{
-				CrystalizeSkills.Add(SkillID);
-			}
-			else if (AISkill->CrowdControlEffect == ECrowdControlEffect::Flinch)
-			{
-				FlinchSkills.Add(SkillID);
-			}
-			else if (AISkill->CrowdControlEffect == ECrowdControlEffect::Interrupt)
-			{
-				InterruptSkills.Add(SkillID);
-			}
-			else if (AISkill->CrowdControlEffect == ECrowdControlEffect::KnockedBack)
-			{
-				KnockBackSkills.Add(SkillID);
-			}
-			else if (AISkill->CrowdControlEffect == ECrowdControlEffect::KnockedDown)
-			{
-				KnockDownSkills.Add(SkillID);
-			}
-			else if (AISkill->CrowdControlEffect == ECrowdControlEffect::Stunned)
-			{
-				StunSkills.Add(SkillID);
-			}
-		}
-		else if (AISkill->SkillType == ESkillType::DamageRanged)
-		{
-			RangedSkills.Add(SkillID);
-			if (AISkill->CrowdControlEffect == ECrowdControlEffect::Crystalized)
-			{
-				CrystalizeSkills.Add(SkillID);
-			}
-			else if (AISkill->CrowdControlEffect == ECrowdControlEffect::Flinch)
-			{
-				FlinchSkills.Add(SkillID);
-			}
-			else if (AISkill->CrowdControlEffect == ECrowdControlEffect::Interrupt)
-			{
-				InterruptSkills.Add(SkillID);
-			}
-			else if (AISkill->CrowdControlEffect == ECrowdControlEffect::KnockedBack)
-			{
-				KnockBackSkills.Add(SkillID);
-			}
-			else if (AISkill->CrowdControlEffect == ECrowdControlEffect::KnockedDown)
-			{
-				KnockDownSkills.Add(SkillID);
-			}
-			else if (AISkill->CrowdControlEffect == ECrowdControlEffect::Stunned)
-			{
-				StunSkills.Add(SkillID);
-			}
-		}
-		else if (AISkill->SkillType == ESkillType::DebuffEnemy)
-		{
-			DebuffSkills.Add(SkillID);
-		}
-		else if (AISkill->SkillType == ESkillType::HealParty)
-		{
-			PartyHealSkills.Add(SkillID);
-		}
-		else if (AISkill->SkillType == ESkillType::HealSelf)
-		{
-			SelfHealSkills.Add(SkillID);
-		}
-
-		SkillIDToWeightMap.Add(SkillID, 0);
-	}
-	*/
 }
 
 void AAICharacterBase::Destroyed()
 {
+	if (SkillAnimationsStreamableHandle.IsValid())
+	{
+		SkillAnimationsStreamableHandle.Get()->ReleaseHandle();
+		SkillAnimationsStreamableHandle.Reset();
+	}
 }
 
 UEODWidgetComponent * AAICharacterBase::BP_GetAggroWidgetComp() const
@@ -242,26 +165,16 @@ void AAICharacterBase::SetInCombat(bool bValue)
 
 void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	/*
-	FAISkillTableRow* AISkill = nullptr;
-	if (GetCurrentActiveSkillID() != NAME_None)
-	{
-		AISkill = SkillsDataTable->FindRow<FAISkillTableRow>(GetCurrentActiveSkillID(), FString("Looking up AI skill"));
-	}
-
-	if (AISkill && AISkill->AnimMontage == AnimMontage)
+	FSkillTableRow* ActiveSkill = GetCurrentActiveSkill();
+	if (ActiveSkill && ActiveSkill->AnimMontage.Get() == AnimMontage)
 	{
 		GetLastUsedSkill().LastUsedSkillID = GetCurrentActiveSkillID();
 		GetLastUsedSkill().bInterrupted = bInterrupted;
 
-		// @todo maybe put following code in a function called ResetState
 		SetCharacterState(ECharacterState::IdleWalkRun);
 		SetCurrentActiveSkillID(NAME_None);
+		SetCurrentActiveSkill(nullptr);
 	}
-	else
-	{
-	}
-	*/
 }
 
 void AAICharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
@@ -271,23 +184,28 @@ void AAICharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrup
 
 bool AAICharacterBase::UseSkill(FName SkillID)
 {
-	/*
 	if (CanUseAnySkill())
 	{
-		FAISkillTableRow* SkillToUse = SkillsDataTable->FindRow<FAISkillTableRow>(SkillID, FString("Looking up AI skill for use"));
+		FSkillTableRow* SkillToUse = GetSkill(SkillID, FString("AAICharacterBase::UseSkill, looking up AI skills for use"));
 
 		if (!SkillToUse)
 		{
-			UKismetSystemLibrary::PrintString(this, FString("Couldn't find the skill AI character is trying to use"));
+#if MESSAGE_LOGGING_ENABLED
+			FString Message = FString("Couldn't find AI character skill : ") + SkillID.ToString();
+			UKismetSystemLibrary::PrintString(this, FString());
+#endif // MESSAGE_LOGGING_ENABLED
 			return false;
 		}
 
-		PlayAnimationMontage(SkillToUse->AnimMontage, SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		if (SkillToUse->AnimMontage.Get())
+		{
+			PlayAnimationMontage(SkillToUse->AnimMontage.Get(), SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		}
 		SetCurrentActiveSkillID(SkillID);
-		SkillIDToWeightMap[SkillID] = SkillIDToWeightMap[SkillID] - 1;
+		SetCurrentActiveSkill(SkillToUse);
+		// SkillIDToWeightMap[SkillID] = SkillIDToWeightMap[SkillID] - 1;
 		return true;
 	}
-	*/
 
 	return false;
 }
@@ -338,10 +256,12 @@ FName AAICharacterBase::GetMostWeightedMeleeSkillID(const AEODCharacterBase* Tar
 				continue;
 			}
 
+			/* @fix
 			if (SkillIDToWeightMap[SkillID] > SkillIDToWeightMap[MostWeightedSkillID])
 			{
 				MostWeightedSkillID = SkillID;
 			}
+			*/
 		}
 	}
 	else
@@ -362,35 +282,135 @@ FName AAICharacterBase::GetMostWeightedMeleeSkillID(const AEODCharacterBase* Tar
 				continue;
 			}
 
+			/* @fix
 			if (SkillIDToWeightMap[SkillID] > SkillIDToWeightMap[MostWeightedSkillID])
 			{
 				MostWeightedSkillID = SkillID;
 			}
+			*/
 		}
 	}
 
 	return MostWeightedSkillID;
 }
 
-/*
-FSkillDamageInfo AAICharacterBase::GetCurrentActiveSkillDamageInfo() const
-{
-	FSkillDamageInfo SkillDamageInfo;
-	FString ContextString = FString("AAICharacterBase::GetCurrentActiveSkillDamageInfo(), looking for AI skill");
-	FAISkillTableRow* Skill = SkillsDataTable->FindRow<FAISkillTableRow>(GetCurrentActiveSkillID(), ContextString);
-	SkillDamageInfo.bUnblockable = Skill->bUnblockable;
-	SkillDamageInfo.bUndodgable = Skill->bUndodgable;
-	SkillDamageInfo.bIgnoresBlock = Skill->bIgnoresBlock;
-	SkillDamageInfo.CrowdControlEffect = Skill->CrowdControlEffect;
-	SkillDamageInfo.CrowdControlEffectDuration = Skill->CrowdControlEffectDuration;
-	SkillDamageInfo.DamagePercent = Skill->DamagePercent;
-	SkillDamageInfo.DamageType = Skill->DamageType;
-
-	return SkillDamageInfo;
-}
-*/
-
 void AAICharacterBase::UpdateMaxWalkSpeed()
 {
 	GetCharacterMovement()->MaxWalkSpeed = bInCombat ? MaxWalkSpeedInCombat : MaxWalkSpeedOutsideCombat;	
+}
+
+void AAICharacterBase::InitializeSkills()
+{
+	if (!SkillsDataTable)
+	{
+		return;
+	}
+
+	TArray<FSoftObjectPath> AnimationsToLoad;
+	TArray<FName> SkillIDs = SkillsDataTable->GetRowNames();
+	for (const FName& SkillID : SkillIDs)
+	{
+		FSkillTableRow* Skill = GetSkill(SkillID, FString("AAICharacterBase::InitializeSkills(), looking for AI skill"));
+		if (!Skill)
+		{
+#if MESSAGE_LOGGING_ENABLED
+			FString Message = FString("Couldn't find skil : ") + SkillID.ToString();
+			UKismetSystemLibrary::PrintString(this, Message);
+#endif // MESSAGE_LOGGING_ENABLED
+			return;
+		}
+		check(Skill); // Redundant
+		if (Skill->SkillType == ESkillType::BuffParty)
+		{
+			PartyBuffSkills.Add(SkillID);
+		}
+		else if (Skill->SkillType == ESkillType::BuffSelf)
+		{
+			SelfBuffSkills.Add(SkillID);
+		}
+		else if (Skill->SkillType == ESkillType::DamageMelee)
+		{
+			MeleeSkills.Add(SkillID);
+			if (Skill->CrowdControlEffect == ECrowdControlEffect::Crystalized)
+			{
+				CrystalizeSkills.Add(SkillID);
+			}
+			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Flinch)
+			{
+				FlinchSkills.Add(SkillID);
+			}
+			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Interrupt)
+			{
+				InterruptSkills.Add(SkillID);
+			}
+			else if (Skill->CrowdControlEffect == ECrowdControlEffect::KnockedBack)
+			{
+				KnockBackSkills.Add(SkillID);
+			}
+			else if (Skill->CrowdControlEffect == ECrowdControlEffect::KnockedDown)
+			{
+				KnockDownSkills.Add(SkillID);
+			}
+			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Stunned)
+			{
+				StunSkills.Add(SkillID);
+			}
+		}
+		else if (Skill->SkillType == ESkillType::DamageRanged)
+		{
+			RangedSkills.Add(SkillID);
+			if (Skill->CrowdControlEffect == ECrowdControlEffect::Crystalized)
+			{
+				CrystalizeSkills.Add(SkillID);
+			}
+			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Flinch)
+			{
+				FlinchSkills.Add(SkillID);
+			}
+			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Interrupt)
+			{
+				InterruptSkills.Add(SkillID);
+			}
+			else if (Skill->CrowdControlEffect == ECrowdControlEffect::KnockedBack)
+			{
+				KnockBackSkills.Add(SkillID);
+			}
+			else if (Skill->CrowdControlEffect == ECrowdControlEffect::KnockedDown)
+			{
+				KnockDownSkills.Add(SkillID);
+			}
+			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Stunned)
+			{
+				StunSkills.Add(SkillID);
+			}
+		}
+		else if (Skill->SkillType == ESkillType::DebuffEnemy)
+		{
+			DebuffSkills.Add(SkillID);
+		}
+		else if (Skill->SkillType == ESkillType::HealParty)
+		{
+			PartyHealSkills.Add(SkillID);
+		}
+		else if (Skill->SkillType == ESkillType::HealSelf)
+		{
+			SelfHealSkills.Add(SkillID);
+		}
+
+		AnimationsToLoad.Add(Skill->AnimMontage.ToSoftObjectPath());
+	}
+
+	if (GEngine)
+	{
+		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+		if (GameSingleton)
+		{
+			if (SkillAnimationsStreamableHandle.IsValid())
+			{
+				SkillAnimationsStreamableHandle.Get()->ReleaseHandle();
+				SkillAnimationsStreamableHandle.Reset();
+			}
+			SkillAnimationsStreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AnimationsToLoad);
+		}
+	}
 }
