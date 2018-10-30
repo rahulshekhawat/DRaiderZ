@@ -234,6 +234,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = Motion)
 	void PushPlayer(FVector ImpulseDirection); // @todo const parameter?
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = SpecialEffects)
+	void CreateGhostTrail();
+
 	/** [server + client] Change idle-walk-run direction of character */
 	inline void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
