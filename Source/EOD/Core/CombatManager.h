@@ -156,6 +156,8 @@ private:
 								  const FHitResult& LineHitResult,
 								  const float BCAngle);
 
+	FORCEINLINE FSkillDamageInfo GetSkillDamageInfoFromSkill(FSkillTableRow* Skill);
+
 };
 
 FORCEINLINE float ACombatManager::CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2)
@@ -191,4 +193,18 @@ inline bool ACombatManager::GetCritChanceBoolean(const AEODCharacterBase* HitIns
 FORCEINLINE float ACombatManager::GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult)
 {
 	return CalculateAngleBetweenVectors(HitCharacter->GetActorForwardVector(), LineHitResult.ImpactNormal);
+}
+
+FORCEINLINE FSkillDamageInfo ACombatManager::GetSkillDamageInfoFromSkill(FSkillTableRow* Skill)
+{
+	check(Skill);
+	FSkillDamageInfo SkillDamageInfo;
+	SkillDamageInfo.bIgnoresBlock = Skill->bIgnoresBlock;
+	SkillDamageInfo.bUnblockable = Skill->bUnblockable;
+	SkillDamageInfo.bUndodgable = Skill->bUndodgable;
+	SkillDamageInfo.CrowdControlEffect = Skill->CrowdControlEffect;
+	SkillDamageInfo.CrowdControlEffectDuration = Skill->CrowdControlEffectDuration;
+	SkillDamageInfo.DamagePercent = Skill->DamagePercent;
+	SkillDamageInfo.DamageType = Skill->DamageType;
+	return SkillDamageInfo;
 }

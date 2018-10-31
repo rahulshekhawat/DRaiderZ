@@ -6,6 +6,7 @@
 #include "Player/Components/StatsComponentBase.h"
 
 #include "Engine/World.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 ACombatManager::ACombatManager(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -26,7 +27,7 @@ void ACombatManager::Tick(float DeltaTime)
 
 }
 
-void ACombatManager::OnMeleeAttack(AActor * HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
+void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
 	if (!IsValid(HitInstigator) || HitResults.Num() == 0)
 	{
@@ -153,10 +154,14 @@ void ACombatManager::ProcessActorAttack(AActor* HitInstigator, const bool bHit, 
 
 void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
-	FSkillDamageInfo SkillDamageInfo;
-	// const FSkillDamageInfo SkillDamageInfo;
-		// = HitInstigator->GetCurrentActiveSkillDamageInfo();
+	FSkillTableRow* HitSkill = HitInstigator->GetCurrentActiveSkill();
+	// Do no process if hit with an invalid skill
+	if (!HitSkill)
+	{
+		return;
+	}
 
+	FSkillDamageInfo SkillDamageInfo = GetSkillDamageInfoFromSkill(HitSkill);
 	for (const FHitResult& HitResult : HitResults)
 	{
 		AActor* HitActor = HitResult.Actor.Get();
@@ -188,8 +193,9 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 
 	if (!SkillDamageInfo.bUndodgable && HitCharacter->IsDodgingDamage())
 	{
-		// DisplayStatusEffectMessage(FString("Dodge"));
+		DisplayStatusEffectMessage(FString("Dodge"), DodgeTextColor, HitResult.ImpactPoint);
 		HitCharacter->OnSuccessfulDodge(HitInstigator);
+		return;
 	}
 
 	FHitResult LineHitResult;

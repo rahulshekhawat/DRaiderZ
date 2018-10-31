@@ -30,6 +30,13 @@ void AAICharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	InitializeSkills();
+}
+
+void AAICharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
 	if (AggroWidgetComp->GetUserWidgetObject())
 	{
 		AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
@@ -38,14 +45,6 @@ void AAICharacterBase::PostInitializeComponents()
 	{
 		HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
 	}
-
-	InitializeSkills();
-}
-
-void AAICharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
-
 	SetInCombat(false);
 }
 
