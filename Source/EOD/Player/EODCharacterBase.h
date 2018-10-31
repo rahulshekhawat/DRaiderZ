@@ -179,7 +179,7 @@ public:
 	virtual void BlockAttack();
 
 	/** Enables immunity frames for a given duration */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = Combat)
 	void EnableiFrames(float Duration = 0.f);
 
 	/** Disables immunity frames */
