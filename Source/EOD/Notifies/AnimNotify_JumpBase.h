@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/EngineTypes.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
-#include "AnimNotify_FootStepBase.generated.h"
+#include "AnimNotify_JumpBase.generated.h"
 
 class USoundBase;
 class USoundAttenuation;
@@ -14,85 +14,84 @@ class USoundAttenuation;
  * 
  */
 UCLASS(Abstract, Blueprintable, hidecategories = Object, collapsecategories)
-class EOD_API UAnimNotify_FootStepBase : public UAnimNotify
+class EOD_API UAnimNotify_JumpBase : public UAnimNotify
 {
 	GENERATED_BODY()
-
+	
 public:
 
-	// virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
-
-	/** Determines if this notify is called when character's left foot hits the ground */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = FootNotify)
-	bool bLeftFoot;
+	/** Determines if the character is starting the jump or ending the jump */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = JumpNotify)
+	bool bJumpStart;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* DefaultLeftFootSound;
+	USoundBase* DefaultJumpStartSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* DefaultRightFootSound;
+	USoundBase* DefaultJumpEndSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* StoneLeftFootSound;
+	USoundBase* StoneJumpStartSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* StoneRightFootSound;
+	USoundBase* StoneJumpEndSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* ConcreteLeftFootSound;
+	USoundBase* ConcreteJumpStartSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* ConcreteRightFootSound;
+	USoundBase* ConcreteJumpEndSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* DirtLeftFootSound;
+	USoundBase* DirtJumpStartSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* DirtRightFootSound;
+	USoundBase* DirtJumpEndSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* MetalLeftFootSound;
+	USoundBase* MetalJumpStartSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* MetalRightFootSound;
+	USoundBase* MetalJumpEndSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* FoliageLeftFootSound;
+	USoundBase* FoliageJumpStartSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* FoliageRightFootSound;
+	USoundBase* FoliageJumpEndSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* SandLeftFootSound;
+	USoundBase* SandJumpStartSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* SandRightFootSound;
+	USoundBase* SandJumpEndSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* SnowLeftFootSound;
+	USoundBase* SnowJumpStartSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* SnowRightFootSound;
+	USoundBase* SnowJumpEndSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* WaterLeftFootSound;
+	USoundBase* WaterJumpStartSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* WaterRightFootSound;
+	USoundBase* WaterJumpEndSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* WoodLeftFootSound;
+	USoundBase* WoodJumpStartSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	USoundBase* WoodRightFootSound;
+	USoundBase* WoodJumpEndSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
 	USoundAttenuation* SoundAttenuation;
 
 	UFUNCTION(BlueprintCallable, Category = FootNotify)
-	void GetFootstepHitResults(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, FHitResult& OutHitResults);
+	void GetJumpHitResults(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, FHitResult& OutHitResults);
 
 	UFUNCTION(BlueprintCallable, Category = FootNotify)
-	void PlayFootstepSound(const FHitResult& HitResult);
+	void PlayJumpSound(const FHitResult& HitResult);
+
 
 };
