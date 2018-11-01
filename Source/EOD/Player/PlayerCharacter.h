@@ -244,6 +244,7 @@ public:
 	void SetBlockMovementDirectionYaw(float NewYaw);
 
 	/** [server + client] Change player's weapon sheath state */
+	UFUNCTION(BlueprintCallable, Category = Combat)
 	void SetWeaponSheathed(bool bNewValue);
 
 	/** Event called when a new normal attack section starts playing */
