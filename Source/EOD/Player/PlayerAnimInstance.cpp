@@ -113,7 +113,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 
-
 }
 
 void UPlayerAnimInstance::NativePostEvaluateAnimation()

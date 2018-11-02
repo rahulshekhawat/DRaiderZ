@@ -386,6 +386,9 @@ private:
 
 protected:
 
+	UPROPERTY()
+	FCharacterStateData CharacterStateData;
+
 	/** Data table for character skills */
 	UPROPERTY(EditDefaultsOnly, Category = Skills)
 	UDataTable* SkillsDataTable;

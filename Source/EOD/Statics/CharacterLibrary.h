@@ -383,6 +383,29 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 	}
 };
 
+/** Struct for in-game skills */
+USTRUCT(BlueprintType, Blueprintable)
+struct EOD_API FCharacterStateData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	UPROPERTY()
+	ECharacterState CharacterState;
+
+	UPROPERTY()
+	bool bValid;
+
+	UPROPERTY()
+	ECharMovementDirection CharMovementDirection;
+
+	inline bool IsValid()
+	{
+		return bValid;
+	}
+};
+
 /**
  * CharacterLibrary contains static helper functions for in-game characters.
  * @note Do not inherit from this class

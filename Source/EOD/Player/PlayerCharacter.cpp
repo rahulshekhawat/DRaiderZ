@@ -568,6 +568,33 @@ void APlayerCharacter::OnDodge()
 	}
 	*/
 
+	/*
+	if (CanDodge())
+	{
+		int32 DodgeCost = DodgeStaminaCost * GetStatsComponent()->GetStaminaConsumptionModifier();
+		GetStatsComponent()->ModifyCurrentStamina(-DodgeCost);
+
+		float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+		float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
+		float DesiredYaw;
+
+		if (ForwardAxisValue != 0)
+		{
+			DesiredYaw = GetRotationYawFromAxisInput();
+		}
+		else
+		{
+			DesiredYaw = GetPlayerControlRotationYaw();
+		}
+
+		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), DodgeImmunityDuration);
+		GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
+	}
+	*/
+
 	if (CanDodge() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Dodge.Get())
 	{
 		int32 DodgeCost = DodgeStaminaCost * GetStatsComponent()->GetStaminaConsumptionModifier();
