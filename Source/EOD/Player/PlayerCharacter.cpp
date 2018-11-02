@@ -25,7 +25,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
+APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer) :Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -217,46 +217,35 @@ void APlayerCharacter::Tick(float DeltaTime)
 #endif // MESSAGE_LOGGING_ENABLED
 		return;
 	}
-	
-	if (IsDead())
-	{
-		UAnimMontage* DeathMontage = GetActiveAnimationReferences()->Die.Get();
 
-		if (GetCharacterState() != ECharacterState::Dead)
+	/*
+	if (Controller && Controller->IsLocalPlayerController())
+	{
+		// Manage controller rotation yaw
+		if (IsBlocking() || IsAutoRunning())
 		{
-			PlayAnimationMontage(DeathMontage, UCharacterLibrary::SectionName_Default, ECharacterState::Dead);
+			if (!bUseControllerRotationYaw)
+			{
+				SetUseControllerRotationYaw(true);
+			}
 		}
 		else
 		{
-			// @todo Revival options when the death animation finishes playing
-		}
-
-		return;
-	}
-
-	if (GetCharacterMovement()->IsFalling() && !(GetCharacterState() == ECharacterState::Jumping))
-	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->Jump.Get(),
-			UCharacterLibrary::SectionName_JumpStart,
-			ECharacterState::Jumping);
-	}
-	else if (!GetCharacterMovement()->IsFalling() && GetCharacterState() == ECharacterState::Jumping)
-	{
-		UAnimMontage* JumpMontage = GetActiveAnimationReferences()->Jump.Get();
-
-		/**
-		 * @note not checking whether JumpMontage is playing or not will make the jump end section play twice 
-		 * (CharacterState is still set to Jumping when JumpMontage is blending out)
-		 */
-		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(JumpMontage))
-		{
-			FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(JumpMontage);
-			if (CurrentSection != UCharacterLibrary::SectionName_JumpEnd)
+			if (bUseControllerRotationYaw)
 			{
-				PlayAnimationMontage(JumpMontage, UCharacterLibrary::SectionName_JumpEnd);
+				SetUseControllerRotationYaw(false);
 			}
 		}
+
+
+
+		// Smooth rotation
+		if (bRotateSmoothly)
+		{
+			bRotateSmoothly = !DeltaRotateCharacterToDesiredYaw(DesiredSmoothRotationYaw, DeltaTime);
+		}
 	}
+	*/
 
 	if (Controller && Controller->IsLocalPlayerController())
 	{
@@ -533,6 +522,8 @@ void APlayerCharacter::MoveForward(const float Value)
 		FRotator Rotation = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
 		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
+
+		// Internal_AddMovementInput()
 	}
 }
 
@@ -564,10 +555,18 @@ void APlayerCharacter::ZoomOutCamera()
 
 void APlayerCharacter::OnDodge()
 {
+	// Alternative to disable auto run
+	if (bUseControllerRotationYaw)
+	{
+		SetUseControllerRotationYaw(false);
+	}
+
+	/*
 	if (IsAutoRunning())
 	{
 		DisableAutoRun();
 	}
+	*/
 
 	if (CanDodge() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Dodge.Get())
 	{
@@ -1061,16 +1060,6 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName& CurrentSecti
 	}
 
 	return NAME_None;
-}
-
-FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationReferences() const
-{
-	if (IsWeaponSheathed() || GetEquippedWeaponType() == EWeaponType::None)
-	{
-		return UnequippedWeaponAnimationReferences;
-	}
-
-	return EquippedWeaponAnimationReferences;
 }
 
 FName APlayerCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender)

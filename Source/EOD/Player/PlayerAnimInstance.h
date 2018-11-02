@@ -3,10 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Player/PlayerCharacter.h"
 #include "Statics/WeaponLibrary.h"
 #include "Statics/CharacterLibrary.h"
+
 #include "Animation/AnimInstance.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "PlayerAnimInstance.generated.h"
+
+class APlayerCharacter;
 
 /**
  * PlayerAnimInstance is the base class for animation blueprints of playable characters
@@ -70,9 +75,35 @@ private:
 	UFUNCTION()
 	void HandleMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
-	class APlayerCharacter* OwningPlayer;
+	UPROPERTY()
+	APlayerCharacter* OwningPlayer;
 
-	class APlayerCharacter* CastPawnOwnerToPlayerCharacter();
-	
-	
+	FORCEINLINE APlayerCharacter* GetPlayerOwner();
+
+	FORCEINLINE void SetupOwningPlayer();
+
 };
+
+FORCEINLINE APlayerCharacter* UPlayerAnimInstance::GetPlayerOwner()
+{
+	if (OwningPlayer)
+	{
+		return OwningPlayer;
+	}
+	else
+	{
+		USkeletalMeshComponent* OwnerComponent = GetSkelMeshComponent();
+		if (AActor* OwnerActor = OwnerComponent->GetOwner())
+		{
+			return Cast<APlayerCharacter>(OwnerComponent->GetOwner());
+		}
+	}
+
+	return nullptr;
+}
+
+FORCEINLINE void UPlayerAnimInstance::SetupOwningPlayer()
+{
+	OwningPlayer = GetPlayerOwner();
+}
+

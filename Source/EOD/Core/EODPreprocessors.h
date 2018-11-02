@@ -19,3 +19,4 @@
 #define SURFACETYPE_FOLIAGE     SurfaceType9
 #define SURFACETYPE_DIRT        SurfaceType10
 #define SURFACETYPE_CONCRETE    SurfaceType11
+

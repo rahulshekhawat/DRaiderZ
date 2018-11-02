@@ -1,8 +1,8 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "EODCharacterBase.h"
-#include "CharAnimInstance.h"
+#include "Player/EODCharacterBase.h"
 #include "Core/EODPreprocessors.h"
+#include "Player/CharAnimInstance.h"
 #include "Components/StatsComponentBase.h"
 #include "Statics/EODBlueprintFunctionLibrary.h"
 

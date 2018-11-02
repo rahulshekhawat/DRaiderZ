@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "Statics/EODLibrary.h"
 #include "Statics/CharacterLibrary.h"
-#include "StatusEffects/StatusEffectBase.h"
 #include "Components/StatsComponentBase.h"
-#include "Components/SkeletalMeshComponent.h"
+#include "StatusEffects/StatusEffectBase.h"
+
 #include "Animation/AnimInstance.h"
 #include "GameFramework/Character.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "EODCharacterBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TWeakObjectPtr<AEODCharacterBase>, RecipientCharacter);
@@ -243,6 +244,9 @@ public:
 	/** [server + client] Change character max walk speed */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	void SetWalkSpeed(const float WalkSpeed);
+
+	/** Change character rotation */
+	// void 
 
 	/** [server + client] Chagne character rotation */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")

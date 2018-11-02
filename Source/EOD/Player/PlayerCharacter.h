@@ -287,6 +287,8 @@ public:
 
 	inline void DisableFastRun();
 
+	inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
+
 private:
 
 	const int CameraZoomRate = 15;
@@ -361,8 +363,6 @@ private:
 	TSharedPtr<FStreamableHandle> EquippedWeaponAnimationsStreamableHandle;
 
 	TSharedPtr<FStreamableHandle> UnequippedWeaponAnimationsStreamableHandle;
-
-	FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
 
 	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender);
 
@@ -595,10 +595,12 @@ inline void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDi
 
 inline void APlayerCharacter::EnableBlock()
 {
+	/*
 	if (IsAutoRunning())
 	{
 		DisableAutoRun();
 	}
+	*/
 
 	if (IsNormalAttacking())
 	{
@@ -636,3 +638,12 @@ inline void APlayerCharacter::DisableFastRun()
 	}
 }
 
+inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationReferences() const
+{
+	if (IsWeaponSheathed() || GetEquippedWeaponType() == EWeaponType::None)
+	{
+		return UnequippedWeaponAnimationReferences;
+	}
+
+	return EquippedWeaponAnimationReferences;
+}

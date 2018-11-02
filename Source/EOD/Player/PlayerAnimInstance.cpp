@@ -2,8 +2,13 @@
 
 #include "PlayerAnimInstance.h"
 #include "PlayerCharacter.h"
+#include "Core/EODPreprocessors.h"
+#include "Statics/CharacterLibrary.h"
 
-UPlayerAnimInstance::UPlayerAnimInstance(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
+#include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
+UPlayerAnimInstance::UPlayerAnimInstance(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 	MasterStateMachine_AnimationsBlendTime = 0.f;
 	IdleWalkRun_AnimationsBlendTime = 0.2f;
@@ -12,8 +17,8 @@ UPlayerAnimInstance::UPlayerAnimInstance(const FObjectInitializer & ObjectInitia
 void UPlayerAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
-	OwningPlayer = CastPawnOwnerToPlayerCharacter();
-	
+	SetupOwningPlayer();
+
 	FScriptDelegate OutDelegate;
 	OutDelegate.BindUFunction(this, FName("HandleMontageBlendingOut"));
 	OnMontageBlendingOut.AddUnique(OutDelegate);
@@ -25,7 +30,90 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds); 
+	Super::NativeUpdateAnimation(DeltaSeconds);
+
+	if (!OwningPlayer || !OwningPlayer->GetActiveAnimationReferences())
+	{
+#if MESSAGE_LOGGING_ENABLED
+		UKismetSystemLibrary::PrintString(this, FString("Either character or animation references are null"));
+#endif // MESSAGE_LOGGING_ENABLED
+		return;
+	}
+
+	FPlayerAnimationReferencesTableRow* AnimationReferences = OwningPlayer->GetActiveAnimationReferences();
+
+	if (OwningPlayer->IsDead())
+	{
+		UAnimMontage* DeathMontage = AnimationReferences->Die.Get();
+		if (DeathMontage && !Montage_IsPlaying(DeathMontage))
+		{
+			Montage_Play(DeathMontage);
+		}
+
+		return;
+	}
+	else
+	{
+		UAnimMontage* DeathMontage = AnimationReferences->Die.Get();
+		if (DeathMontage && Montage_IsPlaying(DeathMontage))
+		{
+			Montage_JumpToSection(FName("Rebirth"), DeathMontage);
+			return;
+		}
+		else
+		{
+			// do nothing
+		}
+	}
+
+	if (OwningPlayer->GetMovementComponent()->IsFalling())
+	{
+		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
+		if (JumpMontage && !Montage_IsPlaying(JumpMontage))
+		{
+			// If some montage is already playing
+			if (Montage_IsPlaying(nullptr))
+			{
+				UAnimMontage* FlinchMontage = AnimationReferences->Flinch.Get();
+				UAnimMontage* BlockAttackMontage = AnimationReferences->BlockAttack.Get();
+
+				if ((FlinchMontage && Montage_IsPlaying(FlinchMontage)) || (BlockAttackMontage && Montage_IsPlaying(FlinchMontage)))
+				{
+					OwningPlayer->SetCharacterState(ECharacterState::Jumping);
+					Montage_Play(JumpMontage);
+					return;
+				}
+			}
+			// If no montage is playing
+			else
+			{
+				OwningPlayer->SetCharacterState(ECharacterState::Jumping);
+				Montage_Play(JumpMontage);
+				return;
+			}
+		}
+
+		return;
+	}
+	else
+	{
+		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
+		if (JumpMontage && Montage_IsPlaying(JumpMontage))
+		{
+			FName CurrentSection = Montage_GetCurrentSection(JumpMontage);
+			if (CurrentSection != UCharacterLibrary::SectionName_JumpEnd)
+			{
+				Montage_JumpToSection(UCharacterLibrary::SectionName_JumpEnd, JumpMontage);
+			}
+			return;
+		}
+		else
+		{
+			// do nothing
+		}
+	}
+
+
 }
 
 void UPlayerAnimInstance::NativePostEvaluateAnimation()
@@ -75,7 +163,7 @@ float UPlayerAnimInstance::GetMovementSpeed() const
 		return OwningPlayer->GetVelocity().Size();
 	}
 
-	return 0.0f;
+	return 0.f;
 }
 
 float UPlayerAnimInstance::GetBlockMovementDirectionYaw() const
@@ -98,21 +186,12 @@ EWeaponType UPlayerAnimInstance::GetWeaponAnimationType() const
 	return EWeaponType::None;
 }
 
-/*
-EWeaponAnimationType UPlayerAnimInstance::GetWeaponAnimationType() const
+void UPlayerAnimInstance::HandleMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
 	if (OwningPlayer)
 	{
-		return OwningPlayer->CurrentWeaponAnimationToUse;
+		OwningPlayer->OnMontageBlendingOut(AnimMontage, bInterrupted);
 	}
-
-	return EWeaponAnimationType();
-}
-*/
-
-void UPlayerAnimInstance::HandleMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
-{
-	OwningPlayer->OnMontageBlendingOut(AnimMontage, bInterrupted);
 
 	/*
 	if(!bInterrupted)
@@ -135,11 +214,15 @@ void UPlayerAnimInstance::HandleMontageBlendingOut(UAnimMontage * AnimMontage, b
 	*/
 }
 
-void UPlayerAnimInstance::HandleMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
+void UPlayerAnimInstance::HandleMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	OwningPlayer->OnMontageEnded(AnimMontage, bInterrupted);
+	if (OwningPlayer)
+	{
+		OwningPlayer->OnMontageEnded(AnimMontage, bInterrupted);
+	}
 }
 
+/*
 APlayerCharacter * UPlayerAnimInstance::CastPawnOwnerToPlayerCharacter()
 {
 	APlayerCharacter* PlayerChar = nullptr;
@@ -151,3 +234,4 @@ APlayerCharacter * UPlayerAnimInstance::CastPawnOwnerToPlayerCharacter()
 
 	return PlayerChar;
 }
+*/
