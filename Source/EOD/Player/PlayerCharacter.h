@@ -148,7 +148,11 @@ public:
 	virtual bool CanUseSkill(FSkillTableRow* Skill);
 
 	/** Returns true if character can auto run */
-	bool CanAutoRun() const;
+	FORCEINLINE bool CanAutoRun() const;
+
+	FORCEINLINE bool CanSwitchWeapon() const;
+
+	bool IsSwitchingWeapon() const;
 
 	/** Returns true if player is on auto run */
 	bool IsAutoRunning() const;
@@ -288,6 +292,8 @@ public:
 	inline void DisableFastRun();
 
 	inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
+
+	inline FPlayerAnimationReferencesTableRow* GetEquippedWeaponAnimationReferences() const;
 
 private:
 
@@ -646,4 +652,24 @@ inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationR
 	}
 
 	return EquippedWeaponAnimationReferences;
+}
+
+inline FPlayerAnimationReferencesTableRow * APlayerCharacter::GetEquippedWeaponAnimationReferences() const
+{
+	return EquippedWeaponAnimationReferences;
+}
+
+FORCEINLINE bool APlayerCharacter::CanAutoRun() const
+{
+	return IsIdleOrMoving();
+}
+
+FORCEINLINE bool APlayerCharacter::CanSwitchWeapon() const
+{
+	return IsIdleOrMoving();
+}
+
+inline bool APlayerCharacter::IsSwitchingWeapon() const
+{
+	return GetCharacterState() == ECharacterState::SwitchingWeapon;
 }

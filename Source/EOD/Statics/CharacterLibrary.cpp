@@ -51,6 +51,9 @@ const FName UCharacterLibrary::SectionName_RightDodge 				= FName("RightDodge");
 
 const FName UCharacterLibrary::SectionName_Default 					= FName("Default");
 
+const FName UCharacterLibrary::SectionName_SheatheWeapon 			= FName("SheatheWeapon");
+const FName UCharacterLibrary::SectionName_UnsheatheWeapon 			= FName("UnsheatheWeapon");
+
 UCharacterLibrary::UCharacterLibrary(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 }

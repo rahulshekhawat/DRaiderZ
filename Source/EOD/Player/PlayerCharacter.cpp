@@ -268,7 +268,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			UpdateAutoRun(DeltaTime);
 		}
-		else if (IsMoving() || (IsUsingAnySkill() && bSkillAllowsMovement))
+		else if (IsMoving() || (IsUsingAnySkill() && bSkillAllowsMovement) || (IsSwitchingWeapon()))
 		{
 			UpdateMovement(DeltaTime);
 		}
@@ -298,7 +298,7 @@ void APlayerCharacter::BeginPlay()
 	}
 }
 
-USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer & ObjectInitializer)
+USkeletalMeshComponent* APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer)
 {
 	USkeletalMeshComponent* Sk = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, Name);
 	Sk->SetupAttachment(GetMesh());
@@ -309,7 +309,7 @@ USkeletalMeshComponent * APlayerCharacter::CreateNewArmorComponent(const FName N
 
 bool APlayerCharacter::CanMove() const
 {
-	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning();
+	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon();
 }
 
 bool APlayerCharacter::CanJump() const
@@ -503,11 +503,6 @@ void APlayerCharacter::BlockAttack()
 		PlayAnimationMontage(GetActiveAnimationReferences()->BlockAttack.Get(),
 			UCharacterLibrary::SectionName_BlockAttack);
 	}
-}
-
-bool APlayerCharacter::CanAutoRun() const
-{
-	return IsIdleOrMoving();
 }
 
 void APlayerCharacter::MoveForward(const float Value)
@@ -725,10 +720,50 @@ void APlayerCharacter::OnInteract()
 
 void APlayerCharacter::OnToggleSheathe()
 {
-	bool bNewValue = !bWeaponSheathed;
-	SetWeaponSheathed(bNewValue);
-	
-	// @todo play sheathe animation
+	// @todo replace active animation references with weapon animation references
+
+	if (CanSwitchWeapon() && EquippedWeaponAnimationReferences)
+	{
+		float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+		float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
+
+		// Play standstill animation
+		if (ForwardAxisValue == 0 && RightAxisValue == 0)
+		{
+			UAnimMontage* FullBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchFullBody.Get();
+			if (FullBodySwitchMontage)
+			{
+				if (IsWeaponSheathed())
+				{
+					PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
+				}
+				else
+				{
+					PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
+				}
+
+			}
+		}
+		// Play moving animation
+		else
+		{
+			UAnimMontage* UpperBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get();
+			if (UpperBodySwitchMontage)
+			{
+				if (IsWeaponSheathed())
+				{
+					PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
+				}
+				else
+				{
+					PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
+				}
+			}
+		}
+
+		bool bNewValue = !IsWeaponSheathed();
+		SetWeaponSheathed(bNewValue);
+	}
 }
 
 void APlayerCharacter::OnToggleCharacterStatsUI()
@@ -1153,16 +1188,18 @@ TSharedPtr<FStreamableHandle> APlayerCharacter::LoadAnimationReferences(FPlayerA
 	TArray<FSoftObjectPath> AssetsToLoad;
 	if (AnimationReferences)
 	{
-		AssetsToLoad.Add(AnimationReferences->BlockAttack.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Die.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Dodge.ToSoftObjectPath());
 		AssetsToLoad.Add(AnimationReferences->Flinch.ToSoftObjectPath());
 		AssetsToLoad.Add(AnimationReferences->HitEffects.ToSoftObjectPath());
 		AssetsToLoad.Add(AnimationReferences->NormalAttacks.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Skills.ToSoftObjectPath());
 		AssetsToLoad.Add(AnimationReferences->Jump.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Dodge.ToSoftObjectPath());
 		AssetsToLoad.Add(AnimationReferences->SpecialActions.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Skills.ToSoftObjectPath());
 		AssetsToLoad.Add(AnimationReferences->Spells.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->BlockAttack.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->WeaponSwitchFullBody.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->WeaponSwitchUpperBody.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Die.ToSoftObjectPath());
 	}
 
 	StreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AssetsToLoad);

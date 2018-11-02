@@ -82,6 +82,12 @@ private:
 
 	FORCEINLINE void SetupOwningPlayer();
 
+	void DoSeamlessTransitionBetweenStillOrMovingMontage(UAnimMontage* StandStillMontage,
+														 UAnimMontage* MovingMontage,
+														 const float ForwardAxisInput,
+														 const float RightAxisInput,
+														 const FName Section);
+
 };
 
 FORCEINLINE APlayerCharacter* UPlayerAnimInstance::GetPlayerOwner()
@@ -106,4 +112,3 @@ FORCEINLINE void UPlayerAnimInstance::SetupOwningPlayer()
 {
 	OwningPlayer = GetPlayerOwner();
 }
-

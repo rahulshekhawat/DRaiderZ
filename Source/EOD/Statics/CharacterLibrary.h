@@ -80,6 +80,7 @@ enum class ECharacterState : uint8
 {
 	IdleWalkRun,
 	AutoRun,
+	SwitchingWeapon,
 	Jumping,
 	Dodging,
 	Blocking,
@@ -219,6 +220,14 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 	/** Reference to player animation montage that contains animations for blocking an attack */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
 	TSoftObjectPtr<UAnimMontage> BlockAttack;
+
+	/** Animation montage containing animation for weapon switch - Full Body Slot */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> WeaponSwitchFullBody;
+
+	/** Animation montage containing animation for weapon switch - Upper Body Slot */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> WeaponSwitchUpperBody;
 
 	/** Reference to player animation montage that contains animations for player death */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
@@ -500,6 +509,10 @@ public:
 	static const FName SectionName_RightDodge;
 
 	static const FName SectionName_Default;
+
+	static const FName SectionName_SheatheWeapon;
+
+	static const FName SectionName_UnsheatheWeapon;
 	//~ End anim montage section names
 
 };

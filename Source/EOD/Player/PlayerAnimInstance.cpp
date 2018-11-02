@@ -5,6 +5,7 @@
 #include "Core/EODPreprocessors.h"
 #include "Statics/CharacterLibrary.h"
 
+#include "Components/InputComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -111,6 +112,28 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			// do nothing
 		}
+	}
+
+	if (OwningPlayer->IsSwitchingWeapon() && OwningPlayer->GetEquippedWeaponAnimationReferences())
+	{
+		UAnimMontage* FullBodySwitchMontage = OwningPlayer->GetEquippedWeaponAnimationReferences()->WeaponSwitchFullBody.Get();
+		UAnimMontage* UpperBodySwitchMontage = OwningPlayer->GetEquippedWeaponAnimationReferences()->WeaponSwitchUpperBody.Get();
+
+		float ForwardAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveForward"));
+		float RightAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveRight"));
+
+		FName MontageSection;
+		// If weapon is currently sheathed then it means we are playing sheathe animation
+		if (OwningPlayer->IsWeaponSheathed())
+		{
+			MontageSection = UCharacterLibrary::SectionName_SheatheWeapon;
+		}
+		else
+		{
+			MontageSection = UCharacterLibrary::SectionName_UnsheatheWeapon;
+		}
+
+		DoSeamlessTransitionBetweenStillOrMovingMontage(FullBodySwitchMontage, UpperBodySwitchMontage, ForwardAxisValue, RightAxisValue, MontageSection);
 	}
 
 }
@@ -234,3 +257,51 @@ APlayerCharacter * UPlayerAnimInstance::CastPawnOwnerToPlayerCharacter()
 	return PlayerChar;
 }
 */
+
+void UPlayerAnimInstance::DoSeamlessTransitionBetweenStillOrMovingMontage(UAnimMontage* StandStillMontage, UAnimMontage* MovingMontage, const float ForwardAxisInput, const float RightAxisInput, const FName Section)
+{
+	if (ForwardAxisInput == 0.f && RightAxisInput == 0.f)
+	{
+		if (Montage_IsPlaying(MovingMontage))
+		{
+			int32 MovingMontageSectionIndex = MovingMontage->GetSectionIndex(Section);
+			int32 StandStillMontageSectionIndex = StandStillMontage->GetSectionIndex(Section);
+			if (MovingMontageSectionIndex != INDEX_NONE && StandStillMontageSectionIndex != INDEX_NONE)
+			{
+				float SectionStartTime;
+				float SectionEndtime;
+				MovingMontage->GetSectionStartAndEndTime(MovingMontageSectionIndex, SectionStartTime, SectionEndtime);
+				float CurrentPosition = Montage_GetPosition(MovingMontage);
+				float SectionOffset = CurrentPosition - SectionStartTime;
+				Montage_Stop(0.f, MovingMontage);
+
+				StandStillMontage->GetSectionStartAndEndTime(StandStillMontageSectionIndex, SectionStartTime, SectionEndtime);
+				float MontageStartPosition = SectionStartTime + SectionOffset;
+
+				Montage_Play(StandStillMontage, 1.f, EMontagePlayReturnType::MontageLength, MontageStartPosition);
+			}
+		}
+	}
+	else
+	{
+		if (Montage_IsPlaying(StandStillMontage))
+		{
+			int32 MovingMontageSectionIndex = MovingMontage->GetSectionIndex(Section);
+			int32 StandStillMontageSectionIndex = StandStillMontage->GetSectionIndex(Section);
+			if (MovingMontageSectionIndex != INDEX_NONE && StandStillMontageSectionIndex != INDEX_NONE)
+			{
+				float SectionStartTime;
+				float SectionEndtime;
+				StandStillMontage->GetSectionStartAndEndTime(StandStillMontageSectionIndex, SectionStartTime, SectionEndtime);
+				float CurrentPosition = Montage_GetPosition(StandStillMontage);
+				float SectionOffset = CurrentPosition - SectionStartTime;
+				Montage_Stop(0.f, StandStillMontage);
+
+				MovingMontage->GetSectionStartAndEndTime(MovingMontageSectionIndex, SectionStartTime, SectionEndtime);
+				float MontageStartPosition = SectionStartTime + SectionOffset;
+
+				Montage_Play(MovingMontage, 1.f, EMontagePlayReturnType::MontageLength, MontageStartPosition);
+			}
+		}
+	}
+}
