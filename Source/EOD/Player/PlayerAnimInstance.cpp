@@ -67,14 +67,22 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 
+	// When the character is falling but not jumping
+	// if (OwningPlayer->GetMovementComponent()->IsFalling() && !OwningPlayer->IsJumping())
 	if (OwningPlayer->GetMovementComponent()->IsFalling())
 	{
 		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
 		if (JumpMontage && !Montage_IsPlaying(JumpMontage))
 		{
+
+			// AnimationReferences->Die.Get();
+
 			// If some montage is already playing
 			if (Montage_IsPlaying(nullptr))
 			{
+				// @todo fix issue of player jumping without playing jump animation if jump is triggered at the end of using a skill
+				// UKismetSystemLibrary::PrintString(this, FString("Something is still playing"));
+
 				UAnimMontage* FlinchMontage = AnimationReferences->Flinch.Get();
 				UAnimMontage* BlockAttackMontage = AnimationReferences->BlockAttack.Get();
 
@@ -119,9 +127,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		UAnimMontage* FullBodySwitchMontage = OwningPlayer->GetEquippedWeaponAnimationReferences()->WeaponSwitchFullBody.Get();
 		UAnimMontage* UpperBodySwitchMontage = OwningPlayer->GetEquippedWeaponAnimationReferences()->WeaponSwitchUpperBody.Get();
 
-		float ForwardAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveForward"));
-		float RightAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveRight"));
-
 		FName MontageSection;
 		// If weapon is currently sheathed then it means we are playing sheathe animation
 		if (OwningPlayer->IsWeaponSheathed())
@@ -133,9 +138,39 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			MontageSection = UCharacterLibrary::SectionName_UnsheatheWeapon;
 		}
 
-		DoSeamlessTransitionBetweenStillOrMovingMontage(FullBodySwitchMontage, UpperBodySwitchMontage, ForwardAxisValue, RightAxisValue, MontageSection);
-	}
+		if (FullBodySwitchMontage && UpperBodySwitchMontage)
+		{
+			float ForwardAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveForward"));
+			float RightAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveRight"));
 
+			DoSeamlessTransitionBetweenStillOrMovingMontage(FullBodySwitchMontage, UpperBodySwitchMontage, ForwardAxisValue, RightAxisValue, MontageSection);
+		}
+	}
+	
+	if (OwningPlayer->IsUsingAnySkill() && OwningPlayer->SkillAllowsMovement())
+	{
+		FSkillTableRow* ActiveSkill = OwningPlayer->GetCurrentActiveSkill();
+		if (ActiveSkill)
+		{
+			UAnimMontage* FullBodySkillMontage = ActiveSkill->AnimMontage.Get();
+			UAnimMontage* UpperBodySkillMontage = ActiveSkill->UpperBodyAnimMontage.Get();
+			FName MontageSection = ActiveSkill->SkillStartMontageSectionName;
+
+			if (FullBodySkillMontage && UpperBodySkillMontage)
+			{
+				UKismetSystemLibrary::PrintString(this, FString("Attempting seamless transition"));
+
+				float ForwardAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveForward"));
+				float RightAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveRight"));
+
+				DoSeamlessTransitionBetweenStillOrMovingMontage(FullBodySkillMontage, UpperBodySkillMontage, ForwardAxisValue, RightAxisValue, MontageSection);
+			}
+			else
+			{
+				UKismetSystemLibrary::PrintString(this, FString("Failed seamless transition"));
+			}
+		}
+	}
 }
 
 void UPlayerAnimInstance::NativePostEvaluateAnimation()

@@ -295,6 +295,8 @@ public:
 
 	inline FPlayerAnimationReferencesTableRow* GetEquippedWeaponAnimationReferences() const;
 
+	FORCEINLINE bool SkillAllowsMovement() const;
+
 private:
 
 	const int CameraZoomRate = 15;
@@ -657,6 +659,11 @@ inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationR
 inline FPlayerAnimationReferencesTableRow * APlayerCharacter::GetEquippedWeaponAnimationReferences() const
 {
 	return EquippedWeaponAnimationReferences;
+}
+
+FORCEINLINE bool APlayerCharacter::SkillAllowsMovement() const
+{
+	return bSkillAllowsMovement;
 }
 
 FORCEINLINE bool APlayerCharacter::CanAutoRun() const

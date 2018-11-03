@@ -697,6 +697,24 @@ void APlayerCharacter::OnPressedEscape()
 
 void APlayerCharacter::OnJump()
 {
+	/*
+	if (CanJump())
+	{
+		if (bUseControllerRotationYaw)
+		{
+			SetUseControllerRotationYaw(false);
+		}
+
+		if (IsAutoRunning())
+		{
+			DisableAutoRun();
+		}
+
+		Jump();
+		SetCharacterState(ECharacterState::Jumping);
+	}
+	*/
+
 	if (CanJump() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Jump.Get())
 	{
 		if (IsBlocking())

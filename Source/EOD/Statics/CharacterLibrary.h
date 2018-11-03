@@ -263,9 +263,13 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	UTexture* Icon;
 
-	/** Animation montage containing animation for this skill */
+	/** Animation montage containing main animation (full body slot) for this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
 	TSoftObjectPtr<UAnimMontage> AnimMontage;
+
+	/** Animation montage containing upper body animation for this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
+	TSoftObjectPtr<UAnimMontage> UpperBodyAnimMontage;
 
 	/** Section name of skill start animation */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
@@ -301,6 +305,10 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 	/** Determines whether this skill can be used while moving */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	bool bAllowsMovement;
+
+	/** Determines whether this skill has different animations to be used while walking in different directions */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bHasDirectionalAnimations;
 
 	/** Determines whether this skill is a passive skill or an active skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)

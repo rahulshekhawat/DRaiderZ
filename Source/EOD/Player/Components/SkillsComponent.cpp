@@ -267,7 +267,18 @@ void USkillsComponent::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
 		
 		if (GameSingleton)
 		{
-			TSharedPtr<FStreamableHandle> AnimHandle = GameSingleton->StreamableManager.RequestSyncLoad(Skill->AnimMontage.ToSoftObjectPath());
+			TArray<FSoftObjectPath> AnimationsToLoad;
+			if (!Skill->AnimMontage.IsNull())
+			{
+				AnimationsToLoad.Add(Skill->AnimMontage.ToSoftObjectPath());
+			}
+			if (!Skill->UpperBodyAnimMontage.IsNull())
+			{
+				AnimationsToLoad.Add(Skill->UpperBodyAnimMontage.ToSoftObjectPath());
+			}
+
+			TSharedPtr<FStreamableHandle> AnimHandle = GameSingleton->StreamableManager.RequestSyncLoad(AnimationsToLoad);
+			// TSharedPtr<FStreamableHandle> AnimHandle = GameSingleton->StreamableManager.RequestSyncLoad(Skill->AnimMontage.ToSoftObjectPath());
 			if (AnimHandle.IsValid())
 			{
 				SkillGroupAnimationStreamableHandles.Add(SkillGroup, AnimHandle);
