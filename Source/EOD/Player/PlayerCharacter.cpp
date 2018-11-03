@@ -268,6 +268,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			UpdateAutoRun(DeltaTime);
 		}
+		else if (IsFastRunning())
+		{
+			UpdateFastMovementState(DeltaTime);
+		}
 		else if (IsMoving() || (IsUsingAnySkill() && bSkillAllowsMovement) || (IsSwitchingWeapon()))
 		{
 			UpdateMovement(DeltaTime);
@@ -275,10 +279,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 		else if (IsBlocking())
 		{
 			UpdateBlockState(DeltaTime);
-		}
-		else if (IsFastRunning())
-		{
-			UpdateFastMovementState(DeltaTime);
 		}
 
 		if (bRotateSmoothly)
@@ -1288,11 +1288,6 @@ void APlayerCharacter::LoadEquippedWeaponAnimationReferences()
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
-	if (IsBlocking())
-	{
-		DisableBlock();
-	}
-
 	if (!CanUseAnySkill())
 	{
 #if MESSAGE_LOGGING_ENABLED
@@ -1300,7 +1295,12 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 #endif // MESSAGE_LOGGING_ENABLED
 		return;
 	}
-	
+
+	if (IsBlocking())
+	{
+		DisableBlock();
+	}
+
 	TPair<FName, FSkillTableRow*> SkillPair = SkillsComponent->GetSkillFromSkillSlot(SkillButtonIndex);
 	// There isn't any skill to use
 	if (SkillPair.Key == NAME_None || SkillPair.Value == nullptr)
@@ -1367,8 +1367,11 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	}
 	else
 	{
-		SetOffSmoothRotation(GetPlayerControlRotationYaw());
-		PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		if (SkillPair.Value->AnimMontage.Get())
+		{
+			SetOffSmoothRotation(GetPlayerControlRotationYaw());
+			PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		}
 	}
 }
 
@@ -1426,6 +1429,11 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 	}
 
 	return ResultingRotation;
+}
+
+void APlayerCharacter::BP_SetCanUseChainSkill(bool bNewValue)
+{
+	SetCanUseChainSkill(bNewValue);
 }
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)

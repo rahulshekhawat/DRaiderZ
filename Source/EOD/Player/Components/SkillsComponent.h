@@ -37,19 +37,15 @@ public:
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Skill Bar Widget"))
 	USkillBarWidget* BP_GetSkillBarWidget() const;
 
-	/** Returns skill bar widget */
+	/** Returns skill tree widget */
 	FORCEINLINE USkillTreeWidget* GetSkillTreeWidget() const;
 
-	/** Returns skill bar widget */
+	/** Returns skill tree widget */
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Skill Tree Widget"))
 	USkillTreeWidget* BP_GetSkillTreeWidget() const;
 
 	/** Toggle the display of skill tree UI in player viewport */
 	void ToggleSkillTreeUI();
-
-	void InitializeComponentWidgets();
-
-	void InitializeSkillBar();
 
 	/** Returns true if player can use skill placed at given skill slot index */
 	bool CanUseSkill(const int32 SkillSlotIndex);
@@ -110,6 +106,10 @@ private:
 
 	FORCEINLINE FString GetGenderPrefix() const;
 
+	void InitializeComponentWidgets();
+
+	void InitializeSkillBar();
+
 };
 
 FORCEINLINE USkillBarWidget* USkillsComponent::GetSkillBarWidget() const
@@ -124,8 +124,7 @@ FORCEINLINE USkillTreeWidget* USkillsComponent::GetSkillTreeWidget() const
 
 FORCEINLINE APlayerCharacter* USkillsComponent::GetOwningEODPlayer() const
 {
-	APlayerCharacter* EODOwner = Cast<APlayerCharacter>(GetOwner());
-	return EODOwner;
+	return Cast<APlayerCharacter>(GetOwner());
 }
 
 FORCEINLINE FString USkillsComponent::GetGenderPrefix() const

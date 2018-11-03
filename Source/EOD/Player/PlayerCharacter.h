@@ -299,6 +299,11 @@ public:
 
 	FORCEINLINE bool SkillHasDirectionalAnimations() const;
 
+	FORCEINLINE void SetCanUseChainSkill(bool bNewValue);
+
+	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Can Use Chain Skill"))
+	void BP_SetCanUseChainSkill(bool bNewValue);
+
 private:
 
 	const int CameraZoomRate = 15;
@@ -340,6 +345,9 @@ private:
 
 	UPROPERTY(Transient)
 	bool bSkillAllowsMovement;
+
+	UPROPERTY(Transient)
+	bool bCanUseChainSkill;
 
 	UPROPERTY(Transient)
 	bool bSkillHasDirectionalAnimations;
@@ -674,6 +682,11 @@ FORCEINLINE bool APlayerCharacter::SkillAllowsMovement() const
 FORCEINLINE bool APlayerCharacter::SkillHasDirectionalAnimations() const
 {
 	return bSkillHasDirectionalAnimations;
+}
+
+FORCEINLINE void APlayerCharacter::SetCanUseChainSkill(bool bNewValue)
+{
+	bCanUseChainSkill = bNewValue;
 }
 
 FORCEINLINE bool APlayerCharacter::CanAutoRun() const
