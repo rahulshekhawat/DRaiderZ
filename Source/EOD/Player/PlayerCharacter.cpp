@@ -1318,6 +1318,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	if (SkillPair.Value->AnimMontage.Get())
 	{
 		bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
+		bSkillHasDirectionalAnimations = SkillPair.Value->bHasDirectionalAnimations;
 		if (!bSkillAllowsMovement)
 		{
 			SetOffSmoothRotation(GetPlayerControlRotationYaw());

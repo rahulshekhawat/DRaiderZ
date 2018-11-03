@@ -86,7 +86,15 @@ private:
 														 UAnimMontage* MovingMontage,
 														 const float ForwardAxisInput,
 														 const float RightAxisInput,
-														 const FName Section);
+														 const FName Section,
+														 bool bZeroBlendOut = false);
+
+	void DoSeamlessTransitionBetweenStillOrMovingDirectionalMontage(UAnimMontage* StandStillMontage,
+																	UAnimMontage* MovingMontage,
+																	const float ForwardAxisInput,
+																	const float RightAxisInput,
+																	const FName BaseSection,
+																	bool bZeroBlendOut = false);
 
 };
 

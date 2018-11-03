@@ -297,6 +297,8 @@ public:
 
 	FORCEINLINE bool SkillAllowsMovement() const;
 
+	FORCEINLINE bool SkillHasDirectionalAnimations() const;
+
 private:
 
 	const int CameraZoomRate = 15;
@@ -338,6 +340,9 @@ private:
 
 	UPROPERTY(Transient)
 	bool bSkillAllowsMovement;
+
+	UPROPERTY(Transient)
+	bool bSkillHasDirectionalAnimations;
 
 	/** Player HUD class reference */
 	UPROPERTY(Transient)
@@ -664,6 +669,11 @@ inline FPlayerAnimationReferencesTableRow * APlayerCharacter::GetEquippedWeaponA
 FORCEINLINE bool APlayerCharacter::SkillAllowsMovement() const
 {
 	return bSkillAllowsMovement;
+}
+
+FORCEINLINE bool APlayerCharacter::SkillHasDirectionalAnimations() const
+{
+	return bSkillHasDirectionalAnimations;
 }
 
 FORCEINLINE bool APlayerCharacter::CanAutoRun() const
