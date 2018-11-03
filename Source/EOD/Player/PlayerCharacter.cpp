@@ -1315,15 +1315,60 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	SetCurrentActiveSkill(SkillPair.Value);
 	SkillsComponent->OnSkillUsed(SkillButtonIndex, SkillPair.Key, SkillPair.Value);
 
-	if (SkillPair.Value->AnimMontage.Get())
+	bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
+	bSkillHasDirectionalAnimations = SkillPair.Value->bHasDirectionalAnimations;
+
+	if (bSkillAllowsMovement)
 	{
-		bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
-		bSkillHasDirectionalAnimations = SkillPair.Value->bHasDirectionalAnimations;
-		if (!bSkillAllowsMovement)
+		if (IsIdle())
 		{
-			SetOffSmoothRotation(GetPlayerControlRotationYaw());
+			if (SkillPair.Value->AnimMontage.Get())
+			{
+				PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+			}
 		}
-		PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value ->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		else if (IsMoving() && !bSkillHasDirectionalAnimations)
+		{
+			if (SkillPair.Value->UpperBodyAnimMontage.Get())
+			{
+				PlayAnimationMontage(SkillPair.Value->UpperBodyAnimMontage.Get(), SkillPair.Value->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+			}
+		}
+		else if (IsMoving() && bSkillHasDirectionalAnimations)
+		{
+			if (SkillPair.Value->UpperBodyAnimMontage.Get())
+			{
+				FString SectionSuffixString;
+				if (IWR_CharacterMovementDirection == ECharMovementDirection::F)
+				{
+					SectionSuffixString = FString("_F");
+				}
+				else if (IWR_CharacterMovementDirection == ECharMovementDirection::B)
+				{
+					SectionSuffixString = FString("_B");
+				}
+				else if (IWR_CharacterMovementDirection == ECharMovementDirection::L)
+				{
+					SectionSuffixString = FString("_L");
+				}
+				else if (IWR_CharacterMovementDirection == ECharMovementDirection::R)
+				{
+					SectionSuffixString = FString("_R");
+				}
+				else
+				{
+					SectionSuffixString = FString("_F");
+				}
+
+				FName SectionToPlay = FName(*(SkillPair.Value->SkillStartMontageSectionName.ToString() + SectionSuffixString));
+				PlayAnimationMontage(SkillPair.Value->UpperBodyAnimMontage.Get(), SectionToPlay, ECharacterState::UsingActiveSkill);
+			}
+		}
+	}
+	else
+	{
+		SetOffSmoothRotation(GetPlayerControlRotationYaw());
+		PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	}
 }
 
