@@ -7,7 +7,8 @@
 #include "AnimNotify_NormalAttack.generated.h"
 
 /**
- * 
+ * Notify called at the beginning of a normal attack animation.
+ * This is used to set current active skill for owning player and set off smooth rotation.
  */
 UCLASS()
 class EOD_API UAnimNotify_NormalAttack : public UAnimNotify

@@ -277,7 +277,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			UpdateFastMovementState(DeltaTime);
 		}
-		else if (IsNormalAttacking())
+		else if (bNormalAttackPressed && IsNormalAttacking())
 		{
 			UpdateNormalAttack(DeltaTime);
 		}
@@ -1103,6 +1103,33 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 
 void APlayerCharacter::UpdateNormalAttack(float DeltaTime)
 {
+	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
+	{
+		return;
+	}
+
+	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
+	if (bNormalAttackSectionChangeAllowed)
+	{
+		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(NormalAttackMontage);
+		FName ExpectedNextSection = GetNextNormalAttackSectionName(CurrentSection);
+
+		if (ExpectedNextSection != NAME_None)
+		{
+			FString CurrentSectionString = CurrentSection.ToString();
+			if (CurrentSectionString.EndsWith("End"))
+			{
+				PlayAnimationMontage(NormalAttackMontage, ExpectedNextSection);
+				// PlayAnimationMontage(NormalAttackMontage, ExpectedNextSection, ECharacterState::Attacking);
+			}
+			else
+			{
+				SetNextMontageSection(CurrentSection, ExpectedNextSection);
+				// SetNextMontageSection(CurrentSection, NextSection);
+			}
+		}
+		bNormalAttackSectionChangeAllowed = false;
+	}
 }
 
 void APlayerCharacter::Destroyed()
@@ -1497,6 +1524,7 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	}
 
 	SetCanUseChainSkill(false);
+	bNormalAttackSectionChangeAllowed = false;
 }
 
 void APlayerCharacter::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
