@@ -177,6 +177,68 @@ TPair<FName, FSkillTableRow*> USkillsComponent::GetSkillFromSkillSlot(const int3
 	}
 }
 
+TPair<FName, FSkillTableRow*> USkillsComponent::GetChainSkillFromSkillSlot(const int32 SkillSlotIndex)
+{
+	if (!SkillBarWidget || !SkillTreeWidget || ActiveSupersedingChainSkillGroup.Key != SkillSlotIndex)
+	{
+		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
+	}
+
+	FString SkillGroup = ActiveSupersedingChainSkillGroup.Value;
+	if (SkillBarWidget->IsSkillGroupInCooldown(SkillGroup))
+	{
+		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
+	}
+
+	FSkillState SkillState = SkillTreeWidget->GetSkillState(SkillGroup);
+	if (SkillState.CurrentUpgradeLevel == 0)
+	{
+		SkillState.CurrentUpgradeLevel = 1;
+	}
+
+	FString GenderPrefix;
+	if (OwnerGender == ECharacterGender::Female)
+	{
+		GenderPrefix = FString("F_");
+	}
+	else
+	{
+		GenderPrefix = FString("M_");
+	}
+
+	FString SkillIDString = GenderPrefix + SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
+	FName SkillID = FName(*SkillIDString);
+	FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, FString("USkillsComponent::GetSkillIDFromSkillSlot"));
+	if (!Skill)
+	{
+		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
+	}
+
+	if (Skill->PrecedingSkillGroups.Num() == 0)
+	{
+		return TPair<FName, FSkillTableRow*>(SkillID, Skill);
+	}
+
+	bool bUsedPrecedingSkill = false;
+	for (const FString& SkillGroup : Skill->PrecedingSkillGroups)
+	{
+		if (SkillGroup == ActivePrecedingChainSkillGroup)
+		{
+			bUsedPrecedingSkill = true;
+			break;
+		}
+	}
+
+	if (bUsedPrecedingSkill)
+	{
+		return TPair<FName, FSkillTableRow*>(SkillID, Skill);
+	}
+	else
+	{
+		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
+	}
+}
+
 void USkillsComponent::OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, const FSkillTableRow* Skill)
 {
 	if (SkillID == NAME_None || Skill == nullptr)

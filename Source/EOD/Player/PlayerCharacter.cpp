@@ -347,7 +347,7 @@ bool APlayerCharacter::CanUseAnySkill() const
 	return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsFastRunning());
 }
 
-bool APlayerCharacter::CanUseSkill(FSkillTableRow * Skill)
+bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
 {
 	if (Skill)
 	{
@@ -697,7 +697,6 @@ void APlayerCharacter::OnPressedEscape()
 
 void APlayerCharacter::OnJump()
 {
-	/*
 	if (CanJump())
 	{
 		if (bUseControllerRotationYaw)
@@ -712,22 +711,6 @@ void APlayerCharacter::OnJump()
 
 		Jump();
 		SetCharacterState(ECharacterState::Jumping);
-	}
-	*/
-
-	if (CanJump() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Jump.Get())
-	{
-		if (IsBlocking())
-		{
-			DisableBlock();
-		}
-
-		if (IsAutoRunning())
-		{
-			DisableAutoRun();
-		}
-
-		Jump();
 	}
 }
 
@@ -1288,6 +1271,17 @@ void APlayerCharacter::LoadEquippedWeaponAnimationReferences()
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
+	TPair<FName, FSkillTableRow*> SkillPair(NAME_None, nullptr);
+	if (CanUseAnySkill())
+	{
+		SkillPair = SkillsComponent->GetSkillFromSkillSlot(SkillButtonIndex);
+	}
+	else if (IsUsingAnySkill() && bCanUseChainSkill)
+	{
+		SkillPair = SkillsComponent->GetChainSkillFromSkillSlot(SkillButtonIndex);
+	}
+
+	/*
 	if (!CanUseAnySkill())
 	{
 #if MESSAGE_LOGGING_ENABLED
@@ -1295,17 +1289,18 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 #endif // MESSAGE_LOGGING_ENABLED
 		return;
 	}
+	*/
 
-	if (IsBlocking())
-	{
-		DisableBlock();
-	}
-
-	TPair<FName, FSkillTableRow*> SkillPair = SkillsComponent->GetSkillFromSkillSlot(SkillButtonIndex);
+	// TPair<FName, FSkillTableRow*> SkillPair = SkillsComponent->GetSkillFromSkillSlot(SkillButtonIndex);
 	// There isn't any skill to use
 	if (SkillPair.Key == NAME_None || SkillPair.Value == nullptr)
 	{
 		return;
+	}
+
+	if (IsBlocking())
+	{
+		DisableBlock();
 	}
 
 	GetStatsComponent()->ModifyCurrentMana(-SkillPair.Value->ManaRequired);
@@ -1447,6 +1442,8 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	{
 		SkillsComponent->SetOffChainSkillReset();
 	}
+
+	SetCanUseChainSkill(false);
 }
 
 void APlayerCharacter::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)

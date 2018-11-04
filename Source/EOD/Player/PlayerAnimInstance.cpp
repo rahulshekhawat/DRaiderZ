@@ -67,39 +67,46 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 
-	// When the character is falling but not jumping
-	// if (OwningPlayer->GetMovementComponent()->IsFalling() && !OwningPlayer->IsJumping())
-	if (OwningPlayer->GetMovementComponent()->IsFalling())
+	// @todo
+	/*
+	// When the character is falling and jumping
+	if (OwningPlayer->GetMovementComponent()->IsFalling() && OwningPlayer->IsJumping())
+	{
+
+	}
+	// When the character is not falling but jumping
+	else if (!OwningPlayer->GetCharacterMovement()->IsFalling() && OwningPlayer->IsJumping())
+	{
+
+	}
+	// When character is falling but not jumping
+	else if (OwningPlayer->GetCharacterMovement()->IsFalling() && !OwningPlayer->IsJumping() && OwningPlayer->IsIdleOrMoving())
 	{
 		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
-		if (JumpMontage && !Montage_IsPlaying(JumpMontage))
+		if (JumpMontage)
 		{
-
-			// AnimationReferences->Die.Get();
-
-			// If some montage is already playing
-			if (Montage_IsPlaying(nullptr))
+			if (Montage_IsPlaying(JumpMontage))
 			{
-				// @todo fix issue of player jumping without playing jump animation if jump is triggered at the end of using a skill
-				// UKismetSystemLibrary::PrintString(this, FString("Something is still playing"));
-
-				UAnimMontage* FlinchMontage = AnimationReferences->Flinch.Get();
-				UAnimMontage* BlockAttackMontage = AnimationReferences->BlockAttack.Get();
-
-				if ((FlinchMontage && Montage_IsPlaying(FlinchMontage)) || (BlockAttackMontage && Montage_IsPlaying(FlinchMontage)))
-				{
-					OwningPlayer->SetCharacterState(ECharacterState::Jumping);
-					Montage_Play(JumpMontage);
-					return;
-				}
+				OwningPlayer->SetCharacterState(ECharacterState::Jumping);
 			}
-			// If no montage is playing
 			else
 			{
 				OwningPlayer->SetCharacterState(ECharacterState::Jumping);
 				Montage_Play(JumpMontage);
 				return;
 			}
+		}
+	}
+	*/
+
+
+	if (OwningPlayer->GetMovementComponent()->IsFalling())
+	{
+		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
+		if (JumpMontage && !Montage_IsPlaying(JumpMontage))
+		{
+			Montage_Play(JumpMontage);
+			return;
 		}
 
 		return;

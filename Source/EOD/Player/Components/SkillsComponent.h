@@ -53,9 +53,14 @@ public:
 	/**
 	 * Returns SkillID and skill struct pointer of skill at given skill slot index
 	 * This will return <NAME_None, nullptr> if no skill is equipped in given skill slot or if the skill is in cooldown (skill unavailable for use)
-	 * However it will return <SkillID, nullptr> for chain skill if it available for use
+	 * However it will return <SkillID, FSkillTableRow*> for chain skill if it available for use
 	 */
 	TPair<FName, FSkillTableRow*> GetSkillFromSkillSlot(const int32 SkillSlotIndex);
+
+	/**
+	 * Returns SkillID and skill struct pointer of chain skill at the give nSkillSlotIndex
+	 */
+	TPair<FName, FSkillTableRow*> GetChainSkillFromSkillSlot(const int32 SkillSlotIndex);
 
 	void OnSkillUsed(const int32 SkillSlotIndex, FName SkillID, const FSkillTableRow* Skill);
 
