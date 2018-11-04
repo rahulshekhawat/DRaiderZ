@@ -1346,6 +1346,7 @@ void APlayerCharacter::LoadEquippedWeaponAnimationReferences()
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
+	// bool bSkillBeingUsedWhileHit;
 	TPair<FName, FSkillTableRow*> SkillPair(NAME_None, nullptr);
 	if (CanUseAnySkill())
 	{
@@ -1354,6 +1355,10 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	else if (IsUsingAnySkill() && bCanUseChainSkill)
 	{
 		SkillPair = SkillsComponent->GetChainSkillFromSkillSlot(SkillButtonIndex);
+	}
+	else if (HasBeenHit())
+	{
+		SkillPair = SkillsComponent->GetHitImmuneSkillFromSkillSlot(SkillButtonIndex);
 	}
 
 	/*
@@ -1387,6 +1392,16 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 	bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
 	bSkillHasDirectionalAnimations = SkillPair.Value->bHasDirectionalAnimations;
+
+	// @todo cleaning of crowd control effect timer needs to be handled better
+	GetWorld()->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
+	// If frozen
+	if (CustomTimeDilation == 0.f)
+	{
+		EndFreeze();
+	}
+
+	GetStatsComponent()->AddCrowdControlImmunitiesFromSkill(SkillPair.Value->CrowdControlImmunities);
 
 	if (bSkillAllowsMovement)
 	{
@@ -1518,13 +1533,27 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 		SetCharacterState(ECharacterState::IdleWalkRun);
 	}
 
+	// @todo handle skill montage blending out better because montages might be blending out in between transition of standstill and moving animations
 	if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
 	{
 		SkillsComponent->SetOffChainSkillReset();
+
+		if (GetCurrentActiveSkill()->CrowdControlImmunities == GetStatsComponent()->GetCrowdControlImmunitiesFromSkill())
+		{
+			GetStatsComponent()->RemoveCrowdControlImmunitiesFromSkil();
+		}
 	}
 
-	SetCanUseChainSkill(false);
-	bNormalAttackSectionChangeAllowed = false;
+	if (GetActiveAnimationReferences()->NormalAttacks.Get() == AnimMontage)
+	{
+		bNormalAttackSectionChangeAllowed = false;
+	}
+
+	// On disable chain skill if the montage blending out is not a flinch montage
+	if (GetActiveAnimationReferences()->Flinch.Get() != AnimMontage)
+	{
+		SetCanUseChainSkill(false);
+	}
 }
 
 void APlayerCharacter::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)

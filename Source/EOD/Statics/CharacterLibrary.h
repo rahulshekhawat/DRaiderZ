@@ -314,6 +314,10 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	bool bPassiveSkill;
 
+	/** Determines whether this skill can be used while character has been hit */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	bool bCanBeUsedWhileHit;
+
 	/** Skills, any of which MUST be used before using this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	TArray<FString> PrecedingSkillGroups;

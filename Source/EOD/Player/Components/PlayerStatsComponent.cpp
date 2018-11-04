@@ -815,7 +815,8 @@ void UPlayerStatsComponent::RemoveAllCrowdControlImmunities()
 
 bool UPlayerStatsComponent::HasCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) const
 {
-	return (CrowdControlImmunities & (1 << (uint8)CrowdControlEffect));
+	// return (CrowdControlImmunities & (1 << (uint8)CrowdControlEffect));
+	return (CrowdControlImmunities & (1 << (uint8)CrowdControlEffect)) || (CrowdControlImmunitiesFromSkill & (1 << (uint8)CrowdControlEffect));
 }
 
 uint8 UPlayerStatsComponent::GetCrowdControlImmunities() const
@@ -1055,6 +1056,21 @@ void UPlayerStatsComponent::RemovePrimaryWeaponStats()
 void UPlayerStatsComponent::RemoveSecondaryWeaponStats()
 {
 	SecondaryWeaponData = nullptr;
+}
+
+void UPlayerStatsComponent::AddCrowdControlImmunitiesFromSkill(uint8 CCImmunities)
+{
+	this->CrowdControlImmunitiesFromSkill |= CCImmunities;
+}
+
+void UPlayerStatsComponent::RemoveCrowdControlImmunitiesFromSkil()
+{
+	this->CrowdControlImmunitiesFromSkill = 0;
+}
+
+uint8 UPlayerStatsComponent::GetCrowdControlImmunitiesFromSkill() const
+{
+	return CrowdControlImmunitiesFromSkill;
 }
 
 void UPlayerStatsComponent::ActivateHealthRegeneration()

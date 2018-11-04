@@ -319,6 +319,12 @@ public:
 
 	void RemoveSecondaryWeaponStats();
 
+	virtual void AddCrowdControlImmunitiesFromSkill(uint8 CCImmunities) override;
+
+	virtual void RemoveCrowdControlImmunitiesFromSkil() override;
+
+	virtual uint8 GetCrowdControlImmunitiesFromSkill() const;
+
 private:
 	
 	//~ @note All changes to variables similar to MaxHealth, CurrentHealth, etc. will occur ONLY on server and will automatically get replicated. No RPC needed.
@@ -451,6 +457,9 @@ private:
 	
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
 	uint8 CrowdControlImmunities;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	uint8 CrowdControlImmunitiesFromSkill;
 
 	//~ @note CooldownModifier, ExpModifier, DropRateModifier, and StaminaConsumptionModifier
 	//~ will be replicated to owner only. They are irrelevant to other clients.

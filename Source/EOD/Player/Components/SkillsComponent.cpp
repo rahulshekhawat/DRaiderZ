@@ -208,7 +208,7 @@ TPair<FName, FSkillTableRow*> USkillsComponent::GetChainSkillFromSkillSlot(const
 
 	FString SkillIDString = GenderPrefix + SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
 	FName SkillID = FName(*SkillIDString);
-	FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, FString("USkillsComponent::GetSkillIDFromSkillSlot"));
+	FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, FString("USkillsComponent::GetChainSkillFromSkillSlot"));
 	if (!Skill)
 	{
 		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
@@ -230,6 +230,44 @@ TPair<FName, FSkillTableRow*> USkillsComponent::GetChainSkillFromSkillSlot(const
 	}
 
 	if (bUsedPrecedingSkill)
+	{
+		return TPair<FName, FSkillTableRow*>(SkillID, Skill);
+	}
+	else
+	{
+		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
+	}
+}
+
+TPair<FName, FSkillTableRow*> USkillsComponent::GetHitImmuneSkillFromSkillSlot(const int32 SkillSlotIndex)
+{
+	if (!SkillBarWidget || !SkillTreeWidget)
+	{
+		return TPair<FName, FSkillTableRow*>(NAME_None, nullptr);
+	}
+
+	FString SkillGroup = SkillBarWidget->GetSkillGroupAtIndex(SkillSlotIndex);
+	FSkillState SkillState = SkillTreeWidget->GetSkillState(SkillGroup);
+	if (SkillState.CurrentUpgradeLevel == 0)
+	{
+		SkillState.CurrentUpgradeLevel = 1;
+	}
+
+	FString GenderPrefix;
+	if (OwnerGender == ECharacterGender::Female)
+	{
+		GenderPrefix = FString("F_");
+	}
+	else
+	{
+		GenderPrefix = FString("M_");
+	}
+
+	FString SkillIDString = GenderPrefix + SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
+	FName SkillID = FName(*SkillIDString);
+	FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, FString("USkillsComponent::GetHitImmuneSkillFromSkillSlot"));
+
+	if (Skill && Skill->bCanBeUsedWhileHit)
 	{
 		return TPair<FName, FSkillTableRow*>(SkillID, Skill);
 	}
