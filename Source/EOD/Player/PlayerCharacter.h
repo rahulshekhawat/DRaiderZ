@@ -301,8 +301,13 @@ public:
 
 	FORCEINLINE void SetCanUseChainSkill(bool bNewValue);
 
+	FORCEINLINE void SetNormalAttackSectionChangeAllowed(bool bNewValue);
+
 	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Can Use Chain Skill"))
 	void BP_SetCanUseChainSkill(bool bNewValue);
+
+	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Normal Attack Section Change Allowed"))
+	void BP_SetNormalAttackSectionChangeAllowed(bool bNewValue);
 
 private:
 
@@ -351,6 +356,9 @@ private:
 
 	UPROPERTY(Transient)
 	bool bSkillHasDirectionalAnimations;
+
+	UPROPERTY(Transient)
+	bool bNormalAttackSectionChangeAllowed;
 
 	/** Player HUD class reference */
 	UPROPERTY(Transient)
@@ -471,6 +479,8 @@ private:
 
 	void OnReleasedNormalAttack();
 
+	void DoNormalAttack();
+
 	void UpdateIdleState(float DeltaTime);
 
 	void UpdateMovement(float DeltaTime);
@@ -480,6 +490,8 @@ private:
 	void UpdateFastMovementState(float DeltaTime);
 
 	void UpdateAutoRun(float DeltaTime);
+
+	void UpdateNormalAttack(float DeltaTime);
 
 	/** Enable or disable auto run */
 	void OnToggleAutoRun();
@@ -687,6 +699,11 @@ FORCEINLINE bool APlayerCharacter::SkillHasDirectionalAnimations() const
 FORCEINLINE void APlayerCharacter::SetCanUseChainSkill(bool bNewValue)
 {
 	bCanUseChainSkill = bNewValue;
+}
+
+FORCEINLINE void APlayerCharacter::SetNormalAttackSectionChangeAllowed(bool bNewValue)
+{
+	bNormalAttackSectionChangeAllowed = bNewValue;
 }
 
 FORCEINLINE bool APlayerCharacter::CanAutoRun() const

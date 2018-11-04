@@ -260,6 +260,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 			DisableBlock();
 		}
 
+		if (bNormalAttackPressed && CanNormalAttack())
+		{
+			DoNormalAttack();
+		}
+
 		if (IsIdle())
 		{
 			UpdateIdleState(DeltaTime);
@@ -271,6 +276,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 		else if (IsFastRunning())
 		{
 			UpdateFastMovementState(DeltaTime);
+		}
+		else if (IsNormalAttacking())
+		{
+			UpdateNormalAttack(DeltaTime);
 		}
 		else if (IsMoving() || (IsUsingAnySkill() && bSkillAllowsMovement) || (IsSwitchingWeapon()))
 		{
@@ -339,7 +348,8 @@ bool APlayerCharacter::CanBlock() const
 
 bool APlayerCharacter::CanNormalAttack() const
 {
-	return IsIdleOrMoving() || IsNormalAttacking();
+	// return IsIdleOrMoving() || IsNormalAttacking();
+	return IsIdleOrMoving();
 }
 
 bool APlayerCharacter::CanUseAnySkill() const
@@ -793,6 +803,9 @@ void APlayerCharacter::OnToggleMouseCursor()
 
 void APlayerCharacter::OnPressedNormalAttack()
 {
+	bNormalAttackPressed = true;
+
+	/*
 	if (!CanNormalAttack() || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
 	{
 		return;
@@ -839,11 +852,42 @@ void APlayerCharacter::OnPressedNormalAttack()
 			}
 		}
 	}
+	*/
 }
 
 void APlayerCharacter::OnReleasedNormalAttack()
 {
-	// empty 
+	bNormalAttackPressed = false;
+}
+
+void APlayerCharacter::DoNormalAttack()
+{
+	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
+	{
+		return;
+	}
+
+	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
+	if (bForwardPressed)
+	{
+		PlayAnimationMontage(NormalAttackMontage,
+			UCharacterLibrary::SectionName_ForwardSPSwing,
+			ECharacterState::Attacking);
+		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
+	}
+	else if (bBackwardPressed)
+	{
+		PlayAnimationMontage(NormalAttackMontage,
+			UCharacterLibrary::SectionName_BackwardSPSwing,
+			ECharacterState::Attacking);
+		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
+	}
+	else
+	{
+		PlayAnimationMontage(NormalAttackMontage,
+			UCharacterLibrary::SectionName_FirstSwing,
+			ECharacterState::Attacking);
+	}
 }
 
 void APlayerCharacter::OnToggleAutoRun()
@@ -1055,6 +1099,10 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 	{
 		SetWalkSpeed(Speed);
 	}
+}
+
+void APlayerCharacter::UpdateNormalAttack(float DeltaTime)
+{
 }
 
 void APlayerCharacter::Destroyed()
@@ -1429,6 +1477,11 @@ float APlayerCharacter::GetRotationYawFromAxisInput()
 void APlayerCharacter::BP_SetCanUseChainSkill(bool bNewValue)
 {
 	SetCanUseChainSkill(bNewValue);
+}
+
+void APlayerCharacter::BP_SetNormalAttackSectionChangeAllowed(bool bNewValue)
+{
+	SetNormalAttackSectionChangeAllowed(bNewValue);
 }
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
