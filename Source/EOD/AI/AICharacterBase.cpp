@@ -37,14 +37,6 @@ void AAICharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (AggroWidgetComp->GetUserWidgetObject())
-	{
-		AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
-	}
-	if (HealthWidgetComp->GetUserWidgetObject())
-	{
-		HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
-	}
 	SetInCombat(false);
 }
 
@@ -67,7 +59,28 @@ UEODWidgetComponent* AAICharacterBase::BP_GetHealthWidgetComp() const
 	return GetHealthWidgetComp();
 }
 
-bool AAICharacterBase::Interrupt(const float BCAngle)
+bool AAICharacterBase::CCEFlinch_Implementation(const float BCAngle)
+{
+	if (CanFlinch() && FlinchAnimMontage)
+	{
+		if (BCAngle <= 90)
+		{
+			PlayAnimationMontage(FlinchAnimMontage,
+				UCharacterLibrary::SectionName_ForwardFlinch);
+		}
+		else
+		{
+			PlayAnimationMontage(FlinchAnimMontage,
+				UCharacterLibrary::SectionName_BackwardFlinch);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool AAICharacterBase::CCEInterrupt_Implementation(const float BCAngle)
 {
 	if (CanInterrupt() && HitEffectsAnimMontage)
 	{
@@ -90,20 +103,12 @@ bool AAICharacterBase::Interrupt(const float BCAngle)
 	return false;
 }
 
-bool AAICharacterBase::Flinch(const float BCAngle)
+bool AAICharacterBase::CCEStun_Implementation(const float Duration)
 {
-	if (CanFlinch() && FlinchAnimMontage)
+	if (CanStun())
 	{
-		if (BCAngle <= 90)
-		{
-			PlayAnimationMontage(FlinchAnimMontage,
-				UCharacterLibrary::SectionName_ForwardFlinch);
-		}
-		else
-		{
-			PlayAnimationMontage(FlinchAnimMontage,
-				UCharacterLibrary::SectionName_BackwardFlinch);
-		}
+		PlayStunAnimation();
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCERemoveStun, Duration, false);
 
 		return true;
 	}
@@ -111,18 +116,13 @@ bool AAICharacterBase::Flinch(const float BCAngle)
 	return false;
 }
 
-bool AAICharacterBase::Stun(const float Duration)
+void AAICharacterBase::CCERemoveStun_Implementation()
 {
-	// @todo definition
-
-	return false;
+	StopStunAnimation();
+	// @todo Restore character state to IdleWalkRun if necessary (if OnMontageBlendingOut event doesn't restore character state to IdleWalkRun)
 }
 
-void AAICharacterBase::EndStun()
-{
-}
-
-bool AAICharacterBase::Freeze(const float Duration)
+bool AAICharacterBase::CCEFreeze_Implementation(const float Duration)
 {
 	// @todo maybe just freeze animation instead of freezing entire character since it might freeze additional effects like glow
 
@@ -130,34 +130,80 @@ bool AAICharacterBase::Freeze(const float Duration)
 	{
 		CustomTimeDilation = 0;
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::EndFreeze, Duration, false);
-		
+
 		return true;
 	}
 
 	return false;
 }
 
-void AAICharacterBase::EndFreeze()
+void AAICharacterBase::CCEUnfreeze_Implementation()
 {
-	// CustomTimeDilation = StatsComp->GetActiveTimeDilation();
+	CustomTimeDilation = GetStatsComponent()->GetActiveTimeDilation();
 }
 
-bool AAICharacterBase::Knockdown(const float Duration)
+bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 {
+	if (CanKnockdown() && HitEffectsAnimMontage)
+	{
+		PlayAnimationMontage(HitEffectsAnimMontage,
+			UCharacterLibrary::SectionName_KnockdownStart,
+			ECharacterState::GotHit);
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
+
+		return true;
+	}
+
 	return false;
 }
 
-void AAICharacterBase::EndKnockdown()
+void AAICharacterBase::CCEEndKnockdown_Implementation()
 {
+	PlayAnimationMontage(HitEffectsAnimMontage,
+		UCharacterLibrary::SectionName_KnockdownEnd,
+		ECharacterState::GotHit);
 }
 
-bool AAICharacterBase::Knockback(const float Duration, const FVector & Impulse)
+bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
 {
+	if (CanKnockdown() && HitEffectsAnimMontage)
+	{
+		PlayAnimationMontage(HitEffectsAnimMontage,
+			UCharacterLibrary::SectionName_KnockdownStart,
+			ECharacterState::GotHit);
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
+		PushBack(ImpulseDirection);
+		return true;
+	}
+
 	return false;
 }
 
 void AAICharacterBase::SetInCombat(bool bValue)
 {
+	if (bValue)
+	{
+		if (AggroWidgetComp->GetUserWidgetObject())
+		{
+			AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Visible);
+		}
+		if (HealthWidgetComp->GetUserWidgetObject())
+		{
+			HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+	else
+	{
+		if (AggroWidgetComp->GetUserWidgetObject())
+		{
+			AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+		}
+		if (HealthWidgetComp->GetUserWidgetObject())
+		{
+			HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+
 	bInCombat = bValue;
 	UpdateMaxWalkSpeed();
 }

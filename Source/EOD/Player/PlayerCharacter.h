@@ -185,11 +185,32 @@ public:
 	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get HUD Widget"))
 	UHUDWidget* BP_GetHUDWidget() const;
 
-	/** [server + client] Interrupt this character's current action */
-	virtual bool Interrupt(const float BCAngle) override;
+	/** Flinch this character (visual feedback) */
+	virtual bool CCEFlinch_Implementation(const float BCAngle) override;
 
-	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
-	virtual bool Flinch(const float BCAngle) override;
+	/** Interrupt this character's current action */
+	virtual bool CCEInterrupt_Implementation(const float BCAngle) override;
+
+	/** Applies stun to this character */
+	virtual bool CCEStun_Implementation(const float Duration) override;
+
+	/** Removes 'stun' crowd control effect from this character */
+	virtual void CCERemoveStun_Implementation() override;
+
+	/** Freeze this character */
+	virtual bool CCEFreeze_Implementation(const float Duration) override;
+
+	/** Removes 'freeze' crowd control effect from this character */
+	virtual void CCEUnfreeze_Implementation() override;
+
+	/** Knockdown this character */
+	virtual bool CCEKnockdown_Implementation(const float Duration) override;
+
+	/** Removes 'knock-down' crowd control effect from this character */
+	virtual void CCEEndKnockdown_Implementation() override;
+
+	/** Knockback this character */
+	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection) override;
 
 	/** [server + client] Applies stun to this character */
 	virtual bool Stun(const float Duration) override;
@@ -225,18 +246,6 @@ public:
 
 	/** Removes secondary weapon if it is currently equipped */
 	void RemoveSecondaryWeapon();
-
-	/** Plays stun animation */
-	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
-	void PlayStunAnimation();
-
-	/** Stops stun animation */
-	UFUNCTION(BlueprintImplementableEvent, Category = Animations)
-	void StopStunAnimation();
-
-	/** Simulates the knock back effect */
-	UFUNCTION(BlueprintImplementableEvent, Category = Motion)
-	void PushPlayer(FVector ImpulseDirection); // @todo const parameter?
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = SpecialEffects)
 	void CreateGhostTrail();

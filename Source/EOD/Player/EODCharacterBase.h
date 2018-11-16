@@ -149,11 +149,68 @@ public:
 	/** Returns true if this character is healing anyone */
 	virtual bool IsHealing() const;
 
-	/** Interrupt this character's current action */
-	virtual bool Interrupt(const float BCAngle);
+	/** Flinch this character (visual feedback) */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Flinch"))
+	bool CCEFlinch(const float BCAngle);
 
-	/** Flinch this character. This is nothing more than a visual feedback to getting attacked */
-	virtual bool Flinch(const float BCAngle);
+	/** Flinch this character (visual feedback) */
+	virtual bool CCEFlinch_Implementation(const float BCAngle);
+
+	/** Interrupt this character's current action */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Interrupt"))
+	bool CCEInterrupt(const float BCAngle);
+
+	/** Interrupt this character's current action */
+	virtual bool CCEInterrupt_Implementation(const float BCAngle);
+
+	/** Applies stun to this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Stun"))
+	bool CCEStun(const float Duration);
+
+	/** Applies stun to this character */
+	virtual bool CCEStun_Implementation(const float Duration);
+
+	/** Removes 'stun' crowd control effect from this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Remove Stun"))
+	void CCERemoveStun();
+
+	/** Removes 'stun' crowd control effect from this character */
+	virtual void CCERemoveStun_Implementation();
+
+	/** Freeze this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Freeze"))
+	bool CCEFreeze(const float Duration);
+
+	/** Freeze this character */
+	virtual bool CCEFreeze_Implementation(const float Duration);
+
+	/** Removes 'freeze' crowd control effect from this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Unfreeze"))
+	void CCEUnfreeze();
+
+	/** Removes 'freeze' crowd control effect from this character */
+	virtual void CCEUnfreeze_Implementation();
+
+	/** Knockdown this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockdown"))
+	bool CCEKnockdown(const float Duration);
+
+	/** Knockdown this character */
+	virtual bool CCEKnockdown_Implementation(const float Duration);
+
+	/** Removes 'knock-down' crowd control effect from this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE End Knockdown"))
+	void CCEEndKnockdown();
+
+	/** Removes 'knock-down' crowd control effect from this character */
+	virtual void CCEEndKnockdown_Implementation();
+
+	/** Knockback this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockback"))
+	bool CCEKnockback(const float Duration, const FVector& ImpulseDirection);
+
+	/** Knockback this character */
+	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection);
 
 	/** Applies stun to this character */
 	virtual bool Stun(const float Duration);
@@ -178,6 +235,18 @@ public:
 
 	/** Plays BlockAttack animation on blocking an incoming attack */
 	virtual void BlockAttack();
+
+	/** Plays stun animation */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Animations|CrowdControlEffect")
+	void PlayStunAnimation();
+
+	/** Stops stun animation */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Animations|CrowdControlEffect")
+	void StopStunAnimation();
+
+	/** Simulates the knock back effect */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Motion|CrowdControlEffect")
+	void PushBack(const FVector& ImpulseDirection); // @todo const parameter?
 
 	/** Enables immunity frames for a given duration */
 	UFUNCTION(BlueprintCallable, Category = Combat)

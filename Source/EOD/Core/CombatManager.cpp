@@ -191,6 +191,11 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 	check(HitInstigator);
 	check(HitCharacter);
 
+	if (!AreEnemies(HitInstigator, HitCharacter))
+	{
+		return;
+	}
+
 	if (!SkillDamageInfo.bUndodgable && HitCharacter->IsDodgingDamage())
 	{
 		DisplayStatusEffectMessage(FString("Dodge"), DodgeTextColor, HitResult.ImpactPoint);
@@ -251,26 +256,32 @@ bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 	switch (SkillDamageInfo.CrowdControlEffect)
 	{
 	case ECrowdControlEffect::Flinch:
-		bCCEApplied = HitCharacter->Flinch(BCAngle);
+		// bCCEApplied = HitCharacter->Flinch(BCAngle);
+		bCCEApplied = HitCharacter->CCEFlinch(BCAngle);
 		break;
 	case ECrowdControlEffect::Interrupt:
-		bCCEApplied = HitCharacter->Interrupt(BCAngle);
+		bCCEApplied = HitCharacter->CCEInterrupt(BCAngle);
 		break;
 	case ECrowdControlEffect::KnockedDown:
-		bCCEApplied = HitCharacter->Knockdown(SkillDamageInfo.CrowdControlEffectDuration);
+		bCCEApplied = HitCharacter->CCEKnockdown(SkillDamageInfo.CrowdControlEffectDuration);
 		break;
 	case ECrowdControlEffect::KnockedBack:
-		bCCEApplied = HitCharacter->Knockback(SkillDamageInfo.CrowdControlEffectDuration, -(LineHitResult.ImpactNormal));
+		bCCEApplied = HitCharacter->CCEKnockback(SkillDamageInfo.CrowdControlEffectDuration, -(LineHitResult.ImpactNormal));
 		break;
 	case ECrowdControlEffect::Stunned:
-		bCCEApplied = HitCharacter->Stun(SkillDamageInfo.CrowdControlEffectDuration);
+		bCCEApplied = HitCharacter->CCEStun(SkillDamageInfo.CrowdControlEffectDuration);
 		break;
 	case ECrowdControlEffect::Crystalized:
-		bCCEApplied = HitCharacter->Freeze(SkillDamageInfo.CrowdControlEffectDuration);
+		bCCEApplied = HitCharacter->CCEFreeze(SkillDamageInfo.CrowdControlEffectDuration);
 		break;
 	default:
 		break;
 	}
 
 	return bCCEApplied;
+}
+
+bool ACombatManager::AreEnemies(AEODCharacterBase* CharOne, AEODCharacterBase* CharTwo)
+{
+	return CharOne->GetFaction() != CharTwo->GetFaction();
 }

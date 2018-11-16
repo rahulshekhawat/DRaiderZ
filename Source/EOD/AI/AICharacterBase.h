@@ -46,32 +46,32 @@ public:
 	UFUNCTION(BlueprintPure, Category = WidgetComponent, meta = (DisplayName = "Get Health Widget Component"))
 	UEODWidgetComponent* BP_GetHealthWidgetComp() const;
 
-	/** [server + client] Interrupt this character's current action */
-	virtual bool Interrupt(const float BCAngle) override;
+	/** Flinch this character (visual feedback) */
+	virtual bool CCEFlinch_Implementation(const float BCAngle) override;
 
-	/** [server + client] Flinch this character. This is nothing more than a visual feedback to getting attacked */
-	virtual bool Flinch(const float BCAngle) override;
+	/** Interrupt this character's current action */
+	virtual bool CCEInterrupt_Implementation(const float BCAngle) override;
 
-	/** [server + client] Applies stun to this character */
-	virtual bool Stun(const float Duration) override;
+	/** Applies stun to this character */
+	virtual bool CCEStun_Implementation(const float Duration) override;
 
-	/** [client] Removes 'stun' crowd control effect from this character */
-	virtual void EndStun() override;
+	/** Removes 'stun' crowd control effect from this character */
+	virtual void CCERemoveStun_Implementation() override;
 
-	/** [server + client] Freeze this character */
-	virtual bool Freeze(const float Duration) override;
+	/** Freeze this character */
+	virtual bool CCEFreeze_Implementation(const float Duration) override;
 
-	/** [client] Removes 'freeze' crowd control effect from this character */
-	virtual void EndFreeze() override;
-
-	/** [server + client] Knockdown this character */
-	virtual bool Knockdown(const float Duration) override;
-
-	/** [client] Removes 'knock-down' crowd control effect from this character */
-	virtual void EndKnockdown() override;
-
-	/** [server + client] Knockback this character */
-	virtual bool Knockback(const float Duration, const FVector& Impulse) override;
+	/** Removes 'freeze' crowd control effect from this character */
+	virtual void CCEUnfreeze_Implementation() override;
+	
+	/** Knockdown this character */
+	virtual bool CCEKnockdown_Implementation(const float Duration) override;
+	
+	/** Removes 'knock-down' crowd control effect from this character */
+	virtual void CCEEndKnockdown_Implementation() override;
+	
+	/** Knockback this character */
+	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection) override;
 
 	/** Set whether character is in combat or not */
 	virtual void SetInCombat(bool bValue) override;

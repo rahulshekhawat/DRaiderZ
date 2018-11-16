@@ -108,12 +108,44 @@ bool AEODCharacterBase::IsHealing() const
 	return false;
 }
 
-bool AEODCharacterBase::Interrupt(const float BCAngle)
+bool AEODCharacterBase::CCEInterrupt_Implementation(const float BCAngle)
 {
 	return false;
 }
 
-bool AEODCharacterBase::Flinch(const float BCAngle)
+bool AEODCharacterBase::CCEStun_Implementation(const float Duration)
+{
+	return false;
+}
+
+void AEODCharacterBase::CCERemoveStun_Implementation()
+{
+}
+
+bool AEODCharacterBase::CCEFreeze_Implementation(const float Duration)
+{
+	return false;
+}
+
+void AEODCharacterBase::CCEUnfreeze_Implementation()
+{
+}
+
+bool AEODCharacterBase::CCEKnockdown_Implementation(const float Duration)
+{
+	return false;
+}
+
+void AEODCharacterBase::CCEEndKnockdown_Implementation()
+{
+}
+
+bool AEODCharacterBase::CCEFlinch_Implementation(const float BCAngle)
+{
+	return false;
+}
+
+bool AEODCharacterBase::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
 {
 	return false;
 }

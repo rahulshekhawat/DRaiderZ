@@ -158,6 +158,8 @@ private:
 
 	FORCEINLINE FSkillDamageInfo GetSkillDamageInfoFromSkill(FSkillTableRow* Skill);
 
+	bool AreEnemies(AEODCharacterBase* CharOne, AEODCharacterBase* CharTwo);
+
 };
 
 FORCEINLINE float ACombatManager::CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2)

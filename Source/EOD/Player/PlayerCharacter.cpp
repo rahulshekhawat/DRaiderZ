@@ -382,7 +382,30 @@ UHUDWidget* APlayerCharacter::BP_GetHUDWidget() const
 	return GetHUDWidget();
 }
 
-bool APlayerCharacter::Interrupt(const float BCAngle)
+bool APlayerCharacter::CCEFlinch_Implementation(const float BCAngle)
+{
+	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Flinch.Get())
+	{
+		UAnimMontage* FlinchMontage = GetActiveAnimationReferences()->Flinch.Get();
+
+		if (BCAngle <= 90)
+		{
+			PlayAnimationMontage(FlinchMontage,
+				UCharacterLibrary::SectionName_ForwardFlinch);
+		}
+		else
+		{
+			PlayAnimationMontage(FlinchMontage,
+				UCharacterLibrary::SectionName_BackwardFlinch);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool APlayerCharacter::CCEInterrupt_Implementation(const float BCAngle)
 {
 	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
 	{
@@ -407,22 +430,75 @@ bool APlayerCharacter::Interrupt(const float BCAngle)
 	return false;
 }
 
-bool APlayerCharacter::Flinch(const float BCAngle)
+bool APlayerCharacter::CCEStun_Implementation(const float Duration)
 {
-	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Flinch.Get())
+	if (CanStun())
 	{
-		UAnimMontage* FlinchMontage = GetActiveAnimationReferences()->Flinch.Get();
+		PlayStunAnimation();
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCERemoveStun, Duration, false);
 
-		if (BCAngle <= 90)
-		{
-			PlayAnimationMontage(FlinchMontage,
-				UCharacterLibrary::SectionName_ForwardFlinch);
-		}
-		else
-		{
-			PlayAnimationMontage(FlinchMontage,
-				UCharacterLibrary::SectionName_BackwardFlinch);
-		}
+		return true;
+	}
+
+	return false;
+}
+
+void APlayerCharacter::CCERemoveStun_Implementation()
+{
+	StopStunAnimation();
+	// @todo Restore character state to IdleWalkRun if necessary (if OnMontageBlendingOut event doesn't restore character state to IdleWalkRun)
+}
+
+bool APlayerCharacter::CCEFreeze_Implementation(const float Duration)
+{
+	// @todo maybe just freeze animation instead of freezing entire character since it might freeze additional effects like glow
+	if (CanFreeze())
+	{
+		CustomTimeDilation = 0;
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEUnfreeze, Duration, false);
+
+		return true;
+	}
+
+	return false;
+}
+
+void APlayerCharacter::CCEUnfreeze_Implementation()
+{
+	CustomTimeDilation = GetStatsComponent()->GetActiveTimeDilation();
+}
+
+bool APlayerCharacter::CCEKnockdown_Implementation(const float Duration)
+{
+	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
+			UCharacterLibrary::SectionName_KnockdownStart,
+			ECharacterState::GotHit);
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
+
+		return true;
+	}
+
+	return false;
+}
+
+void APlayerCharacter::CCEEndKnockdown_Implementation()
+{
+	PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
+		UCharacterLibrary::SectionName_KnockdownEnd,
+		ECharacterState::GotHit);
+}
+
+bool APlayerCharacter::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
+{
+	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
+	{
+		PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
+			UCharacterLibrary::SectionName_KnockdownStart,
+			ECharacterState::GotHit);
+		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
+		PushBack(ImpulseDirection);
 
 		return true;
 	}
@@ -498,7 +574,7 @@ bool APlayerCharacter::Knockback(const float Duration, const FVector& ImpulseDir
 			UCharacterLibrary::SectionName_KnockdownStart,
 			ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
-		PushPlayer(ImpulseDirection);
+		PushBack(ImpulseDirection);
 
 		return true;
 	}
