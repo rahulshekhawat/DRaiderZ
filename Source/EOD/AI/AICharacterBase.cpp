@@ -57,12 +57,12 @@ void AAICharacterBase::Destroyed()
 	}
 }
 
-UEODWidgetComponent * AAICharacterBase::BP_GetAggroWidgetComp() const
+UEODWidgetComponent* AAICharacterBase::BP_GetAggroWidgetComp() const
 {
 	return GetAggroWidgetComp();
 }
 
-UEODWidgetComponent * AAICharacterBase::BP_GetHealthWidgetComp() const
+UEODWidgetComponent* AAICharacterBase::BP_GetHealthWidgetComp() const
 {
 	return GetHealthWidgetComp();
 }
@@ -169,7 +169,7 @@ void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 		return;
 	}
 
-	if (IsUsingAnySkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
+	if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
 	{
 		GetLastUsedSkill().LastUsedSkillID = GetCurrentActiveSkillID();
 		GetLastUsedSkill().bInterrupted = bInterrupted;
@@ -178,7 +178,10 @@ void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 		SetCurrentActiveSkill(nullptr);
 	}
 
-	SetCharacterState(ECharacterState::IdleWalkRun);
+	if (!bInterrupted)
+	{
+		SetCharacterState(ECharacterState::IdleWalkRun);
+	}
 }
 
 void AAICharacterBase::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted)

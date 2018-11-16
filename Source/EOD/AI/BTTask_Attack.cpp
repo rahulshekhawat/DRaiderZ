@@ -59,9 +59,9 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	}
 	else if (TaskStatus == EEODTaskStatus::Aborted)
 	{
-		FinishLatentAbort(OwnerComp);
+		// FinishLatentTask(OwnerComp, EBTNodeResult::Aborted);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}
-
 }
 
 EBTNodeResult::Type UBTTask_Attack::AbortTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)

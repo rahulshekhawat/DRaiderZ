@@ -176,7 +176,7 @@ void AEODCharacterBase::EnableDamageBlocking()
 
 void AEODCharacterBase::DisableDamageBlocking()
 {
-	bBlockInput = false;
+	bBlockingDamage = false;
 	// Clear block damage timer just in case it is still active
 	GetWorld()->GetTimerManager().ClearTimer(BlockTimerHandle); 
 }
