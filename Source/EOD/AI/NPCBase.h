@@ -3,27 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Interactable.generated.h"
+#include "Player/EODCharacterBase.h"
+#include "NPCBase.generated.h"
 
-class AEODCharacterBase;
-
+/**
+ * 
+ */
 UCLASS()
-class EOD_API AInteractable : public AActor
+class EOD_API ANPCBase : public AEODCharacterBase
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AInteractable(const FObjectInitializer& ObjectInitializer);
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+public:
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	ANPCBase(const FObjectInitializer& ObjectInitializer);
 
-	/** Called when a character attempts to interact with this actor */
+	/** Called when a character attempts to interact with this NPC */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Interaction)
 	void OnInteract(const AEODCharacterBase* Character);
 
@@ -38,5 +33,6 @@ public:
 	void DisableCustomDepth();
 
 	virtual void DisableCustomDepth_Implementation();
+
 
 };
