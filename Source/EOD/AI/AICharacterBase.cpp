@@ -17,8 +17,10 @@ AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer)
 
 	AggroWidgetComp = ObjectInitializer.CreateDefaultSubobject<UEODWidgetComponent>(this, TEXT("Aggro Indicator"));
 	AggroWidgetComp->SetupAttachment(RootComponent);
+	// AggroWidgetComp->SetupAttachment(GetMesh(), FName("dummy_ef_head"));
 	HealthWidgetComp = ObjectInitializer.CreateDefaultSubobject<UEODWidgetComponent>(this, TEXT("Health Indicator"));
 	HealthWidgetComp->SetupAttachment(RootComponent);
+	// HealthWidgetComp->SetupAttachment(GetMesh(), FName("dummy_ef_head"));
 
 	AggroWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	HealthWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);

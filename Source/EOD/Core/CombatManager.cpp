@@ -263,10 +263,13 @@ bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 		bCCEApplied = HitCharacter->CCEInterrupt(BCAngle);
 		break;
 	case ECrowdControlEffect::KnockedDown:
+		HitCharacter->SetActorRotation(FRotationMatrix::MakeFromX(HitInstigator->GetActorForwardVector() * -1).Rotator());
 		bCCEApplied = HitCharacter->CCEKnockdown(SkillDamageInfo.CrowdControlEffectDuration);
 		break;
 	case ECrowdControlEffect::KnockedBack:
-		bCCEApplied = HitCharacter->CCEKnockback(SkillDamageInfo.CrowdControlEffectDuration, -(LineHitResult.ImpactNormal));
+		HitCharacter->SetActorRotation(FRotationMatrix::MakeFromX(HitInstigator->GetActorForwardVector() * -1).Rotator());
+		// bCCEApplied = HitCharacter->CCEKnockback(SkillDamageInfo.CrowdControlEffectDuration, -(LineHitResult.ImpactNormal));
+		bCCEApplied = HitCharacter->CCEKnockback(SkillDamageInfo.CrowdControlEffectDuration, HitInstigator->GetActorForwardVector());
 		break;
 	case ECrowdControlEffect::Stunned:
 		bCCEApplied = HitCharacter->CCEStun(SkillDamageInfo.CrowdControlEffectDuration);
