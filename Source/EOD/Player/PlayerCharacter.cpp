@@ -1604,7 +1604,7 @@ void APlayerCharacter::BP_SetNormalAttackSectionChangeAllowed(bool bNewValue)
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	if (!bInterrupted)
+	if (!bInterrupted  && GetCharacterState() != ECharacterState::Interacting)
 	{
 		SetCharacterState(ECharacterState::IdleWalkRun);
 	}
@@ -1632,7 +1632,7 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	}
 }
 
-void APlayerCharacter::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
+void APlayerCharacter::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted)
 {
 }
 

@@ -106,6 +106,10 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		if (JumpMontage && !Montage_IsPlaying(JumpMontage))
 		{
 			Montage_Play(JumpMontage);
+			if (OwningPlayer->GetCharacterState() != ECharacterState::Jumping)
+			{
+				OwningPlayer->SetCharacterState(ECharacterState::Jumping);
+			}
 			return;
 		}
 
