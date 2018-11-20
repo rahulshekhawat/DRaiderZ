@@ -51,6 +51,10 @@ public:
 
 	/** Returns true if character is dead */
 	FORCEINLINE bool IsDead() const;
+
+	/** Returns true if character is dead */
+	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Is Dead"))
+	bool BP_IsDead() const;
 	
 	/** Returns true if character is idling */
 	FORCEINLINE bool IsIdle() const;

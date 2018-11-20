@@ -57,6 +57,11 @@ void AEODCharacterBase::BeginPlay()
 
 }
 
+bool AEODCharacterBase::BP_IsDead() const
+{
+	return IsDead();
+}
+
 bool AEODCharacterBase::CanMove() const
 {
 	// Mobs can only move in IdleWalkRun state

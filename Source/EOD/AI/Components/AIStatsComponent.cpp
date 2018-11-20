@@ -7,6 +7,7 @@
 
 #include "UnrealNetwork.h"
 #include "Components/ProgressBar.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 UAIStatsComponent::UAIStatsComponent(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {

@@ -40,6 +40,9 @@ void AAICharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	SetInCombat(false);
+
+	// Following line is used to update the floating health bar widget (floating health bar widget is NULL when CurrentHealth is initially initialized)
+	GetStatsComponent()->ModifyCurrentHealth(0);
 }
 
 void AAICharacterBase::Destroyed()

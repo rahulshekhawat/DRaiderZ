@@ -221,6 +221,7 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 	}
 
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillDamageInfo, bCritHit, bAttackBlocked);
+	HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
 	NativeDisplayDamage(HitInstigator, HitCharacter, LineHitResult, ActualDamage, bCritHit);
 
 	// @todo make camera shake interesting
