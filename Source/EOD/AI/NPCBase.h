@@ -6,6 +6,8 @@
 #include "Player/EODCharacterBase.h"
 #include "NPCBase.generated.h"
 
+class UCameraComponent;
+
 /**
  * 
  */
@@ -33,6 +35,11 @@ public:
 	void DisableCustomDepth();
 
 	virtual void DisableCustomDepth_Implementation();
+
+private:
+
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* InteractionCamera;
 
 
 };
