@@ -172,7 +172,7 @@ void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, co
 		}
 
 		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitActor);
-		if (HitCharacter)
+		if (HitCharacter && HitCharacter->IsAlive())
 		{
 			CharacterToCharacterAttack(HitInstigator, HitCharacter, SkillDamageInfo, HitResult);
 		}
@@ -221,7 +221,12 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 	}
 
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillDamageInfo, bCritHit, bAttackBlocked);
-	HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
+	int32 ResultingHitCharacterHP = HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
+	bool bCCEApplied = ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillDamageInfo, LineHitResult, BCAngle);
+	if (ResultingHitCharacterHP <= 0)
+	{
+		HitCharacter->InitiateDeathSequence();
+	}
 	NativeDisplayDamage(HitInstigator, HitCharacter, LineHitResult, ActualDamage, bCritHit);
 
 	// @todo make camera shake interesting
@@ -236,7 +241,6 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 
 	HitCharacter->SetOffTargetSwitch();
 
-	bool bCCEApplied = ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillDamageInfo, LineHitResult, BCAngle);
 	// Rest of the function definition is inside BP_CharacterToCharacterAttack for now
 	BP_CharacterToCharacterAttack(HitInstigator, HitCharacter, SkillDamageInfo, HitResult, LineHitResult);
 }

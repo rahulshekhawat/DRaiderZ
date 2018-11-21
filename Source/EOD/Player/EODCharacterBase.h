@@ -216,6 +216,11 @@ public:
 	/** Knockback this character */
 	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerStatus)
+	void InitiateDeathSequence();
+
+	virtual void InitiateDeathSequence_Implementation();
+
 	/** Applies stun to this character */
 	virtual bool Stun(const float Duration);
 
@@ -657,32 +662,32 @@ FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 
 FORCEINLINE bool AEODCharacterBase::CanFlinch() const
 {
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
+	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanStun() const
 {
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
+	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
 {
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
+	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockback() const
 {
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
+	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanFreeze() const
 {
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 }
 
 FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
 {
-	return !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
+	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
 }
 
 FORCEINLINE bool AEODCharacterBase::NeedsHealing() const

@@ -155,6 +155,10 @@ bool AEODCharacterBase::CCEKnockback_Implementation(const float Duration, const 
 	return false;
 }
 
+void AEODCharacterBase::InitiateDeathSequence_Implementation()
+{
+}
+
 bool AEODCharacterBase::Stun(const float Duration)
 {
 	return false;
