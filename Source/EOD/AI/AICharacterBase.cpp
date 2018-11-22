@@ -352,6 +352,15 @@ FName AAICharacterBase::GetMostWeightedMeleeSkillID(const AEODCharacterBase* Tar
 	return MostWeightedSkillID;
 }
 
+bool AAICharacterBase::CanAssistAlly_Implementation()
+{
+	return false;
+}
+
+void AAICharacterBase::AssistanceRequested_Implementation(const AAICharacterBase * Requestor)
+{
+}
+
 void AAICharacterBase::UpdateMaxWalkSpeed()
 {
 	GetCharacterMovement()->MaxWalkSpeed = bInCombat ? MaxWalkSpeedInCombat : MaxWalkSpeedOutsideCombat;	

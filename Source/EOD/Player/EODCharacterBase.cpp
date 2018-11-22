@@ -62,6 +62,11 @@ bool AEODCharacterBase::BP_IsDead() const
 	return IsDead();
 }
 
+bool AEODCharacterBase::BP_HasBeenHit() const
+{
+	return HasBeenHit();
+}
+
 bool AEODCharacterBase::CanMove() const
 {
 	// Mobs can only move in IdleWalkRun state

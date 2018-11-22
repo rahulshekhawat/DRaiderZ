@@ -101,6 +101,10 @@ public:
 	/** Returns true if character has just been hit */
 	FORCEINLINE bool HasBeenHit() const;
 
+	/** Returns true if character has just been hit */
+	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Has Been Hit"))
+	bool BP_HasBeenHit() const;
+
 	/** Returns true if character can move */
 	virtual bool CanMove() const;
 	

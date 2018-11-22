@@ -95,6 +95,20 @@ public:
 	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const override;
 
+	/** Returns true if this AI character can currently assist an ally */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Behavior")
+	bool CanAssistAlly();
+
+	/** Returns true if this AI character can currently assist an ally */
+	virtual bool CanAssistAlly_Implementation();
+
+	/** Called when an ally requests assistance from this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Behavior")
+	void AssistanceRequested(const AAICharacterBase* Requestor);
+
+	/** Called when an ally requests assistance from this character */
+	void AssistanceRequested_Implementation(const AAICharacterBase* Requestor);
+
 private:
 
 	/** Used to display floating aggro widget above AI character */
