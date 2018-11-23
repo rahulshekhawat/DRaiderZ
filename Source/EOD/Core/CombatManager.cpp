@@ -269,7 +269,8 @@ bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 		break;
 	case ECrowdControlEffect::KnockedDown:
 		HitCharacter->SetActorRotation(FRotationMatrix::MakeFromX(HitInstigator->GetActorForwardVector() * -1).Rotator());
-		bCCEApplied = HitCharacter->CCEKnockdown(SkillDamageInfo.CrowdControlEffectDuration);
+		// bCCEApplied = HitCharacter->CCEKnockdown(SkillDamageInfo.CrowdControlEffectDuration);
+		bCCEApplied = HitCharacter->CCEKnockback(SkillDamageInfo.CrowdControlEffectDuration, 0.2 * HitInstigator->GetActorForwardVector());
 		break;
 	case ECrowdControlEffect::KnockedBack:
 		HitCharacter->SetActorRotation(FRotationMatrix::MakeFromX(HitInstigator->GetActorForwardVector() * -1).Rotator());
