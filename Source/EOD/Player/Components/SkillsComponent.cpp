@@ -442,3 +442,8 @@ void USkillsComponent::ResetChainSkill()
 	UKismetSystemLibrary::PrintString(this, FString("Skill chain resetted"));
 #endif // MESSAGE_LOGGING_ENABLED
 }
+
+APlayerCharacter* USkillsComponent::GetOwningEODPlayer() const
+{
+	return Cast<APlayerCharacter>(GetOwner());
+}

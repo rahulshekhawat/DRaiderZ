@@ -240,7 +240,7 @@ void AAICharacterBase::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupt
 	// @todo
 }
 
-bool AAICharacterBase::UseSkill(FName SkillID)
+bool AAICharacterBase::UseSkill_Implementation(FName SkillID)
 {
 	if (CanUseAnySkill())
 	{

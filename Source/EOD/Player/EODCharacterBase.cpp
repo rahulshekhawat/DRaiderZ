@@ -297,7 +297,7 @@ void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)
 	}
 }
 
-bool AEODCharacterBase::UseSkill(FName SkillID)
+bool AEODCharacterBase::UseSkill_Implementation(FName SkillID)
 {
 	return false;
 }
@@ -408,6 +408,13 @@ void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase * Inst
 
 		// @todo play death animation and death sound
 	}
+}
+
+float AEODCharacterBase::GetOrientationYawToActor(AActor* TargetActor)
+{
+	FVector OrientationVector = TargetActor->GetActorLocation() - GetActorLocation();
+	FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
+	return OrientationRotator.Yaw;
 }
 
 void AEODCharacterBase::TurnOnTargetSwitch()

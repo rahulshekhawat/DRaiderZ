@@ -26,4 +26,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Angle)
 	static float CalculateAngleBetweenVectors(const FVector& Vector1, const FVector& Vector2);
 
+	UFUNCTION(BlueprintCallable, Category = Angle)
+	static float FindDeltaAngleDegrees(float A1, float A2);
+
 };

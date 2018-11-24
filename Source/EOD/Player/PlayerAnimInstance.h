@@ -11,8 +11,6 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "PlayerAnimInstance.generated.h"
 
-class APlayerCharacter;
-
 /**
  * PlayerAnimInstance is the base class for animation blueprints of playable characters
  */

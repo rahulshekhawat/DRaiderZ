@@ -11,8 +11,8 @@
 
 class USkillBarWidget;
 class USkillTreeWidget;
-class APlayerCharacter;
 class UStatusEffectBase;
+class APlayerCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EOD_API USkillsComponent : public UActorComponent
@@ -109,7 +109,7 @@ private:
 	void ResetChainSkill();
 
 	/** Get the owning EOD player of this component */
-	FORCEINLINE APlayerCharacter* GetOwningEODPlayer() const;
+	APlayerCharacter* GetOwningEODPlayer() const;
 
 	FORCEINLINE FString GetGenderPrefix() const;
 
@@ -127,11 +127,6 @@ FORCEINLINE USkillBarWidget* USkillsComponent::GetSkillBarWidget() const
 FORCEINLINE USkillTreeWidget* USkillsComponent::GetSkillTreeWidget() const
 {
 	return SkillTreeWidget;
-}
-
-FORCEINLINE APlayerCharacter* USkillsComponent::GetOwningEODPlayer() const
-{
-	return Cast<APlayerCharacter>(GetOwner());
 }
 
 FORCEINLINE FString USkillsComponent::GetGenderPrefix() const

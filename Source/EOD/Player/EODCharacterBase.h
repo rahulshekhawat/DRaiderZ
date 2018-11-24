@@ -347,8 +347,13 @@ public:
 	 * Use a skill and play it's animation
 	 * This method is primarily intended to be used by AI characters
 	 */
-	UFUNCTION(BlueprintCallable, Category = Skills)
-	virtual bool UseSkill(FName SkillID);
+	// UFUNCTION(BlueprintCallable, Category = Skills)
+	// virtual bool UseSkill(FName SkillID);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect)
+	bool UseSkill(FName SkillID);
+
+	virtual bool UseSkill_Implementation(FName SkillID);
 
 	/**
 	 * Determines and returns the status of a skill
@@ -441,6 +446,9 @@ public:
 	 */
 	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* InstigatingChar = nullptr);
 
+	UFUNCTION(BlueprintCallable, category = Rotation)
+	float GetOrientationYawToActor(AActor* TargetActor);
+
 private:
 
 	/** StatsComp contains and manages the stats info of this character */
@@ -472,7 +480,7 @@ protected:
 	FCharacterStateData CharacterStateData;
 
 	/** Data table for character skills */
-	UPROPERTY(EditDefaultsOnly, Category = Skills)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills)
 	UDataTable* SkillsDataTable;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Rotation)

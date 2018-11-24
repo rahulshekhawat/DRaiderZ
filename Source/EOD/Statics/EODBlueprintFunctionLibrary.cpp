@@ -22,3 +22,8 @@ float UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(const FVector &
 	
 	return Angle;
 }
+
+float UEODBlueprintFunctionLibrary::FindDeltaAngleDegrees(float A1, float A2)
+{
+	return FMath::FindDeltaAngleDegrees(A1, A2);
+}

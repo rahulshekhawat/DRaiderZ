@@ -81,7 +81,7 @@ public:
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
 	/** Use a skill and play it's animation */
-	virtual bool UseSkill(FName SkillID) override;
+	virtual bool UseSkill_Implementation(FName SkillID) override;
 
 	/**
 	 * Determines and returns the status of a skill

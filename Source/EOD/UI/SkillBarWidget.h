@@ -10,8 +10,6 @@
 #include "Blueprint/UserWidget.h"
 #include "SkillBarWidget.generated.h"
 
-class APlayerCharacter;
-
 /**
  * 
  */
