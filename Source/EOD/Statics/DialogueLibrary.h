@@ -54,6 +54,18 @@ public:
 };
 
 
+USTRUCT(BlueprintType)
+struct EOD_API FNPCDialogueTriggers : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+
+
+};
+
+
 /**
  * 
  */

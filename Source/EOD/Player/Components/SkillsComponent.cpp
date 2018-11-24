@@ -92,7 +92,12 @@ void USkillsComponent::InitializeComponentWidgets()
 
 void USkillsComponent::InitializeSkillBar()
 {
-	check(SkillBarWidget);
+	if (!SkillBarWidget)
+	{
+		return;
+	}
+
+	// check(SkillBarWidget);
 
 	for (int i = 1; i <= 20; i++)
 	{
