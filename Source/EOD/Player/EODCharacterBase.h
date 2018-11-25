@@ -125,6 +125,7 @@ public:
 	virtual bool CanNormalAttack() const;
 	
 	/** Returns true if character can use any skill at all */
+	UFUNCTION(BlueprintCallable, Category = CharacterState)
 	virtual bool CanUseAnySkill() const;
 
 	/** Returns true if character can use a particular skill */
@@ -477,8 +478,11 @@ private:
 
 protected:
 
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadWrite)
 	bool bSkillAllowsMovement;
+
+	UPROPERTY(Transient, BlueprintReadWrite)
+	bool bUsingUniqueSkill;
 
 	UPROPERTY()
 	FCharacterStateData CharacterStateData;

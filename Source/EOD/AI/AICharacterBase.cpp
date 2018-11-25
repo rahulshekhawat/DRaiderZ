@@ -215,7 +215,7 @@ void AAICharacterBase::SetInCombat(bool bValue)
 
 void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	if (AnimMontage == FlinchAnimMontage)
+	if (AnimMontage == FlinchAnimMontage || bUsingUniqueSkill)
 	{
 		return;
 	}
