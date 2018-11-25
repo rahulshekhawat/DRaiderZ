@@ -70,7 +70,7 @@ bool AEODCharacterBase::BP_HasBeenHit() const
 bool AEODCharacterBase::CanMove() const
 {
 	// Mobs can only move in IdleWalkRun state
-	return CharacterState == ECharacterState::IdleWalkRun;
+	return CharacterState == ECharacterState::IdleWalkRun || (IsUsingAnySkill() && bSkillAllowsMovement);
 }
 
 bool AEODCharacterBase::CanJump() const

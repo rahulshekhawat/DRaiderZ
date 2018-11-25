@@ -106,6 +106,7 @@ public:
 	bool BP_HasBeenHit() const;
 
 	/** Returns true if character can move */
+	UFUNCTION(BlueprintCallable, Category = CharacterState)
 	virtual bool CanMove() const;
 	
 	/** Returns true if character can jump */
@@ -475,6 +476,9 @@ private:
 	ECharacterState CharacterState;
 
 protected:
+
+	UPROPERTY(Transient)
+	bool bSkillAllowsMovement;
 
 	UPROPERTY()
 	FCharacterStateData CharacterStateData;

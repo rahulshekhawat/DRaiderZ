@@ -262,6 +262,7 @@ bool AAICharacterBase::UseSkill_Implementation(FName SkillID)
 		SetCurrentActiveSkillID(SkillID);
 		SetCurrentActiveSkill(SkillToUse);
 		// SkillIDToWeightMap[SkillID] = SkillIDToWeightMap[SkillID] - 1;
+		bSkillAllowsMovement = SkillToUse->bAllowsMovement;
 		return true;
 	}
 

@@ -358,9 +358,6 @@ private:
 	bool bNormalAttackPressed;
 
 	UPROPERTY(Transient)
-	bool bSkillAllowsMovement;
-
-	UPROPERTY(Transient)
 	bool bCanUseChainSkill;
 
 	UPROPERTY(Transient)
