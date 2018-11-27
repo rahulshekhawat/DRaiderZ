@@ -45,6 +45,7 @@ enum class EFaction : uint8
 {
 	Rendel_Commoner, // People of rendel kingdom
 	Rendel_Soldier,
+	Unknown,
 	Undead,
 	Corrupted,
 	Player,
