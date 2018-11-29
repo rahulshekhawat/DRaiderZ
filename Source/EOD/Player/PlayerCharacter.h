@@ -22,7 +22,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInventoryComponent;
 class USkillsComponent;
-
+class USphereComponent;
 
 /**
  * PlayerCharacter is the base class for playable characters
@@ -112,7 +112,11 @@ private:
 	//~ Audio component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* AudioComponent;
-	
+
+	//~ Sphere component used to detect interactive objects
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USphereComponent* InteractionSphere;
+
 	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
 	
@@ -317,6 +321,38 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Normal Attack Section Change Allowed"))
 	void BP_SetNormalAttackSectionChangeAllowed(bool bNewValue);
+
+	/** On beginning overlap with an interactive actors */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	void OnInteractionSphereBeginOverlap(AActor* OtherActor);
+
+	/** On beginning overlap with an interactive actors */
+	virtual void OnInteractionSphereBeginOverlap_Implementation(AActor* OtherActor);
+
+	/** On ending overlap with an interactive actors */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	void OnInteractionSphereEndOverlap(AActor* OtherActor);
+
+	/** On ending overlap with an interactive actors */
+	virtual void OnInteractionSphereEndOverlap_Implementation(AActor* OtherActor);
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
+	TArray<AActor*> OverlappingInteractiveActors;
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
+	AActor* ActiveInteractiveActor;
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
+	UUserWidget* DialogueWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = PlayerInteraction)
+	TSubclassOf<UUserWidget> DialogueWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
+	USoundBase* InteractionStartSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
+	USoundBase* InteractionEndSound;
 
 private:
 

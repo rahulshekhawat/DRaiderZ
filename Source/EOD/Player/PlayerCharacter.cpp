@@ -9,6 +9,9 @@
 #include "Core/EODPreprocessors.h"
 #include "Core/EODSaveGame.h"
 #include "UI/HUDWidget.h"
+#include "Interactables/Interactable.h"
+#include "AI/NPCBase.h"
+#include "Player/EODPlayerController.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -19,6 +22,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/AudioComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/GameUserSettings.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -51,6 +55,10 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	Hands			= CreateNewArmorComponent(FName("Hands"), ObjectInitializer);
 	Legs			= CreateNewArmorComponent(FName("Legs"), ObjectInitializer);
 	Feet			= CreateNewArmorComponent(FName("Feet"), ObjectInitializer);
+
+	InteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, FName("Interaction Sphere"));
+	InteractionSphere->SetupAttachment(RootComponent);
+	InteractionSphere->SetSphereRadius(150.f);
 
 	//~ Begin Camera Components Initialization
 	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, FName("Camera Boom"));
@@ -802,7 +810,37 @@ void APlayerCharacter::OnJump()
 
 void APlayerCharacter::OnInteract()
 {
-	// @todo definition
+	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
+	if (GetCharacterState() == ECharacterState::Interacting)
+	{
+		PC->SetViewTargetWithBlend(this, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
+		SetCharacterState(ECharacterState::IdleWalkRun);
+
+		if (DialogueWidget)
+		{
+			DialogueWidget->RemoveFromParent();
+			DialogueWidget->MarkPendingKill(); // Would this crash?
+			DialogueWidget = nullptr;
+		}
+
+		AudioComponent->SetSound(InteractionEndSound);
+		AudioComponent->Play();
+	}
+	else
+	{
+		if (ActiveInteractiveActor)
+		{
+			PC->SetViewTargetWithBlend(ActiveInteractiveActor, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
+			AudioComponent->SetSound(InteractionStartSound);
+			AudioComponent->Play();
+		}
+		else
+		{
+#if MESSAGE_LOGGING_ENABLED
+			UKismetSystemLibrary::PrintString(this, FString("APlayerCharacter::OnInteract() - ActiveInteractiveActor is NULL when it shouldn't be"));
+#endif
+		}
+	}
 }
 
 void APlayerCharacter::OnToggleSheathe()
@@ -1600,6 +1638,89 @@ void APlayerCharacter::BP_SetCanUseChainSkill(bool bNewValue)
 void APlayerCharacter::BP_SetNormalAttackSectionChangeAllowed(bool bNewValue)
 {
 	SetNormalAttackSectionChangeAllowed(bNewValue);
+}
+
+void APlayerCharacter::OnInteractionSphereBeginOverlap_Implementation(AActor* OtherActor)
+{
+	ANPCBase* NPC = Cast<ANPCBase>(OtherActor);
+	AInteractable* Interactable = Cast<AInteractable>(OtherActor);
+
+	// If neither npc or interactable is valid
+	if (!(NPC || Interactable))
+	{
+		return;
+	}
+
+	if (ActiveInteractiveActor)
+	{
+		ANPCBase* OldNPC = Cast<ANPCBase>(ActiveInteractiveActor);
+		if (OldNPC)
+		{
+			OldNPC->DisableCustomDepth();
+		}
+		else
+		{
+			AInteractable* OldInteractable = Cast<AInteractable>(ActiveInteractiveActor);
+			if (OldInteractable)
+			{
+				OldInteractable->DisableCustomDepth();
+			}
+		}
+	}
+
+	if (NPC)
+	{
+		NPC->EnableCustomDepth();
+		ActiveInteractiveActor = NPC;
+		OverlappingInteractiveActors.Add(ActiveInteractiveActor);
+	}
+	else if (Interactable)
+	{
+		Interactable->EnableCustomDepth();
+		ActiveInteractiveActor = Interactable;
+		OverlappingInteractiveActors.Add(Interactable);
+	}
+}
+
+void APlayerCharacter::OnInteractionSphereEndOverlap_Implementation(AActor* OtherActor)
+{
+	ANPCBase* NPC = Cast<ANPCBase>(OtherActor);
+	AInteractable* Interactable = Cast<AInteractable>(OtherActor);
+
+	// If neither npc or interactable is valid
+	if (!(NPC || Interactable))
+	{
+		return;
+	}
+
+	if (NPC)
+	{
+		NPC->DisableCustomDepth();
+	}
+	else if (Interactable)
+	{
+		Interactable->DisableCustomDepth();
+	}
+
+	OverlappingInteractiveActors.Remove(OtherActor);
+	if (ActiveInteractiveActor == OtherActor && OverlappingInteractiveActors.Num() > 0)
+	{
+		ActiveInteractiveActor = OverlappingInteractiveActors[OverlappingInteractiveActors.Num() - 1];
+
+		ANPCBase* NewNPC = Cast<ANPCBase>(ActiveInteractiveActor);
+		if (NewNPC)
+		{
+			NewNPC->EnableCustomDepth();
+		}
+		else
+		{
+			AInteractable* NewInteractable = Cast<AInteractable>(ActiveInteractiveActor);
+			if (NewInteractable)
+			{
+				NewInteractable->EnableCustomDepth();
+			}
+		}
+	}
 }
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
