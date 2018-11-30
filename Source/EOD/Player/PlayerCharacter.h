@@ -354,6 +354,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
 	USoundBase* InteractionEndSound;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
+	USoundBase* InteractiveActorDetectedSound;
+
 private:
 
 	const int CameraZoomRate = 15;

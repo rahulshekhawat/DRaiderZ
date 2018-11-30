@@ -1666,6 +1666,9 @@ void APlayerCharacter::OnInteractionSphereBeginOverlap_Implementation(AActor* Ot
 	InteractiveObj->Execute_EnableCustomDepth(OtherActor);
 	ActiveInteractiveActor = OtherActor;
 	OverlappingInteractiveActors.Add(OtherActor);
+
+	AudioComponent->SetSound(InteractiveActorDetectedSound);
+	AudioComponent->Play();
 }
 
 void APlayerCharacter::OnInteractionSphereEndOverlap_Implementation(AActor* OtherActor)
@@ -1685,6 +1688,9 @@ void APlayerCharacter::OnInteractionSphereEndOverlap_Implementation(AActor* Othe
 		ActiveInteractiveActor = OverlappingInteractiveActors[OverlappingInteractiveActors.Num() - 1];
 		IInteractionInterface* NewInteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
 		NewInteractiveObj->Execute_EnableCustomDepth(ActiveInteractiveActor);
+
+		AudioComponent->SetSound(InteractiveActorDetectedSound);
+		AudioComponent->Play();
 	}
 }
 
