@@ -9,7 +9,7 @@
 
 
 UENUM(BlueprintType)
-enum EEventType
+enum EDialogueEventType
 {
 	Dialogue,	// Triggers a new dialogue
 	Option,		// Replaces current dialogue options with new options
@@ -30,7 +30,7 @@ public:
 	FString OptionText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue Option")
-	TEnumAsByte<EEventType> EventType;
+	TEnumAsByte<EDialogueEventType> EventType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue Option")
 	FName EventID;
