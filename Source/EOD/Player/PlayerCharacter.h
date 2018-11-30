@@ -561,6 +561,12 @@ private:
 	template<uint32 SkillButtonIndex>
 	void ReleasedSkillKey();
 
+	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
+	void DisplayDialogueWidget();
+
+	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
+	void RemoveDialogueWidget();
+
 public:
 
 	/** The relative yaw of character's movement direction from the direction character is facing while blocking */

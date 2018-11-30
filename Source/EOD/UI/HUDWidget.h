@@ -120,6 +120,12 @@ private:
 	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FVector2D StatusIndicatorWidgetPosition;
 
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D DialogueWidgetSize;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D DialogueWidgetPosition;
+
 };
 
 inline void UHUDWidget::AddSkillBarWidget(USkillBarWidget * NewWidget)
@@ -153,8 +159,8 @@ inline void UHUDWidget::AddInventoryWidget(UInventoryWidget * NewWidget)
 inline void UHUDWidget::AddDialogueWidget(UUserWidget * NewWidget)
 {
 	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
-	CPSlot->SetSize(FVector2D(720.f, 360.f));
-	CPSlot->SetPosition(FVector2D(600.f, 630.f));
+	CPSlot->SetSize(DialogueWidgetSize);
+	CPSlot->SetPosition(DialogueWidgetPosition);
 }
 
 inline void UHUDWidget::AddStatusIndicatorWidget(UStatusIndicatorWidget * NewWidget)

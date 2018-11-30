@@ -16,7 +16,8 @@ UHUDWidget::UHUDWidget(const FObjectInitializer & ObjectInitializer) : Super(Obj
 	SkillTreeWidgetPosition			= FVector2D(464.f, 220.f);
 	StatusIndicatorWidgetSize		= FVector2D(375.f, 50.f);
 	StatusIndicatorWidgetPosition	= FVector2D(74.f, 20.f);
-
+	DialogueWidgetSize				= FVector2D(720.f, 360.f);
+	DialogueWidgetPosition			= FVector2D(600.f, 630.f);
 }
 
 bool UHUDWidget::Initialize()

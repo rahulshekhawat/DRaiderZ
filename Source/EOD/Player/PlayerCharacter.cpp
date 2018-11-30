@@ -815,12 +815,7 @@ void APlayerCharacter::OnInteract()
 		PC->SetViewTargetWithBlend(this, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
 		SetCharacterState(ECharacterState::IdleWalkRun);
 
-		if (DialogueWidget)
-		{
-			DialogueWidget->RemoveFromParent();
-			DialogueWidget->MarkPendingKill(); // Would this crash?
-			DialogueWidget = nullptr;
-		}
+		RemoveDialogueWidget();
 
 		AudioComponent->SetSound(InteractionEndSound);
 		AudioComponent->Play();
@@ -834,14 +829,7 @@ void APlayerCharacter::OnInteract()
 			PC->SetViewTargetWithBlend(ActiveInteractiveActor, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
 			SetCharacterState(ECharacterState::Interacting);
 
-			if (DialogueWidgetClass.Get())
-			{
-				DialogueWidget = CreateWidget<UUserWidget>(GetGameInstance(), DialogueWidgetClass);
-				if (DialogueWidget && HUDWidget)
-				{
-					HUDWidget->AddDialogueWidget(DialogueWidget);
-				}
-			}
+			DisplayDialogueWidget();
 
 			AudioComponent->SetSound(InteractionStartSound);
 			AudioComponent->Play();
@@ -1320,6 +1308,36 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName& CurrentSecti
 	}
 
 	return NAME_None;
+}
+
+void APlayerCharacter::DisplayDialogueWidget()
+{
+	if (DialogueWidgetClass.Get())
+	{
+		DialogueWidget = CreateWidget<UUserWidget>(GetGameInstance(), DialogueWidgetClass);
+		if (DialogueWidget && HUDWidget)
+		{
+			HUDWidget->AddDialogueWidget(DialogueWidget);
+			HUDWidget->SkillBarWidget->SetVisibility(ESlateVisibility::Hidden);
+			HUDWidget->InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+			HUDWidget->SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
+void APlayerCharacter::RemoveDialogueWidget()
+{
+	if (DialogueWidget)
+	{
+		DialogueWidget->RemoveFromParent();
+		DialogueWidget->MarkPendingKill(); // Would this crash?
+		DialogueWidget = nullptr;
+	}
+
+	if (HUDWidget)
+	{
+		HUDWidget->SkillBarWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 FName APlayerCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender)
