@@ -1,0 +1,10 @@
+[
+	{
+		"Name": "DW-001",
+		"DialogueText": "NSLOCTEXT(\"[C82207F84AC129B3E8906DAF5D9FD0B6]\", \"3D791D0140B5A77DEDFD02AE7A4F3A10\", \"Sample Text\")",
+		"OptionIDs": [
+			"DOP-001",
+			"DOP-002"
+		]
+	}
+]

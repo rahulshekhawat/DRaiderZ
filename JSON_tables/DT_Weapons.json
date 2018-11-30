@@ -1,0 +1,27 @@
+[
+	{
+		"Name": "GS-T-001",
+		"DisplayName": "Test Weapon",
+		"Description": "",
+		"WeaponMesh": "/Game/EOD/Model/weapons/2hd_ritz/SK_2hd_ritz.SK_2hd_ritz",
+		"Icon": "None",
+		"WeaponType": "GreatSword",
+		"Level": 0,
+		"Stability": 0,
+		"DamageThreshold": 0,
+		"PhysicalAttack": 0,
+		"MagickalAttack": 0,
+		"PhysicalCritRate": 0,
+		"MagickalCritRate": 0,
+		"PhysicalCritBonusDamage": 0,
+		"MagickalCritBonusDamage": 0,
+		"OnBlock_MinStaminaConsumption": 0,
+		"OnBlock_PhysicalDamageReduction": 50,
+		"OnBlock_MagickalDamageReduction": 50,
+		"MaxEnchantLevel": 5,
+		"WeaponQualityScale": 0,
+		"bSupportsElementalEnchant": false,
+		"bCanAddSpecialAbilityGem": false,
+		"StatusEffects": []
+	}
+]

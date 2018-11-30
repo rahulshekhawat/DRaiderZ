@@ -36,6 +36,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* WeaponsDataTable;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
+	UDataTable* DialogueWindowsDataTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
+	UDataTable* DialogueOptionsDataTable;
+
 	/** Default save profile name */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = SaveGame)
 	FString DefaultSaveSlotName;	

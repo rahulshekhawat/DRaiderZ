@@ -7,6 +7,7 @@
 #include "EODLibrary.generated.h"
 
 class UTexture;
+class UGameSingleton;
 
 UENUM(BlueprintType)
 enum class EEODContainerType : uint8
@@ -95,6 +96,8 @@ class EOD_API UEODLibrary : public UObject
 	
 public:
 
+	UFUNCTION(BlueprintCallable, Category = "EOD Library")
+	static UGameSingleton* GetGameSingleton();
 	
 	
 };

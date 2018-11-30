@@ -324,6 +324,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
 	uint32 bHasStaminaRegenration : 1;
 
+private:
+
+
+
 		
 	
 };

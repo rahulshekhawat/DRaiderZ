@@ -75,5 +75,9 @@ UCLASS()
 class EOD_API UDialogueLibrary : public UObject
 {
 	GENERATED_BODY()
+
+public:
+
+
 	
 };
