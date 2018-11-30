@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "DialogueWindowWidget.generated.h"
 
+class URichTextBlock;
+
 /**
  * 
  */
@@ -23,5 +25,11 @@ public:
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	URichTextBlock* DialogueText;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DialogueWidget)
+	FText DefaultDialogueText;
 
 };

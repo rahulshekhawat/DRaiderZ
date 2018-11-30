@@ -12,7 +12,7 @@ UENUM(BlueprintType)
 enum EDialogueEventType
 {
 	Dialogue,	// Triggers a new dialogue
-	Option,		// Replaces current dialogue options with new options
+	// Option,		// Replaces current dialogue options with new options
 	ArmorMenu,	// Opens armor craft menu
 	WeaponMenu,	// Opens weapon craft menu
 	Exit,		// Exits dialogue. Implies the interacting player wants to finish dialogue.
@@ -27,7 +27,8 @@ struct EOD_API FDialogueOptions : public FTableRowBase
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue Option")
-	FString OptionText;
+	FText OptionText;
+	// FString OptionText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue Option")
 	TEnumAsByte<EDialogueEventType> EventType;
@@ -46,7 +47,8 @@ struct EOD_API FDialogueWindow : public FTableRowBase
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue")
-	FString DialogueText;
+	FText DialogueText;
+	// FString DialogueText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue", meta = (DisplayName = "Option IDs"))
 	TArray<FName> OptionIDs;
