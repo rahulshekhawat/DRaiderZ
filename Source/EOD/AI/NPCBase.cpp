@@ -3,6 +3,7 @@
 #include "NPCBase.h"
 
 #include "Camera/CameraComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 ANPCBase::ANPCBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -13,8 +14,9 @@ ANPCBase::ANPCBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectIn
 	
 }
 
-void ANPCBase::OnInteract_Implementation(const AEODCharacterBase* Character)
+void ANPCBase::OnInteract_Implementation(const AEODCharacterBase * Character, UUserWidget * DialogueWidget)
 {
+	UKismetSystemLibrary::PrintString(this, FString("On interaction called from interface of ANPCBase"));
 }
 
 void ANPCBase::EnableCustomDepth_Implementation()

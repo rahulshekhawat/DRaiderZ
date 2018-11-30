@@ -9,7 +9,6 @@
 #include "Core/EODPreprocessors.h"
 #include "Core/EODSaveGame.h"
 #include "UI/HUDWidget.h"
-#include "Interactables/Interactable.h"
 #include "AI/NPCBase.h"
 #include "Player/EODPlayerController.h"
 
@@ -1642,84 +1641,41 @@ void APlayerCharacter::BP_SetNormalAttackSectionChangeAllowed(bool bNewValue)
 
 void APlayerCharacter::OnInteractionSphereBeginOverlap_Implementation(AActor* OtherActor)
 {
-	ANPCBase* NPC = Cast<ANPCBase>(OtherActor);
-	AInteractable* Interactable = Cast<AInteractable>(OtherActor);
-
-	// If neither npc or interactable is valid
-	if (!(NPC || Interactable))
+	IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(OtherActor);
+	// If the actor is not interactive
+	if (!InteractiveObj)
 	{
 		return;
 	}
 
 	if (ActiveInteractiveActor)
 	{
-		ANPCBase* OldNPC = Cast<ANPCBase>(ActiveInteractiveActor);
-		if (OldNPC)
-		{
-			OldNPC->DisableCustomDepth();
-		}
-		else
-		{
-			AInteractable* OldInteractable = Cast<AInteractable>(ActiveInteractiveActor);
-			if (OldInteractable)
-			{
-				OldInteractable->DisableCustomDepth();
-			}
-		}
+		IInteractionInterface* OldInteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
+		OldInteractiveObj->Execute_DisableCustomDepth(ActiveInteractiveActor);
 	}
 
-	if (NPC)
-	{
-		NPC->EnableCustomDepth();
-		ActiveInteractiveActor = NPC;
-		OverlappingInteractiveActors.Add(ActiveInteractiveActor);
-	}
-	else if (Interactable)
-	{
-		Interactable->EnableCustomDepth();
-		ActiveInteractiveActor = Interactable;
-		OverlappingInteractiveActors.Add(Interactable);
-	}
+	InteractiveObj->Execute_EnableCustomDepth(OtherActor);
+	ActiveInteractiveActor = OtherActor;
+	OverlappingInteractiveActors.Add(OtherActor);
 }
 
 void APlayerCharacter::OnInteractionSphereEndOverlap_Implementation(AActor* OtherActor)
 {
-	ANPCBase* NPC = Cast<ANPCBase>(OtherActor);
-	AInteractable* Interactable = Cast<AInteractable>(OtherActor);
-
-	// If neither npc or interactable is valid
-	if (!(NPC || Interactable))
+	IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(OtherActor);
+	// If the actor is not interactive
+	if (!InteractiveObj)
 	{
 		return;
 	}
 
-	if (NPC)
-	{
-		NPC->DisableCustomDepth();
-	}
-	else if (Interactable)
-	{
-		Interactable->DisableCustomDepth();
-	}
-
+	InteractiveObj->Execute_DisableCustomDepth(OtherActor);
 	OverlappingInteractiveActors.Remove(OtherActor);
+
 	if (ActiveInteractiveActor == OtherActor && OverlappingInteractiveActors.Num() > 0)
 	{
 		ActiveInteractiveActor = OverlappingInteractiveActors[OverlappingInteractiveActors.Num() - 1];
-
-		ANPCBase* NewNPC = Cast<ANPCBase>(ActiveInteractiveActor);
-		if (NewNPC)
-		{
-			NewNPC->EnableCustomDepth();
-		}
-		else
-		{
-			AInteractable* NewInteractable = Cast<AInteractable>(ActiveInteractiveActor);
-			if (NewInteractable)
-			{
-				NewInteractable->EnableCustomDepth();
-			}
-		}
+		IInteractionInterface* NewInteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
+		NewInteractiveObj->Execute_EnableCustomDepth(ActiveInteractiveActor);
 	}
 }
 
