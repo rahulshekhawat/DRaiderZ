@@ -825,19 +825,28 @@ void APlayerCharacter::OnInteract()
 		AudioComponent->SetSound(InteractionEndSound);
 		AudioComponent->Play();
 	}
-	else
+	else if (ActiveInteractiveActor)
 	{
-		if (ActiveInteractiveActor)
+		IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
+		// Just in case, make sure 'ActiveInteractiveActor' implements 'IInteractionInterface'
+		if (InteractiveObj)
 		{
 			PC->SetViewTargetWithBlend(ActiveInteractiveActor, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
+			SetCharacterState(ECharacterState::Interacting);
+
+			if (DialogueWidgetClass.Get())
+			{
+				DialogueWidget = CreateWidget<UUserWidget>(GetGameInstance(), DialogueWidgetClass);
+				if (DialogueWidget && HUDWidget)
+				{
+					HUDWidget->AddDialogueWidget(DialogueWidget);
+				}
+			}
+
 			AudioComponent->SetSound(InteractionStartSound);
 			AudioComponent->Play();
-		}
-		else
-		{
-#if MESSAGE_LOGGING_ENABLED
-			UKismetSystemLibrary::PrintString(this, FString("APlayerCharacter::OnInteract() - ActiveInteractiveActor is NULL when it shouldn't be"));
-#endif
+
+			InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this, DialogueWidget);
 		}
 	}
 }

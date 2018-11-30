@@ -65,6 +65,9 @@ public:
 	/** Add inventory widget as a child to HUD widget */
 	inline void AddInventoryWidget(UInventoryWidget* NewWidget);
 
+	/** Add dialogue widget as a child to HUD widget */
+	inline void AddDialogueWidget(UUserWidget* NewWidget);
+
 	/** Add status indicator widget as a child to HUD widget */
 	inline void AddStatusIndicatorWidget(UStatusIndicatorWidget* NewWidget);
 
@@ -145,6 +148,13 @@ inline void UHUDWidget::AddInventoryWidget(UInventoryWidget * NewWidget)
 	CPSlot->SetPosition(InventoryWidgetPosition);
 
 	InventoryWidget = NewWidget;
+}
+
+inline void UHUDWidget::AddDialogueWidget(UUserWidget * NewWidget)
+{
+	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
+	CPSlot->SetSize(FVector2D(720.f, 360.f));
+	CPSlot->SetPosition(FVector2D(600.f, 630.f));
 }
 
 inline void UHUDWidget::AddStatusIndicatorWidget(UStatusIndicatorWidget * NewWidget)
