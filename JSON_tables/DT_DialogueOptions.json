@@ -1,13 +1,13 @@
 [
 	{
-		"Name": "DOP-001",
-		"OptionText": "NSLOCTEXT(\"[6D2F3A4F4181C2523AEC6A90A2BFF528]\", \"D3ED7BB243EDB07CF31FCB88F1E0D8E0\", \"Sample Option 01\")",
-		"EventType": "Exit",
-		"EventID": "None"
+		"Name": "DO-001",
+		"OptionText": "Option 01",
+		"EventType": "Dialogue",
+		"EventID": "DW-002"
 	},
 	{
-		"Name": "DOP-002",
-		"OptionText": "NSLOCTEXT(\"[6D2F3A4F4181C2523AEC6A90A2BFF528]\", \"53E1B1A24A84F05B463F13BF78D02DF7\", \"Sample Option 02\")",
+		"Name": "DO-002",
+		"OptionText": "Option 02",
 		"EventType": "Exit",
 		"EventID": "None"
 	}

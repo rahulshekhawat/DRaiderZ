@@ -20,15 +20,12 @@ enum EDialogueEventType
 };
 
 USTRUCT(BlueprintType)
-struct EOD_API FDialogueOptions : public FTableRowBase
+struct EOD_API FDialogueOption : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue Option")
-	FText OptionText;
-	// FString OptionText;
+	FString OptionText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue Option")
 	TEnumAsByte<EDialogueEventType> EventType;
@@ -44,11 +41,9 @@ struct EOD_API FDialogueWindow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue")
-	FText DialogueText;
-	// FString DialogueText;
+	FString DialogueText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue", meta = (DisplayName = "Option IDs"))
 	TArray<FName> OptionIDs;

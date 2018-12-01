@@ -357,6 +357,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
 	USoundBase* InteractiveActorDetectedSound;
 
+	/** Attempts to start interaction with the active interactive actor */
+	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
+	void StartInteraction();
+
+	/** End any interaction currently in progress */
+	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
+	void EndInteraction();
+
 private:
 
 	const int CameraZoomRate = 15;

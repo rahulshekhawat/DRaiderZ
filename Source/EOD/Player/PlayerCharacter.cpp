@@ -809,33 +809,14 @@ void APlayerCharacter::OnJump()
 
 void APlayerCharacter::OnInteract()
 {
-	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
+	// If player is already interacting
 	if (GetCharacterState() == ECharacterState::Interacting)
 	{
-		PC->SetViewTargetWithBlend(this, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
-		SetCharacterState(ECharacterState::IdleWalkRun);
-
-		RemoveDialogueWidget();
-
-		AudioComponent->SetSound(InteractionEndSound);
-		AudioComponent->Play();
+		EndInteraction();
 	}
-	else if (ActiveInteractiveActor)
+	else
 	{
-		IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
-		// Just in case, make sure 'ActiveInteractiveActor' implements 'IInteractionInterface'
-		if (InteractiveObj)
-		{
-			PC->SetViewTargetWithBlend(ActiveInteractiveActor, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
-			SetCharacterState(ECharacterState::Interacting);
-
-			DisplayDialogueWidget();
-
-			AudioComponent->SetSound(InteractionStartSound);
-			AudioComponent->Play();
-
-			InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this, DialogueWidget);
-		}
+		StartInteraction();
 	}
 }
 
@@ -1708,6 +1689,43 @@ void APlayerCharacter::OnInteractionSphereEndOverlap_Implementation(AActor* Othe
 		NewInteractiveObj->Execute_EnableCustomDepth(ActiveInteractiveActor);
 
 		AudioComponent->SetSound(InteractiveActorDetectedSound);
+		AudioComponent->Play();
+	}
+}
+
+void APlayerCharacter::StartInteraction()
+{
+	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
+	if (PC && ActiveInteractiveActor)
+	{
+		IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
+		// Just in case, make sure 'ActiveInteractiveActor' implements 'IInteractionInterface'
+		if (InteractiveObj)
+		{
+			PC->SetViewTargetWithBlend(ActiveInteractiveActor, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
+			SetCharacterState(ECharacterState::Interacting);
+
+			DisplayDialogueWidget();
+
+			AudioComponent->SetSound(InteractionStartSound);
+			AudioComponent->Play();
+
+			InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this, DialogueWidget);
+		}
+	}
+}
+
+void APlayerCharacter::EndInteraction()
+{
+	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
+	if (PC)
+	{
+		PC->SetViewTargetWithBlend(this, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
+		SetCharacterState(ECharacterState::IdleWalkRun);
+
+		RemoveDialogueWidget();
+
+		AudioComponent->SetSound(InteractionEndSound);
 		AudioComponent->Play();
 	}
 }
