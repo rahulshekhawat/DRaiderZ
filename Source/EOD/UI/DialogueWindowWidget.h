@@ -7,6 +7,8 @@
 #include "DialogueWindowWidget.generated.h"
 
 class URichTextBlock;
+class UDialogueOptionWidget;
+class UVerticalBox;
 
 /**
  * 
@@ -29,7 +31,29 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	URichTextBlock* DialogueText;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UVerticalBox* VertiBox;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DialogueWidget)
 	FText DefaultDialogueText;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = DialogueWidget)
+	void UpdateDialogueWindow(FName DialogueWindowID);
+
+	void UpdateDialogueWindow_Implementation(FName DialogueWindowID);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = DialogueWidget)
+	void AddOption(FName OptionID);
+
+	void AddOption_Implementation(FName OptionID);
+
+protected:
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
+	TArray<UDialogueOptionWidget*> DialogueOptions;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = DialogueWidget)
+	void CleanupOptions();
+
+	void CleanupOptions_Implementation();
 };

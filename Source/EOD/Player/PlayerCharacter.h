@@ -23,6 +23,7 @@ class UCameraComponent;
 class UInventoryComponent;
 class USkillsComponent;
 class USphereComponent;
+class UDialogueWindowWidget;
 
 /**
  * PlayerCharacter is the base class for playable characters
@@ -364,6 +365,16 @@ public:
 	/** End any interaction currently in progress */
 	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
 	void EndInteraction();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	void FinishDialogue(UDialogueWindowWidget* Widget);
+
+	void FinishDialogue_Implementation(UDialogueWindowWidget* Widget);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	void ExitDialogue(UDialogueWindowWidget* Widget);
+
+	void ExitDialogue_Implementation(UDialogueWindowWidget* Widget);
 
 private:
 

@@ -36,16 +36,48 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* OptionText;
 
+ 	FORCEINLINE void SetOptionEventID(FName NewOptionEventID);
+
+	FORCEINLINE void SetOptionEventType(TEnumAsByte<EDialogueEventType> NewOptionEventType);
+
+	FORCEINLINE void SetOwningDialogueWidget(UDialogueWindowWidget* NewOwner);
+
 protected:
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
-	TEnumAsByte<EDialogueEventType> EventType;
+	TEnumAsByte<EDialogueEventType> OptionEventType;
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
-	FName EventID;
+	FName OptionEventID;
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
 	UDialogueWindowWidget* OwningDialogueWidget;
 
+	UFUNCTION(BlueprintCallable, Category = DialogueWidget)
+	void OnOptionButtonClicked();
+
+	UFUNCTION(BlueprintCallable, Category = DialogueWidget)
+	void HandleNewDialogueEvent();
+
+	UFUNCTION(BlueprintCallable, Category = DialogueWidget)
+	void HandleExitEvent();
+
+	UFUNCTION(BlueprintCallable, Category = DialogueWidget)
+	void HandleFinishEvent();
 
 };
+
+FORCEINLINE void UDialogueOptionWidget::SetOptionEventID(FName NewOptionEventID)
+{
+	OptionEventID = NewOptionEventID;
+}
+
+inline void UDialogueOptionWidget::SetOptionEventType(TEnumAsByte<EDialogueEventType> NewOptionEventType)
+{
+	OptionEventType = NewOptionEventType;
+}
+
+inline void UDialogueOptionWidget::SetOwningDialogueWidget(UDialogueWindowWidget * NewOwner)
+{
+	OwningDialogueWidget = NewOwner;
+}

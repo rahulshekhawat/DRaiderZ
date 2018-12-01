@@ -11,6 +11,7 @@
 #include "UI/HUDWidget.h"
 #include "AI/NPCBase.h"
 #include "Player/EODPlayerController.h"
+#include "UI/DialogueWindowWidget.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -1728,6 +1729,14 @@ void APlayerCharacter::EndInteraction()
 		AudioComponent->SetSound(InteractionEndSound);
 		AudioComponent->Play();
 	}
+}
+
+void APlayerCharacter::FinishDialogue_Implementation(UDialogueWindowWidget* Widget)
+{
+}
+
+void APlayerCharacter::ExitDialogue_Implementation(UDialogueWindowWidget* Widget)
+{
 }
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
