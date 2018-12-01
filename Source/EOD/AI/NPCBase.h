@@ -21,24 +21,6 @@ public:
 
 	ANPCBase(const FObjectInitializer& ObjectInitializer);
 
-	/** Called when a character attempts to interact with this NPC */
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Interaction)
-	// void OnInteract(const AEODCharacterBase* Character);
-
-	// virtual void OnInteract_Implementation(const AEODCharacterBase* Character);
-
-	/*
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Interaction)
-	void EnableCustomDepth();
-
-	virtual void EnableCustomDepth_Implementation();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Interaction)
-	void DisableCustomDepth();
-
-	virtual void DisableCustomDepth_Implementation();
-	*/
-
 	virtual void OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget) override;
 
 	virtual void EnableCustomDepth_Implementation() override;
