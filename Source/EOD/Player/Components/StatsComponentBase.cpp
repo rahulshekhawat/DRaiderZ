@@ -15,6 +15,11 @@ UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitial
 	bHasStaminaRegenration = false;
 }
 
+void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
 void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

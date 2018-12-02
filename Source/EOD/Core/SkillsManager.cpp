@@ -4,6 +4,7 @@
 
 ASkillsManager::ASkillsManager(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void ASkillsManager::BeginPlay()

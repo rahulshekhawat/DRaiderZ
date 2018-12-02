@@ -19,7 +19,10 @@ public:
 
 	/** Sets default values for this component's properties */
 	UStatsComponentBase(const FObjectInitializer& ObjectInitializer);
-	
+
+	/** Sets up property replication */
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
