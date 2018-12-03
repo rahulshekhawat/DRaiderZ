@@ -41,12 +41,14 @@ struct EOD_API FDialogueWindow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue")
 	FString DialogueText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue", meta = (DisplayName = "Option IDs"))
 	TArray<FName> OptionIDs;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue")
+	FName NextDialogueID;
 
 };
 

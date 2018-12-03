@@ -10,5 +10,11 @@
 		"OptionText": "Option 02",
 		"EventType": "Exit",
 		"EventID": "None"
+	},
+	{
+		"Name": "DO-003",
+		"OptionText": "Option 02",
+		"EventType": "Exit",
+		"EventID": "None"
 	}
 ]
