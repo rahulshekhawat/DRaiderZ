@@ -1683,14 +1683,21 @@ void APlayerCharacter::OnInteractionSphereEndOverlap_Implementation(AActor* Othe
 	InteractiveObj->Execute_DisableCustomDepth(OtherActor);
 	OverlappingInteractiveActors.Remove(OtherActor);
 
-	if (ActiveInteractiveActor == OtherActor && OverlappingInteractiveActors.Num() > 0)
+	if (ActiveInteractiveActor == OtherActor)
 	{
-		ActiveInteractiveActor = OverlappingInteractiveActors[OverlappingInteractiveActors.Num() - 1];
-		IInteractionInterface* NewInteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
-		NewInteractiveObj->Execute_EnableCustomDepth(ActiveInteractiveActor);
+		if (OverlappingInteractiveActors.Num() > 0)
+		{
+			ActiveInteractiveActor = OverlappingInteractiveActors[OverlappingInteractiveActors.Num() - 1];
+			IInteractionInterface* NewInteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
+			NewInteractiveObj->Execute_EnableCustomDepth(ActiveInteractiveActor);
 
-		AudioComponent->SetSound(InteractiveActorDetectedSound);
-		AudioComponent->Play();
+			AudioComponent->SetSound(InteractiveActorDetectedSound);
+			AudioComponent->Play();
+		}
+		else
+		{
+			ActiveInteractiveActor = nullptr;
+		}
 	}
 }
 
