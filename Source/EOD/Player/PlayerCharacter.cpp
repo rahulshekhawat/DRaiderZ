@@ -1296,7 +1296,7 @@ void APlayerCharacter::DisplayDialogueWidget()
 {
 	if (DialogueWidgetClass.Get())
 	{
-		DialogueWidget = CreateWidget<UUserWidget>(GetGameInstance(), DialogueWidgetClass);
+		DialogueWidget = CreateWidget<UDialogueWindowWidget>(GetGameInstance(), DialogueWidgetClass);
 		if (DialogueWidget && HUDWidget)
 		{
 			HUDWidget->AddDialogueWidget(DialogueWidget);

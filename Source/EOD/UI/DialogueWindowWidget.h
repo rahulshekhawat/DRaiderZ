@@ -43,17 +43,32 @@ public:
 	void UpdateDialogueWindow_Implementation(FName DialogueWindowID);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = DialogueWidget)
+	void MoveToNextDialogue();
+
+	void MoveToNextDialogue_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = DialogueWidget)
 	void AddOption(FName OptionID);
 
 	void AddOption_Implementation(FName OptionID);
 
+	// UFUNCTION(BlueprintCallable, Category = DialogueWidget)
+	// void FocusOnFirstOption();
+
 protected:
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
+	FName CurrentDialogueWindowID;
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
 	TArray<UDialogueOptionWidget*> DialogueOptions;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = DialogueWidget)
+	TSubclassOf<UDialogueOptionWidget> DialogueOptionWidgetClass;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = DialogueWidget)
 	void CleanupOptions();
 
 	void CleanupOptions_Implementation();
+
 };

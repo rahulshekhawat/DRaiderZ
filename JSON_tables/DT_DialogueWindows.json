@@ -25,7 +25,7 @@
 	},
 	{
 		"Name": "DW-004",
-		"DialogueText": "I suppose the least I could do is provide you a armor and a weapon.",
+		"DialogueText": "I suppose the least I could do is provide you an armor and a weapon.",
 		"OptionIDs": [
 		],
 		"NextDialogueID": "None"

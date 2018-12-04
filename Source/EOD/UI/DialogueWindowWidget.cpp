@@ -5,6 +5,7 @@
 #include "Statics/DialogueLibrary.h"
 #include "UI/DialogueOptionWidget.h"
 
+#include "Button.h"
 #include "Engine/Engine.h"
 #include "RichTextBlock.h"
 #include "TextBlock.h"
@@ -48,6 +49,7 @@ void UDialogueWindowWidget::UpdateDialogueWindow_Implementation(FName DialogueWi
 			CleanupOptions();
 			FText Text = FText::FromString(DialogueWin->DialogueText);
 			DialogueText->SetText(Text);
+			CurrentDialogueWindowID = DialogueWindowID;
 
 			for (FName OptionID : DialogueWin->OptionIDs)
 			{
@@ -57,15 +59,25 @@ void UDialogueWindowWidget::UpdateDialogueWindow_Implementation(FName DialogueWi
 	}
 }
 
+void UDialogueWindowWidget::MoveToNextDialogue_Implementation()
+{
+}
+
 void UDialogueWindowWidget::AddOption_Implementation(FName OptionID)
 {
+	if (!DialogueOptionWidgetClass.Get())
+	{
+		return;
+	}
+
 	UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
 	if (GameSingleton)
 	{
 		FDialogueOption* DialogueOpt = GameSingleton->DialogueOptionsDataTable->FindRow<FDialogueOption>(OptionID, FString("UDialogueWindowWidget::AddOption() : Searching for dialogue option row"));
 		if (DialogueOpt)
 		{
-			UDialogueOptionWidget* NewOptionWidget = CreateWidget<UDialogueOptionWidget>(GetGameInstance(), UDialogueOptionWidget::StaticClass());
+			// UDialogueOptionWidget* NewOptionWidget = CreateWidget<UDialogueOptionWidget>(GetGameInstance(), UDialogueOptionWidget::StaticClass());
+			UDialogueOptionWidget* NewOptionWidget = CreateWidget<UDialogueOptionWidget>(GetGameInstance(), DialogueOptionWidgetClass);
 			FText Text = FText::FromString(DialogueOpt->OptionText);
 			NewOptionWidget->OptionText->SetText(Text);
 			NewOptionWidget->SetOptionEventID(DialogueOpt->EventID);
@@ -73,13 +85,23 @@ void UDialogueWindowWidget::AddOption_Implementation(FName OptionID)
 			NewOptionWidget->SetOwningDialogueWidget(this);
 
 			UVerticalBoxSlot* VBSlot = VertiBox->AddChildToVerticalBox(NewOptionWidget);
-			FMargin SlotPadding = FMargin(100.f, 10.f, 0.f, 0.f);
+			FMargin SlotPadding = FMargin(0.f, 10.f, 0.f, 0.f);
 			VBSlot->SetPadding(SlotPadding);
 
 			DialogueOptions.Add(NewOptionWidget);
 		}
 	}
 }
+
+/*
+void UDialogueWindowWidget::FocusOnFirstOption()
+{
+	if (DialogueOptions.Num() > 0)
+	{
+		DialogueOptions[0]->OptionButton->SetKeyboardFocus();
+	}
+}
+*/
 
 void UDialogueWindowWidget::CleanupOptions_Implementation()
 {

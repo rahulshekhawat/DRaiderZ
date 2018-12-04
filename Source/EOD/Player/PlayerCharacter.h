@@ -344,10 +344,10 @@ public:
 	AActor* ActiveInteractiveActor;
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
-	UUserWidget* DialogueWidget;
+	UDialogueWindowWidget* DialogueWidget;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = PlayerInteraction)
-	TSubclassOf<UUserWidget> DialogueWidgetClass;
+	TSubclassOf<UDialogueWindowWidget> DialogueWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
 	USoundBase* InteractionStartSound;
