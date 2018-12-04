@@ -12,6 +12,7 @@
 #include "AI/NPCBase.h"
 #include "Player/EODPlayerController.h"
 #include "UI/DialogueWindowWidget.h"
+#include "Statics/DialogueLibrary.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -813,7 +814,8 @@ void APlayerCharacter::OnInteract()
 	// If player is already interacting
 	if (GetCharacterState() == ECharacterState::Interacting)
 	{
-		EndInteraction();
+		UpdateInteraction();
+		// EndInteraction();
 	}
 	else
 	{
@@ -1722,6 +1724,43 @@ void APlayerCharacter::StartInteraction()
 		}
 	}
 }
+
+void APlayerCharacter::UpdateInteraction_Implementation()
+{
+	UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+	if (GameSingleton && DialogueWidget && DialogueWidget->GetDialogueWindowID() != NAME_None)
+	{
+		FDialogueWindow* DialogueWin = GameSingleton->DialogueWindowsDataTable->FindRow<FDialogueWindow>(DialogueWidget->GetDialogueWindowID(), FString("APlayerCharacter::UpdateInteraction()"));
+		if (DialogueWin->NextEventID == NAME_None)
+		{
+			EndInteraction();
+		}
+		else
+		{
+			DialogueWidget->UpdateDialogueWindow(DialogueWin->NextEventID);
+		}
+	}
+}
+
+/*
+void APlayerCharacter::UpdateActiveInteraction()
+{
+	if (DialogueWidget)
+	{
+		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+		FDialogueWindow* DialogueWin = GameSingleton->DialogueWindowsDataTable->FindRow<FDialogueWindow>(DialogueWidget->GetDialogueWindowID(), FString("APlayerCharacter::UpdateActiveInteraction()"));
+		if (DialogueWin->NextEventID != NAME_None)
+		{
+
+
+			// @todo handle next event
+			return;
+		}
+	}
+	
+	EndInteraction();
+}
+*/
 
 void APlayerCharacter::EndInteraction()
 {

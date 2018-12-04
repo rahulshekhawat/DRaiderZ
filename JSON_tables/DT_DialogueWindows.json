@@ -6,7 +6,8 @@
 			"DO-001",
 			"DO-002"
 		],
-		"NextDialogueID": "None"
+		"NextEventType": "Dialogue",
+		"NextEventID": "None"
 	},
 	{
 		"Name": "DW-002",
@@ -14,20 +15,21 @@
 		"OptionIDs": [
 			"DO-002"
 		],
-		"NextDialogueID": "None"
+		"NextEventType": "Dialogue",
+		"NextEventID": "None"
 	},
 	{
 		"Name": "DW-003",
 		"DialogueText": "Another adventurer, eh?",
-		"OptionIDs": [
-		],
-		"NextDialogueID": "DW-004"
+		"OptionIDs": [],
+		"NextEventType": "Dialogue",
+		"NextEventID": "DW-004"
 	},
 	{
 		"Name": "DW-004",
 		"DialogueText": "I suppose the least I could do is provide you an armor and a weapon.",
-		"OptionIDs": [
-		],
-		"NextDialogueID": "None"
+		"OptionIDs": [],
+		"NextEventType": "Dialogue",
+		"NextEventID": "None"
 	}
 ]

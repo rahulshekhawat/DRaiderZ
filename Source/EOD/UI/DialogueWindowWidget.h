@@ -55,6 +55,8 @@ public:
 	// UFUNCTION(BlueprintCallable, Category = DialogueWidget)
 	// void FocusOnFirstOption();
 
+	FORCEINLINE FName GetDialogueWindowID() const;
+
 protected:
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
@@ -72,3 +74,8 @@ protected:
 	void CleanupOptions_Implementation();
 
 };
+
+FName UDialogueWindowWidget::GetDialogueWindowID() const
+{
+	return CurrentDialogueWindowID;
+}

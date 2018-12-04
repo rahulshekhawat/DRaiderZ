@@ -362,6 +362,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
 	void StartInteraction();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	void UpdateInteraction();
+
+	void UpdateInteraction_Implementation();
+
+	// UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
+	// void UpdateActiveInteraction();
+
 	/** End any interaction currently in progress */
 	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
 	void EndInteraction();
