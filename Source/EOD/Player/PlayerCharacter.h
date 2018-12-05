@@ -364,7 +364,15 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
 	void UpdateInteraction();
 
-	void UpdateInteraction_Implementation();
+	virtual void UpdateInteraction_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	void RequestDialogue(AActor* Requestor, FName DialogueWindowID);
+
+	virtual void RequestDialogue_Implementation(AActor* Requestor, FName DialogueWindowID);
+
+	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
+	void FocusCameraOnActor(AActor* TargetActor);
 
 	// UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
 	// void UpdateActiveInteraction();

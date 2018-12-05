@@ -1715,6 +1715,17 @@ void APlayerCharacter::OnInteractionSphereEndOverlap_Implementation(AActor* Othe
 
 void APlayerCharacter::StartInteraction()
 {
+	if (ActiveInteractiveActor)
+	{
+		IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
+		if (InteractiveObj)
+		{
+			InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this);
+		}
+	}
+
+
+	/*
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
 	if (PC && ActiveInteractiveActor)
 	{
@@ -1734,6 +1745,7 @@ void APlayerCharacter::StartInteraction()
 			// InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this, DialogueWidget);
 		}
 	}
+	*/
 }
 
 void APlayerCharacter::UpdateInteraction_Implementation()
@@ -1750,6 +1762,20 @@ void APlayerCharacter::UpdateInteraction_Implementation()
 		{
 			DialogueWidget->UpdateDialogueWindow(DialogueWin->NextEventID);
 		}
+	}
+}
+
+void APlayerCharacter::RequestDialogue_Implementation(AActor* Requestor, FName DialogueWindowID)
+{
+
+}
+
+void APlayerCharacter::FocusCameraOnActor(AActor* TargetActor)
+{
+	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
+	if (PC && TargetActor)
+	{
+		PC->SetViewTargetWithBlend(TargetActor, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
 	}
 }
 
