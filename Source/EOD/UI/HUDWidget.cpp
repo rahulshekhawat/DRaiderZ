@@ -64,3 +64,28 @@ bool UHUDWidget::NativeOnDrop(const FGeometry & InGeometry, const FDragDropEvent
 
 	return true;
 }
+
+void UHUDWidget::BP_AddSkillBarWidgetToCanvas(USkillBarWidget* NewWidget)
+{
+	AddSkillBarWidget(NewWidget);
+}
+
+void UHUDWidget::BP_AddSkillTreeWidgetToCanvas(USkillTreeWidget* NewWidget)
+{
+	AddSkillTreeWidget(NewWidget);
+}
+
+void UHUDWidget::BP_AddInventoryWidgetToCanvas(UInventoryWidget* NewWidget)
+{
+	AddInventoryWidget(NewWidget);
+}
+
+void UHUDWidget::BP_AddDialogueWidgetToCanvas(UDialogueWindowWidget* NewWidget)
+{
+	AddDialogueWidget(NewWidget);
+}
+
+void UHUDWidget::BP_AddStatusIndicatorWidgetToCanvas(UStatusIndicatorWidget* NewWidget)
+{
+	AddStatusIndicatorWidget(NewWidget);
+}

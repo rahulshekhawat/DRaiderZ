@@ -8,6 +8,7 @@
 #include "EOD/UI/SkillBarWidget.h"
 #include "EOD/UI/SkillTreeWidget.h"
 #include "EOD/UI/InventoryWidget.h"
+#include "EOD/UI/DialogueWindowWidget.h"
 #include "EOD/UI/StatusIndicatorWidget.h"
 
 #include "UObject/ObjectMacros.h"
@@ -66,26 +67,30 @@ public:
 	inline void AddInventoryWidget(UInventoryWidget* NewWidget);
 
 	/** Add dialogue widget as a child to HUD widget */
-	inline void AddDialogueWidget(UUserWidget* NewWidget);
+	inline void AddDialogueWidget(UDialogueWindowWidget* NewWidget);
 
 	/** Add status indicator widget as a child to HUD widget */
 	inline void AddStatusIndicatorWidget(UStatusIndicatorWidget* NewWidget);
 
 	/** Add skill bar widget as a child to HUD widget */
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Skill Bar Widget To Canvas"))
+	UFUNCTION(BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Skill Bar Widget To Canvas"))
 	void BP_AddSkillBarWidgetToCanvas(USkillBarWidget* NewWidget);
 
 	/** Add skill tree widget as a child to HUD widget */
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Skill Tree Widget To Canvas"))
-	void BP_AddSkillTreeWidgetToCanvas(USkillBarWidget* NewWidget);
+	UFUNCTION(BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Skill Tree Widget To Canvas"))
+	void BP_AddSkillTreeWidgetToCanvas(USkillTreeWidget* NewWidget);
 
 	/** Add inventory widget as a child to HUD widget */
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Inventory Widget To Canvas"))
-	void BP_AddInventoryWidgetToCanvas(USkillBarWidget* NewWidget);
+	UFUNCTION(BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Inventory Widget To Canvas"))
+	void BP_AddInventoryWidgetToCanvas(UInventoryWidget* NewWidget);
+
+	/** Add dialogue widget as a child to HUD widget */
+	UFUNCTION(BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Dialogue Widget To Canvas"))
+	void BP_AddDialogueWidgetToCanvas(UDialogueWindowWidget* NewWidget);
 
 	/** Add status indicator widget as a child to HUD widget */
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Status Indicator Widget To Canvas"))
-	void BP_AddStatusIndicatorWidgetToCanvas(USkillBarWidget* NewWidget);
+	UFUNCTION(BlueprintCallable, Category = "HUD Widget", meta = (DisplayName = "Add Status Indicator Widget To Canvas"))
+	void BP_AddStatusIndicatorWidgetToCanvas(UStatusIndicatorWidget* NewWidget);
 
 protected:
 
@@ -156,7 +161,7 @@ inline void UHUDWidget::AddInventoryWidget(UInventoryWidget * NewWidget)
 	InventoryWidget = NewWidget;
 }
 
-inline void UHUDWidget::AddDialogueWidget(UUserWidget * NewWidget)
+inline void UHUDWidget::AddDialogueWidget(UDialogueWindowWidget* NewWidget)
 {
 	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
 	CPSlot->SetSize(DialogueWidgetSize);
