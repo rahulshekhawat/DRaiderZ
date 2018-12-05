@@ -311,6 +311,15 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Since setting master pose component from constructor doesn't work in packaged game
+	Hair->SetMasterPoseComponent(GetMesh());
+	HatItem->SetMasterPoseComponent(GetMesh());
+	FaceItem->SetMasterPoseComponent(GetMesh());
+	Chest->SetMasterPoseComponent(GetMesh());
+	Hands->SetMasterPoseComponent(GetMesh());
+	Legs->SetMasterPoseComponent(GetMesh());
+	Feet->SetMasterPoseComponent(GetMesh());
+
 	if (Controller && Controller->IsLocalPlayerController() && HUDWidget)
 	{
 		HUDWidget->AddToViewport();
