@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "CombatZoneModeBase.h"
-#include "CombatManager.h"
+#include "EOD/Core/CombatManager.h"
 
 #include "Engine/World.h"
 

@@ -1,18 +1,19 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "PlayerCharacter.h"
-#include "PlayerAnimInstance.h"
-#include "Core/GameSingleton.h"
-#include "Statics/WeaponLibrary.h"
-#include "Components/InventoryComponent.h"
-#include "Components/PlayerStatsComponent.h"
-#include "Core/EODPreprocessors.h"
-#include "Core/EODSaveGame.h"
-#include "UI/HUDWidget.h"
-#include "AI/NPCBase.h"
-#include "Player/EODPlayerController.h"
-#include "UI/DialogueWindowWidget.h"
-#include "Statics/DialogueLibrary.h"
+#include "EOD/Player/PlayerAnimInstance.h"
+#include "EOD/Core/GameSingleton.h"
+#include "EOD/Statics/WeaponLibrary.h"
+#include "EOD/Player/Components/SkillsComponent.h"
+#include "EOD/Player/Components/InventoryComponent.h"
+#include "EOD/Player/Components/PlayerStatsComponent.h"
+#include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Core/EODSaveGame.h"
+#include "EOD/UI/HUDWidget.h"
+#include "EOD/AI/NPCBase.h"
+#include "EOD/Player/EODPlayerController.h"
+#include "EOD/UI/DialogueWindowWidget.h"
+#include "EOD/Statics/DialogueLibrary.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -1720,7 +1721,8 @@ void APlayerCharacter::StartInteraction()
 			AudioComponent->SetSound(InteractionStartSound);
 			AudioComponent->Play();
 
-			InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this, DialogueWidget);
+			InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this);
+			// InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this, DialogueWidget);
 		}
 	}
 }
@@ -1923,6 +1925,16 @@ void APlayerCharacter::TurnOffTargetSwitch()
 	Legs->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
 	Feet->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
 	*/
+}
+
+void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)
+{
+	SkillsComponent->OnSkillGroupAddedToSkillBar(SkillGroup);
+}
+
+void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString & SkillGroup)
+{
+	SkillsComponent->OnSkillGroupRemovedFromSkillBar(SkillGroup);
 }
 
 bool APlayerCharacter::IsPrimaryWeaponEquippped() const

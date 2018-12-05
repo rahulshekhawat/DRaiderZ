@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "EODGameModeBase.h"
-#include "Core/EODSaveGame.h"
-#include "Core/GameSingleton.h"
-#include "Core/StatusEffectsManager.h"
+#include "EOD/Core/EODSaveGame.h"
+#include "EOD/Core/GameSingleton.h"
+#include "EOD/Core/StatusEffectsManager.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"

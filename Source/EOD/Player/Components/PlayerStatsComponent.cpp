@@ -1,9 +1,9 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "PlayerStatsComponent.h"
-#include "Player/PlayerCharacter.h"
-#include "UI/HUDWidget.h"
-#include "UI/StatusIndicatorWidget.h"
+#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/UI/HUDWidget.h"
+#include "EOD/UI/StatusIndicatorWidget.h"
 
 #include "UnrealNetwork.h"
 #include "Components/ProgressBar.h"
@@ -1123,8 +1123,8 @@ void UPlayerStatsComponent::DeactivateStaminaRegeneration()
 
 void UPlayerStatsComponent::RegenerateHealth()
 {
-	int32 CurrentHealth = ModifyCurrentHealth(HealthRegenRate);
-	if (CurrentHealth >= MaxHealth)
+	int32 CurrentHP = ModifyCurrentHealth(HealthRegenRate);
+	if (CurrentHP >= MaxHealth)
 	{
 		DeactivateHealthRegeneration();
 	}
@@ -1132,8 +1132,8 @@ void UPlayerStatsComponent::RegenerateHealth()
 
 void UPlayerStatsComponent::RegenerateMana()
 {
-	int32 CurrentMana = ModifyCurrentMana(ManaRegenRate);
-	if (CurrentMana >= MaxMana)
+	int32 CurrentMP = ModifyCurrentMana(ManaRegenRate);
+	if (CurrentMP >= MaxMana)
 	{
 		DeactivateManaRegeneration();
 	}
@@ -1141,8 +1141,8 @@ void UPlayerStatsComponent::RegenerateMana()
 
 void UPlayerStatsComponent::RegenerateStamina()
 {
-	int32 CurrentStamina = ModifyCurrentStamina(StaminaRegenRate);
-	if (CurrentStamina >= MaxStamina)
+	int32 CurrentSP = ModifyCurrentStamina(StaminaRegenRate);
+	if (CurrentSP >= MaxStamina)
 	{
 		DeactivateStaminaRegeneration();
 	}

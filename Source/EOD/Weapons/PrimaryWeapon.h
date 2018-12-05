@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Weapons/WeaponBase.h"
+#include "EOD/Weapons/WeaponBase.h"
 #include "PrimaryWeapon.generated.h"
 
 class USkeletalMeshComponent;

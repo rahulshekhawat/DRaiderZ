@@ -1,9 +1,9 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "PlayerAnimInstance.h"
-#include "PlayerCharacter.h"
-#include "Core/EODPreprocessors.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Statics/CharacterLibrary.h"
 
 #include "Components/InputComponent.h"
 #include "Kismet/KismetSystemLibrary.h"

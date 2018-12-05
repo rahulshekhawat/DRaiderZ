@@ -1,10 +1,10 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "DialogueOptionWidget.h"
-#include "UI/DialogueWindowWidget.h"
-#include "Player/PlayerCharacter.h"
+#include "EOD/UI/DialogueWindowWidget.h"
+#include "EOD/Player/PlayerCharacter.h"
 
-#include "Button.h"
+#include "Components/Button.h"
 
 UDialogueOptionWidget::UDialogueOptionWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

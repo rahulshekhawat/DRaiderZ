@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 
-#include "Image.h"
-#include "Spacer.h"
-#include "Overlay.h"
-#include "HorizontalBox.h"
-#include "HorizontalBoxSlot.h"
+#include "Components/Image.h"
+#include "Components/Spacer.h"
+#include "Components/Overlay.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
 #include "Blueprint/UserWidget.h"
 #include "StatusIndicatorWidget.generated.h"
 

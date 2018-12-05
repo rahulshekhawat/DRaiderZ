@@ -7,7 +7,14 @@ UInteractionInterface::UInteractionInterface(const FObjectInitializer& ObjectIni
 	
 }
 
+/*
 void IInteractionInterface::OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget)
+{
+	// empty defintion
+}
+*/
+
+void IInteractionInterface::OnInteract_Implementation(AEODCharacterBase* Character)
 {
 	// empty defintion
 }

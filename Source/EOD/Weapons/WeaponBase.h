@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/WeaponLibrary.h"
+#include "EOD/Statics/WeaponLibrary.h"
+
 #include "GameFramework/Actor.h"
 #include "WeaponBase.generated.h"
 

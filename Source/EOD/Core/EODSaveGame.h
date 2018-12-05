@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/Statics/CharacterLibrary.h"
+
 #include "GameFramework/SaveGame.h"
 #include "EODSaveGame.generated.h"
 

@@ -1,8 +1,8 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "BTTask_Attack.h"
-#include "Player/EODCharacterBase.h"
-#include "Statics/AILibrary.h"
+#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Statics/AILibrary.h"
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"

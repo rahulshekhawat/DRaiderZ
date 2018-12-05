@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Core/EODGameModeBase.h"
+#include "EOD/Core/EODGameModeBase.h"
+
 #include "CombatZoneModeBase.generated.h"
 
 class ACombatManager;

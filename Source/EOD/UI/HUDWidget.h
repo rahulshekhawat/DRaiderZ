@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 
-#include "EODItemContainer.h"
-#include "SkillBarWidget.h"
-#include "SkillTreeWidget.h"
-#include "InventoryWidget.h"
-#include "StatusIndicatorWidget.h"
+#include "EOD/UI/EODItemContainer.h"
+#include "EOD/UI/SkillBarWidget.h"
+#include "EOD/UI/SkillTreeWidget.h"
+#include "EOD/UI/InventoryWidget.h"
+#include "EOD/UI/StatusIndicatorWidget.h"
 
 #include "UObject/ObjectMacros.h"
 #include "Blueprint/UserWidget.h"

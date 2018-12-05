@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "CharAnimInstance.h"
-#include "EODCharacterBase.h"
+#include "EOD/Player/EODCharacterBase.h"
 
 
 UCharAnimInstance::UCharAnimInstance(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)

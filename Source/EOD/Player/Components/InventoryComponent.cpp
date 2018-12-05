@@ -1,9 +1,9 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "InventoryComponent.h"
-#include "Player/PlayerCharacter.h"
-#include "UI/HUDWidget.h"
-#include "UI/InventoryWidget.h"
+#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/UI/HUDWidget.h"
+#include "EOD/UI/InventoryWidget.h"
 
 
 // Sets default values for this component's properties

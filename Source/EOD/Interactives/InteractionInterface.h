@@ -29,10 +29,12 @@ public:
 
 	/** This event is called when a (player) character interacts with the underlying actor */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
-	void OnInteract(const AEODCharacterBase* Character, UUserWidget* DialogueWidget);
+	void OnInteract(AEODCharacterBase* Character);
+	// void OnInteract(const AEODCharacterBase* Character, UUserWidget* DialogueWidget);
 
 	/** This event is called when a (player) character interacts with the underlying actor */
-	virtual void OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget);
+	virtual void OnInteract_Implementation(AEODCharacterBase* Character);
+	// virtual void OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget);
 
 	/** This event is called to highlight interactive actor's meshes */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)

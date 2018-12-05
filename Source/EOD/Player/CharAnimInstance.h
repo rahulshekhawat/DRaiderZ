@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/Statics/CharacterLibrary.h"
 #include "Animation/AnimInstance.h"
 #include "CharAnimInstance.generated.h"
 

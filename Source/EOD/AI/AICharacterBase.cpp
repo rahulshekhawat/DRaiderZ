@@ -1,10 +1,10 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "AICharacterBase.h"
-#include "Core/GameSingleton.h"
-#include "Core/EODPreprocessors.h"
-#include "Components/AIStatsComponent.h"
-#include "Player/Components/EODWidgetComponent.h"
+#include "EOD/Core/GameSingleton.h"
+#include "EOD/Core/EODPreprocessors.h"
+#include "EOD/AI/Components/AIStatsComponent.h"
+#include "EOD/Player/Components/EODWidgetComponent.h"
 
 #include "Engine/Engine.h"
 #include "Kismet/KismetSystemLibrary.h"

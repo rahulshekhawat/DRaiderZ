@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/EODLibrary.h"
-#include "Statics/CharacterLibrary.h"
-#include "Components/StatsComponentBase.h"
-#include "StatusEffects/StatusEffectBase.h"
+#include "EOD/Statics/EODLibrary.h"
+#include "EOD/Statics/CharacterLibrary.h"
+#include "EOD/Player/Components/StatsComponentBase.h"
+#include "EOD/StatusEffects/StatusEffectBase.h"
 
 #include "Animation/AnimInstance.h"
 #include "GameFramework/Character.h"

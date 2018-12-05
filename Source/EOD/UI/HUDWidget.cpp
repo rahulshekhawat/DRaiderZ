@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "HUDWidget.h"
-#include "EODItemDragDropOperation.h"
+#include "EOD/UI/EODItemDragDropOperation.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 

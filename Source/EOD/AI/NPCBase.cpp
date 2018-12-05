@@ -15,9 +15,15 @@ ANPCBase::ANPCBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectIn
 
 }
 
+/*
 void ANPCBase::OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget)
 {
 	UKismetSystemLibrary::PrintString(this, FString("On interaction called from interface of ANPCBase"));
+}
+*/
+
+void ANPCBase::OnInteract_Implementation(AEODCharacterBase* Character)
+{
 }
 
 void ANPCBase::EnableCustomDepth_Implementation()

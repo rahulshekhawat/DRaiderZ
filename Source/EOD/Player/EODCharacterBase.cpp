@@ -1,10 +1,10 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "Player/EODCharacterBase.h"
-#include "Core/EODPreprocessors.h"
-#include "Player/CharAnimInstance.h"
-#include "Components/StatsComponentBase.h"
-#include "Statics/EODBlueprintFunctionLibrary.h"
+#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Player/CharAnimInstance.h"
+#include "EOD/Player/Components/StatsComponentBase.h"
+#include "EOD/Statics/EODBlueprintFunctionLibrary.h"
 
 #include "UnrealNetwork.h"
 #include "Kismet/KismetSystemLibrary.h"

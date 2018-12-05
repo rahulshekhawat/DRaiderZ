@@ -1,8 +1,8 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "CombatLibrary.h"
-#include "CharacterLibrary.h"
-#include "Player/EODCharacterBase.h"
+#include "EOD/Statics/CharacterLibrary.h"
+#include "EOD/Player/EODCharacterBase.h"
 
 UCombatLibrary::UCombatLibrary(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {

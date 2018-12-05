@@ -3,10 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Weapons/PrimaryWeapon.h"
-#include "Weapons/SecondaryWeapon.h"
-#include "Player/EODCharacterBase.h"
-#include "Components/SkillsComponent.h"
+#include "EOD/Weapons/PrimaryWeapon.h"
+#include "EOD/Weapons/SecondaryWeapon.h"
+#include "EOD/Player/EODCharacterBase.h"
 
 #include "Engine/DataTable.h"
 #include "Engine/StreamableManager.h"
@@ -295,11 +294,11 @@ public:
 
 	virtual void TurnOffTargetSwitch() override;
 
+	void OnSkillGroupAddedToSkillBar(const FString& SkillGroup);
+
+	void OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup);
+
 	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
-
-	FORCEINLINE void OnSkillGroupAddedToSkillBar(const FString& SkillGroup);
-
-	FORCEINLINE void OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup);
 
 	inline void EnableFastRun();
 
@@ -377,12 +376,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
 	void FinishDialogue(UDialogueWindowWidget* Widget);
 
-	void FinishDialogue_Implementation(UDialogueWindowWidget* Widget);
+	virtual void FinishDialogue_Implementation(UDialogueWindowWidget* Widget);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
 	void ExitDialogue(UDialogueWindowWidget* Widget);
 
-	void ExitDialogue_Implementation(UDialogueWindowWidget* Widget);
+	virtual void ExitDialogue_Implementation(UDialogueWindowWidget* Widget);
 
 private:
 
@@ -682,16 +681,6 @@ FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
 {
 	bRotateSmoothly = true;
 	DesiredSmoothRotationYaw = DesiredYaw;
-}
-
-FORCEINLINE void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
-{
-	SkillsComponent->OnSkillGroupAddedToSkillBar(SkillGroup);
-}
-
-FORCEINLINE void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup)
-{
-	SkillsComponent->OnSkillGroupRemovedFromSkillBar(SkillGroup);
 }
 
 inline void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)

@@ -1,9 +1,9 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "CharacterLibrary.h"
-#include "Core/GameSingleton.h"
-#include "Player/EODCharacterBase.h"
-#include "Statics/EODLibrary.h"
+#include "EOD/Core/GameSingleton.h"
+#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Statics/EODLibrary.h"
 
 #include "Engine/Engine.h"
 #include "Engine/Texture.h"

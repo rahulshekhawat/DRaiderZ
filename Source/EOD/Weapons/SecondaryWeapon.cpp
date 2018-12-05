@@ -1,8 +1,8 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "SecondaryWeapon.h"
-#include "Player/PlayerCharacter.h"
-#include "Weapons/PrimaryWeapon.h"
+#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Weapons/PrimaryWeapon.h"
 
 #include "Components/SkeletalMeshComponent.h"
 

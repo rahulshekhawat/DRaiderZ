@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Statics/WeaponLibrary.h"
+#include "EOD/Statics/CombatLibrary.h"
+
 #include "Engine/DataTable.h"
-#include "WeaponLibrary.h"
-#include "CombatLibrary.h"
 #include "UObject/NoExportTypes.h"
 #include "CharacterLibrary.generated.h"
 
@@ -399,6 +400,28 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 
 	FSkillTableRow()
 	{
+		Icon = nullptr;
+		SupportedWeapons = 0;
+		DamageType = EDamageType::Physical;
+		SkillType = ESkillType::DamageMelee;
+		StaminaRequired = 0;
+		ManaRequired = 0;
+		bAllowsMovement = false;
+		bHasDirectionalAnimations = false;
+		bPassiveSkill = false;
+		bCanBeUsedWhileHit = false;
+		CurrentUpgradeLevel = 1;
+		MaxUpgrades = 1;
+		Cooldown = 1.f;
+		LoopDuration = 0.f;
+		DamagePercent = 0;
+		bUnblockable = false;
+		bUndodgable = false;
+		bIgnoresBlock = false;
+		CrowdControlEffect = ECrowdControlEffect::Flinch;
+		CrowdControlEffectDuration = 1.f;
+		CameraShakeOnHit = ECameraShakeType::Medium;
+		CrowdControlImmunities = 0;
 		SkillStartMontageSectionName = FName("Default");
 		SkillLoopMontageSectionName = NAME_None;
 		SkillEndMontageSectionName = NAME_None;

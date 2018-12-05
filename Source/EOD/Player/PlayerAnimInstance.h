@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/PlayerCharacter.h"
-#include "Statics/WeaponLibrary.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Statics/WeaponLibrary.h"
+#include "EOD/Statics/CharacterLibrary.h"
 
 #include "Animation/AnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"

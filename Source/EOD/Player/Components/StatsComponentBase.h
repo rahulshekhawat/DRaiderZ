@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/CombatLibrary.h"
+#include "EOD/Statics/CombatLibrary.h"
+
 #include "Components/ActorComponent.h"
 #include "StatsComponentBase.generated.h"
 

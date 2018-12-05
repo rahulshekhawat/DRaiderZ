@@ -1,11 +1,11 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODItemContainer.h"
-#include "DragVisualWidget.h"
-#include "Player/PlayerCharacter.h"
-#include "EODItemDragDropOperation.h"
+#include "EOD/UI/DragVisualWidget.h"
+#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/UI/EODItemDragDropOperation.h"
 
-#include "SlateTypes.h"
+#include "Styling/SlateTypes.h"
 #include "Engine/Texture.h"
 
 

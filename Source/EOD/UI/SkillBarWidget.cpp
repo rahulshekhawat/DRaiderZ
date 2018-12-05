@@ -1,13 +1,13 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "SkillBarWidget.h"
-#include "UI/EODItemContainer.h"
-#include "Core/EODSaveGame.h"
-#include "Core/EODPreprocessors.h"
-#include "Core/GameSingleton.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/UI/EODItemContainer.h"
+#include "EOD/Core/EODSaveGame.h"
+#include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Core/GameSingleton.h"
+#include "EOD/Statics/CharacterLibrary.h"
 
-#include "Button.h"
+#include "Components/Button.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"

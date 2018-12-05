@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 
-#include "Statics/EODLibrary.h"
+#include "EOD/Statics/EODLibrary.h"
 
-#include "Image.h"
-#include "TextBlock.h"
+#include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/DialogueLibrary.h"
+#include "EOD/Statics/DialogueLibrary.h"
 
 #include "Blueprint/UserWidget.h"
 #include "DialogueOptionWidget.generated.h"

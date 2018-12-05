@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "AnimNotify_JumpBase.h"
-#include "Core/EODPreprocessors.h"
+#include "EOD/Core/EODPreprocessors.h"
 
 #include "CollisionQueryParams.h"
 #include "Kismet/KismetSystemLibrary.h"

@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "BTTask_EODRotateToFaceBBEntry.h"
-#include "Player/EODCharacterBase.h"
+#include "EOD/Player/EODCharacterBase.h"
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"

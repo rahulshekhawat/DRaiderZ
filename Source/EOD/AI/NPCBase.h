@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/EODCharacterBase.h"
+#include "EOD/Player/EODCharacterBase.h"
 #include "Interactives/InteractionInterface.h"
 #include "NPCBase.generated.h"
 
@@ -21,7 +21,8 @@ public:
 
 	ANPCBase(const FObjectInitializer& ObjectInitializer);
 
-	virtual void OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget) override;
+	virtual void OnInteract_Implementation(AEODCharacterBase* Character) override;
+	// virtual void OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget) override;
 
 	virtual void EnableCustomDepth_Implementation() override;
 

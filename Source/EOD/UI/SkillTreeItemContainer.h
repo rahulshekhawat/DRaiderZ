@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 
-#include "Core/EODSaveGame.h"
-#include "Core/GameSingleton.h"
-#include "UI/EODItemContainer.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/Core/EODSaveGame.h"
+#include "EOD/Core/GameSingleton.h"
+#include "EOD/UI/EODItemContainer.h"
+#include "EOD/Statics/CharacterLibrary.h"
 
-#include "TextBlock.h"
+#include "Components/TextBlock.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include "SkillTreeItemContainer.generated.h"

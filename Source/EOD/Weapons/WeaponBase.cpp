@@ -1,8 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "WeaponBase.h"
-#include "Components/WeaponStatsComponent.h"
-#include "Statics/WeaponLibrary.h"
+#include "EOD/Weapons/Components/WeaponStatsComponent.h"
 
 
 // Sets default values

@@ -1,7 +1,8 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "InventoryWidget.h"
-#include "ScrollBox.h"
+
+#include "Components/ScrollBox.h"
 
 UInventoryWidget::UInventoryWidget(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {

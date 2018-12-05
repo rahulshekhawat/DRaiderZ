@@ -1,13 +1,12 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "SkillsComponent.h"
-#include "UI/HUDWidget.h"
-#include "UI/SkillTreeWidget.h"
-#include "Core/EODPreprocessors.h"
-#include "Core/EODSaveGame.h"
-#include "Core/GameSingleton.h"
-#include "Player/PlayerCharacter.h"
-#include "StatusEffects/StatusEffectBase.h"
+#include "EOD/UI/HUDWidget.h"
+#include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Core/EODSaveGame.h"
+#include "EOD/Core/GameSingleton.h"
+#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/StatusEffects/StatusEffectBase.h"
 
 #include "Engine/Engine.h"
 #include "Engine/World.h"
@@ -43,12 +42,12 @@ void USkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 }
 
-inline USkillBarWidget * USkillsComponent::BP_GetSkillBarWidget() const
+USkillBarWidget* USkillsComponent::BP_GetSkillBarWidget() const
 {
 	return GetSkillBarWidget();
 }
 
-inline USkillTreeWidget * USkillsComponent::BP_GetSkillTreeWidget() const
+USkillTreeWidget* USkillsComponent::BP_GetSkillTreeWidget() const
 {
 	return GetSkillTreeWidget();
 }
@@ -225,9 +224,9 @@ TPair<FName, FSkillTableRow*> USkillsComponent::GetChainSkillFromSkillSlot(const
 	}
 
 	bool bUsedPrecedingSkill = false;
-	for (const FString& SkillGroup : Skill->PrecedingSkillGroups)
+	for (const FString& SGroup : Skill->PrecedingSkillGroups)
 	{
-		if (SkillGroup == ActivePrecedingChainSkillGroup)
+		if (SGroup == ActivePrecedingChainSkillGroup)
 		{
 			bUsedPrecedingSkill = true;
 			break;

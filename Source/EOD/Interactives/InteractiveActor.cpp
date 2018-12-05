@@ -24,7 +24,13 @@ void AInteractiveActor::Tick(float DeltaTime)
 
 }
 
+void AInteractiveActor::OnInteract_Implementation(AEODCharacterBase * Character)
+{
+}
+
+/*
 void AInteractiveActor::OnInteract_Implementation(const AEODCharacterBase * Character, UUserWidget * DialogueWidget)
 {
 	UKismetSystemLibrary::PrintString(this, FString("On interaction called from interface of AInteractable"));
 }
+*/

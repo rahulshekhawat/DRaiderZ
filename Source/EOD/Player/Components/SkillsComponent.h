@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/UI/SkillTreeWidget.h"
+#include "EOD/UI/SkillBarWidget.h"
+#include "EOD/Statics/CharacterLibrary.h"
 
 #include "Engine/StreamableManager.h"
 #include "Components/ActorComponent.h"

@@ -1,10 +1,10 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "BTService_CheckForEnemies.h"
-#include "Player/EODCharacterBase.h"
-#include "Core/EODPreprocessors.h"
-#include "Statics/AILibrary.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Statics/AILibrary.h"
+#include "EOD/Statics/CharacterLibrary.h"
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"

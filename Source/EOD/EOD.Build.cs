@@ -7,8 +7,8 @@ public class EOD : ModuleRules
 	public EOD(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "AssetRegistry", 
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "AssetRegistry", 
 															"AIModule", "GameplayTasks", "XmlParser", "Json"  });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

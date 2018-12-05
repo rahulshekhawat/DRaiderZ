@@ -1,13 +1,13 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "SkillTreeWidget.h"
-#include "Core/EODPreprocessors.h"
-#include "SkillTreeItemContainer.h"
-#include "Player/PlayerCharacter.h"
+#include "EOD/Core/EODPreprocessors.h"
+#include "EOD/UI/SkillTreeItemContainer.h"
+#include "EOD/Player/PlayerCharacter.h"
 
-#include "Button.h"
-#include "WidgetSwitcher.h"
-#include "CanvasPanelSlot.h"
+#include "Components/Button.h"
+#include "Components/WidgetSwitcher.h"
+#include "Components/CanvasPanelSlot.h"
 
 USkillTreeWidget::USkillTreeWidget(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {

@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "FuriousDashBase.h"
-#include "Player/PlayerCharacter.h"
+#include "EOD/Player/PlayerCharacter.h"
 
 #include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"

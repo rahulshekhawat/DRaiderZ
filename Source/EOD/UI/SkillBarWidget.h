@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UI/EODItemContainer.h"
-#include "Player/PlayerCharacter.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/UI/EODItemContainer.h"
+#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Statics/CharacterLibrary.h"
 
 #include "Blueprint/UserWidget.h"
 #include "SkillBarWidget.generated.h"

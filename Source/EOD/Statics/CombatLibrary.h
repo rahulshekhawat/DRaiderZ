@@ -55,7 +55,9 @@ struct FEODDamageResult
 	FEODDamageResult()
 	{
 		CharacterResponseToDamage = ECharacterResponseToDamage::Damaged;
+		CrowdControlEffect = ECrowdControlEffect::Flinch;
 		ActualDamage = 0;
+		bCritHit = false;
 	}
 };
 

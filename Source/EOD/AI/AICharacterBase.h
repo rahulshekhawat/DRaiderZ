@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/CharacterLibrary.h"
-#include "Player/EODCharacterBase.h"
+#include "EOD/Statics/CharacterLibrary.h"
+#include "EOD/Player/EODCharacterBase.h"
 
 #include "Engine/StreamableManager.h"
 #include "AICharacterBase.generated.h"
@@ -107,7 +107,7 @@ public:
 	void AssistanceRequested(const AAICharacterBase* Requestor);
 
 	/** Called when an ally requests assistance from this character */
-	void AssistanceRequested_Implementation(const AAICharacterBase* Requestor);
+	virtual void AssistanceRequested_Implementation(const AAICharacterBase* Requestor);
 
 private:
 

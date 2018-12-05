@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Interactives/InteractionInterface.h"
+
 #include "GameFramework/Actor.h"
-#include "Interactives/InteractionInterface.h"
 #include "InteractiveActor.generated.h"
 
 UCLASS()
@@ -20,6 +21,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget) override;
+	virtual void OnInteract_Implementation(AEODCharacterBase* Character) override;
+	// virtual void OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget) override;
 
 };

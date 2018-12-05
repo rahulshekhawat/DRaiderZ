@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/EODLibrary.h"
+#include "EOD/Statics/EODLibrary.h"
+
 #include "Blueprint/UserWidget.h"
 #include "DragVisualWidget.generated.h"
 

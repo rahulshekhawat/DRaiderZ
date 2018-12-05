@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interactives/InteractiveActor.h"
+#include "EOD/Interactives/InteractiveActor.h"
 #include "InteractiveSkeletalMesh.generated.h"
 
 class USkeletalMeshComponent;

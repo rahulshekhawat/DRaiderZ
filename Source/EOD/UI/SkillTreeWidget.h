@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/Statics/CharacterLibrary.h"
 
-#include "SlateTypes.h"
+#include "Styling/SlateTypes.h"
 #include "Blueprint/UserWidget.h"
 #include "SkillTreeWidget.generated.h"
 

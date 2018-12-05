@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Statics/WeaponLibrary.h"
-#include "Player/Components/StatsComponentBase.h"
+#include "EOD/Statics/WeaponLibrary.h"
+#include "EOD/Player/Components/StatsComponentBase.h"
+
 #include "PlayerStatsComponent.generated.h"
 
 class APlayerCharacter;

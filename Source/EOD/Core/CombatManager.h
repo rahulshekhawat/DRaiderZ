@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/EODCharacterBase.h"
-#include "Statics/CharacterLibrary.h"
+#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Statics/CharacterLibrary.h"
+
 #include "Camera/CameraShake.h"
 #include "GameFramework/Info.h"
 #include "CombatManager.generated.h"

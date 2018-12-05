@@ -1,7 +1,8 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "MobController.h"
-#include "Statics/AILibrary.h"
+#include "EOD/Statics/AILibrary.h"
+
 #include "BehaviorTree/BlackboardComponent.h"
 
 AMobController::AMobController(const FObjectInitializer & ObjectInitializer)

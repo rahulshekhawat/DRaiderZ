@@ -1,16 +1,16 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "DialogueWindowWidget.h"
-#include "Core/GameSingleton.h"
-#include "Statics/DialogueLibrary.h"
-#include "UI/DialogueOptionWidget.h"
+#include "EOD/Core/GameSingleton.h"
+#include "EOD/Statics/DialogueLibrary.h"
+#include "EOD/UI/DialogueOptionWidget.h"
 
-#include "Button.h"
 #include "Engine/Engine.h"
-#include "RichTextBlock.h"
-#include "TextBlock.h"
-#include "VerticalBox.h"
-#include "VerticalBoxSlot.h"
+#include "Components/Button.h"
+#include "Components/RichTextBlock.h"
+#include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
 
 UDialogueWindowWidget::UDialogueWindowWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
