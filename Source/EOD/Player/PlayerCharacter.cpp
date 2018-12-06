@@ -1781,7 +1781,9 @@ void APlayerCharacter::UpdateInteraction_Implementation()
 
 void APlayerCharacter::RequestDialogue_Implementation(AActor* Requestor, FName DialogueWindowID)
 {
-
+	FocusCameraOnActor(Requestor);
+	DisplayDialogueWidget(DialogueWindowID);
+	SetCharacterState(ECharacterState::Interacting);
 }
 
 void APlayerCharacter::FocusCameraOnActor(AActor* TargetActor)
