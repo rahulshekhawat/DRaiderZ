@@ -12,6 +12,8 @@
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 
+#include "Kismet/KismetSystemLibrary.h"
+
 UDialogueWindowWidget::UDialogueWindowWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	DefaultDialogueText = NSLOCTEXT("eod-namespace", "eng-us", "DEFAULT TEXT\n\n<IF YOU ARE READING THIS THEN ACTUAL DIALOGUE TEXT IS MISSING>");
@@ -54,6 +56,11 @@ void UDialogueWindowWidget::UpdateDialogueWindow_Implementation(FName DialogueWi
 			for (FName OptionID : DialogueWin->OptionIDs)
 			{
 				AddOption(OptionID);
+			}
+
+			if (DialogueOptions.Num() > 0)
+			{
+				DialogueOptions[0]->SetOptionSelected(true);
 			}
 		}
 	}
@@ -108,5 +115,25 @@ void UDialogueWindowWidget::CleanupOptions_Implementation()
 	for (UDialogueOptionWidget* OptionWidget : DialogueOptions)
 	{
 		VertiBox->RemoveChild(OptionWidget);
+	}
+
+	DialogueOptions.Empty();
+}
+
+void UDialogueWindowWidget::SimulateSelectedOptionClick()
+{
+	UDialogueOptionWidget* OptionWidget = nullptr;
+	for (UDialogueOptionWidget* DialogueOption : DialogueOptions)
+	{
+		if (DialogueOption->IsOptionSelected())
+		{
+			OptionWidget = DialogueOption;
+			break;
+		}
+	}
+
+	if (OptionWidget)
+	{
+		OptionWidget->OptionButton->OnClicked.Broadcast();
 	}
 }

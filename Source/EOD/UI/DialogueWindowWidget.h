@@ -57,13 +57,15 @@ public:
 
 	FORCEINLINE FName GetDialogueWindowID() const;
 
+	void SimulateSelectedOptionClick();
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
+	TArray<UDialogueOptionWidget*> DialogueOptions;
+
 protected:
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
 	FName CurrentDialogueWindowID;
-
-	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
-	TArray<UDialogueOptionWidget*> DialogueOptions;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = DialogueWidget)
 	TSubclassOf<UDialogueOptionWidget> DialogueOptionWidgetClass;

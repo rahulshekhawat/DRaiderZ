@@ -1304,7 +1304,7 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName& CurrentSecti
 	return NAME_None;
 }
 
-void APlayerCharacter::DisplayDialogueWidget()
+void APlayerCharacter::DisplayDialogueWidget(FName DialogueWindowID)
 {
 	if (DialogueWidgetClass.Get())
 	{
@@ -1315,6 +1315,11 @@ void APlayerCharacter::DisplayDialogueWidget()
 			HUDWidget->SkillBarWidget->SetVisibility(ESlateVisibility::Hidden);
 			HUDWidget->InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 			HUDWidget->SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+
+			DialogueWidget->UpdateDialogueWindow(DialogueWindowID);
+
+			AudioComponent->SetSound(DialogueTriggeredSound);
+			AudioComponent->Play();
 		}
 	}
 }
@@ -1724,7 +1729,6 @@ void APlayerCharacter::StartInteraction()
 		}
 	}
 
-
 	/*
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
 	if (PC && ActiveInteractiveActor)
@@ -1756,11 +1760,21 @@ void APlayerCharacter::UpdateInteraction_Implementation()
 		FDialogueWindow* DialogueWin = GameSingleton->DialogueWindowsDataTable->FindRow<FDialogueWindow>(DialogueWidget->GetDialogueWindowID(), FString("APlayerCharacter::UpdateInteraction()"));
 		if (DialogueWin->NextEventID == NAME_None)
 		{
-			EndInteraction();
+			if (DialogueWidget->DialogueOptions.Num() > 0)
+			{
+				DialogueWidget->SimulateSelectedOptionClick();
+			}
+			else
+			{
+				EndInteraction();
+			}
 		}
 		else
 		{
 			DialogueWidget->UpdateDialogueWindow(DialogueWin->NextEventID);
+
+			AudioComponent->SetSound(DialogueTriggeredSound);
+			AudioComponent->Play();
 		}
 	}
 }
@@ -1809,7 +1823,8 @@ void APlayerCharacter::EndInteraction()
 
 		RemoveDialogueWidget();
 
-		AudioComponent->SetSound(InteractionEndSound);
+		AudioComponent->SetSound(DialogueEndSound);
+		// AudioComponent->SetSound(InteractionEndSound);
 		AudioComponent->Play();
 	}
 }

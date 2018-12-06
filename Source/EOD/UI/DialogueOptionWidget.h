@@ -42,7 +42,14 @@ public:
 
 	FORCEINLINE void SetOwningDialogueWidget(UDialogueWindowWidget* NewOwner);
 
+	FORCEINLINE void SetOptionSelected(bool bValue);
+
+	FORCEINLINE bool IsOptionSelected() const;
+
 protected:
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
+	bool bOptionSelected;
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
 	TEnumAsByte<EDialogueEventType> OptionEventType;
@@ -72,12 +79,22 @@ FORCEINLINE void UDialogueOptionWidget::SetOptionEventID(FName NewOptionEventID)
 	OptionEventID = NewOptionEventID;
 }
 
-inline void UDialogueOptionWidget::SetOptionEventType(TEnumAsByte<EDialogueEventType> NewOptionEventType)
+FORCEINLINE void UDialogueOptionWidget::SetOptionEventType(TEnumAsByte<EDialogueEventType> NewOptionEventType)
 {
 	OptionEventType = NewOptionEventType;
 }
 
-inline void UDialogueOptionWidget::SetOwningDialogueWidget(UDialogueWindowWidget * NewOwner)
+FORCEINLINE void UDialogueOptionWidget::SetOwningDialogueWidget(UDialogueWindowWidget * NewOwner)
 {
 	OwningDialogueWidget = NewOwner;
+}
+
+FORCEINLINE void UDialogueOptionWidget::SetOptionSelected(bool bValue)
+{
+	bOptionSelected = bValue;
+}
+
+FORCEINLINE bool UDialogueOptionWidget::IsOptionSelected() const
+{
+	return bOptionSelected;
 }

@@ -349,10 +349,10 @@ public:
 	TSubclassOf<UDialogueWindowWidget> DialogueWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
-	USoundBase* InteractionStartSound;
+	USoundBase* DialogueTriggeredSound;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
-	USoundBase* InteractionEndSound;
+	USoundBase* DialogueEndSound;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
 	USoundBase* InteractiveActorDetectedSound;
@@ -596,7 +596,7 @@ private:
 	void ReleasedSkillKey();
 
 	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
-	void DisplayDialogueWidget();
+	void DisplayDialogueWidget(FName DialogueWindowID);
 
 	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
 	void RemoveDialogueWidget();
@@ -672,7 +672,7 @@ FORCEINLINE ASecondaryWeapon* APlayerCharacter::GetSecondaryWeapon() const
 
 FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
 {
-	return PrimaryWeapon->WeaponType;
+	return PrimaryWeapon ? PrimaryWeapon->WeaponType : EWeaponType::None;
 }
 
 FORCEINLINE UHUDWidget* APlayerCharacter::GetHUDWidget() const
