@@ -396,6 +396,9 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
 	FCombatStateEvent CombatInitiated;
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
+	FCombatStateEvent CombatFinished;
+
 private:
 
 	const int CameraZoomRate = 15;
