@@ -23,14 +23,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Combat)
-	void CombatStarted();
+	void OnCombatStarted();
 
-	virtual void CombatStarted_Implementation();
+	virtual void OnCombatStarted_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Combat)
-	void CombatEnded();
+	void OnCombatEnded();
 
-	virtual void CombatEnded_Implementation();
+	virtual void OnCombatEnded_Implementation();
 
 
 };
