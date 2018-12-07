@@ -24,6 +24,8 @@ class USkillsComponent;
 class USphereComponent;
 class UDialogueWindowWidget;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCombatStateEvent);
+
 /**
  * PlayerCharacter is the base class for playable characters
  */
@@ -390,6 +392,9 @@ public:
 	void ExitDialogue(UDialogueWindowWidget* Widget);
 
 	virtual void ExitDialogue_Implementation(UDialogueWindowWidget* Widget);
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
+	FCombatStateEvent CombatInitiated;
 
 private:
 
