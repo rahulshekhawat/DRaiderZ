@@ -10,6 +10,8 @@ void AStatusEffectsManager::BeginPlay()
 {
     Super::BeginPlay();
 
+	// StatusEffectActivated.Broadcast()
+
 }
 
 void AStatusEffectsManager::Tick(float DeltaTime)

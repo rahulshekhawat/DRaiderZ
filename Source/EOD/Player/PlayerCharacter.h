@@ -401,6 +401,10 @@ public:
 
 private:
 
+	TArray<UStatusEffectBase*> ManagedStatusEffectsList;
+
+	TArray<UStatusEffectBase*> InflictedStatusEffectsList;
+
 	const int CameraZoomRate = 15;
 
 	const int CameraArmMinimumLength = 50;
