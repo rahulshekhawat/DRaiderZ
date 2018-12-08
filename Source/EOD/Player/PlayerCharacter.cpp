@@ -85,7 +85,6 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	BaseSpecialMovementSpeed = 600.f;
 	BaseBlockMovementSpeed = 150.f;
 
-	// OnSuccessfulDodgeEvent.Broadcast()
 
 }
 

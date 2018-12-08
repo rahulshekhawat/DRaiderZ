@@ -23,8 +23,13 @@ class UInventoryComponent;
 class USkillsComponent;
 class USphereComponent;
 class UDialogueWindowWidget;
+class UWeaponDataAsset;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCombatStateEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, WeaponID, UWeaponDataAsset*, WeaponData);
+
+// Delegates (dynamic or not) don't support struct pointers
+// DECLARE_MULTICAST_DELEGATE_TwoParams(FWeaponChangedEvents, FName, WeaponID, FWeaponTableRow*, WeaponData); 
 
 /**
  * PlayerCharacter is the base class for playable characters

@@ -14,7 +14,7 @@
 #include "EODCharacterBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TWeakObjectPtr<AEODCharacterBase>, RecipientCharacter);
-
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams()
 class UAnimMontage;
 class UInputComponent;
 class UStatusEffectBase;

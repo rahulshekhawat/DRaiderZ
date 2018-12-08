@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/StatusEffects/StatusEffectBase.h"
+
+#include "Engine/Texture.h"
 #include "Engine/DataTable.h"
+#include "Engine/SkeletalMesh.h"
 #include "UObject/NoExportTypes.h"
-// #include "StatusEffects/ElementalBase.h"
 #include "WeaponLibrary.generated.h"
 
 /** This enum describes all the types of weapons available in-game */
@@ -41,11 +44,11 @@ public:
 	
 	/** The skeletal mesh that represents this weapon */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	TSoftObjectPtr<class USkeletalMesh> WeaponMesh;
+	TSoftObjectPtr<USkeletalMesh> WeaponMesh;
 	
 	/** Icon that will be used to represent this weapon inside in-game UI */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
-	TSoftObjectPtr<class UTexture> Icon;
+	TSoftObjectPtr<UTexture> Icon;
 	
 	/**
 	 * Weapon Type determines:
@@ -62,9 +65,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	EWeaponType WeaponType;
 
-	/** Minimum level required to equip this weapon */
+	/** Minimum level that a character must be to equip this weapon */
 	UPROPERTY(EditAnywhere, Category = Stats)
-	int Level;
+	int UnlockLevel;
 	
 	/** Maximum damage a weapon can block without consuming more stamina than OnBlock_MinStaminaConsumption */
 	UPROPERTY(EditAnywhere, Category = Stats)
@@ -123,7 +126,8 @@ public:
 
 	/** Determines whether a special ability gem can be added to weapon */
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	bool bCanAddSpecialAbilityGem;
+	bool bHasSpecialGemSlot;
+	// bool bCanAddSpecialAbilityGem;
 	
 	/** Status effects (both buffs and debuffs) */
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
