@@ -24,9 +24,24 @@ class USkillsComponent;
 class USphereComponent;
 class UDialogueWindowWidget;
 class UWeaponDataAsset;
+class APlayerCharacter;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCombatStateEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, WeaponID, UWeaponDataAsset*, WeaponData);
+/**
+ * Delegate for when a player either enters or leaves combat
+ * 
+ * PlayerCharacter = Player that entered or left the combat state
+ */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCombatStateChangedMCDelegate, APlayerCharacter*, PlayerCharacter);
+
+/** Delegate for when a player changes it's weapon */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, WeaponID, UWeaponDataAsset*, WeaponDataAsset);
+
+/**
+* Delegate for when Montage is completed, whether interrupted or finished
+* Weight of this montage is 0.f, so it stops contributing to output pose
+*
+* bInterrupted = true if it was not property finished
+*/
 
 // Delegates (dynamic or not) don't support struct pointers
 // DECLARE_MULTICAST_DELEGATE_TwoParams(FWeaponChangedEvents, FName, WeaponID, FWeaponTableRow*, WeaponData); 
@@ -407,10 +422,10 @@ public:
 	virtual void ExitDialogue_Implementation(UDialogueWindowWidget* Widget);
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
-	FCombatStateEvent CombatInitiated;
+	FOnCombatStateChangedMCDelegate OnInitiatingCombat;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
-	FCombatStateEvent CombatFinished;
+	FOnCombatStateChangedMCDelegate OnLeavingCombat;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
 	FOnWeaponChangedMCDelegate OnPrimaryWeaponEquipped;

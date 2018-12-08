@@ -19,8 +19,8 @@ void AEODLevelScriptActor::BeginPlay()
 		APlayerCharacter* PlayerPawn = Cast<APlayerCharacter>(PC->GetPawn());
 		if (PlayerPawn)
 		{
-			PlayerPawn->CombatInitiated.AddDynamic(this, &AEODLevelScriptActor::OnCombatStarted);
-			PlayerPawn->CombatFinished.AddDynamic(this, &AEODLevelScriptActor::OnCombatEnded);
+			PlayerPawn->OnInitiatingCombat.AddDynamic(this, &AEODLevelScriptActor::OnCombatStarted);
+			PlayerPawn->OnLeavingCombat.AddDynamic(this, &AEODLevelScriptActor::OnCombatEnded);
 		}
 	}
 }
@@ -30,10 +30,10 @@ void AEODLevelScriptActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AEODLevelScriptActor::OnCombatStarted_Implementation()
+void AEODLevelScriptActor::OnCombatStarted_Implementation(APlayerCharacter* PlayerCharacter)
 {
 }
 
-void AEODLevelScriptActor::OnCombatEnded_Implementation()
+void AEODLevelScriptActor::OnCombatEnded_Implementation(APlayerCharacter* PlayerCharacter)
 {
 }
