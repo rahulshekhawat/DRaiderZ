@@ -70,7 +70,7 @@ public:
 
 	/** Initializes booleans to defaults */
 	UStatusEffectBase(const FObjectInitializer& ObjectInitializer);
-	
+
 	/**
 	 * Called to initialize a status effect on a character.
 	 * @param Owner The character that owns the status effect

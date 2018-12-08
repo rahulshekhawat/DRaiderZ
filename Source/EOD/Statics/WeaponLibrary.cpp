@@ -2,6 +2,7 @@
 
 #include "WeaponLibrary.h"
 #include "EOD/Core/GameSingleton.h"
+#include "EOD/Weapons/WeaponDataAsset.h"
 
 #include "Engine/Engine.h"
 
@@ -54,7 +55,7 @@ bool UWeaponLibrary::IsHybridWeapon(EWeaponType WeaponType)
 	return false;
 }
 
-FWeaponTableRow * UWeaponLibrary::GetWeaponData(FName WeaponID)
+FWeaponTableRow* UWeaponLibrary::GetWeaponData(FName WeaponID)
 {
 	FWeaponTableRow* WeaponData = nullptr;
 
@@ -68,4 +69,24 @@ FWeaponTableRow * UWeaponLibrary::GetWeaponData(FName WeaponID)
 	}
 
 	return WeaponData;
+}
+
+UWeaponDataAsset* UWeaponLibrary::GetWeaponDataAsset(FName WeaponID)
+{
+	UWeaponDataAsset* WeaponDataAsset = nullptr;
+
+	if (GEngine && GEngine->GameSingleton)
+	{
+		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+		if (GameSingleton && GameSingleton->WeaponsDataAssetsDataTable)
+		{
+			FWeaponDataAssetTableRow* WeaponDataAssetRow = GameSingleton->WeaponsDataAssetsDataTable->FindRow<FWeaponDataAssetTableRow>(WeaponID, FString("UWeaponLibrary::GetWeaponDataAsset(), weapon data asset lookup"));
+			if (WeaponDataAssetRow && !WeaponDataAssetRow->WeaponDataAsset.IsNull())
+			{
+				WeaponDataAsset = WeaponDataAssetRow->WeaponDataAsset.LoadSynchronous();
+			}
+		}
+	}
+
+	return WeaponDataAsset;
 }

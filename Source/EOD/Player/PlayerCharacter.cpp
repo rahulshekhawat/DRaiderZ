@@ -14,6 +14,7 @@
 #include "EOD/Player/EODPlayerController.h"
 #include "EOD/UI/DialogueWindowWidget.h"
 #include "EOD/Statics/DialogueLibrary.h"
+#include "EOD/Weapons/WeaponDataAsset.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -392,11 +393,6 @@ bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
 	return false;
 }
 
-bool APlayerCharacter::IsAutoRunning() const
-{
-	return GetCharacterState() == ECharacterState::AutoRun;
-}
-
 UHUDWidget* APlayerCharacter::BP_GetHUDWidget() const
 {
 	return GetHUDWidget();
@@ -611,6 +607,68 @@ void APlayerCharacter::BlockAttack()
 	}
 }
 
+void APlayerCharacter::SetPrimaryWeaponFromDataAsset(FName WeaponID)
+{
+	//  You would call SetCurrentPrimaryWeapon(NAME_None) when you want to remove equipped primary weapon
+	if (WeaponID == NAME_None)
+	{
+		RemovePrimaryWeaponFromDataAsset();
+		return;
+	}
+
+	UWeaponDataAsset* WeaponDataAsset = UWeaponLibrary::GetWeaponDataAsset(WeaponID);
+	if (!WeaponDataAsset)
+	{
+		return;
+	}
+
+	RemovePrimaryWeaponFromDataAsset();
+	if (UWeaponLibrary::IsWeaponDualHanded(WeaponDataAsset->WeaponType))
+	{
+		RemoveSecondaryWeaponFromDataAsset();
+	}
+
+	PrimaryWeaponID = WeaponID;
+	PrimaryWeaponDataAsset = WeaponDataAsset;
+	
+	OnPrimaryWeaponEquipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
+
+	/*
+	LoadEquippedWeaponAnimationReferences();
+	// @todo add weapon stats
+	*/
+}
+
+void APlayerCharacter::SetSecondaryWeaponFromDataAsset(FName WeaponID)
+{
+	//  You would call SetCurrentSecondaryWeapon(NAME_None) when you want to remove equipped secondary weapon
+	if (WeaponID == NAME_None)
+	{
+		RemoveSecondaryWeaponFromDataAsset();
+		return;
+	}
+
+	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
+	// If it's an invalid weapon
+	if (!WeaponData || WeaponData->WeaponMesh.IsNull())
+	{
+		return;
+	}
+
+	// Since secondary weapon is guaranteed to be single handed
+	RemoveSecondaryWeaponFromDataAsset();
+	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->WeaponType))
+	{
+		RemovePrimaryWeaponFromDataAsset();
+	}
+	SecondaryWeaponID = WeaponID;
+	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
+
+	
+	// @todo add weapon stats
+
+}
+
 void APlayerCharacter::MoveForward(const float Value)
 {
 	if (Value != 0 && CanMove())
@@ -623,8 +681,6 @@ void APlayerCharacter::MoveForward(const float Value)
 		FRotator Rotation = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
 		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
-
-		// Internal_AddMovementInput()
 	}
 }
 
@@ -1933,6 +1989,20 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 	// @todo add weapon stats
 }
 
+void APlayerCharacter::RemovePrimaryWeaponFromDataAsset()
+{
+	OnPrimaryWeaponUnequipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
+	PrimaryWeaponID = NAME_None;
+	PrimaryWeaponDataAsset = nullptr;
+}
+
+void APlayerCharacter::RemoveSecondaryWeaponFromDataAsset()
+{
+	OnSecondaryWeaponUnequipped.Broadcast(SecondaryWeaponID, SecondaryWeaponDataAsset);
+	SecondaryWeaponID = NAME_None;
+	SecondaryWeaponDataAsset = nullptr;
+}
+
 void APlayerCharacter::RemovePrimaryWeapon()
 {
 	PrimaryWeapon->OnUnEquip();
@@ -1988,21 +2058,6 @@ void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)
 void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString & SkillGroup)
 {
 	SkillsComponent->OnSkillGroupRemovedFromSkillBar(SkillGroup);
-}
-
-bool APlayerCharacter::IsPrimaryWeaponEquippped() const
-{
-	return PrimaryWeaponID != NAME_None && PrimaryWeapon->bEquipped;
-}
-
-bool APlayerCharacter::IsSecondaryWeaponEquipped() const
-{
-	return SecondaryWeaponID != NAME_None && SecondaryWeapon->bEquipped;
-}
-
-bool APlayerCharacter::IsFastRunning() const
-{
-	return GetCharacterState() == ECharacterState::SpecialMovement;
 }
 
 void APlayerCharacter::Server_SetIWRCharMovementDir_Implementation(ECharMovementDirection NewDirection)

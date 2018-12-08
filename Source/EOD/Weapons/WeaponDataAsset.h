@@ -25,6 +25,30 @@ public:
 
 	UWeaponDataAsset(const FObjectInitializer& ObjectInitializer);
 
+	inline USkeletalMesh* GetWeaponMesh();
+
+	inline UTexture* GetIcon();
+
+protected:
+
+	/** The skeletal mesh that represents this weapon */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseInfo)
+	USkeletalMesh* WeaponMesh;
+
+	/** A soft pointer to skeletal mesh that represents this weapon */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseInfo)
+	TSoftObjectPtr<USkeletalMesh> WeaponMeshSoftPtr;
+
+	/** Weapon's UI icon */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseInfo)
+	UTexture* Icon;
+	
+	/** A soft pointer to weapon's UI icon */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseInfo)
+	TSoftObjectPtr<UTexture> IconSoftPtr;
+
+public:
+
 	/** The in-game name used for this weapon */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseInfo)
 	FString DisplayName;
@@ -32,14 +56,6 @@ public:
 	/** Weapon description that will be displayed on hovering over the weapon icon */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseInfo)
 	FString Description;
-
-	/** The skeletal mesh that represents this weapon */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseInfo)
-	TSoftObjectPtr<USkeletalMesh> WeaponMesh;
-
-	/** Icon that will be used to represent this weapon inside in-game UI */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseInfo)
-	TSoftObjectPtr<UTexture> Icon;
 
 	/**
 	 * Weapon Type determines:
@@ -131,3 +147,63 @@ public:
 	 TSubclassOf<UElementalBase> ElementalAffinity;
 
 };
+
+USTRUCT(BlueprintType)
+struct EOD_API FWeaponDataAssetTableRow : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WeaponDAta)
+	TSoftObjectPtr<UWeaponDataAsset> WeaponDataAsset;
+
+};
+
+inline USkeletalMesh* UWeaponDataAsset::GetWeaponMesh()
+{
+	if (IsValid(WeaponMesh))
+	{
+		return WeaponMesh;
+	}
+	else
+	{
+		if (WeaponMeshSoftPtr.IsNull())
+		{
+			return nullptr;
+		}
+		else if (WeaponMeshSoftPtr.IsPending())
+		{
+			return WeaponMeshSoftPtr.LoadSynchronous();
+		}
+		else if (WeaponMeshSoftPtr.IsValid())
+		{
+			return WeaponMeshSoftPtr.Get();
+		}
+	}
+
+	return nullptr;
+}
+
+inline UTexture* UWeaponDataAsset::GetIcon()
+{
+	if (IsValid(Icon))
+	{
+		return Icon;
+	}
+	else
+	{
+		if (IconSoftPtr.IsNull())
+		{
+			return nullptr;
+		}
+		else if (IconSoftPtr.IsPending())
+		{
+			return IconSoftPtr.LoadSynchronous();
+		}
+		else if (IconSoftPtr.IsValid())
+		{
+			return IconSoftPtr.Get();
+		}
+	}
+
+	return nullptr;
+}

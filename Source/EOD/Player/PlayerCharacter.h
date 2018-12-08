@@ -163,18 +163,18 @@ public:
 
 	FORCEINLINE bool CanSwitchWeapon() const;
 
-	bool IsSwitchingWeapon() const;
+	FORCEINLINE bool IsSwitchingWeapon() const;
 
 	/** Returns true if player is on auto run */
-	bool IsAutoRunning() const;
+	FORCEINLINE bool IsAutoRunning() const;
 
 	/** Returns true if primary weapon is equipped */
-	bool IsPrimaryWeaponEquippped() const;
+	FORCEINLINE bool IsPrimaryWeaponEquippped() const;
 
 	/** Returns true if secondary weapon is equipped */
-	bool IsSecondaryWeaponEquipped() const;
+	FORCEINLINE bool IsSecondaryWeaponEquipped() const;
 
-	bool IsFastRunning() const;
+	FORCEINLINE bool IsFastRunning() const;
 
 	FORCEINLINE bool IsWeaponSheathed() const;
 
@@ -246,11 +246,19 @@ public:
 
 	virtual void BlockAttack() override;
 
+	void SetPrimaryWeaponFromDataAsset(FName WeaponID);
+
+	void SetSecondaryWeaponFromDataAsset(FName WeaponID);
+
 	/** Replace primary weapon with a new weapon */
 	void SetCurrentPrimaryWeapon(const FName WeaponID);
 
 	/** Replace secondary weapon with a new weapon */
 	void SetCurrentSecondaryWeapon(const FName WeaponID);
+
+	void RemovePrimaryWeaponFromDataAsset();
+
+	void RemoveSecondaryWeaponFromDataAsset();
 
 	/** Removes primary weapon if it is currently equipped */
 	void RemovePrimaryWeapon();
@@ -404,6 +412,18 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
 	FCombatStateEvent CombatFinished;
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
+	FOnWeaponChangedMCDelegate OnPrimaryWeaponEquipped;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
+	FOnWeaponChangedMCDelegate OnPrimaryWeaponUnequipped;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
+	FOnWeaponChangedMCDelegate OnSecondaryWeaponEquipped;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
+	FOnWeaponChangedMCDelegate OnSecondaryWeaponUnequipped;
+
 private:
 
 	TArray<UStatusEffectBase*> ManagedStatusEffectsList;
@@ -434,6 +454,12 @@ private:
 
 	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FName SecondaryWeaponID;
+
+	UPROPERTY()
+	UWeaponDataAsset* PrimaryWeaponDataAsset;
+
+	UPROPERTY()
+	UWeaponDataAsset* SecondaryWeaponDataAsset;
 
 	UPROPERTY(Transient)
 	bool bForwardPressed;
@@ -808,7 +834,27 @@ FORCEINLINE bool APlayerCharacter::CanSwitchWeapon() const
 	return IsIdleOrMoving();
 }
 
-inline bool APlayerCharacter::IsSwitchingWeapon() const
+FORCEINLINE bool APlayerCharacter::IsSwitchingWeapon() const
 {
 	return GetCharacterState() == ECharacterState::SwitchingWeapon;
+}
+
+FORCEINLINE bool APlayerCharacter::IsAutoRunning() const
+{
+	return GetCharacterState() == ECharacterState::AutoRun;
+}
+
+FORCEINLINE bool APlayerCharacter::IsPrimaryWeaponEquippped() const
+{
+	return PrimaryWeaponID != NAME_None && PrimaryWeapon->bEquipped;
+}
+
+FORCEINLINE bool APlayerCharacter::IsSecondaryWeaponEquipped() const
+{
+	return SecondaryWeaponID != NAME_None && SecondaryWeapon->bEquipped;
+}
+
+FORCEINLINE bool APlayerCharacter::IsFastRunning() const
+{
+	return GetCharacterState() == ECharacterState::SpecialMovement;
 }

@@ -20,3 +20,6 @@
 #define SURFACETYPE_DIRT        SurfaceType10
 #define SURFACETYPE_CONCRETE    SurfaceType11
 
+
+
+// #define EOD_LOG()

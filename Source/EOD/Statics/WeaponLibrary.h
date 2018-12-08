@@ -32,8 +32,6 @@ struct EOD_API FWeaponTableRow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-
 	/** The in-game name used for this weapon */
 	UPROPERTY(EditAnywhere, Category = BaseInfo)
 	FString DisplayName;
@@ -177,5 +175,8 @@ public:
 	
 	/** Returns FWeaponData corresponding to WeaponID from the weapons data table */
 	static FWeaponTableRow* GetWeaponData(FName WeaponID);
+
+	/** Returns weapon data asset for a given weaponID */
+	static class UWeaponDataAsset* GetWeaponDataAsset(FName WeaponID);
 	
 };
