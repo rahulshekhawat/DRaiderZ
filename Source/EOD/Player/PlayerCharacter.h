@@ -264,25 +264,32 @@ public:
 	UFUNCTION()
 	void ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
-	void SetPrimaryWeaponFromDataAsset(FName WeaponID);
+	UFUNCTION()
+	void DeactivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
-	void SetSecondaryWeaponFromDataAsset(FName WeaponID);
+	UFUNCTION()
+	void LoadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
-	/** Replace primary weapon with a new weapon */
-	void SetCurrentPrimaryWeapon(const FName WeaponID);
+	UFUNCTION()
+	void UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
-	/** Replace secondary weapon with a new weapon */
-	void SetCurrentSecondaryWeapon(const FName WeaponID);
+	/** Add or replace primary weapon with a new weapon */
+	void AddPrimaryWeapon(FName WeaponID);
 
-	void RemovePrimaryWeaponFromDataAsset();
-
-	void RemoveSecondaryWeaponFromDataAsset();
+	/** Add or replace secondary weapon with a new weapon */
+	void AddSecondaryWeapon(FName WeaponID);
 
 	/** Removes primary weapon if it is currently equipped */
 	void RemovePrimaryWeapon();
 
 	/** Removes secondary weapon if it is currently equipped */
 	void RemoveSecondaryWeapon();
+
+	/** Replace primary weapon with a new weapon */
+	void SetCurrentPrimaryWeapon(const FName WeaponID);
+
+	/** Replace secondary weapon with a new weapon */
+	void SetCurrentSecondaryWeapon(const FName WeaponID);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = SpecialEffects)
 	void CreateGhostTrail();

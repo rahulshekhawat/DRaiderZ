@@ -87,6 +87,12 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	BaseBlockMovementSpeed = 150.f;
 	
 	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
+	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::LoadWeaponAnimationReferences);
+	OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
+	OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::UnloadWeaponAnimationReferences);
+
+	OnSecondaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
+	OnSecondaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
 
 }
 
@@ -196,6 +202,9 @@ void APlayerCharacter::PostInitializeComponents()
 	LoadUnequippedWeaponAnimationReferences();
 
 	// @note Set secondary weapon first and primary weapon later during initialization
+	// AddSecondaryWeapon(SecondaryWeaponID);
+	// AddPrimaryWeapon(PrimaryWeaponID);
+
 	SetCurrentSecondaryWeapon(SecondaryWeaponID);
 	SetCurrentPrimaryWeapon(PrimaryWeaponID);
 
@@ -608,16 +617,29 @@ void APlayerCharacter::BlockAttack()
 	}
 }
 
-void APlayerCharacter::ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset * WeaponDataAsset)
+void APlayerCharacter::ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
 {
 }
 
-void APlayerCharacter::SetPrimaryWeaponFromDataAsset(FName WeaponID)
+void APlayerCharacter::DeactivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
+{
+}
+
+void APlayerCharacter::LoadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
+{
+}
+
+void APlayerCharacter::UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
+{
+}
+
+void APlayerCharacter::AddPrimaryWeapon(FName WeaponID)
 {
 	//  You would call SetCurrentPrimaryWeapon(NAME_None) when you want to remove equipped primary weapon
 	if (WeaponID == NAME_None)
 	{
-		RemovePrimaryWeaponFromDataAsset();
+		RemovePrimaryWeapon();
+		// RemovePrimaryWeaponFromDataAsset();
 		return;
 	}
 
@@ -627,10 +649,12 @@ void APlayerCharacter::SetPrimaryWeaponFromDataAsset(FName WeaponID)
 		return;
 	}
 
-	RemovePrimaryWeaponFromDataAsset();
+	RemovePrimaryWeapon();
+	// RemovePrimaryWeaponFromDataAsset();
 	if (UWeaponLibrary::IsWeaponDualHanded(WeaponDataAsset->WeaponType))
 	{
-		RemoveSecondaryWeaponFromDataAsset();
+		RemoveSecondaryWeapon();
+		// RemoveSecondaryWeaponFromDataAsset();
 	}
 
 	PrimaryWeaponID = WeaponID;
@@ -644,12 +668,13 @@ void APlayerCharacter::SetPrimaryWeaponFromDataAsset(FName WeaponID)
 	*/
 }
 
-void APlayerCharacter::SetSecondaryWeaponFromDataAsset(FName WeaponID)
+void APlayerCharacter::AddSecondaryWeapon(FName WeaponID)
 {
 	//  You would call SetCurrentSecondaryWeapon(NAME_None) when you want to remove equipped secondary weapon
 	if (WeaponID == NAME_None)
 	{
-		RemoveSecondaryWeaponFromDataAsset();
+		RemoveSecondaryWeapon();
+		// RemoveSecondaryWeaponFromDataAsset();
 		return;
 	}
 
@@ -661,10 +686,12 @@ void APlayerCharacter::SetSecondaryWeaponFromDataAsset(FName WeaponID)
 	}
 
 	// Since secondary weapon is guaranteed to be single handed
-	RemoveSecondaryWeaponFromDataAsset();
+	RemoveSecondaryWeapon();
+	// RemoveSecondaryWeaponFromDataAsset();
 	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->WeaponType))
 	{
-		RemovePrimaryWeaponFromDataAsset();
+		RemovePrimaryWeapon();
+		// RemovePrimaryWeaponFromDataAsset();
 	}
 	SecondaryWeaponID = WeaponID;
 	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
@@ -672,6 +699,34 @@ void APlayerCharacter::SetSecondaryWeaponFromDataAsset(FName WeaponID)
 	
 	// @todo add weapon stats
 
+}
+
+void APlayerCharacter::RemovePrimaryWeapon()
+{
+	OnPrimaryWeaponUnequipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
+	PrimaryWeaponID = NAME_None;
+	PrimaryWeaponDataAsset = nullptr;	
+
+	/*
+	PrimaryWeapon->OnUnEquip();
+	PrimaryWeaponID = NAME_None;
+	UnloadEquippedWeaponAnimationReferences();
+	*/
+
+	// @todo remove weapon stats
+}
+
+void APlayerCharacter::RemoveSecondaryWeapon()
+{
+	OnSecondaryWeaponUnequipped.Broadcast(SecondaryWeaponID, SecondaryWeaponDataAsset);
+	SecondaryWeaponID = NAME_None;
+	SecondaryWeaponDataAsset = nullptr;
+
+	/*
+	SecondaryWeaponID = NAME_None;
+	SecondaryWeapon->OnUnEquip();
+	*/
+	// @todo remove weapon stats
 }
 
 void APlayerCharacter::MoveForward(const float Value)
@@ -1992,37 +2047,6 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 
 	
 	// @todo add weapon stats
-}
-
-void APlayerCharacter::RemovePrimaryWeaponFromDataAsset()
-{
-	OnPrimaryWeaponUnequipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
-	PrimaryWeaponID = NAME_None;
-	PrimaryWeaponDataAsset = nullptr;
-}
-
-void APlayerCharacter::RemoveSecondaryWeaponFromDataAsset()
-{
-	OnSecondaryWeaponUnequipped.Broadcast(SecondaryWeaponID, SecondaryWeaponDataAsset);
-	SecondaryWeaponID = NAME_None;
-	SecondaryWeaponDataAsset = nullptr;
-}
-
-void APlayerCharacter::RemovePrimaryWeapon()
-{
-	PrimaryWeapon->OnUnEquip();
-	PrimaryWeaponID = NAME_None;
-	UnloadEquippedWeaponAnimationReferences();
-
-	// @todo remove weapon stats
-}
-
-void APlayerCharacter::RemoveSecondaryWeapon()
-{
-	SecondaryWeaponID = NAME_None;
-	SecondaryWeapon->OnUnEquip();
-
-	// @todo remove weapon stats
 }
 
 void APlayerCharacter::TurnOnTargetSwitch()
