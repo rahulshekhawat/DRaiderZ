@@ -85,7 +85,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	BaseNormalMovementSpeed = 400.f;
 	BaseSpecialMovementSpeed = 600.f;
 	BaseBlockMovementSpeed = 150.f;
-
+	
+	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
 
 }
 
@@ -605,6 +606,10 @@ void APlayerCharacter::BlockAttack()
 		PlayAnimationMontage(GetActiveAnimationReferences()->BlockAttack.Get(),
 			UCharacterLibrary::SectionName_BlockAttack);
 	}
+}
+
+void APlayerCharacter::ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset * WeaponDataAsset)
+{
 }
 
 void APlayerCharacter::SetPrimaryWeaponFromDataAsset(FName WeaponID)

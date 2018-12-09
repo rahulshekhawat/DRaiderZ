@@ -46,6 +46,19 @@ enum class EEODTaskStatus : uint8
 	Aborted
 };
 
+/*
+USTRUCT(BlueprintType)
+struct EOD_API FEODEventBase
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+
+
+};
+*/
+
 USTRUCT(BlueprintType)
 struct EOD_API FEODItemInfo
 {

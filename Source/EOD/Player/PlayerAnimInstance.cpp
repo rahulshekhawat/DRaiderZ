@@ -27,6 +27,7 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 	FScriptDelegate EndDelegate;
 	EndDelegate.BindUFunction(this, FName("HandleMontageEnded"));
 	OnMontageEnded.AddUnique(EndDelegate);
+
 }
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

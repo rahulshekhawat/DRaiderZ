@@ -261,6 +261,9 @@ public:
 
 	virtual void BlockAttack() override;
 
+	UFUNCTION()
+	void ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
+
 	void SetPrimaryWeaponFromDataAsset(FName WeaponID);
 
 	void SetSecondaryWeaponFromDataAsset(FName WeaponID);
@@ -451,9 +454,11 @@ private:
 
 	const int CameraArmMaximumLength = 500;
 
-	TArray<FCombatEvent> EventsOnUsingSkill;
+	// TArray<FCombatEvent> EventsOnUsingSkill;
+	TArray<FOnGameplayEventMCDelegate> EventsOnUsingSkill;
 
-	TArray<FCombatEvent> EventsOnSuccessfulSkillAttack;
+	TArray<FOnGameplayEventMCDelegate> EventsOnSuccessfulSkillAttack;
+	// TArray<FCombatEvent> EventsOnSuccessfulSkillAttack;
 
 	/** Timer handle needed for executing SP normal attacks */
 	FTimerHandle SPAttackTimerHandle;

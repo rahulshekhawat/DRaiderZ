@@ -227,29 +227,32 @@ void AEODCharacterBase::DisableDamageBlocking()
 	GetWorld()->GetTimerManager().ClearTimer(BlockTimerHandle); 
 }
 
-void AEODCharacterBase::OnSuccessfulDodge(AEODCharacterBase* AttackInstigator)
+/*
+// void AEODCharacterBase::OnSuccessfulDodge(AEODCharacterBase* AttackInstigator)
+void AEODCharacterBase::SuccessfulDodge(AEODCharacterBase* AttackInstigator)
 {
 	TWeakObjectPtr<AEODCharacterBase> AttackInstigatorWeakPtr(AttackInstigator);
-	OnSuccessfulDodgeEvent.Broadcast(AttackInstigatorWeakPtr);
+	// OnSuccessfulDodgeEvent.Broadcast(AttackInstigatorWeakPtr);
 }
 
 void AEODCharacterBase::OnSuccessfulBlock(AEODCharacterBase * AttackInstigator)
 {
 	TWeakObjectPtr<AEODCharacterBase> AttackInstigatorWeakPtr(AttackInstigator);
-	OnSuccessfulBlockEvent.Broadcast(AttackInstigatorWeakPtr);
+	// OnSuccessfulBlockEvent.Broadcast(AttackInstigatorWeakPtr);
 	BlockAttack();
 }
 
 void AEODCharacterBase::OnAttackDeflected(AEODCharacterBase * AttackBlocker, bool bSkillIgnoresBlock)
 {
 	TWeakObjectPtr<AEODCharacterBase> AttackBlockerWeakPtr(AttackBlocker);
-	OnAttackDeflectedEvent.Broadcast(AttackBlockerWeakPtr);
+	// OnAttackDeflectedEvent.Broadcast(AttackBlockerWeakPtr);
 
 	if (!bSkillIgnoresBlock)
 	{
 		// PlayAnimationMontage()
 	}
 }
+*/
 
 bool AEODCharacterBase::BP_GetInCombat() const
 {

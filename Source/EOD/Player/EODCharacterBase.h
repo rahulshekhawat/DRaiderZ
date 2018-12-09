@@ -13,12 +13,25 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "EODCharacterBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCombatEvent, TWeakObjectPtr<AEODCharacterBase>, RecipientCharacter);
-// DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams()
 class UAnimMontage;
 class UInputComponent;
 class UStatusEffectBase;
+class UGameplayEventBase;
 class UStatsComponentBase;
+
+/** 
+ * Delegate for when a gameplay event occurs
+ * 
+ * Owner = The actor that owns the gameplay event
+ * Instigator = The actor that triggered the gameplay event. e.g., if character dodged an enemy attack, then enemy triggered the dodge event
+ * Target = The actor that is target for the gameplay event. e.e., the character that dodged the enemy attack
+ * GameplayEvent = An event object containing information regarding gameplay event
+ */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnGameplayEventMCDelegate,
+											  AActor*, Owner,
+											  AActor*, Instigator,
+											  AActor*, Target,
+											  UGameplayEventBase*, GameplayEvent);
 
 /**
  * An abstract base class to handle the behavior of in-game characters.
@@ -280,22 +293,24 @@ public:
 	void DisableDamageBlocking();
 
 	/**
-	 * Called on successfully dodging an enemy attack
+	 * Called on dodging an enemy attack
 	 * @param AttackInstigator Enemy character whose incoming damage this character dodged
 	 */
-	void OnSuccessfulDodge(AEODCharacterBase* AttackInstigator);
+	// void OnSuccessfulDodge(AEODCharacterBase* AttackInstigator);
+	// void SuccessfulDodge(AEODCharacterBase* AttackInstigator);
+	// void DodgedAttack(AEODCharacterBase* AttackInstigator);
 
 	/**
 	 * Called on successfully blocking an enemy attack
 	 * @param AttackInstigator Enemy character whose incoming damage this character blocked
 	 */
-	void OnSuccessfulBlock(AEODCharacterBase* AttackInstigator);
+	// void OnSuccessfulBlock(AEODCharacterBase* AttackInstigator);
 
 	/**
 	 * Called on getting an attack of this character blocked by an enemy
 	 * @param AttackBlocker Enemy character that blocked this character's attack
 	 */
-	void OnAttackDeflected(AEODCharacterBase* AttackBlocker, bool bSkillIgnoresBlock);
+	// void OnAttackDeflected(AEODCharacterBase* AttackBlocker, bool bSkillIgnoresBlock);
 
 	/** Temporarily trigger 'Target_Switch' material parameter to make the character glow */
 	FORCEINLINE void SetOffTargetSwitch();
@@ -525,37 +540,47 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
 	float DamageBlockTriggerDelay;
 
-	FCombatEvent OnSuccessfulDodgeEvent;
+public:
 
-	FCombatEvent OnSuccessfulBlockEvent;
+	/** Called on dodging an enemy attack */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Event")
+	FOnGameplayEventMCDelegate OnDodgingAttack;
 
-	FCombatEvent OnAttackDeflectedEvent;
+	/** Called on blocking an enemy attack */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Event")
+	FOnGameplayEventMCDelegate OnBlockingAttack;
+
+	/** Called on deflecting an enemy attack */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Event")
+	FOnGameplayEventMCDelegate OnDeflectingAttack;
 
 	//~
-	FCombatEvent OnReceivingHit;
+	FOnGameplayEventMCDelegate OnReceivingHit;
 
-	FCombatEvent OnSuccessfulHit;
+	FOnGameplayEventMCDelegate OnSuccessfulHit;
 
-	FCombatEvent OnSuccessfulMagickAttack;
+	FOnGameplayEventMCDelegate OnSuccessfulMagickAttack;
 
-	FCombatEvent OnSuccessfulPhysicalAttack;
+	FOnGameplayEventMCDelegate OnSuccessfulPhysicalAttack;
 
-	FCombatEvent OnUnsuccessfulHit;
+	FOnGameplayEventMCDelegate OnUnsuccessfulHit;
 
-	FCombatEvent OnCriticalHit;
+	FOnGameplayEventMCDelegate OnCriticalHit;
 
-	FCombatEvent OnKillingEnemy;
+	FOnGameplayEventMCDelegate OnKillingEnemy;
 
-	FCombatEvent OnFullHealth;
+	FOnGameplayEventMCDelegate OnFullHealth;
 
-	FCombatEvent OnDamageAtFullHealth;
+	FOnGameplayEventMCDelegate OnDamageAtFullHealth;
 
-	FCombatEvent OnLowHealth;
+	FOnGameplayEventMCDelegate OnLowHealth;
 
-	FCombatEvent OnEnteringCombat;
+	FOnGameplayEventMCDelegate OnEnteringCombat;
 
-	FCombatEvent OnLeavingCombat;
+	FOnGameplayEventMCDelegate OnLeavingCombat;
 	//~ 
+
+protected:
 
 	FTimerHandle TargetSwitchTimerHandle;
 
