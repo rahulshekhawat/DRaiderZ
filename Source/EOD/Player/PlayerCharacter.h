@@ -533,10 +533,10 @@ private:
 	bool bWeaponSheathed;
 
 	/** Animations for this player when it has a weapon equipped */
-	FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
+	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
 
 	/** Animations for this player when it does not have a weapon equipped */
-	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
+	FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
 
 	TSharedPtr<FStreamableHandle> EquippedWeaponAnimationsStreamableHandle;
 
