@@ -85,11 +85,14 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	BaseNormalMovementSpeed = 400.f;
 	BaseSpecialMovementSpeed = 600.f;
 	BaseBlockMovementSpeed = 150.f;
+
+	MaxWeaponSlots = 2;
 	
 	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
 	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::LoadWeaponAnimationReferences);
 	OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
-	OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::UnloadWeaponAnimationReferences);
+	// Perhaps unloading weapon animation references is not necessary until the equipped weapon type actually changes
+	// OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::UnloadWeaponAnimationReferences);
 
 	OnSecondaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
 	OnSecondaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
@@ -192,6 +195,10 @@ void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	// AddPrimaryWeapon(PrimaryWeaponID);
+	// AddSecondaryWeapon(SecondaryWeaponID);
+
+	/*
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Instigator = this;
 	SpawnInfo.Owner = this;
@@ -199,7 +206,6 @@ void APlayerCharacter::PostInitializeComponents()
 	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
 
-	LoadUnequippedWeaponAnimationReferences();
 
 	// @note Set secondary weapon first and primary weapon later during initialization
 	// AddSecondaryWeapon(SecondaryWeaponID);
@@ -207,6 +213,9 @@ void APlayerCharacter::PostInitializeComponents()
 
 	SetCurrentSecondaryWeapon(SecondaryWeaponID);
 	SetCurrentPrimaryWeapon(PrimaryWeaponID);
+	*/
+
+	LoadUnequippedWeaponAnimationReferences();
 
 	if (HUDWidgetClass.Get())
 	{
@@ -627,6 +636,41 @@ void APlayerCharacter::DeactivateStatusEffectFromWeapon(FName WeaponID, UWeaponD
 
 void APlayerCharacter::LoadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
 {
+	EWeaponType WeaponType = EWeaponType::None;
+	if (WeaponDataAsset)
+	{
+		WeaponType = WeaponDataAsset->WeaponType;
+	}
+
+	// No need to load references if they are already loaded
+	if (AnimationReferencesMap.Contains(WeaponDataAsset->WeaponType))
+	{
+		return;
+	}
+
+
+
+
+	/*
+	UnloadEquippedWeaponAnimationReferences();
+
+	if (!PlayerAnimationReferencesDataTable)
+	{
+		return;
+	}
+
+	FName RowID = GetAnimationReferencesRowID(GetEquippedWeaponType(), Gender);
+	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
+		FString("APlayerCharacter::LoadEquippedWeaponAnimationReferences(), loading equipped weapon animation references"));
+
+	if (!PlayerAnimationReferences)
+	{
+		return;
+	}
+
+	EquippedWeaponAnimationReferences = PlayerAnimationReferences;
+	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
+	*/
 }
 
 void APlayerCharacter::UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
@@ -635,6 +679,8 @@ void APlayerCharacter::UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDa
 
 void APlayerCharacter::AddPrimaryWeapon(FName WeaponID)
 {
+
+
 	//  You would call SetCurrentPrimaryWeapon(NAME_None) when you want to remove equipped primary weapon
 	if (WeaponID == NAME_None)
 	{
@@ -699,6 +745,42 @@ void APlayerCharacter::AddSecondaryWeapon(FName WeaponID)
 	
 	// @todo add weapon stats
 
+}
+
+void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex)
+{
+	// Detemine whether the command has been passed to actually remove the weapon
+	if (WeaponID == NAME_None && SlotWeapons.Num() > SlotIndex)
+	{
+		RemovePrimaryWeaponFromSlot(SlotIndex);
+	}
+
+
+
+
+}
+
+void APlayerCharacter::AddSecondaryWeaponToSlot(FName WeaponID, int32 SlotIndex)
+{
+
+}
+
+void APlayerCharacter::RemovePrimaryWeaponFromSlot(int32 SlotIndex)
+{
+	/*
+	if (SlotWeapons.Num() > SlotIndex)
+	{
+		FWeaponSlot WeaponSlot = SlotWeapons[SlotIndex];
+		if (WeaponSlot.IsPrimaryWeaponAttached())
+		{
+			
+		}
+	}
+	*/
+}
+
+void APlayerCharacter::RemoveSecondaryWeaponFromSlot(int32 SlotIndex)
+{
 }
 
 void APlayerCharacter::RemovePrimaryWeapon()

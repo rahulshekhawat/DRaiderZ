@@ -36,15 +36,36 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCombatStateChangedMCDelegate, APl
 /** Delegate for when a player changes it's weapon */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, WeaponID, UWeaponDataAsset*, WeaponDataAsset);
 
-/**
-* Delegate for when Montage is completed, whether interrupted or finished
-* Weight of this montage is 0.f, so it stops contributing to output pose
-*
-* bInterrupted = true if it was not property finished
-*/
 
-// Delegates (dynamic or not) don't support struct pointers
-// DECLARE_MULTICAST_DELEGATE_TwoParams(FWeaponChangedEvents, FName, WeaponID, FWeaponTableRow*, WeaponData); 
+USTRUCT(BlueprintType)
+struct EOD_API FWeaponSlot
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
+	AWeaponBase* PrimaryWeapon;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
+	AWeaponBase* SecondaryWeapon;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
+	UWeaponDataAsset* PrimaryWeaponDataAsset;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
+	UWeaponDataAsset* SecondaryWeaponDataAsset;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
+	FName PrimaryWeaponID;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
+	FName SecondaryWeaponID;
+
+	bool IsPrimaryWeaponAttached()
+	{
+		return PrimaryWeapon && PrimaryWeaponDataAsset && (PrimaryWeaponID != NAME_None) ? true : false;
+	}
+};
+
 
 /**
  * PlayerCharacter is the base class for playable characters
@@ -267,17 +288,19 @@ public:
 	UFUNCTION()
 	void DeactivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
-	UFUNCTION()
-	void LoadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
-
-	UFUNCTION()
-	void UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
-
 	/** Add or replace primary weapon with a new weapon */
 	void AddPrimaryWeapon(FName WeaponID);
 
 	/** Add or replace secondary weapon with a new weapon */
 	void AddSecondaryWeapon(FName WeaponID);
+
+	void AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex);
+
+	void AddSecondaryWeaponToSlot(FName WeaponID, int32 SlotIndex);
+
+	void RemovePrimaryWeaponFromSlot(int32 SlotIndex);
+
+	void RemoveSecondaryWeaponFromSlot(int32 SlotIndex);
 
 	/** Removes primary weapon if it is currently equipped */
 	void RemovePrimaryWeapon();
@@ -470,6 +493,18 @@ private:
 	/** Timer handle needed for executing SP normal attacks */
 	FTimerHandle SPAttackTimerHandle;
 
+public:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon Slot")
+	int32 MaxWeaponSlots;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
+	TArray<FWeaponSlot> SlotWeapons;
+
+	int32 ActiveWeaponSlotIndex;
+
+private:
+
 	UPROPERTY(Transient)
 	APrimaryWeapon* PrimaryWeapon;
 
@@ -524,13 +559,48 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills, meta = (AllowPrivateAccess = "true"))
 	uint8 MaxNumberOfSkills;
 
+	/** Determines whether weapon is currently sheathed or not */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_WeaponSheathed)
+	bool bWeaponSheathed;
+
 	/** Data table containing player animation references */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable, meta = (AllowPrivateAccess = "true"))
 	UDataTable* PlayerAnimationReferencesDataTable;
 
-	/** Determines whether weapon is currently sheathed or not */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_WeaponSheathed)
-	bool bWeaponSheathed;
+	/** Animation references by weapon type */
+	TMap<EWeaponType, FPlayerAnimationReferencesTableRow*> AnimationReferencesMap;
+
+	/** Streamable handle for animation references by weapon type */
+	TMap<EWeaponType, TSharedPtr<FStreamableHandle>> AnimationReferencesStreamableHandles;
+
+	inline FPlayerAnimationReferencesTableRow* GetAnimationReferences() const;
+
+	UFUNCTION()
+	void LoadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
+
+	UFUNCTION()
+	void UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
+
+
+	
+	/** Animations to be used when this player doesn't have any weapon equipped */
+	// FPlayerAnimationReferencesTableRow* DefaultAnimations;
+
+	/** Animations to be used when this player has a weapon equipped */
+	// FPlayerAnimationReferencesTableRow* EquippedWeaponAnimations;
+
+
+	/**
+	 * StreamableHandle for default animations
+	 * EWeaponType will (and must) always be set to EWeaponType::None
+	 */
+	// TPair<EWeaponType, FStreamableHandle> DefaultAnimationsStreamableHandle;
+
+	/** StreamableHandle for weapon animations */
+	// TPair<EWeaponType, FStreamableHandle> WeaponAnimationsStreamableHandle;
+
+
+
 
 	/** Animations for this player when it has a weapon equipped */
 	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
@@ -541,6 +611,9 @@ private:
 	TSharedPtr<FStreamableHandle> EquippedWeaponAnimationsStreamableHandle;
 
 	TSharedPtr<FStreamableHandle> UnequippedWeaponAnimationsStreamableHandle;
+
+
+
 
 	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender);
 
@@ -789,7 +862,7 @@ inline void APlayerCharacter::EnableBlock()
 	SetUseControllerRotationYaw(true);
 	SetWalkSpeed(BaseBlockMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier());
 
-	FTimerHandle TimerDelegate;
+	// FTimerHandle TimerDelegate;
 	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);
 }
 
@@ -814,6 +887,18 @@ inline void APlayerCharacter::DisableFastRun()
 	{
 		SetCharacterState(ECharacterState::IdleWalkRun);
 	}
+}
+
+inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetAnimationReferences() const
+{
+	EWeaponType WeaponType = EWeaponType::None;
+	if (!IsWeaponSheathed())
+	{
+		WeaponType = GetEquippedWeaponType();
+	}
+
+	FPlayerAnimationReferencesTableRow* const* AnimationsPtr = AnimationReferencesMap.Find(WeaponType);
+	return AnimationsPtr ? *AnimationsPtr : nullptr;
 }
 
 inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationReferences() const
