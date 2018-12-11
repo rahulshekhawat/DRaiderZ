@@ -432,6 +432,14 @@ void USkillsComponent::OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup
 	}
 }
 
+void USkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
+{
+}
+
+void USkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
+{
+}
+
 void USkillsComponent::ResetChainSkill()
 {
 	ActivePrecedingChainSkillGroup = FString("");

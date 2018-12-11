@@ -74,6 +74,10 @@ public:
 
 	void OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup);
 
+	void OnPressingSkillKey(const int32 SkillKeyIndex);
+
+	void OnReleasingSkillKey(const int32 SkillKeyIndex);
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = Skills)

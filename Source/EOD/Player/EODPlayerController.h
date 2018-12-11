@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "GameFramework/PlayerController.h"
 #include "EODPlayerController.generated.h"
+
+class UInventoryComponent;
+class UStatsComponentBase;
 
 /**
  * EmberPlayerController is the base (and final c++) class for EOD's player controller
@@ -20,7 +24,111 @@ public:
 	AEODPlayerController(const FObjectInitializer& ObjectInitializer);
 
 	/** Binds functionality for mouse axis input */
-	virtual void SetupInputComponent() override;	
-	
-	
+	virtual void SetupInputComponent() override;
+
+	FORCEINLINE UStatsComponentBase* GetStatsComponent() const;
+
+	FORCEINLINE UInventoryComponent* GetInventoryComponent() const;
+
+private:
+
+	//~ Inventory component
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UInventoryComponent* InventoryComponent;
+
+	/** StatsComp contains and manages the stats of player */
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UStatsComponentBase* StatsComponent;
+
+public:
+
+	FORCEINLINE void SwitchToUIInput();
+
+	FORCEINLINE void SwitchToGameInput();
+
+	void TogglePlayerStatsUI();
+
+	void TogglePlayerHUD();
+
+	void TogglePlayerSkillTreeUI();
+
+	void TogglePlayerInventoryUI();
+
+private:
+
+	const int CameraZoomRate = 15;
+
+	const int CameraArmMinimumLength = 50;
+
+	const int CameraArmMaximumLength = 500;
+
+	/** Move controlled pawn forward/backward */
+	void MovePawnForward(const float Value);
+
+	/** Move controlled pawn left/right */
+	void MovePawnRight(const float Value);
+
+	void MakePawnJump();
+
+	void ZoomInCamera();
+
+	void ZoomOutCamera();
+
+	void ToggleAutoRun();
+
+	void ToggleMouseCursor();
+
+	void OnPressingEscapeKey();
+
+	void OnPressingSkillKey(const int32 SkillKeyIndex);
+
+	void OnReleasingSkillKey(const int32 SkillKeyIndex);
+
+	/** Called when player presses a skill key */
+	template<uint32 SkillKeyIndex>
+	inline void PressedSkillKey();
+
+	/** Called when player releases a skill key */
+	template<uint32 SkillKeyIndex>
+	inline void ReleasedSkillKey();
+
 };
+
+FORCEINLINE UStatsComponentBase* AEODPlayerController::GetStatsComponent() const
+{
+	return StatsComponent;
+}
+
+FORCEINLINE UInventoryComponent* AEODPlayerController::GetInventoryComponent() const
+{
+	return InventoryComponent;
+}
+
+
+FORCEINLINE void AEODPlayerController::SwitchToUIInput()
+{
+	bShowMouseCursor = true;
+	FInputModeGameAndUI GameAndUIInputMode;
+	GameAndUIInputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+	SetInputMode(GameAndUIInputMode);
+}
+
+FORCEINLINE void AEODPlayerController::SwitchToGameInput()
+{
+	bShowMouseCursor = false;
+	FInputModeGameOnly GameOnlyInputMode;
+	GameOnlyInputMode.SetConsumeCaptureMouseDown(true);
+	SetInputMode(GameOnlyInputMode);
+}
+
+template<uint32 SkillKeyIndex>
+inline void AEODPlayerController::PressedSkillKey()
+{
+	OnPressingSkillKey(SkillKeyIndex);
+}
+
+template<uint32 SkillKeyIndex>
+inline void AEODPlayerController::ReleasedSkillKey()
+{
+	OnReleasingSkillKey(SkillKeyIndex);
+}
