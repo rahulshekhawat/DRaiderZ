@@ -114,6 +114,7 @@ void AEODPlayerController::CreateHUDWidget()
 	}
 }
 
+/*
 void AEODPlayerController::CreateSkillTreeWidget()
 {
 	// We only need to create a skill tree widget if the HUD widget exist
@@ -143,7 +144,7 @@ void AEODPlayerController::CreateSkillBarWidget()
 	// We only need to create a skill bar widget if the HUD widget exist
 	if (HUDWidget && WidgetClass.Get())
 	{
-		SkillBarWidget = CreateWidget<USkillBarWidget>(this, SkillBarWidgetClass);
+		SkillBarWidget = CreateWidget<USkillBarWidget>(this, WidgetClass);
 		if (SkillBarWidget)
 		{
 			HUDWidget->AddSkillBarWidget(SkillBarWidget);
@@ -151,8 +152,14 @@ void AEODPlayerController::CreateSkillBarWidget()
 	}
 }
 
+void AEODPlayerController::CreatePlayerStatsWidget()
+{
+}
+*/
+
 void AEODPlayerController::TogglePlayerStatsUI()
 {
+
 }
 
 void AEODPlayerController::TogglePlayerHUD()
@@ -161,7 +168,7 @@ void AEODPlayerController::TogglePlayerHUD()
 	{
 		HUDWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else
+	else if (HUDWidget && !HUDWidget->IsVisible())
 	{
 		HUDWidget->SetVisibility(ESlateVisibility::Visible);
 	}
@@ -173,7 +180,7 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 	{
 		HUDWidget->GetSkillTreeWidget()->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else
+	else if (HUDWidget && HUDWidget->GetSkillTreeWidget() && !HUDWidget->GetSkillTreeWidget()->IsVisible())
 	{
 		HUDWidget->GetSkillTreeWidget()->SetVisibility(ESlateVisibility::Visible);
 	}
@@ -185,7 +192,7 @@ void AEODPlayerController::TogglePlayerInventoryUI()
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else
+	else if (HUDWidget && HUDWidget->GetInventoryWidget() && !HUDWidget->GetInventoryWidget()->IsVisible())
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Visible);
 	}

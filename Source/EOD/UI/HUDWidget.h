@@ -8,11 +8,13 @@
 #include "EOD/UI/SkillBarWidget.h"
 #include "EOD/UI/SkillTreeWidget.h"
 #include "EOD/UI/InventoryWidget.h"
+#include "EOD/UI/PlayerStatsWidget.h"
 #include "EOD/UI/DialogueWindowWidget.h"
 #include "EOD/UI/StatusIndicatorWidget.h"
 
 #include "UObject/ObjectMacros.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "HUDWidget.generated.h"
@@ -40,23 +42,30 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 protected:
 	/** Widget containing health, mana, and stamina bars */
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UStatusIndicatorWidget* StatusIndicatorWidget;
 
 	/** Widget containing skills that can be used by player */
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	USkillBarWidget* SkillBarWidget;
 
 	/** Widget containing player inventory items */
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UInventoryWidget* InventoryWidget;
 
 	/** Widget containing skill trees of all vocations */
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	USkillTreeWidget* SkillTreeWidget;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	/** Widget containing player stats info */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPlayerStatsWidget* PlayerStatsWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UCanvasPanel* MainCanvas;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UTextBlock* LevelText;
 
 public:
 	FORCEINLINE UStatusIndicatorWidget* GetStatusIndicatorWidget() const;
@@ -66,6 +75,8 @@ public:
 	FORCEINLINE UInventoryWidget* GetInventoryWidget() const;
 
 	FORCEINLINE USkillTreeWidget* GetSkillTreeWidget() const;
+
+	FORCEINLINE UPlayerStatsWidget* GetPlayerStatsWidget() const;
 
 	FORCEINLINE UCanvasPanel* GetMainCanvas() const;
 
@@ -169,6 +180,11 @@ FORCEINLINE USkillTreeWidget* UHUDWidget::GetSkillTreeWidget() const
 	return SkillTreeWidget;
 }
 
+inline UPlayerStatsWidget* UHUDWidget::GetPlayerStatsWidget() const
+{
+	return PlayerStatsWidget;
+}
+
 FORCEINLINE UCanvasPanel* UHUDWidget::GetMainCanvas() const
 {
 	return MainCanvas;
@@ -176,44 +192,102 @@ FORCEINLINE UCanvasPanel* UHUDWidget::GetMainCanvas() const
 
 inline void UHUDWidget::AddSkillBarWidget(USkillBarWidget* NewWidget)
 {
-	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
-	CPSlot->SetSize(SkillBarWidgetSize);
-	CPSlot->SetPosition(SkillBarWidgetPosition);
-	CPSlot->SetAnchors(SkillBarWidgetAnchor);
+	if (SkillBarWidget == NewWidget)
+	{
+		return;
+	}
 
-	SkillBarWidget = NewWidget;
+	if (SkillBarWidget)
+	{
+		MainCanvas->RemoveChild(SkillBarWidget);
+		SkillBarWidget = nullptr;
+	}
+
+	if (NewWidget)
+	{
+		UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
+		CPSlot->SetSize(SkillBarWidgetSize);
+		CPSlot->SetPosition(SkillBarWidgetPosition);
+		CPSlot->SetAnchors(SkillBarWidgetAnchor);
+
+		SkillBarWidget = NewWidget;
+	}
 }
 
 inline void UHUDWidget::AddSkillTreeWidget(USkillTreeWidget* NewWidget)
 {
-	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
-	CPSlot->SetSize(SkillTreeWidgetSize);
-	CPSlot->SetPosition(SkillTreeWidgetPosition);
+	if (SkillTreeWidget == NewWidget)
+	{
+		return;
+	}
 
-	SkillTreeWidget = NewWidget;
+	if (SkillTreeWidget)
+	{
+		MainCanvas->RemoveChild(SkillTreeWidget);
+		SkillTreeWidget = nullptr;
+	}
+
+	if (NewWidget)
+	{
+		UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
+		CPSlot->SetSize(SkillTreeWidgetSize);
+		CPSlot->SetPosition(SkillTreeWidgetPosition);
+
+		SkillTreeWidget = NewWidget;
+	}
 }
 
 inline void UHUDWidget::AddInventoryWidget(UInventoryWidget* NewWidget)
 {
-	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
-	CPSlot->SetSize(InventoryWidgetSize);
-	CPSlot->SetPosition(InventoryWidgetPosition);
+	if (InventoryWidget == NewWidget)
+	{
+		return;
+	}
 
-	InventoryWidget = NewWidget;
-}
+	if (InventoryWidget)
+	{
+		MainCanvas->RemoveChild(InventoryWidget);
+		InventoryWidget = nullptr;
+	}
 
-inline void UHUDWidget::AddDialogueWidget(UDialogueWindowWidget* NewWidget)
-{
-	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
-	CPSlot->SetSize(DialogueWidgetSize);
-	CPSlot->SetPosition(DialogueWidgetPosition);
+	if (NewWidget)
+	{
+		UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
+		CPSlot->SetSize(InventoryWidgetSize);
+		CPSlot->SetPosition(InventoryWidgetPosition);
+
+		InventoryWidget = NewWidget;
+	}
 }
 
 inline void UHUDWidget::AddStatusIndicatorWidget(UStatusIndicatorWidget* NewWidget)
 {
-	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
-	CPSlot->SetSize(StatusIndicatorWidgetSize);
-	CPSlot->SetPosition(StatusIndicatorWidgetPosition);
+	if (StatusIndicatorWidget == NewWidget)
+	{
+		return;
+	}
 
-	StatusIndicatorWidget = NewWidget;
+	if (StatusIndicatorWidget)
+	{
+		MainCanvas->RemoveChild(StatusIndicatorWidget);
+		StatusIndicatorWidget = nullptr;
+	}
+
+	if (NewWidget)
+	{
+		UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
+		CPSlot->SetSize(StatusIndicatorWidgetSize);
+		CPSlot->SetPosition(StatusIndicatorWidgetPosition);
+
+		StatusIndicatorWidget = NewWidget;
+	}
+}
+
+inline void UHUDWidget::AddDialogueWidget(UDialogueWindowWidget* NewWidget)
+{
+	// @todo - improve?
+
+	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
+	CPSlot->SetSize(DialogueWidgetSize);
+	CPSlot->SetPosition(DialogueWidgetPosition);
 }

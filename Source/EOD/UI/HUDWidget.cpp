@@ -22,12 +22,22 @@ UHUDWidget::UHUDWidget(const FObjectInitializer & ObjectInitializer) : Super(Obj
 
 bool UHUDWidget::Initialize()
 {
-	if (!(Super::Initialize()))
+	if (Super::Initialize() &&
+		StatusIndicatorWidget &&
+		SkillBarWidget &&
+		InventoryWidget &&
+		SkillTreeWidget &&
+		PlayerStatsWidget &&
+		LevelText)
 	{
-		return false;
+		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+		PlayerStatsWidget->SetVisibility(ESlateVisibility::Hidden);
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 void UHUDWidget::NativeConstruct()
