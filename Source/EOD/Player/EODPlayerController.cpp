@@ -92,10 +92,62 @@ void AEODPlayerController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if(IsLocalPlayerController() && HUDWidgetClass.Get())
+}
+
+void AEODPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	CreateHUDWidget();
+
+}
+
+void AEODPlayerController::CreateHUDWidget()
+{
+	if (IsLocalPlayerController() && HUDWidgetClass.Get())
 	{
 		HUDWidget = CreateWidget<UHUDWidget>(this, HUDWidgetClass);
-		HUDWidget->AddToViewport();
+		if (HUDWidget)
+		{
+			HUDWidget->AddToViewport();
+		}
+	}
+}
+
+void AEODPlayerController::CreateSkillTreeWidget()
+{
+	// We only need to create a skill tree widget if the HUD widget exist
+	if (HUDWidget && SkillTreeWidgetClass.Get())
+	{
+		SkillTreeWidget = CreateWidget<USkillTreeWidget>(this, SkillTreeWidgetClass);
+		if (SkillTreeWidget)
+		{
+			HUDWidget->AddSkillTreeWidget(SkillTreeWidget);
+		}
+	}
+}
+
+void AEODPlayerController::CreateSkillBarWidget()
+{
+	// The default skill bar widget class
+	TSubclassOf<USkillBarWidget> WidgetClass = SkillBarWidgetClass;
+	if (GetCharacter())
+	{
+		APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(GetCharacter());
+		if (PlayerChar)
+		{
+			WidgetClass = PlayerChar->SkillBarWidgetClass;
+		}
+	}
+
+	// We only need to create a skill bar widget if the HUD widget exist
+	if (HUDWidget && WidgetClass.Get())
+	{
+		SkillBarWidget = CreateWidget<USkillBarWidget>(this, SkillBarWidgetClass);
+		if (SkillBarWidget)
+		{
+			HUDWidget->AddSkillBarWidget(SkillBarWidget);
+		}
 	}
 }
 

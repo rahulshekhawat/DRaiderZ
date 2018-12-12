@@ -8,6 +8,8 @@
 #include "EODPlayerController.generated.h"
 
 class UHUDWidget;
+class USkillBarWidget;
+class USkillTreeWidget;
 class UInventoryComponent;
 class UStatsComponentBase;
 
@@ -28,6 +30,7 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+	virtual void BeginPlay() override;
 
 	////////////////////////////////////////////////////////////////////////////////
 	// COMPONENTS
@@ -51,13 +54,38 @@ private:
 	// UI
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	/** Player HUD class reference */
+	/** Player's head-up display widget */
 	UPROPERTY(Transient)
 	UHUDWidget* HUDWidget;
 
-	/** The blueprint widget class to use for player HUD */
-	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
+	/** The widget class to use for player's head-up display */
+	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<UHUDWidget> HUDWidgetClass;
+
+	/** Player's skill tree widget */
+	UPROPERTY(Transient)
+	USkillTreeWidget* SkillTreeWidget;
+
+	/** The widget class to use for player's skill tree widget */
+	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
+	TSubclassOf<USkillTreeWidget> SkillTreeWidgetClass;
+
+	/** Player's skill bar widget. This will be created using skill bar widget class of possessed pawn */
+	UPROPERTY(Transient)
+	USkillBarWidget* SkillBarWidget;
+
+	/**
+	 * The default widget class to use for player's skill bar widget (in case we fail to retrieve it from the possessed pawn)
+	 * If this is set to NULL no skill bar will created and displayed
+	 */
+	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
+	TSubclassOf<USkillBarWidget> SkillBarWidgetClass;
+
+	void CreateHUDWidget();
+
+	void CreateSkillTreeWidget();
+
+	void CreateSkillBarWidget();
 
 public:
 	FORCEINLINE UHUDWidget* GetHUDWidget() const;

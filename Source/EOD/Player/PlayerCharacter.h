@@ -12,6 +12,7 @@
 #include "PlayerCharacter.generated.h"
 
 class UHUDWidget;
+class USkillBarWidget;
 class UAudioComponent;
 class UAnimMontage;
 class UPlayerAnimInstance;
@@ -471,6 +472,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
 	FOnWeaponChangedMCDelegate OnSecondaryWeaponUnequipped;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
+	TSubclassOf<USkillBarWidget> SkillBarWidgetClass;
 
 private:
 
