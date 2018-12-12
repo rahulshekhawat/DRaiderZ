@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "EODPlayerController.generated.h"
 
+class UHUDWidget;
 class UInventoryComponent;
 class UStatsComponentBase;
 
@@ -20,28 +21,52 @@ class EOD_API AEODPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-
 	AEODPlayerController(const FObjectInitializer& ObjectInitializer);
 
 	/** Binds functionality for mouse axis input */
 	virtual void SetupInputComponent() override;
 
+	virtual void PostInitializeComponents() override;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// COMPONENTS
+	////////////////////////////////////////////////////////////////////////////////
+public:
 	FORCEINLINE UStatsComponentBase* GetStatsComponent() const;
 
 	FORCEINLINE UInventoryComponent* GetInventoryComponent() const;
 
 private:
-
 	//~ Inventory component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInventoryComponent* InventoryComponent;
 
-	/** StatsComp contains and manages the stats of player */
+	//~ StatsComp contains and manages the stats of player
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UStatsComponentBase* StatsComponent;
 
-public:
 
+	////////////////////////////////////////////////////////////////////////////////
+	// UI
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	/** Player HUD class reference */
+	UPROPERTY(Transient)
+	UHUDWidget* HUDWidget;
+
+	/** The blueprint widget class to use for player HUD */
+	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
+	TSubclassOf<UHUDWidget> HUDWidgetClass;
+
+public:
+	FORCEINLINE UHUDWidget* GetHUDWidget() const;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// INPUT HANDLING
+	////////////////////////////////////////////////////////////////////////////////
+public:
 	FORCEINLINE void SwitchToUIInput();
 
 	FORCEINLINE void SwitchToGameInput();
@@ -55,13 +80,6 @@ public:
 	void TogglePlayerInventoryUI();
 
 private:
-
-	const int CameraZoomRate = 15;
-
-	const int CameraArmMinimumLength = 50;
-
-	const int CameraArmMaximumLength = 500;
-
 	/** Move controlled pawn forward/backward */
 	void MovePawnForward(const float Value);
 
@@ -92,6 +110,17 @@ private:
 	template<uint32 SkillKeyIndex>
 	inline void ReleasedSkillKey();
 
+	
+	////////////////////////////////////////////////////////////////////////////////
+	// CONSTANTS
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	const int CameraZoomRate = 15;
+
+	const int CameraArmMinimumLength = 50;
+
+	const int CameraArmMaximumLength = 500;
+
 };
 
 FORCEINLINE UStatsComponentBase* AEODPlayerController::GetStatsComponent() const
@@ -103,7 +132,6 @@ FORCEINLINE UInventoryComponent* AEODPlayerController::GetInventoryComponent() c
 {
 	return InventoryComponent;
 }
-
 
 FORCEINLINE void AEODPlayerController::SwitchToUIInput()
 {
@@ -119,6 +147,11 @@ FORCEINLINE void AEODPlayerController::SwitchToGameInput()
 	FInputModeGameOnly GameOnlyInputMode;
 	GameOnlyInputMode.SetConsumeCaptureMouseDown(true);
 	SetInputMode(GameOnlyInputMode);
+}
+
+FORCEINLINE UHUDWidget* AEODPlayerController::GetHUDWidget() const
+{
+	return HUDWidget;
 }
 
 template<uint32 SkillKeyIndex>

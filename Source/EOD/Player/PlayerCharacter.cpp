@@ -218,10 +218,12 @@ void APlayerCharacter::PostInitializeComponents()
 
 	LoadUnequippedWeaponAnimationReferences();
 
+	/*
 	if (HUDWidgetClass.Get())
 	{
 		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), HUDWidgetClass);
 	}
+	*/
 
 	SetWalkSpeed(BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier());
 }
@@ -1512,9 +1514,9 @@ void APlayerCharacter::DisplayDialogueWidget(FName DialogueWindowID)
 		if (DialogueWidget && HUDWidget)
 		{
 			HUDWidget->AddDialogueWidget(DialogueWidget);
-			HUDWidget->SkillBarWidget->SetVisibility(ESlateVisibility::Hidden);
-			HUDWidget->InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
-			HUDWidget->SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+			HUDWidget->GetSkillBarWidget()->SetVisibility(ESlateVisibility::Hidden);
+			HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Hidden);
+			HUDWidget->GetSkillTreeWidget()->SetVisibility(ESlateVisibility::Hidden);
 
 			DialogueWidget->UpdateDialogueWindow(DialogueWindowID);
 
@@ -1535,7 +1537,7 @@ void APlayerCharacter::RemoveDialogueWidget()
 
 	if (HUDWidget)
 	{
-		HUDWidget->SkillBarWidget->SetVisibility(ESlateVisibility::Visible);
+		HUDWidget->GetSkillBarWidget()->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 

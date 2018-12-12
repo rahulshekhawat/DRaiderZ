@@ -18,7 +18,7 @@
 #include "HUDWidget.generated.h"
 
 /**
- * HUDWidget is used to display player HUD
+* HUDWidget is used to display player HUD
  */
 UCLASS()
 class EOD_API UHUDWidget : public UUserWidget
@@ -35,6 +35,10 @@ public:
 
 	virtual void NativeDestruct() override;
 
+	////////////////////////////////////////////////////////////////////////////////
+	// CHILD WIDGETS
+	////////////////////////////////////////////////////////////////////////////////
+protected:
 	/** Widget containing health, mana, and stamina bars */
 	UPROPERTY(Transient, BlueprintReadWrite)
 	UStatusIndicatorWidget* StatusIndicatorWidget;
@@ -54,6 +58,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UCanvasPanel* MainCanvas;
 
+public:
+	FORCEINLINE UStatusIndicatorWidget* GetStatusIndicatorWidget() const;
+
+	FORCEINLINE USkillBarWidget* GetSkillBarWidget() const;
+
+	FORCEINLINE UInventoryWidget* GetInventoryWidget() const;
+
+	FORCEINLINE USkillTreeWidget* GetSkillTreeWidget() const;
+
+	FORCEINLINE UCanvasPanel* GetMainCanvas() const;
+
+public:
 	/** Save current HUD layout to the current save slot */
 	void SaveHUDLayout();
 
@@ -133,7 +149,32 @@ private:
 
 };
 
-inline void UHUDWidget::AddSkillBarWidget(USkillBarWidget * NewWidget)
+FORCEINLINE UStatusIndicatorWidget* UHUDWidget::GetStatusIndicatorWidget() const
+{
+	return StatusIndicatorWidget;
+}
+
+FORCEINLINE USkillBarWidget* UHUDWidget::GetSkillBarWidget() const
+{
+	return SkillBarWidget;
+}
+
+FORCEINLINE UInventoryWidget* UHUDWidget::GetInventoryWidget() const
+{
+	return InventoryWidget;
+}
+
+FORCEINLINE USkillTreeWidget* UHUDWidget::GetSkillTreeWidget() const
+{
+	return SkillTreeWidget;
+}
+
+FORCEINLINE UCanvasPanel* UHUDWidget::GetMainCanvas() const
+{
+	return MainCanvas;
+}
+
+inline void UHUDWidget::AddSkillBarWidget(USkillBarWidget* NewWidget)
 {
 	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
 	CPSlot->SetSize(SkillBarWidgetSize);
@@ -143,7 +184,7 @@ inline void UHUDWidget::AddSkillBarWidget(USkillBarWidget * NewWidget)
 	SkillBarWidget = NewWidget;
 }
 
-inline void UHUDWidget::AddSkillTreeWidget(USkillTreeWidget * NewWidget)
+inline void UHUDWidget::AddSkillTreeWidget(USkillTreeWidget* NewWidget)
 {
 	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
 	CPSlot->SetSize(SkillTreeWidgetSize);
@@ -152,7 +193,7 @@ inline void UHUDWidget::AddSkillTreeWidget(USkillTreeWidget * NewWidget)
 	SkillTreeWidget = NewWidget;
 }
 
-inline void UHUDWidget::AddInventoryWidget(UInventoryWidget * NewWidget)
+inline void UHUDWidget::AddInventoryWidget(UInventoryWidget* NewWidget)
 {
 	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
 	CPSlot->SetSize(InventoryWidgetSize);
@@ -168,7 +209,7 @@ inline void UHUDWidget::AddDialogueWidget(UDialogueWindowWidget* NewWidget)
 	CPSlot->SetPosition(DialogueWidgetPosition);
 }
 
-inline void UHUDWidget::AddStatusIndicatorWidget(UStatusIndicatorWidget * NewWidget)
+inline void UHUDWidget::AddStatusIndicatorWidget(UStatusIndicatorWidget* NewWidget)
 {
 	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
 	CPSlot->SetSize(StatusIndicatorWidgetSize);

@@ -6,7 +6,10 @@
 #include "EOD/Player/Components/InventoryComponent.h"
 #include "EOD/Player/Components/PlayerStatsComponent.h"
 
+#include "EOD/UI/HUDWidget.h"
+
 #include "GameFramework/SpringArmComponent.h"
+#include "Blueprint/UserWidget.h"
 
 AEODPlayerController::AEODPlayerController(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
@@ -85,21 +88,55 @@ void AEODPlayerController::SetupInputComponent()
 
 }
 
+void AEODPlayerController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if(IsLocalPlayerController() && HUDWidgetClass.Get())
+	{
+		HUDWidget = CreateWidget<UHUDWidget>(this, HUDWidgetClass);
+		HUDWidget->AddToViewport();
+	}
+}
+
 void AEODPlayerController::TogglePlayerStatsUI()
 {
-
 }
 
 void AEODPlayerController::TogglePlayerHUD()
 {
+	if (HUDWidget && HUDWidget->IsVisible())
+	{
+		HUDWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		HUDWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void AEODPlayerController::TogglePlayerSkillTreeUI()
 {
+	if (HUDWidget && HUDWidget->GetSkillTreeWidget() && HUDWidget->GetSkillTreeWidget()->IsVisible())
+	{
+		HUDWidget->GetSkillTreeWidget()->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		HUDWidget->GetSkillTreeWidget()->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void AEODPlayerController::TogglePlayerInventoryUI()
 {
+	if (HUDWidget && HUDWidget->GetInventoryWidget() && HUDWidget->GetInventoryWidget()->IsVisible())
+	{
+		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void AEODPlayerController::MovePawnForward(const float Value)
