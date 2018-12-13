@@ -36,6 +36,7 @@ void UPlayerStatsComponent::PostInitProperties()
 {
 	Super::PostInitProperties();
 
+
 	
 }
 
@@ -45,6 +46,7 @@ void UPlayerStatsComponent::BeginPlay()
 
 	InitializeComponentWidget();
 
+	/*
 	//~ Initialize current variables
 	SetMaxHealth(BaseHealth);
 	SetCurrentHealth(BaseHealth);
@@ -54,6 +56,7 @@ void UPlayerStatsComponent::BeginPlay()
 
 	SetMaxStamina(BaseStamina);
 	SetCurrentStamina(BaseStamina);
+	*/
 
 	// @todo load damage and resistance stats
 
@@ -116,6 +119,7 @@ void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 
 }
 
+/*
 int32 UPlayerStatsComponent::GetBaseHealth() const
 {
 	return BaseHealth;
@@ -337,6 +341,7 @@ void UPlayerStatsComponent::SetCurrentStamina(int32 Value)
 		ActivateStaminaRegeneration();
 	}
 }
+*/
 
 int32 UPlayerStatsComponent::GetHealthRegenRate() const
 {
@@ -1123,8 +1128,10 @@ void UPlayerStatsComponent::DeactivateStaminaRegeneration()
 
 void UPlayerStatsComponent::RegenerateHealth()
 {
-	int32 CurrentHP = ModifyCurrentHealth(HealthRegenRate);
-	if (CurrentHP >= MaxHealth)
+	ModifyCurrentHealth(HealthRegenRate);
+	// int32 CurrentHP = ModifyCurrentHealth(HealthRegenRate);
+	// if (CurrentHP >= MaxHealth)
+	if (CurrentHealth >= MaxHealth)
 	{
 		DeactivateHealthRegeneration();
 	}
@@ -1132,8 +1139,9 @@ void UPlayerStatsComponent::RegenerateHealth()
 
 void UPlayerStatsComponent::RegenerateMana()
 {
-	int32 CurrentMP = ModifyCurrentMana(ManaRegenRate);
-	if (CurrentMP >= MaxMana)
+	// int32 CurrentMP = ModifyCurrentMana(ManaRegenRate);
+	// if (CurrentMP >= MaxMana)
+	if (CurrentMana >= MaxMana)
 	{
 		DeactivateManaRegeneration();
 	}
@@ -1141,8 +1149,9 @@ void UPlayerStatsComponent::RegenerateMana()
 
 void UPlayerStatsComponent::RegenerateStamina()
 {
-	int32 CurrentSP = ModifyCurrentStamina(StaminaRegenRate);
-	if (CurrentSP >= MaxStamina)
+	// int32 CurrentSP = ModifyCurrentStamina(StaminaRegenRate);
+	// if (CurrentSP >= MaxStamina)
+	if (CurrentStamina >= MaxStamina)
 	{
 		DeactivateStaminaRegeneration();
 	}

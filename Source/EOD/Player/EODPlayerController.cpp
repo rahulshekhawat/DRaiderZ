@@ -127,8 +127,10 @@ void AEODPlayerController::InitStatusIndicatorWidget()
 {
 	if (HUDWidget && HUDWidget->GetStatusIndicatorWidget())
 	{
-		// UStatusIndicatorWidget* 
-		// StatsComponent->
+		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
+		StatsComponent->OnHealthChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+		StatsComponent->OnManaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+		StatsComponent->OnStaminaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
 	}
 }
 

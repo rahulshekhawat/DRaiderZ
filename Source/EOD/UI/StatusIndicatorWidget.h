@@ -82,11 +82,11 @@ public:
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProgressBar)
 	// float Percent;
 
-	inline void UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth);
+	inline void UpdateHealthBar(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
 
-	inline void UpdateManaBar(int32 CurrentMana, int32 MaxMana, int32 BaseMana);
+	inline void UpdateManaBar(int32 BaseMana, int32 MaxMana, int32 CurrentMana);
 
-	inline void UpdateStaminaBar(int32 CurrentStamina, int32 MaxStamina, int32 BaseStamina);
+	inline void UpdateStaminaBar(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina);
 
 private:
 
@@ -113,7 +113,7 @@ private:
 	
 };
 
-inline void UStatusIndicatorWidget::UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth)
+inline void UStatusIndicatorWidget::UpdateHealthBar(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth)
 {
 	float MBHratio = (float)MaxHealth / (float)BaseHealth;
 	MBHratio = MBHratio > 1.0 ? 1.0 : MBHratio;
@@ -134,7 +134,7 @@ inline void UStatusIndicatorWidget::UpdateHealthBar(int32 CurrentHealth, int32 M
 	SetHorizontalSlotSize(HealthSpacerHSlot, 1 - CMHratio);
 }
 
-inline void UStatusIndicatorWidget::UpdateManaBar(int32 CurrentMana, int32 MaxMana, int32 BaseMana)
+inline void UStatusIndicatorWidget::UpdateManaBar(int32 BaseMana, int32 MaxMana, int32 CurrentMana)
 {
 	float MBMratio = (float)MaxMana / (float)BaseMana;
 	MBMratio = MBMratio > 1.0 ? 1.0 : MBMratio;
@@ -155,7 +155,7 @@ inline void UStatusIndicatorWidget::UpdateManaBar(int32 CurrentMana, int32 MaxMa
 	SetHorizontalSlotSize(ManaSpacerHSlot, 1 - CMMratio);
 }
 
-inline void UStatusIndicatorWidget::UpdateStaminaBar(int32 CurrentStamina, int32 MaxStamina, int32 BaseStamina)
+inline void UStatusIndicatorWidget::UpdateStaminaBar(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina)
 {
 	float MBSratio = (float)MaxStamina / (float)BaseStamina;
 	MBSratio = MBSratio > 1.0 ? 1.0 : MBSratio;

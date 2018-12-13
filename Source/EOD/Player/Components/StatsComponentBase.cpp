@@ -13,6 +13,8 @@ UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitial
 	bHasHealthRegenration = false;
 	bHasManaRegenration = false;
 	bHasStaminaRegenration = false;
+
+	LowHealthPercent = 0.15f;
 }
 
 void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -20,9 +22,24 @@ void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
+void UStatsComponentBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//~ Initialize current variables
+	SetMaxHealth(BaseHealth);
+	SetCurrentHealth(BaseHealth);
+
+	SetMaxMana(BaseMana);
+	SetCurrentMana(BaseMana);
+
+	SetMaxStamina(BaseStamina);
+	SetCurrentStamina(BaseStamina);
+
+}
+
 void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 }
-

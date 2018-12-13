@@ -227,7 +227,8 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 	}
 
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillDamageInfo, bCritHit, bAttackBlocked);
-	int32 ResultingHitCharacterHP = HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
+	HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
+	int32 ResultingHitCharacterHP = HitCharacter->GetStatsComponent()->GetCurrentHealth();
 	bool bCCEApplied = ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillDamageInfo, LineHitResult, BCAngle);
 	if (ResultingHitCharacterHP <= 0)
 	{

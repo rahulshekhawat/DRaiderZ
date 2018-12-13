@@ -18,11 +18,13 @@ void UAIStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*
 	SetMaxHealth(BaseHealth);
 	SetCurrentHealth(BaseHealth);
 
 	SetMaxMana(BaseMana);
 	SetCurrentMana(BaseMana);
+	*/
 
 }
 
@@ -43,6 +45,7 @@ void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 }
 
+/*
 int32 UAIStatsComponent::GetBaseHealth() const
 {
 	return BaseHealth;
@@ -196,6 +199,7 @@ void UAIStatsComponent::SetMaxStamina(int32 Value)
 void UAIStatsComponent::SetCurrentStamina(int32 Value)
 {
 }
+*/
 
 int32 UAIStatsComponent::GetHealthRegenRate() const
 {
