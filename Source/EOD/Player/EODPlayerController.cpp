@@ -7,6 +7,7 @@
 #include "EOD/Player/Components/PlayerStatsComponent.h"
 
 #include "EOD/UI/HUDWidget.h"
+#include "EOD/Statics/EODLibrary.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -27,14 +28,15 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("LookUp", this, &AEODPlayerController::AddPitchInput);
 
 	//~ Movement Input
-	InputComponent->BindAxis("MoveForward", this, &AEODPlayerController::MovePawnForward);
-	InputComponent->BindAxis("MoveRight", this, &AEODPlayerController::MovePawnRight);
+	InputComponent->BindAxis("MoveForward",	this, &AEODPlayerController::MovePawnForward);
+	InputComponent->BindAxis("MoveRight", this,	&AEODPlayerController::MovePawnRight);
 
 	//~ Begin Action Input Bindings
 	InputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &AEODPlayerController::ZoomInCamera);
 	InputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &AEODPlayerController::ZoomOutCamera);
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AEODPlayerController::MakePawnJump);
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AEODPlayerController::TriggerInteraction);
 
 	InputComponent->BindAction("Escape", IE_Pressed, this, &AEODPlayerController::OnPressingEscapeKey);
 	InputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &AEODPlayerController::ToggleMouseCursor);
@@ -99,7 +101,14 @@ void AEODPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	CreateHUDWidget();
-
+	// If HUD widget created successfully
+	if (HUDWidget)
+	{
+		InitStatusIndicatorWidget();
+		InitInventoryWidget();
+		InitSkillTreeWidget();
+		InitSkillBarWidget();
+	}
 }
 
 void AEODPlayerController::CreateHUDWidget()
@@ -114,52 +123,37 @@ void AEODPlayerController::CreateHUDWidget()
 	}
 }
 
-/*
-void AEODPlayerController::CreateSkillTreeWidget()
+void AEODPlayerController::InitStatusIndicatorWidget()
 {
-	// We only need to create a skill tree widget if the HUD widget exist
-	if (HUDWidget && SkillTreeWidgetClass.Get())
+	if (HUDWidget && HUDWidget->GetStatusIndicatorWidget())
 	{
-		SkillTreeWidget = CreateWidget<USkillTreeWidget>(this, SkillTreeWidgetClass);
-		if (SkillTreeWidget)
-		{
-			HUDWidget->AddSkillTreeWidget(SkillTreeWidget);
-		}
+		// UStatusIndicatorWidget* 
+		// StatsComponent->
 	}
 }
 
-void AEODPlayerController::CreateSkillBarWidget()
+void AEODPlayerController::InitInventoryWidget()
 {
-	// The default skill bar widget class
-	TSubclassOf<USkillBarWidget> WidgetClass = SkillBarWidgetClass;
-	if (GetCharacter())
+	if (HUDWidget && HUDWidget->GetInventoryWidget())
 	{
-		APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(GetCharacter());
-		if (PlayerChar)
+		UInventoryWidget* InvWidget = HUDWidget->GetInventoryWidget();
+		TArray<FInventoryItem> Items = InventoryComponent->GetInventoryItems();
+		for (const FInventoryItem& Item : Items)
 		{
-			WidgetClass = PlayerChar->SkillBarWidgetClass;
+			InvWidget->AddItem(Item);
 		}
-	}
 
-	// We only need to create a skill bar widget if the HUD widget exist
-	if (HUDWidget && WidgetClass.Get())
-	{
-		SkillBarWidget = CreateWidget<USkillBarWidget>(this, WidgetClass);
-		if (SkillBarWidget)
-		{
-			HUDWidget->AddSkillBarWidget(SkillBarWidget);
-		}
+		InventoryComponent->OnInventoryItemAdded.AddDynamic(InvWidget, &UInventoryWidget::AddItem);
+		InventoryComponent->OnInventoryItemRemoved.AddDynamic(InvWidget, &UInventoryWidget::RemoveItem);
 	}
 }
 
-void AEODPlayerController::CreatePlayerStatsWidget()
+void AEODPlayerController::InitSkillTreeWidget()
 {
 }
-*/
 
-void AEODPlayerController::TogglePlayerStatsUI()
+void AEODPlayerController::InitSkillBarWidget()
 {
-
 }
 
 void AEODPlayerController::TogglePlayerHUD()
@@ -195,6 +189,18 @@ void AEODPlayerController::TogglePlayerInventoryUI()
 	else if (HUDWidget && HUDWidget->GetInventoryWidget() && !HUDWidget->GetInventoryWidget()->IsVisible())
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void AEODPlayerController::TogglePlayerStatsUI()
+{
+	if (HUDWidget && HUDWidget->GetPlayerStatsWidget() && HUDWidget->GetPlayerStatsWidget()->IsVisible())
+	{
+		HUDWidget->GetPlayerStatsWidget()->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else if (HUDWidget && HUDWidget->GetPlayerStatsWidget() && !HUDWidget->GetPlayerStatsWidget()->IsVisible())
+	{
+		HUDWidget->GetPlayerStatsWidget()->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
@@ -247,6 +253,10 @@ void AEODPlayerController::ZoomOutCamera()
 			SpringArm->TargetArmLength += CameraZoomRate;
 		}
 	}
+}
+
+void AEODPlayerController::TriggerInteraction()
+{
 }
 
 void AEODPlayerController::ToggleAutoRun()

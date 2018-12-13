@@ -146,8 +146,8 @@ private:
 	USkeletalMeshComponent* Feet;
 	
 	//~ Inventory component
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UInventoryComponent* InventoryComponent;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UInventoryComponent* InventoryComponent;
 
 	//~ Skills component - manages both skill bar and skill tree of player
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

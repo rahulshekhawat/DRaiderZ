@@ -8,9 +8,10 @@
 #include "EODPlayerController.generated.h"
 
 class UHUDWidget;
-class USkillBarWidget;
-class USkillTreeWidget;
-class UPlayerStatsWidget;
+// class USkillBarWidget;
+// class USkillTreeWidget;
+// class UPlayerStatsWidget;
+class USkillsComponent;
 class UInventoryComponent;
 class UStatsComponentBase;
 class UDialogueWindowWidget;
@@ -42,6 +43,8 @@ public:
 
 	FORCEINLINE UInventoryComponent* GetInventoryComponent() const;
 
+	FORCEINLINE USkillsComponent* GetSkillsComponent() const;
+
 private:
 	//~ Inventory component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -51,10 +54,17 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UStatsComponentBase* StatsComponent;
 
+	//~ Skills component manages and displays the skills of possessed pawn (player or not)
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkillsComponent* SkillsComponent;
+
 
 	////////////////////////////////////////////////////////////////////////////////
 	// UI
 	////////////////////////////////////////////////////////////////////////////////
+public:
+	FORCEINLINE UHUDWidget* GetHUDWidget() const;
+
 private:
 	/** Player's head-up display widget */
 	UPROPERTY(Transient)
@@ -64,25 +74,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<UHUDWidget> HUDWidgetClass;
 
-	/** Player's skill tree widget */
-	// UPROPERTY(Transient)
-	// USkillTreeWidget* SkillTreeWidget;
-
-	/** The widget class to use for player's skill tree widget */
-	// UPROPERTY(EditDefaultsOnly, Category = "Player UI")
-	// TSubclassOf<USkillTreeWidget> SkillTreeWidgetClass;
-
-	/** Player's skill bar widget. This will be created using skill bar widget class of possessed pawn */
-	// UPROPERTY(Transient)
-	// USkillBarWidget* SkillBarWidget;
-
-	/**
-	 * The default widget class to use for player's skill bar widget (in case we fail to retrieve it from the possessed pawn)
-	 * If this is set to NULL no skill bar will created and displayed
-	 */
-	// UPROPERTY(EditDefaultsOnly, Category = "Player UI")
-	// TSubclassOf<USkillBarWidget> SkillBarWidgetClass;
-
 	/** Dialogue widget used to display NPC dialogues */
 	UPROPERTY(Transient, BlueprintReadWrite, Category = "Player UI", meta = (AllowPrivateAccess = "true"))
 	UDialogueWindowWidget* DialogueWidget;
@@ -91,24 +82,16 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<UDialogueWindowWidget> DialogueWidgetClass;
 
-	/** A widget used to display player stats */
-	// UPROPERTY(Transient)
-	// UPlayerStatsWidget* PlayerStatsWidget;
-
-	/** The widget class to use for player stats widget */
-	// UPROPERTY(EditDefaultsOnly, Category = "Player UI")
-	// TSubclassOf<UPlayerStatsWidget> PlayerStatsWidgetClass;
-
 	void CreateHUDWidget();
 
-	// void CreateSkillTreeWidget();
+	void InitStatusIndicatorWidget();
 
-	// void CreateSkillBarWidget();
+	/** Initialized inventory widget and also sets up proper delegates */
+	void InitInventoryWidget();
 
-	// void CreatePlayerStatsWidget();
+	void InitSkillTreeWidget();
 
-public:
-	FORCEINLINE UHUDWidget* GetHUDWidget() const;
+	void InitSkillBarWidget();
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -139,6 +122,8 @@ private:
 	void ZoomInCamera();
 
 	void ZoomOutCamera();
+
+	void TriggerInteraction();
 
 	void ToggleAutoRun();
 
@@ -179,6 +164,11 @@ FORCEINLINE UStatsComponentBase* AEODPlayerController::GetStatsComponent() const
 FORCEINLINE UInventoryComponent* AEODPlayerController::GetInventoryComponent() const
 {
 	return InventoryComponent;
+}
+
+FORCEINLINE USkillsComponent* AEODPlayerController::GetSkillsComponent() const
+{
+	return SkillsComponent;
 }
 
 FORCEINLINE void AEODPlayerController::SwitchToUIInput()
