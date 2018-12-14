@@ -123,7 +123,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnPressedNormalAttack);
 	PlayerInputComponent->BindAction("NormalAttack", IE_Released, this, &APlayerCharacter::OnReleasedNormalAttack);
 	
-	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &APlayerCharacter::OnDodge);
+	// PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &APlayerCharacter::OnDodge);
 	// PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::OnJump);
 	// PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::OnInteract);
 	PlayerInputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &APlayerCharacter::OnToggleSheathe);
@@ -855,6 +855,12 @@ void APlayerCharacter::ZoomOutCamera()
 		CameraBoom->TargetArmLength += CameraZoomRate;
 }
 
+bool APlayerCharacter::StartAction_Dodge()
+{
+	// UKismetSystemLibrary::PrintString(this, FString("Dodged"));
+	return false;
+}
+
 void APlayerCharacter::OnDodge()
 {
 	// Alternative to disable auto run
@@ -1238,8 +1244,11 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 			
 	bool bRotatePlayer = DesiredPlayerRotationYaw == ActorRotationYaw ? false : true;
 
-	float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-	float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
+	float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
+	float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
+
+	// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+	// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
 	if (ForwardAxisValue == 0 && RightAxisValue == 0)
 	{
 		bRotatePlayer = false;

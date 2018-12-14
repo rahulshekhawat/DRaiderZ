@@ -36,6 +36,7 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &AEODPlayerController::ZoomOutCamera);
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AEODPlayerController::MakePawnJump);
+	InputComponent->BindAction("Dodge", IE_Pressed, this, &AEODPlayerController::AttemptDodge);
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AEODPlayerController::TriggerInteraction);
 
 	InputComponent->BindAction("Escape", IE_Pressed, this, &AEODPlayerController::OnPressingEscapeKey);
@@ -206,10 +207,33 @@ void AEODPlayerController::TogglePlayerStatsUI()
 	}
 }
 
+void AEODPlayerController::EnableAutoRun()
+{
+	bAutoRunEnabled = true;
+	if (GetPawn())
+	{
+		GetPawn()->bUseControllerRotationYaw = true;
+	}
+}
+
+void AEODPlayerController::DisableAutoRun()
+{
+	bAutoRunEnabled = false;
+	if (GetPawn())
+	{
+		GetPawn()->bUseControllerRotationYaw = false;
+	}
+}
+
 void AEODPlayerController::MovePawnForward(const float Value)
 {
 	if (GetPawn() && Value != 0)
 	{
+		if (bAutoRunEnabled)
+		{
+			
+		}
+
 		FRotator Rotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
 		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
 		GetPawn()->AddMovementInput(Direction, Value);
@@ -254,6 +278,29 @@ void AEODPlayerController::ZoomOutCamera()
 		{
 			SpringArm->TargetArmLength += CameraZoomRate;
 		}
+	}
+}
+
+void AEODPlayerController::AttemptDodge()
+{
+	// Only player character can dodge
+	APlayerCharacter* Char = Cast<APlayerCharacter>(GetCharacter());
+	if (Char)
+	{
+		if (bAutoRunEnabled)
+		{
+			DisableAutoRun();
+		}
+
+		int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
+		if (StatsComponent->GetCurrentStamina() >= DodgeCost)
+		{
+			bool bResult = Char->StartAction_Dodge();
+			if (bResult)
+			{
+				StatsComponent->ModifyCurrentStamina(-DodgeCost);
+			}
+		}		
 	}
 }
 

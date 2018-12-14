@@ -507,6 +507,8 @@ public:
 
 	int32 ActiveWeaponSlotIndex;
 
+	bool StartAction_Dodge();
+
 private:
 
 	UPROPERTY(Transient)

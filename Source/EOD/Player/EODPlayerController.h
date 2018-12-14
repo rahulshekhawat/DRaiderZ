@@ -111,6 +111,13 @@ public:
 	void TogglePlayerInventoryUI();
 
 private:
+
+	bool bAutoRunEnabled;
+
+	void EnableAutoRun();
+
+	void DisableAutoRun();
+
 	/** Move controlled pawn forward/backward */
 	void MovePawnForward(const float Value);
 
@@ -122,6 +129,8 @@ private:
 	void ZoomInCamera();
 
 	void ZoomOutCamera();
+
+	void AttemptDodge();
 
 	void TriggerInteraction();
 
@@ -153,6 +162,8 @@ private:
 	const int CameraArmMinimumLength = 50;
 
 	const int CameraArmMaximumLength = 500;
+
+	const int DodgeStaminaCost = 30;
 
 };
 
