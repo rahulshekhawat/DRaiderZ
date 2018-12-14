@@ -1,8 +1,8 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODPlayerController.h"
-#include "EOD/Player/PlayerCharacter.h"
-#include "EOD/Player/Components/SkillsComponent.h"
+#include "EOD/Characters/PlayerCharacter.h"
+#include "EOD/Characters/Components/SkillsComponent.h"
 #include "EOD/Player/Components/InventoryComponent.h"
 #include "EOD/Player/Components/PlayerStatsComponent.h"
 

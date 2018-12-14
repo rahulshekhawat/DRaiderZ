@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "AIStatsComponent.h"
-#include "AI/AICharacterBase.h"
+#include "EOD/AI/Components/AIStatsComponent.h"
+#include "EOD/Characters/AICharacterBase.h"
 #include "UI/FloatingHealthBarWidget.h"
 #include "Player/Components/EODWidgetComponent.h"
 

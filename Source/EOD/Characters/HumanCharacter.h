@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/EODCharacterBase.h"
-#include "RideCharacter.generated.h"
+#include "EOD/Characters/EODCharacterBase.h"
+#include "HumanCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API ARideCharacter : public AEODCharacterBase
+class EOD_API AHumanCharacter : public AEODCharacterBase
 {
 	GENERATED_BODY()
 	

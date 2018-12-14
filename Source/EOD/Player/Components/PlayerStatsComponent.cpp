@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "PlayerStatsComponent.h"
-#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/UI/HUDWidget.h"
 #include "EOD/UI/StatusIndicatorWidget.h"
 

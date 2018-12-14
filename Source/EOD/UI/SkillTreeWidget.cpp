@@ -3,7 +3,7 @@
 #include "SkillTreeWidget.h"
 #include "EOD/Core/EODPreprocessors.h"
 #include "EOD/UI/SkillTreeItemContainer.h"
-#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Characters/PlayerCharacter.h"
 
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"

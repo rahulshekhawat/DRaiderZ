@@ -2,9 +2,9 @@
 
 #include "CombatManager.h"
 #include "EOD/Core/EODPreprocessors.h"
-#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/Events/AttackDodgedEvent.h"
-#include "EOD/Player/Components/StatsComponentBase.h"
+#include "EOD/Characters/Components/StatsComponentBase.h"
 
 #include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"

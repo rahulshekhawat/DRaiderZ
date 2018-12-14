@@ -2,7 +2,7 @@
 
 #include "CombatLibrary.h"
 #include "EOD/Statics/CharacterLibrary.h"
-#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Characters/EODCharacterBase.h"
 
 UCombatLibrary::UCombatLibrary(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {

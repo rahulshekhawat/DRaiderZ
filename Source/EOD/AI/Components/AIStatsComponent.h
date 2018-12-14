@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EOD/Player/Components/StatsComponentBase.h"
+#include "EOD/Characters/Components/StatsComponentBase.h"
 #include "AIStatsComponent.generated.h"
 
 class AAICharacterBase;

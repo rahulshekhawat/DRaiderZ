@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EOD/UI/EODItemContainer.h"
-#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/Statics/CharacterLibrary.h"
 
 #include "Blueprint/UserWidget.h"

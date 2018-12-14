@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EOD/Statics/WeaponLibrary.h"
-#include "EOD/Player/Components/StatsComponentBase.h"
+#include "EOD/Characters/Components/StatsComponentBase.h"
 
 #include "PlayerStatsComponent.generated.h"
 

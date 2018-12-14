@@ -2,7 +2,7 @@
 
 #include "DialogueOptionWidget.h"
 #include "EOD/UI/DialogueWindowWidget.h"
-#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Characters/PlayerCharacter.h"
 
 #include "Components/Button.h"
 
