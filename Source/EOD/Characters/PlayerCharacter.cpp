@@ -59,11 +59,14 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	Legs			= CreateNewArmorComponent(FName("Legs"), ObjectInitializer);
 	Feet			= CreateNewArmorComponent(FName("Feet"), ObjectInitializer);
 
+	/*
 	InteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, FName("Interaction Sphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
 	InteractionSphere->SetSphereRadius(150.f);
+	*/
 
 	//~ Begin Camera Components Initialization
+	/*
 	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, FName("Camera Boom"));
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->SetupAttachment(RootComponent);
@@ -71,10 +74,11 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	PlayerCamera = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, FName("Camera"));
 	PlayerCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	*/
 	//~ End Camera Components Initialization
 
 	// InventoryComponent = ObjectInitializer.CreateDefaultSubobject<UInventoryComponent>(this, FName("Player Inventory"));
-	SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
+	// SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
 
 	AudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("Audio Component"));
 	AudioComponent->SetupAttachment(RootComponent);
@@ -845,14 +849,14 @@ void APlayerCharacter::MoveRight(const float Value)
 
 void APlayerCharacter::ZoomInCamera()
 {
-	if (CameraBoom->TargetArmLength >= CameraArmMinimumLength)
-		CameraBoom->TargetArmLength -= CameraZoomRate;
+	if (GetCameraBoom()->TargetArmLength >= CameraArmMinimumLength)
+		GetCameraBoom()->TargetArmLength -= CameraZoomRate;
 }
 
 void APlayerCharacter::ZoomOutCamera()
 {
-	if (CameraBoom->TargetArmLength <= CameraArmMaximumLength)
-		CameraBoom->TargetArmLength += CameraZoomRate;
+	if (GetCameraBoom()->TargetArmLength <= CameraArmMaximumLength)
+		GetCameraBoom()->TargetArmLength += CameraZoomRate;
 }
 
 bool APlayerCharacter::StartAction_Dodge()
@@ -1700,15 +1704,15 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	TPair<FName, FSkillTableRow*> SkillPair(NAME_None, nullptr);
 	if (CanUseAnySkill())
 	{
-		SkillPair = SkillsComponent->GetSkillFromSkillSlot(SkillButtonIndex);
+		SkillPair = GetSkillsComponent()->GetSkillFromSkillSlot(SkillButtonIndex);
 	}
 	else if (IsUsingAnySkill() && bCanUseChainSkill)
 	{
-		SkillPair = SkillsComponent->GetChainSkillFromSkillSlot(SkillButtonIndex);
+		SkillPair = GetSkillsComponent()->GetChainSkillFromSkillSlot(SkillButtonIndex);
 	}
 	else if (HasBeenHit())
 	{
-		SkillPair = SkillsComponent->GetHitImmuneSkillFromSkillSlot(SkillButtonIndex);
+		SkillPair = GetSkillsComponent()->GetHitImmuneSkillFromSkillSlot(SkillButtonIndex);
 	}
 
 	/*
@@ -1738,7 +1742,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 	SetCurrentActiveSkillID(SkillPair.Key);
 	SetCurrentActiveSkill(SkillPair.Value);
-	SkillsComponent->OnSkillUsed(SkillButtonIndex, SkillPair.Key, SkillPair.Value);
+	GetSkillsComponent()->OnSkillUsed(SkillButtonIndex, SkillPair.Key, SkillPair.Value);
 
 	bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
 	bSkillHasDirectionalAnimations = SkillPair.Value->bHasDirectionalAnimations;
@@ -2060,7 +2064,7 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	// @todo handle skill montage blending out better because montages might be blending out in between transition of standstill and moving animations
 	if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
 	{
-		SkillsComponent->SetOffChainSkillReset();
+		GetSkillsComponent()->SetOffChainSkillReset();
 
 		if (GetCurrentActiveSkill()->CrowdControlImmunities == GetStatsComponent()->GetCrowdControlImmunitiesFromSkill())
 		{
@@ -2145,42 +2149,22 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 
 void APlayerCharacter::TurnOnTargetSwitch()
 {
-	/*
-	Super::TurnOnTargetSwitch();
-
-	Hair->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
-	HatItem->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
-	FaceItem->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
-	Chest->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
-	Hands->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
-	Legs->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
-	Feet->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
-	*/
+	// Empty override to prevent call of Super::TurnOffTargetSwitch()
 }
 
 void APlayerCharacter::TurnOffTargetSwitch()
 {
-	/*
-	Super::TurnOffTargetSwitch();
-
-	Hair->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
-	HatItem->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
-	FaceItem->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
-	Chest->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
-	Hands->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
-	Legs->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
-	Feet->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
-	*/
+	// Empty override to prevent call of Super::TurnOffTargetSwitch()
 }
 
 void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)
 {
-	SkillsComponent->OnSkillGroupAddedToSkillBar(SkillGroup);
+	GetSkillsComponent()->OnSkillGroupAddedToSkillBar(SkillGroup);
 }
 
 void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString & SkillGroup)
 {
-	SkillsComponent->OnSkillGroupRemovedFromSkillBar(SkillGroup);
+	GetSkillsComponent()->OnSkillGroupRemovedFromSkillBar(SkillGroup);
 }
 
 void APlayerCharacter::Server_SetIWRCharMovementDir_Implementation(ECharMovementDirection NewDirection)

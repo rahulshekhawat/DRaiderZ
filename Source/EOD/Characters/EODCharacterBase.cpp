@@ -2,11 +2,15 @@
 
 #include "EOD/Characters/EODCharacterBase.h"
 #include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Player/EODPlayerController.h"
 #include "EOD/AnimInstances/CharAnimInstance.h"
+#include "EOD/Characters/Components/SkillsComponent.h"
 #include "EOD/Characters/Components/StatsComponentBase.h"
 #include "EOD/Statics/EODBlueprintFunctionLibrary.h"
 
 #include "UnrealNetwork.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -15,9 +19,26 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+
 	// Initialize Stats Component
 	StatsComp = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, FName("Character Stats Component"));
-	
+	SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
+
+	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, FName("Camera Boom"));
+	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->SetupAttachment(RootComponent);
+	CameraBoom->AddLocalOffset(FVector(0.f, 0.f, 60.f));
+
+	Camera = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, FName("Camera"));
+	Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+
+	InteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, FName("Interaction Sphere"));
+	InteractionSphere->SetupAttachment(RootComponent);
+	InteractionSphere->SetSphereRadius(150.f);
+
+	// No need to enable interaction sphere unless the character is possessed by player controller
+	DisableInteractionSphere();
+
 	// Initialize variables
 	CharacterState = ECharacterState::IdleWalkRun;
 	bGodMode = false;
@@ -55,6 +76,25 @@ void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void AEODCharacterBase::PossessedBy(AController* NewController)
+{
+	// AEODPlayerController* EODPC = Cast<AEODPlayerController>(NewController);
+	APlayerController* LController = Cast<APlayerController>(NewController);
+	// If this character got possessed by a player controller
+	if (LController)
+	{
+		EnableInteractionSphere();
+	}
+	else
+	{
+		DisableInteractionSphere();
+	}
+}
+
+void AEODCharacterBase::UnPossessed()
+{
 }
 
 bool AEODCharacterBase::BP_IsDead() const

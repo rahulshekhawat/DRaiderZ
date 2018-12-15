@@ -112,6 +112,22 @@ void AEODPlayerController::BeginPlay()
 	}
 }
 
+void AEODPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+void AEODPlayerController::Possess(APawn* Pawn)
+{
+	Super::Possess(Pawn);
+}
+
+void AEODPlayerController::UnPossess()
+{
+	Super::UnPossess();
+}
+
 void AEODPlayerController::CreateHUDWidget()
 {
 	if (IsLocalPlayerController() && HUDWidgetClass.Get())
@@ -351,4 +367,8 @@ void AEODPlayerController::OnReleasingSkillKey(const int32 SkillKeyIndex)
 			SkillComponent->OnReleasingSkillKey(SkillKeyIndex);
 		}
 	}
+}
+
+void AEODPlayerController::SavePlayerState()
+{
 }

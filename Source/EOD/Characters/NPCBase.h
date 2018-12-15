@@ -30,8 +30,8 @@ public:
 
 private:
 
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* InteractionCamera;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UCameraComponent* InteractionCamera;
 
 
 };

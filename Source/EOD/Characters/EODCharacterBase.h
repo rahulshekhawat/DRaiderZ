@@ -10,11 +10,15 @@
 
 #include "Animation/AnimInstance.h"
 #include "GameFramework/Character.h"
+#include "Components/SphereComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "EODCharacterBase.generated.h"
 
 class UAnimMontage;
+class USkillsComponent;
 class UInputComponent;
+class UCameraComponent;
+class USpringArmComponent;
 class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
@@ -58,6 +62,10 @@ public:
 
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
+
+	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void UnPossessed() override;
 
 	/** Returns true if character is alive */
 	FORCEINLINE bool IsAlive() const;
@@ -466,12 +474,43 @@ public:
 	UFUNCTION(BlueprintCallable, category = Rotation)
 	float GetOrientationYawToActor(AActor* TargetActor);
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// COMPONENTS
+	////////////////////////////////////////////////////////////////////////////////
+public:
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const;
+
+	FORCEINLINE UCameraComponent* GetCamera() const;
+
+	FORCEINLINE USkillsComponent* GetSkillsComponent() const;
+
+	FORCEINLINE USphereComponent* GetInteractionSphere() const;
+
+	FORCEINLINE void EnableInteractionSphere();
+
+	FORCEINLINE void DisableInteractionSphere();
+
 private:
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* Camera;
 
 	/** StatsComp contains and manages the stats info of this character */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UStatsComponentBase* StatsComp;
 
+	//~ Skills component - manages skills of character
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkillsComponent* SkillsComponent;
+
+	//~ Sphere component used to detect interactive objects
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USphereComponent* InteractionSphere;
+
+private:
 	/** In game faction of your character */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character", meta = (AllowPrivateAccess = "true"))
 	EFaction Faction;
@@ -629,6 +668,38 @@ private:
 	
 	
 };
+
+FORCEINLINE USpringArmComponent* AEODCharacterBase::GetCameraBoom() const
+{
+	return CameraBoom;
+}
+
+FORCEINLINE UCameraComponent* AEODCharacterBase::GetCamera() const
+{
+	return Camera;
+}
+
+FORCEINLINE USkillsComponent* AEODCharacterBase::GetSkillsComponent() const
+{
+	return SkillsComponent;
+}
+
+FORCEINLINE USphereComponent* AEODCharacterBase::GetInteractionSphere() const
+{
+	return InteractionSphere;
+}
+
+FORCEINLINE void AEODCharacterBase::EnableInteractionSphere()
+{
+	InteractionSphere->Activate();
+	InteractionSphere->SetCollisionProfileName(FName("OverlapAllDynamic"));
+}
+
+FORCEINLINE void AEODCharacterBase::DisableInteractionSphere()
+{
+	InteractionSphere->Deactivate();
+	InteractionSphere->SetCollisionProfileName(FName("NoCollision"));
+}
 
 FORCEINLINE bool AEODCharacterBase::IsAlive() const
 {
