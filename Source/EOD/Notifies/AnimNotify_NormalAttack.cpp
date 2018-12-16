@@ -13,7 +13,7 @@ void UAnimNotify_NormalAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 		return;
 	}
 
-	PlayerCharacter->SetOffSmoothRotation(PlayerCharacter->GetPlayerControlRotationYaw());
+	PlayerCharacter->SetOffSmoothRotation(PlayerCharacter->GetControllerRotationYaw());
 	PlayerCharacter->OnNormalAttackSectionStart(SectionName);
 
 }

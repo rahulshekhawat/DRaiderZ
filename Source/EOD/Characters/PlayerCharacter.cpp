@@ -85,10 +85,6 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	// By default the weapon should be sheathed
 	bWeaponSheathed = true;
 
-	BaseNormalMovementSpeed = 400.f;
-	BaseSpecialMovementSpeed = 600.f;
-	BaseBlockMovementSpeed = 150.f;
-
 	MaxWeaponSlots = 2;
 	
 	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
@@ -228,7 +224,7 @@ void APlayerCharacter::PostInitializeComponents()
 	}
 	*/
 
-	SetWalkSpeed(BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier());
+	SetWalkSpeed(DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier());
 }
 
 void APlayerCharacter::PostInitProperties()
@@ -895,7 +891,7 @@ void APlayerCharacter::OnDodge()
 		}
 		else
 		{
-			DesiredYaw = GetPlayerControlRotationYaw();
+			DesiredYaw = GetControllerRotationYaw();
 		}
 
 		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
@@ -913,7 +909,7 @@ void APlayerCharacter::OnDodge()
 
 		float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
 		float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
-		float DesiredYaw = GetPlayerControlRotationYaw();
+		float DesiredYaw = GetControllerRotationYaw();
 
 		if (ForwardAxisValue != 0)
 		{
@@ -1134,14 +1130,14 @@ void APlayerCharacter::OnPressedNormalAttack()
 		PlayAnimationMontage(NormalAttackMontage,
 			UCharacterLibrary::SectionName_ForwardSPSwing,
 			ECharacterState::Attacking);
-		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
+		SetCharacterRotation(FRotator(0.f, GetControllerRotationYaw(), 0.f));
 	}
 	else if (!IsNormalAttacking() && bBackwardPressed)
 	{
 		PlayAnimationMontage(NormalAttackMontage,
 			UCharacterLibrary::SectionName_BackwardSPSwing,
 			ECharacterState::Attacking);
-		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
+		SetCharacterRotation(FRotator(0.f, GetControllerRotationYaw(), 0.f));
 	}
 	else if (!IsNormalAttacking())
 	{
@@ -1188,14 +1184,14 @@ void APlayerCharacter::DoNormalAttack()
 		PlayAnimationMontage(NormalAttackMontage,
 			UCharacterLibrary::SectionName_ForwardSPSwing,
 			ECharacterState::Attacking);
-		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
+		SetCharacterRotation(FRotator(0.f, GetControllerRotationYaw(), 0.f));
 	}
 	else if (bBackwardPressed)
 	{
 		PlayAnimationMontage(NormalAttackMontage,
 			UCharacterLibrary::SectionName_BackwardSPSwing,
 			ECharacterState::Attacking);
-		SetCharacterRotation(FRotator(0.f, GetPlayerControlRotationYaw(), 0.f));
+		SetCharacterRotation(FRotator(0.f, GetControllerRotationYaw(), 0.f));
 	}
 	else
 	{
@@ -1264,7 +1260,7 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 	
 	if (ForwardAxisValue < 0)
 	{
-		float Speed = (BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1272,7 +1268,7 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 	}
 	else
 	{
-		float Speed = BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+		float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1358,7 +1354,7 @@ void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 
 	if (ForwardAxisValue < 0)
 	{
-		float Speed = (BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1366,7 +1362,7 @@ void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 	}
 	else
 	{
-		float Speed = BaseSpecialMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+		float Speed = DefaultRunSpeed * GetStatsComponent()->GetMovementSpeedModifier();
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1412,7 +1408,7 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 		SetIWRCharMovementDir(ECharMovementDirection::F);
 	}
 	
-	float Speed = BaseNormalMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+	float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
 	if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 	{
 		SetWalkSpeed(Speed);
@@ -1807,7 +1803,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	{
 		if (SkillPair.Value->AnimMontage.Get())
 		{
-			SetOffSmoothRotation(GetPlayerControlRotationYaw());
+			SetOffSmoothRotation(GetControllerRotationYaw());
 			PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 		}
 	}
@@ -1815,58 +1811,6 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
 {
-}
-
-float APlayerCharacter::GetPlayerControlRotationYaw()
-{
-	float ControlRotationYaw = Controller->GetControlRotation().Yaw;
-
-	if (0 <= ControlRotationYaw && ControlRotationYaw <= 180)
-		return ControlRotationYaw;
-	else if (180 < ControlRotationYaw && ControlRotationYaw < 360)
-	{
-		return (ControlRotationYaw - 360.f);
-	}
-	else if (ControlRotationYaw == 360)
-		return 0.f;
-	else
-		return ControlRotationYaw;
-}
-
-float APlayerCharacter::GetRotationYawFromAxisInput()
-{
-	float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-	float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
-	
-	float ControlRotationYaw = GetPlayerControlRotationYaw();
-	float ResultingRotation = 0.f;
-
-	if (ForwardAxisValue == 0)
-	{
-		if (RightAxisValue > 0)
-		{
-			ResultingRotation = ControlRotationYaw + 90.f;
-		}
-		else if (RightAxisValue < 0)
-		{
-			ResultingRotation = ControlRotationYaw - 90.f;
-		}
-	}
-	else
-	{
-		if (ForwardAxisValue > 0)
-		{
-			float DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
-			ResultingRotation = ControlRotationYaw + DeltaAngle;
-		}
-		else if (ForwardAxisValue < 0)
-		{
-			float DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(-RightAxisValue, -ForwardAxisValue));
-			ResultingRotation = ControlRotationYaw + DeltaAngle;
-		}
-	}
-
-	return ResultingRotation;
 }
 
 void APlayerCharacter::BP_SetCanUseChainSkill(bool bNewValue)

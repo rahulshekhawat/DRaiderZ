@@ -46,7 +46,7 @@ void AEODPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("Escape", IE_Pressed, this, &AEODPlayerController::OnPressingEscapeKey);
 	InputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &AEODPlayerController::ToggleMouseCursor);
-	InputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &AEODPlayerController::ToggleAutoRun);
+	InputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &AEODPlayerController::ToggleAutoMove);
 
 	InputComponent->BindAction("ToggleStats", IE_Pressed, this, &AEODPlayerController::TogglePlayerStatsUI);
 	InputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &AEODPlayerController::TogglePlayerSkillTreeUI);
@@ -106,7 +106,7 @@ void AEODPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(AEODPlayerController, bAutoRunEnabled, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AEODPlayerController, bAutoMoveEnabled, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODPlayerController, bBlockKeyPressed, COND_SkipOwner);
 
 }
@@ -247,9 +247,9 @@ void AEODPlayerController::MovePawnForward(const float Value)
 {
 	if (EODCharacter && Value != 0)
 	{
-		if (IsAutoRunEnabled())
+		if (IsAutoMoveEnabled())
 		{
-			DisableAutoRun();
+			DisableAutoMove();
 		}
 
 		FRotator Rotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
@@ -262,9 +262,9 @@ void AEODPlayerController::MovePawnRight(const float Value)
 {
 	if (EODCharacter && Value != 0)
 	{
-		if (IsAutoRunEnabled())
+		if (IsAutoMoveEnabled())
 		{
-			DisableAutoRun();
+			DisableAutoMove();
 		}
 
 		FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
@@ -303,9 +303,9 @@ void AEODPlayerController::AttemptDodge()
 {
 	if (EODCharacter)
 	{
-		if (IsAutoRunEnabled())
+		if (IsAutoMoveEnabled())
 		{
-			DisableAutoRun();
+			DisableAutoMove();
 		}
 
 		int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
@@ -328,15 +328,15 @@ void AEODPlayerController::TriggerInteraction()
 	}
 }
 
-void AEODPlayerController::ToggleAutoRun()
+void AEODPlayerController::ToggleAutoMove()
 {
-	if (IsAutoRunEnabled())
+	if (IsAutoMoveEnabled())
 	{
-		DisableAutoRun();
+		DisableAutoMove();
 	}
 	else
 	{
-		EnableAutoRun();
+		EnableAutoMove();
 	}
 }
 
@@ -364,7 +364,7 @@ void AEODPlayerController::OnReleasingBlockKey()
 
 void AEODPlayerController::OnPressingEscapeKey()
 {
-
+	// SetPause()
 }
 
 void AEODPlayerController::OnPressingSkillKey(const int32 SkillKeyIndex)
@@ -387,12 +387,12 @@ void AEODPlayerController::SavePlayerState()
 {
 }
 
-void AEODPlayerController::Server_SetAutoRunEnabled_Implementation(bool bValue)
+void AEODPlayerController::Server_SetAutoMoveEnabled_Implementation(bool bValue)
 {
-	SetAutoRunEnabled(bValue);
+	SetAutoMoveEnabled(bValue);
 }
 
-bool AEODPlayerController::Server_SetAutoRunEnabled_Validate(bool bValue)
+bool AEODPlayerController::Server_SetAutoMoveEnabled_Validate(bool bValue)
 {
 	return true;
 }

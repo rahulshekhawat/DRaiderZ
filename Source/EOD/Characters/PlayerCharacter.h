@@ -328,20 +328,6 @@ public:
 	/** Event called when a new normal attack section starts playing */
 	void OnNormalAttackSectionStart(FName SectionName);
 
-	/**
-	 * Returns player controller rotation yaw in -180/180 range.
-	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
-	 */
-	UFUNCTION(BlueprintCallable, category = "EOD Character")
-	float GetPlayerControlRotationYaw();
-
-	/**
-	 * Returns the expected rotation yaw of character based on current Axis Input.
-	 * @warning Only call for locally controlled character otherwise it would lead to crash (intentional)
-	 */
-	UFUNCTION(BlueprintCallable, category = "EOD Character")
-	float GetRotationYawFromAxisInput();
-
 	UFUNCTION(BlueprintImplementableEvent)
 	void DisplayStatusMessage(const FString& Message);
 
@@ -630,18 +616,6 @@ private:
 
 	void LoadEquippedWeaponAnimationReferences();
 
-	/** This indicates the base maximum value of player's normal movement speed without any status effects */
-	UPROPERTY(Category = Movement, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float BaseNormalMovementSpeed;
-
-	//~ @todo test special movement speed (current value has been set untested and set on a guess)
-	/** This indicates the base maximum value of player's special movement speed without any status effects */
-	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float BaseSpecialMovementSpeed;
-
-	/** This indicates the base maximum value of player's movement speed when it's blocking damage */
-	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float BaseBlockMovementSpeed;
 
 	//~ @note Pressing and releasing skill keys are separate events to support charge events (e.g. charge rage)
 
@@ -725,7 +699,7 @@ private:
 
 	inline void DisableAutoRun();
 
-	FORCEINLINE void StopNormalAttacking();
+	void StopNormalAttacking();
 
 	void DisableForwardPressed();
 
@@ -863,7 +837,7 @@ inline void APlayerCharacter::EnableBlock()
 
 	SetCharacterState(ECharacterState::Blocking);
 	SetUseControllerRotationYaw(true);
-	SetWalkSpeed(BaseBlockMovementSpeed * GetStatsComponent()->GetMovementSpeedModifier());
+	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetStatsComponent()->GetMovementSpeedModifier());
 
 	// FTimerHandle TimerDelegate;
 	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);

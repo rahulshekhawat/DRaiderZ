@@ -7,6 +7,7 @@
 #include "EOD/Statics/EODBlueprintFunctionLibrary.h"
 
 #include "EOD/Player/EODPlayerController.h"
+#include "EOD/AI/EODAIControllerBase.h"
 #include "EOD/Characters/Components/SkillsComponent.h"
 #include "EOD/Characters/Components/StatsComponentBase.h"
 
@@ -37,6 +38,10 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	CameraArmMinimumLength = 50;
 	CameraArmMaximumLength = 500;
 
+	DefaultWalkSpeed = 400.f;
+	DefaultRunSpeed = 600.f;
+	DefaultWalkSpeedWhileBlocking = 150.f;
+
 	InteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, FName("Interaction Sphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
 	InteractionSphere->SetSphereRadius(150.f);
@@ -61,6 +66,11 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 void AEODCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (GetEODPlayerController() && GetEODPlayerController()->IsLocalPlayerController())
+	{
+
+	}
 }
 
 void AEODCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -74,7 +84,7 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterState, COND_SkipOwner);
-
+	DOREPLIFETIME_CONDITION(AEODCharacterBase, bIsRunning, COND_SkipOwner);
 }
 
 void AEODCharacterBase::BeginPlay()
@@ -85,10 +95,11 @@ void AEODCharacterBase::BeginPlay()
 
 void AEODCharacterBase::PossessedBy(AController* NewController)
 {
-	// AEODPlayerController* EODPC = Cast<AEODPlayerController>(NewController);
-	APlayerController* LController = Cast<APlayerController>(NewController);
-	// If this character got possessed by a player controller
-	if (LController)
+	EODPlayerController = NewController ? Cast<AEODPlayerController>(NewController) : nullptr;
+	EODAIController = NewController ? Cast<AEODAIControllerBase>(NewController) : nullptr;
+
+	// Enable interaction sphere only if this character gets possessed by a player controller
+	if (EODPlayerController)
 	{
 		EnableInteractionSphere();
 	}
@@ -100,6 +111,65 @@ void AEODCharacterBase::PossessedBy(AController* NewController)
 
 void AEODCharacterBase::UnPossessed()
 {
+}
+
+float AEODCharacterBase::GetRotationYawFromAxisInput() const
+{
+	float ResultingRotation = 0.f;
+	if (GetEODPlayerController())
+	{
+		float ForwardAxisValue = GetEODPlayerController()->InputComponent->GetAxisValue(FName("MoveForward"));
+		float RightAxisValue = GetEODPlayerController()->InputComponent->GetAxisValue(FName("MoveRight"));
+
+		float ControlRotationYaw = GetControllerRotationYaw();
+		if (ForwardAxisValue == 0)
+		{
+			if (RightAxisValue > 0)
+			{
+				ResultingRotation = ControlRotationYaw + 90.f;
+			}
+			else if (RightAxisValue < 0)
+			{
+				ResultingRotation = ControlRotationYaw - 90.f;
+			}
+		}
+		else
+		{
+			if (ForwardAxisValue > 0) 
+			{
+				float DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
+				ResultingRotation = ControlRotationYaw + DeltaAngle;
+			}
+			else if (ForwardAxisValue < 0)
+			{
+				float DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(-RightAxisValue, -ForwardAxisValue));
+				ResultingRotation = ControlRotationYaw + DeltaAngle;
+			}
+		}
+	}
+
+	return ResultingRotation;
+}
+
+float AEODCharacterBase::GetControllerRotationYaw() const
+{
+	// Make sure the character is controlled
+	if (Controller)
+	{
+		float ControlRotationYaw = Controller->GetControlRotation().Yaw;
+
+		if (0 <= ControlRotationYaw && ControlRotationYaw <= 180)
+			return ControlRotationYaw;
+		else if (180 < ControlRotationYaw && ControlRotationYaw < 360)
+		{
+			return (ControlRotationYaw - 360.f);
+		}
+		else if (ControlRotationYaw == 360)
+			return 0.f;
+		else
+			return ControlRotationYaw;
+	}
+	return 0.f;
 }
 
 bool AEODCharacterBase::BP_IsDead() const
@@ -476,6 +546,16 @@ void AEODCharacterBase::TurnOffTargetSwitch()
 	GetMesh()->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
 }
 
+void AEODCharacterBase::Server_SetIsRunning_Implementation(bool bValue)
+{
+	SetIsRunning(bValue);
+}
+
+bool AEODCharacterBase::Server_SetIsRunning_Validate(bool bValue)
+{
+	return true;
+}
+
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
 	//~ @todo : Cleanup old state
@@ -627,4 +707,71 @@ void AEODCharacterBase::UpdateInteraction()
 
 void AEODCharacterBase::StopInteraction()
 {
+}
+
+void AEODCharacterBase::UpdateMovement(float DeltaTime)
+{
+	float CharacterRotationYaw = GetActorRotation().Yaw;
+	float DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
+	bool bRotatePlayer = (DesiredPlayerRotationYaw == CharacterRotationYaw) ? false : true;
+
+	float ForwardAxisValue = 0;
+	float RightAxisValue = 0;
+	if (GetEODPlayerController())
+	{
+		ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
+		RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
+	}
+
+	if (ForwardAxisValue == 0 && RightAxisValue == 0)
+	{
+		bRotatePlayer = false;
+	}
+
+	if (bRotatePlayer)
+	{
+		DeltaRotateCharacterToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
+	}
+
+	if (ForwardAxisValue < 0)
+	{
+		float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
+		{
+			SetWalkSpeed(Speed);
+		}
+	}
+	else
+	{
+		float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
+		{
+			SetWalkSpeed(Speed);
+		}
+	}
+
+	/*
+	if (ForwardAxisValue == 0)
+	{
+		if (RightAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::R)
+		{
+			SetIWRCharMovementDir(ECharMovementDirection::R);
+		}
+		else if (RightAxisValue < 0 && IWR_CharacterMovementDirection != ECharMovementDirection::L)
+		{
+			SetIWRCharMovementDir(ECharMovementDirection::L);
+		}
+	}
+	else
+	{
+		if (ForwardAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::F)
+		{
+			SetIWRCharMovementDir(ECharMovementDirection::F);
+		}
+		else if (ForwardAxisValue < 0 && IWR_CharacterMovementDirection != ECharMovementDirection::B)
+		{
+			SetIWRCharMovementDir(ECharMovementDirection::B);
+		}
+	}
+	*/
 }

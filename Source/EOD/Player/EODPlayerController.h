@@ -144,15 +144,15 @@ public:
 
 private:
 	UPROPERTY(Replicated)
-	bool bAutoRunEnabled;
+	bool bAutoMoveEnabled;
 
-	FORCEINLINE bool IsAutoRunEnabled() const;
+	FORCEINLINE bool IsAutoMoveEnabled() const;
 
-	FORCEINLINE void SetAutoRunEnabled(bool bValue);
+	FORCEINLINE void SetAutoMoveEnabled(bool bValue);
 
-	FORCEINLINE void EnableAutoRun();
+	FORCEINLINE void EnableAutoMove();
 
-	FORCEINLINE void DisableAutoRun();
+	FORCEINLINE void DisableAutoMove();
 
 	UPROPERTY(Replicated)
 	bool bBlockKeyPressed;
@@ -177,7 +177,7 @@ private:
 
 	void TriggerInteraction();
 
-	void ToggleAutoRun();
+	void ToggleAutoMove();
 
 	void ToggleMouseCursor();
 
@@ -222,7 +222,7 @@ private:
 	////////////////////////////////////////////////////////////////////////////////
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetAutoRunEnabled(bool bValue);
+	void Server_SetAutoMoveEnabled(bool bValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockKeyPressed(bool bValue);
@@ -260,32 +260,32 @@ FORCEINLINE void AEODPlayerController::SwitchToGameInput()
 	SetInputMode(GameOnlyInputMode);
 }
 
-FORCEINLINE bool AEODPlayerController::IsAutoRunEnabled() const
+FORCEINLINE bool AEODPlayerController::IsAutoMoveEnabled() const
 {
-	return bAutoRunEnabled;
+	return bAutoMoveEnabled;
 }
 
-FORCEINLINE void AEODPlayerController::SetAutoRunEnabled(bool bValue)
+FORCEINLINE void AEODPlayerController::SetAutoMoveEnabled(bool bValue)
 {
-	bAutoRunEnabled = bValue;
+	bAutoMoveEnabled = bValue;
 	if (Role < ROLE_Authority)
 	{
-		Server_SetAutoRunEnabled(bValue);
+		Server_SetAutoMoveEnabled(bValue);
 	}
 }
 
-FORCEINLINE void AEODPlayerController::EnableAutoRun()
+FORCEINLINE void AEODPlayerController::EnableAutoMove()
 {
-	SetAutoRunEnabled(true);
+	SetAutoMoveEnabled(true);
 	if (EODCharacter)
 	{
 		EODCharacter->SetUseControllerRotationYaw(true);
 	}
 }
 
-FORCEINLINE void AEODPlayerController::DisableAutoRun()
+FORCEINLINE void AEODPlayerController::DisableAutoMove()
 {
-	SetAutoRunEnabled(false);
+	SetAutoMoveEnabled(false);
 	if (EODCharacter)
 	{
 		EODCharacter->SetUseControllerRotationYaw(false);

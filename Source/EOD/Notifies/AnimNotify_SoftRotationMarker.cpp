@@ -13,6 +13,6 @@ void UAnimNotify_SoftRotationMarker::Notify(USkeletalMeshComponent* MeshComp, UA
 		return;
 	}
 
-	PlayerCharacter->SetOffSmoothRotation(PlayerCharacter->GetPlayerControlRotationYaw());
+	PlayerCharacter->SetOffSmoothRotation(PlayerCharacter->GetControllerRotationYaw());
 
 }

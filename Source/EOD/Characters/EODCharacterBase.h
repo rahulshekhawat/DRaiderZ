@@ -19,7 +19,8 @@ class UAnimMontage;
 class USkillsComponent;
 class UInputComponent;
 class UCameraComponent;
-// class USpringArmComponent;
+class AEODPlayerController;
+class AEODAIControllerBase;
 class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
@@ -67,6 +68,67 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void UnPossessed() override;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// EOD CHARACTER
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	UPROPERTY()
+	AEODPlayerController* EODPlayerController;
+
+	UPROPERTY()
+	AEODAIControllerBase* EODAIController;
+
+	UPROPERTY(Replicated)
+	bool bIsRunning;
+
+	FORCEINLINE void SetIsRunning(bool bValue);
+
+public:
+	FORCEINLINE bool IsRunning() const { return bIsRunning; }
+
+	FORCEINLINE AEODPlayerController* GetEODPlayerController() const { return EODPlayerController; }
+
+	FORCEINLINE AEODAIControllerBase* GetEODAIController() const { return EODAIController; }
+
+	/** Returns the expected rotation yaw of character based on current Axis Input */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character")
+	float GetRotationYawFromAxisInput() const;
+
+	/**
+	 * Returns controller rotation yaw in -180/180 range.
+	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
+	 */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character")
+	float GetControllerRotationYaw() const;
+
+protected:
+	/** Max speed of character when it's walking */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
+	float DefaultWalkSpeed;
+
+	/** Max speed of character when it's running */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
+	float DefaultRunSpeed;
+
+	/** Max speed of character when it's moving while blocking attacks */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
+	float DefaultWalkSpeedWhileBlocking;
+
+
+	/**  This indicates the base maximum value of player's normal movement speed without any status effects */
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
+	// float BaseNormalMovementSpeed;
+
+	//~ @todo test special movement speed (current value has been set untested and set on a guess)
+	/** This indicates the base maximum value of player's special movement speed without any status effects */
+	// UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		// float BaseSpecialMovementSpeed;
+
+	/** This indicates the base maximum value of player's movement speed when it's blocking damage */
+	// UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// float BaseBlockMovementSpeed;
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -147,6 +209,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character Action")
 	virtual void StopInteraction();
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// CHARACTER STATE
+	////////////////////////////////////////////////////////////////////////////////
+protected:
+	virtual void UpdateMovement(float DeltaTime);
+
+public:
 	/** Returns true if character is alive */
 	FORCEINLINE bool IsAlive() const;
 
@@ -679,9 +749,14 @@ protected:
 	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CombatEvents)
 	virtual void TurnOffTargetSwitch();
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// NETWORK
+	////////////////////////////////////////////////////////////////////////////////
 private:
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetIsRunning(bool bValue);
 	
-	//~ Begin Multiplayer Code
 	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
 
@@ -708,10 +783,18 @@ private:
 	
 	UFUNCTION(NetMultiCast, Reliable)
 	void MultiCast_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
-	//~ End Multiplayer Code
 	
 	
 };
+
+FORCEINLINE void AEODCharacterBase::SetIsRunning(bool bValue)
+{
+	bIsRunning = bValue;
+	if (Role < ROLE_Authority)
+	{
+		Server_SetIsRunning(bValue);
+	}
+}
 
 FORCEINLINE USpringArmComponent* AEODCharacterBase::GetCameraBoom() const
 {
