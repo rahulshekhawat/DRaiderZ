@@ -369,25 +369,17 @@ void AEODPlayerController::OnPressingEscapeKey()
 
 void AEODPlayerController::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
-	if (GetPawn())
+	if (GetSkillsComponent())
 	{
-		USkillsComponent* SkillComponent = Cast<USkillsComponent>(GetPawn()->GetComponentByClass(USkillsComponent::StaticClass()));
-		if (SkillComponent)
-		{
-			SkillComponent->OnPressingSkillKey(SkillKeyIndex);
-		}
+		GetSkillsComponent()->OnPressingSkillKey(SkillKeyIndex);
 	}
 }
 
 void AEODPlayerController::OnReleasingSkillKey(const int32 SkillKeyIndex)
 {
-	if (GetPawn())
+	if (GetSkillsComponent())
 	{
-		USkillsComponent* SkillComponent = Cast<USkillsComponent>(GetPawn()->GetComponentByClass(USkillsComponent::StaticClass()));
-		if (SkillComponent)
-		{
-			SkillComponent->OnReleasingSkillKey(SkillKeyIndex);
-		}
+		GetSkillsComponent()->OnReleasingSkillKey(SkillKeyIndex);
 	}
 }
 

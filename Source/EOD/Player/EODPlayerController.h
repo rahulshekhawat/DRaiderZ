@@ -9,7 +9,7 @@
 #include "EODPlayerController.generated.h"
 
 class UHUDWidget;
-// class USkillBarWidget;
+class UPauseMenuWidget;
 // class USkillTreeWidget;
 // class UPlayerStatsWidget;
 // class AEODCharacterBase;
@@ -108,8 +108,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<UDialogueWindowWidget> DialogueWidgetClass;
 
-	// UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI", meta = (AllowPrivateAccess = "true"))
+	UPauseMenuWidget* PauseMenuWidget;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
+	TSubclassOf<UPauseMenuWidget> PauseMenuWidgetClass;
 
 	void CreateHUDWidget();
 
