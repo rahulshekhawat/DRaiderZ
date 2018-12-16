@@ -5,12 +5,13 @@
 #include "CoreMinimal.h"
 #include "EOD/Statics/EODLibrary.h"
 #include "EOD/Statics/CharacterLibrary.h"
-#include "EOD/Characters/Components/StatsComponentBase.h"
 #include "EOD/StatusEffects/StatusEffectBase.h"
+#include "EOD/Characters/Components/StatsComponentBase.h"
 
 #include "Animation/AnimInstance.h"
 #include "GameFramework/Character.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "EODCharacterBase.generated.h"
 
@@ -18,7 +19,7 @@ class UAnimMontage;
 class USkillsComponent;
 class UInputComponent;
 class UCameraComponent;
-class USpringArmComponent;
+// class USpringArmComponent;
 class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
@@ -66,6 +67,85 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void UnPossessed() override;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// COMPONENTS
+	////////////////////////////////////////////////////////////////////////////////
+public:
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const;
+
+	FORCEINLINE UCameraComponent* GetCamera() const;
+
+	FORCEINLINE USkillsComponent* GetSkillsComponent() const;
+
+	FORCEINLINE USphereComponent* GetInteractionSphere() const;
+
+	FORCEINLINE void EnableInteractionSphere();
+
+	FORCEINLINE void DisableInteractionSphere();
+
+	FORCEINLINE void ZoomInCamera();
+
+	FORCEINLINE void ZoomOutCamera();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	int32 CameraZoomRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	int CameraArmMinimumLength;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	int CameraArmMaximumLength;
+
+private:
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* Camera;
+
+	/** StatsComp contains and manages the stats info of this character */
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UStatsComponentBase* StatsComp;
+
+	//~ Skills component - manages skills of character
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkillsComponent* SkillsComponent;
+
+	//~ Sphere component used to detect interactive objects
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USphereComponent* InteractionSphere;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// ACTIONS
+	////////////////////////////////////////////////////////////////////////////////
+public:
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual bool StartDodging();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual bool StopDodging();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual bool StartBlockingAttacks();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual bool StopBlockingAttacks();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual void TriggerInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual void StartInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual void UpdateInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual void StopInteraction();
 
 	/** Returns true if character is alive */
 	FORCEINLINE bool IsAlive() const;
@@ -474,42 +554,6 @@ public:
 	UFUNCTION(BlueprintCallable, category = Rotation)
 	float GetOrientationYawToActor(AActor* TargetActor);
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// COMPONENTS
-	////////////////////////////////////////////////////////////////////////////////
-public:
-	FORCEINLINE USpringArmComponent* GetCameraBoom() const;
-
-	FORCEINLINE UCameraComponent* GetCamera() const;
-
-	FORCEINLINE USkillsComponent* GetSkillsComponent() const;
-
-	FORCEINLINE USphereComponent* GetInteractionSphere() const;
-
-	FORCEINLINE void EnableInteractionSphere();
-
-	FORCEINLINE void DisableInteractionSphere();
-
-private:
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraBoom;
-
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* Camera;
-
-	/** StatsComp contains and manages the stats info of this character */
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStatsComponentBase* StatsComp;
-
-	//~ Skills component - manages skills of character
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkillsComponent* SkillsComponent;
-
-	//~ Sphere component used to detect interactive objects
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USphereComponent* InteractionSphere;
-
 private:
 	/** In game faction of your character */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character", meta = (AllowPrivateAccess = "true"))
@@ -527,7 +571,7 @@ private:
 	FLastUsedSkillInfo LastUsedSkillInfo;
 
 	/** Character state determines the current action character is doing */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
+	UPROPERTY(ReplicatedUsing = OnRep_CharacterState)
 	ECharacterState CharacterState;
 
 protected:
@@ -699,6 +743,22 @@ FORCEINLINE void AEODCharacterBase::DisableInteractionSphere()
 {
 	InteractionSphere->Deactivate();
 	InteractionSphere->SetCollisionProfileName(FName("NoCollision"));
+}
+
+FORCEINLINE void AEODCharacterBase::ZoomInCamera()
+{
+	if (CameraBoom && CameraBoom->TargetArmLength >= CameraArmMinimumLength)
+	{
+		CameraBoom->TargetArmLength -= CameraZoomRate;
+	}
+}
+
+FORCEINLINE void AEODCharacterBase::ZoomOutCamera()
+{
+	if (CameraBoom && CameraBoom->TargetArmLength <= CameraArmMaximumLength)
+	{
+		CameraBoom->TargetArmLength += CameraZoomRate;
+	}
 }
 
 FORCEINLINE bool AEODCharacterBase::IsAlive() const

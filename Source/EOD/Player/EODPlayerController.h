@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Characters/EODCharacterBase.h"
 
 #include "GameFramework/PlayerController.h"
 #include "EODPlayerController.generated.h"
@@ -11,6 +12,7 @@ class UHUDWidget;
 // class USkillBarWidget;
 // class USkillTreeWidget;
 // class UPlayerStatsWidget;
+// class AEODCharacterBase;
 class USkillsComponent;
 class UInventoryComponent;
 class UStatsComponentBase;
@@ -33,13 +35,27 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Possess(APawn* Pawn) override;
+	virtual void Possess(APawn* InPawn) override;
 
 	virtual void UnPossess() override;
+
+	virtual void SetPawn(APawn* InPawn) override;
+
+	////////////////////////////////////////////////////////////////////////////////
+	// 
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	UPROPERTY()
+	AEODCharacterBase* EODCharacter;
+
+public:
+	FORCEINLINE AEODCharacterBase* GetEODCharacter() const { return EODCharacter; }
 
 	////////////////////////////////////////////////////////////////////////////////
 	// COMPONENTS
@@ -60,7 +76,11 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UStatsComponentBase* StatsComponent;
 
-	//~ Skills component manages and displays the skills of possessed pawn (player or not)
+	/** Primary skills component manages the skills of player's primary character */
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkillsComponent* PrimarySkillsComponent;
+
+	/** Skills component manages the skills of any character possessed by player controller that is not the primary pawn */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillsComponent* SkillsComponent;
 
@@ -73,7 +93,7 @@ public:
 
 private:
 	/** Player's head-up display widget */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI", meta = (AllowPrivateAccess = "true"))
 	UHUDWidget* HUDWidget;
 
 	/** The widget class to use for player's head-up display */
@@ -87,6 +107,9 @@ private:
 	/** The widget class used for dialogue widget */
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<UDialogueWindowWidget> DialogueWidgetClass;
+
+	// UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI", meta = (AllowPrivateAccess = "true"))
+
 
 	void CreateHUDWidget();
 
@@ -117,12 +140,23 @@ public:
 	void TogglePlayerInventoryUI();
 
 private:
-
+	UPROPERTY(Replicated)
 	bool bAutoRunEnabled;
 
-	void EnableAutoRun();
+	FORCEINLINE bool IsAutoRunEnabled() const;
 
-	void DisableAutoRun();
+	FORCEINLINE void SetAutoRunEnabled(bool bValue);
+
+	FORCEINLINE void EnableAutoRun();
+
+	FORCEINLINE void DisableAutoRun();
+
+	UPROPERTY(Replicated)
+	bool bBlockKeyPressed;
+
+	FORCEINLINE bool IsBlockKeyPressed() const;
+
+	FORCEINLINE void SetBlockKeyPressed(bool bValue);
 
 	/** Move controlled pawn forward/backward */
 	void MovePawnForward(const float Value);
@@ -143,6 +177,10 @@ private:
 	void ToggleAutoRun();
 
 	void ToggleMouseCursor();
+
+	void OnPressingBlockKey();
+
+	void OnReleasingBlockKey();
 
 	void OnPressingEscapeKey();
 
@@ -167,17 +205,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Save/Load System")
 	void SavePlayerState();
 
+
 	////////////////////////////////////////////////////////////////////////////////
 	// CONSTANTS
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	const int CameraZoomRate = 15;
+	UPROPERTY(EditDefaultsOnly, Category = "Player Constants")
+	int32 DodgeStaminaCost;
 
-	const int CameraArmMinimumLength = 50;
 
-	const int CameraArmMaximumLength = 500;
+	////////////////////////////////////////////////////////////////////////////////
+	// NETWORK
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetAutoRunEnabled(bool bValue);
 
-	const int DodgeStaminaCost = 30;
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetBlockKeyPressed(bool bValue);
 
 };
 
@@ -193,7 +238,7 @@ FORCEINLINE UInventoryComponent* AEODPlayerController::GetInventoryComponent() c
 
 FORCEINLINE USkillsComponent* AEODPlayerController::GetSkillsComponent() const
 {
-	return SkillsComponent;
+	return SkillsComponent ? SkillsComponent : PrimarySkillsComponent;
 }
 
 FORCEINLINE void AEODPlayerController::SwitchToUIInput()
@@ -210,6 +255,52 @@ FORCEINLINE void AEODPlayerController::SwitchToGameInput()
 	FInputModeGameOnly GameOnlyInputMode;
 	GameOnlyInputMode.SetConsumeCaptureMouseDown(true);
 	SetInputMode(GameOnlyInputMode);
+}
+
+FORCEINLINE bool AEODPlayerController::IsAutoRunEnabled() const
+{
+	return bAutoRunEnabled;
+}
+
+FORCEINLINE void AEODPlayerController::SetAutoRunEnabled(bool bValue)
+{
+	bAutoRunEnabled = bValue;
+	if (Role < ROLE_Authority)
+	{
+		Server_SetAutoRunEnabled(bValue);
+	}
+}
+
+FORCEINLINE void AEODPlayerController::EnableAutoRun()
+{
+	SetAutoRunEnabled(true);
+	if (EODCharacter)
+	{
+		EODCharacter->SetUseControllerRotationYaw(true);
+	}
+}
+
+FORCEINLINE void AEODPlayerController::DisableAutoRun()
+{
+	SetAutoRunEnabled(false);
+	if (EODCharacter)
+	{
+		EODCharacter->SetUseControllerRotationYaw(false);
+	}
+}
+
+FORCEINLINE bool AEODPlayerController::IsBlockKeyPressed() const
+{
+	return bBlockKeyPressed;
+}
+
+FORCEINLINE void AEODPlayerController::SetBlockKeyPressed(bool bValue)
+{
+	bBlockKeyPressed = bValue;
+	if (Role < ROLE_Authority)
+	{
+		Server_SetBlockKeyPressed(bValue);
+	}
 }
 
 FORCEINLINE UHUDWidget* AEODPlayerController::GetHUDWidget() const

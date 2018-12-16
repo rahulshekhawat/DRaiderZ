@@ -74,6 +74,26 @@ USkeletalMeshComponent* AHumanCharacter::CreateNewArmorComponent(const FName Nam
 	return Sk;
 }
 
+bool AHumanCharacter::StartDodging()
+{
+	return false;
+}
+
+bool AHumanCharacter::StopDodging()
+{
+	return false;
+}
+
+bool AHumanCharacter::StartBlockingAttacks()
+{
+	return false;
+}
+
+bool AHumanCharacter::StopBlockingAttacks()
+{
+	return false;
+}
+
 void AHumanCharacter::TurnOnTargetSwitch()
 {
 	APlayerController* PC = Cast<APlayerController>(GetController());

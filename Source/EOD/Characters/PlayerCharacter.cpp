@@ -28,7 +28,6 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/GameUserSettings.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -121,8 +120,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("Backward", IE_Pressed, this, &APlayerCharacter::OnPressedBackward);
 	PlayerInputComponent->BindAction("Backward", IE_Released, this, &APlayerCharacter::OnReleasedBackward);
 
-	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
-	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
+	// PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
+	// PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
 
 	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnPressedNormalAttack);
 	PlayerInputComponent->BindAction("NormalAttack", IE_Released, this, &APlayerCharacter::OnReleasedNormalAttack);
@@ -859,9 +858,9 @@ void APlayerCharacter::ZoomOutCamera()
 		GetCameraBoom()->TargetArmLength += CameraZoomRate;
 }
 
-bool APlayerCharacter::StartAction_Dodge()
+bool APlayerCharacter::StartDodging()
 {
-	// UKismetSystemLibrary::PrintString(this, FString("Dodged"));
+	UKismetSystemLibrary::PrintString(this, FString("Dodged"));
 	return false;
 }
 
@@ -1967,7 +1966,8 @@ void APlayerCharacter::StartInteraction()
 	*/
 }
 
-void APlayerCharacter::UpdateInteraction_Implementation()
+// void APlayerCharacter::UpdateInteraction_Implementation()
+void APlayerCharacter::UpdateInteraction()
 {
 	UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
 	if (GameSingleton && DialogueWidget && DialogueWidget->GetDialogueWindowID() != NAME_None)

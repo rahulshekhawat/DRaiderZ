@@ -419,13 +419,13 @@ public:
 	USoundBase* InteractiveActorDetectedSound;
 
 	/** Attempts to start interaction with the active interactive actor */
-	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
-	void StartInteraction();
+	// UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
+	virtual void StartInteraction() override;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
-	void UpdateInteraction();
+	// UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
+	virtual void UpdateInteraction() override;
 
-	virtual void UpdateInteraction_Implementation();
+	// virtual void UpdateInteraction_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
 	void RequestDialogue(AActor* Requestor, FName DialogueWindowID);
@@ -504,7 +504,7 @@ public:
 
 	int32 ActiveWeaponSlotIndex;
 
-	bool StartAction_Dodge();
+	virtual bool StartDodging() override;
 
 private:
 

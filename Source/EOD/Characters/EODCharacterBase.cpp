@@ -2,15 +2,16 @@
 
 #include "EOD/Characters/EODCharacterBase.h"
 #include "EOD/Core/EODPreprocessors.h"
-#include "EOD/Player/EODPlayerController.h"
 #include "EOD/AnimInstances/CharAnimInstance.h"
+#include "EOD/Interactives/InteractionInterface.h"
+#include "EOD/Statics/EODBlueprintFunctionLibrary.h"
+
+#include "EOD/Player/EODPlayerController.h"
 #include "EOD/Characters/Components/SkillsComponent.h"
 #include "EOD/Characters/Components/StatsComponentBase.h"
-#include "EOD/Statics/EODBlueprintFunctionLibrary.h"
 
 #include "UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -31,6 +32,10 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 
 	Camera = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, FName("Camera"));
 	Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+
+	CameraZoomRate = 15;
+	CameraArmMinimumLength = 50;
+	CameraArmMaximumLength = 500;
 
 	InteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, FName("Interaction Sphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
@@ -556,4 +561,70 @@ void AEODCharacterBase::MultiCast_PlayAnimationMontage_Implementation(UAnimMonta
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
 		CharacterState = NewState;
 	}
+}
+
+bool AEODCharacterBase::StartDodging()
+{
+	if (CanDodge())
+	{
+		// @dodge logic
+		return true;
+	}
+
+	return false;
+}
+
+bool AEODCharacterBase::StopDodging()
+{
+	if (IsDodging())
+	{
+		// @stop dodge
+	}
+
+	return true;
+}
+
+bool AEODCharacterBase::StartBlockingAttacks()
+{
+	if (CanBlock())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool AEODCharacterBase::StopBlockingAttacks()
+{
+	if (IsBlocking())
+	{
+
+	}
+
+	return true;
+}
+
+void AEODCharacterBase::TriggerInteraction()
+{
+	// If Character is already interacting
+	if (GetCharacterState() == ECharacterState::Interacting)
+	{
+		UpdateInteraction();
+	}
+	else
+	{
+		StartInteraction();
+	}
+}
+
+void AEODCharacterBase::StartInteraction()
+{
+}
+
+void AEODCharacterBase::UpdateInteraction()
+{
+}
+
+void AEODCharacterBase::StopInteraction()
+{
 }

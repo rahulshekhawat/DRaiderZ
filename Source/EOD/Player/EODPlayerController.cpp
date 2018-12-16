@@ -9,14 +9,16 @@
 #include "EOD/UI/HUDWidget.h"
 #include "EOD/Statics/EODLibrary.h"
 
-#include "GameFramework/SpringArmComponent.h"
+#include "UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
+#include "GameFramework/SpringArmComponent.h"
 
 AEODPlayerController::AEODPlayerController(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
 	InventoryComponent 	= ObjectInitializer.CreateDefaultSubobject<UInventoryComponent>(this, FName("Player Inventory"));
 	StatsComponent 		= ObjectInitializer.CreateDefaultSubobject<UPlayerStatsComponent>(this, FName("Player Stats"));
 
+	DodgeStaminaCost = 30;
 }
 
 void AEODPlayerController::SetupInputComponent()
@@ -34,6 +36,9 @@ void AEODPlayerController::SetupInputComponent()
 	//~ Begin Action Input Bindings
 	InputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &AEODPlayerController::ZoomInCamera);
 	InputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &AEODPlayerController::ZoomOutCamera);
+
+	InputComponent->BindAction("Block", IE_Pressed, this, &AEODPlayerController::OnPressingBlockKey);
+	InputComponent->BindAction("Block", IE_Released, this, &AEODPlayerController::OnReleasingBlockKey);
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AEODPlayerController::MakePawnJump);
 	InputComponent->BindAction("Dodge", IE_Pressed, this, &AEODPlayerController::AttemptDodge);
@@ -97,6 +102,15 @@ void AEODPlayerController::PostInitializeComponents()
 
 }
 
+void AEODPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AEODPlayerController, bAutoRunEnabled, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AEODPlayerController, bBlockKeyPressed, COND_SkipOwner);
+
+}
+
 void AEODPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -118,14 +132,20 @@ void AEODPlayerController::Tick(float DeltaTime)
 
 }
 
-void AEODPlayerController::Possess(APawn* Pawn)
+void AEODPlayerController::Possess(APawn* InPawn)
 {
-	Super::Possess(Pawn);
+	Super::Possess(InPawn);
 }
 
 void AEODPlayerController::UnPossess()
 {
 	Super::UnPossess();
+}
+
+void AEODPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+	EODCharacter = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
 }
 
 void AEODPlayerController::CreateHUDWidget()
@@ -223,87 +243,67 @@ void AEODPlayerController::TogglePlayerStatsUI()
 	}
 }
 
-void AEODPlayerController::EnableAutoRun()
-{
-	bAutoRunEnabled = true;
-	if (GetPawn())
-	{
-		GetPawn()->bUseControllerRotationYaw = true;
-	}
-}
-
-void AEODPlayerController::DisableAutoRun()
-{
-	bAutoRunEnabled = false;
-	if (GetPawn())
-	{
-		GetPawn()->bUseControllerRotationYaw = false;
-	}
-}
-
 void AEODPlayerController::MovePawnForward(const float Value)
 {
-	if (GetPawn() && Value != 0)
+	if (EODCharacter && Value != 0)
 	{
-		if (bAutoRunEnabled)
+		if (IsAutoRunEnabled())
 		{
-			
+			DisableAutoRun();
 		}
 
 		FRotator Rotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
 		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
-		GetPawn()->AddMovementInput(Direction, Value);
+		EODCharacter->AddMovementInput(Direction, Value);
 	}
 }
 
 void AEODPlayerController::MovePawnRight(const float Value)
 {
-	if (GetPawn() && Value != 0)
+	if (EODCharacter && Value != 0)
 	{
+		if (IsAutoRunEnabled())
+		{
+			DisableAutoRun();
+		}
+
 		FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
-		GetPawn()->AddMovementInput(Direction, Value);
+		EODCharacter->AddMovementInput(Direction, Value);
 	}
 }
 
 void AEODPlayerController::MakePawnJump()
 {
-	if (GetCharacter())
+	if (EODCharacter)
 	{
-		GetCharacter()->Jump();
+		if (EODCharacter->CanJump())
+		{
+			EODCharacter->Jump();
+		}
 	}
 }
 
 void AEODPlayerController::ZoomInCamera()
 {
-	if (GetPawn())
+	if (EODCharacter)
 	{
-		USpringArmComponent* SpringArm = Cast<USpringArmComponent>(GetPawn()->GetComponentByClass(USpringArmComponent::StaticClass()));
-		if (SpringArm && SpringArm->TargetArmLength >= CameraArmMinimumLength)
-		{
-			SpringArm->TargetArmLength -= CameraZoomRate;
-		}
+		EODCharacter->ZoomInCamera();
 	}
 }
 
 void AEODPlayerController::ZoomOutCamera()
 {
-	if (GetPawn())
+	if (EODCharacter)
 	{
-		USpringArmComponent* SpringArm = Cast<USpringArmComponent>(GetCharacter()->GetComponentByClass(USpringArmComponent::StaticClass()));
-		if (SpringArm && SpringArm->TargetArmLength <= CameraArmMaximumLength)
-		{
-			SpringArm->TargetArmLength += CameraZoomRate;
-		}
+		EODCharacter->ZoomOutCamera();
 	}
 }
 
 void AEODPlayerController::AttemptDodge()
 {
-	// Only player character can dodge
-	APlayerCharacter* Char = Cast<APlayerCharacter>(GetCharacter());
-	if (Char)
+	if (EODCharacter)
 	{
-		if (bAutoRunEnabled)
+		if (IsAutoRunEnabled())
 		{
 			DisableAutoRun();
 		}
@@ -311,21 +311,33 @@ void AEODPlayerController::AttemptDodge()
 		int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
 		if (StatsComponent->GetCurrentStamina() >= DodgeCost)
 		{
-			bool bResult = Char->StartAction_Dodge();
+			bool bResult = EODCharacter->StartDodging();
 			if (bResult)
 			{
 				StatsComponent->ModifyCurrentStamina(-DodgeCost);
 			}
-		}		
+		}
 	}
 }
 
 void AEODPlayerController::TriggerInteraction()
 {
+	if (EODCharacter)
+	{
+		EODCharacter->TriggerInteraction();
+	}
 }
 
 void AEODPlayerController::ToggleAutoRun()
 {
+	if (IsAutoRunEnabled())
+	{
+		DisableAutoRun();
+	}
+	else
+	{
+		EnableAutoRun();
+	}
 }
 
 void AEODPlayerController::ToggleMouseCursor()
@@ -338,6 +350,16 @@ void AEODPlayerController::ToggleMouseCursor()
 	{
 		SwitchToUIInput();
 	}
+}
+
+void AEODPlayerController::OnPressingBlockKey()
+{
+	SetBlockKeyPressed(true);
+}
+
+void AEODPlayerController::OnReleasingBlockKey()
+{
+	SetBlockKeyPressed(false);
 }
 
 void AEODPlayerController::OnPressingEscapeKey()
@@ -371,4 +393,24 @@ void AEODPlayerController::OnReleasingSkillKey(const int32 SkillKeyIndex)
 
 void AEODPlayerController::SavePlayerState()
 {
+}
+
+void AEODPlayerController::Server_SetAutoRunEnabled_Implementation(bool bValue)
+{
+	SetAutoRunEnabled(bValue);
+}
+
+bool AEODPlayerController::Server_SetAutoRunEnabled_Validate(bool bValue)
+{
+	return true;
+}
+
+void AEODPlayerController::Server_SetBlockKeyPressed_Implementation(bool bValue)
+{
+	SetBlockKeyPressed(bValue);
+}
+
+bool AEODPlayerController::Server_SetBlockKeyPressed_Validate(bool bValue)
+{
+	return true;
 }
