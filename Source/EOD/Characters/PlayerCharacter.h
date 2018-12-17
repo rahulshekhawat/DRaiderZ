@@ -682,7 +682,7 @@ private:
 
 	void UpdateIdleState(float DeltaTime);
 
-	void UpdateMovement(float DeltaTime);
+	// void UpdateMovement(float DeltaTime);
 
 	void UpdateBlockState(float DeltaTime);
 

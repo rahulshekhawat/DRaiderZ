@@ -19,8 +19,8 @@ class UAnimMontage;
 class USkillsComponent;
 class UInputComponent;
 class UCameraComponent;
-class AEODPlayerController;
-class AEODAIControllerBase;
+// class AEODPlayerController;
+// class AEODAIControllerBase;
 class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
@@ -74,11 +74,11 @@ public:
 	// EOD CHARACTER
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	UPROPERTY()
-	AEODPlayerController* EODPlayerController;
+	// UPROPERTY()
+	// AEODPlayerController* EODPlayerController;
 
-	UPROPERTY()
-	AEODAIControllerBase* EODAIController;
+	// UPROPERTY()
+	// AEODAIControllerBase* EODAIController;
 
 	UPROPERTY(Replicated)
 	bool bIsRunning;
@@ -94,9 +94,9 @@ public:
 
 	FORCEINLINE bool IsRunning() const { return bIsRunning; }
 
-	FORCEINLINE AEODPlayerController* GetEODPlayerController() const { return EODPlayerController; }
+	// FORCEINLINE AEODPlayerController* GetEODPlayerController() const { return EODPlayerController; }
 
-	FORCEINLINE AEODAIControllerBase* GetEODAIController() const { return EODAIController; }
+	// FORCEINLINE AEODAIControllerBase* GetEODAIController() const { return EODAIController; }
 
 	/** Returns the expected rotation yaw of character based on current Axis Input */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")

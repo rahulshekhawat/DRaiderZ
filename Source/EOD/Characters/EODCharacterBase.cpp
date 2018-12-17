@@ -70,9 +70,12 @@ void AEODCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (GetEODPlayerController() && GetEODPlayerController()->IsLocalPlayerController())
+	if (Controller && Controller->IsLocalPlayerController())
 	{
-
+		if (IsMoving())
+		{
+			UpdateMovement(DeltaTime);
+		}
 	}
 }
 
@@ -101,11 +104,7 @@ void AEODCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	EODPlayerController = NewController ? Cast<AEODPlayerController>(NewController) : nullptr;
-	EODAIController = NewController ? Cast<AEODAIControllerBase>(NewController) : nullptr;
-
-	// Enable interaction sphere only if this character gets possessed by a player controller
-	if (EODPlayerController)
+	if (NewController && NewController->IsLocalPlayerController())
 	{
 		EnableInteractionSphere();
 	}
@@ -123,10 +122,14 @@ void AEODCharacterBase::UnPossessed()
 float AEODCharacterBase::GetRotationYawFromAxisInput() const
 {
 	float ResultingRotation = GetActorRotation().Yaw;
-	if (GetEODPlayerController())
+
+	// if (GetEODPlayerController())
+	if (Controller)
 	{
-		float ForwardAxisValue = GetEODPlayerController()->InputComponent->GetAxisValue(FName("MoveForward"));
-		float RightAxisValue = GetEODPlayerController()->InputComponent->GetAxisValue(FName("MoveRight"));
+		// float ForwardAxisValue = GetEODPlayerController()->InputComponent->GetAxisValue(FName("MoveForward"));
+		float ForwardAxisValue = Controller->InputComponent->GetAxisValue(FName("MoveForward"));
+		// float RightAxisValue = GetEODPlayerController()->InputComponent->GetAxisValue(FName("MoveRight"));
+		float RightAxisValue = Controller->InputComponent->GetAxisValue(FName("MoveRight"));
 
 		float ControlRotationYaw = GetControllerRotationYaw();
 		if (ForwardAxisValue == 0)
@@ -726,10 +729,13 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 		DeltaRotateCharacterToDesiredYaw(DesiredRotationYaw, DeltaTime);
 	}
 
-	if (GetEODPlayerController())
+	// if (GetEODPlayerController())
+	if (Controller)
 	{
-		float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
-		float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
+		// float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
+		float ForwardAxisValue = Controller->InputComponent->GetAxisValue(FName("MoveForward"));
+		// float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
+		float RightAxisValue = Controller->InputComponent->GetAxisValue(FName("MoveRight"));
 
 		if (ForwardAxisValue < 0)
 		{

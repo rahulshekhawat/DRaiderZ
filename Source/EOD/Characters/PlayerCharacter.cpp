@@ -314,7 +314,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 		else if (IsMoving() || (IsUsingAnySkill() && bSkillAllowsMovement) || (IsSwitchingWeapon()))
 		{
-			UpdateMovement(DeltaTime);
+			// UpdateMovement(DeltaTime);
 		}
 		else if (IsBlocking())
 		{
@@ -1234,6 +1234,7 @@ void APlayerCharacter::UpdateIdleState(float DeltaTime)
 	}
 }
 
+/*
 void APlayerCharacter::UpdateMovement(float DeltaTime)
 {
 	float ActorRotationYaw = GetActorRotation().Yaw;
@@ -1296,6 +1297,7 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 		}
 	}
 }
+*/
 
 void APlayerCharacter::UpdateBlockState(float DeltaTime)
 {
