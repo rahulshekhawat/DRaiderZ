@@ -9,6 +9,8 @@
 #include "EOD/UI/HUDWidget.h"
 #include "EOD/Statics/EODLibrary.h"
 
+#include "Kismet/KismetSystemLibrary.h"
+
 #include "UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -245,7 +247,7 @@ void AEODPlayerController::TogglePlayerStatsUI()
 
 void AEODPlayerController::MovePawnForward(const float Value)
 {
-	if (EODCharacter && Value != 0)
+	if (EODCharacter && EODCharacter->CanMove() && Value != 0)
 	{
 		if (IsAutoMoveEnabled())
 		{
@@ -260,7 +262,7 @@ void AEODPlayerController::MovePawnForward(const float Value)
 
 void AEODPlayerController::MovePawnRight(const float Value)
 {
-	if (EODCharacter && Value != 0)
+	if (EODCharacter && EODCharacter->CanMove() && Value != 0)
 	{
 		if (IsAutoMoveEnabled())
 		{
@@ -274,12 +276,10 @@ void AEODPlayerController::MovePawnRight(const float Value)
 
 void AEODPlayerController::MakePawnJump()
 {
-	if (EODCharacter)
+	if (EODCharacter && EODCharacter->CanJump())
 	{
-		if (EODCharacter->CanJump())
-		{
-			EODCharacter->Jump();
-		}
+		UKismetSystemLibrary::PrintString(this, FString("Attempting to jump"));
+		EODCharacter->Jump();
 	}
 }
 

@@ -2,6 +2,7 @@
 
 #include "StatsComponentBase.h"
 
+#include "UnrealNetwork.h"
 
 UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
@@ -20,6 +21,13 @@ UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitial
 void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UStatsComponentBase, MaxHealth);
+	DOREPLIFETIME(UStatsComponentBase, CurrentHealth);
+	DOREPLIFETIME(UStatsComponentBase, MaxMana);
+	DOREPLIFETIME(UStatsComponentBase, CurrentMana);
+	DOREPLIFETIME(UStatsComponentBase, MaxStamina);
+	DOREPLIFETIME(UStatsComponentBase, CurrentStamina);	
 }
 
 void UStatsComponentBase::BeginPlay()

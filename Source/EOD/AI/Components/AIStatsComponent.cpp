@@ -32,16 +32,20 @@ void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	/*
 	DOREPLIFETIME(UAIStatsComponent, MaxHealth);
 	DOREPLIFETIME(UAIStatsComponent, CurrentHealth);
 	DOREPLIFETIME(UAIStatsComponent, MaxMana);
 	DOREPLIFETIME(UAIStatsComponent, CurrentMana);
+	*/
 
+	/*
 	DOREPLIFETIME(UAIStatsComponent, MovementSpeedModifier);
 	DOREPLIFETIME(UAIStatsComponent, ActiveTimeDilation);
 	DOREPLIFETIME(UAIStatsComponent, SpellCastingSpeedModifier);
 	
 	DOREPLIFETIME(UAIStatsComponent, Darkness);
+	*/
 
 }
 

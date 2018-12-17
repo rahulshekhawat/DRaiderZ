@@ -184,8 +184,6 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(APlayerCharacter, IWR_CharacterMovementDirection, COND_SkipOwner);
-	// DOREPLIFETIME_CONDITION(APlayerCharacter, CurrentWeaponAnimationToUse, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, bWeaponSheathed, COND_SkipOwner);
 
@@ -2109,16 +2107,6 @@ void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)
 void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString & SkillGroup)
 {
 	GetSkillsComponent()->OnSkillGroupRemovedFromSkillBar(SkillGroup);
-}
-
-void APlayerCharacter::Server_SetIWRCharMovementDir_Implementation(ECharMovementDirection NewDirection)
-{
-	SetIWRCharMovementDir(NewDirection);
-}
-
-bool APlayerCharacter::Server_SetIWRCharMovementDir_Validate(ECharMovementDirection NewDirection)
-{
-	return true;
 }
 
 void APlayerCharacter::SetBlockMovementDirectionYaw(float NewYaw)

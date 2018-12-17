@@ -69,13 +69,16 @@ void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	/*
 	DOREPLIFETIME(UPlayerStatsComponent, MaxHealth);
 	DOREPLIFETIME(UPlayerStatsComponent, CurrentHealth);
 	DOREPLIFETIME(UPlayerStatsComponent, MaxMana);
 	DOREPLIFETIME(UPlayerStatsComponent, CurrentMana);
 	DOREPLIFETIME(UPlayerStatsComponent, MaxStamina);
 	DOREPLIFETIME(UPlayerStatsComponent, CurrentStamina);
+	*/
 
+	/*
 	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, HealthRegenRate, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, ManaRegenRate, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(UPlayerStatsComponent, StaminaRegenRate, COND_OwnerOnly);
@@ -116,7 +119,7 @@ void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(UPlayerStatsComponent, SpellCastingSpeedModifier);
 	
 	DOREPLIFETIME(UPlayerStatsComponent, Darkness);
-
+	*/
 }
 
 /*

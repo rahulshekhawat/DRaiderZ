@@ -316,7 +316,7 @@ public:
 	void CreateGhostTrail();
 
 	/** [server + client] Change idle-walk-run direction of character */
-	inline void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
+	// inline void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
 	/** [server + client] Set the yaw for player's movement direction relative to player's forward direction */
 	void SetBlockMovementDirectionYaw(float NewYaw);
@@ -549,7 +549,7 @@ private:
 	uint8 MaxNumberOfSkills;
 
 	/** Determines whether weapon is currently sheathed or not */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_WeaponSheathed)
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
 	bool bWeaponSheathed;
 
 	/** Data table containing player animation references */
@@ -728,17 +728,14 @@ public:
 	float BlockMovementDirectionYaw;
 
 	/** Character movement direction for Idle-Walk-Run state */
-	UPROPERTY(Replicated)
-	ECharMovementDirection IWR_CharacterMovementDirection;
+	// UPROPERTY(Replicated)
+	// ECharMovementDirection IWR_CharacterMovementDirection;
 
 private:
 	
 	//~ Begin multiplayer code
 	UFUNCTION()
 	void OnRep_WeaponSheathed();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
@@ -809,16 +806,6 @@ FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
 {
 	bRotateSmoothly = true;
 	DesiredSmoothRotationYaw = DesiredYaw;
-}
-
-inline void APlayerCharacter::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
-{
-	IWR_CharacterMovementDirection = NewDirection;
-
-	if (Role < ROLE_Authority)
-	{
-		Server_SetIWRCharMovementDir(NewDirection);
-	}
 }
 
 inline void APlayerCharacter::EnableBlock()

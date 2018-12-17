@@ -83,9 +83,15 @@ private:
 	UPROPERTY(Replicated)
 	bool bIsRunning;
 
+public:
+	/** Character movement direction for Idle-Walk-Run state */
+	UPROPERTY(Replicated)
+	ECharMovementDirection IWR_CharacterMovementDirection;
+
 	FORCEINLINE void SetIsRunning(bool bValue);
 
-public:
+	FORCEINLINE void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
+
 	FORCEINLINE bool IsRunning() const { return bIsRunning; }
 
 	FORCEINLINE AEODPlayerController* GetEODPlayerController() const { return EODPlayerController; }
@@ -115,20 +121,6 @@ protected:
 	/** Max speed of character when it's moving while blocking attacks */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
 	float DefaultWalkSpeedWhileBlocking;
-
-
-	/**  This indicates the base maximum value of player's normal movement speed without any status effects */
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
-	// float BaseNormalMovementSpeed;
-
-	//~ @todo test special movement speed (current value has been set untested and set on a guess)
-	/** This indicates the base maximum value of player's special movement speed without any status effects */
-	// UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		// float BaseSpecialMovementSpeed;
-
-	/** This indicates the base maximum value of player's movement speed when it's blocking damage */
-	// UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// float BaseBlockMovementSpeed;
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -756,7 +748,10 @@ protected:
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIsRunning(bool bValue);
-	
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);
+
 	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
 
@@ -793,6 +788,15 @@ FORCEINLINE void AEODCharacterBase::SetIsRunning(bool bValue)
 	if (Role < ROLE_Authority)
 	{
 		Server_SetIsRunning(bValue);
+	}
+}
+
+FORCEINLINE void AEODCharacterBase::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
+{
+	IWR_CharacterMovementDirection = NewDirection;
+	if (Role < ROLE_Authority)
+	{
+		Server_SetIWRCharMovementDir(NewDirection);
 	}
 }
 
