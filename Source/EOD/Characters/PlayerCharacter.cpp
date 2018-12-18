@@ -15,6 +15,7 @@
 #include "EOD/UI/DialogueWindowWidget.h"
 #include "EOD/Statics/DialogueLibrary.h"
 #include "EOD/Weapons/WeaponDataAsset.h"
+#include "EOD/Weapons/WeaponSlot.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -102,12 +103,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
-	//~ Begin Axis Input Bindings
 	// PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
 	// PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::MoveRight);
-	//~ End Axis Input Bindings
 	
-	//~ Begin Action Input Bindings
 	// PlayerInputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &APlayerCharacter::ZoomInCamera);
 	// PlayerInputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &APlayerCharacter::ZoomOutCamera);
 
@@ -119,13 +117,13 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	// PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
 	// PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
 
-	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnPressedNormalAttack);
-	PlayerInputComponent->BindAction("NormalAttack", IE_Released, this, &APlayerCharacter::OnReleasedNormalAttack);
+	// PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnPressedNormalAttack);
+	// PlayerInputComponent->BindAction("NormalAttack", IE_Released, this, &APlayerCharacter::OnReleasedNormalAttack);
 	
 	// PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &APlayerCharacter::OnDodge);
 	// PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::OnJump);
 	// PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::OnInteract);
-	PlayerInputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &APlayerCharacter::OnToggleSheathe);
+	// PlayerInputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &APlayerCharacter::OnToggleSheathe);
 	// PlayerInputComponent->BindAction("ToggleStats", IE_Pressed, this, &APlayerCharacter::OnToggleCharacterStatsUI);
 	// PlayerInputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &APlayerCharacter::OnToggleMouseCursor);
 	// PlayerInputComponent->BindAction("ToggleSkillTree", IE_Pressed, SkillsComponent, &USkillsComponent::ToggleSkillTreeUI);
@@ -176,7 +174,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("Skill_19", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<19>);
 	PlayerInputComponent->BindAction("Skill_20", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<20>);
 	*/
-	//~ End Action Input Bindings
 
 }
 
@@ -186,15 +183,16 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, bWeaponSheathed, COND_SkipOwner);
-
+	DOREPLIFETIME_CONDITION(APlayerCharacter, WeaponSlots, COND_InitialOnly);
 }
 
 void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	// AddPrimaryWeapon(PrimaryWeaponID);
+
 	// AddSecondaryWeapon(SecondaryWeaponID);
+	// AddPrimaryWeapon(PrimaryWeaponID);
 
 	/*
 	FActorSpawnParameters SpawnInfo;
@@ -331,6 +329,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// @note Set secondary weapon first and primary weapon later during initialization
+	if (Controller && Controller->IsLocalController())
+	{
+		AddSecondaryWeaponToCurrentSlot(SecondaryWeaponID);
+		AddPrimaryWeaponToCurrentSlot(PrimaryWeaponID);
+	}
 
 	// Since setting master pose component from constructor doesn't work in packaged game
 	Hair->SetMasterPoseComponent(GetMesh());
@@ -747,6 +752,77 @@ void APlayerCharacter::AddSecondaryWeapon(FName WeaponID)
 
 }
 
+void APlayerCharacter::AddPrimaryWeaponToCurrentSlot(FName WeaponID)
+{
+	// @todo check whether a weapon is already equipped
+
+	UWeaponDataAsset* WeaponDataAsset = UWeaponLibrary::GetWeaponDataAsset(WeaponID);
+	if (WeaponDataAsset)
+	{
+		Server_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset);
+	}
+
+	/*
+	//  You would call AddPrimaryWeaponToCurrentSlot(NAME_None) when you want to remove equipped primary weapon
+	if (WeaponID == NAME_None)
+	{
+		RemovePrimaryWeaponFromCurrentSlot();
+		return;
+	}
+
+	UWeaponDataAsset* WeaponDataAsset = UWeaponLibrary::GetWeaponDataAsset(WeaponID);
+	if (!WeaponDataAsset)
+	{
+		return;
+	}
+
+	RemovePrimaryWeaponFromCurrentSlot();
+	if (UWeaponLibrary::IsWeaponDualHanded(WeaponDataAsset->WeaponType))
+	{
+		RemoveSecondaryWeaponFromCurrentSlot();
+	}
+
+	Server_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset);
+	*/
+
+	/*
+	UWeaponSlot* CurrentWeaponSlot = GetCurrentWeaponSlot() ? GetCurrentWeaponSlot() : CreateNewWeaponSlot();
+
+	UWeaponSlot* WeaponSlot = GetCurrentWeaponSlot();
+	if (WeaponSlot)
+	{
+		WeaponSlot->AttachPrimaryWeapon(WeaponID, WeaponDataAsset);
+	}
+	else
+	{
+
+	}
+
+
+
+	PrimaryWeaponID = WeaponID;
+	PrimaryWeaponDataAsset = WeaponDataAsset;
+
+	OnPrimaryWeaponEquipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
+	*/
+	/*
+	LoadEquippedWeaponAnimationReferences();
+	// @todo add weapon stats
+	*/
+}
+
+void APlayerCharacter::AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset * WeaponDataAsset)
+{
+}
+
+void APlayerCharacter::AddSecondaryWeaponToCurrentSlot(FName WeaponID)
+{
+}
+
+void APlayerCharacter::AddSecondaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset * WeaponDataAsset)
+{
+}
+
 void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex)
 {
 	// Detemine whether the command has been passed to actually remove the weapon
@@ -760,9 +836,25 @@ void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex)
 
 }
 
+void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, UWeaponDataAsset * WeaponDataAsset, int32 SlotIndex)
+{
+}
+
 void APlayerCharacter::AddSecondaryWeaponToSlot(FName WeaponID, int32 SlotIndex)
 {
 
+}
+
+void APlayerCharacter::AddSecondaryWeaponToSlot(FName WeaponID, UWeaponDataAsset * WeaponDataAsset, int32 SlotIndex)
+{
+}
+
+void APlayerCharacter::RemovePrimaryWeaponFromCurrentSlot()
+{
+}
+
+void APlayerCharacter::RemoveSecondaryWeaponFromCurrentSlot()
+{
 }
 
 void APlayerCharacter::RemovePrimaryWeaponFromSlot(int32 SlotIndex)
@@ -780,6 +872,10 @@ void APlayerCharacter::RemovePrimaryWeaponFromSlot(int32 SlotIndex)
 }
 
 void APlayerCharacter::RemoveSecondaryWeaponFromSlot(int32 SlotIndex)
+{
+}
+
+void APlayerCharacter::ToggleWeaponSlot()
 {
 }
 
@@ -850,6 +946,22 @@ void APlayerCharacter::ZoomOutCamera()
 {
 	if (GetCameraBoom()->TargetArmLength <= CameraArmMaximumLength)
 		GetCameraBoom()->TargetArmLength += CameraZoomRate;
+}
+
+UWeaponSlot* APlayerCharacter::CreateNewWeaponSlot()
+{
+	UWeaponSlot* NewSlot = NewObject<UWeaponSlot>((UObject*)GetTransientPackage(), UWeaponSlot::StaticClass());
+	int32 NewSlotIndex = WeaponSlots.Add(NewSlot);
+	if (WeaponSlots.Num() == 1)
+	{
+		SetActiveWeaponSlotIndex(NewSlotIndex);
+	}
+	return NewSlot;
+}
+
+void APlayerCharacter::SetActiveWeaponSlotIndex(int32 NewSlotIndex)
+{
+	ActiveWeaponSlotIndex = NewSlotIndex;
 }
 
 bool APlayerCharacter::StartDodging()
@@ -1038,7 +1150,7 @@ void APlayerCharacter::OnInteract()
 	}
 }
 
-void APlayerCharacter::OnToggleSheathe()
+void APlayerCharacter::ToggleSheathe()
 {
 	// @todo replace active animation references with weapon animation references
 
@@ -2218,6 +2330,72 @@ void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 
 void APlayerCharacter::OnRep_WeaponSheathed()
 {
+}
+
+void APlayerCharacter::OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots)
+{
+	UKismetSystemLibrary::PrintString(this, FString("Weapon slots got replicated"));
+
+	FString Message = FString::FromInt(WeaponSlots.Num());
+	UKismetSystemLibrary::PrintString(this, Message);
+
+	ActiveWeaponSlotIndex = 0;
+	UWeaponSlot* WeaponSlot = WeaponSlots[ActiveWeaponSlotIndex];
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Instigator = this;
+	SpawnInfo.Owner = this;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	APrimaryWeapon* Wep = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
+
+	// UKismetSystemLibrary::PrintString(this, WeaponSlot->PrimaryWeaponID.ToString());
+
+	if (WeaponSlot)
+	{
+		WeaponSlot->AttachPrimaryWeapon(Wep);
+	}
+	
+}
+
+void APlayerCharacter::Server_AddPrimaryWeaponToCurrentSlot_Implementation(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
+{
+	UKismetSystemLibrary::PrintString(this, FString("Server RPC called"));
+
+	Multicast_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset);
+}
+
+bool APlayerCharacter::Server_AddPrimaryWeaponToCurrentSlot_Validate(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
+{
+	return true;
+}
+
+void APlayerCharacter::Multicast_AddPrimaryWeaponToCurrentSlot_Implementation(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
+{
+	UKismetSystemLibrary::PrintString(this, FString("Multicast called"));
+
+	PrimaryWeaponID = WeaponID;
+	UWeaponSlot* WeaponSlot = GetCurrentWeaponSlot();
+	if (!WeaponSlot)
+	{
+		// WeaponSlot = NewObject<UWeaponSlot>((UObject*)GetTransientPackage(), UWeaponSlot::StaticClass());
+		WeaponSlot = NewObject<UWeaponSlot>(this, UWeaponSlot::StaticClass(), FName("SlotObj"), RF_Transient);
+	}
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Instigator = this;
+	SpawnInfo.Owner = this;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	APrimaryWeapon* Wep = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
+
+	if (WeaponSlot)
+	{
+		WeaponSlot->AttachPrimaryWeapon(WeaponID, WeaponDataAsset, Wep);
+	}
+
+	if (WeaponSlot)
+	{
+		ActiveWeaponSlotIndex = WeaponSlots.Add(WeaponSlot);
+	}
 }
 
 void APlayerCharacter::Server_SetWeaponSheathed_Implementation(bool bNewValue)

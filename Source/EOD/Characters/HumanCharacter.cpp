@@ -1,6 +1,6 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "HumanCharacter.h"
+#include "EOD/Characters/HumanCharacter.h"
 
 #include "GameFramework/PlayerController.h"
 
@@ -18,6 +18,11 @@ AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) : 
 void AHumanCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAction("Forward", IE_Pressed, this, &AHumanCharacter::OnPressedForward);
+	PlayerInputComponent->BindAction("Forward", IE_Released, this, &AHumanCharacter::OnReleasedForward);
+	PlayerInputComponent->BindAction("Backward", IE_Pressed, this, &AHumanCharacter::OnPressedBackward);
+	PlayerInputComponent->BindAction("Backward", IE_Released, this, &AHumanCharacter::OnReleasedBackward);
 }
 
 void AHumanCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -92,6 +97,38 @@ bool AHumanCharacter::StartBlockingAttacks()
 bool AHumanCharacter::StopBlockingAttacks()
 {
 	return false;
+}
+
+void AHumanCharacter::OnPressedForward()
+{
+	bBackwardPressed = false;
+	bForwardPressed = true;
+	GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &AHumanCharacter::DisableForwardPressed, 0.1f, false);
+}
+
+void AHumanCharacter::OnPressedBackward()
+{
+	bForwardPressed = false;
+	bBackwardPressed = true;
+	GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &AHumanCharacter::DisableBackwardPressed, 0.1f, false);
+}
+
+void AHumanCharacter::OnReleasedForward()
+{
+}
+
+void AHumanCharacter::OnReleasedBackward()
+{
+}
+
+void AHumanCharacter::DisableForwardPressed()
+{
+	bForwardPressed = false;
+}
+
+void AHumanCharacter::DisableBackwardPressed()
+{
+	bBackwardPressed = false;
 }
 
 void AHumanCharacter::TurnOnTargetSwitch()

@@ -718,6 +718,19 @@ void AEODCharacterBase::StopInteraction()
 {
 }
 
+void AEODCharacterBase::ToggleSheathe()
+{
+
+}
+
+void AEODCharacterBase::StartNormalAttacking()
+{
+}
+
+void AEODCharacterBase::StopNormalAttacking()
+{
+}
+
 void AEODCharacterBase::UpdateMovement(float DeltaTime)
 {
 	float DesiredRotationYaw = GetRotationYawFromAxisInput();

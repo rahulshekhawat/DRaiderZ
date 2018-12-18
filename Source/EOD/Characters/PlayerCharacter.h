@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Weapons/WeaponBase.h"
+#include "EOD/Weapons/WeaponSlot.h"
 #include "EOD/Weapons/PrimaryWeapon.h"
 #include "EOD/Weapons/SecondaryWeapon.h"
 #include "EOD/Characters/EODCharacterBase.h"
@@ -39,7 +41,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, 
 
 
 USTRUCT(BlueprintType)
-struct EOD_API FWeaponSlot
+struct EOD_API FWeaponSlotX
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -292,13 +294,42 @@ public:
 	/** Add or replace secondary weapon with a new weapon */
 	void AddSecondaryWeapon(FName WeaponID);
 
+	UPROPERTY()
+	int32 ActiveWeaponSlotIndex;
+
+	void AddPrimaryWeaponToCurrentSlot(FName WeaponID);
+
+	void AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
+
+	void AddSecondaryWeaponToCurrentSlot(FName WeaponID);
+
+	void AddSecondaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
+
 	void AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex);
 
+	void AddPrimaryWeaponToSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, int32 SlotIndex);
+
 	void AddSecondaryWeaponToSlot(FName WeaponID, int32 SlotIndex);
+
+	void AddSecondaryWeaponToSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, int32 SlotIndex);
+
+	void RemovePrimaryWeaponFromCurrentSlot();
+
+	void RemoveSecondaryWeaponFromCurrentSlot();
 
 	void RemovePrimaryWeaponFromSlot(int32 SlotIndex);
 
 	void RemoveSecondaryWeaponFromSlot(int32 SlotIndex);
+
+	void ToggleWeaponSlot();
+
+	// void AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex);
+
+	// void AddSecondaryWeaponToSlot(FName WeaponID, int32 SlotIndex);
+
+	// void RemovePrimaryWeaponFromSlot(int32 SlotIndex);
+
+	// void RemoveSecondaryWeaponFromSlot(int32 SlotIndex);
 
 	/** Removes primary weapon if it is currently equipped */
 	void RemovePrimaryWeapon();
@@ -486,9 +517,25 @@ public:
 	int32 MaxWeaponSlots;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
-	TArray<FWeaponSlot> SlotWeapons;
+	TArray<FWeaponSlotX> SlotWeapons;
 
-	int32 ActiveWeaponSlotIndex;
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponSlots, BlueprintReadOnly, Category = "Weapon Slot")
+	TArray<UWeaponSlot*> WeaponSlots;
+
+	FORCEINLINE UWeaponSlot* GetCurrentWeaponSlot() const
+	{
+		if (ActiveWeaponSlotIndex >= 0 && ActiveWeaponSlotIndex < WeaponSlots.Num())
+		{
+			return WeaponSlots[ActiveWeaponSlotIndex];
+		}
+
+		return nullptr;
+	}
+
+	/** Creates a new weapon slot and returns a pointer to it */
+	UWeaponSlot* CreateNewWeaponSlot();
+
+	void SetActiveWeaponSlotIndex(int32 NewSlotIndex);
 
 	virtual bool StartDodging() override;
 
@@ -666,7 +713,7 @@ private:
 	void OnInteract();
 
 	/** Put or remove weapon inside sheath */
-	void OnToggleSheathe();
+	virtual void ToggleSheathe() override;
 
 	/** Display or hide character stats UI */
 	void OnToggleCharacterStatsUI();
@@ -736,13 +783,21 @@ private:
 	//~ Begin multiplayer code
 	UFUNCTION()
 	void OnRep_WeaponSheathed();
+
+	UFUNCTION()
+	void OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetWeaponSheathed(bool bNewValue);
-	//~ End multiplayer code
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void Multicast_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
 };
 
@@ -875,7 +930,7 @@ inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationR
 	return EquippedWeaponAnimationReferences;
 }
 
-inline FPlayerAnimationReferencesTableRow * APlayerCharacter::GetEquippedWeaponAnimationReferences() const
+inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetEquippedWeaponAnimationReferences() const
 {
 	return EquippedWeaponAnimationReferences;
 }

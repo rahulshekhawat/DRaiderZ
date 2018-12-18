@@ -93,6 +93,31 @@ public:
 
 	virtual bool StopBlockingAttacks() override;
 
+	////////////////////////////////////////////////////////////////////////////////
+	// INPUT
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	void OnPressedForward();
+
+	void OnPressedBackward();
+
+	void OnReleasedForward();
+
+	void OnReleasedBackward();
+
+	bool bForwardPressed;
+
+	bool bBackwardPressed;
+
+	/** Timer handle needed for executing SP normal attacks */
+	FTimerHandle SPAttackTimerHandle;
+
+	UFUNCTION()
+	void DisableForwardPressed();
+
+	UFUNCTION()
+	void DisableBackwardPressed();
+
 
 	////////////////////////////////////////////////////////////////////////////////
 	// MATERIALS

@@ -42,13 +42,17 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Block", IE_Pressed, this, &AEODPlayerController::OnPressingBlockKey);
 	InputComponent->BindAction("Block", IE_Released, this, &AEODPlayerController::OnReleasingBlockKey);
 
+	InputComponent->BindAction("NormalAttack", IE_Pressed, this, &AEODPlayerController::OnPressingNormalAttackKey);
+	InputComponent->BindAction("NormalAttack", IE_Released, this, &AEODPlayerController::OnReleasingNormalAttackKey);
+
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AEODPlayerController::MakePawnJump);
 	InputComponent->BindAction("Dodge", IE_Pressed, this, &AEODPlayerController::AttemptDodge);
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AEODPlayerController::TriggerInteraction);
 
 	InputComponent->BindAction("Escape", IE_Pressed, this, &AEODPlayerController::OnPressingEscapeKey);
-	InputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &AEODPlayerController::ToggleMouseCursor);
+	InputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &AEODPlayerController::ToggleSheathe);
 	InputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &AEODPlayerController::ToggleAutoMove);
+	InputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &AEODPlayerController::ToggleMouseCursor);
 
 	InputComponent->BindAction("ToggleStats", IE_Pressed, this, &AEODPlayerController::TogglePlayerStatsUI);
 	InputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &AEODPlayerController::TogglePlayerSkillTreeUI);
@@ -299,6 +303,22 @@ void AEODPlayerController::ZoomOutCamera()
 	}
 }
 
+void AEODPlayerController::OnPressingNormalAttackKey()
+{
+	if (EODCharacter)
+	{
+		EODCharacter->StartNormalAttacking();
+	}
+}
+
+void AEODPlayerController::OnReleasingNormalAttackKey()
+{
+	if (EODCharacter)
+	{
+		EODCharacter->StopNormalAttacking();
+	}
+}
+
 void AEODPlayerController::AttemptDodge()
 {
 	if (EODCharacter)
@@ -349,6 +369,14 @@ void AEODPlayerController::ToggleMouseCursor()
 	else
 	{
 		SwitchToUIInput();
+	}
+}
+
+void AEODPlayerController::ToggleSheathe()
+{
+	if (EODCharacter)
+	{
+		EODCharacter->ToggleSheathe();
 	}
 }
 

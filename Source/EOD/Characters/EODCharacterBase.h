@@ -201,6 +201,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character Action")
 	virtual void StopInteraction();
 
+	/** Put or remove weapon inside sheath */
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual void ToggleSheathe();
+	
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual void StartNormalAttacking();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	virtual void StopNormalAttacking();
 
 	////////////////////////////////////////////////////////////////////////////////
 	// CHARACTER STATE

@@ -249,9 +249,16 @@ float UPlayerAnimInstance::GetBlockMovementDirectionYaw() const
 
 EWeaponType UPlayerAnimInstance::GetWeaponAnimationType() const
 {
+	/*
 	if (OwningPlayer && !OwningPlayer->IsWeaponSheathed())
 	{
 		return OwningPlayer->GetEquippedWeaponType();
+	}
+	*/
+
+	if (OwningPlayer && OwningPlayer->GetCurrentWeaponSlot() && OwningPlayer->GetCurrentWeaponSlot()->PrimaryWeapon)
+	{
+		return OwningPlayer->GetCurrentWeaponSlot()->PrimaryWeapon->WeaponType;
 	}
 
 	return EWeaponType::None;

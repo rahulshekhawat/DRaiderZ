@@ -173,6 +173,10 @@ private:
 
 	void ZoomOutCamera();
 
+	void OnPressingNormalAttackKey();
+
+	void OnReleasingNormalAttackKey();
+
 	void AttemptDodge();
 
 	void TriggerInteraction();
@@ -180,6 +184,9 @@ private:
 	void ToggleAutoMove();
 
 	void ToggleMouseCursor();
+
+	/** Put or remove weapon inside sheath */
+	void ToggleSheathe();
 
 	void OnPressingBlockKey();
 
