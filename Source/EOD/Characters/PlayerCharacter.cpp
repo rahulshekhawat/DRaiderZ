@@ -15,7 +15,7 @@
 #include "EOD/UI/DialogueWindowWidget.h"
 #include "EOD/Statics/DialogueLibrary.h"
 #include "EOD/Weapons/WeaponDataAsset.h"
-#include "EOD/Weapons/WeaponSlot.h"
+// #include "EOD/Weapons/WeaponSlot.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -164,7 +164,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, bWeaponSheathed, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(APlayerCharacter, WeaponSlots, COND_SkipOwner);
+	// DOREPLIFETIME_CONDITION(APlayerCharacter, WeaponSlots, COND_SkipOwner);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -776,15 +776,6 @@ void APlayerCharacter::AddSecondaryWeaponToCurrentSlot(FName WeaponID, UWeaponDa
 
 void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex)
 {
-	// Detemine whether the command has been passed to actually remove the weapon
-	if (WeaponID == NAME_None && SlotWeapons.Num() > SlotIndex)
-	{
-		RemovePrimaryWeaponFromSlot(SlotIndex);
-	}
-
-
-
-
 }
 
 void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, int32 SlotIndex)
@@ -899,6 +890,7 @@ void APlayerCharacter::ZoomOutCamera()
 		GetCameraBoom()->TargetArmLength += CameraZoomRate;
 }
 
+/*
 UWeaponSlot* APlayerCharacter::CreateNewWeaponSlot()
 {
 	UWeaponSlot* NewSlot = NewObject<UWeaponSlot>((UObject*)GetTransientPackage(), UWeaponSlot::StaticClass());
@@ -909,6 +901,7 @@ UWeaponSlot* APlayerCharacter::CreateNewWeaponSlot()
 	}
 	return NewSlot;
 }
+*/
 
 void APlayerCharacter::SetActiveWeaponSlotIndex(int32 NewSlotIndex)
 {
@@ -2297,9 +2290,9 @@ void APlayerCharacter::OnRep_WeaponSheathed()
 {
 }
 
+/*
 void APlayerCharacter::OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots)
 {
-	/*
 	UKismetSystemLibrary::PrintString(this, FString("Weapon slots got replicated"));
 
 	FString Message = FString::FromInt(WeaponSlots.Num());
@@ -2320,8 +2313,8 @@ void APlayerCharacter::OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots)
 	{
 		WeaponSlot->AttachPrimaryWeapon(Wep);
 	}
-	*/
 }
+*/
 
 void APlayerCharacter::Server_SetPrimaryWeaponID_Implementation(FName NewWeaponID)
 {
@@ -2355,6 +2348,7 @@ void APlayerCharacter::Multicast_AddPrimaryWeaponToCurrentSlot_Implementation(FN
 {
 	UKismetSystemLibrary::PrintString(this, FString("Multicast called"));
 
+	/*
 	PrimaryWeaponID = WeaponID;
 	UWeaponSlot* WeaponSlot = GetCurrentWeaponSlot();
 	if (!WeaponSlot)
@@ -2372,6 +2366,7 @@ void APlayerCharacter::Multicast_AddPrimaryWeaponToCurrentSlot_Implementation(FN
 	{
 		ActiveWeaponSlotIndex = WeaponSlots.Add(WeaponSlot);
 	}
+	*/
 }
 
 void APlayerCharacter::Server_SetWeaponSheathed_Implementation(bool bNewValue)

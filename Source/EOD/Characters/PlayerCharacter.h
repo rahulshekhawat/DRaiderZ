@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EOD/Weapons/WeaponBase.h"
-#include "EOD/Weapons/WeaponSlot.h"
+// #include "EOD/Weapons/WeaponSlot.h"
 #include "EOD/Weapons/PrimaryWeapon.h"
 #include "EOD/Weapons/SecondaryWeapon.h"
 #include "EOD/Characters/EODCharacterBase.h"
@@ -42,6 +42,21 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, 
 
 
 USTRUCT(BlueprintType)
+struct EOD_API FWeaponSlot
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
+	FName PrimaryWeaponID;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
+	FName SecondaryWeaponID;
+
+};
+
+
+/*
+USTRUCT(BlueprintType)
 struct EOD_API FWeaponSlotX
 {
 	GENERATED_USTRUCT_BODY()
@@ -69,6 +84,7 @@ struct EOD_API FWeaponSlotX
 		return PrimaryWeapon && PrimaryWeaponDataAsset && (PrimaryWeaponID != NAME_None) ? true : false;
 	}
 };
+*/
 
 
 /**
@@ -534,12 +550,14 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 	void EquipPrimaryWeapon(FName WeaponID);
 
+	
 
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon Slot")
 	int32 MaxWeaponSlots;
 
+	/*
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
 	TArray<FWeaponSlotX> SlotWeapons;
 
@@ -555,9 +573,10 @@ public:
 
 		return nullptr;
 	}
+	*/
 
 	/** Creates a new weapon slot and returns a pointer to it */
-	UWeaponSlot* CreateNewWeaponSlot();
+	//  UWeaponSlot* CreateNewWeaponSlot();
 
 	void SetActiveWeaponSlotIndex(int32 NewSlotIndex);
 
@@ -805,8 +824,8 @@ private:
 	UFUNCTION()
 	void OnRep_WeaponSheathed();
 
-	UFUNCTION()
-	void OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots);
+	// UFUNCTION()
+	// void OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetPrimaryWeaponID(FName NewWeaponID);
