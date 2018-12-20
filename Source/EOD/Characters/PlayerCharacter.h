@@ -156,19 +156,10 @@ private:
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Feet;
-	
-	//~ Inventory component
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UInventoryComponent* InventoryComponent;
-
 
 	//~ Audio component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* AudioComponent;
-
-	//~ Sphere component used to detect interactive objects
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// USphereComponent* InteractionSphere;
 
 	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
@@ -176,7 +167,6 @@ private:
 	FORCEINLINE void SetMasterPoseComponentForMeshes();
 
 public:
-
 	/** Determines if this character should be rotated toward DesiredSmoothRotationYaw */
 	UPROPERTY(Transient)
 	bool bRotateSmoothly;
@@ -334,14 +324,6 @@ public:
 	void RemoveSecondaryWeaponFromSlot(int32 SlotIndex);
 
 	void ToggleWeaponSlot();
-
-	// void AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex);
-
-	// void AddSecondaryWeaponToSlot(FName WeaponID, int32 SlotIndex);
-
-	// void RemovePrimaryWeaponFromSlot(int32 SlotIndex);
-
-	// void RemoveSecondaryWeaponFromSlot(int32 SlotIndex);
 
 	/** Removes primary weapon if it is currently equipped */
 	void RemovePrimaryWeapon();
@@ -557,27 +539,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon Slot")
 	int32 MaxWeaponSlots;
 
-	/*
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
-	TArray<FWeaponSlotX> SlotWeapons;
-
-	UPROPERTY(ReplicatedUsing = OnRep_WeaponSlots, BlueprintReadOnly, Category = "Weapon Slot")
-	TArray<UWeaponSlot*> WeaponSlots;
-
-	FORCEINLINE UWeaponSlot* GetCurrentWeaponSlot() const
-	{
-		if (ActiveWeaponSlotIndex >= 0 && ActiveWeaponSlotIndex < WeaponSlots.Num())
-		{
-			return WeaponSlots[ActiveWeaponSlotIndex];
-		}
-
-		return nullptr;
-	}
-	*/
-
-	/** Creates a new weapon slot and returns a pointer to it */
-	//  UWeaponSlot* CreateNewWeaponSlot();
-
 	void SetActiveWeaponSlotIndex(int32 NewSlotIndex);
 
 	virtual bool StartDodging() override;
@@ -650,26 +611,6 @@ private:
 	void UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
 
-	
-	/** Animations to be used when this player doesn't have any weapon equipped */
-	// FPlayerAnimationReferencesTableRow* DefaultAnimations;
-
-	/** Animations to be used when this player has a weapon equipped */
-	// FPlayerAnimationReferencesTableRow* EquippedWeaponAnimations;
-
-
-	/**
-	 * StreamableHandle for default animations
-	 * EWeaponType will (and must) always be set to EWeaponType::None
-	 */
-	// TPair<EWeaponType, FStreamableHandle> DefaultAnimationsStreamableHandle;
-
-	/** StreamableHandle for weapon animations */
-	// TPair<EWeaponType, FStreamableHandle> WeaponAnimationsStreamableHandle;
-
-
-
-
 	/** Animations for this player when it has a weapon equipped */
 	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
 
@@ -679,8 +620,6 @@ private:
 	TSharedPtr<FStreamableHandle> EquippedWeaponAnimationsStreamableHandle;
 
 	TSharedPtr<FStreamableHandle> UnequippedWeaponAnimationsStreamableHandle;
-
-
 
 
 	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender);
