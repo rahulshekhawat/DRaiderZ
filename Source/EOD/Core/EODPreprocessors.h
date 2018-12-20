@@ -8,6 +8,13 @@
 #define DEBUG_SHAPES_ENABLED 0
 #define MESSAGE_LOGGING_ENABLED 1
 
+#define EOD_TEST_CODE_ENABLED 1
+#define EOD_MESSAGE_LOGGING_ENABLED 1
+#define EOD_SCREEN_MESSAGES_ENABLED 1
+#define EOD_CONSOLE_MESSAGES_ENABLED 1
+#define EOD_DRAWING_DEBUG_SHAPES_ENABLED 1
+
+
 #define SURFACETYPE_FLESH       SurfaceType1
 #define SURFACETYPE_METAL       SurfaceType2
 #define SURFACETYPE_STONE       SurfaceType3
@@ -21,5 +28,39 @@
 #define SURFACETYPE_CONCRETE    SurfaceType11
 
 
+#include "Kismet/KismetSystemLibrary.h"
 
-// #define EOD_LOG()
+
+inline void PrintToScreen(UObject* WorldContextObject, const FString& Message, float Duration = 2.0f)
+{
+#if EOD_MESSAGE_LOGGING_ENABLED
+#if EOD_SCREEN_MESSAGES_ENABLED
+	UKismetSystemLibrary::PrintString(WorldContextObject, Message, true, false, FLinearColor((0.0), (0.66), (1.0)), Duration);
+#endif // EOD_SCREEN_MESSAGES_ENABLED
+#endif // EOD_MESSAGE_LOGGING_ENABLED
+}
+
+inline void PrintToConsole(UObject* WorldContextObject, const FString& Message, float Duration = 2.0f)
+{
+#if EOD_MESSAGE_LOGGING_ENABLED
+#if EOD_CONSOLE_MESSAGES_ENABLED
+	UKismetSystemLibrary::PrintString(WorldContextObject, Message, false, true, FLinearColor((0.0), (0.66), (1.0)), Duration);
+#endif // EOD_CONSOLE_MESSAGES_ENABLED
+#endif // EOD_MESSAGE_LOGGING_ENABLED
+}
+
+
+inline void PrintEverywhere(UObject* WorldContextObject, const FString& Message, float Duration = 2.0f)
+{
+#if EOD_MESSAGE_LOGGING_ENABLED
+	bool bLogScreen = false, bLogConsole = false;
+#if EOD_SCREEN_MESSAGES_ENABLED
+	bLogScreen = true;
+#endif // EOD_SCREEN_MESSAGES_ENABLED
+#if EOD_CONSOLE_MESSAGES_ENABLED
+	bLogConsole = true;
+#endif // EOD_CONSOLE_MESSAGES_ENABLED
+	UKismetSystemLibrary::PrintString(WorldContextObject, Message, bLogScreen, bLogConsole, FLinearColor((0.0), (0.66), (1.0)), Duration);
+#endif // EOD_MESSAGE_LOGGING_ENABLED
+}
+

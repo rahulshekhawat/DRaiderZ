@@ -11,6 +11,7 @@
 
 #include "Engine/DataTable.h"
 #include "Engine/StreamableManager.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "PlayerCharacter.generated.h"
 
 class UHUDWidget;
@@ -117,13 +118,6 @@ public:
 	void SavePlayerState();
 
 private:
-	
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// USpringArmComponent* CameraBoom;
-
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UCameraComponent* PlayerCamera;
-
 	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player face
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -162,7 +156,9 @@ private:
 
 	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
-	
+
+	FORCEINLINE void SetMasterPoseComponentForMeshes();
+
 public:
 
 	/** Determines if this character should be rotated toward DesiredSmoothRotationYaw */
@@ -511,6 +507,34 @@ private:
 	/** Timer handle needed for executing SP normal attacks */
 	FTimerHandle SPAttackTimerHandle;
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// WEAPONS
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	/** An actor for primary weapon equipped by the player */
+	UPROPERTY(Transient)
+	APrimaryWeapon* PrimaryWeapon;
+
+	/** An actor for secondary weapon equipped by the player */
+	UPROPERTY(Transient)
+	ASecondaryWeapon* SecondaryWeapon;
+
+	FORCEINLINE void SetPrimaryWeaponID(FName NewWeaponID);
+
+protected:
+	/** ID of the current primary weapon equipped. It will be NAME_None if no primary weapon is equipped */
+	UPROPERTY(ReplicatedUsing = OnRep_PrimaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
+	FName PrimaryWeaponID;
+	
+	/** ID of current secondary weapon equipped. It will be NAME_None if no secondary weapon is equipped */
+	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
+	FName SecondaryWeaponID;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	void EquipPrimaryWeapon(FName WeaponID);
+
+
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon Slot")
@@ -541,17 +565,6 @@ public:
 
 private:
 
-	UPROPERTY(Transient)
-	APrimaryWeapon* PrimaryWeapon;
-
-	UPROPERTY(Transient)
-	ASecondaryWeapon* SecondaryWeapon;
-
-	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	FName PrimaryWeaponID;
-
-	UPROPERTY(Category = Weapons, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	FName SecondaryWeaponID;
 
 	UPROPERTY()
 	UWeaponDataAsset* PrimaryWeaponDataAsset;
@@ -778,14 +791,25 @@ public:
 	// UPROPERTY(Replicated)
 	// ECharMovementDirection IWR_CharacterMovementDirection;
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// NETWORK
+	////////////////////////////////////////////////////////////////////////////////
 private:
-	
-	//~ Begin multiplayer code
+	UFUNCTION()
+	void OnRep_PrimaryWeaponID();
+
+	UFUNCTION()
+	void OnRep_SecondaryWeaponID();
+
 	UFUNCTION()
 	void OnRep_WeaponSheathed();
 
 	UFUNCTION()
 	void OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetPrimaryWeaponID(FName NewWeaponID);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
@@ -797,9 +821,22 @@ private:
 	void Server_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
 	UFUNCTION(NetMultiCast, Reliable)
-	void Multicast_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
+	void Multicast_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, AWeaponBase* PrimaryWep);
 
 };
+
+FORCEINLINE void APlayerCharacter::SetPrimaryWeaponID(FName NewWeaponID)
+{
+	if (Role < ROLE_Authority)
+	{
+		Server_SetPrimaryWeaponID(NewWeaponID);
+	}
+	else
+	{
+		PrimaryWeaponID = NewWeaponID;
+		SetCurrentPrimaryWeapon(NewWeaponID);
+	}
+}
 
 template<uint32 SkillButtonIndex>
 inline void APlayerCharacter::PressedSkillKey()
@@ -988,4 +1025,18 @@ FORCEINLINE bool APlayerCharacter::IsSecondaryWeaponEquipped() const
 FORCEINLINE bool APlayerCharacter::IsFastRunning() const
 {
 	return GetCharacterState() == ECharacterState::SpecialMovement;
+}
+
+FORCEINLINE void APlayerCharacter::SetMasterPoseComponentForMeshes()
+{
+	if (GetMesh())
+	{
+		Hair->SetMasterPoseComponent(GetMesh());
+		HatItem->SetMasterPoseComponent(GetMesh());
+		FaceItem->SetMasterPoseComponent(GetMesh());
+		Chest->SetMasterPoseComponent(GetMesh());
+		Hands->SetMasterPoseComponent(GetMesh());
+		Legs->SetMasterPoseComponent(GetMesh());
+		Feet->SetMasterPoseComponent(GetMesh());
+	}
 }

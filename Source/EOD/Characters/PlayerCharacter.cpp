@@ -29,7 +29,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/GameUserSettings.h"
-#include "Components/SkeletalMeshComponent.h"
+// #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer) :Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
@@ -38,9 +38,6 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 
 	// The player should be free to look around with mouse without actually rotating the posessed character
 	bUseControllerRotationYaw = false;
-	bReplicates = true;
-	bReplicateMovement = true;
-	GetCharacterMovement()->SetIsReplicated(true);
 
 	// @note Defaul skeletal mesh component inherited from ACharacter class will contain face mesh
 	if (GetMesh())
@@ -58,24 +55,6 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	Hands			= CreateNewArmorComponent(FName("Hands"), ObjectInitializer);
 	Legs			= CreateNewArmorComponent(FName("Legs"), ObjectInitializer);
 	Feet			= CreateNewArmorComponent(FName("Feet"), ObjectInitializer);
-
-	/*
-	InteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, FName("Interaction Sphere"));
-	InteractionSphere->SetupAttachment(RootComponent);
-	InteractionSphere->SetSphereRadius(150.f);
-	*/
-
-	//~ Begin Camera Components Initialization
-	/*
-	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, FName("Camera Boom"));
-	CameraBoom->bUsePawnControlRotation = true;
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->AddLocalOffset(FVector(0.f, 0.f, 60.f));
-
-	PlayerCamera = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, FName("Camera"));
-	PlayerCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	*/
-	//~ End Camera Components Initialization
 
 	// InventoryComponent = ObjectInitializer.CreateDefaultSubobject<UInventoryComponent>(this, FName("Player Inventory"));
 	// SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
@@ -181,20 +160,20 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(APlayerCharacter, PrimaryWeaponID);
+
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, bWeaponSheathed, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(APlayerCharacter, WeaponSlots, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(APlayerCharacter, WeaponSlots, COND_SkipOwner);
 }
 
 void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	LoadUnequippedWeaponAnimationReferences();
+	SetWalkSpeed(DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier());
 
-	// AddSecondaryWeapon(SecondaryWeaponID);
-	// AddPrimaryWeapon(PrimaryWeaponID);
-
-	/*
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Instigator = this;
 	SpawnInfo.Owner = this;
@@ -202,25 +181,17 @@ void APlayerCharacter::PostInitializeComponents()
 	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
 
+	SetCurrentSecondaryWeapon(SecondaryWeaponID);
+	SetCurrentPrimaryWeapon(PrimaryWeaponID);
 
-	// @note Set secondary weapon first and primary weapon later during initialization
 	// AddSecondaryWeapon(SecondaryWeaponID);
 	// AddPrimaryWeapon(PrimaryWeaponID);
 
-	SetCurrentSecondaryWeapon(SecondaryWeaponID);
-	SetCurrentPrimaryWeapon(PrimaryWeaponID);
-	*/
-
-	LoadUnequippedWeaponAnimationReferences();
-
 	/*
-	if (HUDWidgetClass.Get())
-	{
-		HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), HUDWidgetClass);
-	}
+	// @note Set secondary weapon first and primary weapon later during initialization
+	// AddSecondaryWeapon(SecondaryWeaponID);
+	// AddPrimaryWeapon(PrimaryWeaponID);
 	*/
-
-	SetWalkSpeed(DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier());
 }
 
 void APlayerCharacter::PostInitProperties()
@@ -241,40 +212,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (!GetActiveAnimationReferences())
 	{
-#if MESSAGE_LOGGING_ENABLED
-		UKismetSystemLibrary::PrintString(this, FString("Animation references are NULL"));
-#endif // MESSAGE_LOGGING_ENABLED
+		PrintToScreen(this, FString("Animation references are NULL"));
 		return;
 	}
-
-	/*
-	if (Controller && Controller->IsLocalPlayerController())
-	{
-		// Manage controller rotation yaw
-		if (IsBlocking() || IsAutoRunning())
-		{
-			if (!bUseControllerRotationYaw)
-			{
-				SetUseControllerRotationYaw(true);
-			}
-		}
-		else
-		{
-			if (bUseControllerRotationYaw)
-			{
-				SetUseControllerRotationYaw(false);
-			}
-		}
-
-
-
-		// Smooth rotation
-		if (bRotateSmoothly)
-		{
-			bRotateSmoothly = !DeltaRotateCharacterToDesiredYaw(DesiredSmoothRotationYaw, DeltaTime);
-		}
-	}
-	*/
 
 	if (Controller && Controller->IsLocalPlayerController())
 	{
@@ -330,26 +270,37 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Since setting master pose component from constructor doesn't work in packaged game
+	SetMasterPoseComponentForMeshes();
+
+	if (Controller && Controller->IsLocalPlayerController() && HUDWidgetClass.Get())
+	{
+		if (HUDWidgetClass.Get())
+		{
+			HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), HUDWidgetClass);
+			if (HUDWidget)
+			{
+				HUDWidget->AddToViewport();
+			}
+		}
+	}
+
+
+
+	// SetCurrentSecondaryWeapon(SecondaryWeaponID);
+	// SetCurrentPrimaryWeapon(PrimaryWeaponID);
+
+
+	/*
 	// @note Set secondary weapon first and primary weapon later during initialization
-	if (Controller && Controller->IsLocalController())
+	// if (Controller && Controller->IsLocalController())
+	if (Controller && Controller->IsLocalPlayerController())
 	{
 		AddSecondaryWeaponToCurrentSlot(SecondaryWeaponID);
 		AddPrimaryWeaponToCurrentSlot(PrimaryWeaponID);
 	}
+	*/
 
-	// Since setting master pose component from constructor doesn't work in packaged game
-	Hair->SetMasterPoseComponent(GetMesh());
-	HatItem->SetMasterPoseComponent(GetMesh());
-	FaceItem->SetMasterPoseComponent(GetMesh());
-	Chest->SetMasterPoseComponent(GetMesh());
-	Hands->SetMasterPoseComponent(GetMesh());
-	Legs->SetMasterPoseComponent(GetMesh());
-	Feet->SetMasterPoseComponent(GetMesh());
-
-	if (Controller && Controller->IsLocalPlayerController() && HUDWidget)
-	{
-		HUDWidget->AddToViewport();
-	}
 }
 
 USkeletalMeshComponent* APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer)
@@ -836,7 +787,7 @@ void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex)
 
 }
 
-void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, UWeaponDataAsset * WeaponDataAsset, int32 SlotIndex)
+void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, int32 SlotIndex)
 {
 }
 
@@ -2144,6 +2095,11 @@ void APlayerCharacter::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupt
 {
 }
 
+void APlayerCharacter::EquipPrimaryWeapon(FName WeaponID)
+{
+	SetPrimaryWeaponID(WeaponID);
+}
+
 void APlayerCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
 {
 	//  You would call SetCurrentPrimaryWeapon(NAME_None) when you want to remove equipped primary weapon
@@ -2328,12 +2284,22 @@ void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 	// @todo set current active skill
 }
 
+void APlayerCharacter::OnRep_PrimaryWeaponID()
+{
+	SetCurrentPrimaryWeapon(PrimaryWeaponID);
+}
+
+void APlayerCharacter::OnRep_SecondaryWeaponID()
+{
+}
+
 void APlayerCharacter::OnRep_WeaponSheathed()
 {
 }
 
 void APlayerCharacter::OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots)
 {
+	/*
 	UKismetSystemLibrary::PrintString(this, FString("Weapon slots got replicated"));
 
 	FString Message = FString::FromInt(WeaponSlots.Num());
@@ -2354,14 +2320,30 @@ void APlayerCharacter::OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots)
 	{
 		WeaponSlot->AttachPrimaryWeapon(Wep);
 	}
-	
+	*/
+}
+
+void APlayerCharacter::Server_SetPrimaryWeaponID_Implementation(FName NewWeaponID)
+{
+	SetPrimaryWeaponID(NewWeaponID);
+}
+
+bool APlayerCharacter::Server_SetPrimaryWeaponID_Validate(FName NewWeaponID)
+{
+	return true;
 }
 
 void APlayerCharacter::Server_AddPrimaryWeaponToCurrentSlot_Implementation(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
 {
 	UKismetSystemLibrary::PrintString(this, FString("Server RPC called"));
 
-	Multicast_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset);
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Instigator = this;
+	SpawnInfo.Owner = this;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	APrimaryWeapon* Wep = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
+
+	Multicast_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset, Wep);
 }
 
 bool APlayerCharacter::Server_AddPrimaryWeaponToCurrentSlot_Validate(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
@@ -2369,7 +2351,7 @@ bool APlayerCharacter::Server_AddPrimaryWeaponToCurrentSlot_Validate(FName Weapo
 	return true;
 }
 
-void APlayerCharacter::Multicast_AddPrimaryWeaponToCurrentSlot_Implementation(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
+void APlayerCharacter::Multicast_AddPrimaryWeaponToCurrentSlot_Implementation(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, AWeaponBase* PrimaryWep)
 {
 	UKismetSystemLibrary::PrintString(this, FString("Multicast called"));
 
@@ -2381,15 +2363,9 @@ void APlayerCharacter::Multicast_AddPrimaryWeaponToCurrentSlot_Implementation(FN
 		WeaponSlot = NewObject<UWeaponSlot>(this, UWeaponSlot::StaticClass(), FName("SlotObj"), RF_Transient);
 	}
 
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.Instigator = this;
-	SpawnInfo.Owner = this;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	APrimaryWeapon* Wep = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
-
 	if (WeaponSlot)
 	{
-		WeaponSlot->AttachPrimaryWeapon(WeaponID, WeaponDataAsset, Wep);
+		WeaponSlot->AttachPrimaryWeapon(WeaponID, WeaponDataAsset, PrimaryWep);
 	}
 
 	if (WeaponSlot)

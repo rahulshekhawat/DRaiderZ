@@ -21,8 +21,8 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	bReplicates = true;
-	bReplicateMovement = true;
+	SetReplicates(true);
+	SetReplicateMovement(true);
 	GetCharacterMovement()->SetIsReplicated(true);
 
 	// Initialize Stats Component
