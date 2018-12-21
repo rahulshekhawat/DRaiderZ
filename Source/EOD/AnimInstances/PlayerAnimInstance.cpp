@@ -4,6 +4,7 @@
 #include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Statics/CharacterLibrary.h"
+#include "EOD/Player/EODPlayerController.h"
 
 #include "Components/InputComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -34,11 +35,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (!OwningPlayer || !OwningPlayer->GetActiveAnimationReferences())
+	if (!OwningPlayer || !OwningPlayer->GetActiveAnimationReferences() || (OwningPlayer->Controller && !OwningPlayer->Controller->IsLocalPlayerController()))
 	{
-#if MESSAGE_LOGGING_ENABLED
-		UKismetSystemLibrary::PrintString(this, FString("Either character or animation references are null"));
-#endif // MESSAGE_LOGGING_ENABLED
 		return;
 	}
 

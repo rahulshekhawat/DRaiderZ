@@ -1075,12 +1075,33 @@ void APlayerCharacter::OnInteract()
 
 void APlayerCharacter::ToggleSheathe()
 {
-	// @todo replace active animation references with weapon animation references
-
-	if (CanSwitchWeapon() && EquippedWeaponAnimationReferences)
+	if (CanSwitchWeapon())
 	{
-		float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-		float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
+		if (GetController())
+		{
+			float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
+			float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
+			if (ForwardAxisValue == 0 && RightAxisValue == 0)
+			{
+				SetPCTryingToMove(false);
+			}
+			else
+			{
+				SetPCTryingToMove(true);
+			}
+		}
+
+		bool bNewValue = !IsWeaponSheathed();
+		SetWeaponSheathed(bNewValue);
+
+		PlayToggleSheatheAnimation();
+	}
+
+	/*
+	if (CanSwitchWeapon() && EquippedWeaponAnimationReferences && Controller)
+	{
+		float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
+		float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight")); 
 
 		// Play standstill animation
 		if (ForwardAxisValue == 0 && RightAxisValue == 0)
@@ -1119,6 +1140,81 @@ void APlayerCharacter::ToggleSheathe()
 		bool bNewValue = !IsWeaponSheathed();
 		SetWeaponSheathed(bNewValue);
 	}
+	*/
+}
+
+void APlayerCharacter::PlayToggleSheatheAnimation()
+{
+	if (bPCTryingToMove)
+	{
+		UAnimMontage* UpperBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get();
+		if (UpperBodySwitchMontage)
+		{
+			if (IsWeaponSheathed())
+			{
+				PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
+			}
+			else
+			{
+				PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
+			}
+		}
+	}
+	else
+	{
+		UAnimMontage* FullBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchFullBody.Get();
+		if (FullBodySwitchMontage)
+		{
+			if (IsWeaponSheathed())
+			{
+				PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
+			}
+			else
+			{
+				PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
+			}
+
+		}
+	}
+
+	/*
+	float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
+	float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
+
+	// Play standstill animation
+	if (ForwardAxisValue == 0 && RightAxisValue == 0)
+	{
+		UAnimMontage* FullBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchFullBody.Get();
+		if (FullBodySwitchMontage)
+		{
+			if (IsWeaponSheathed())
+			{
+				PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
+			}
+			else
+			{
+				PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
+			}
+
+		}
+	}
+	// Play moving animation
+	else
+	{
+		UAnimMontage* UpperBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get();
+		if (UpperBodySwitchMontage)
+		{
+			if (IsWeaponSheathed())
+			{
+				PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
+			}
+			else
+			{
+				PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
+			}
+		}
+	}
+	*/
 }
 
 void APlayerCharacter::OnToggleCharacterStatsUI()
@@ -2267,6 +2363,16 @@ void APlayerCharacter::OnRep_SecondaryWeaponID()
 
 void APlayerCharacter::OnRep_WeaponSheathed()
 {
+}
+
+void APlayerCharacter::Server_SetPCTryingToMove_Implementation(bool bNewValue)
+{
+	SetPCTryingToMove(bNewValue);
+}
+
+bool APlayerCharacter::Server_SetPCTryingToMove_Validate(bool bNewValue)
+{
+	return true;
 }
 
 /*

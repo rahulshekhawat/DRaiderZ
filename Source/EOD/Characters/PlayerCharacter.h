@@ -201,6 +201,8 @@ public:
 
 	FORCEINLINE bool CanSwitchWeapon() const;
 
+	FORCEINLINE bool CanToggleSheathe() const { return IsIdleOrMoving() && IsPrimaryWeaponEquippped(); }
+
 	FORCEINLINE bool IsSwitchingWeapon() const;
 
 	/** Returns true if player is on auto run */
@@ -349,6 +351,8 @@ public:
 	/** [server + client] Change player's weapon sheath state */
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void SetWeaponSheathed(bool bNewValue);
+
+	FORCEINLINE void SetPCTryingToMove(bool bNewValue);
 
 	/** Event called when a new normal attack section starts playing */
 	void OnNormalAttackSectionStart(FName SectionName);
@@ -532,8 +536,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 	void EquipPrimaryWeapon(FName WeaponID);
 
-	
-
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon Slot")
@@ -591,6 +593,9 @@ private:
 	/** Determines whether weapon is currently sheathed or not */
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
 	bool bWeaponSheathed;
+
+	UPROPERTY(Replicated)
+	bool bPCTryingToMove;
 
 	/** Data table containing player animation references */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable, meta = (AllowPrivateAccess = "true"))
@@ -686,6 +691,8 @@ private:
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe() override;
 
+	void PlayToggleSheatheAnimation();
+
 	/** Display or hide character stats UI */
 	void OnToggleCharacterStatsUI();
 
@@ -767,6 +774,9 @@ private:
 	// void OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots);
 
 	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetPCTryingToMove(bool bNewValue);
+
+	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetPrimaryWeaponID(FName NewWeaponID);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -782,6 +792,15 @@ private:
 	void Multicast_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, AWeaponBase* PrimaryWep);
 
 };
+
+FORCEINLINE void APlayerCharacter::SetPCTryingToMove(bool bNewValue)
+{
+	bPCTryingToMove = bNewValue;
+	if (Role < ROLE_Authority)
+	{
+		Server_SetPCTryingToMove(bNewValue);
+	}
+}
 
 FORCEINLINE void APlayerCharacter::SetPrimaryWeaponID(FName NewWeaponID)
 {
