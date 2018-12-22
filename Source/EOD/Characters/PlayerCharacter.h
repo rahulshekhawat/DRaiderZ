@@ -594,9 +594,13 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
 	bool bWeaponSheathed;
 
-	UPROPERTY(Replicated)
+public:
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool bPCTryingToMove;
 
+	void UpdatePCTryingToMove();
+
+private:
 	/** Data table containing player animation references */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable, meta = (AllowPrivateAccess = "true"))
 	UDataTable* PlayerAnimationReferencesDataTable;

@@ -105,9 +105,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &APlayerCharacter::OnDodge);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::OnJump);
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::OnInteract);
-	PlayerInputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &APlayerCharacter::OnToggleSheathe);
-	PlayerInputComponent->BindAction("ToggleStats", IE_Pressed, this, &APlayerCharacter::OnToggleCharacterStatsUI);
-	PlayerInputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &APlayerCharacter::OnToggleMouseCursor);
+	PlayerInputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &APlayerCharacter::ToggleSheathe);
+	PlayerInputComponent->BindAction("ToggleStats", IE_Pressed, this, &APlayerCharacter::ToggleCharacterStatsUI);
+	PlayerInputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &APlayerCharacter::ToggleMouseCursor);
 	PlayerInputComponent->BindAction("ToggleSkillTree", IE_Pressed, SkillsComponent, &USkillsComponent::ToggleSkillTreeUI);
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
 	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
@@ -168,6 +168,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, bWeaponSheathed, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(APlayerCharacter, bPCTryingToMove, COND_SkipOwner);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -214,6 +215,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (Controller && Controller->IsLocalPlayerController())
 	{
+		if (IsSwitchingWeapon())
+		{
+			UpdatePCTryingToMove();
+		}
+
 		// If block key is pressed but the character is not blocking
 		if (bBlockPressed && !IsBlocking() && CanBlock())
 		{
@@ -1075,7 +1081,9 @@ void APlayerCharacter::OnInteract()
 
 void APlayerCharacter::ToggleSheathe()
 {
-	if (CanSwitchWeapon())
+	PrintToScreen(this, FString("Toggling sheathe"));
+
+	if (CanToggleSheathe())
 	{
 		if (GetController())
 		{
@@ -1093,8 +1101,7 @@ void APlayerCharacter::ToggleSheathe()
 
 		bool bNewValue = !IsWeaponSheathed();
 		SetWeaponSheathed(bNewValue);
-
-		PlayToggleSheatheAnimation();
+		// PlayToggleSheatheAnimation();
 	}
 
 	/*
@@ -1143,8 +1150,60 @@ void APlayerCharacter::ToggleSheathe()
 	*/
 }
 
+void APlayerCharacter::UpdatePCTryingToMove()
+{
+	PrintToScreen(this, FString("Updating PCTryingToMove"));
+
+	if (GetController() && GetController()->InputComponent)
+	{
+		float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
+		float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
+		if (ForwardAxisValue == 0 && RightAxisValue == 0)
+		{
+			SetPCTryingToMove(false);
+		}
+		else
+		{
+			SetPCTryingToMove(true);
+		}
+	}
+}
+
 void APlayerCharacter::PlayToggleSheatheAnimation()
 {
+	SetCharacterState(ECharacterState::SwitchingWeapon);
+
+	UAnimMontage* UpperBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get();
+	UAnimMontage* FullBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchFullBody.Get();
+
+	if (IsWeaponSheathed())
+	{
+		if (UpperBodySwitchMontage)
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(UpperBodySwitchMontage);
+			GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_SheatheWeapon);
+		}
+		if (FullBodySwitchMontage)
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(FullBodySwitchMontage);
+			GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_SheatheWeapon);
+		}
+	}
+	else
+	{
+		if (UpperBodySwitchMontage)
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(UpperBodySwitchMontage);
+			GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_UnsheatheWeapon);
+		}
+		if (FullBodySwitchMontage)
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(FullBodySwitchMontage);
+			GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_UnsheatheWeapon);
+		}
+	}
+
+	/*
 	if (bPCTryingToMove)
 	{
 		UAnimMontage* UpperBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get();
@@ -1152,12 +1211,15 @@ void APlayerCharacter::PlayToggleSheatheAnimation()
 		{
 			if (IsWeaponSheathed())
 			{
-				PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
+				GetMesh()->GetAnimInstance()->Montage_Play(UpperBodySwitchMontage);
+				GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_SheatheWeapon);
 			}
 			else
 			{
-				PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
+				GetMesh()->GetAnimInstance()->Montage_Play(UpperBodySwitchMontage);
+				GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_UnsheatheWeapon);
 			}
+			SetCharacterState(ECharacterState::SwitchingWeapon);
 		}
 	}
 	else
@@ -1167,51 +1229,15 @@ void APlayerCharacter::PlayToggleSheatheAnimation()
 		{
 			if (IsWeaponSheathed())
 			{
-				PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
+				GetMesh()->GetAnimInstance()->Montage_Play(FullBodySwitchMontage);
+				GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_SheatheWeapon);
 			}
 			else
 			{
-				PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
+				GetMesh()->GetAnimInstance()->Montage_Play(FullBodySwitchMontage);
+				GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_UnsheatheWeapon);
 			}
-
-		}
-	}
-
-	/*
-	float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
-	float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
-
-	// Play standstill animation
-	if (ForwardAxisValue == 0 && RightAxisValue == 0)
-	{
-		UAnimMontage* FullBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchFullBody.Get();
-		if (FullBodySwitchMontage)
-		{
-			if (IsWeaponSheathed())
-			{
-				PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
-			}
-			else
-			{
-				PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
-			}
-
-		}
-	}
-	// Play moving animation
-	else
-	{
-		UAnimMontage* UpperBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get();
-		if (UpperBodySwitchMontage)
-		{
-			if (IsWeaponSheathed())
-			{
-				PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
-			}
-			else
-			{
-				PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
-			}
+			SetCharacterState(ECharacterState::SwitchingWeapon);
 		}
 	}
 	*/
@@ -2270,6 +2296,7 @@ bool APlayerCharacter::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw
 void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
 {
 	bWeaponSheathed = bNewValue;
+	PlayToggleSheatheAnimation();
 
 	if (Role < ROLE_Authority)
 	{
@@ -2363,6 +2390,7 @@ void APlayerCharacter::OnRep_SecondaryWeaponID()
 
 void APlayerCharacter::OnRep_WeaponSheathed()
 {
+	PlayToggleSheatheAnimation();
 }
 
 void APlayerCharacter::Server_SetPCTryingToMove_Implementation(bool bNewValue)

@@ -35,10 +35,12 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (!OwningPlayer || !OwningPlayer->GetActiveAnimationReferences() || (OwningPlayer->Controller && !OwningPlayer->Controller->IsLocalPlayerController()))
+	if (!OwningPlayer || !OwningPlayer->GetActiveAnimationReferences())
 	{
 		return;
 	}
+
+	// || (OwningPlayer->Controller && !OwningPlayer->Controller->IsLocalPlayerController())
 
 	FPlayerAnimationReferencesTableRow* AnimationReferences = OwningPlayer->GetActiveAnimationReferences();
 
@@ -49,7 +51,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			Montage_Play(DeathMontage);
 		}
-
 		return;
 	}
 	else
@@ -132,6 +133,19 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 
+	if (OwningPlayer->IsSwitchingWeapon())
+	{
+		if (OwningPlayer->bPCTryingToMove)
+		{
+			RootMotionMode = ERootMotionMode::IgnoreRootMotion;
+		}
+		else
+		{
+			RootMotionMode = ERootMotionMode::RootMotionFromMontagesOnly;
+		}
+	}
+
+	/*
 	if (OwningPlayer->IsSwitchingWeapon() && OwningPlayer->GetEquippedWeaponAnimationReferences())
 	{
 		UAnimMontage* FullBodySwitchMontage = OwningPlayer->GetEquippedWeaponAnimationReferences()->WeaponSwitchFullBody.Get();
@@ -156,6 +170,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			DoSeamlessTransitionBetweenStillOrMovingMontage(FullBodySwitchMontage, UpperBodySwitchMontage, ForwardAxisValue, RightAxisValue, MontageSection, true);
 		}
 	}
+	*/
 	
 	if (OwningPlayer->IsUsingAnySkill() && OwningPlayer->SkillAllowsMovement())
 	{
@@ -243,6 +258,16 @@ float UPlayerAnimInstance::GetBlockMovementDirectionYaw() const
 	}
 
 	return 0.f;
+}
+
+bool UPlayerAnimInstance::IsPCTryingToMove() const
+{
+	if (OwningPlayer)
+	{
+		return OwningPlayer->bPCTryingToMove;
+	}
+
+	return false;
 }
 
 EWeaponType UPlayerAnimInstance::GetWeaponAnimationType() const

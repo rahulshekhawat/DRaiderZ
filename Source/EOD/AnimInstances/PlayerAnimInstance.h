@@ -57,6 +57,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
 	float GetBlockMovementDirectionYaw() const;
+
+	UFUNCTION(BlueprintCallable, Category = LocomotionUpdate, meta = (BlueprintThreadSafe))
+	bool IsPCTryingToMove() const;
 	
 	// UFUNCTION(BlueprintCallable, Category = MasterStateUpdate, meta = (BlueprintThreadSafe))
 	// EWeaponAnimationType GetWeaponAnimationType() const;
