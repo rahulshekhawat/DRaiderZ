@@ -251,30 +251,40 @@ void AEODPlayerController::TogglePlayerStatsUI()
 
 void AEODPlayerController::MovePawnForward(const float Value)
 {
-	if (EODCharacter && EODCharacter->CanMove() && Value != 0)
+	if (EODCharacter)
 	{
-		if (IsAutoMoveEnabled())
-		{
-			DisableAutoMove();
-		}
+		EODCharacter->ForwardAxisValue = Value;
 
-		FRotator Rotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
-		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
-		EODCharacter->AddMovementInput(Direction, Value);
+		if (EODCharacter->CanMove() && Value != 0)
+		{
+			if (IsAutoMoveEnabled())
+			{
+				DisableAutoMove();
+			}
+
+			FRotator Rotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
+			FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
+			EODCharacter->AddMovementInput(Direction, Value);
+		}
 	}
 }
 
 void AEODPlayerController::MovePawnRight(const float Value)
 {
-	if (EODCharacter && EODCharacter->CanMove() && Value != 0)
+	if (EODCharacter)
 	{
-		if (IsAutoMoveEnabled())
-		{
-			DisableAutoMove();
-		}
+		EODCharacter->RightAxisValue = Value;
 
-		FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
-		EODCharacter->AddMovementInput(Direction, Value);
+		if (EODCharacter->CanMove() && Value != 0)
+		{
+			if (IsAutoMoveEnabled())
+			{
+				DisableAutoMove();
+			}
+
+			FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
+			EODCharacter->AddMovementInput(Direction, Value);
+		}
 	}
 }
 
@@ -282,7 +292,6 @@ void AEODPlayerController::MakePawnJump()
 {
 	if (EODCharacter && EODCharacter->CanJump())
 	{
-		UKismetSystemLibrary::PrintString(this, FString("Attempting to jump"));
 		EODCharacter->Jump();
 	}
 }

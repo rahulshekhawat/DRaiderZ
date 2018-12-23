@@ -70,8 +70,13 @@ void AEODCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Controller && Controller->IsLocalPlayerController())
+	if (GetController() && GetController()->IsLocalPlayerController())
 	{
+		if (bSkillAllowsMovement)
+		{
+			
+		}
+
 		if (IsMoving())
 		{
 			UpdateMovement(DeltaTime);
@@ -89,9 +94,11 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterState, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bIsRunning, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(AEODCharacterBase, IWR_CharacterMovementDirection, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterState, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AEODCharacterBase, bPCTryingToMove, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterMovementDirection, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AEODCharacterBase, bCharacterStateAllowsMovement, COND_SkipOwner);
 }
 
 void AEODCharacterBase::BeginPlay()
@@ -119,66 +126,14 @@ void AEODCharacterBase::UnPossessed()
 	Super::UnPossessed();
 }
 
-float AEODCharacterBase::GetRotationYawFromAxisInput() const
+float AEODCharacterBase::BP_GetRotationYawFromAxisInput() const
 {
-	float ResultingRotation = GetActorRotation().Yaw;
-
-	// if (GetEODPlayerController())
-	if (Controller)
-	{
-		// float ForwardAxisValue = GetEODPlayerController()->InputComponent->GetAxisValue(FName("MoveForward"));
-		float ForwardAxisValue = Controller->InputComponent->GetAxisValue(FName("MoveForward"));
-		// float RightAxisValue = GetEODPlayerController()->InputComponent->GetAxisValue(FName("MoveRight"));
-		float RightAxisValue = Controller->InputComponent->GetAxisValue(FName("MoveRight"));
-
-		float ControlRotationYaw = GetControllerRotationYaw();
-		if (ForwardAxisValue == 0)
-		{
-			if (RightAxisValue > 0)
-			{
-				ResultingRotation = ControlRotationYaw + 90.f;
-			}
-			else if (RightAxisValue < 0)
-			{
-				ResultingRotation = ControlRotationYaw - 90.f;
-			}
-		}
-		else
-		{
-			if (ForwardAxisValue > 0) 
-			{
-				float DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
-				ResultingRotation = ControlRotationYaw + DeltaAngle;
-			}
-			else if (ForwardAxisValue < 0)
-			{
-				float DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(-RightAxisValue, -ForwardAxisValue));
-				ResultingRotation = ControlRotationYaw + DeltaAngle;
-			}
-		}
-	}
-	return ResultingRotation;
+	return GetRotationYawFromAxisInput();
 }
 
-float AEODCharacterBase::GetControllerRotationYaw() const
+float AEODCharacterBase::BP_GetControllerRotationYaw() const
 {
-	// Make sure the character is controlled
-	if (Controller)
-	{
-		float ControlRotationYaw = Controller->GetControlRotation().Yaw;
-
-		if (0 <= ControlRotationYaw && ControlRotationYaw <= 180)
-			return ControlRotationYaw;
-		else if (180 < ControlRotationYaw && ControlRotationYaw < 360)
-		{
-			return (ControlRotationYaw - 360.f);
-		}
-		else if (ControlRotationYaw == 360)
-			return 0.f;
-		else
-			return ControlRotationYaw;
-	}
-	return 0.f;
+	return GetControllerRotationYaw();
 }
 
 bool AEODCharacterBase::BP_IsDead() const
@@ -555,16 +510,6 @@ void AEODCharacterBase::TurnOffTargetSwitch()
 	GetMesh()->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
 }
 
-void AEODCharacterBase::Server_SetIsRunning_Implementation(bool bValue)
-{
-	SetIsRunning(bValue);
-}
-
-bool AEODCharacterBase::Server_SetIsRunning_Validate(bool bValue)
-{
-	return true;
-}
-
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
 	//~ @todo : Cleanup old state
@@ -734,8 +679,7 @@ void AEODCharacterBase::StopNormalAttacking()
 void AEODCharacterBase::UpdateMovement(float DeltaTime)
 {
 	float DesiredRotationYaw = GetRotationYawFromAxisInput();
-	float CurrentRotationYaw = GetActorRotation().Yaw;
-	bool bRotatePlayer = (DesiredRotationYaw == CurrentRotationYaw) ? false : true;
+	bool bRotatePlayer = DesiredRotationYaw == GetActorRotation().Yaw ? false : true;
 
 	if (bRotatePlayer)
 	{
@@ -769,35 +713,65 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 
 		if (ForwardAxisValue == 0)
 		{
-			if (RightAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::R)
+			if (RightAxisValue > 0 && CharacterMovementDirection != ECharMovementDirection::R)
 			{
-				SetIWRCharMovementDir(ECharMovementDirection::R);
+				SetCharacterMovementDirection(ECharMovementDirection::R);
 			}
-			else if (RightAxisValue < 0 && IWR_CharacterMovementDirection != ECharMovementDirection::L)
+			else if (RightAxisValue < 0 && CharacterMovementDirection != ECharMovementDirection::L)
 			{
-				SetIWRCharMovementDir(ECharMovementDirection::L);
+				SetCharacterMovementDirection(ECharMovementDirection::L);
 			}
 		}
 		else
 		{
-			if (ForwardAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::F)
+			if (ForwardAxisValue > 0 && CharacterMovementDirection != ECharMovementDirection::F)
 			{
-				SetIWRCharMovementDir(ECharMovementDirection::F);
+				SetCharacterMovementDirection(ECharMovementDirection::F);
 			}
-			else if (ForwardAxisValue < 0 && IWR_CharacterMovementDirection != ECharMovementDirection::B)
+			else if (ForwardAxisValue < 0 && CharacterMovementDirection != ECharMovementDirection::B)
 			{
-				SetIWRCharMovementDir(ECharMovementDirection::B);
+				SetCharacterMovementDirection(ECharMovementDirection::B);
 			}
 		}
 	}
 }
 
-void AEODCharacterBase::Server_SetIWRCharMovementDir_Implementation(ECharMovementDirection NewDirection)
+void AEODCharacterBase::Server_SetIsRunning_Implementation(bool bValue)
 {
-	SetIWRCharMovementDir(NewDirection);
+	SetIsRunning(bValue);
 }
 
-bool AEODCharacterBase::Server_SetIWRCharMovementDir_Validate(ECharMovementDirection NewDirection)
+bool AEODCharacterBase::Server_SetIsRunning_Validate(bool bValue)
+{
+	return true;
+}
+
+void AEODCharacterBase::Server_SetCharacterStateAllowsMovement_Implementation(bool bNewValue)
+{
+	SetCharacterStateAllowsMovement(bNewValue);
+}
+
+bool AEODCharacterBase::Server_SetCharacterStateAllowsMovement_Validate(bool bNewValue)
+{
+	return true;
+}
+
+void AEODCharacterBase::Server_SetPCTryingToMove_Implementation(bool bNewValue)
+{
+	SetPCTryingToMove(bNewValue);
+}
+
+bool AEODCharacterBase::Server_SetPCTryingToMove_Validate(bool bNewValue)
+{
+	return true;
+}
+
+void AEODCharacterBase::Server_SetCharMovementDir_Implementation(ECharMovementDirection NewDirection)
+{
+	SetCharacterMovementDirection(NewDirection);
+}
+
+bool AEODCharacterBase::Server_SetCharMovementDir_Validate(ECharMovementDirection NewDirection)
 {
 	return true;
 }

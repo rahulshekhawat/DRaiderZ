@@ -263,25 +263,25 @@ public:
 	/** Knockback this character */
 	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection) override;
 
-	/** [server + client] Applies stun to this character */
+	/** [server + local] Applies stun to this character */
 	virtual bool Stun(const float Duration) override;
 
-	/** [client] Removes 'stun' crowd control effect from this character */
+	/** Removes 'stun' crowd control effect from this character */
 	virtual void EndStun() override;
 
-	/** [server + client] Freeze this character */
+	/** [server + local] Freeze this character */
 	virtual bool Freeze(const float Duration) override;
 
-	/** [client] Removes 'freeze' crowd control effect from this character */
+	/** Removes 'freeze' crowd control effect from this character */
 	virtual void EndFreeze() override;
 
-	/** [server + client] Knockdown this character */
+	/** [server + local] Knockdown this character */
 	virtual bool Knockdown(const float Duration) override;
 
-	/** [client] Removes 'knock-down' crowd control effect from this character */
+	/** Removes 'knock-down' crowd control effect from this character */
 	virtual void EndKnockdown() override;
 
-	/** [server + client] Knockback this character */
+	/** [server + local] Knockback this character */
 	virtual bool Knockback(const float Duration, const FVector& ImpulseDirection) override;
 
 	virtual void BlockAttack() override;
@@ -342,17 +342,15 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = SpecialEffects)
 	void CreateGhostTrail();
 
-	/** [server + client] Change idle-walk-run direction of character */
+	/** [server + local] Change idle-walk-run direction of character */
 	// inline void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
-	/** [server + client] Set the yaw for player's movement direction relative to player's forward direction */
+	/** [server + local] Set the yaw for player's movement direction relative to player's forward direction */
 	void SetBlockMovementDirectionYaw(float NewYaw);
 
-	/** [server + client] Change player's weapon sheath state */
+	/** [server + local] Change player's weapon sheath state */
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void SetWeaponSheathed(bool bNewValue);
-
-	FORCEINLINE void SetPCTryingToMove(bool bNewValue);
 
 	/** Event called when a new normal attack section starts playing */
 	void OnNormalAttackSectionStart(FName SectionName);
@@ -595,10 +593,8 @@ private:
 	bool bWeaponSheathed;
 
 public:
-	UPROPERTY(Replicated, BlueprintReadOnly)
-	bool bPCTryingToMove;
 
-	void UpdatePCTryingToMove();
+	// void UpdatePCTryingToMove();
 
 private:
 	/** Data table containing player animation references */
@@ -692,6 +688,12 @@ private:
 	/** Interacts with NPC or an in-game interactable object */
 	void OnInteract();
 
+	////////////////////////////////////////////////////////////////////////////////
+	// ACTIONS
+	////////////////////////////////////////////////////////////////////////////////
+private:
+
+
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe() override;
 
@@ -778,9 +780,6 @@ private:
 	// void OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetPCTryingToMove(bool bNewValue);
-
-	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetPrimaryWeaponID(FName NewWeaponID);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -796,15 +795,6 @@ private:
 	void Multicast_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, AWeaponBase* PrimaryWep);
 
 };
-
-FORCEINLINE void APlayerCharacter::SetPCTryingToMove(bool bNewValue)
-{
-	bPCTryingToMove = bNewValue;
-	if (Role < ROLE_Authority)
-	{
-		Server_SetPCTryingToMove(bNewValue);
-	}
-}
 
 FORCEINLINE void APlayerCharacter::SetPrimaryWeaponID(FName NewWeaponID)
 {

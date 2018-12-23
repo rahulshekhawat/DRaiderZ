@@ -168,7 +168,6 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, bWeaponSheathed, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(APlayerCharacter, bPCTryingToMove, COND_SkipOwner);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -220,6 +219,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 			UpdatePCTryingToMove();
 		}
 
+		/*
 		// If block key is pressed but the character is not blocking
 		if (bBlockPressed && !IsBlocking() && CanBlock())
 		{
@@ -260,6 +260,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			UpdateBlockState(DeltaTime);
 		}
+		*/
 
 		if (bRotateSmoothly)
 		{
@@ -299,7 +300,7 @@ USkeletalMeshComponent* APlayerCharacter::CreateNewArmorComponent(const FName Na
 
 bool APlayerCharacter::CanMove() const
 {
-	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon();
+	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
 }
 
 bool APlayerCharacter::CanJump() const
@@ -1081,8 +1082,6 @@ void APlayerCharacter::OnInteract()
 
 void APlayerCharacter::ToggleSheathe()
 {
-	PrintToScreen(this, FString("Toggling sheathe"));
-
 	if (CanToggleSheathe())
 	{
 		if (GetController())
@@ -1101,7 +1100,9 @@ void APlayerCharacter::ToggleSheathe()
 
 		bool bNewValue = !IsWeaponSheathed();
 		SetWeaponSheathed(bNewValue);
-		// PlayToggleSheatheAnimation();
+
+		// Since character can move while switching weapons
+		SetCharacterStateAllowsMovement(true);
 	}
 
 	/*
@@ -1150,6 +1151,7 @@ void APlayerCharacter::ToggleSheathe()
 	*/
 }
 
+/*
 void APlayerCharacter::UpdatePCTryingToMove()
 {
 	PrintToScreen(this, FString("Updating PCTryingToMove"));
@@ -1168,6 +1170,7 @@ void APlayerCharacter::UpdatePCTryingToMove()
 		}
 	}
 }
+*/
 
 void APlayerCharacter::PlayToggleSheatheAnimation()
 {
@@ -1385,9 +1388,9 @@ void APlayerCharacter::DisableBackwardPressed()
 
 void APlayerCharacter::UpdateIdleState(float DeltaTime)
 {
-	if (IWR_CharacterMovementDirection != ECharMovementDirection::None)
+	if (GetCharacterMovementDirection() != ECharMovementDirection::None)
 	{
-		SetIWRCharMovementDir(ECharMovementDirection::None);
+		SetCharacterMovementDirection(ECharMovementDirection::None);
 	}
 }
 
@@ -1433,24 +1436,24 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 
 	if (ForwardAxisValue == 0)
 	{
-		if (RightAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::R)
+		if (RightAxisValue > 0 && GetCharacterMovementDirection() != ECharMovementDirection::R)
 		{
-			SetIWRCharMovementDir(ECharMovementDirection::R);
+			SetCharacterMovementDirection(ECharMovementDirection::R);
 		}
-		else if (RightAxisValue < 0 && IWR_CharacterMovementDirection != ECharMovementDirection::L)
+		else if (RightAxisValue < 0 && GetCharacterMovementDirection() != ECharMovementDirection::L)
 		{
-			SetIWRCharMovementDir(ECharMovementDirection::L);
+			SetCharacterMovementDirection(ECharMovementDirection::L);
 		}
 	}
 	else
 	{
-		if (ForwardAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::F)
+		if (ForwardAxisValue > 0 && GetCharacterMovementDirection() != ECharMovementDirection::F)
 		{
-			SetIWRCharMovementDir(ECharMovementDirection::F);
+			SetCharacterMovementDirection(ECharMovementDirection::F);
 		}
-		else if (ForwardAxisValue < 0 && IWR_CharacterMovementDirection != ECharMovementDirection::B)
+		else if (ForwardAxisValue < 0 && GetCharacterMovementDirection() != ECharMovementDirection::B)
 		{
-			SetIWRCharMovementDir(ECharMovementDirection::B);
+			SetCharacterMovementDirection(ECharMovementDirection::B);
 		}
 	}
 }
@@ -1528,24 +1531,24 @@ void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 
 	if (ForwardAxisValue == 0)
 	{
-		if (RightAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::R)
+		if (RightAxisValue > 0 && GetCharacterMovementDirection() != ECharMovementDirection::R)
 		{
-			SetIWRCharMovementDir(ECharMovementDirection::R);
+			SetCharacterMovementDirection(ECharMovementDirection::R);
 		}
-		else if (RightAxisValue < 0 && IWR_CharacterMovementDirection != ECharMovementDirection::L)
+		else if (RightAxisValue < 0 && GetCharacterMovementDirection() != ECharMovementDirection::L)
 		{
-			SetIWRCharMovementDir(ECharMovementDirection::L);
+			SetCharacterMovementDirection(ECharMovementDirection::L);
 		}
 	}
 	else
 	{
-		if (ForwardAxisValue > 0 && IWR_CharacterMovementDirection != ECharMovementDirection::F)
+		if (ForwardAxisValue > 0 && GetCharacterMovementDirection() != ECharMovementDirection::F)
 		{
-			SetIWRCharMovementDir(ECharMovementDirection::F);
+			SetCharacterMovementDirection(ECharMovementDirection::F);
 		}
-		else if (ForwardAxisValue < 0 && IWR_CharacterMovementDirection != ECharMovementDirection::B)
+		else if (ForwardAxisValue < 0 && GetCharacterMovementDirection() != ECharMovementDirection::B)
 		{
-			SetIWRCharMovementDir(ECharMovementDirection::B);
+			SetCharacterMovementDirection(ECharMovementDirection::B);
 		}
 	}
 }
@@ -1560,9 +1563,9 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 	}
 
 	// @todo Why isn't following code inside Enable Auto Run? Un-necessarily repetitive condition checks
-	if (IWR_CharacterMovementDirection != ECharMovementDirection::F)
+	if (GetCharacterMovementDirection() != ECharMovementDirection::F)
 	{
-		SetIWRCharMovementDir(ECharMovementDirection::F);
+		SetCharacterMovementDirection(ECharMovementDirection::F);
 	}
 	
 	float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
@@ -1930,19 +1933,19 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 			if (SkillPair.Value->UpperBodyAnimMontage.Get())
 			{
 				FString SectionSuffixString;
-				if (IWR_CharacterMovementDirection == ECharMovementDirection::F)
+				if (GetCharacterMovementDirection() == ECharMovementDirection::F)
 				{
 					SectionSuffixString = FString("_F");
 				}
-				else if (IWR_CharacterMovementDirection == ECharMovementDirection::B)
+				else if (GetCharacterMovementDirection() == ECharMovementDirection::B)
 				{
 					SectionSuffixString = FString("_B");
 				}
-				else if (IWR_CharacterMovementDirection == ECharMovementDirection::L)
+				else if (GetCharacterMovementDirection() == ECharMovementDirection::L)
 				{
 					SectionSuffixString = FString("_L");
 				}
-				else if (IWR_CharacterMovementDirection == ECharMovementDirection::R)
+				else if (GetCharacterMovementDirection() == ECharMovementDirection::R)
 				{
 					SectionSuffixString = FString("_R");
 				}
@@ -2157,6 +2160,11 @@ void APlayerCharacter::ExitDialogue_Implementation(UDialogueWindowWidget* Widget
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
+	if (GetController() && GetController()->IsLocalPlayerController())
+	{
+		// @todo
+	}
+
 	if (!bInterrupted  && GetCharacterState() != ECharacterState::Interacting)
 	{
 		SetCharacterState(ECharacterState::IdleWalkRun);
@@ -2391,16 +2399,6 @@ void APlayerCharacter::OnRep_SecondaryWeaponID()
 void APlayerCharacter::OnRep_WeaponSheathed()
 {
 	PlayToggleSheatheAnimation();
-}
-
-void APlayerCharacter::Server_SetPCTryingToMove_Implementation(bool bNewValue)
-{
-	SetPCTryingToMove(bNewValue);
-}
-
-bool APlayerCharacter::Server_SetPCTryingToMove_Validate(bool bNewValue)
-{
-	return true;
 }
 
 /*

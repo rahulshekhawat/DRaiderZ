@@ -10,8 +10,9 @@
 
 #include "Animation/AnimInstance.h"
 #include "GameFramework/Character.h"
-#include "Components/SphereComponent.h"
+#include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "EODCharacterBase.generated.h"
 
@@ -74,40 +75,95 @@ public:
 	// EOD CHARACTER
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	// UPROPERTY()
-	// AEODPlayerController* EODPlayerController;
-
-	// UPROPERTY()
-	// AEODAIControllerBase* EODAIController;
-
 	UPROPERTY(Replicated)
 	bool bIsRunning;
 
-public:
-	/** Character movement direction for Idle-Walk-Run state */
+	/**
+	 * This boolean determines whether player is trying to move or not
+	 * i.e., if this character is possessed by a player controller, is player pressing the movement keys
+	 */
 	UPROPERTY(Replicated)
-	ECharMovementDirection IWR_CharacterMovementDirection;
+	bool bPCTryingToMove;
 
-	FORCEINLINE void SetIsRunning(bool bValue);
+	/**
+	 * The direction character is trying to move relative to it's controller rotation
+	 * If the character is controlled by player, it is determined by the movement keys pressed by player
+	 */
+	UPROPERTY(Replicated)
+	ECharMovementDirection CharacterMovementDirection;
 
-	FORCEINLINE void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
+	UPROPERTY()
+	float DesiredRotationYawFromAxisInput;
 
+protected:
+	/**
+	 * This bool is used to determine if the character can move even if it's not in 'IdleWalkRun' state.
+	 * e.g., moving while casting spell.
+	 */
+	UPROPERTY(Replicated)
+	bool bCharacterStateAllowsMovement;
+
+	/** [server + local]  */
+	FORCEINLINE void SetCharacterStateAllowsMovement(bool bNewValue)
+	{
+		bCharacterStateAllowsMovement = bNewValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharacterStateAllowsMovement(bNewValue);
+		}
+	}
+
+	/** [server + local] */
+	FORCEINLINE void SetIsRunning(bool bValue)
+	{
+		bIsRunning = bValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetIsRunning(bValue);
+		}
+	}
+
+	/** [server + local] */
+	FORCEINLINE void SetCharacterMovementDirection(ECharMovementDirection NewDirection)
+	{
+		CharacterMovementDirection = NewDirection;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharMovementDir(NewDirection);
+		}
+	}
+
+	/** [server + local] */
+	FORCEINLINE void SetPCTryingToMove(bool bNewValue)
+	{
+		bPCTryingToMove = bNewValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetPCTryingToMove(bNewValue);
+		}
+	}
+
+public:
 	FORCEINLINE bool IsRunning() const { return bIsRunning; }
 
-	// FORCEINLINE AEODPlayerController* GetEODPlayerController() const { return EODPlayerController; }
+	FORCEINLINE bool IsPCTryingToMove() const { return bPCTryingToMove; }
 
-	// FORCEINLINE AEODAIControllerBase* GetEODAIController() const { return EODAIController; }
+	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const { return CharacterMovementDirection; }
+
+	inline float GetRotationYawFromAxisInput() const;
 
 	/** Returns the expected rotation yaw of character based on current Axis Input */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
-	float GetRotationYawFromAxisInput() const;
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Get Rotation Yaw From Axis Input"))
+	float BP_GetRotationYawFromAxisInput() const;
+
+	inline float GetControllerRotationYaw() const;
 
 	/**
 	 * Returns controller rotation yaw in -180/180 range.
 	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
 	 */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
-	float GetControllerRotationYaw() const;
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Get Controller Rotation Yaw"))
+	float BP_GetControllerRotationYaw() const;
 
 protected:
 	/** Max speed of character when it's walking */
@@ -127,13 +183,13 @@ protected:
 	// COMPONENTS
 	////////////////////////////////////////////////////////////////////////////////
 public:
-	FORCEINLINE USpringArmComponent* GetCameraBoom() const;
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-	FORCEINLINE UCameraComponent* GetCamera() const;
+	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
 
-	FORCEINLINE USkillsComponent* GetSkillsComponent() const;
+	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
 
-	FORCEINLINE USphereComponent* GetInteractionSphere() const;
+	FORCEINLINE USphereComponent* GetInteractionSphere() const { return InteractionSphere; }
 
 	FORCEINLINE void EnableInteractionSphere();
 
@@ -214,7 +270,22 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 	// CHARACTER STATE
 	////////////////////////////////////////////////////////////////////////////////
-protected:
+public:
+	/** Cached value of player's forward axis input */
+	UPROPERTY()
+	float ForwardAxisValue;
+
+	/** Cached value of player's right axis input */
+	UPROPERTY()
+	float RightAxisValue;
+
+protected:	
+	inline void UpdatePCTryingToMove();
+
+	inline void UpdateCharacterMovementDirection();
+
+	inline void UpdateDesiredYawFromAxisInput();
+
 	virtual void UpdateMovement(float DeltaTime);
 
 public:
@@ -402,19 +473,19 @@ public:
 	/** Applies stun to this character */
 	virtual bool Stun(const float Duration);
 
-	/** [client] Removes 'stun' crowd control effect from this character */
+	/** Removes 'stun' crowd control effect from this character */
 	virtual void EndStun();
 
 	/** Freeze this character */
 	virtual bool Freeze(const float Duration);
 
-	/** [client] Removes 'freeze' crowd control effect from this character */
+	/** Removes 'freeze' crowd control effect from this character */
 	virtual void EndFreeze();
 
 	/** Knockdown this character */
 	virtual bool Knockdown(const float Duration);
 
-	/** [client] Removes 'knock-down' crowd control effect from this character */
+	/** Removes 'knock-down' crowd control effect from this character */
 	virtual void EndKnockdown();
 
 	/** Knockback this character */
@@ -755,14 +826,20 @@ protected:
 	// NETWORK
 	////////////////////////////////////////////////////////////////////////////////
 private:
+	UFUNCTION()
+	void OnRep_CharacterState(ECharacterState OldState);
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIsRunning(bool bValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetIWRCharMovementDir(ECharMovementDirection NewDirection);
+	void Server_SetCharacterStateAllowsMovement(bool bNewValue);
 
-	UFUNCTION()
-	void OnRep_CharacterState(ECharacterState OldState);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetPCTryingToMove(bool bNewValue);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetCharMovementDir(ECharMovementDirection NewDirection);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterState(ECharacterState NewState);
@@ -791,42 +868,115 @@ private:
 	
 };
 
-FORCEINLINE void AEODCharacterBase::SetIsRunning(bool bValue)
+inline void AEODCharacterBase::UpdatePCTryingToMove()
 {
-	bIsRunning = bValue;
-	if (Role < ROLE_Authority)
+	if (ForwardAxisValue == 0 && RightAxisValue == 0)
 	{
-		Server_SetIsRunning(bValue);
+		if (IsPCTryingToMove())
+		{
+			SetPCTryingToMove(false);
+		}
+	}
+	else
+	{
+		if (!IsPCTryingToMove())
+		{
+			SetPCTryingToMove(true);
+		}
 	}
 }
 
-FORCEINLINE void AEODCharacterBase::SetIWRCharMovementDir(ECharMovementDirection NewDirection)
+inline void AEODCharacterBase::UpdateCharacterMovementDirection()
 {
-	IWR_CharacterMovementDirection = NewDirection;
-	if (Role < ROLE_Authority)
+	if (ForwardAxisValue == 0 && RightAxisValue == 0)
 	{
-		Server_SetIWRCharMovementDir(NewDirection);
+		if (CharacterMovementDirection != ECharMovementDirection::None)
+		{
+			SetCharacterMovementDirection(ECharMovementDirection::None);
+		}
+	}
+	else
+	{
+		if (ForwardAxisValue == 0)
+		{
+			if (RightAxisValue > 0 && CharacterMovementDirection != ECharMovementDirection::R)
+			{
+				SetCharacterMovementDirection(ECharMovementDirection::R);
+			}
+			else if (RightAxisValue < 0 && CharacterMovementDirection != ECharMovementDirection::L)
+			{
+				SetCharacterMovementDirection(ECharMovementDirection::L);
+			}
+		}
+		else
+		{
+			if (ForwardAxisValue > 0 && CharacterMovementDirection != ECharMovementDirection::F)
+			{
+				SetCharacterMovementDirection(ECharMovementDirection::F);
+			}
+			else if (ForwardAxisValue < 0 && CharacterMovementDirection != ECharMovementDirection::B)
+			{
+				SetCharacterMovementDirection(ECharMovementDirection::B);
+			}
+		}
 	}
 }
 
-FORCEINLINE USpringArmComponent* AEODCharacterBase::GetCameraBoom() const
+inline float AEODCharacterBase::GetRotationYawFromAxisInput() const
 {
-	return CameraBoom;
+	float ResultingRotation = GetActorRotation().Yaw;
+	float ControlRotationYaw = GetControllerRotationYaw();
+	if (ForwardAxisValue == 0)
+	{
+		if (RightAxisValue > 0)
+		{
+			ResultingRotation = ControlRotationYaw + 90.f;
+		}
+		else if (RightAxisValue < 0)
+		{
+			ResultingRotation = ControlRotationYaw - 90.f;
+		}
+	}
+	else
+	{
+		if (ForwardAxisValue > 0)
+		{
+			float DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
+			ResultingRotation = ControlRotationYaw + DeltaAngle;
+		}
+		else if (ForwardAxisValue < 0)
+		{
+			float DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(-RightAxisValue, -ForwardAxisValue));
+			ResultingRotation = ControlRotationYaw + DeltaAngle;
+		}
+	}
+	return ResultingRotation;
 }
 
-FORCEINLINE UCameraComponent* AEODCharacterBase::GetCamera() const
+inline void AEODCharacterBase::UpdateDesiredYawFromAxisInput()
 {
-	return Camera;
+	DesiredRotationYawFromAxisInput = GetRotationYawFromAxisInput();
 }
 
-FORCEINLINE USkillsComponent* AEODCharacterBase::GetSkillsComponent() const
+inline float AEODCharacterBase::GetControllerRotationYaw() const
 {
-	return SkillsComponent;
-}
+	// Make sure the character is controlled
+	if (GetController())
+	{
+		float ControlRotationYaw = GetController()->GetControlRotation().Yaw;
 
-FORCEINLINE USphereComponent* AEODCharacterBase::GetInteractionSphere() const
-{
-	return InteractionSphere;
+		if (0 <= ControlRotationYaw && ControlRotationYaw <= 180)
+			return ControlRotationYaw;
+		else if (180 < ControlRotationYaw && ControlRotationYaw < 360)
+		{
+			return (ControlRotationYaw - 360.f);
+		}
+		else if (ControlRotationYaw == 360)
+			return 0.f;
+		else
+			return ControlRotationYaw;
+	}
+	return 0.f;
 }
 
 FORCEINLINE void AEODCharacterBase::EnableInteractionSphere()
@@ -1034,7 +1184,7 @@ FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkill(FSkillTableRow* Skill)
 	CurrentActiveSkill = Skill;
 }
 
-FORCEINLINE FLastUsedSkillInfo & AEODCharacterBase::GetLastUsedSkill()
+FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
 {
 	return LastUsedSkillInfo;
 }

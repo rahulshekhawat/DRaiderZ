@@ -135,7 +135,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (OwningPlayer->IsSwitchingWeapon())
 	{
-		if (OwningPlayer->bPCTryingToMove)
+		if (OwningPlayer->IsPCTryingToMove())
 		{
 			RootMotionMode = ERootMotionMode::IgnoreRootMotion;
 		}
@@ -234,7 +234,7 @@ ECharMovementDirection UPlayerAnimInstance::GetIWRCharMovementDir() const
 {
 	if (OwningPlayer)
 	{
-		return OwningPlayer->IWR_CharacterMovementDirection;
+		return OwningPlayer->GetCharacterMovementDirection();
 	}
 
 	return ECharMovementDirection::None;
@@ -264,7 +264,7 @@ bool UPlayerAnimInstance::IsPCTryingToMove() const
 {
 	if (OwningPlayer)
 	{
-		return OwningPlayer->bPCTryingToMove;
+		return OwningPlayer->IsPCTryingToMove();
 	}
 
 	return false;
