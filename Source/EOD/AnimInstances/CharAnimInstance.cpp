@@ -4,7 +4,7 @@
 #include "EOD/Characters/EODCharacterBase.h"
 
 
-UCharAnimInstance::UCharAnimInstance(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
+UCharAnimInstance::UCharAnimInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	IdleWalkRun_AnimationsBlendTime = 0.2f;
 }
@@ -12,7 +12,7 @@ UCharAnimInstance::UCharAnimInstance(const FObjectInitializer & ObjectInitialize
 void UCharAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
-	OwningCharacter = CastOwnerToBaseCharacter();
+	EODCharacterOwner = TryGetPawnOwner() ? Cast<AEODCharacterBase>(TryGetPawnOwner()) : nullptr;
 
 	FScriptDelegate OutDelegate;
 	OutDelegate.BindUFunction(this, FName("HandleMontageBlendingOut"));
@@ -25,14 +25,37 @@ void UCharAnimInstance::NativeInitializeAnimation()
 
 void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
-
-	if (!OwningCharacter)
+	if (!EODCharacterOwner)
 	{
-		OwningCharacter = CastOwnerToBaseCharacter();
-		// Return because we are not sure if OwningCharacter is nullptr right now or not
-		return;
+		// If EOD character owner is null, attempt to recast pawn owner to EOD character
+		if (!(EODCharacterOwner = TryGetPawnOwner() ? Cast<AEODCharacterBase>(TryGetPawnOwner()) : nullptr))
+		{
+			return;
+		}
 	}
+
+	MovementSpeed = EODCharacterOwner->GetVelocity().Size();
+	CharacterMovementDirection = EODCharacterOwner->GetCharacterMovementDirection();
+	bIsBlocking = EODCharacterOwner->IsBlocking();
+
+	/*
+	if (EODCharacterOwner->IsIdle())
+	{
+		MovementSpeed = 0.f;
+		CharacterMovementDirection = ECharMovementDirection::None;
+	}
+	else if (EODCharacterOwner->IsMoving())
+	{
+		MovementSpeed = EODCharacterOwner->GetVelocity().Size();
+		CharacterMovementDirection = EODCharacterOwner->GetCharacterMovementDirection();
+	}
+	else if (EODCharacterOwner->IsBlocking())
+	{
+		bIsBlocking = true;
+		MovementSpeed = EODCharacterOwner->GetVelocity().Size();
+		CharacterMovementDirection = EODCharacterOwner->GetCharacterMovementDirection();
+	}
+	*/
 
 	/*
 	if (OwningCharacter->IsIdle())
@@ -66,9 +89,9 @@ void UCharAnimInstance::NativeUninitializeAnimation()
 
 float UCharAnimInstance::GetMovementSpeed() const
 {
-	if (OwningCharacter)
+	if (EODCharacterOwner)
 	{
-		return OwningCharacter->GetVelocity().Size();
+		return EODCharacterOwner->GetVelocity().Size();
 	}
 
 	return 0.0f;
@@ -96,9 +119,9 @@ void UCharAnimInstance::UpdateDodgeAnimation()
 
 bool UCharAnimInstance::IsBlocking() const
 {
-	if (OwningCharacter)
+	if (EODCharacterOwner)
 	{
-		return OwningCharacter->IsBlocking();
+		return EODCharacterOwner->IsBlocking();
 	}
 
 	return false;
@@ -116,23 +139,18 @@ ECharMovementDirection UCharAnimInstance::GetIWRCharMovementDir() const
 	}
 }
 
-void UCharAnimInstance::HandleMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
+void UCharAnimInstance::HandleMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	OwningCharacter->OnMontageBlendingOut(AnimMontage, bInterrupted);
-}
-
-void UCharAnimInstance::HandleMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
-{
-}
-
-AEODCharacterBase * UCharAnimInstance::CastOwnerToBaseCharacter() const
-{
-	AEODCharacterBase* BaseCharacter = nullptr;
-
-	if (TryGetPawnOwner())
+	if (IsValid(EODCharacterOwner))
 	{
-		BaseCharacter = Cast<AEODCharacterBase>(TryGetPawnOwner());
+		EODCharacterOwner->OnMontageBlendingOut(AnimMontage, bInterrupted);
 	}
+}
 
-	return BaseCharacter;
+void UCharAnimInstance::HandleMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted)
+{
+	if (IsValid(EODCharacterOwner))
+	{
+		EODCharacterOwner->OnMontageEnded(AnimMontage, bInterrupted);
+	}
 }
