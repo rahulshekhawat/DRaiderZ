@@ -11,7 +11,6 @@ UCharAnimInstance::UCharAnimInstance(const FObjectInitializer& ObjectInitializer
 
 void UCharAnimInstance::NativeInitializeAnimation()
 {
-	Super::NativeInitializeAnimation();
 	EODCharacterOwner = TryGetPawnOwner() ? Cast<AEODCharacterBase>(TryGetPawnOwner()) : nullptr;
 
 	FScriptDelegate OutDelegate;
@@ -79,17 +78,15 @@ void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UCharAnimInstance::NativePostEvaluateAnimation()
 {
-	Super::NativePostEvaluateAnimation();
 }
 
 void UCharAnimInstance::NativeUninitializeAnimation()
 {
-	Super::NativeUninitializeAnimation();
 }
 
 float UCharAnimInstance::GetMovementSpeed() const
 {
-	if (EODCharacterOwner)
+	if (IsValid(EODCharacterOwner))
 	{
 		return EODCharacterOwner->GetVelocity().Size();
 	}
@@ -119,7 +116,7 @@ void UCharAnimInstance::UpdateDodgeAnimation()
 
 bool UCharAnimInstance::IsBlocking() const
 {
-	if (EODCharacterOwner)
+	if (IsValid(EODCharacterOwner))
 	{
 		return EODCharacterOwner->IsBlocking();
 	}
