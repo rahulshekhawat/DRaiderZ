@@ -300,6 +300,8 @@ USkeletalMeshComponent* APlayerCharacter::CreateNewArmorComponent(const FName Na
 
 bool APlayerCharacter::CanMove() const
 {
+	// @todo, uncomment and replace return code with following comment:
+	// return IsIdleOrMoving() || IsRunning() || bCharacterStateAllowsMovement;
 	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
 }
 

@@ -50,7 +50,6 @@ class EOD_API AEODCharacterBase : public ACharacter
 	GENERATED_BODY()
 		
 public:
-
 	/** Sets default values for this character's properties */
 	AEODCharacterBase(const FObjectInitializer& ObjectInitializer);
 
@@ -284,9 +283,9 @@ protected:
 
 	inline void UpdateCharacterMovementDirection();
 
-	inline void UpdateDesiredYawFromAxisInput();
+	void UpdateDesiredYawFromAxisInput();
 
-	virtual void UpdateMovement(float DeltaTime);
+	void UpdateMovement(float DeltaTime);
 
 public:
 	/** Returns true if character is alive */
@@ -550,10 +549,10 @@ public:
 	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; };
 	
 	/** Returns true if character is engaged in combat */
-	FORCEINLINE bool GetInCombat() const;
+	FORCEINLINE bool IsInCombat() const { return bInCombat; }
 
-	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get In Combat"))
-	bool BP_GetInCombat() const;
+	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Is In Combat"))
+	bool BP_IsInCombat() const;
 
 	/** [server + client] Set current state of character */
 	inline void SetCharacterState(const ECharacterState NewState);
@@ -577,7 +576,7 @@ public:
 	/** Change character rotation */
 	// void 
 
-	/** [server + client] Chagne character rotation */
+	/** [server + client] Change character rotation */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	void SetCharacterRotation(const FRotator NewRotation);
 
@@ -683,8 +682,8 @@ public:
 	 * @param RotationRate 	Rotation rate to use for yaw rotation in degrees
 	 * @return 				True if character successfully rotates to DesiredYaw (CurrentYaw == DesiredYaw)
 	 */
-	UFUNCTION(BlueprintCallable, category = Rotation)
-	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision = 0.1f, float RotationRate = 600.f);
+	UFUNCTION(BlueprintCallable, category = Rotation, meta = (DeprecatedFunction))
+	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision = 1e-3f, float RotationRate = 600.f);
 
 	/**
 	 * Kills this character 
@@ -950,12 +949,7 @@ inline float AEODCharacterBase::GetRotationYawFromAxisInput() const
 			ResultingRotation = ControlRotationYaw + DeltaAngle;
 		}
 	}
-	return ResultingRotation;
-}
-
-inline void AEODCharacterBase::UpdateDesiredYawFromAxisInput()
-{
-	DesiredRotationYawFromAxisInput = GetRotationYawFromAxisInput();
+	return FMath::UnwindDegrees(ResultingRotation);
 }
 
 inline float AEODCharacterBase::GetControllerRotationYaw() const
@@ -1120,11 +1114,6 @@ FORCEINLINE bool AEODCharacterBase::NeedsHealing() const
 FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
 {
 	TurnOnTargetSwitch();
-}
-
-FORCEINLINE bool AEODCharacterBase::GetInCombat() const
-{
-	return bInCombat;
 }
 
 inline void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
