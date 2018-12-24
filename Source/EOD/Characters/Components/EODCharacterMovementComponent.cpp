@@ -11,6 +11,7 @@
 UEODCharacterMovementComponent::UEODCharacterMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bUseCustomRotation = false;
+	RotationRate = FRotator(0.f, 600.f, 0.f);
 }
 
 void UEODCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -19,8 +20,6 @@ void UEODCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetime
 
 	DOREPLIFETIME(UEODCharacterMovementComponent, DesiredCustomRotationYaw);
 	DOREPLIFETIME_CONDITION(UEODCharacterMovementComponent, bUseCustomRotation, COND_SkipOwner);
-
-	// DOREPLIFETIME_CONDITION(UEODCharacterMovementComponent, DesiredRotationYaw, COND_SkipOwner);
 }
 
 void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
@@ -112,12 +111,22 @@ void UEODCharacterMovementComponent::OnRep_UseCustomRotation(bool bOldValue)
 	}
 }
 
-void UEODCharacterMovementComponent::Server_SetUseCustomRotation_Implementation(bool bValue, float NewRotationYaw)
+void UEODCharacterMovementComponent::Server_SetUseCustomRotation_Implementation(bool bValue)
 {
-	SetUseCustomRotation(bValue, NewRotationYaw);
+	SetUseCustomRotation(bValue);
 }
 
-bool UEODCharacterMovementComponent::Server_SetUseCustomRotation_Validate(bool bValue, float NewRotationYaw)
+bool UEODCharacterMovementComponent::Server_SetUseCustomRotation_Validate(bool bValue)
+{
+	return true;
+}
+
+void UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Implementation(float NewRotationYaw)
+{
+	SetDesiredCustomRotationYaw(NewRotationYaw);
+}
+
+bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Validate(float NewRotationYaw)
 {
 	return true;
 }

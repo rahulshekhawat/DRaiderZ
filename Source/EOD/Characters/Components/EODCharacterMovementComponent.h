@@ -44,16 +44,25 @@ private:
 public:
 	FORCEINLINE float GetDesiredCustomRotationYaw() const { return DesiredCustomRotationYaw; }
 
-	FORCEINLINE void SetUseCustomRotation(bool bNewValue, float NewRotationYaw)
+	FORCEINLINE bool IsUsingCustomRotation() const { return bUseCustomRotation; }
+
+	FORCEINLINE void SetUseCustomRotation(bool bNewValue)
 	{
 		bUseCustomRotation = bNewValue;
-		DesiredCustomRotationYaw = NewRotationYaw;
 		if (CharacterOwner && CharacterOwner->Role < ROLE_Authority)
 		{
-			Server_SetUseCustomRotation(bNewValue, NewRotationYaw);
+			Server_SetUseCustomRotation(bNewValue);
 		}
 	}
 
+	FORCEINLINE void SetDesiredCustomRotationYaw(float NewRotationYaw)
+	{
+		DesiredCustomRotationYaw = NewRotationYaw;
+		if (CharacterOwner && CharacterOwner->Role < ROLE_Authority)
+		{
+			Server_SetDesiredCustomRotationYaw(NewRotationYaw);
+		}
+	}
 
 	////////////////////////////////////////////////////////////////////////////////
 	// NETWORK
@@ -63,7 +72,10 @@ private:
 	void OnRep_UseCustomRotation(bool bOldValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetUseCustomRotation(bool bValue, float NewRotationYaw);
+	void Server_SetUseCustomRotation(bool bValue);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetDesiredCustomRotationYaw(float NewRotationYaw);
 
 
 };
