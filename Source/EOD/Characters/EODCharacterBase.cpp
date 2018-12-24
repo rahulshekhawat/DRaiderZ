@@ -5,7 +5,7 @@
 #include "EOD/AnimInstances/CharAnimInstance.h"
 #include "EOD/Interactives/InteractionInterface.h"
 #include "EOD/Statics/EODBlueprintFunctionLibrary.h"
-
+#include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 #include "EOD/Player/EODPlayerController.h"
 #include "EOD/AI/EODAIControllerBase.h"
 #include "EOD/Characters/Components/SkillsComponent.h"
@@ -17,7 +17,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
-AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
+AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UEODCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -72,9 +73,11 @@ void AEODCharacterBase::Tick(float DeltaTime)
 
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
-		if (bSkillAllowsMovement)
+		if (CanMove())
 		{
-			
+			UpdatePCTryingToMove();
+			UpdateCharacterMovementDirection();
+			UpdateDesiredYawFromAxisInput();
 		}
 
 		if (IsMoving())
@@ -678,6 +681,14 @@ void AEODCharacterBase::StopNormalAttacking()
 
 void AEODCharacterBase::UpdateMovement(float DeltaTime)
 {
+	/*
+	bool bRotatePlayer = DesiredRotationYawFromAxisInput == GetActorRotation().Yaw ? false : true;
+	if (bRotatePlayer)
+	{
+		// DeltaRotateCharacterToDesiredYaw
+	}
+	*/
+
 	float DesiredRotationYaw = GetRotationYawFromAxisInput();
 	bool bRotatePlayer = DesiredRotationYaw == GetActorRotation().Yaw ? false : true;
 
