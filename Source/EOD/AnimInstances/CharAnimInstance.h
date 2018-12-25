@@ -53,11 +53,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Character Animation", meta = (BlueprintThreadSafe, DeprecatedFunction))
 	ECharMovementDirection GetIWRCharMovementDir() const;
 
-	// virtual void UpdateIdleAnimation();
-	// virtual void UpdateMovementAnimation();
-	// virtual void UpdateBlockAnimation();*
-	// virtual void UpdateDodgeAnimation();
-
 private:
 	UFUNCTION()
 	void HandleMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
@@ -65,6 +60,7 @@ private:
 	UFUNCTION()
 	void HandleMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
+	UPROPERTY()
 	AEODCharacterBase* EODCharacterOwner;
 	
 	

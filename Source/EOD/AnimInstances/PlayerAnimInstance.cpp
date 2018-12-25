@@ -7,19 +7,19 @@
 #include "EOD/Player/EODPlayerController.h"
 
 #include "Components/InputComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 UPlayerAnimInstance::UPlayerAnimInstance(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 	MasterStateMachine_AnimationsBlendTime = 0.f;
 	IdleWalkRun_AnimationsBlendTime = 0.2f;
+	CurrentWeaponType = EWeaponType::None;
 }
 
 void UPlayerAnimInstance::NativeInitializeAnimation()
 {
-	Super::NativeInitializeAnimation();
-	SetupOwningPlayer();
+	EODPlayerOwner = TryGetPawnOwner() ? Cast<APlayerCharacter>(TryGetPawnOwner()) : nullptr;
 
 	FScriptDelegate OutDelegate;
 	OutDelegate.BindUFunction(this, FName("HandleMontageBlendingOut"));
@@ -28,23 +28,34 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 	FScriptDelegate EndDelegate;
 	EndDelegate.BindUFunction(this, FName("HandleMontageEnded"));
 	OnMontageEnded.AddUnique(EndDelegate);
-
 }
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
+	if (!EODPlayerOwner)
+	{
+		if (!(EODPlayerOwner = TryGetPawnOwner() ? Cast<APlayerCharacter>(TryGetPawnOwner()) : nullptr))
+		{
+			return;
+		}
+	}
 
-	if (!OwningPlayer || !OwningPlayer->GetActiveAnimationReferences())
+	MovementSpeed = EODPlayerOwner->GetVelocity().Size();
+	CharacterMovementDirection = EODPlayerOwner->GetCharacterMovementDirection();
+	bIsBlocking = EODPlayerOwner->IsBlocking();
+	bIsRunning = EODPlayerOwner->IsRunning();
+	BlockMovementDirectionYaw = EODPlayerOwner->BlockMovementDirectionYaw;
+	bPCTryingToMove = EODPlayerOwner->IsPCTryingToMove();
+	CurrentWeaponType = EODPlayerOwner->GetEquippedWeaponType();
+	
+	if (!EODPlayerOwner->GetActiveAnimationReferences())
 	{
 		return;
 	}
+	
+	FPlayerAnimationReferencesTableRow* AnimationReferences = EODPlayerOwner->GetActiveAnimationReferences();
 
-	// || (OwningPlayer->Controller && !OwningPlayer->Controller->IsLocalPlayerController())
-
-	FPlayerAnimationReferencesTableRow* AnimationReferences = OwningPlayer->GetActiveAnimationReferences();
-
-	if (OwningPlayer->IsDead())
+	if (EODPlayerOwner->IsDead())
 	{
 		UAnimMontage* DeathMontage = AnimationReferences->Die.Get();
 		if (DeathMontage && !Montage_IsPlaying(DeathMontage))
@@ -70,28 +81,28 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// @todo
 	/*
 	// When the character is falling and jumping
-	if (OwningPlayer->GetMovementComponent()->IsFalling() && OwningPlayer->IsJumping())
+	if (EODPlayerOwner->GetMovementComponent()->IsFalling() && EODPlayerOwner->IsJumping())
 	{
 
 	}
 	// When the character is not falling but jumping
-	else if (!OwningPlayer->GetCharacterMovement()->IsFalling() && OwningPlayer->IsJumping())
+	else if (!EODPlayerOwner->GetCharacterMovement()->IsFalling() && EODPlayerOwner->IsJumping())
 	{
 
 	}
 	// When character is falling but not jumping
-	else if (OwningPlayer->GetCharacterMovement()->IsFalling() && !OwningPlayer->IsJumping() && OwningPlayer->IsIdleOrMoving())
+	else if (EODPlayerOwner->GetCharacterMovement()->IsFalling() && !EODPlayerOwner->IsJumping() && EODPlayerOwner->IsIdleOrMoving())
 	{
 		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
 		if (JumpMontage)
 		{
 			if (Montage_IsPlaying(JumpMontage))
 			{
-				OwningPlayer->SetCharacterState(ECharacterState::Jumping);
+				EODPlayerOwner->SetCharacterState(ECharacterState::Jumping);
 			}
 			else
 			{
-				OwningPlayer->SetCharacterState(ECharacterState::Jumping);
+				EODPlayerOwner->SetCharacterState(ECharacterState::Jumping);
 				Montage_Play(JumpMontage);
 				return;
 			}
@@ -100,15 +111,15 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	*/
 
 
-	if (OwningPlayer->GetMovementComponent()->IsFalling())
+	if (EODPlayerOwner->GetMovementComponent()->IsFalling())
 	{
 		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
 		if (JumpMontage && !Montage_IsPlaying(JumpMontage))
 		{
 			Montage_Play(JumpMontage);
-			if (OwningPlayer->GetCharacterState() != ECharacterState::Jumping)
+			if (EODPlayerOwner->GetCharacterState() != ECharacterState::Jumping)
 			{
-				OwningPlayer->SetCharacterState(ECharacterState::Jumping);
+				EODPlayerOwner->SetCharacterState(ECharacterState::Jumping);
 			}
 			return;
 		}
@@ -133,9 +144,9 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 
-	if (OwningPlayer->IsSwitchingWeapon())
+	if (EODPlayerOwner->IsSwitchingWeapon())
 	{
-		if (OwningPlayer->IsPCTryingToMove())
+		if (EODPlayerOwner->IsPCTryingToMove())
 		{
 			RootMotionMode = ERootMotionMode::IgnoreRootMotion;
 		}
@@ -146,14 +157,14 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 
 	/*
-	if (OwningPlayer->IsSwitchingWeapon() && OwningPlayer->GetEquippedWeaponAnimationReferences())
+	if (EODPlayerOwner->IsSwitchingWeapon() && EODPlayerOwner->GetEquippedWeaponAnimationReferences())
 	{
-		UAnimMontage* FullBodySwitchMontage = OwningPlayer->GetEquippedWeaponAnimationReferences()->WeaponSwitchFullBody.Get();
-		UAnimMontage* UpperBodySwitchMontage = OwningPlayer->GetEquippedWeaponAnimationReferences()->WeaponSwitchUpperBody.Get();
+		UAnimMontage* FullBodySwitchMontage = EODPlayerOwner->GetEquippedWeaponAnimationReferences()->WeaponSwitchFullBody.Get();
+		UAnimMontage* UpperBodySwitchMontage = EODPlayerOwner->GetEquippedWeaponAnimationReferences()->WeaponSwitchUpperBody.Get();
 
 		FName MontageSection;
 		// If weapon is currently sheathed then it means we are playing sheathe animation
-		if (OwningPlayer->IsWeaponSheathed())
+		if (EODPlayerOwner->IsWeaponSheathed())
 		{
 			MontageSection = UCharacterLibrary::SectionName_SheatheWeapon;
 		}
@@ -164,17 +175,17 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		if (FullBodySwitchMontage && UpperBodySwitchMontage)
 		{
-			float ForwardAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveForward"));
-			float RightAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveRight"));
+			float ForwardAxisValue = EODPlayerOwner->InputComponent->GetAxisValue(FName("MoveForward"));
+			float RightAxisValue = EODPlayerOwner->InputComponent->GetAxisValue(FName("MoveRight"));
 
 			DoSeamlessTransitionBetweenStillOrMovingMontage(FullBodySwitchMontage, UpperBodySwitchMontage, ForwardAxisValue, RightAxisValue, MontageSection, true);
 		}
 	}
 	*/
 	
-	if (OwningPlayer->IsUsingAnySkill() && OwningPlayer->SkillAllowsMovement())
+	if (EODPlayerOwner->IsUsingAnySkill() && EODPlayerOwner->SkillAllowsMovement())
 	{
-		FSkillTableRow* ActiveSkill = OwningPlayer->GetCurrentActiveSkill();
+		FSkillTableRow* ActiveSkill = EODPlayerOwner->GetCurrentActiveSkill();
 		if (ActiveSkill)
 		{
 			UAnimMontage* FullBodySkillMontage = ActiveSkill->AnimMontage.Get();
@@ -183,10 +194,10 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 			if (FullBodySkillMontage && UpperBodySkillMontage)
 			{
-				float ForwardAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveForward"));
-				float RightAxisValue = OwningPlayer->InputComponent->GetAxisValue(FName("MoveRight"));
+				float ForwardAxisValue = EODPlayerOwner->InputComponent->GetAxisValue(FName("MoveForward"));
+				float RightAxisValue = EODPlayerOwner->InputComponent->GetAxisValue(FName("MoveRight"));
 
-				if (OwningPlayer->SkillHasDirectionalAnimations())
+				if (EODPlayerOwner->SkillHasDirectionalAnimations())
 				{
 					DoSeamlessTransitionBetweenStillOrMovingDirectionalMontage(FullBodySkillMontage, UpperBodySkillMontage, ForwardAxisValue, RightAxisValue, MontageSection);
 				}
@@ -202,19 +213,17 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UPlayerAnimInstance::NativePostEvaluateAnimation()
 {
-	Super::NativePostEvaluateAnimation();
 }
 
 void UPlayerAnimInstance::NativeUninitializeAnimation()
 {
-	Super::NativeUninitializeAnimation();
 }
 
 bool UPlayerAnimInstance::IsBlocking() const
 {
-	if (OwningPlayer)
+	if (EODPlayerOwner)
 	{
-		return OwningPlayer->IsBlocking();
+		return EODPlayerOwner->IsBlocking();
 	}
 
 	return false;
@@ -222,9 +231,9 @@ bool UPlayerAnimInstance::IsBlocking() const
 
 bool UPlayerAnimInstance::IsFastRunning() const
 {
-	if (OwningPlayer)
+	if (EODPlayerOwner)
 	{
-		return OwningPlayer->IsFastRunning();
+		return EODPlayerOwner->IsFastRunning();
 	}
 
 	return false;
@@ -232,9 +241,9 @@ bool UPlayerAnimInstance::IsFastRunning() const
 
 ECharMovementDirection UPlayerAnimInstance::GetIWRCharMovementDir() const
 {
-	if (OwningPlayer)
+	if (EODPlayerOwner)
 	{
-		return OwningPlayer->GetCharacterMovementDirection();
+		return EODPlayerOwner->GetCharacterMovementDirection();
 	}
 
 	return ECharMovementDirection::None;
@@ -242,9 +251,9 @@ ECharMovementDirection UPlayerAnimInstance::GetIWRCharMovementDir() const
 
 float UPlayerAnimInstance::GetMovementSpeed() const
 {
-	if (OwningPlayer)
+	if (EODPlayerOwner)
 	{
-		return OwningPlayer->GetVelocity().Size();
+		return EODPlayerOwner->GetVelocity().Size();
 	}
 
 	return 0.f;
@@ -252,9 +261,9 @@ float UPlayerAnimInstance::GetMovementSpeed() const
 
 float UPlayerAnimInstance::GetBlockMovementDirectionYaw() const
 {
-	if (OwningPlayer)
+	if (EODPlayerOwner)
 	{
-		return OwningPlayer->BlockMovementDirectionYaw;
+		return EODPlayerOwner->BlockMovementDirectionYaw;
 	}
 
 	return 0.f;
@@ -262,9 +271,9 @@ float UPlayerAnimInstance::GetBlockMovementDirectionYaw() const
 
 bool UPlayerAnimInstance::IsPCTryingToMove() const
 {
-	if (OwningPlayer)
+	if (EODPlayerOwner)
 	{
-		return OwningPlayer->IsPCTryingToMove();
+		return EODPlayerOwner->IsPCTryingToMove();
 	}
 
 	return false;
@@ -272,15 +281,15 @@ bool UPlayerAnimInstance::IsPCTryingToMove() const
 
 EWeaponType UPlayerAnimInstance::GetWeaponAnimationType() const
 {
-	if (OwningPlayer && !OwningPlayer->IsWeaponSheathed())
+	if (EODPlayerOwner && !EODPlayerOwner->IsWeaponSheathed())
 	{
-		return OwningPlayer->GetEquippedWeaponType();
+		return EODPlayerOwner->GetEquippedWeaponType();
 	}
 
 	/*
-	if (OwningPlayer && OwningPlayer->GetCurrentWeaponSlot() && OwningPlayer->GetCurrentWeaponSlot()->PrimaryWeapon)
+	if (EODPlayerOwner && EODPlayerOwner->GetCurrentWeaponSlot() && EODPlayerOwner->GetCurrentWeaponSlot()->PrimaryWeapon)
 	{
-		return OwningPlayer->GetCurrentWeaponSlot()->PrimaryWeapon->WeaponType;
+		return EODPlayerOwner->GetCurrentWeaponSlot()->PrimaryWeapon->WeaponType;
 	}
 	*/
 
@@ -289,27 +298,27 @@ EWeaponType UPlayerAnimInstance::GetWeaponAnimationType() const
 
 void UPlayerAnimInstance::HandleMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	if (OwningPlayer)
+	if (EODPlayerOwner)
 	{
-		OwningPlayer->OnMontageBlendingOut(AnimMontage, bInterrupted);
+		EODPlayerOwner->OnMontageBlendingOut(AnimMontage, bInterrupted);
 	}
 
 	/*
 	if(!bInterrupted)
 	{
-		if (AnimMontage == OwningPlayer->GetActiveAnimationReferences()->AnimationMontage_Jump)
+		if (AnimMontage == EODPlayerOwner->GetActiveAnimationReferences()->AnimationMontage_Jump)
 		{
-			// OwningPlayer->GetCharacterState() == ECharacterState::IdleWalkRun;
+			// EODPlayerOwner->GetCharacterState() == ECharacterState::IdleWalkRun;
 		}
-		else if (AnimMontage == OwningPlayer->GetActiveAnimationReferences()->AnimationMontage_Dodge)
+		else if (AnimMontage == EODPlayerOwner->GetActiveAnimationReferences()->AnimationMontage_Dodge)
 		{
-			// OwningPlayer->GetCharacterState() == ECharacterState::IdleWalkRun;
+			// EODPlayerOwner->GetCharacterState() == ECharacterState::IdleWalkRun;
 			// @todo
-			// OwningPlayer-> UpdateMovementAnimation();
+			// EODPlayerOwner-> UpdateMovementAnimation();
 		}
 		else
 		{
-			// OwningPlayer->GetCharacterState() == ECharacterState::IdleWalkRun;
+			// EODPlayerOwner->GetCharacterState() == ECharacterState::IdleWalkRun;
 		}
 	}
 	*/
@@ -317,9 +326,9 @@ void UPlayerAnimInstance::HandleMontageBlendingOut(UAnimMontage* AnimMontage, bo
 
 void UPlayerAnimInstance::HandleMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	if (OwningPlayer)
+	if (EODPlayerOwner)
 	{
-		OwningPlayer->OnMontageEnded(AnimMontage, bInterrupted);
+		EODPlayerOwner->OnMontageEnded(AnimMontage, bInterrupted);
 	}
 }
 

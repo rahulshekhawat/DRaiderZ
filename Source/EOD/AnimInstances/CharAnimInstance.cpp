@@ -37,43 +37,6 @@ void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	CharacterMovementDirection = EODCharacterOwner->GetCharacterMovementDirection();
 	bIsBlocking = EODCharacterOwner->IsBlocking();
 
-	/*
-	if (EODCharacterOwner->IsIdle())
-	{
-		MovementSpeed = 0.f;
-		CharacterMovementDirection = ECharMovementDirection::None;
-	}
-	else if (EODCharacterOwner->IsMoving())
-	{
-		MovementSpeed = EODCharacterOwner->GetVelocity().Size();
-		CharacterMovementDirection = EODCharacterOwner->GetCharacterMovementDirection();
-	}
-	else if (EODCharacterOwner->IsBlocking())
-	{
-		bIsBlocking = true;
-		MovementSpeed = EODCharacterOwner->GetVelocity().Size();
-		CharacterMovementDirection = EODCharacterOwner->GetCharacterMovementDirection();
-	}
-	*/
-
-	/*
-	if (OwningCharacter->IsIdle())
-	{
-		UpdateIdleAnimation();
-	}
-	else if (OwningCharacter->IsMoving())
-	{
-		UpdateMovementAnimation();
-	}
-	else if (OwningCharacter->IsBlocking())
-	{
-		UpdateBlockAnimation();
-	}
-	else if (OwningCharacter->IsDodging())
-	{
-		UpdateDodgeAnimation();
-	}
-	*/
 }
 
 void UCharAnimInstance::NativePostEvaluateAnimation()
@@ -94,26 +57,6 @@ float UCharAnimInstance::GetMovementSpeed() const
 	return 0.0f;
 }
 
-/*
-void UCharAnimInstance::UpdateIdleAnimation()
-{
-	// IdleWalkRun_MovementSpeed = 0.f;
-}
-
-void UCharAnimInstance::UpdateMovementAnimation()
-{
-	// IdleWalkRun_MovementSpeed = OwningCharacter->GetVelocity().Size();
-}
-
-void UCharAnimInstance::UpdateBlockAnimation()
-{
-}
-
-void UCharAnimInstance::UpdateDodgeAnimation()
-{
-}
-*/
-
 bool UCharAnimInstance::IsBlocking() const
 {
 	if (IsValid(EODCharacterOwner))
@@ -126,14 +69,12 @@ bool UCharAnimInstance::IsBlocking() const
 
 ECharMovementDirection UCharAnimInstance::GetIWRCharMovementDir() const
 {
-	if (GetMovementSpeed() == 0)
+	if (IsValid(EODCharacterOwner))
 	{
-		return ECharMovementDirection::None;
+		return EODCharacterOwner->GetCharacterMovementDirection();
 	}
-	else
-	{
-		return ECharMovementDirection::F;
-	}
+
+	return ECharMovementDirection::None;
 }
 
 void UCharAnimInstance::HandleMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
