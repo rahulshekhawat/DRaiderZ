@@ -54,34 +54,32 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 
-
 #if EOD_TEST_CODE_ENABLED
-	if (EODPlayerOwner->IsSwitchingWeapon() && EODPlayerOwner->GetEquippedWeaponAnimationReferences())
+	if (EODPlayerOwner->IsSwitchingWeapon())
 	{
-		UAnimMontage* FullBodySwitchMontage = EODPlayerOwner->GetEquippedWeaponAnimationReferences()->WeaponSwitchFullBody.Get();
-		UAnimMontage* UpperBodySwitchMontage = EODPlayerOwner->GetEquippedWeaponAnimationReferences()->WeaponSwitchUpperBody.Get();
+		// Movable montage should play based on whether PC is trying to move or not
+		if (bPCTryingToMove != bMovableMontagePlaying)
+		{
+			UAnimMontage* FullBodySwitchMontage = EODPlayerOwner->GetEquippedWeaponAnimationReferences()->WeaponSwitchFullBody.Get();
+			UAnimMontage* UpperBodySwitchMontage = EODPlayerOwner->GetEquippedWeaponAnimationReferences()->WeaponSwitchUpperBody.Get();
 
-		FName MontageSection;
-		// If weapon is currently sheathed then it means we are playing sheathe animation
-		if (EODPlayerOwner->IsWeaponSheathed())
-		{
-			MontageSection = UCharacterLibrary::SectionName_SheatheWeapon;
-		}
-		else
-		{
-			MontageSection = UCharacterLibrary::SectionName_UnsheatheWeapon;
-		}
+			FName MontageSection;
+			// If weapon is currently sheathed then it means we are playing sheathe animation
+			if (EODPlayerOwner->IsWeaponSheathed())
+			{
+				MontageSection = UCharacterLibrary::SectionName_SheatheWeapon;
+			}
+			else
+			{
+				MontageSection = UCharacterLibrary::SectionName_UnsheatheWeapon;
+			}
 
-		if (FullBodySwitchMontage && UpperBodySwitchMontage)
-		{
-			// float ForwardAxisValue = EODPlayerOwner->InputComponent->GetAxisValue(FName("MoveForward"));
-			// float RightAxisValue = EODPlayerOwner->InputComponent->GetAxisValue(FName("MoveRight"));
-			float ForwardAxisValue = EODPlayerOwner->ForwardAxisValue;
-			float RightAxisValue = EODPlayerOwner->RightAxisValue;
-			DoSeamlessTransitionBetweenStillOrMovingMontage(FullBodySwitchMontage, UpperBodySwitchMontage, ForwardAxisValue, RightAxisValue, MontageSection, true);
+			if (FullBodySwitchMontage && UpperBodySwitchMontage)
+			{
+				DoSeamlessTransitionBetweenStillOrMovingMontage(FullBodySwitchMontage, UpperBodySwitchMontage, MontageSection, true);
+			}
 		}
 	}
-
 	return;
 #endif
 
@@ -355,6 +353,36 @@ void UPlayerAnimInstance::HandleMontageEnded(UAnimMontage* AnimMontage, bool bIn
 	if (EODPlayerOwner)
 	{
 		EODPlayerOwner->OnMontageEnded(AnimMontage, bInterrupted);
+	}
+}
+
+void UPlayerAnimInstance::TransitionBetweenMontages(UAnimMontage * TransitionFromMontage, UAnimMontage * TransitionToMontage, const FName Section, bool bZeroBlendOut)
+{
+	if (Montage_IsPlaying(TransitionFromMontage))
+	{
+		int32 MovingMontageSectionIndex = TransitionToMontage->GetSectionIndex(Section);
+		int32 StandStillMontageSectionIndex = TransitionFromMontage->GetSectionIndex(Section);
+		if (MovingMontageSectionIndex != INDEX_NONE && StandStillMontageSectionIndex != INDEX_NONE)
+		{
+			float SectionStartTime;
+			float SectionEndtime;
+			TransitionFromMontage->GetSectionStartAndEndTime(StandStillMontageSectionIndex, SectionStartTime, SectionEndtime);
+			float CurrentPosition = Montage_GetPosition(TransitionFromMontage);
+			float SectionOffset = CurrentPosition - SectionStartTime;
+			if (bZeroBlendOut)
+			{
+				Montage_Stop(0.f, TransitionFromMontage);
+			}
+			else
+			{
+				Montage_Stop(TransitionFromMontage->BlendOut.GetBlendTime(), TransitionFromMontage);
+			}
+
+			TransitionToMontage->GetSectionStartAndEndTime(MovingMontageSectionIndex, SectionStartTime, SectionEndtime);
+			float MontageStartPosition = SectionStartTime + SectionOffset;
+
+			Montage_Play(TransitionToMontage, 1.f, EMontagePlayReturnType::MontageLength, MontageStartPosition);
+		}
 	}
 }
 

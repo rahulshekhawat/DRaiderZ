@@ -1114,6 +1114,11 @@ void APlayerCharacter::PlayToggleSheatheAnimation()
 			{
 				SetCharacterState(ECharacterState::SwitchingWeapon);
 			}
+			UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+			if (PlayerAnimInstance)
+			{
+				PlayerAnimInstance->OnTransitionableMontageTriggered(true);
+			}
 		}
 	}
 	else
@@ -1134,6 +1139,11 @@ void APlayerCharacter::PlayToggleSheatheAnimation()
 			if (GetController() && GetController()->IsLocalPlayerController())
 			{
 				SetCharacterState(ECharacterState::SwitchingWeapon);
+			}
+			UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+			if (PlayerAnimInstance)
+			{
+				PlayerAnimInstance->OnTransitionableMontageTriggered(false);
 			}
 		}
 	}

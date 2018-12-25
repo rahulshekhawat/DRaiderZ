@@ -81,12 +81,15 @@ void AEODCharacterBase::Tick(float DeltaTime)
 			UpdatePCTryingToMove();
 			UpdateCharacterMovementDirection();
 			UpdateDesiredYawFromAxisInput();
+			UpdateMovement(DeltaTime);
 		}
 
+		/*
 		if (IsMoving())
 		{
 			UpdateMovement(DeltaTime);
 		}
+		*/
 	}
 }
 
@@ -675,19 +678,6 @@ void AEODCharacterBase::UpdateDesiredYawFromAxisInput()
 
 void AEODCharacterBase::UpdateMovement(float DeltaTime)
 {
-	/*
-	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-	if (MoveComp)
-	{
-		const float AngleTolerance = 1e-3f;
-		if (!FMath::IsNearlyEqual(MoveComp->GetDesiredCustomRotationYaw(), GetActorRotation().Yaw, AngleTolerance) && !MoveComp->IsUsingCustomRotation())
-		{
-			PrintToScreen(this, FString("TRIGGERING ROTATION"));
-			MoveComp->SetUseCustomRotation(true);
-		}
-	}
-	*/
-
 	if (ForwardAxisValue < 0)
 	{
 		float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
