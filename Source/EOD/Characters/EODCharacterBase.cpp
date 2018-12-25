@@ -675,6 +675,7 @@ void AEODCharacterBase::UpdateDesiredYawFromAxisInput()
 
 void AEODCharacterBase::UpdateMovement(float DeltaTime)
 {
+	/*
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
 	{
@@ -685,6 +686,7 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 			MoveComp->SetUseCustomRotation(true);
 		}
 	}
+	*/
 
 	if (ForwardAxisValue < 0)
 	{
