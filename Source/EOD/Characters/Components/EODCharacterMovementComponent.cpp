@@ -52,7 +52,6 @@ void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 	else if(!FMath::IsNearlyEqual(CurrentRotation.Yaw, DesiredCustomRotationYaw, AngleTolerance))
 	{
 		DesiredRotation.Yaw = DesiredCustomRotationYaw;
-
 	}
 	else
 	{

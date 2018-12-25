@@ -171,48 +171,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			// do nothing
 		}
 	}
-
-	/*
-	if (EODPlayerOwner->IsSwitchingWeapon())
-	{
-		if (EODPlayerOwner->IsPCTryingToMove())
-		{
-			RootMotionMode = ERootMotionMode::IgnoreRootMotion;
-		}
-		else
-		{
-			RootMotionMode = ERootMotionMode::RootMotionFromMontagesOnly;
-		}
-	
-	}
-	*/
-
-	/*
-	if (EODPlayerOwner->IsSwitchingWeapon() && EODPlayerOwner->GetEquippedWeaponAnimationReferences())
-	{
-		UAnimMontage* FullBodySwitchMontage = EODPlayerOwner->GetEquippedWeaponAnimationReferences()->WeaponSwitchFullBody.Get();
-		UAnimMontage* UpperBodySwitchMontage = EODPlayerOwner->GetEquippedWeaponAnimationReferences()->WeaponSwitchUpperBody.Get();
-
-		FName MontageSection;
-		// If weapon is currently sheathed then it means we are playing sheathe animation
-		if (EODPlayerOwner->IsWeaponSheathed())
-		{
-			MontageSection = UCharacterLibrary::SectionName_SheatheWeapon;
-		}
-		else
-		{
-			MontageSection = UCharacterLibrary::SectionName_UnsheatheWeapon;
-		}
-
-		if (FullBodySwitchMontage && UpperBodySwitchMontage)
-		{
-			float ForwardAxisValue = EODPlayerOwner->InputComponent->GetAxisValue(FName("MoveForward"));
-			float RightAxisValue = EODPlayerOwner->InputComponent->GetAxisValue(FName("MoveRight"));
-
-			DoSeamlessTransitionBetweenStillOrMovingMontage(FullBodySwitchMontage, UpperBodySwitchMontage, ForwardAxisValue, RightAxisValue, MontageSection, true);
-		}
-	}
-	*/
 	
 	if (EODPlayerOwner->IsUsingAnySkill() && EODPlayerOwner->SkillAllowsMovement())
 	{

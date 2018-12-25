@@ -149,24 +149,27 @@ private:
 		}
 	}
 
-	void TransitionBetweenMontages(UAnimMontage* TransitionFromMontage,
-								   UAnimMontage* TransitionToMontage,
-								   const FName Section,
-								   bool bZeroBlendOut = false);
+	void TransitionBetweenMontages(
+		UAnimMontage* TransitionFromMontage,
+		UAnimMontage* TransitionToMontage,
+		const FName Section,
+		bool bZeroBlendOut = false);
 
+	// DEPRECATED - doesn't work in multiplayer
+	void DoSeamlessTransitionBetweenStillOrMovingMontage(
+		UAnimMontage* StandStillMontage,
+		UAnimMontage* MovingMontage,
+		const float ForwardAxisInput,
+		const float RightAxisInput,
+		const FName Section,
+		bool bZeroBlendOut = false);
 
-	void DoSeamlessTransitionBetweenStillOrMovingMontage(UAnimMontage* StandStillMontage,
-														 UAnimMontage* MovingMontage,
-														 const float ForwardAxisInput,
-														 const float RightAxisInput,
-														 const FName Section,
-														 bool bZeroBlendOut = false);
-
-	void DoSeamlessTransitionBetweenStillOrMovingDirectionalMontage(UAnimMontage* StandStillMontage,
-																	UAnimMontage* MovingMontage,
-																	const float ForwardAxisInput,
-																	const float RightAxisInput,
-																	const FName BaseSection,
-																	bool bZeroBlendOut = false);
+	void DoSeamlessTransitionBetweenStillOrMovingDirectionalMontage(
+		UAnimMontage* StandStillMontage,
+		UAnimMontage* MovingMontage,
+		const float ForwardAxisInput,
+		const float RightAxisInput,
+		const FName BaseSection,
+		bool bZeroBlendOut = false);
 
 };

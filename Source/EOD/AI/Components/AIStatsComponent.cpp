@@ -3,7 +3,7 @@
 #include "EOD/AI/Components/AIStatsComponent.h"
 #include "EOD/Characters/AICharacterBase.h"
 #include "UI/FloatingHealthBarWidget.h"
-#include "Player/Components/EODWidgetComponent.h"
+#include "EOD/Characters/Components/EODWidgetComponent.h"
 
 #include "UnrealNetwork.h"
 #include "Components/ProgressBar.h"
