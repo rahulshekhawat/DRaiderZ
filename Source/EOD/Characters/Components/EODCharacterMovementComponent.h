@@ -35,7 +35,7 @@ private:
 	 * Once the rotation is complete, bUseCustomRotation is automatically set to false.
 	 * This overrides the behavior of 'bOrientRotationToMovement' and 'bUseControllerDesiredRotation' while true.
 	 */
-	UPROPERTY(ReplicatedUsing = OnRep_UseCustomRotation)
+	UPROPERTY(Replicated)
 	bool bUseCustomRotation;
 
 	UPROPERTY(Replicated)
@@ -68,8 +68,8 @@ public:
 	// NETWORK
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	UFUNCTION()
-	void OnRep_UseCustomRotation(bool bOldValue);
+	// UFUNCTION()
+	// void OnRep_UseCustomRotation(bool bOldValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetUseCustomRotation(bool bValue);

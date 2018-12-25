@@ -62,9 +62,6 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer)
 	AudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("Audio Component"));
 	AudioComponent->SetupAttachment(RootComponent);
 
-	// By default the weapon should be sheathed
-	bWeaponSheathed = true;
-
 	MaxWeaponSlots = 2;
 	
 	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
@@ -167,7 +164,6 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(APlayerCharacter, PrimaryWeaponID);
 
 	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(APlayerCharacter, bWeaponSheathed, COND_SkipOwner);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -1086,130 +1082,20 @@ void APlayerCharacter::ToggleSheathe()
 {
 	if (CanToggleSheathe())
 	{
-		if (GetController())
-		{
-			float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
-			float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
-			if (ForwardAxisValue == 0 && RightAxisValue == 0)
-			{
-				SetPCTryingToMove(false);
-			}
-			else
-			{
-				SetPCTryingToMove(true);
-			}
-		}
-
 		bool bNewValue = !IsWeaponSheathed();
 		SetWeaponSheathed(bNewValue);
-
-		// Since character can move while switching weapons
 		SetCharacterStateAllowsMovement(true);
 	}
-
-	/*
-	if (CanSwitchWeapon() && EquippedWeaponAnimationReferences && Controller)
-	{
-		float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
-		float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight")); 
-
-		// Play standstill animation
-		if (ForwardAxisValue == 0 && RightAxisValue == 0)
-		{
-			UAnimMontage* FullBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchFullBody.Get();
-			if (FullBodySwitchMontage)
-			{
-				if (IsWeaponSheathed())
-				{
-					PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
-				}
-				else
-				{
-					PlayAnimationMontage(FullBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
-				}
-
-			}
-		}
-		// Play moving animation
-		else
-		{
-			UAnimMontage* UpperBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get();
-			if (UpperBodySwitchMontage)
-			{
-				if (IsWeaponSheathed())
-				{
-					PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_UnsheatheWeapon, ECharacterState::SwitchingWeapon);
-				}
-				else
-				{
-					PlayAnimationMontage(UpperBodySwitchMontage, UCharacterLibrary::SectionName_SheatheWeapon, ECharacterState::SwitchingWeapon);
-				}
-			}
-		}
-
-		bool bNewValue = !IsWeaponSheathed();
-		SetWeaponSheathed(bNewValue);
-	}
-	*/
 }
-
-/*
-void APlayerCharacter::UpdatePCTryingToMove()
-{
-	PrintToScreen(this, FString("Updating PCTryingToMove"));
-
-	if (GetController() && GetController()->InputComponent)
-	{
-		float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
-		float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
-		if (ForwardAxisValue == 0 && RightAxisValue == 0)
-		{
-			SetPCTryingToMove(false);
-		}
-		else
-		{
-			SetPCTryingToMove(true);
-		}
-	}
-}
-*/
 
 void APlayerCharacter::PlayToggleSheatheAnimation()
 {
-	SetCharacterState(ECharacterState::SwitchingWeapon);
-
-	UAnimMontage* UpperBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get();
-	UAnimMontage* FullBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchFullBody.Get();
-
-	if (IsWeaponSheathed())
+	if (!EquippedWeaponAnimationReferences)
 	{
-		if (UpperBodySwitchMontage)
-		{
-			GetMesh()->GetAnimInstance()->Montage_Play(UpperBodySwitchMontage);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_SheatheWeapon);
-		}
-		if (FullBodySwitchMontage)
-		{
-			GetMesh()->GetAnimInstance()->Montage_Play(FullBodySwitchMontage);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_SheatheWeapon);
-		}
-	}
-	else
-	{
-		if (UpperBodySwitchMontage)
-		{
-			GetMesh()->GetAnimInstance()->Montage_Play(UpperBodySwitchMontage);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_UnsheatheWeapon);
-		}
-		if (FullBodySwitchMontage)
-		{
-			GetMesh()->GetAnimInstance()->Montage_Play(FullBodySwitchMontage);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_UnsheatheWeapon);
-		}
+		return;
 	}
 
-	/*
-	if (bPCTryingToMove)
+	if (IsPCTryingToMove())
 	{
 		UAnimMontage* UpperBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get();
 		if (UpperBodySwitchMontage)
@@ -1224,7 +1110,10 @@ void APlayerCharacter::PlayToggleSheatheAnimation()
 				GetMesh()->GetAnimInstance()->Montage_Play(UpperBodySwitchMontage);
 				GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_UnsheatheWeapon);
 			}
-			SetCharacterState(ECharacterState::SwitchingWeapon);
+			if (GetController() && GetController()->IsLocalPlayerController())
+			{
+				SetCharacterState(ECharacterState::SwitchingWeapon);
+			}
 		}
 	}
 	else
@@ -1242,10 +1131,12 @@ void APlayerCharacter::PlayToggleSheatheAnimation()
 				GetMesh()->GetAnimInstance()->Montage_Play(FullBodySwitchMontage);
 				GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_UnsheatheWeapon);
 			}
-			SetCharacterState(ECharacterState::SwitchingWeapon);
+			if (GetController() && GetController()->IsLocalPlayerController())
+			{
+				SetCharacterState(ECharacterState::SwitchingWeapon);
+			}
 		}
 	}
-	*/
 }
 
 void APlayerCharacter::OnToggleCharacterStatsUI()
@@ -2303,17 +2194,6 @@ bool APlayerCharacter::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw
 	return true;
 }
 
-void APlayerCharacter::SetWeaponSheathed(bool bNewValue)
-{
-	bWeaponSheathed = bNewValue;
-	PlayToggleSheatheAnimation();
-
-	if (Role < ROLE_Authority)
-	{
-		Server_SetWeaponSheathed(bNewValue);
-	}
-}
-
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
 	FString SkillIDString = FString("");
@@ -2398,11 +2278,6 @@ void APlayerCharacter::OnRep_SecondaryWeaponID()
 {
 }
 
-void APlayerCharacter::OnRep_WeaponSheathed()
-{
-	PlayToggleSheatheAnimation();
-}
-
 /*
 void APlayerCharacter::OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots)
 {
@@ -2480,14 +2355,4 @@ void APlayerCharacter::Multicast_AddPrimaryWeaponToCurrentSlot_Implementation(FN
 		ActiveWeaponSlotIndex = WeaponSlots.Add(WeaponSlot);
 	}
 	*/
-}
-
-void APlayerCharacter::Server_SetWeaponSheathed_Implementation(bool bNewValue)
-{
-	SetWeaponSheathed(bNewValue);
-}
-
-bool APlayerCharacter::Server_SetWeaponSheathed_Validate(bool bNewValue)
-{
-	return true;
 }

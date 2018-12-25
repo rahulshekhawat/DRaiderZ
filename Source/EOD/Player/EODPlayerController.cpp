@@ -383,7 +383,7 @@ void AEODPlayerController::ToggleMouseCursor()
 
 void AEODPlayerController::ToggleSheathe()
 {
-	if (EODCharacter)
+	if (IsValid(EODCharacter))
 	{
 		EODCharacter->ToggleSheathe();
 	}

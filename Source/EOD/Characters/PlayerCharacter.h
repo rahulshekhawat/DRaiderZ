@@ -216,8 +216,6 @@ public:
 
 	FORCEINLINE bool IsFastRunning() const;
 
-	FORCEINLINE bool IsWeaponSheathed() const;
-
 	/** Returns primary weapon actor */
 	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
 
@@ -347,10 +345,6 @@ public:
 
 	/** [server + local] Set the yaw for player's movement direction relative to player's forward direction */
 	void SetBlockMovementDirectionYaw(float NewYaw);
-
-	/** [server + local] Change player's weapon sheath state */
-	UFUNCTION(BlueprintCallable, Category = Combat)
-	void SetWeaponSheathed(bool bNewValue);
 
 	/** Event called when a new normal attack section starts playing */
 	void OnNormalAttackSectionStart(FName SectionName);
@@ -588,13 +582,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills, meta = (AllowPrivateAccess = "true"))
 	uint8 MaxNumberOfSkills;
 
-	/** Determines whether weapon is currently sheathed or not */
-	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
-	bool bWeaponSheathed;
-
-public:
-
-	// void UpdatePCTryingToMove();
 
 private:
 	/** Data table containing player animation references */
@@ -692,12 +679,10 @@ private:
 	// ACTIONS
 	////////////////////////////////////////////////////////////////////////////////
 private:
-
-
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe() override;
 
-	void PlayToggleSheatheAnimation();
+	virtual void PlayToggleSheatheAnimation() override;
 
 	/** Display or hide character stats UI */
 	void OnToggleCharacterStatsUI();
@@ -773,9 +758,6 @@ private:
 	UFUNCTION()
 	void OnRep_SecondaryWeaponID();
 
-	UFUNCTION()
-	void OnRep_WeaponSheathed();
-
 	// UFUNCTION()
 	// void OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots);
 
@@ -784,9 +766,6 @@ private:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetWeaponSheathed(bool bNewValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
@@ -833,11 +812,6 @@ inline void APlayerCharacter::DisableAutoRun()
 
 	SetCharacterState(ECharacterState::IdleWalkRun);
 	SetUseControllerRotationYaw(false);
-}
-
-FORCEINLINE bool APlayerCharacter::IsWeaponSheathed() const
-{
-	return bWeaponSheathed;
 }
 
 FORCEINLINE APrimaryWeapon* APlayerCharacter::GetPrimaryWeapon() const

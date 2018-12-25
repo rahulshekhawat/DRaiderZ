@@ -45,14 +45,46 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsRunning					= EODPlayerOwner->IsRunning();
 	BlockMovementDirectionYaw	= EODPlayerOwner->BlockMovementDirectionYaw;
 	bPCTryingToMove				= EODPlayerOwner->IsPCTryingToMove();
-	CurrentWeaponType			= EODPlayerOwner->GetEquippedWeaponType();
-	
-	if (!EODPlayerOwner->GetActiveAnimationReferences())
+
+	CurrentWeaponType = EODPlayerOwner->IsWeaponSheathed() ? EWeaponType::None : EODPlayerOwner->GetEquippedWeaponType();
+
+	FPlayerAnimationReferencesTableRow* AnimationReferences = EODPlayerOwner->GetActiveAnimationReferences();
+	if (!AnimationReferences)
 	{
 		return;
 	}
-	
-	FPlayerAnimationReferencesTableRow* AnimationReferences = EODPlayerOwner->GetActiveAnimationReferences();
+
+
+#if EOD_TEST_CODE_ENABLED
+	if (EODPlayerOwner->IsSwitchingWeapon() && EODPlayerOwner->GetEquippedWeaponAnimationReferences())
+	{
+		UAnimMontage* FullBodySwitchMontage = EODPlayerOwner->GetEquippedWeaponAnimationReferences()->WeaponSwitchFullBody.Get();
+		UAnimMontage* UpperBodySwitchMontage = EODPlayerOwner->GetEquippedWeaponAnimationReferences()->WeaponSwitchUpperBody.Get();
+
+		FName MontageSection;
+		// If weapon is currently sheathed then it means we are playing sheathe animation
+		if (EODPlayerOwner->IsWeaponSheathed())
+		{
+			MontageSection = UCharacterLibrary::SectionName_SheatheWeapon;
+		}
+		else
+		{
+			MontageSection = UCharacterLibrary::SectionName_UnsheatheWeapon;
+		}
+
+		if (FullBodySwitchMontage && UpperBodySwitchMontage)
+		{
+			// float ForwardAxisValue = EODPlayerOwner->InputComponent->GetAxisValue(FName("MoveForward"));
+			// float RightAxisValue = EODPlayerOwner->InputComponent->GetAxisValue(FName("MoveRight"));
+			float ForwardAxisValue = EODPlayerOwner->ForwardAxisValue;
+			float RightAxisValue = EODPlayerOwner->RightAxisValue;
+			DoSeamlessTransitionBetweenStillOrMovingMontage(FullBodySwitchMontage, UpperBodySwitchMontage, ForwardAxisValue, RightAxisValue, MontageSection, true);
+		}
+	}
+
+	return;
+#endif
+
 	if (EODPlayerOwner->IsDead())
 	{
 		UAnimMontage* DeathMontage = AnimationReferences->Die.Get();
@@ -142,6 +174,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 
+	/*
 	if (EODPlayerOwner->IsSwitchingWeapon())
 	{
 		if (EODPlayerOwner->IsPCTryingToMove())
@@ -152,7 +185,9 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			RootMotionMode = ERootMotionMode::RootMotionFromMontagesOnly;
 		}
+	
 	}
+	*/
 
 	/*
 	if (EODPlayerOwner->IsSwitchingWeapon() && EODPlayerOwner->GetEquippedWeaponAnimationReferences())

@@ -58,6 +58,9 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	bGodMode = false;
 	TargetSwitchDuration = 0.1f;
 
+	// By default the weapon should be sheathed
+	bWeaponSheathed = true;
+
 	// MaxNumberOfSkills = 30;
 	DodgeStaminaCost = 20;
 	DodgeImmunityTriggerDelay = 0.1f;
@@ -99,6 +102,7 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bIsRunning, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterState, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AEODCharacterBase, bWeaponSheathed, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bPCTryingToMove, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterMovementDirection, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bCharacterStateAllowsMovement, COND_SkipOwner);
@@ -481,6 +485,11 @@ void AEODCharacterBase::TurnOffTargetSwitch()
 	GetMesh()->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
 }
 
+void AEODCharacterBase::OnRep_WeaponSheathed()
+{
+	PlayToggleSheatheAnimation();
+}
+
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
 	//~ @todo : Cleanup old state
@@ -636,7 +645,6 @@ void AEODCharacterBase::StopInteraction()
 
 void AEODCharacterBase::ToggleSheathe()
 {
-
 }
 
 void AEODCharacterBase::StartNormalAttacking()
@@ -644,6 +652,10 @@ void AEODCharacterBase::StartNormalAttacking()
 }
 
 void AEODCharacterBase::StopNormalAttacking()
+{
+}
+
+void AEODCharacterBase::PlayToggleSheatheAnimation()
 {
 }
 
@@ -685,7 +697,6 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 	else
 	{
 		float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
-		GetCharacterMovement()->MaxWalkSpeed = Speed;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -738,6 +749,16 @@ void AEODCharacterBase::Server_SetCharMovementDir_Implementation(ECharMovementDi
 }
 
 bool AEODCharacterBase::Server_SetCharMovementDir_Validate(ECharMovementDirection NewDirection)
+{
+	return true;
+}
+
+void AEODCharacterBase::Server_SetWeaponSheathed_Implementation(bool bNewValue)
+{
+	SetWeaponSheathed(bNewValue);
+}
+
+bool AEODCharacterBase::Server_SetWeaponSheathed_Validate(bool bNewValue)
 {
 	return true;
 }

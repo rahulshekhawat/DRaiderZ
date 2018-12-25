@@ -18,8 +18,9 @@ void UEODCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetime
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UEODCharacterMovementComponent, DesiredCustomRotationYaw);
+	// DOREPLIFETIME(UEODCharacterMovementComponent, DesiredCustomRotationYaw);
 	DOREPLIFETIME_CONDITION(UEODCharacterMovementComponent, bUseCustomRotation, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(UEODCharacterMovementComponent, DesiredCustomRotationYaw, COND_SkipOwner);
 }
 
 void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
@@ -102,6 +103,7 @@ void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 	}
 }
 
+/*
 void UEODCharacterMovementComponent::OnRep_UseCustomRotation(bool bOldValue)
 {
 	// If the new rotation value is false, set it to true and let it auto-finish
@@ -110,6 +112,7 @@ void UEODCharacterMovementComponent::OnRep_UseCustomRotation(bool bOldValue)
 		bUseCustomRotation = true;
 	}
 }
+*/
 
 void UEODCharacterMovementComponent::Server_SetUseCustomRotation_Implementation(bool bValue)
 {

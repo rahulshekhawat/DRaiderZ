@@ -266,9 +266,37 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character Action")
 	virtual void StopNormalAttacking();
 
+	virtual void PlayToggleSheatheAnimation();
+
+
 	////////////////////////////////////////////////////////////////////////////////
 	// CHARACTER STATE
 	////////////////////////////////////////////////////////////////////////////////
+private:
+	/** Determines whether weapon is currently sheathed or not */
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
+	bool bWeaponSheathed;
+
+protected:
+	/** [server + local] Change player's weapon sheath state */
+	FORCEINLINE void SetWeaponSheathed(bool bNewValue)
+	{
+		bWeaponSheathed = bNewValue;
+		PlayToggleSheatheAnimation();
+		if (Role < ROLE_Authority)
+		{
+			Server_SetWeaponSheathed(bNewValue);
+		}
+	}
+
+	inline void UpdatePCTryingToMove();
+
+	inline void UpdateCharacterMovementDirection();
+
+	void UpdateDesiredYawFromAxisInput();
+
+	void UpdateMovement(float DeltaTime);
+
 public:
 	/** Cached value of player's forward axis input */
 	UPROPERTY()
@@ -278,14 +306,7 @@ public:
 	UPROPERTY()
 	float RightAxisValue;
 
-protected:	
-	inline void UpdatePCTryingToMove();
-
-	inline void UpdateCharacterMovementDirection();
-
-	void UpdateDesiredYawFromAxisInput();
-
-	void UpdateMovement(float DeltaTime);
+	FORCEINLINE bool IsWeaponSheathed() const { return bWeaponSheathed; }
 
 public:
 	/** Returns true if character is alive */
@@ -555,7 +576,7 @@ public:
 	bool BP_IsInCombat() const;
 
 	/** [server + client] Set current state of character */
-	inline void SetCharacterState(const ECharacterState NewState);
+	FORCEINLINE void SetCharacterState(const ECharacterState NewState);
 
 	/** [server + client] Set current state of character */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
@@ -826,7 +847,13 @@ protected:
 	////////////////////////////////////////////////////////////////////////////////
 private:
 	UFUNCTION()
+	void OnRep_WeaponSheathed();
+
+	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetWeaponSheathed(bool bNewValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIsRunning(bool bValue);
@@ -1116,10 +1143,9 @@ FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
 	TurnOnTargetSwitch();
 }
 
-inline void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
+FORCEINLINE void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
 {
 	CharacterState = NewState;
-
 	if (Role < ROLE_Authority)
 	{
 		Server_SetCharacterState(NewState);
