@@ -6,6 +6,8 @@
 #include "AnimInstances/CharAnimInstance.h"
 #include "HumanCharAnimInstance.generated.h"
 
+class AHumanCharacter;
+
 /**
  * 
  */
@@ -25,5 +27,16 @@ public:
 
 	virtual void NativeUninitializeAnimation() override;
 
-	
+	/** Blend time for transitions between the animations coming from various state machines in main anim graph */
+	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Human Character Animation")
+	float MasterStateMachine_AnimationsBlendTime;
+
+	UPROPERTY(Transient, BlueprintReadonly, Category = "Human Character Animation")
+	EWeaponType CurrentWeaponType;
+
+private:
+	UPROPERTY()
+	AHumanCharacter* HumanOwner;
+
+
 };

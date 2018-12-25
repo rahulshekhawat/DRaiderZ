@@ -1,10 +1,9 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "PlayerAnimInstance.h"
-#include "EOD/Characters/PlayerCharacter.h"
+#include "EOD/AnimInstances/PlayerAnimInstance.h"
 #include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Statics/CharacterLibrary.h"
-#include "EOD/Player/EODPlayerController.h"
+#include "EOD/Characters/PlayerCharacter.h"
 
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -40,13 +39,13 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 
-	MovementSpeed = EODPlayerOwner->GetVelocity().Size();
-	CharacterMovementDirection = EODPlayerOwner->GetCharacterMovementDirection();
-	bIsBlocking = EODPlayerOwner->IsBlocking();
-	bIsRunning = EODPlayerOwner->IsRunning();
-	BlockMovementDirectionYaw = EODPlayerOwner->BlockMovementDirectionYaw;
-	bPCTryingToMove = EODPlayerOwner->IsPCTryingToMove();
-	CurrentWeaponType = EODPlayerOwner->GetEquippedWeaponType();
+	MovementSpeed				= EODPlayerOwner->GetVelocity().Size();
+	CharacterMovementDirection	= EODPlayerOwner->GetCharacterMovementDirection();
+	bIsBlocking					= EODPlayerOwner->IsBlocking();
+	bIsRunning					= EODPlayerOwner->IsRunning();
+	BlockMovementDirectionYaw	= EODPlayerOwner->BlockMovementDirectionYaw;
+	bPCTryingToMove				= EODPlayerOwner->IsPCTryingToMove();
+	CurrentWeaponType			= EODPlayerOwner->GetEquippedWeaponType();
 	
 	if (!EODPlayerOwner->GetActiveAnimationReferences())
 	{
@@ -54,7 +53,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 	
 	FPlayerAnimationReferencesTableRow* AnimationReferences = EODPlayerOwner->GetActiveAnimationReferences();
-
 	if (EODPlayerOwner->IsDead())
 	{
 		UAnimMontage* DeathMontage = AnimationReferences->Die.Get();
@@ -286,19 +284,12 @@ EWeaponType UPlayerAnimInstance::GetWeaponAnimationType() const
 		return EODPlayerOwner->GetEquippedWeaponType();
 	}
 
-	/*
-	if (EODPlayerOwner && EODPlayerOwner->GetCurrentWeaponSlot() && EODPlayerOwner->GetCurrentWeaponSlot()->PrimaryWeapon)
-	{
-		return EODPlayerOwner->GetCurrentWeaponSlot()->PrimaryWeapon->WeaponType;
-	}
-	*/
-
 	return EWeaponType::None;
 }
 
 void UPlayerAnimInstance::HandleMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	if (EODPlayerOwner)
+	if (IsValid(EODPlayerOwner))
 	{
 		EODPlayerOwner->OnMontageBlendingOut(AnimMontage, bInterrupted);
 	}
@@ -331,20 +322,6 @@ void UPlayerAnimInstance::HandleMontageEnded(UAnimMontage* AnimMontage, bool bIn
 		EODPlayerOwner->OnMontageEnded(AnimMontage, bInterrupted);
 	}
 }
-
-/*
-APlayerCharacter * UPlayerAnimInstance::CastPawnOwnerToPlayerCharacter()
-{
-	APlayerCharacter* PlayerChar = nullptr;
-
-	if (TryGetPawnOwner())
-	{
-		PlayerChar = Cast<APlayerCharacter>(TryGetPawnOwner());
-	}
-
-	return PlayerChar;
-}
-*/
 
 void UPlayerAnimInstance::DoSeamlessTransitionBetweenStillOrMovingMontage(UAnimMontage* StandStillMontage, UAnimMontage* MovingMontage, const float ForwardAxisInput, const float RightAxisInput, const FName Section, bool bZeroBlendOut)
 {

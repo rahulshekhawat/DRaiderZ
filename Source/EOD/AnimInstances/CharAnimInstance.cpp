@@ -1,6 +1,6 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "CharAnimInstance.h"
+#include "EOD/AnimInstances/CharAnimInstance.h"
 #include "EOD/Characters/EODCharacterBase.h"
 
 
@@ -36,7 +36,6 @@ void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	MovementSpeed = EODCharacterOwner->GetVelocity().Size();
 	CharacterMovementDirection = EODCharacterOwner->GetCharacterMovementDirection();
 	bIsBlocking = EODCharacterOwner->IsBlocking();
-
 }
 
 void UCharAnimInstance::NativePostEvaluateAnimation()

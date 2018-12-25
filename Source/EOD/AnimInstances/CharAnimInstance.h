@@ -31,12 +31,21 @@ public:
 	/** Blend time for transition between IdleWalkRun animations (of all state machines) */
 	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "EOD Character Animation")
 	float IdleWalkRun_AnimationsBlendTime;
+	
+	UPROPERTY(Transient, BlueprintReadonly, Category = "EOD Character Animation")
+	float BlockMovementDirectionYaw;
 
 	UPROPERTY(Transient, BlueprintReadonly, Category = "EOD Character Animation")
 	float MovementSpeed;
 
 	UPROPERTY(Transient, BlueprintReadonly, Category = "EOD Character Animation")
 	bool bIsBlocking;
+
+	UPROPERTY(Transient, BlueprintReadonly, Category = "EOD Character Animation")
+	bool bIsRunning;
+
+	UPROPERTY(Transient, BlueprintReadonly, Category = "EOD Character Animation")
+	bool bPCTryingToMove;
 
 	UPROPERTY(Transient, BlueprintReadonly, Category = "EOD Character Animation")
 	ECharMovementDirection CharacterMovementDirection;

@@ -61,28 +61,33 @@ public:
 	UPROPERTY(Transient, BlueprintReadonly, Category = "Player Anim Instance")
 	EWeaponType CurrentWeaponType;
 
-	//~ Begin functions to update animation blueprint
+	// DEPRECATED
 	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
 	bool IsBlocking() const;
 
+	// DEPRECATED
 	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
 	bool IsFastRunning() const;
 
+	// DEPRECATED
 	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
 	ECharMovementDirection GetIWRCharMovementDir() const;
 	
+	// DEPRECATED
 	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
 	float GetMovementSpeed() const;
 	
+	// DEPRECATED
 	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
 	float GetBlockMovementDirectionYaw() const;
 
+	// DEPRECATED
 	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
 	bool IsPCTryingToMove() const;
 	
+	// DEPRECATED
 	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
 	EWeaponType GetWeaponAnimationType() const;
-	//~ End functions to update animation blueprint
 
 private:
 	UFUNCTION()
