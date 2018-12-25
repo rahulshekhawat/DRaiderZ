@@ -341,15 +341,9 @@ void AEODCharacterBase::SetWalkSpeed(const float WalkSpeed)
 	}
 }
 
-void AEODCharacterBase::SetCharacterRotation(const FRotator NewRotation)
+void AEODCharacterBase::BP_SetCharacterRotation(const FRotator NewRotation)
 {
-	GetCharacterMovement()->FlushServerMoves();
-	SetActorRotation(NewRotation);
-
-	if (Role < ROLE_Authority)
-	{
-		Server_SetCharacterRotation(NewRotation);
-	}
+	SetCharacterRotation(NewRotation);
 }
 
 void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)

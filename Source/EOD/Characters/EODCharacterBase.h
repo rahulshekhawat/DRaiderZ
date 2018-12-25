@@ -91,10 +91,10 @@ private:
 	UPROPERTY(Replicated)
 	ECharMovementDirection CharacterMovementDirection;
 
+protected:
 	UPROPERTY()
 	float DesiredRotationYawFromAxisInput;
 
-protected:
 	/**
 	 * This bool is used to determine if the character can move even if it's not in 'IdleWalkRun' state.
 	 * e.g., moving while casting spell.
@@ -155,7 +155,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Get Rotation Yaw From Axis Input"))
 	float BP_GetRotationYawFromAxisInput() const;
 
-	inline float GetControllerRotationYaw() const;
+	/**
+	 * Returns controller rotation yaw in -180/180 range.
+	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
+	 */
+	FORCEINLINE float GetControllerRotationYaw() const
+	{
+		if (GetController())
+		{
+			return FMath::UnwindDegrees(GetController()->GetControlRotation().Yaw);
+		}
+		return 0.f;
+	}
 
 	/**
 	 * Returns controller rotation yaw in -180/180 range.
@@ -594,12 +605,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	void SetWalkSpeed(const float WalkSpeed);
 
-	/** Change character rotation */
-	// void 
+	/** [server + client] Change character rotation. Do not use this for consecutive rotation change */
+	FORCEINLINE void SetCharacterRotation(const FRotator NewRotation)
+	{
+		// Following line of code has been commented out intentionally and this function can no longer be used for consecutive rotation change.
+		// GetCharacterMovement()->FlushServerMoves(); 
+		SetActorRotation(NewRotation);
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharacterRotation(NewRotation);
+		}
+	}
 
-	/** [server + client] Change character rotation */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
-	void SetCharacterRotation(const FRotator NewRotation);
+	/** [server + client] Change character rotation. Do not use this for consecutive rotation change */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character Rotation"))
+	void BP_SetCharacterRotation(const FRotator NewRotation);
 
 	/** [server + client] Set whether character should use controller rotation yaw or not */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
@@ -977,27 +997,6 @@ inline float AEODCharacterBase::GetRotationYawFromAxisInput() const
 		}
 	}
 	return FMath::UnwindDegrees(ResultingRotation);
-}
-
-inline float AEODCharacterBase::GetControllerRotationYaw() const
-{
-	// Make sure the character is controlled
-	if (GetController())
-	{
-		float ControlRotationYaw = GetController()->GetControlRotation().Yaw;
-
-		if (0 <= ControlRotationYaw && ControlRotationYaw <= 180)
-			return ControlRotationYaw;
-		else if (180 < ControlRotationYaw && ControlRotationYaw < 360)
-		{
-			return (ControlRotationYaw - 360.f);
-		}
-		else if (ControlRotationYaw == 360)
-			return 0.f;
-		else
-			return ControlRotationYaw;
-	}
-	return 0.f;
 }
 
 FORCEINLINE void AEODCharacterBase::EnableInteractionSphere()

@@ -330,7 +330,7 @@ void AEODPlayerController::OnReleasingNormalAttackKey()
 
 void AEODPlayerController::AttemptDodge()
 {
-	if (EODCharacter)
+	if (IsValid(EODCharacter))
 	{
 		if (IsAutoMoveEnabled())
 		{
@@ -341,6 +341,7 @@ void AEODPlayerController::AttemptDodge()
 		if (StatsComponent->GetCurrentStamina() >= DodgeCost)
 		{
 			bool bResult = EODCharacter->StartDodging();
+			// If character successfully started 'dodge'
 			if (bResult)
 			{
 				StatsComponent->ModifyCurrentStamina(-DodgeCost);

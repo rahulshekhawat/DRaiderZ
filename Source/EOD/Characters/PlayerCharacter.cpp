@@ -894,8 +894,65 @@ void APlayerCharacter::SetActiveWeaponSlotIndex(int32 NewSlotIndex)
 
 bool APlayerCharacter::StartDodging()
 {
-	UKismetSystemLibrary::PrintString(this, FString("Dodged"));
-	return false;
+	// If the animations for dodge are missing
+	if (!GetActiveAnimationReferences())
+	{
+		return false;
+	}
+	UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
+	if (!DodgeMontage)
+	{
+		return false;
+	}
+
+	// Disable movement during dodge
+	if (bCharacterStateAllowsMovement)
+	{
+		SetCharacterStateAllowsMovement(true);
+	}
+
+	// Rotate character
+	float DesiredYaw = GetControllerRotationYaw();
+	if (ForwardAxisValue != 0)
+	{
+		DesiredYaw = DesiredRotationYawFromAxisInput;
+	}
+	SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+
+	FName SectionToPlay;
+	if (ForwardAxisValue == 0)
+	{
+		if (RightAxisValue > 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_RightDodge;
+		}
+		else if (RightAxisValue < 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_LeftDodge;
+		}
+		else
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
+		}
+	}
+	else
+	{
+		if (ForwardAxisValue > 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_ForwardDodge;
+		}
+		else if (ForwardAxisValue < 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
+		}
+	}
+	PlayAnimationMontage(DodgeMontage, SectionToPlay, ECharacterState::Dodging);
+
+	// Enable iFrames with a delay
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindUFunction(this, FName("EnableiFrames"), DodgeImmunityDuration);
+	GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
+	return true;
 }
 
 void APlayerCharacter::OnDodge()
