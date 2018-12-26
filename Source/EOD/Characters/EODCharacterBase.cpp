@@ -638,7 +638,6 @@ void AEODCharacterBase::EnableCharacterGuard()
 
 	bUseControllerRotationYaw = true;
 	SetCharacterState(ECharacterState::Blocking);
-
 }
 
 void AEODCharacterBase::DisableCharacterGuard()

@@ -288,6 +288,7 @@ public:
 	{
 		SetGuardActive(true);
 		StartBlockingDamage(DamageBlockTriggerDelay);
+		SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetStatsComponent()->GetMovementSpeedModifier());
 	}
 
 	FORCEINLINE void DeactivateGuard() { }
