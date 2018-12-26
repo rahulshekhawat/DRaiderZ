@@ -908,7 +908,7 @@ bool APlayerCharacter::StartDodging()
 	// Disable movement during dodge
 	if (bCharacterStateAllowsMovement)
 	{
-		SetCharacterStateAllowsMovement(true);
+		SetCharacterStateAllowsMovement(false);
 	}
 
 	// Rotate character
