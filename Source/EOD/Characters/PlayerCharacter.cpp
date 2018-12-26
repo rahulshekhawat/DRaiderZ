@@ -894,65 +894,70 @@ void APlayerCharacter::SetActiveWeaponSlotIndex(int32 NewSlotIndex)
 
 bool APlayerCharacter::StartDodging()
 {
-	// If the animations for dodge are missing
 	if (!GetActiveAnimationReferences())
 	{
 		return false;
 	}
+	// If the animations for dodge are missing
 	UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
 	if (!DodgeMontage)
 	{
 		return false;
 	}
 
-	// Disable movement during dodge
-	if (bCharacterStateAllowsMovement)
+	if (IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking())
 	{
-		SetCharacterStateAllowsMovement(false);
-	}
-
-	// Rotate character
-	float DesiredYaw = GetControllerRotationYaw();
-	if (ForwardAxisValue != 0)
-	{
-		DesiredYaw = DesiredRotationYawFromAxisInput;
-	}
-	SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-
-	FName SectionToPlay;
-	if (ForwardAxisValue == 0)
-	{
-		if (RightAxisValue > 0)
+		// Disable movement during dodge
+		if (bCharacterStateAllowsMovement)
 		{
-			SectionToPlay = UCharacterLibrary::SectionName_RightDodge;
+			SetCharacterStateAllowsMovement(false);
 		}
-		else if (RightAxisValue < 0)
+
+		// Rotate character
+		float DesiredYaw = GetControllerRotationYaw();
+		if (ForwardAxisValue != 0)
 		{
-			SectionToPlay = UCharacterLibrary::SectionName_LeftDodge;
+			DesiredYaw = DesiredRotationYawFromAxisInput;
+		}
+		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+
+		FName SectionToPlay;
+		if (ForwardAxisValue == 0)
+		{
+			if (RightAxisValue > 0)
+			{
+				SectionToPlay = UCharacterLibrary::SectionName_RightDodge;
+			}
+			else if (RightAxisValue < 0)
+			{
+				SectionToPlay = UCharacterLibrary::SectionName_LeftDodge;
+			}
+			else
+			{
+				SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
+			}
 		}
 		else
 		{
-			SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
+			if (ForwardAxisValue > 0)
+			{
+				SectionToPlay = UCharacterLibrary::SectionName_ForwardDodge;
+			}
+			else if (ForwardAxisValue < 0)
+			{
+				SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
+			}
 		}
-	}
-	else
-	{
-		if (ForwardAxisValue > 0)
-		{
-			SectionToPlay = UCharacterLibrary::SectionName_ForwardDodge;
-		}
-		else if (ForwardAxisValue < 0)
-		{
-			SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
-		}
-	}
-	PlayAnimationMontage(DodgeMontage, SectionToPlay, ECharacterState::Dodging);
+		PlayAnimationMontage(DodgeMontage, SectionToPlay, ECharacterState::Dodging);
 
-	// Enable iFrames with a delay
-	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindUFunction(this, FName("EnableiFrames"), DodgeImmunityDuration);
-	GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
-	return true;
+		// Enable iFrames with a delay
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), DodgeImmunityDuration);
+		GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
+		return true;
+	}
+
+	return false;
 }
 
 void APlayerCharacter::OnDodge()
@@ -962,40 +967,6 @@ void APlayerCharacter::OnDodge()
 	{
 		SetUseControllerRotationYaw(false);
 	}
-
-	/*
-	if (IsAutoRunning())
-	{
-		DisableAutoRun();
-	}
-	*/
-
-	/*
-	if (CanDodge())
-	{
-		int32 DodgeCost = DodgeStaminaCost * GetStatsComponent()->GetStaminaConsumptionModifier();
-		GetStatsComponent()->ModifyCurrentStamina(-DodgeCost);
-
-		float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-		float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
-		float DesiredYaw;
-
-		if (ForwardAxisValue != 0)
-		{
-			DesiredYaw = GetRotationYawFromAxisInput();
-		}
-		else
-		{
-			DesiredYaw = GetControllerRotationYaw();
-		}
-
-		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), DodgeImmunityDuration);
-		GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
-	}
-	*/
 
 	if (CanDodge() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Dodge.Get())
 	{

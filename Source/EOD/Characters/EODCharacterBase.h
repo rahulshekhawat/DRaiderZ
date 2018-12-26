@@ -188,6 +188,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
 	float DefaultWalkSpeedWhileBlocking;
 
+	/** [server + local] Plays an animation montage and changes character state over network */
+	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
 	////////////////////////////////////////////////////////////////////////////////
 	// COMPONENTS
@@ -702,9 +704,6 @@ public:
 
 	/** [server + client] Plays an animation montage over network */
 	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
-	
-	/** [server + client] Plays an animation montage and changes character state over network */
-	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
 	//~ @note UFUNCTIONs don't allow function overloading
 	/** [server + client] Plays an animation montage and changes character state over network */
@@ -1203,7 +1202,7 @@ FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
 	return LastUsedSkillInfo;
 }
 
-inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay)
+inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay)
 {
 	if (GetMesh()->GetAnimInstance())
 	{
@@ -1212,7 +1211,7 @@ inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay
 	}
 }
 
-inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
+inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
 	if (GetMesh()->GetAnimInstance())
 	{
