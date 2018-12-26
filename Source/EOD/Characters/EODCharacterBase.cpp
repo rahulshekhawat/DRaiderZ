@@ -104,7 +104,7 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bIsRunning, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterState, COND_SkipOwner);
+	// DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterState, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bWeaponSheathed, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bPCTryingToMove, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterMovementDirection, COND_SkipOwner);

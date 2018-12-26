@@ -1151,58 +1151,19 @@ void APlayerCharacter::PlayToggleSheatheAnimation()
 	{
 		return;
 	}
+	
+	UAnimMontage* MontageToPlay = IsPCTryingToMove() ? EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get() :
+		EquippedWeaponAnimationReferences->WeaponSwitchFullBody.Get();
+	FName SectionToPlay = IsWeaponSheathed() ? UCharacterLibrary::SectionName_SheatheWeapon :
+		UCharacterLibrary::SectionName_UnsheatheWeapon;
 
-	if (IsPCTryingToMove())
+	UPlayerAnimInstance* PlayerAnimInstance = GetMesh()->GetAnimInstance() ? Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()) : nullptr;
+	if (PlayerAnimInstance)
 	{
-		UAnimMontage* UpperBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get();
-		if (UpperBodySwitchMontage)
-		{
-			if (IsWeaponSheathed())
-			{
-				GetMesh()->GetAnimInstance()->Montage_Play(UpperBodySwitchMontage);
-				GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_SheatheWeapon);
-			}
-			else
-			{
-				GetMesh()->GetAnimInstance()->Montage_Play(UpperBodySwitchMontage);
-				GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_UnsheatheWeapon);
-			}
-			if (GetController() && GetController()->IsLocalPlayerController())
-			{
-				SetCharacterState(ECharacterState::SwitchingWeapon);
-			}
-			UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-			if (PlayerAnimInstance)
-			{
-				PlayerAnimInstance->OnTransitionableMontageTriggered(true);
-			}
-		}
-	}
-	else
-	{
-		UAnimMontage* FullBodySwitchMontage = EquippedWeaponAnimationReferences->WeaponSwitchFullBody.Get();
-		if (FullBodySwitchMontage)
-		{
-			if (IsWeaponSheathed())
-			{
-				GetMesh()->GetAnimInstance()->Montage_Play(FullBodySwitchMontage);
-				GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_SheatheWeapon);
-			}
-			else
-			{
-				GetMesh()->GetAnimInstance()->Montage_Play(FullBodySwitchMontage);
-				GetMesh()->GetAnimInstance()->Montage_JumpToSection(UCharacterLibrary::SectionName_UnsheatheWeapon);
-			}
-			if (GetController() && GetController()->IsLocalPlayerController())
-			{
-				SetCharacterState(ECharacterState::SwitchingWeapon);
-			}
-			UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-			if (PlayerAnimInstance)
-			{
-				PlayerAnimInstance->OnTransitionableMontageTriggered(false);
-			}
-		}
+		PlayerAnimInstance->Montage_Play(MontageToPlay);
+		PlayerAnimInstance->Montage_JumpToSection(SectionToPlay);
+		PlayerAnimInstance->OnTransitionableMontageTriggered(false);
+		SetCharacterState(ECharacterState::SwitchingWeapon);
 	}
 }
 
