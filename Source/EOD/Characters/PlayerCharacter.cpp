@@ -93,8 +93,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("Backward", IE_Released, this, &APlayerCharacter::OnReleasedBackward);
 
 	/*
-	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
-	PlayerInputComponent->BindAction("Block", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
+	PlayerInputComponent->BindAction("Guard", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
+	PlayerInputComponent->BindAction("Guard", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
 
 	PlayerInputComponent->BindAction("NormalAttack", IE_Pressed, this, &APlayerCharacter::OnPressedNormalAttack);
 	PlayerInputComponent->BindAction("NormalAttack", IE_Released, this, &APlayerCharacter::OnReleasedNormalAttack);
@@ -210,10 +210,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (Controller && Controller->IsLocalPlayerController())
 	{
+		/*
 		if (IsSwitchingWeapon())
 		{
 			UpdatePCTryingToMove();
 		}
+		*/
 
 		/*
 		// If block key is pressed but the character is not blocking
@@ -258,10 +260,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 		*/
 
+		/*
 		if (bRotateSmoothly)
 		{
 			bRotateSmoothly = !DeltaRotateCharacterToDesiredYaw(DesiredSmoothRotationYaw, DeltaTime);
 		}
+		*/
 	}
 }
 
@@ -969,8 +973,8 @@ void APlayerCharacter::OnDodge()
 		int32 DodgeCost = DodgeStaminaCost * GetStatsComponent()->GetStaminaConsumptionModifier();
 		GetStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 
-		float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-		float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
+		// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+		// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
 		float DesiredYaw = GetControllerRotationYaw();
 
 		if (ForwardAxisValue != 0)
@@ -1349,8 +1353,8 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 
 void APlayerCharacter::UpdateBlockState(float DeltaTime)
 {
-	float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-	float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
+	// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+	// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
 	
 	if (ForwardAxisValue == 0)
 	{
@@ -1388,8 +1392,8 @@ void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 
 	bool bRotatePlayer = DesiredPlayerRotationYaw == ActorRotationYaw ? false : true;
 
-	float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-	float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
+	// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
+	// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
 	if (ForwardAxisValue == 0 && RightAxisValue == 0)
 	{
 		bRotatePlayer = false;

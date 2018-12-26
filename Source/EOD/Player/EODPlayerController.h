@@ -154,12 +154,10 @@ private:
 
 	FORCEINLINE void DisableAutoMove();
 
-	UPROPERTY(Replicated)
-	bool bBlockKeyPressed;
-
-	FORCEINLINE bool IsBlockKeyPressed() const;
-
-	FORCEINLINE void SetBlockKeyPressed(bool bValue);
+	FORCEINLINE bool IsBlockKeyPressed() const
+	{
+		return IsValid(EODCharacter) ? EODCharacter->IsBlockKeyPressed() : false;
+	}
 
 	/** Move controlled pawn forward/backward */
 	void MovePawnForward(const float Value);
@@ -188,9 +186,9 @@ private:
 	/** Put or remove weapon inside sheath */
 	void ToggleSheathe();
 
-	void OnPressingBlockKey();
+	void OnPressingGuardKey();
 
-	void OnReleasingBlockKey();
+	void OnReleasingGuardKey();
 
 	void OnPressingEscapeKey();
 
@@ -230,9 +228,6 @@ private:
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetAutoMoveEnabled(bool bValue);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetBlockKeyPressed(bool bValue);
 
 };
 
@@ -296,20 +291,6 @@ FORCEINLINE void AEODPlayerController::DisableAutoMove()
 	if (EODCharacter)
 	{
 		EODCharacter->SetUseControllerRotationYaw(false);
-	}
-}
-
-FORCEINLINE bool AEODPlayerController::IsBlockKeyPressed() const
-{
-	return bBlockKeyPressed;
-}
-
-FORCEINLINE void AEODPlayerController::SetBlockKeyPressed(bool bValue)
-{
-	bBlockKeyPressed = bValue;
-	if (Role < ROLE_Authority)
-	{
-		Server_SetBlockKeyPressed(bValue);
 	}
 }
 

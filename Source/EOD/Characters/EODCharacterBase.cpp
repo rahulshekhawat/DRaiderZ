@@ -14,7 +14,6 @@
 #include "UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 
 AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
@@ -84,12 +83,16 @@ void AEODCharacterBase::Tick(float DeltaTime)
 			UpdateMovement(DeltaTime);
 		}
 
-		/*
-		if (IsMoving())
+		// If block key is pressed but the character is not blocking
+		if (bGuardKeyPressed && !IsGuardActive() && CanGuardAttacks())
 		{
-			UpdateMovement(DeltaTime);
+			ActivateGuard();
 		}
-		*/
+		// If block is not pressed but character is blocking
+		else if (!bGuardKeyPressed && IsGuardActive())
+		{
+			DeactivateGuard();
+		}
 	}
 }
 
@@ -104,7 +107,7 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bIsRunning, COND_SkipOwner);
-	// DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterState, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AEODCharacterBase, bGuardActive, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bWeaponSheathed, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bPCTryingToMove, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterMovementDirection, COND_SkipOwner);
@@ -175,6 +178,11 @@ bool AEODCharacterBase::CanJump() const
 bool AEODCharacterBase::CanDodge() const
 {
 	return CharacterState == ECharacterState::IdleWalkRun;
+}
+
+bool AEODCharacterBase::CanGuardAttacks() const
+{
+	return true;
 }
 
 bool AEODCharacterBase::CanBlock() const
@@ -336,14 +344,9 @@ ECharacterState AEODCharacterBase::BP_GetCharacterState() const
 	return GetCharacterState();
 }
 
-void AEODCharacterBase::SetWalkSpeed(const float WalkSpeed)
+void AEODCharacterBase::BP_SetWalkSpeed(const float WalkSpeed)
 {
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	
-	if (Role < ROLE_Authority)
-	{
-		Server_SetWalkSpeed(WalkSpeed);
-	}
+	SetWalkSpeed(WalkSpeed);
 }
 
 void AEODCharacterBase::BP_SetCharacterRotation(const FRotator NewRotation)
@@ -492,9 +495,24 @@ void AEODCharacterBase::OnRep_WeaponSheathed()
 	PlayToggleSheatheAnimation();
 }
 
+void AEODCharacterBase::OnRep_GuardActive()
+{
+	ActivateGuard();
+}
+
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
 	//~ @todo : Cleanup old state
+}
+
+void AEODCharacterBase::Server_StartBlockingDamage_Implementation(float Delay)
+{
+	StartBlockingDamage(Delay);
+}
+
+bool AEODCharacterBase::Server_StartBlockingDamage_Validate(float Delay)
+{
+	return true;
 }
 
 void AEODCharacterBase::Server_TriggeriFrames_Implementation(float Duration, float Delay)
@@ -610,25 +628,23 @@ bool AEODCharacterBase::StopDodging()
 	return true;
 }
 
-bool AEODCharacterBase::StartBlockingAttacks()
+void AEODCharacterBase::EnableCharacterGuard()
 {
-	if (CanBlock())
+	// @todo wait for normal attack section to finish before blocking?
+	if (IsNormalAttacking())
 	{
-		return true;
+		StopNormalAttacking();
 	}
 
-	return false;
+	bUseControllerRotationYaw = true;
+	SetCharacterState(ECharacterState::Blocking);
+
 }
 
-bool AEODCharacterBase::StopBlockingAttacks()
+void AEODCharacterBase::DisableCharacterGuard()
 {
-	if (IsBlocking())
-	{
-
-	}
-
-	return true;
 }
+
 
 void AEODCharacterBase::TriggerInteraction()
 {
@@ -760,6 +776,16 @@ void AEODCharacterBase::Server_SetWeaponSheathed_Implementation(bool bNewValue)
 }
 
 bool AEODCharacterBase::Server_SetWeaponSheathed_Validate(bool bNewValue)
+{
+	return true;
+}
+
+void AEODCharacterBase::Server_SetGuardActive_Implementation(bool bValue)
+{
+	SetGuardActive(bValue);
+}
+
+bool AEODCharacterBase::Server_SetGuardActive_Validate(bool bValue)
 {
 	return true;
 }

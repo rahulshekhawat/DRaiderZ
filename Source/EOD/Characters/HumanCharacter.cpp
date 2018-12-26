@@ -89,14 +89,12 @@ bool AHumanCharacter::StopDodging()
 	return false;
 }
 
-bool AHumanCharacter::StartBlockingAttacks()
+void AHumanCharacter::EnableCharacterGuard()
 {
-	return false;
 }
 
-bool AHumanCharacter::StopBlockingAttacks()
+void AHumanCharacter::DisableCharacterGuard()
 {
-	return false;
 }
 
 void AHumanCharacter::OnPressedForward()

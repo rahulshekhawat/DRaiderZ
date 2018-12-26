@@ -89,9 +89,9 @@ public:
 
 	virtual bool StopDodging() override;
 
-	virtual bool StartBlockingAttacks() override;
+	virtual void EnableCharacterGuard() override;
 
-	virtual bool StopBlockingAttacks() override;
+	virtual void DisableCharacterGuard() override;
 
 	////////////////////////////////////////////////////////////////////////////////
 	// INPUT

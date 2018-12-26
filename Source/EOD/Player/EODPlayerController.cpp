@@ -39,8 +39,8 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &AEODPlayerController::ZoomInCamera);
 	InputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &AEODPlayerController::ZoomOutCamera);
 
-	InputComponent->BindAction("Block", IE_Pressed, this, &AEODPlayerController::OnPressingBlockKey);
-	InputComponent->BindAction("Block", IE_Released, this, &AEODPlayerController::OnReleasingBlockKey);
+	InputComponent->BindAction("Guard", IE_Pressed, this, &AEODPlayerController::OnPressingGuardKey);
+	InputComponent->BindAction("Guard", IE_Released, this, &AEODPlayerController::OnReleasingGuardKey);
 
 	InputComponent->BindAction("NormalAttack", IE_Pressed, this, &AEODPlayerController::OnPressingNormalAttackKey);
 	InputComponent->BindAction("NormalAttack", IE_Released, this, &AEODPlayerController::OnReleasingNormalAttackKey);
@@ -113,8 +113,6 @@ void AEODPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AEODPlayerController, bAutoMoveEnabled, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(AEODPlayerController, bBlockKeyPressed, COND_SkipOwner);
-
 }
 
 void AEODPlayerController::BeginPlay()
@@ -251,7 +249,7 @@ void AEODPlayerController::TogglePlayerStatsUI()
 
 void AEODPlayerController::MovePawnForward(const float Value)
 {
-	if (EODCharacter)
+	if (IsValid(EODCharacter))
 	{
 		EODCharacter->ForwardAxisValue = Value;
 
@@ -271,7 +269,7 @@ void AEODPlayerController::MovePawnForward(const float Value)
 
 void AEODPlayerController::MovePawnRight(const float Value)
 {
-	if (EODCharacter)
+	if (IsValid(EODCharacter))
 	{
 		EODCharacter->RightAxisValue = Value;
 
@@ -290,7 +288,7 @@ void AEODPlayerController::MovePawnRight(const float Value)
 
 void AEODPlayerController::MakePawnJump()
 {
-	if (EODCharacter && EODCharacter->CanJump())
+	if (IsValid(EODCharacter) && EODCharacter->CanJump())
 	{
 		EODCharacter->Jump();
 	}
@@ -390,14 +388,25 @@ void AEODPlayerController::ToggleSheathe()
 	}
 }
 
-void AEODPlayerController::OnPressingBlockKey()
+void AEODPlayerController::OnPressingGuardKey()
 {
-	SetBlockKeyPressed(true);
+	if (IsValid(EODCharacter))
+	{
+		if (IsAutoMoveEnabled())
+		{
+			DisableAutoMove();
+		}
+
+		EODCharacter->SetGuardKeyPressed(true);
+	}
 }
 
-void AEODPlayerController::OnReleasingBlockKey()
+void AEODPlayerController::OnReleasingGuardKey()
 {
-	SetBlockKeyPressed(false);
+	if (IsValid(EODCharacter))
+	{
+		EODCharacter->SetGuardKeyPressed(false);
+	}
 }
 
 void AEODPlayerController::OnPressingEscapeKey()
@@ -431,16 +440,6 @@ void AEODPlayerController::Server_SetAutoMoveEnabled_Implementation(bool bValue)
 }
 
 bool AEODPlayerController::Server_SetAutoMoveEnabled_Validate(bool bValue)
-{
-	return true;
-}
-
-void AEODPlayerController::Server_SetBlockKeyPressed_Implementation(bool bValue)
-{
-	SetBlockKeyPressed(bValue);
-}
-
-bool AEODPlayerController::Server_SetBlockKeyPressed_Validate(bool bValue)
 {
 	return true;
 }

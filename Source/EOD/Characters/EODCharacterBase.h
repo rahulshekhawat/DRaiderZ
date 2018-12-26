@@ -9,11 +9,12 @@
 #include "EOD/Characters/Components/StatsComponentBase.h"
 
 #include "Animation/AnimInstance.h"
+#include "Components/SphereComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Components/SphereComponent.h"
-#include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "EODCharacterBase.generated.h"
 
 class UAnimMontage;
@@ -74,16 +75,6 @@ public:
 	// EOD CHARACTER
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	UPROPERTY(Replicated)
-	bool bIsRunning;
-
-	/**
-	 * This boolean determines whether player is trying to move or not
-	 * i.e., if this character is possessed by a player controller, is player pressing the movement keys
-	 */
-	UPROPERTY(Replicated)
-	bool bPCTryingToMove;
-
 	/**
 	 * The direction character is trying to move relative to it's controller rotation
 	 * If the character is controlled by player, it is determined by the movement keys pressed by player
@@ -99,6 +90,14 @@ private:
 	UFUNCTION()
 	void DisableiFrames();
 
+	/** Determines if invincibility frames are active */
+	UPROPERTY(Transient)
+	bool bActiveiFrames;
+
+	/** Determines if character is blocking any incoming damage */
+	UPROPERTY(Transient)
+	bool bBlockingDamage;
+
 protected:
 	UPROPERTY()
 	float DesiredRotationYawFromAxisInput;
@@ -110,7 +109,7 @@ protected:
 	UPROPERTY(Replicated)
 	bool bCharacterStateAllowsMovement;
 
-	/** [server + local]  */
+	/** [server + local] Sets whether current character state allows movement */
 	FORCEINLINE void SetCharacterStateAllowsMovement(bool bNewValue)
 	{
 		bCharacterStateAllowsMovement = bNewValue;
@@ -120,17 +119,7 @@ protected:
 		}
 	}
 
-	/** [server + local] */
-	FORCEINLINE void SetIsRunning(bool bValue)
-	{
-		bIsRunning = bValue;
-		if (Role < ROLE_Authority)
-		{
-			Server_SetIsRunning(bValue);
-		}
-	}
-
-	/** [server + local] */
+	/** [server + local] Sets the current character movement direction */
 	FORCEINLINE void SetCharacterMovementDirection(ECharMovementDirection NewDirection)
 	{
 		CharacterMovementDirection = NewDirection;
@@ -140,21 +129,7 @@ protected:
 		}
 	}
 
-	/** [server + local] */
-	FORCEINLINE void SetPCTryingToMove(bool bNewValue)
-	{
-		bPCTryingToMove = bNewValue;
-		if (Role < ROLE_Authority)
-		{
-			Server_SetPCTryingToMove(bNewValue);
-		}
-	}
-
 public:
-	FORCEINLINE bool IsRunning() const { return bIsRunning; }
-
-	FORCEINLINE bool IsPCTryingToMove() const { return bPCTryingToMove; }
-
 	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const { return CharacterMovementDirection; }
 
 	inline float GetRotationYawFromAxisInput() const;
@@ -195,9 +170,12 @@ public:
 		}
 		else
 		{
-			FTimerDelegate TimerDelegate;
-			TimerDelegate.BindUFunction(this, FName("EnableiFrames"), Duration);
-			GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
+			if (GetWorld())
+			{
+				FTimerDelegate TimerDelegate;
+				TimerDelegate.BindUFunction(this, FName("EnableiFrames"), Duration);
+				GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
+			}
 		}
 	}
 
@@ -207,6 +185,21 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Trigger iFrames"))
 	void BP_TriggeriFrames(float Duration = 0.4f, float Delay = 0.f);
+
+	FORCEINLINE void StartBlockingDamage(float Delay = 0.2f)
+	{
+		if (Role < ROLE_Authority)
+		{
+			Server_StartBlockingDamage(Delay);
+		}
+		else
+		{
+			if (GetWorld())
+			{
+				GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &AEODCharacterBase::EnableDamageBlocking, Delay, false);
+			}
+		}
+	}
 
 protected:
 	/** Max speed of character when it's walking */
@@ -223,6 +216,7 @@ protected:
 
 	/** [server + local] Plays an animation montage and changes character state over network */
 	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+
 
 	////////////////////////////////////////////////////////////////////////////////
 	// COMPONENTS
@@ -278,38 +272,46 @@ private:
 	// ACTIONS
 	////////////////////////////////////////////////////////////////////////////////
 public:
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual bool StartDodging();
 
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual bool StopDodging();
 
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
-	virtual bool StartBlockingAttacks();
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
+	virtual void EnableCharacterGuard();
 
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
-	virtual bool StopBlockingAttacks();
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
+	virtual void DisableCharacterGuard();
 
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	FORCEINLINE void ActivateGuard()
+	{
+		SetGuardActive(true);
+		StartBlockingDamage(DamageBlockTriggerDelay);
+	}
+
+	FORCEINLINE void DeactivateGuard() { }
+
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void TriggerInteraction();
 
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void StartInteraction();
 
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void UpdateInteraction();
 
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void StopInteraction();
 
 	/** Put or remove weapon inside sheath */
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void ToggleSheathe();
 	
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void StartNormalAttacking();
 
-	UFUNCTION(BlueprintCallable, Category = "Character Action")
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void StopNormalAttacking();
 
 	virtual void PlayToggleSheatheAnimation();
@@ -319,12 +321,26 @@ public:
 	// CHARACTER STATE
 	////////////////////////////////////////////////////////////////////////////////
 private:
+	UPROPERTY(Replicated)
+	bool bIsRunning;
+
+	/**
+	 * This boolean determines whether player is trying to move or not
+	 * i.e., if this character is possessed by a player controller, is player pressing the movement keys
+	 */
+	UPROPERTY(Replicated)
+	bool bPCTryingToMove;
+	
 	/** Determines whether weapon is currently sheathed or not */
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
 	bool bWeaponSheathed;
 
+	/** Determines whether the character has it's guard up */
+	UPROPERTY(ReplicatedUsing = OnRep_GuardActive)
+	bool bGuardActive;
+
 protected:
-	/** [server + local] Change player's weapon sheath state */
+	/** [server + local] Sets whether this character's weapon is sheathed or not */
 	FORCEINLINE void SetWeaponSheathed(bool bNewValue)
 	{
 		bWeaponSheathed = bNewValue;
@@ -332,6 +348,37 @@ protected:
 		if (Role < ROLE_Authority)
 		{
 			Server_SetWeaponSheathed(bNewValue);
+		}
+	}
+
+	/** [server + local] Sets whether this character is running or not */
+	FORCEINLINE void SetIsRunning(bool bNewValue)
+	{
+		bIsRunning = bNewValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetIsRunning(bNewValue);
+		}
+	}
+
+	/** [server + local] Sets whether a player controller is currently trying to move this character or not */
+	FORCEINLINE void SetPCTryingToMove(bool bNewValue)
+	{
+		bPCTryingToMove = bNewValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetPCTryingToMove(bNewValue);
+		}
+	}
+
+	/** [server + local] Sets whether this character has it's guard up against incoming attacks or not */
+	FORCEINLINE void SetGuardActive(bool bNewValue)
+	{
+		bGuardActive = bNewValue;
+		EnableCharacterGuard();
+		if (Role < ROLE_Authority)
+		{
+			Server_SetGuardActive(bNewValue);
 		}
 	}
 
@@ -344,6 +391,23 @@ protected:
 	void UpdateMovement(float DeltaTime);
 
 public:
+	FORCEINLINE bool IsWeaponSheathed() const { return bWeaponSheathed; }
+
+	FORCEINLINE bool IsRunning() const { return bIsRunning; }
+
+	FORCEINLINE bool IsPCTryingToMove() const { return bPCTryingToMove; }
+
+	FORCEINLINE bool IsGuardActive() const { return bGuardActive; }
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// INPUT
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	UPROPERTY(Transient)
+	bool bGuardKeyPressed;
+
+public:
 	/** Cached value of player's forward axis input */
 	UPROPERTY()
 	float ForwardAxisValue;
@@ -352,7 +416,12 @@ public:
 	UPROPERTY()
 	float RightAxisValue;
 
-	FORCEINLINE bool IsWeaponSheathed() const { return bWeaponSheathed; }
+	FORCEINLINE void SetGuardKeyPressed(bool bNewValue)
+	{
+		bGuardKeyPressed = bNewValue;
+	}
+
+	FORCEINLINE bool IsBlockKeyPressed() const { return bGuardKeyPressed; }
 
 public:
 	/** Returns true if character is alive */
@@ -423,7 +492,10 @@ public:
 
 	/** Returns true if character can dodge */
 	virtual bool CanDodge() const;
-	
+
+	/** Returns true if character can guard against incoming attacks */
+	virtual bool CanGuardAttacks() const;
+
 	/** Returns true if character can block */
 	virtual bool CanBlock() const;
 
@@ -613,10 +685,20 @@ public:
 	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Is In Combat"))
 	bool BP_IsInCombat() const;
 
-	/** [server + client] Set current state of character */
-	FORCEINLINE void SetCharacterState(const ECharacterState NewState);
+	/** Sets current state of character */
+	FORCEINLINE void SetCharacterState(const ECharacterState NewState)
+	{
+		CharacterState = NewState;
+		// Character state is no longer replicated
+		/*
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharacterState(NewState);
+		}
+		*/
+	}
 
-	/** [server + client] Set current state of character */
+	/** Sets current state of character */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
 	void BP_SetCharacterState(const ECharacterState NewState);
 
@@ -628,11 +710,24 @@ public:
 
 	FORCEINLINE UStatsComponentBase* GetStatsComponent() const;
 
-	/** [server + client] Change character max walk speed */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
-	void SetWalkSpeed(const float WalkSpeed);
+	/** [server + local] Change character max walk speed */
+	FORCEINLINE void SetWalkSpeed(const float WalkSpeed)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetWalkSpeed(WalkSpeed);
+		}
+	}
 
-	/** [server + client] Change character rotation. Do not use this for consecutive rotation change */
+	/** [server + local] Change character max walk speed */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Walk Speed"))
+	void BP_SetWalkSpeed(const float WalkSpeed);
+
+	/**
+	 * [server + local] Change character rotation.
+	 * Note : Do not use this for consecutive rotation change 
+	 */
 	FORCEINLINE void SetCharacterRotation(const FRotator NewRotation)
 	{
 		// Following line of code has been commented out intentionally and this function can no longer be used for consecutive rotation change.
@@ -805,14 +900,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EOD Character")
 	float TargetSwitchDuration;
 
-	/** Determines if invincibility frames are active */
-	UPROPERTY(Transient)
-	bool bActiveiFrames;
-
-	/** Determines if character is blocking any incoming damage */
-	UPROPERTY(Transient)
-	bool bBlockingDamage;
-
 	/** Determines whether character is currently engaged in combat or not */
 	UPROPERTY(Transient)
 	bool bInCombat;
@@ -894,10 +981,20 @@ private:
 	void OnRep_WeaponSheathed();
 
 	UFUNCTION()
+	void OnRep_GuardActive();
+
+	// DEPRECATED
+	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
 
 	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_StartBlockingDamage(float Delay);
+
+	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_TriggeriFrames(float Duration, float Delay);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetGuardActive(bool bValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetWeaponSheathed(bool bNewValue);
@@ -914,6 +1011,7 @@ private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharMovementDir(ECharMovementDirection NewDirection);
 
+	// DEPRECATED
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterState(ECharacterState NewState);
 
@@ -1167,15 +1265,6 @@ FORCEINLINE bool AEODCharacterBase::NeedsHealing() const
 FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
 {
 	TurnOnTargetSwitch();
-}
-
-FORCEINLINE void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
-{
-	CharacterState = NewState;
-	if (Role < ROLE_Authority)
-	{
-		Server_SetCharacterState(NewState);
-	}
 }
 
 FORCEINLINE ECharacterState AEODCharacterBase::GetCharacterState() const
