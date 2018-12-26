@@ -146,6 +146,11 @@ float AEODCharacterBase::BP_GetControllerRotationYaw() const
 	return GetControllerRotationYaw();
 }
 
+void AEODCharacterBase::BP_TriggeriFrames(float Duration, float Delay)
+{
+	TriggeriFrames(Duration, Delay);
+}
+
 bool AEODCharacterBase::BP_IsDead() const
 {
 	return IsDead();
@@ -490,6 +495,16 @@ void AEODCharacterBase::OnRep_WeaponSheathed()
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
 	//~ @todo : Cleanup old state
+}
+
+void AEODCharacterBase::Server_TriggeriFrames_Implementation(float Duration, float Delay)
+{
+	TriggeriFrames(Duration, Delay);
+}
+
+bool AEODCharacterBase::Server_TriggeriFrames_Validate(float Duration, float Delay)
+{
+	return true;
 }
 
 void AEODCharacterBase::Server_SetCharacterState_Implementation(ECharacterState NewState)

@@ -949,11 +949,7 @@ bool APlayerCharacter::StartDodging()
 			}
 		}
 		PlayAnimationMontage(DodgeMontage, SectionToPlay, ECharacterState::Dodging);
-
-		// Enable iFrames with a delay
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), DodgeImmunityDuration);
-		GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
+		TriggeriFrames(DodgeImmunityDuration, DodgeImmunityTriggerDelay);
 		return true;
 	}
 

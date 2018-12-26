@@ -91,6 +91,14 @@ private:
 	UPROPERTY(Replicated)
 	ECharMovementDirection CharacterMovementDirection;
 
+	/** Enables immunity frames for a given duration */
+	UFUNCTION()
+	void EnableiFrames(float Duration = 0.f);
+
+	/** Disables immunity frames */
+	UFUNCTION()
+	void DisableiFrames();
+
 protected:
 	UPROPERTY()
 	float DesiredRotationYawFromAxisInput;
@@ -174,6 +182,31 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Get Controller Rotation Yaw"))
 	float BP_GetControllerRotationYaw() const;
+
+	/**
+	 * [server + local] 
+	 * Enables immunity frames after a given Delay for a given Duration on the server copy of this character.
+	 */
+	FORCEINLINE void TriggeriFrames(float Duration = 0.4f, float Delay = 0.f)
+	{
+		if (Role < ROLE_Authority)
+		{
+			Server_TriggeriFrames(Duration, Delay);
+		}
+		else
+		{
+			FTimerDelegate TimerDelegate;
+			TimerDelegate.BindUFunction(this, FName("EnableiFrames"), Duration);
+			GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
+		}
+	}
+
+	/**
+	 * [server + local]
+	 * Enables immunity frames after a given Delay for a given Duration on the server copy of this character.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Trigger iFrames"))
+	void BP_TriggeriFrames(float Duration = 0.4f, float Delay = 0.f);
 
 protected:
 	/** Max speed of character when it's walking */
@@ -539,14 +572,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Motion|CrowdControlEffect")
 	void PushBack(const FVector& ImpulseDirection); // @todo const parameter?
 
-	/** Enables immunity frames for a given duration */
-	UFUNCTION(BlueprintCallable, Category = Combat)
-	void EnableiFrames(float Duration = 0.f);
-
-	/** Disables immunity frames */
-	UFUNCTION()
-	void DisableiFrames();
-
 	/** Enables blocking of incoming attacks */
 	UFUNCTION()
 	void EnableDamageBlocking();
@@ -870,6 +895,9 @@ private:
 
 	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_TriggeriFrames(float Duration, float Delay);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetWeaponSheathed(bool bNewValue);
