@@ -76,7 +76,7 @@ void AEODCharacterBase::Tick(float DeltaTime)
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		// If block key is pressed but the character is not blocking
-		if (bGuardKeyPressed && !IsGuardActive() && CanGuardAttacks())
+		if (bGuardKeyPressed && !IsGuardActive() && CanGuardAgainstAttacks())
 		{
 			ActivateGuard();
 		}
@@ -186,9 +186,9 @@ bool AEODCharacterBase::CanDodge() const
 	return CharacterState == ECharacterState::IdleWalkRun;
 }
 
-bool AEODCharacterBase::CanGuardAttacks() const
+bool AEODCharacterBase::CanGuardAgainstAttacks() const
 {
-	return true;
+	return (IsIdleOrMoving() || IsNormalAttacking()) && !(IsWeaponSheathed());
 }
 
 bool AEODCharacterBase::CanBlock() const

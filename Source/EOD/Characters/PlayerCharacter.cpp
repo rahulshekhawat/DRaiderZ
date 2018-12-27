@@ -325,6 +325,11 @@ bool APlayerCharacter::CanDodge() const
 	return false;
 }
 
+bool APlayerCharacter::CanGuardAgainstAttacks() const
+{
+	return (IsIdleOrMoving() || IsNormalAttacking()) && !(IsWeaponSheathed() || GetEquippedWeaponType() == EWeaponType::None);
+}
+
 bool APlayerCharacter::CanBlock() const
 {
 	return (IsIdleOrMoving() || IsAutoRunning() || IsNormalAttacking()) &&
@@ -925,6 +930,11 @@ bool APlayerCharacter::StartDodging()
 			DesiredYaw = DesiredRotationYawFromAxisInput;
 		}
 		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+		if (MoveComp)
+		{
+			MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+		}
 
 		FName SectionToPlay;
 		if (ForwardAxisValue == 0)

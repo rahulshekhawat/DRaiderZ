@@ -536,7 +536,7 @@ public:
 	virtual bool CanDodge() const;
 
 	/** Returns true if character can guard against incoming attacks */
-	virtual bool CanGuardAttacks() const;
+	virtual bool CanGuardAgainstAttacks() const;
 
 	/** Returns true if character can block */
 	virtual bool CanBlock() const;
