@@ -300,16 +300,12 @@ private:
 	// ACTIONS
 	////////////////////////////////////////////////////////////////////////////////
 public:
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual bool StartDodging();
 
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual bool StopDodging();
 
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void EnableCharacterGuard();
 
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void DisableCharacterGuard();
 
 	FORCEINLINE void ActivateGuard()
@@ -341,11 +337,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void ToggleSheathe();
 	
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
-	virtual void StartNormalAttacking();
+	virtual void StartNormalAttack();
 
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
-	virtual void StopNormalAttacking();
+	virtual void StopNormalAttack();
+
+	virtual void UpdateNormalAttackState(float DeltaTime);
 
 	virtual void PlayToggleSheatheAnimation();
 
@@ -449,6 +445,9 @@ private:
 	UPROPERTY(Transient)
 	bool bGuardKeyPressed;
 
+	UPROPERTY(Transient)
+	bool bNormalAttackKeyPressed;
+
 public:
 	/** Cached value of player's forward axis input */
 	UPROPERTY()
@@ -463,7 +462,14 @@ public:
 		bGuardKeyPressed = bNewValue;
 	}
 
+	FORCEINLINE void SetNormalAttackKeyPressed(bool bNewValue)
+	{
+		bNormalAttackKeyPressed = bNewValue;
+	}
+
 	FORCEINLINE bool IsBlockKeyPressed() const { return bGuardKeyPressed; }
+
+	FORCEINLINE bool IsNormalAttackKeyPressed()const { return bNormalAttackKeyPressed; }
 
 public:
 	/** Returns true if character is alive */
@@ -773,7 +779,7 @@ public:
 	FORCEINLINE void SetCharacterRotation(const FRotator NewRotation)
 	{
 		// Following line of code has been commented out intentionally and this function can no longer be used for consecutive rotation change.
-		// GetCharacterMovement()->FlushServerMoves(); 
+		// GetCharacterMovement()->FlushServerMoves();
 		SetActorRotation(NewRotation);
 		if (Role < ROLE_Authority)
 		{
@@ -839,10 +845,16 @@ public:
 	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Current Active Skill ID"))
 	FName BP_GetCurrentActiveSkillID() const;
 
-	/** Set the ID of the skill that is currently being used */
-	FORCEINLINE void SetCurrentActiveSkillID(FName SkillID);
+	//  Set the ID of the skill that is currently being used
+	FORCEINLINE void SetCurrentActiveSkillID(FName SkillID)
+	{
+		CurrentActiveSkillID = SkillID;
+	}
 
-	FORCEINLINE void SetCurrentActiveSkill(FSkillTableRow* Skill);
+	FORCEINLINE void SetCurrentActiveSkill(FSkillTableRow* Skill)
+	{
+		CurrentActiveSkill = Skill;
+	}
 
 	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
 	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Current Active Skill ID"))
@@ -873,7 +885,7 @@ public:
 	/** Called when an animation montage is ending to clean up, reset, or change any state variables */
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
-	/** [server + client] Plays an animation montage over network */
+	// Play an animation montage locally
 	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
 
 	//~ @note UFUNCTIONs don't allow function overloading
@@ -1359,16 +1371,6 @@ FORCEINLINE FName AEODCharacterBase::GetCurrentActiveSkillID() const
 FORCEINLINE FSkillTableRow* AEODCharacterBase::GetCurrentActiveSkill() const
 {
 	return CurrentActiveSkill;
-}
-
-FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkillID(FName SkillID)
-{
-	CurrentActiveSkillID = SkillID;
-}
-
-FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkill(FSkillTableRow* Skill)
-{
-	CurrentActiveSkill = Skill;
 }
 
 FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()

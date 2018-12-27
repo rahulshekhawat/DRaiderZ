@@ -904,17 +904,13 @@ void APlayerCharacter::SetActiveWeaponSlotIndex(int32 NewSlotIndex)
 
 bool APlayerCharacter::StartDodging()
 {
-	if (!GetActiveAnimationReferences())
-	{
-		return false;
-	}
-	// If the animations for dodge are missing
-	UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
-	if (!DodgeMontage)
+	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->Dodge.Get())
 	{
 		return false;
 	}
 
+	// If the animations for dodge are missing
+	UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
 	if (IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking())
 	{
 		// Disable movement during dodge
@@ -929,7 +925,10 @@ bool APlayerCharacter::StartDodging()
 		{
 			DesiredYaw = DesiredRotationYawFromAxisInput;
 		}
+
+		// Instantly rotate character
 		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+		// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
 		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 		if (MoveComp)
 		{
@@ -1175,7 +1174,7 @@ void APlayerCharacter::OnToggleMouseCursor()
 
 void APlayerCharacter::OnPressedNormalAttack()
 {
-	bNormalAttackPressed = true;
+	SetNormalAttackKeyPressed(true);
 
 	/*
 	if (!CanNormalAttack() || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
@@ -1229,7 +1228,7 @@ void APlayerCharacter::OnPressedNormalAttack()
 
 void APlayerCharacter::OnReleasedNormalAttack()
 {
-	bNormalAttackPressed = false;
+	SetNormalAttackKeyPressed(false);
 }
 
 void APlayerCharacter::DoNormalAttack()
@@ -1272,11 +1271,6 @@ void APlayerCharacter::OnToggleAutoRun()
 	{
 		EnableAutoRun();
 	}
-}
-
-void APlayerCharacter::StopNormalAttacking()
-{
-	GetMesh()->GetAnimInstance()->Montage_Stop(0.2, GetActiveAnimationReferences()->NormalAttacks.Get());
 }
 
 void APlayerCharacter::DisableForwardPressed()
@@ -1480,8 +1474,54 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 	}
 }
 
-void APlayerCharacter::UpdateNormalAttack(float DeltaTime)
+void APlayerCharacter::StartNormalAttack()
 {
+	if (bCharacterStateAllowsMovement)
+	{
+		SetCharacterStateAllowsMovement(false);
+	}
+
+	// Determine what normal attack section should we start with
+	FName SectionToPlay;
+	if (bForwardPressed)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_ForwardSPSwing;
+	}
+	else if (bBackwardPressed)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_BackwardSPSwing;
+	}
+	else
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_FirstSwing;
+	}
+
+	float DesiredYaw = GetControllerRotationYaw();
+	// Instantly rotate character
+	SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+	// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (MoveComp)
+	{
+		MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+		if (MoveComp->bUseControllerDesiredRotation)
+		{
+			SetUseControllerRotationYaw(false);
+		}
+	}
+
+	// SetCurrentActiveSkillI
+	PlayNormalAttackAnimation(NAME_None, SectionToPlay);
+}
+
+void APlayerCharacter::StopNormalAttack()
+{
+	GetMesh()->GetAnimInstance()->Montage_Stop(0.2f, GetActiveAnimationReferences()->NormalAttacks.Get());
+}
+
+void APlayerCharacter::UpdateNormalAttackState(float DeltaTime)
+{
+	/*
 	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
 	{
 		return;
@@ -1509,6 +1549,7 @@ void APlayerCharacter::UpdateNormalAttack(float DeltaTime)
 		}
 		bNormalAttackSectionChangeAllowed = false;
 	}
+	*/
 }
 
 void APlayerCharacter::Destroyed()
@@ -1612,6 +1653,30 @@ void APlayerCharacter::RemoveDialogueWidget()
 	{
 		HUDWidget->GetSkillBarWidget()->SetVisibility(ESlateVisibility::Visible);
 	}
+}
+
+void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSection)
+{
+	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
+	{
+		return;
+	}
+	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
+	if (GetMesh()->GetAnimInstance())
+	{
+		if (OldSection == NAME_None)
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(NormalAttackMontage);
+			GetMesh()->GetAnimInstance()->Montage_JumpToSection(NewSection, NormalAttackMontage);
+			SetCharacterState(ECharacterState::Attacking);
+		}
+		else
+		{
+
+		}
+	}
+
+	Server_PlayNormalAttackAnimation(OldSection, NewSection);
 }
 
 FName APlayerCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender)
@@ -2268,6 +2333,38 @@ void APlayerCharacter::OnRep_PrimaryWeaponID()
 
 void APlayerCharacter::OnRep_SecondaryWeaponID()
 {
+}
+
+void APlayerCharacter::Server_PlayNormalAttackAnimation_Implementation(FName OldSection, FName NewSection)
+{
+	Multicast_PlayNormalAttackAnimation(OldSection, NewSection);
+}
+
+bool APlayerCharacter::Server_PlayNormalAttackAnimation_Validate(FName OldSection, FName NewSection)
+{
+	return true;
+}
+
+void APlayerCharacter::Multicast_PlayNormalAttackAnimation_Implementation(FName OldSection, FName NewSection)
+{
+	if (IsLocallyControlled() || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
+	{
+		return;
+	}
+	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
+	if (GetMesh()->GetAnimInstance())
+	{
+		if (OldSection == NAME_None)
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(NormalAttackMontage);
+			GetMesh()->GetAnimInstance()->Montage_JumpToSection(NewSection, NormalAttackMontage);
+			SetCharacterState(ECharacterState::Attacking);
+		}
+		else
+		{
+
+		}
+	}
 }
 
 /*

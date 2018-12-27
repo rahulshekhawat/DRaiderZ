@@ -86,6 +86,15 @@ void AEODCharacterBase::Tick(float DeltaTime)
 			DeactivateGuard();
 		}
 
+		if (bNormalAttackKeyPressed && !IsNormalAttacking() && CanNormalAttack())
+		{
+			StartNormalAttack();
+		}
+		else if (bNormalAttackKeyPressed && IsNormalAttacking())
+		{
+			UpdateNormalAttackState(DeltaTime);
+		}
+
 		// If the character is either idle or moving, or is in a state that allows movement except guard
 		if (IsIdleOrMoving() || (bCharacterStateAllowsMovement && !IsGuardActive()))
 		{
@@ -652,7 +661,7 @@ void AEODCharacterBase::EnableCharacterGuard()
 	// @todo wait for normal attack section to finish before blocking?
 	if (IsNormalAttacking())
 	{
-		StopNormalAttacking();
+		StopNormalAttack();
 	}
 	SetCharacterState(ECharacterState::Blocking);
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
@@ -694,11 +703,15 @@ void AEODCharacterBase::ToggleSheathe()
 {
 }
 
-void AEODCharacterBase::StartNormalAttacking()
+void AEODCharacterBase::StartNormalAttack()
 {
 }
 
-void AEODCharacterBase::StopNormalAttacking()
+void AEODCharacterBase::StopNormalAttack()
+{
+}
+
+void AEODCharacterBase::UpdateNormalAttackState(float DeltaTime)
 {
 }
 

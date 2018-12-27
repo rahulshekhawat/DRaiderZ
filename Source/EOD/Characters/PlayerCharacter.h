@@ -556,9 +556,6 @@ private:
 	bool bBlockPressed;
 
 	UPROPERTY(Transient)
-	bool bNormalAttackPressed;
-
-	UPROPERTY(Transient)
 	bool bCanUseChainSkill;
 
 	UPROPERTY(Transient)
@@ -705,8 +702,12 @@ private:
 	void UpdateFastMovementState(float DeltaTime);
 
 	void UpdateAutoRun(float DeltaTime);
+	
+	virtual void StartNormalAttack() override;
 
-	void UpdateNormalAttack(float DeltaTime);
+	virtual void StopNormalAttack() override;
+
+	virtual void UpdateNormalAttackState(float DeltaTime) override;
 
 	/** Enable or disable auto run */
 	void OnToggleAutoRun();
@@ -714,8 +715,6 @@ private:
 	inline void EnableAutoRun();
 
 	inline void DisableAutoRun();
-
-	void StopNormalAttacking();
 
 	void DisableForwardPressed();
 
@@ -737,11 +736,8 @@ private:
 	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
 	void RemoveDialogueWidget();
 
-public:
-
-	/** Character movement direction for Idle-Walk-Run state */
-	// UPROPERTY(Replicated)
-	// ECharMovementDirection IWR_CharacterMovementDirection;
+	/** Plays normal attack animation over network */
+	void PlayNormalAttackAnimation(FName OldSection, FName NewSection);
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -754,8 +750,11 @@ private:
 	UFUNCTION()
 	void OnRep_SecondaryWeaponID();
 
-	// UFUNCTION()
-	// void OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_PlayNormalAttackAnimation(FName OldSection, FName NewSection);
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void Multicast_PlayNormalAttackAnimation(FName OldSection, FName NewSection);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetPrimaryWeaponID(FName NewWeaponID);
@@ -849,7 +848,7 @@ inline void APlayerCharacter::EnableBlock()
 
 	if (IsNormalAttacking())
 	{
-		StopNormalAttacking();
+		StopNormalAttack();
 	}
 
 	SetCharacterState(ECharacterState::Blocking);

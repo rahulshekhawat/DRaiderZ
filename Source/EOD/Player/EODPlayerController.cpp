@@ -312,17 +312,22 @@ void AEODPlayerController::ZoomOutCamera()
 
 void AEODPlayerController::OnPressingNormalAttackKey()
 {
-	if (EODCharacter)
+	if (IsValid(EODCharacter))
 	{
-		EODCharacter->StartNormalAttacking();
+		if (IsAutoMoveEnabled())
+		{
+			DisableAutoMove();
+		}
+
+		EODCharacter->SetNormalAttackKeyPressed(true);
 	}
 }
 
 void AEODPlayerController::OnReleasingNormalAttackKey()
 {
-	if (EODCharacter)
+	if (IsValid(EODCharacter))
 	{
-		EODCharacter->StopNormalAttacking();
+		EODCharacter->SetNormalAttackKeyPressed(false);
 	}
 }
 
