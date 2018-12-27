@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "EODCharacterMovementComponent.h"
+#include "EOD/Characters/Components/EODCharacterMovementComponent.h"
+#include "EOD/Core/EODPreprocessors.h"
 
 #include "UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"

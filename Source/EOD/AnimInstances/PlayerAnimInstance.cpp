@@ -44,7 +44,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// bIsBlocking					= EODPlayerOwner->IsBlocking();
 	bIsBlocking					= EODPlayerOwner->IsGuardActive();
 	bIsRunning					= EODPlayerOwner->IsRunning();
-	BlockMovementDirectionYaw	= EODPlayerOwner->BlockMovementDirectionYaw;
+	BlockMovementDirectionYaw	= EODPlayerOwner->GetBlockMovementDirectionYaw();
 	bPCTryingToMove				= EODPlayerOwner->IsPCTryingToMove();
 
 	CurrentWeaponType = EODPlayerOwner->IsWeaponSheathed() ? EWeaponType::None : EODPlayerOwner->GetEquippedWeaponType();
@@ -253,7 +253,7 @@ float UPlayerAnimInstance::GetBlockMovementDirectionYaw() const
 {
 	if (EODPlayerOwner)
 	{
-		return EODPlayerOwner->BlockMovementDirectionYaw;
+		return EODPlayerOwner->GetBlockMovementDirectionYaw();
 	}
 
 	return 0.f;

@@ -16,6 +16,7 @@
 #include "EOD/Statics/DialogueLibrary.h"
 #include "EOD/Weapons/WeaponDataAsset.h"
 // #include "EOD/Weapons/WeaponSlot.h"
+#include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -32,7 +33,8 @@
 // #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-APlayerCharacter::APlayerCharacter(const FObjectInitializer & ObjectInitializer) :Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
+APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -163,7 +165,6 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(APlayerCharacter, PrimaryWeaponID);
 
-	DOREPLIFETIME_CONDITION(APlayerCharacter, BlockMovementDirectionYaw, COND_SkipOwner);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -1351,7 +1352,8 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 }
 */
 
-void APlayerCharacter::UpdateBlockState(float DeltaTime)
+/*
+void APlayerCharacter::UpdateGuardState(float DeltaTime)
 {
 	// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
 	// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
@@ -1384,6 +1386,7 @@ void APlayerCharacter::UpdateBlockState(float DeltaTime)
 		}
 	}
 }
+*/
 
 void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 {
@@ -2171,26 +2174,6 @@ void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)
 void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString & SkillGroup)
 {
 	GetSkillsComponent()->OnSkillGroupRemovedFromSkillBar(SkillGroup);
-}
-
-void APlayerCharacter::SetBlockMovementDirectionYaw(float NewYaw)
-{
-	BlockMovementDirectionYaw = NewYaw;
-
-	if (Role < ROLE_Authority)
-	{
-		Server_SetBlockMovementDirectionYaw(NewYaw);
-	}
-}
-
-void APlayerCharacter::Server_SetBlockMovementDirectionYaw_Implementation(float NewYaw)
-{
-	SetBlockMovementDirectionYaw(NewYaw);
-}
-
-bool APlayerCharacter::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw)
-{
-	return true;
 }
 
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)

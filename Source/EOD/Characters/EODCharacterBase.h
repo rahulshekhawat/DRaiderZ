@@ -98,6 +98,10 @@ private:
 	UPROPERTY(Transient)
 	bool bBlockingDamage;
 
+	/** The relative yaw of character's movement direction from the direction character is facing while blocking */
+	UPROPERTY(Replicated)
+	float BlockMovementDirectionYaw;
+
 protected:
 	UPROPERTY()
 	float DesiredRotationYawFromAxisInput;
@@ -129,8 +133,20 @@ protected:
 		}
 	}
 
+	/** [server + local] Set the yaw for player's movement direction relative to player's forward direction */
+	FORCEINLINE void SetBlockMovementDirectionYaw(float NewYaw)
+	{
+		BlockMovementDirectionYaw = NewYaw;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetBlockMovementDirectionYaw(NewYaw);
+		}
+	}
+
 public:
 	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const { return CharacterMovementDirection; }
+
+	FORCEINLINE float GetBlockMovementDirectionYaw() const { return BlockMovementDirectionYaw; }
 
 	inline float GetRotationYawFromAxisInput() const;
 
@@ -198,6 +214,18 @@ public:
 			{
 				GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &AEODCharacterBase::EnableDamageBlocking, Delay, false);
 			}
+		}
+	}
+
+	FORCEINLINE void StopBlockingDamage()
+	{
+		if (Role < ROLE_Authority)
+		{
+			Server_StopBlockingDamage();
+		}
+		else
+		{
+			DisableDamageBlocking();
 		}
 	}
 
@@ -291,7 +319,11 @@ public:
 		SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetStatsComponent()->GetMovementSpeedModifier());
 	}
 
-	FORCEINLINE void DeactivateGuard() { }
+	FORCEINLINE void DeactivateGuard()
+	{
+		SetGuardActive(false);
+		StopBlockingDamage();
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void TriggerInteraction();
@@ -376,7 +408,14 @@ protected:
 	FORCEINLINE void SetGuardActive(bool bNewValue)
 	{
 		bGuardActive = bNewValue;
-		EnableCharacterGuard();
+		if (bGuardActive)
+		{
+			EnableCharacterGuard();
+		}
+		else
+		{
+			DisableCharacterGuard();
+		}
 		if (Role < ROLE_Authority)
 		{
 			Server_SetGuardActive(bNewValue);
@@ -389,7 +428,9 @@ protected:
 
 	void UpdateDesiredYawFromAxisInput();
 
-	void UpdateMovement(float DeltaTime);
+	virtual void UpdateMovementState(float DeltaTime);
+
+	virtual void UpdateGuardState(float DeltaTime);
 
 public:
 	FORCEINLINE bool IsWeaponSheathed() const { return bWeaponSheathed; }
@@ -744,9 +785,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character Rotation"))
 	void BP_SetCharacterRotation(const FRotator NewRotation);
 
+	FORCEINLINE void SetUseControllerRotationYaw(const bool bNewBool)
+	{
+		GetCharacterMovement()->bUseControllerDesiredRotation = bNewBool;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetUseControllerRotationYaw(bNewBool);
+		}
+	}
+
 	/** [server + client] Set whether character should use controller rotation yaw or not */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
-	void SetUseControllerRotationYaw(const bool bNewBool);
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Use Controller Rotation Yaw"))
+	void BP_SetUseControllerRotationYaw(const bool bNewBool);
 
 	/** Returns character faction */
 	FORCEINLINE EFaction GetFaction() const;
@@ -989,7 +1039,13 @@ private:
 	void OnRep_CharacterState(ECharacterState OldState);
 
 	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetBlockMovementDirectionYaw(float NewYaw);
+
+	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_StartBlockingDamage(float Delay);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_StopBlockingDamage();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_TriggeriFrames(float Duration, float Delay);

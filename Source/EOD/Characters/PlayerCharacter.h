@@ -343,9 +343,6 @@ public:
 	/** [server + local] Change idle-walk-run direction of character */
 	// inline void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
-	/** [server + local] Set the yaw for player's movement direction relative to player's forward direction */
-	void SetBlockMovementDirectionYaw(float NewYaw);
-
 	/** Event called when a new normal attack section starts playing */
 	void OnNormalAttackSectionStart(FName SectionName);
 
@@ -700,7 +697,7 @@ private:
 
 	// void UpdateMovement(float DeltaTime);
 
-	void UpdateBlockState(float DeltaTime);
+	// virtual void UpdateGuardState(float DeltaTime) override;
 
 	void UpdateFastMovementState(float DeltaTime);
 
@@ -739,10 +736,6 @@ private:
 
 public:
 
-	/** The relative yaw of character's movement direction from the direction character is facing while blocking */
-	UPROPERTY(Replicated)
-	float BlockMovementDirectionYaw;
-
 	/** Character movement direction for Idle-Walk-Run state */
 	// UPROPERTY(Replicated)
 	// ECharMovementDirection IWR_CharacterMovementDirection;
@@ -763,9 +756,6 @@ private:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetPrimaryWeaponID(FName NewWeaponID);
-	
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetBlockMovementDirectionYaw(float NewYaw);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);

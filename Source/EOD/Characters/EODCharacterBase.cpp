@@ -75,14 +75,6 @@ void AEODCharacterBase::Tick(float DeltaTime)
 
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
-		if (CanMove())
-		{
-			UpdatePCTryingToMove();
-			UpdateCharacterMovementDirection();
-			UpdateDesiredYawFromAxisInput();
-			UpdateMovement(DeltaTime);
-		}
-
 		// If block key is pressed but the character is not blocking
 		if (bGuardKeyPressed && !IsGuardActive() && CanGuardAttacks())
 		{
@@ -92,6 +84,19 @@ void AEODCharacterBase::Tick(float DeltaTime)
 		else if (!bGuardKeyPressed && IsGuardActive())
 		{
 			DeactivateGuard();
+		}
+
+		// If the character is either idle or moving, or is in a state that allows movement except guard
+		if (IsIdleOrMoving() || (bCharacterStateAllowsMovement && !IsGuardActive()))
+		{
+			UpdatePCTryingToMove();
+			UpdateCharacterMovementDirection();
+			UpdateDesiredYawFromAxisInput();
+			UpdateMovementState(DeltaTime);
+		}
+		else if (IsGuardActive())
+		{
+			UpdateGuardState(DeltaTime);
 		}
 	}
 }
@@ -110,6 +115,7 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bGuardActive, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bWeaponSheathed, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bPCTryingToMove, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AEODCharacterBase, BlockMovementDirectionYaw, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterMovementDirection, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bCharacterStateAllowsMovement, COND_SkipOwner);
 }
@@ -354,14 +360,9 @@ void AEODCharacterBase::BP_SetCharacterRotation(const FRotator NewRotation)
 	SetCharacterRotation(NewRotation);
 }
 
-void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)
+void AEODCharacterBase::BP_SetUseControllerRotationYaw(const bool bNewBool)
 {
-	bUseControllerRotationYaw = bNewBool;
-
-	if (Role < ROLE_Authority)
-	{
-		Server_SetUseControllerRotationYaw(bNewBool);
-	}
+	SetUseControllerRotationYaw(bNewBool);
 }
 
 bool AEODCharacterBase::UseSkill_Implementation(FName SkillID)
@@ -497,12 +498,30 @@ void AEODCharacterBase::OnRep_WeaponSheathed()
 
 void AEODCharacterBase::OnRep_GuardActive()
 {
-	ActivateGuard();
+	if (IsGuardActive())
+	{
+		EnableCharacterGuard();
+	}
+	else
+	{
+		DisableCharacterGuard();
+	}
+	// ActivateGuard();
 }
 
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
 	//~ @todo : Cleanup old state
+}
+
+void AEODCharacterBase::Server_StopBlockingDamage_Implementation()
+{
+	StopBlockingDamage();
+}
+
+bool AEODCharacterBase::Server_StopBlockingDamage_Validate()
+{
+	return true;
 }
 
 void AEODCharacterBase::Server_StartBlockingDamage_Implementation(float Delay)
@@ -635,15 +654,16 @@ void AEODCharacterBase::EnableCharacterGuard()
 	{
 		StopNormalAttacking();
 	}
-
-	bUseControllerRotationYaw = true;
 	SetCharacterState(ECharacterState::Blocking);
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 }
 
 void AEODCharacterBase::DisableCharacterGuard()
 {
-}
+	SetCharacterState(ECharacterState::IdleWalkRun);
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 
+}
 
 void AEODCharacterBase::TriggerInteraction()
 {
@@ -700,7 +720,7 @@ void AEODCharacterBase::UpdateDesiredYawFromAxisInput()
 	}
 }
 
-void AEODCharacterBase::UpdateMovement(float DeltaTime)
+void AEODCharacterBase::UpdateMovementState(float DeltaTime)
 {
 	if (ForwardAxisValue < 0)
 	{
@@ -727,6 +747,36 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 		DeltaRotateCharacterToDesiredYaw(DesiredRotationYaw, DeltaTime);
 	}
 	*/
+}
+
+void AEODCharacterBase::UpdateGuardState(float DeltaTime)
+{
+	if (ForwardAxisValue == 0)
+	{
+		if (RightAxisValue > 0)
+		{
+			if (BlockMovementDirectionYaw != 90.f)
+				SetBlockMovementDirectionYaw(90.f);
+		}
+		else if (RightAxisValue < 0)
+		{
+			if (BlockMovementDirectionYaw != -90.f)
+				SetBlockMovementDirectionYaw(-90.f);
+		}
+		else
+		{
+			if (BlockMovementDirectionYaw != 0.f)
+				SetBlockMovementDirectionYaw(0.f);
+		}
+	}
+	else
+	{
+		float NewYaw = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
+		if (BlockMovementDirectionYaw != NewYaw)
+		{
+			SetBlockMovementDirectionYaw(NewYaw);
+		}
+	}
 }
 
 void AEODCharacterBase::Server_SetIsRunning_Implementation(bool bValue)
@@ -785,6 +835,16 @@ void AEODCharacterBase::Server_SetGuardActive_Implementation(bool bValue)
 }
 
 bool AEODCharacterBase::Server_SetGuardActive_Validate(bool bValue)
+{
+	return true;
+}
+
+void AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Implementation(float NewYaw)
+{
+	SetBlockMovementDirectionYaw(NewYaw);
+}
+
+bool AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw)
 {
 	return true;
 }
