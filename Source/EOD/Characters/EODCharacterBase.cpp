@@ -10,6 +10,7 @@
 #include "EOD/AI/EODAIControllerBase.h"
 #include "EOD/Characters/Components/SkillsComponent.h"
 #include "EOD/Characters/Components/StatsComponentBase.h"
+#include "EOD/Characters/Components/SkillBarComponent.h"
 
 #include "UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
@@ -28,6 +29,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	// Initialize Stats Component
 	StatsComp = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, FName("Character Stats Component"));
 	SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
+	SkillBarComponent = ObjectInitializer.CreateDefaultSubobject<USkillBarComponent>(this, FName("Skill Bar Component"));
 
 	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, FName("Camera Boom"));
 	CameraBoom->bUsePawnControlRotation = true;
@@ -586,7 +588,7 @@ bool AEODCharacterBase::Server_SetUseControllerRotationYaw_Validate(bool bNewBoo
 
 void AEODCharacterBase::Server_SetCharacterRotation_Implementation(FRotator NewRotation)
 {
-	SetCharacterRotation(NewRotation);
+	Multicast_SetCharacterRotation(NewRotation);
 }
 
 bool AEODCharacterBase::Server_SetCharacterRotation_Validate(FRotator NewRotation)
@@ -860,4 +862,12 @@ void AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Implementation(float
 bool AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw)
 {
 	return true;
+}
+
+void AEODCharacterBase::Multicast_SetCharacterRotation_Implementation(FRotator NewRotation)
+{
+	if (!IsLocallyControlled())
+	{
+		SetCharacterRotation(NewRotation);
+	}
 }

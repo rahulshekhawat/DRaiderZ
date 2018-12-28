@@ -10,7 +10,7 @@
 
 class UHUDWidget;
 class UPauseMenuWidget;
-// class USkillTreeWidget;
+class USkillTreeComponent;
 // class UPlayerStatsWidget;
 // class AEODCharacterBase;
 class USkillsComponent;
@@ -67,6 +67,8 @@ public:
 
 	FORCEINLINE USkillsComponent* GetSkillsComponent() const;
 
+	FORCEINLINE USkillTreeComponent* GetSkillTreeComponent() const { return SkillTreeComponent; }
+
 private:
 	//~ Inventory component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -83,6 +85,9 @@ private:
 	/** Skills component manages the skills of any character possessed by player controller that is not the primary pawn */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillsComponent* SkillsComponent;
+
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkillTreeComponent* SkillTreeComponent;
 
 
 	////////////////////////////////////////////////////////////////////////////////

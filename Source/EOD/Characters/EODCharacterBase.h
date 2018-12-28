@@ -26,6 +26,8 @@ class UCameraComponent;
 class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
+class USkillBarComponent;
+// class USkillTreeComponent;
 
 /** 
  * Delegate for when a gameplay event occurs
@@ -254,6 +256,8 @@ public:
 
 	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
 
+	FORCEINLINE USkillBarComponent* GetSkillBarComponent() const { return SkillBarComponent; }
+
 	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
 
 	FORCEINLINE USphereComponent* GetInteractionSphere() const { return InteractionSphere; }
@@ -290,6 +294,10 @@ private:
 	//~ Skills component - manages skills of character
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillsComponent* SkillsComponent;
+
+	//~ Skill bar component - manages skill bar (for player controlled character) and skills of character
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkillBarComponent* SkillBarComponent;
 
 	//~ Sphere component used to detect interactive objects
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -1089,6 +1097,9 @@ private:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterRotation(FRotator NewRotation);
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void Multicast_SetCharacterRotation(FRotator NewRotation);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetUseControllerRotationYaw(bool bNewBool);

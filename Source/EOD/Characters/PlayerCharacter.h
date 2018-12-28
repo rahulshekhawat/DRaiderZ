@@ -480,6 +480,78 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<USkillBarWidget> SkillBarWidgetClass;
 
+	FORCEINLINE FString GetGenderPrefix() const
+	{
+		return (Gender == ECharacterGender::Male) ? FString("M_") : FString("F_");
+	}
+
+	FORCEINLINE FString GetWeaponPrefix() const
+	{
+		FString ReturnString = FString("");
+		switch (GetEquippedWeaponType())
+		{
+		case EWeaponType::GreatSword:
+			ReturnString += FString("GS_");
+			break;
+		case EWeaponType::WarHammer:
+			ReturnString += FString("WH_");
+			break;
+		case EWeaponType::LongSword:
+			ReturnString += FString("LS_");
+			break;
+		case EWeaponType::Mace:
+			ReturnString += FString("MC_");
+			break;
+		case EWeaponType::Dagger:
+			ReturnString += FString("DG_");
+			break;
+		case EWeaponType::Staff:
+			ReturnString += FString("ST_");
+			break;
+		case EWeaponType::Shield:
+		case EWeaponType::None:
+		default:
+			break;
+		}
+		return ReturnString;
+	}
+
+	FORCEINLINE FString GetNormalAttackSuffix(FName NormalAttackSection) const
+	{
+		if (NormalAttackSection == UCharacterLibrary::SectionName_FirstSwing)
+		{
+			return FString("1");
+		}
+		else if (NormalAttackSection == UCharacterLibrary::SectionName_SecondSwing)
+		{
+			return FString("2");
+		}
+		else if (NormalAttackSection == UCharacterLibrary::SectionName_ThirdSwing)
+		{
+			return FString("3");
+		}
+		else if (NormalAttackSection == UCharacterLibrary::SectionName_FourthSwing)
+		{
+			return FString("4");
+		}
+		else if (NormalAttackSection == UCharacterLibrary::SectionName_FifthSwing)
+		{
+			return FString("5");
+		}
+		else if (NormalAttackSection == UCharacterLibrary::SectionName_BackwardSPSwing)
+		{
+			return FString("BSP");
+		}
+		else if (NormalAttackSection == UCharacterLibrary::SectionName_ForwardSPSwing)
+		{
+			return FString("FSP");
+		}
+		else
+		{
+			return FString("");
+		}
+	}
+
 private:
 
 	TArray<UStatusEffectBase*> ManagedStatusEffectsList;

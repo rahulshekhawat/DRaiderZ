@@ -16,6 +16,7 @@
 #include "EOD/Statics/DialogueLibrary.h"
 #include "EOD/Weapons/WeaponDataAsset.h"
 // #include "EOD/Weapons/WeaponSlot.h"
+#include "EOD/Characters/Components/SkillBarComponent.h"
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
 #include "Engine/World.h"
@@ -1496,6 +1497,15 @@ void APlayerCharacter::StartNormalAttack()
 		SectionToPlay = UCharacterLibrary::SectionName_FirstSwing;
 	}
 
+
+	float DesiredYaw = GetControllerRotationYaw();
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (MoveComp)
+	{
+		MoveComp->DoInstantRotation(DesiredYaw);
+	}
+
+	/*
 	float DesiredYaw = GetControllerRotationYaw();
 	// Instantly rotate character
 	SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
@@ -1504,13 +1514,9 @@ void APlayerCharacter::StartNormalAttack()
 	if (MoveComp)
 	{
 		MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
-		if (MoveComp->bUseControllerDesiredRotation)
-		{
-			SetUseControllerRotationYaw(false);
-		}
 	}
+	*/
 
-	// SetCurrentActiveSkillI
 	PlayNormalAttackAnimation(NAME_None, SectionToPlay);
 }
 
@@ -2254,6 +2260,11 @@ void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString & SkillGrou
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
 	FString SkillIDString = FString("");
+	SkillIDString += GetGenderPrefix();
+	SkillIDString += GetWeaponPrefix();
+	SkillIDString += GetNormalAttackSuffix(SectionName);
+
+	/*
 	if (Gender == ECharacterGender::Male)
 	{
 		SkillIDString += FString("M_");
@@ -2319,9 +2330,14 @@ void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 	{
 		SkillIDString += FString("FSP");
 	}
-	
-	FName SkillID = FName(*SkillIDString);
-	SetCurrentActiveSkillID(SkillID);
+	*/
+
+	// FName SkillID = FName(*SkillIDString);
+	// SetCurrentActiveSkillID(SkillID);
+	if (GetSkillBarComponent())
+	{
+		GetSkillBarComponent()->SetCurrentActiveSkill(FName(*SkillIDString));
+	}
 
 	// @todo set current active skill
 }

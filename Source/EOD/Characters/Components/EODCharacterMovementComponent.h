@@ -50,6 +50,8 @@ public:
 		}
 	}
 
+	void DoInstantRotation(float InstantRotationYaw);
+
 	////////////////////////////////////////////////////////////////////////////////
 	// NETWORK
 	////////////////////////////////////////////////////////////////////////////////
@@ -57,5 +59,7 @@ private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetDesiredCustomRotationYaw(float NewRotationYaw);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_DoInstantRotation(float InstantRotationYaw);
 
 };
