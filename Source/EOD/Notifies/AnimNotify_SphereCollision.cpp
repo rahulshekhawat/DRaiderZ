@@ -5,7 +5,7 @@
 #include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Core/CombatZoneModeBase.h"
 #include "EOD/Core/CombatManager.h"
-#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Characters/EODCharacterBase.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/SkeletalMeshComponent.h"

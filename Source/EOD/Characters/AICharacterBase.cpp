@@ -4,7 +4,7 @@
 #include "EOD/Core/GameSingleton.h"
 #include "EOD/Core/EODPreprocessors.h"
 #include "EOD/AI/Components/AIStatsComponent.h"
-#include "EOD/Player/Components/EODWidgetComponent.h"
+#include "EOD/Characters/Components/EODWidgetComponent.h"
 
 #include "Engine/Engine.h"
 #include "Kismet/KismetSystemLibrary.h"

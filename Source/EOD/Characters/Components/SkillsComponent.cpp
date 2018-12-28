@@ -5,7 +5,7 @@
 #include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Core/EODSaveGame.h"
 #include "EOD/Core/GameSingleton.h"
-#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/StatusEffects/StatusEffectBase.h"
 
 #include "Engine/Engine.h"
@@ -430,6 +430,14 @@ void USkillsComponent::OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup
 		SkillGroupToStatusEffectMap[SkillGroup]->MarkPendingKill();
 		SkillGroupToStatusEffectMap.Remove(SkillGroup);
 	}
+}
+
+void USkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
+{
+}
+
+void USkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
+{
 }
 
 void USkillsComponent::ResetChainSkill()

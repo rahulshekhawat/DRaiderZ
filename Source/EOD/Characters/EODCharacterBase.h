@@ -5,19 +5,29 @@
 #include "CoreMinimal.h"
 #include "EOD/Statics/EODLibrary.h"
 #include "EOD/Statics/CharacterLibrary.h"
-#include "EOD/Player/Components/StatsComponentBase.h"
 #include "EOD/StatusEffects/StatusEffectBase.h"
+#include "EOD/Characters/Components/StatsComponentBase.h"
 
 #include "Animation/AnimInstance.h"
-#include "GameFramework/Character.h"
+#include "Components/SphereComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/Controller.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "EODCharacterBase.generated.h"
 
 class UAnimMontage;
+class USkillsComponent;
 class UInputComponent;
+class UCameraComponent;
+// class AEODPlayerController;
+// class AEODAIControllerBase;
 class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
+class USkillBarComponent;
+// class USkillTreeComponent;
 
 /** 
  * Delegate for when a gameplay event occurs
@@ -43,7 +53,6 @@ class EOD_API AEODCharacterBase : public ACharacter
 	GENERATED_BODY()
 		
 public:
-
 	/** Sets default values for this character's properties */
 	AEODCharacterBase(const FObjectInitializer& ObjectInitializer);
 
@@ -59,6 +68,418 @@ public:
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
+	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void UnPossessed() override;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// EOD CHARACTER
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	/**
+	 * The direction character is trying to move relative to it's controller rotation
+	 * If the character is controlled by player, it is determined by the movement keys pressed by player
+	 */
+	UPROPERTY(Replicated)
+	ECharMovementDirection CharacterMovementDirection;
+
+	/** Enables immunity frames for a given duration */
+	UFUNCTION()
+	void EnableiFrames(float Duration = 0.f);
+
+	/** Disables immunity frames */
+	UFUNCTION()
+	void DisableiFrames();
+
+	/** Determines if invincibility frames are active */
+	UPROPERTY(Transient)
+	bool bActiveiFrames;
+
+	/** Determines if character is blocking any incoming damage */
+	UPROPERTY(Transient)
+	bool bBlockingDamage;
+
+	/** The relative yaw of character's movement direction from the direction character is facing while blocking */
+	UPROPERTY(Replicated)
+	float BlockMovementDirectionYaw;
+
+protected:
+	UPROPERTY()
+	float DesiredRotationYawFromAxisInput;
+
+	/**
+	 * This bool is used to determine if the character can move even if it's not in 'IdleWalkRun' state.
+	 * e.g., moving while casting spell.
+	 */
+	UPROPERTY(Replicated)
+	bool bCharacterStateAllowsMovement;
+
+	/** [server + local] Sets whether current character state allows movement */
+	FORCEINLINE void SetCharacterStateAllowsMovement(bool bNewValue)
+	{
+		bCharacterStateAllowsMovement = bNewValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharacterStateAllowsMovement(bNewValue);
+		}
+	}
+
+	/** [server + local] Sets the current character movement direction */
+	FORCEINLINE void SetCharacterMovementDirection(ECharMovementDirection NewDirection)
+	{
+		CharacterMovementDirection = NewDirection;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharMovementDir(NewDirection);
+		}
+	}
+
+	/** [server + local] Set the yaw for player's movement direction relative to player's forward direction */
+	FORCEINLINE void SetBlockMovementDirectionYaw(float NewYaw)
+	{
+		BlockMovementDirectionYaw = NewYaw;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetBlockMovementDirectionYaw(NewYaw);
+		}
+	}
+
+public:
+	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const { return CharacterMovementDirection; }
+
+	FORCEINLINE float GetBlockMovementDirectionYaw() const { return BlockMovementDirectionYaw; }
+
+	inline float GetRotationYawFromAxisInput() const;
+
+	/** Returns the expected rotation yaw of character based on current Axis Input */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Get Rotation Yaw From Axis Input"))
+	float BP_GetRotationYawFromAxisInput() const;
+
+	/**
+	 * Returns controller rotation yaw in -180/180 range.
+	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
+	 */
+	FORCEINLINE float GetControllerRotationYaw() const
+	{
+		if (GetController())
+		{
+			return FMath::UnwindDegrees(GetController()->GetControlRotation().Yaw);
+		}
+		return 0.f;
+	}
+
+	/**
+	 * Returns controller rotation yaw in -180/180 range.
+	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
+	 */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Get Controller Rotation Yaw"))
+	float BP_GetControllerRotationYaw() const;
+
+	/**
+	 * [server + local] 
+	 * Enables immunity frames after a given Delay for a given Duration on the server copy of this character.
+	 */
+	FORCEINLINE void TriggeriFrames(float Duration = 0.4f, float Delay = 0.f)
+	{
+		if (Role < ROLE_Authority)
+		{
+			Server_TriggeriFrames(Duration, Delay);
+		}
+		else
+		{
+			if (GetWorld())
+			{
+				FTimerDelegate TimerDelegate;
+				TimerDelegate.BindUFunction(this, FName("EnableiFrames"), Duration);
+				GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
+			}
+		}
+	}
+
+	/**
+	 * [server + local]
+	 * Enables immunity frames after a given Delay for a given Duration on the server copy of this character.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Trigger iFrames"))
+	void BP_TriggeriFrames(float Duration = 0.4f, float Delay = 0.f);
+
+	FORCEINLINE void StartBlockingDamage(float Delay = 0.2f)
+	{
+		if (Role < ROLE_Authority)
+		{
+			Server_StartBlockingDamage(Delay);
+		}
+		else
+		{
+			if (GetWorld())
+			{
+				GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &AEODCharacterBase::EnableDamageBlocking, Delay, false);
+			}
+		}
+	}
+
+	FORCEINLINE void StopBlockingDamage()
+	{
+		if (Role < ROLE_Authority)
+		{
+			Server_StopBlockingDamage();
+		}
+		else
+		{
+			DisableDamageBlocking();
+		}
+	}
+
+protected:
+	/** Max speed of character when it's walking */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
+	float DefaultWalkSpeed;
+
+	/** Max speed of character when it's running */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
+	float DefaultRunSpeed;
+
+	/** Max speed of character when it's moving while blocking attacks */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
+	float DefaultWalkSpeedWhileBlocking;
+
+	/** [server + local] Plays an animation montage and changes character state over network */
+	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// COMPONENTS
+	////////////////////////////////////////////////////////////////////////////////
+public:
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
+
+	FORCEINLINE USkillBarComponent* GetSkillBarComponent() const { return SkillBarComponent; }
+
+	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
+
+	FORCEINLINE USphereComponent* GetInteractionSphere() const { return InteractionSphere; }
+
+	FORCEINLINE void EnableInteractionSphere();
+
+	FORCEINLINE void DisableInteractionSphere();
+
+	FORCEINLINE void ZoomInCamera();
+
+	FORCEINLINE void ZoomOutCamera();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	int32 CameraZoomRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	int CameraArmMinimumLength;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	int CameraArmMaximumLength;
+
+private:
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* Camera;
+
+	/** StatsComp contains and manages the stats info of this character */
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UStatsComponentBase* StatsComp;
+
+	//~ Skills component - manages skills of character
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkillsComponent* SkillsComponent;
+
+	//~ Skill bar component - manages skill bar (for player controlled character) and skills of character
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkillBarComponent* SkillBarComponent;
+
+	//~ Sphere component used to detect interactive objects
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USphereComponent* InteractionSphere;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// ACTIONS
+	////////////////////////////////////////////////////////////////////////////////
+public:
+	virtual bool StartDodging();
+
+	virtual bool StopDodging();
+
+	virtual void EnableCharacterGuard();
+
+	virtual void DisableCharacterGuard();
+
+	FORCEINLINE void ActivateGuard()
+	{
+		SetGuardActive(true);
+		StartBlockingDamage(DamageBlockTriggerDelay);
+		SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetStatsComponent()->GetMovementSpeedModifier());
+	}
+
+	FORCEINLINE void DeactivateGuard()
+	{
+		SetGuardActive(false);
+		StopBlockingDamage();
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
+	virtual void TriggerInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
+	virtual void StartInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
+	virtual void UpdateInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
+	virtual void StopInteraction();
+
+	/** Put or remove weapon inside sheath */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
+	virtual void ToggleSheathe();
+	
+	virtual void StartNormalAttack();
+
+	virtual void StopNormalAttack();
+
+	virtual void UpdateNormalAttackState(float DeltaTime);
+
+	virtual void PlayToggleSheatheAnimation();
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// CHARACTER STATE
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	UPROPERTY(Replicated)
+	bool bIsRunning;
+
+	/**
+	 * This boolean determines whether player is trying to move or not
+	 * i.e., if this character is possessed by a player controller, is player pressing the movement keys
+	 */
+	UPROPERTY(Replicated)
+	bool bPCTryingToMove;
+	
+	/** Determines whether weapon is currently sheathed or not */
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
+	bool bWeaponSheathed;
+
+	/** Determines whether the character has it's guard up */
+	UPROPERTY(ReplicatedUsing = OnRep_GuardActive)
+	bool bGuardActive;
+
+protected:
+	/** [server + local] Sets whether this character's weapon is sheathed or not */
+	FORCEINLINE void SetWeaponSheathed(bool bNewValue)
+	{
+		bWeaponSheathed = bNewValue;
+		PlayToggleSheatheAnimation();
+		if (Role < ROLE_Authority)
+		{
+			Server_SetWeaponSheathed(bNewValue);
+		}
+	}
+
+	/** [server + local] Sets whether this character is running or not */
+	FORCEINLINE void SetIsRunning(bool bNewValue)
+	{
+		bIsRunning = bNewValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetIsRunning(bNewValue);
+		}
+	}
+
+	/** [server + local] Sets whether a player controller is currently trying to move this character or not */
+	FORCEINLINE void SetPCTryingToMove(bool bNewValue)
+	{
+		bPCTryingToMove = bNewValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetPCTryingToMove(bNewValue);
+		}
+	}
+
+	/** [server + local] Sets whether this character has it's guard up against incoming attacks or not */
+	FORCEINLINE void SetGuardActive(bool bNewValue)
+	{
+		bGuardActive = bNewValue;
+		if (bGuardActive)
+		{
+			EnableCharacterGuard();
+		}
+		else
+		{
+			DisableCharacterGuard();
+		}
+		if (Role < ROLE_Authority)
+		{
+			Server_SetGuardActive(bNewValue);
+		}
+	}
+
+	inline void UpdatePCTryingToMove();
+
+	inline void UpdateCharacterMovementDirection();
+
+	void UpdateDesiredYawFromAxisInput();
+
+	virtual void UpdateMovementState(float DeltaTime);
+
+	virtual void UpdateGuardState(float DeltaTime);
+
+public:
+	FORCEINLINE bool IsWeaponSheathed() const { return bWeaponSheathed; }
+
+	FORCEINLINE bool IsRunning() const { return bIsRunning; }
+
+	FORCEINLINE bool IsPCTryingToMove() const { return bPCTryingToMove; }
+
+	FORCEINLINE bool IsGuardActive() const { return bGuardActive; }
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// INPUT
+	////////////////////////////////////////////////////////////////////////////////
+private:
+	UPROPERTY(Transient)
+	bool bGuardKeyPressed;
+
+	UPROPERTY(Transient)
+	bool bNormalAttackKeyPressed;
+
+public:
+	/** Cached value of player's forward axis input */
+	UPROPERTY()
+	float ForwardAxisValue;
+
+	/** Cached value of player's right axis input */
+	UPROPERTY()
+	float RightAxisValue;
+
+	FORCEINLINE void SetGuardKeyPressed(bool bNewValue)
+	{
+		bGuardKeyPressed = bNewValue;
+	}
+
+	FORCEINLINE void SetNormalAttackKeyPressed(bool bNewValue)
+	{
+		bNormalAttackKeyPressed = bNewValue;
+	}
+
+	FORCEINLINE bool IsBlockKeyPressed() const { return bGuardKeyPressed; }
+
+	FORCEINLINE bool IsNormalAttackKeyPressed()const { return bNormalAttackKeyPressed; }
+
+public:
 	/** Returns true if character is alive */
 	FORCEINLINE bool IsAlive() const;
 
@@ -127,7 +548,10 @@ public:
 
 	/** Returns true if character can dodge */
 	virtual bool CanDodge() const;
-	
+
+	/** Returns true if character can guard against incoming attacks */
+	virtual bool CanGuardAgainstAttacks() const;
+
 	/** Returns true if character can block */
 	virtual bool CanBlock() const;
 
@@ -243,19 +667,19 @@ public:
 	/** Applies stun to this character */
 	virtual bool Stun(const float Duration);
 
-	/** [client] Removes 'stun' crowd control effect from this character */
+	/** Removes 'stun' crowd control effect from this character */
 	virtual void EndStun();
 
 	/** Freeze this character */
 	virtual bool Freeze(const float Duration);
 
-	/** [client] Removes 'freeze' crowd control effect from this character */
+	/** Removes 'freeze' crowd control effect from this character */
 	virtual void EndFreeze();
 
 	/** Knockdown this character */
 	virtual bool Knockdown(const float Duration);
 
-	/** [client] Removes 'knock-down' crowd control effect from this character */
+	/** Removes 'knock-down' crowd control effect from this character */
 	virtual void EndKnockdown();
 
 	/** Knockback this character */
@@ -275,14 +699,6 @@ public:
 	/** Simulates the knock back effect */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Motion|CrowdControlEffect")
 	void PushBack(const FVector& ImpulseDirection); // @todo const parameter?
-
-	/** Enables immunity frames for a given duration */
-	UFUNCTION(BlueprintCallable, Category = Combat)
-	void EnableiFrames(float Duration = 0.f);
-
-	/** Disables immunity frames */
-	UFUNCTION()
-	void DisableiFrames();
 
 	/** Enables blocking of incoming attacks */
 	UFUNCTION()
@@ -320,15 +736,25 @@ public:
 	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; };
 	
 	/** Returns true if character is engaged in combat */
-	FORCEINLINE bool GetInCombat() const;
+	FORCEINLINE bool IsInCombat() const { return bInCombat; }
 
-	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get In Combat"))
-	bool BP_GetInCombat() const;
+	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Is In Combat"))
+	bool BP_IsInCombat() const;
 
-	/** [server + client] Set current state of character */
-	inline void SetCharacterState(const ECharacterState NewState);
+	/** Sets current state of character */
+	FORCEINLINE void SetCharacterState(const ECharacterState NewState)
+	{
+		CharacterState = NewState;
+		// Character state is no longer replicated
+		/*
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharacterState(NewState);
+		}
+		*/
+	}
 
-	/** [server + client] Set current state of character */
+	/** Sets current state of character */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
 	void BP_SetCharacterState(const ECharacterState NewState);
 
@@ -340,20 +766,51 @@ public:
 
 	FORCEINLINE UStatsComponentBase* GetStatsComponent() const;
 
-	/** [server + client] Change character max walk speed */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
-	void SetWalkSpeed(const float WalkSpeed);
+	/** [server + local] Change character max walk speed */
+	FORCEINLINE void SetWalkSpeed(const float WalkSpeed)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetWalkSpeed(WalkSpeed);
+		}
+	}
 
-	/** Change character rotation */
-	// void 
+	/** [server + local] Change character max walk speed */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Walk Speed"))
+	void BP_SetWalkSpeed(const float WalkSpeed);
 
-	/** [server + client] Chagne character rotation */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
-	void SetCharacterRotation(const FRotator NewRotation);
+	/**
+	 * [server + local] Change character rotation.
+	 * Note : Do not use this for consecutive rotation change 
+	 */
+	FORCEINLINE void SetCharacterRotation(const FRotator NewRotation)
+	{
+		// Following line of code has been commented out intentionally and this function can no longer be used for consecutive rotation change.
+		// GetCharacterMovement()->FlushServerMoves();
+		SetActorRotation(NewRotation);
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharacterRotation(NewRotation);
+		}
+	}
+
+	/** [server + client] Change character rotation. Do not use this for consecutive rotation change */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character Rotation"))
+	void BP_SetCharacterRotation(const FRotator NewRotation);
+
+	FORCEINLINE void SetUseControllerRotationYaw(const bool bNewBool)
+	{
+		GetCharacterMovement()->bUseControllerDesiredRotation = bNewBool;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetUseControllerRotationYaw(bNewBool);
+		}
+	}
 
 	/** [server + client] Set whether character should use controller rotation yaw or not */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
-	void SetUseControllerRotationYaw(const bool bNewBool);
+	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Use Controller Rotation Yaw"))
+	void BP_SetUseControllerRotationYaw(const bool bNewBool);
 
 	/** Returns character faction */
 	FORCEINLINE EFaction GetFaction() const;
@@ -396,10 +853,16 @@ public:
 	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Current Active Skill ID"))
 	FName BP_GetCurrentActiveSkillID() const;
 
-	/** Set the ID of the skill that is currently being used */
-	FORCEINLINE void SetCurrentActiveSkillID(FName SkillID);
+	//  Set the ID of the skill that is currently being used
+	FORCEINLINE void SetCurrentActiveSkillID(FName SkillID)
+	{
+		CurrentActiveSkillID = SkillID;
+	}
 
-	FORCEINLINE void SetCurrentActiveSkill(FSkillTableRow* Skill);
+	FORCEINLINE void SetCurrentActiveSkill(FSkillTableRow* Skill)
+	{
+		CurrentActiveSkill = Skill;
+	}
 
 	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
 	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Current Active Skill ID"))
@@ -430,11 +893,8 @@ public:
 	/** Called when an animation montage is ending to clean up, reset, or change any state variables */
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
-	/** [server + client] Plays an animation montage over network */
+	// Play an animation montage locally
 	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
-	
-	/** [server + client] Plays an animation montage and changes character state over network */
-	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
 	//~ @note UFUNCTIONs don't allow function overloading
 	/** [server + client] Plays an animation montage and changes character state over network */
@@ -453,8 +913,8 @@ public:
 	 * @param RotationRate 	Rotation rate to use for yaw rotation in degrees
 	 * @return 				True if character successfully rotates to DesiredYaw (CurrentYaw == DesiredYaw)
 	 */
-	UFUNCTION(BlueprintCallable, category = Rotation)
-	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision = 0.1f, float RotationRate = 600.f);
+	UFUNCTION(BlueprintCallable, category = Rotation, meta = (DeprecatedFunction))
+	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision = 1e-3f, float RotationRate = 600.f);
 
 	/**
 	 * Kills this character 
@@ -467,11 +927,6 @@ public:
 	float GetOrientationYawToActor(AActor* TargetActor);
 
 private:
-
-	/** StatsComp contains and manages the stats info of this character */
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStatsComponentBase* StatsComp;
-
 	/** In game faction of your character */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character", meta = (AllowPrivateAccess = "true"))
 	EFaction Faction;
@@ -488,7 +943,7 @@ private:
 	FLastUsedSkillInfo LastUsedSkillInfo;
 
 	/** Character state determines the current action character is doing */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
+	UPROPERTY(ReplicatedUsing = OnRep_CharacterState)
 	ECharacterState CharacterState;
 
 protected:
@@ -515,14 +970,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EOD Character")
 	float TargetSwitchDuration;
-
-	/** Determines if invincibility frames are active */
-	UPROPERTY(Transient)
-	bool bActiveiFrames;
-
-	/** Determines if character is blocking any incoming damage */
-	UPROPERTY(Transient)
-	bool bBlockingDamage;
 
 	/** Determines whether character is currently engaged in combat or not */
 	UPROPERTY(Transient)
@@ -596,12 +1043,52 @@ protected:
 	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CombatEvents)
 	virtual void TurnOffTargetSwitch();
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// NETWORK
+	////////////////////////////////////////////////////////////////////////////////
 private:
-	
-	//~ Begin Multiplayer Code
+	UFUNCTION()
+	void OnRep_WeaponSheathed();
+
+	UFUNCTION()
+	void OnRep_GuardActive();
+
+	// DEPRECATED
 	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetBlockMovementDirectionYaw(float NewYaw);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_StartBlockingDamage(float Delay);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_StopBlockingDamage();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_TriggeriFrames(float Duration, float Delay);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetGuardActive(bool bValue);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetWeaponSheathed(bool bNewValue);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetIsRunning(bool bValue);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetCharacterStateAllowsMovement(bool bNewValue);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetPCTryingToMove(bool bNewValue);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetCharMovementDir(ECharMovementDirection NewDirection);
+
+	// DEPRECATED
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterState(ECharacterState NewState);
 
@@ -610,6 +1097,9 @@ private:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterRotation(FRotator NewRotation);
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void Multicast_SetCharacterRotation(FRotator NewRotation);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetUseControllerRotationYaw(bool bNewBool);
@@ -625,10 +1115,122 @@ private:
 	
 	UFUNCTION(NetMultiCast, Reliable)
 	void MultiCast_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
-	//~ End Multiplayer Code
 	
 	
 };
+
+inline void AEODCharacterBase::UpdatePCTryingToMove()
+{
+	if (ForwardAxisValue == 0 && RightAxisValue == 0)
+	{
+		if (IsPCTryingToMove())
+		{
+			SetPCTryingToMove(false);
+		}
+	}
+	else
+	{
+		if (!IsPCTryingToMove())
+		{
+			SetPCTryingToMove(true);
+		}
+	}
+}
+
+inline void AEODCharacterBase::UpdateCharacterMovementDirection()
+{
+	if (ForwardAxisValue == 0 && RightAxisValue == 0)
+	{
+		if (CharacterMovementDirection != ECharMovementDirection::None)
+		{
+			SetCharacterMovementDirection(ECharMovementDirection::None);
+		}
+	}
+	else
+	{
+		if (ForwardAxisValue == 0)
+		{
+			if (RightAxisValue > 0 && CharacterMovementDirection != ECharMovementDirection::R)
+			{
+				SetCharacterMovementDirection(ECharMovementDirection::R);
+			}
+			else if (RightAxisValue < 0 && CharacterMovementDirection != ECharMovementDirection::L)
+			{
+				SetCharacterMovementDirection(ECharMovementDirection::L);
+			}
+		}
+		else
+		{
+			if (ForwardAxisValue > 0 && CharacterMovementDirection != ECharMovementDirection::F)
+			{
+				SetCharacterMovementDirection(ECharMovementDirection::F);
+			}
+			else if (ForwardAxisValue < 0 && CharacterMovementDirection != ECharMovementDirection::B)
+			{
+				SetCharacterMovementDirection(ECharMovementDirection::B);
+			}
+		}
+	}
+}
+
+inline float AEODCharacterBase::GetRotationYawFromAxisInput() const
+{
+	float ResultingRotation = GetActorRotation().Yaw;
+	float ControlRotationYaw = GetControllerRotationYaw();
+	if (ForwardAxisValue == 0)
+	{
+		if (RightAxisValue > 0)
+		{
+			ResultingRotation = ControlRotationYaw + 90.f;
+		}
+		else if (RightAxisValue < 0)
+		{
+			ResultingRotation = ControlRotationYaw - 90.f;
+		}
+	}
+	else
+	{
+		if (ForwardAxisValue > 0)
+		{
+			float DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
+			ResultingRotation = ControlRotationYaw + DeltaAngle;
+		}
+		else if (ForwardAxisValue < 0)
+		{
+			float DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(-RightAxisValue, -ForwardAxisValue));
+			ResultingRotation = ControlRotationYaw + DeltaAngle;
+		}
+	}
+	return FMath::UnwindDegrees(ResultingRotation);
+}
+
+FORCEINLINE void AEODCharacterBase::EnableInteractionSphere()
+{
+	InteractionSphere->Activate();
+	InteractionSphere->SetCollisionProfileName(FName("OverlapAllDynamic"));
+}
+
+FORCEINLINE void AEODCharacterBase::DisableInteractionSphere()
+{
+	InteractionSphere->Deactivate();
+	InteractionSphere->SetCollisionProfileName(FName("NoCollision"));
+}
+
+FORCEINLINE void AEODCharacterBase::ZoomInCamera()
+{
+	if (CameraBoom && CameraBoom->TargetArmLength >= CameraArmMinimumLength)
+	{
+		CameraBoom->TargetArmLength -= CameraZoomRate;
+	}
+}
+
+FORCEINLINE void AEODCharacterBase::ZoomOutCamera()
+{
+	if (CameraBoom && CameraBoom->TargetArmLength <= CameraArmMaximumLength)
+	{
+		CameraBoom->TargetArmLength += CameraZoomRate;
+	}
+}
 
 FORCEINLINE bool AEODCharacterBase::IsAlive() const
 {
@@ -745,21 +1347,6 @@ FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
 	TurnOnTargetSwitch();
 }
 
-FORCEINLINE bool AEODCharacterBase::GetInCombat() const
-{
-	return bInCombat;
-}
-
-inline void AEODCharacterBase::SetCharacterState(const ECharacterState NewState)
-{
-	CharacterState = NewState;
-
-	if (Role < ROLE_Authority)
-	{
-		Server_SetCharacterState(NewState);
-	}
-}
-
 FORCEINLINE ECharacterState AEODCharacterBase::GetCharacterState() const
 {
 	return CharacterState;
@@ -797,22 +1384,12 @@ FORCEINLINE FSkillTableRow* AEODCharacterBase::GetCurrentActiveSkill() const
 	return CurrentActiveSkill;
 }
 
-FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkillID(FName SkillID)
-{
-	CurrentActiveSkillID = SkillID;
-}
-
-FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkill(FSkillTableRow* Skill)
-{
-	CurrentActiveSkill = Skill;
-}
-
-FORCEINLINE FLastUsedSkillInfo & AEODCharacterBase::GetLastUsedSkill()
+FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
 {
 	return LastUsedSkillInfo;
 }
 
-inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay)
+inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay)
 {
 	if (GetMesh()->GetAnimInstance())
 	{
@@ -821,7 +1398,7 @@ inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay
 	}
 }
 
-inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
+inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
 	if (GetMesh()->GetAnimInstance())
 	{

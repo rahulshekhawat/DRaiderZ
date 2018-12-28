@@ -1,10 +1,12 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "InventoryComponent.h"
-#include "EOD/Player/PlayerCharacter.h"
+// #include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Player/EODPlayerController.h"
 #include "EOD/UI/HUDWidget.h"
 #include "EOD/UI/InventoryWidget.h"
 
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
@@ -22,7 +24,6 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializeComponentWidget();
 }
 
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -31,40 +32,9 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 }
 
-void UInventoryComponent::ToggleInventoryUI()
+TArray<FInventoryItem>& UInventoryComponent::GetInventoryItems()
 {
-	if (InventoryWidget)
-	{
-		if (InventoryWidget->IsVisible())
-		{
-			InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
-		}
-		else
-		{
-			InventoryWidget->SetVisibility(ESlateVisibility::Visible);
-		}
-	}
-}
-
-UInventoryWidget* UInventoryComponent::BP_GetInventoryWidget() const
-{
-	return GetInventoryWidget();
-}
-
-void UInventoryComponent::InitializeComponentWidget()
-{
-	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
-	if (!(OwningPlayer && OwningPlayer->IsLocallyControlled() && OwningPlayer->GetHUDWidget()))
-	{
-		return;
-	}
-
-	if (InventoryWidgetClass.Get())
-	{
-		InventoryWidget = CreateWidget<UInventoryWidget>(OwningPlayer->GetGameInstance(), InventoryWidgetClass);
-		OwningPlayer->GetHUDWidget()->AddInventoryWidget(InventoryWidget);
-		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
+	return Items;
 }
 
 void UInventoryComponent::AddItem(FName ItemID)

@@ -3,34 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Statics/EODLibrary.h"
+
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
-class UTexture;
-class APlayerCharacter;
-class UInventoryWidget;
+// class UTexture;
+// class APlayerCharacter;
+// class UInventoryWidget;
 
-USTRUCT(BlueprintType)
-struct EOD_API FInventoryItem
-{
-	GENERATED_USTRUCT_BODY()
+/** Delegate for when a new inventory item is added */
 
-public:
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryItemChangedMCDelegate, const FInventoryItem&, InventoryItem);
 
-	FName ItemID;
-
-	UTexture* ItemIcon;
-
-	FString Description;
-
-	// @todo hover info
-
-};
 
 /**
- * InventoryComponent is used to implement and manage player inventory
+ * InventoryComponent is used to implement and manage player inventory.
+ * Should be attached to player controller, not pawn
  */
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS()
 class EOD_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -46,29 +37,23 @@ public:
 	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
-	/** Returns inventory widget */
-	FORCEINLINE UInventoryWidget* GetInventoryWidget() const;
+	TArray<FInventoryItem>& GetInventoryItems();
 
-	/** Returns inventory widget */
-	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get Inventory Widget"))
-	UInventoryWidget* BP_GetInventoryWidget() const;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Inventory")
+	FOnInventoryItemChangedMCDelegate OnInventoryItemAdded;
 
-	void InitializeComponentWidget();
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Inventory")
+	FOnInventoryItemChangedMCDelegate OnInventoryItemRemoved;
 
-	/** Toggle the display of inventory UI in player viewport */
-	void ToggleInventoryUI();
-	
+protected:
+
+	/** Maximum number of inventory slots */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	int32 MaxSlots;
+
 private:
 
-	UPROPERTY(Transient)
-	UInventoryWidget* InventoryWidget;
-
-	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
-	
-	/** Maximum number of inventory slots */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
-	int32 MaxSlots;
+	// void InitializeInventoryWidget();
 
 	// FInventoryItem& GetItem(int32 ItemIndex) const;
 
@@ -89,7 +74,9 @@ private:
 
 };
 
+/*
 FORCEINLINE UInventoryWidget* UInventoryComponent::GetInventoryWidget() const
 {
 	return InventoryWidget;
 }
+*/

@@ -46,25 +46,10 @@ enum class EEODTaskStatus : uint8
 	Aborted
 };
 
-/*
-USTRUCT(BlueprintType)
-struct EOD_API FEODEventBase
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-
-
-};
-*/
-
 USTRUCT(BlueprintType)
 struct EOD_API FEODItemInfo
 {
 	GENERATED_USTRUCT_BODY()
-
-public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
 	FName ItemID;
@@ -97,6 +82,23 @@ public:
 		EODItemType = EEODItemType::None;
 		StackCount = 1;
 	}
+};
+
+USTRUCT(BlueprintType)
+struct EOD_API FInventoryItem
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Inventory Item")
+	FName ItemID;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Inventory Item")
+	UTexture* ItemIcon;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Inventory Item")
+	FString Description;
+
+	// @todo hover info
 };
 
 /**

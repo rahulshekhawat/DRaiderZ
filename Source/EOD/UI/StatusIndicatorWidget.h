@@ -78,42 +78,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	USpacer* StaminaSpacer;
 
+	UFUNCTION()
+	void UpdateHealthBar(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProgressBar)
-	// float Percent;
+	UFUNCTION()
+	void UpdateManaBar(int32 BaseMana, int32 MaxMana, int32 CurrentMana);
 
-	inline void UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth);
-
-	inline void UpdateManaBar(int32 CurrentMana, int32 MaxMana, int32 BaseMana);
-
-	inline void UpdateStaminaBar(int32 CurrentStamina, int32 MaxStamina, int32 BaseStamina);
+	UFUNCTION()
+	void UpdateStaminaBar(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina);
 
 private:
-
 	FORCEINLINE void SetHorizontalSlotSize(class UHorizontalBoxSlot* HBSlot, float FillValue);
 
-	// FORCEINLINE SetHealthPercent(float Value);
+	FORCEINLINE void UpdateHealthBar_Internal(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	// UProgressBar* HealthBar;
+	FORCEINLINE void UpdateManaBar_Internal(int32 BaseMana, int32 MaxMana, int32 CurrentMana);
 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	// UProgressBar* ManaBar;
+	FORCEINLINE void UpdateStaminaBar_Internal(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina);
 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	// UProgressBar* StaminaBar;
-
-	// @todo Class icon
-
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	// UTextBlock* LevelText;
-
-	
-	
-	
 };
 
-inline void UStatusIndicatorWidget::UpdateHealthBar(int32 CurrentHealth, int32 MaxHealth, int32 BaseHealth)
+FORCEINLINE void UStatusIndicatorWidget::UpdateHealthBar_Internal(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth)
 {
 	float MBHratio = (float)MaxHealth / (float)BaseHealth;
 	MBHratio = MBHratio > 1.0 ? 1.0 : MBHratio;
@@ -134,7 +119,7 @@ inline void UStatusIndicatorWidget::UpdateHealthBar(int32 CurrentHealth, int32 M
 	SetHorizontalSlotSize(HealthSpacerHSlot, 1 - CMHratio);
 }
 
-inline void UStatusIndicatorWidget::UpdateManaBar(int32 CurrentMana, int32 MaxMana, int32 BaseMana)
+FORCEINLINE void UStatusIndicatorWidget::UpdateManaBar_Internal(int32 BaseMana, int32 MaxMana, int32 CurrentMana)
 {
 	float MBMratio = (float)MaxMana / (float)BaseMana;
 	MBMratio = MBMratio > 1.0 ? 1.0 : MBMratio;
@@ -155,7 +140,7 @@ inline void UStatusIndicatorWidget::UpdateManaBar(int32 CurrentMana, int32 MaxMa
 	SetHorizontalSlotSize(ManaSpacerHSlot, 1 - CMMratio);
 }
 
-inline void UStatusIndicatorWidget::UpdateStaminaBar(int32 CurrentStamina, int32 MaxStamina, int32 BaseStamina)
+FORCEINLINE void UStatusIndicatorWidget::UpdateStaminaBar_Internal(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina)
 {
 	float MBSratio = (float)MaxStamina / (float)BaseStamina;
 	MBSratio = MBSratio > 1.0 ? 1.0 : MBSratio;

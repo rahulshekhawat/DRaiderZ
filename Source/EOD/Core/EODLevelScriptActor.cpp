@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODLevelScriptActor.h"
-#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Characters/PlayerCharacter.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"

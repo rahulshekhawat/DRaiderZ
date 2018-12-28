@@ -2,9 +2,9 @@
 
 #include "CombatManager.h"
 #include "EOD/Core/EODPreprocessors.h"
-#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/Events/AttackDodgedEvent.h"
-#include "EOD/Player/Components/StatsComponentBase.h"
+#include "EOD/Characters/Components/StatsComponentBase.h"
 
 #include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -227,7 +227,8 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 	}
 
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillDamageInfo, bCritHit, bAttackBlocked);
-	int32 ResultingHitCharacterHP = HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
+	HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
+	int32 ResultingHitCharacterHP = HitCharacter->GetStatsComponent()->GetCurrentHealth();
 	bool bCCEApplied = ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillDamageInfo, LineHitResult, BCAngle);
 	if (ResultingHitCharacterHP <= 0)
 	{

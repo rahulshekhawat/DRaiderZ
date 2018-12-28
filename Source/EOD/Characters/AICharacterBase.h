@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EOD/Statics/CharacterLibrary.h"
-#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Characters/EODCharacterBase.h"
 
 #include "Engine/StreamableManager.h"
 #include "AICharacterBase.generated.h"

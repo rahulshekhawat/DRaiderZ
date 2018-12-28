@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "AnimNotify_SoftRotationMarker.h"
-#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Characters/PlayerCharacter.h"
 
 #include "Components/SkeletalMeshComponent.h"
 
@@ -13,6 +13,6 @@ void UAnimNotify_SoftRotationMarker::Notify(USkeletalMeshComponent* MeshComp, UA
 		return;
 	}
 
-	PlayerCharacter->SetOffSmoothRotation(PlayerCharacter->GetPlayerControlRotationYaw());
+	PlayerCharacter->SetOffSmoothRotation(PlayerCharacter->GetControllerRotationYaw());
 
 }

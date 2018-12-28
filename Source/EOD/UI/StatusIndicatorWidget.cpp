@@ -40,3 +40,18 @@ void UStatusIndicatorWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 }
+
+void UStatusIndicatorWidget::UpdateHealthBar(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth)
+{
+	UpdateHealthBar_Internal(BaseHealth, MaxHealth, CurrentHealth);
+}
+
+void UStatusIndicatorWidget::UpdateManaBar(int32 BaseMana, int32 MaxMana, int32 CurrentMana)
+{
+	UpdateManaBar_Internal(BaseMana, MaxMana, CurrentMana);
+}
+
+void UStatusIndicatorWidget::UpdateStaminaBar(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina)
+{
+	UpdateStaminaBar_Internal(BaseStamina, MaxStamina, CurrentStamina);
+}

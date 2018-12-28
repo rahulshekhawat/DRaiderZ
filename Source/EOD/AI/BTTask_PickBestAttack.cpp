@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "BTTask_PickBestAttack.h"
-#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Characters/EODCharacterBase.h"
 #include "EOD/Statics/AILibrary.h"
 
 #include "AIController.h"

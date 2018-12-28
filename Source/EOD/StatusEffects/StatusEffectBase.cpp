@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "StatusEffectBase.h"
-#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Characters/EODCharacterBase.h"
 
 #include "Engine/World.h"
 

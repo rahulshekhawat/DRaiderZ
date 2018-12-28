@@ -8,6 +8,11 @@
 #include "Components/ActorComponent.h"
 #include "StatsComponentBase.generated.h"
 
+
+/** Delegate for whenever one of the health, mana, or stamina changes */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStatChanged, int32, BaseStatValue, int32, MaxStatValue, int32, CurrentStatValue);
+
+
 /**
  * An abstract base class that lays out the expected behavior of stats component to manage character stats.
  */
@@ -24,9 +29,141 @@ public:
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void BeginPlay() override;
+
 	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
+
+	////////////////////////////////////////////////////////////////////////////////
+	// HEALTH
+	////////////////////////////////////////////////////////////////////////////////
+protected:
+	/** Maximum health of character without any status effects */
+	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
+	int32 BaseHealth;
+
+	/** Percentage (0 to 1) of max health that will be considered low health */
+	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
+	float LowHealthPercent;
+
+	/** Current maximum health of character (with or without any status effects) */
+	UPROPERTY(Replicated)
+	int32 MaxHealth;
+
+	/** Current health of character */
+	UPROPERTY(Replicated)
+	int32 CurrentHealth;
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Stats Component")			
+	FOnStatChanged OnHealthChanged;
+
+	FORCEINLINE bool IsLowOnHealth() const;
+
+	FORCEINLINE int32 GetBaseHealth() const;
+
+	FORCEINLINE int32 GetMaxHealth() const;
+
+	FORCEINLINE int32 GetCurrentHealth() const;
+
+	FORCEINLINE void ModifyBaseHealth(int32 Value, bool bPercent = false);
+
+	FORCEINLINE void ModifyMaxHealth(int32 Value, bool bPercent = false);
+
+	FORCEINLINE void ModifyCurrentHealth(int32 Value, bool bPercent = false);
+
+private:
+	FORCEINLINE void SetBaseHealth(int32 Value);
+
+	FORCEINLINE void SetMaxHealth(int32 Value);
+
+	FORCEINLINE void SetCurrentHealth(int32 Value);
+
+	
+	////////////////////////////////////////////////////////////////////////////////
+	// MANA
+	////////////////////////////////////////////////////////////////////////////////
+protected:
+	/** Maximum mana of character without any status effects */
+	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
+	int32 BaseMana;
+
+	/** Current maximum mana of character - with or without any status effects */
+	UPROPERTY(Replicated)
+	int32 MaxMana;
+
+	/** Current mana of character */
+	UPROPERTY(Replicated)
+	int32 CurrentMana;
+	
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
+	FOnStatChanged OnManaChanged;
+
+	FORCEINLINE int32 GetBaseMana() const;
+
+	FORCEINLINE int32 GetMaxMana() const;
+
+	FORCEINLINE int32 GetCurrentMana() const;
+
+	FORCEINLINE void ModifyBaseMana(int32 Value, bool bPercent = false);
+
+	FORCEINLINE void ModifyMaxMana(int32 Value, bool bPercent = false);
+
+	FORCEINLINE void ModifyCurrentMana(int32 Value, bool bPercent = false);
+
+private:
+	FORCEINLINE void SetBaseMana(int32 Value);
+
+	FORCEINLINE void SetMaxMana(int32 Value);
+
+	FORCEINLINE void SetCurrentMana(int32 Value);
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// STAMINA
+	////////////////////////////////////////////////////////////////////////////////
+protected:
+	/** Maximum mana of character without any status effects */
+	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
+	int32 BaseStamina;
+
+	/** Current maximum stamina of character - with or without any status effects */
+	UPROPERTY(Replicated)
+	int32 MaxStamina;
+
+	/** Current stamina of character */
+	UPROPERTY(Replicated)
+	int32 CurrentStamina;
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
+	FOnStatChanged OnStaminaChanged;
+
+	FORCEINLINE int32 GetBaseStamina() const;
+
+	FORCEINLINE int32 GetMaxStamina() const;
+
+	FORCEINLINE int32 GetCurrentStamina() const;
+
+	FORCEINLINE void ModifyBaseStamina(int32 Value, bool bPercent = false);
+
+	FORCEINLINE void ModifyMaxStamina(int32 Value, bool bPercent = false);
+
+	FORCEINLINE void ModifyCurrentStamina(int32 Value, bool bPercent = false);
+
+private:
+	FORCEINLINE void SetBaseStamina(int32 Value);
+
+	FORCEINLINE void SetMaxStamina(int32 Value);
+
+	FORCEINLINE void SetCurrentStamina(int32 Value);
+
+
+public:
+
+	/*
 	virtual int32 GetBaseHealth() const PURE_VIRTUAL(UStatsComponentBase::GetBaseHealth, return 0; );
 	
 	virtual int32 GetMaxHealth() const PURE_VIRTUAL(UStatsComponentBase::GetMaxHealth, return 0; );
@@ -82,6 +219,7 @@ public:
 	virtual void SetMaxStamina(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetMaxStamina, );
 
 	virtual void SetCurrentStamina(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetCurrentStamina, );
+	*/
 
 	virtual int32 GetHealthRegenRate() const PURE_VIRTUAL(UStatsComponentBase::GetHealthRegenRate, return 0; );
 
@@ -335,3 +473,270 @@ private:
 		
 	
 };
+
+FORCEINLINE bool UStatsComponentBase::IsLowOnHealth() const
+{
+	float CurrentPercent = (float)CurrentHealth / (float)MaxHealth;
+	return CurrentPercent <= LowHealthPercent;
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetBaseHealth() const
+{
+	return BaseHealth;
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetMaxHealth() const
+{
+	return MaxHealth;
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetCurrentHealth() const
+{
+	return CurrentHealth;
+}
+
+inline void UStatsComponentBase::ModifyBaseHealth(int32 Value, bool bPercent)
+{
+	if (Value == 0)
+	{
+		return;
+	}
+
+	if (bPercent)
+	{
+		int32 ModificationValue = (float)(BaseHealth * Value) / 100.f;
+		SetBaseHealth(BaseHealth + ModificationValue);
+	}
+	else
+	{
+		SetBaseHealth(BaseHealth + Value);
+	}
+}
+
+inline void UStatsComponentBase::ModifyMaxHealth(int32 Value, bool bPercent)
+{
+	if (Value == 0)
+	{
+		return;
+	}
+
+	if (bPercent)
+	{
+		int32 ModificationValue = (float)(MaxHealth * Value) / 100.f;
+		SetMaxHealth(MaxHealth + ModificationValue);
+	}
+	else
+	{
+		SetMaxHealth(MaxHealth + Value);
+	}
+}
+
+inline void UStatsComponentBase::ModifyCurrentHealth(int32 Value, bool bPercent)
+{
+	if (Value == 0)
+	{
+		return;
+	}
+
+	if (bPercent)
+	{
+		int32 ModificationValue = (float)(CurrentHealth * Value) / 100.f;
+		SetCurrentHealth(CurrentHealth + ModificationValue);
+	}
+	else
+	{
+		SetCurrentHealth(CurrentHealth + Value);
+	}
+}
+
+FORCEINLINE void UStatsComponentBase::SetBaseHealth(int32 Value)
+{
+	BaseHealth = Value <= 0 ? 0 : Value;
+	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
+}
+
+FORCEINLINE void UStatsComponentBase::SetMaxHealth(int32 Value)
+{
+	MaxHealth = Value <= 0 ? 0 : Value;
+	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
+}
+
+FORCEINLINE void UStatsComponentBase::SetCurrentHealth(int32 Value)
+{
+	CurrentHealth = Value <= 0 ? 0 : Value;
+	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetBaseMana() const
+{
+	return BaseMana;
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetMaxMana() const
+{
+	return MaxMana;
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetCurrentMana() const
+{
+	return CurrentMana;
+}
+
+inline void UStatsComponentBase::ModifyBaseMana(int32 Value, bool bPercent)
+{
+	if (Value == 0)
+	{
+		return;
+	}
+
+	if (bPercent)
+	{
+		int32 ModificationValue = (float)(BaseMana * Value) / 100.f;
+		SetBaseMana(BaseMana + ModificationValue);
+	}
+	else
+	{
+		SetBaseMana(BaseMana + Value);
+	}
+}
+
+inline void UStatsComponentBase::ModifyMaxMana(int32 Value, bool bPercent)
+{
+	if (Value == 0)
+	{
+		return;
+	}
+
+	if (bPercent)
+	{
+		int32 ModificationValue = (float)(MaxMana * Value) / 100.f;
+		SetMaxMana(MaxMana + ModificationValue);
+	}
+	else
+	{
+		SetMaxMana(MaxMana + Value);
+	}
+}
+
+inline void UStatsComponentBase::ModifyCurrentMana(int32 Value, bool bPercent)
+{
+	if (Value == 0)
+	{
+		return;
+	}
+
+	if (bPercent)
+	{
+		int32 ModificationValue = (float)(CurrentMana * Value) / 100.f;
+		SetCurrentMana(CurrentMana + ModificationValue);
+	}
+	else
+	{
+		SetCurrentMana(CurrentMana + Value);
+	}
+}
+
+FORCEINLINE void UStatsComponentBase::SetBaseMana(int32 Value)
+{
+	BaseMana = Value <= 0 ? 0 : Value;
+	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
+}
+
+FORCEINLINE void UStatsComponentBase::SetMaxMana(int32 Value)
+{
+	MaxMana = Value <= 0 ? 0 : Value;
+	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
+}
+
+FORCEINLINE void UStatsComponentBase::SetCurrentMana(int32 Value)
+{
+	CurrentMana = Value <= 0 ? 0 : Value;
+	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetBaseStamina() const
+{
+	return BaseStamina;
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetMaxStamina() const
+{
+	return MaxStamina;
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetCurrentStamina() const
+{
+	return CurrentStamina;
+}
+
+inline void UStatsComponentBase::ModifyBaseStamina(int32 Value, bool bPercent)
+{
+	if (Value == 0)
+	{
+		return;
+	}
+
+	if (bPercent)
+	{
+		int32 ModificationValue = (float)(BaseStamina * Value) / 100.f;
+		SetBaseStamina(BaseStamina + ModificationValue);
+	}
+	else
+	{
+		SetBaseStamina(BaseStamina + Value);
+	}
+}
+
+inline void UStatsComponentBase::ModifyMaxStamina(int32 Value, bool bPercent)
+{
+	if (Value == 0)
+	{
+		return;
+	}
+
+	if (bPercent)
+	{
+		int32 ModificationValue = (float)(MaxStamina * Value) / 100.f;
+		SetMaxStamina(MaxStamina + ModificationValue);
+	}
+	else
+	{
+		SetMaxStamina(MaxStamina + Value);
+	}
+}
+
+inline void UStatsComponentBase::ModifyCurrentStamina(int32 Value, bool bPercent)
+{
+	if (Value == 0)
+	{
+		return;
+	}
+
+	if (bPercent)
+	{
+		int32 ModificationValue = (float)(CurrentStamina * Value) / 100.f;
+		SetCurrentStamina(CurrentStamina + ModificationValue);
+	}
+	else
+	{
+		SetCurrentStamina(CurrentStamina + Value);
+	}
+}
+
+inline void UStatsComponentBase::SetBaseStamina(int32 Value)
+{
+	BaseStamina = Value <= 0 ? 0 : Value;
+	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
+}
+
+inline void UStatsComponentBase::SetMaxStamina(int32 Value)
+{
+	MaxStamina = Value <= 0 ? 0 : Value;
+	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
+}
+
+inline void UStatsComponentBase::SetCurrentStamina(int32 Value)
+{
+	CurrentStamina = Value <= 0 ? 0 : Value;
+	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
+}

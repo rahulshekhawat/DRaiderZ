@@ -2,6 +2,7 @@
 
 #include "StatsComponentBase.h"
 
+#include "UnrealNetwork.h"
 
 UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
@@ -13,11 +14,36 @@ UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitial
 	bHasHealthRegenration = false;
 	bHasManaRegenration = false;
 	bHasStaminaRegenration = false;
+
+	LowHealthPercent = 0.15f;
 }
 
 void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UStatsComponentBase, MaxHealth);
+	DOREPLIFETIME(UStatsComponentBase, CurrentHealth);
+	DOREPLIFETIME(UStatsComponentBase, MaxMana);
+	DOREPLIFETIME(UStatsComponentBase, CurrentMana);
+	DOREPLIFETIME(UStatsComponentBase, MaxStamina);
+	DOREPLIFETIME(UStatsComponentBase, CurrentStamina);	
+}
+
+void UStatsComponentBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//~ Initialize current variables
+	SetMaxHealth(BaseHealth);
+	SetCurrentHealth(BaseHealth);
+
+	SetMaxMana(BaseMana);
+	SetCurrentMana(BaseMana);
+
+	SetMaxStamina(BaseStamina);
+	SetCurrentStamina(BaseStamina);
+
 }
 
 void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -25,4 +51,3 @@ void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 }
-

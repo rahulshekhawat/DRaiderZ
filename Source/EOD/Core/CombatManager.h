@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Characters/EODCharacterBase.h"
 #include "EOD/Statics/CharacterLibrary.h"
 
 #include "Camera/CameraShake.h"

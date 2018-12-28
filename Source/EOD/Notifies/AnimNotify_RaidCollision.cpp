@@ -3,7 +3,7 @@
 #include "AnimNotify_RaidCollision.h"
 #include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Statics/CombatLibrary.h"
-#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Characters/EODCharacterBase.h"
 #include "EOD/Core/CombatZoneModeBase.h"
 #include "EOD/Core/CombatManager.h"
 

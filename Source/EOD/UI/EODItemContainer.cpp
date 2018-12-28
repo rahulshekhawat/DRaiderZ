@@ -2,7 +2,7 @@
 
 #include "EODItemContainer.h"
 #include "EOD/UI/DragVisualWidget.h"
-#include "EOD/Player/PlayerCharacter.h"
+#include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/UI/EODItemDragDropOperation.h"
 
 #include "Styling/SlateTypes.h"

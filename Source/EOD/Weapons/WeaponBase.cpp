@@ -7,6 +7,9 @@
 // Sets default values
 AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
+	// SetReplicates(true);
+	SetReplicates(false);
+
 	// This actor doesn't tick
 	PrimaryActorTick.bCanEverTick = false;
 	

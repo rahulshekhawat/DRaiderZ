@@ -2,7 +2,7 @@
 
 #include "CharacterLibrary.h"
 #include "EOD/Core/GameSingleton.h"
-#include "EOD/Player/EODCharacterBase.h"
+#include "EOD/Characters/EODCharacterBase.h"
 #include "EOD/Statics/EODLibrary.h"
 
 #include "Engine/Engine.h"

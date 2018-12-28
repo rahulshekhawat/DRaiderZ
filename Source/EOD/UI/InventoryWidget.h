@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Statics/EODLibrary.h"
+
 #include "Blueprint/UserWidget.h"
 #include "InventoryWidget.generated.h"
 
@@ -28,6 +30,14 @@ public:
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
+
+	UFUNCTION()
+	void AddItem(const FInventoryItem& Item);
+
+	UFUNCTION()
+	void RemoveItem(const FInventoryItem& Item);
+
+	// void RemoveItem()
 
 	/*
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))

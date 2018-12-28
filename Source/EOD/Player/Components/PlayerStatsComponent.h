@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EOD/Statics/WeaponLibrary.h"
-#include "EOD/Player/Components/StatsComponentBase.h"
+#include "EOD/Characters/Components/StatsComponentBase.h"
 
 #include "PlayerStatsComponent.generated.h"
 
@@ -30,6 +30,7 @@ public:
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
+	/*
 	virtual int32 GetBaseHealth() const override;
 	
 	virtual int32 GetMaxHealth() const override;
@@ -85,6 +86,7 @@ public:
 	virtual void SetMaxStamina(int32 Value) override;
 
 	virtual void SetCurrentStamina(int32 Value) override;
+	*/
 
 	virtual int32 GetHealthRegenRate() const override;
 
@@ -337,40 +339,40 @@ private:
 	int32 Level;
 
 	/** Maximum health of character without any status effects */
-	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
-	int32 BaseHealth;
+	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
+	// int32 BaseHealth;
 
 	/** Current maximum health of character - with or without any status effects */
-	UPROPERTY(Replicated)
-	int32 MaxHealth;
+	// UPROPERTY(Replicated)
+	// int32 MaxHealth;
 
 	/** Current health of character */
-	UPROPERTY(Replicated)
-	int32 CurrentHealth;
+	// UPROPERTY(Replicated)
+	// int32 CurrentHealth;
 	
 	/** Maximum mana of character without any status effects */
-	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
-	int32 BaseMana;
-	
+	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
+	// int32 BaseMana;
+
 	/** Current maximum health of character - with or without any status effects */
-	UPROPERTY(Replicated)
-	int32 MaxMana;
+	// UPROPERTY(Replicated)
+	// int32 MaxMana;
 	
 	/** Current mana of character */
-	UPROPERTY(Replicated)
-	int32 CurrentMana;
+	// UPROPERTY(Replicated)
+	// int32 CurrentMana;
 	
 	/** Maximum stamina of character without any status effects */
-	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
-	int32 BaseStamina;
+	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
+	// int32 BaseStamina;
 	
 	/** Current maximum stamina of character - with or without any status effects */
-	UPROPERTY(Replicated)
-	int32 MaxStamina;
+	// UPROPERTY(Replicated)
+	// int32 MaxStamina;
 	
 	/** Current stamina of character */
-	UPROPERTY(Replicated)
-	int32 CurrentStamina;
+	// UPROPERTY(Replicated)
+	// int32 CurrentStamina;
 
 	//~ If regeneration rates are not displayed to player in-game then they are not needed to be replicated
 	//~ However, if we do need to replicate regeneration rate then we can simply replicate it to owner only

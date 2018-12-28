@@ -37,6 +37,8 @@ public:
 	
 	/** Called when a new weapon is equipped by a character */
 	virtual void OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData) override;
+
+	virtual void OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset) override;
 	
 	/** Called when this weapon is unequipped by a character */
 	virtual void OnUnEquip() override;	

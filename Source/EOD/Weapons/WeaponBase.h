@@ -9,6 +9,7 @@
 #include "WeaponBase.generated.h"
 
 class APlayerCharacter;
+class UWeaponDataAsset;
 
 /**
  * An abstract base class for player equippable weapons
@@ -31,6 +32,8 @@ public:
 
 	/** Called when a new weapon is equipped by a character */
 	virtual void OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData) PURE_VIRTUAL(AWeaponBase::OnEquip, );
+
+	virtual void OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset) PURE_VIRTUAL(AWeaponBase::OnEquip, );
 
 	/** Called when this weapon is unequipped by a character */
 	virtual void OnUnEquip() PURE_VIRTUAL(ABaseWeapon::OnUnEquip, );

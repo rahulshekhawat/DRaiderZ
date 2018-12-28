@@ -1,9 +1,9 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "AIStatsComponent.h"
-#include "AI/AICharacterBase.h"
+#include "EOD/AI/Components/AIStatsComponent.h"
+#include "EOD/Characters/AICharacterBase.h"
 #include "UI/FloatingHealthBarWidget.h"
-#include "Player/Components/EODWidgetComponent.h"
+#include "EOD/Characters/Components/EODWidgetComponent.h"
 
 #include "UnrealNetwork.h"
 #include "Components/ProgressBar.h"
@@ -18,11 +18,13 @@ void UAIStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*
 	SetMaxHealth(BaseHealth);
 	SetCurrentHealth(BaseHealth);
 
 	SetMaxMana(BaseMana);
 	SetCurrentMana(BaseMana);
+	*/
 
 }
 
@@ -30,19 +32,24 @@ void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	/*
 	DOREPLIFETIME(UAIStatsComponent, MaxHealth);
 	DOREPLIFETIME(UAIStatsComponent, CurrentHealth);
 	DOREPLIFETIME(UAIStatsComponent, MaxMana);
 	DOREPLIFETIME(UAIStatsComponent, CurrentMana);
+	*/
 
+	/*
 	DOREPLIFETIME(UAIStatsComponent, MovementSpeedModifier);
 	DOREPLIFETIME(UAIStatsComponent, ActiveTimeDilation);
 	DOREPLIFETIME(UAIStatsComponent, SpellCastingSpeedModifier);
 	
 	DOREPLIFETIME(UAIStatsComponent, Darkness);
+	*/
 
 }
 
+/*
 int32 UAIStatsComponent::GetBaseHealth() const
 {
 	return BaseHealth;
@@ -196,6 +203,7 @@ void UAIStatsComponent::SetMaxStamina(int32 Value)
 void UAIStatsComponent::SetCurrentStamina(int32 Value)
 {
 }
+*/
 
 int32 UAIStatsComponent::GetHealthRegenRate() const
 {

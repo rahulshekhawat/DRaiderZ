@@ -27,3 +27,11 @@ void UInventoryWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 }
+
+void UInventoryWidget::AddItem(const FInventoryItem& Item)
+{
+}
+
+void UInventoryWidget::RemoveItem(const FInventoryItem& Item)
+{
+}
