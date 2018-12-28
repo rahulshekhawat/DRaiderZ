@@ -1497,27 +1497,8 @@ void APlayerCharacter::StartNormalAttack()
 		SectionToPlay = UCharacterLibrary::SectionName_FirstSwing;
 	}
 
-
-	float DesiredYaw = GetControllerRotationYaw();
-	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-	if (MoveComp)
-	{
-		MoveComp->DoInstantRotation(DesiredYaw);
-	}
-
-	/*
-	float DesiredYaw = GetControllerRotationYaw();
-	// Instantly rotate character
-	SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-	// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
-	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-	if (MoveComp)
-	{
-		MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
-	}
-	*/
-
 	PlayNormalAttackAnimation(NAME_None, SectionToPlay);
+	// @note The rotation is handled through the AnimNotify_NormalAttack that gets called when a normal attack starts.
 }
 
 void APlayerCharacter::StopNormalAttack()

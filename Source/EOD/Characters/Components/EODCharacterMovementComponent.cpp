@@ -120,7 +120,7 @@ void UEODCharacterMovementComponent::DoInstantRotation(float InstantRotationYaw)
 
 void UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Implementation(float NewRotationYaw)
 {
-	// SetDesiredCustomRotationYaw(NewRotationYaw);
+	SetDesiredCustomRotationYaw(NewRotationYaw);
 }
 
 bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Validate(float NewRotationYaw)
