@@ -35,7 +35,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 private:
 	UPROPERTY()
-	AEODCharacterBase* CharacterOwner;
+	AEODCharacterBase* EODCharacterOwner;
 
 	UPROPERTY()
 	FName ActiveSkillID;
@@ -62,7 +62,7 @@ public:
 
 	FORCEINLINE FSkillTableRow* GetCurrentActiveSkill() const { return ActiveSkill; }
 
-	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return CharacterOwner; }
+	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return EODCharacterOwner; }
 
 	////////////////////////////////////////////////////////////////////////////////
 	// NETWORK

@@ -26,7 +26,7 @@ void UGameplaySkillsComponent::BeginPlay()
 	// * GetOwner() in constructor is CDO of created character (e.g., Default_BP_FemaleCharacter, etc.)
 	// * GetOwner() in PostLoad() was correct for AI characters spawned along with map, but was incorrect (NULL)  for player character
 	// * GetOwner() has been found to be setup correctly in BeginPlay
-	CharacterOwner = Cast<AEODCharacterBase>(GetOwner());
+	EODCharacterOwner = Cast<AEODCharacterBase>(GetOwner());
 
 }
 
@@ -43,25 +43,23 @@ void UGameplaySkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 void UGameplaySkillsComponent::SetCurrentActiveSkill(const FName SkillID)
 {
-	if (!IsValid(CharacterOwner))
+	// Although setting ActiveSkillID and ActiveSkill on local client is un-necessary from combat perspective (all combat events fire on server only),
+	// these variables have been set up in local client as well for query purposes.
+
+	if (SkillID == NAME_None)
 	{
-		return;
+		ActiveSkillID = NAME_None;
+		ActiveSkill = nullptr;
 	}
-	else if (IsValid(CharacterOwner) && CharacterOwner->Role < ROLE_Authority)
+	else
+	{
+		ActiveSkill = GetSkill(SkillID);
+		ActiveSkillID = ActiveSkill ? SkillID : NAME_None;
+	}
+
+	if (IsValid(EODCharacterOwner) && EODCharacterOwner->Role < ROLE_Authority)
 	{
 		Server_SetCurrentActiveSkill(SkillID);
-	}
-	else if (IsValid(CharacterOwner) && CharacterOwner->Role == ROLE_Authority)
-	{
-		if (SkillID == NAME_None)
-		{
-			ActiveSkill = nullptr;
-		}
-		else
-		{
-			ActiveSkill = GetSkill(SkillID);
-			ActiveSkillID = ActiveSkill ? SkillID : NAME_None;
-		}
 	}
 }
 
