@@ -16,7 +16,7 @@
 #include "EOD/Statics/DialogueLibrary.h"
 #include "EOD/Weapons/WeaponDataAsset.h"
 // #include "EOD/Weapons/WeaponSlot.h"
-#include "EOD/Characters/Components/SkillBarComponent.h"
+#include "EOD/Characters/Components/GameplaySkillsComponent.h"
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
 #include "Engine/World.h"
@@ -2148,6 +2148,11 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	{
 		SetCanUseChainSkill(false);
 	}
+
+	if (IsValid(GetGameplaySkillsComponent()) && IsValid(GetController()) && GetController()->IsLocalPlayerController())
+	{
+		GetGameplaySkillsComponent()->SetCurrentActiveSkill(NAME_None);
+	}
 }
 
 void APlayerCharacter::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted)
@@ -2245,79 +2250,9 @@ void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 	SkillIDString += GetWeaponPrefix();
 	SkillIDString += GetNormalAttackSuffix(SectionName);
 
-	/*
-	if (Gender == ECharacterGender::Male)
+	if (IsValid(GetGameplaySkillsComponent()) && IsValid(GetController()) && GetController()->IsLocalPlayerController())
 	{
-		SkillIDString += FString("M_");
-	}
-	else
-	{
-		SkillIDString += FString("F_");
-	}
-
-	switch (GetEquippedWeaponType())
-	{
-	case EWeaponType::GreatSword:
-		SkillIDString += FString("GS_");
-		break;
-	case EWeaponType::WarHammer:
-		SkillIDString += FString("WH_");
-		break;
-	case EWeaponType::LongSword:
-		SkillIDString += FString("LS_");
-		break;
-	case EWeaponType::Mace:
-		SkillIDString += FString("MC_");
-		break;
-	case EWeaponType::Dagger:
-		SkillIDString += FString("DG_");
-		break;
-	case EWeaponType::Staff:
-		SkillIDString += FString("ST_");
-		break;
-	case EWeaponType::Shield:
-		break;
-	case EWeaponType::None:
-		break;
-	default:
-		break;
-	}
-
-	if (SectionName == UCharacterLibrary::SectionName_FirstSwing)
-	{
-		SkillIDString += FString("1");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_SecondSwing)
-	{
-		SkillIDString += FString("2");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_ThirdSwing)
-	{
-		SkillIDString += FString("3");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_FourthSwing)
-	{
-		SkillIDString += FString("4");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_FifthSwing)
-	{
-		SkillIDString += FString("5");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_BackwardSPSwing)
-	{
-		SkillIDString += FString("BSP");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_ForwardSPSwing)
-	{
-		SkillIDString += FString("FSP");
-	}
-	*/
-
-	// FName SkillID = FName(*SkillIDString);
-	// SetCurrentActiveSkillID(SkillID);
-	if (GetSkillBarComponent())
-	{
-		GetSkillBarComponent()->SetCurrentActiveSkill(FName(*SkillIDString));
+		GetGameplaySkillsComponent()->SetCurrentActiveSkill(FName(*SkillIDString));
 	}
 
 	// @todo set current active skill

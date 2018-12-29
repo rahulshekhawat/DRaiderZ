@@ -1,7 +1,6 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
-#include "EOD/Core/EODPreprocessors.h"
 
 #include "UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"
@@ -12,6 +11,11 @@
 UEODCharacterMovementComponent::UEODCharacterMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	RotationRate = FRotator(0.f, 600.f, 0.f);
+}
+
+void UEODCharacterMovementComponent::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 void UEODCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

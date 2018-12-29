@@ -38,8 +38,15 @@ void USkillBarComponent::SetCurrentActiveSkill(const FName SkillID)
 	}
 	else
 	{
-		ActiveSkill = GetSkill(SkillID);
-		ActiveSkillID = ActiveSkill ? SkillID : NAME_None;
+		if (SkillID == NAME_None)
+		{
+			ActiveSkill = nullptr;
+		}
+		else
+		{
+			ActiveSkill = GetSkill(SkillID);
+			ActiveSkillID = ActiveSkill ? SkillID : NAME_None;
+		}
 	}
 }
 

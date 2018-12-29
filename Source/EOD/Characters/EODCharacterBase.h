@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Statics/EODLibrary.h"
 #include "EOD/Statics/CharacterLibrary.h"
 #include "EOD/StatusEffects/StatusEffectBase.h"
@@ -26,7 +27,7 @@ class UCameraComponent;
 class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
-class USkillBarComponent;
+class UGameplaySkillsComponent;
 // class USkillTreeComponent;
 
 /** 
@@ -256,7 +257,7 @@ public:
 
 	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
 
-	FORCEINLINE USkillBarComponent* GetSkillBarComponent() const { return SkillBarComponent; }
+	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const { return GameplaySkillsComponent; }
 
 	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
 
@@ -269,6 +270,8 @@ public:
 	FORCEINLINE void ZoomInCamera();
 
 	FORCEINLINE void ZoomOutCamera();
+
+	static FName GameplaySkillsComponentName;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
@@ -297,7 +300,7 @@ private:
 
 	//~ Skill bar component - manages skill bar (for player controlled character) and skills of character
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkillBarComponent* SkillBarComponent;
+	UGameplaySkillsComponent* GameplaySkillsComponent;
 
 	//~ Sphere component used to detect interactive objects
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

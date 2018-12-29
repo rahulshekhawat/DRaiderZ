@@ -1,7 +1,6 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EOD/Characters/EODCharacterBase.h"
-#include "EOD/Core/EODPreprocessors.h"
 #include "EOD/AnimInstances/CharAnimInstance.h"
 #include "EOD/Interactives/InteractionInterface.h"
 #include "EOD/Statics/EODBlueprintFunctionLibrary.h"
@@ -10,12 +9,14 @@
 #include "EOD/AI/EODAIControllerBase.h"
 #include "EOD/Characters/Components/SkillsComponent.h"
 #include "EOD/Characters/Components/StatsComponentBase.h"
-#include "EOD/Characters/Components/SkillBarComponent.h"
+#include "EOD/Characters/Components/GameplaySkillsComponent.h"
 
 #include "UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+
+FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("GameplaySkillsComponent"));
 
 AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UEODCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -29,7 +30,8 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	// Initialize Stats Component
 	StatsComp = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, FName("Character Stats Component"));
 	SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
-	SkillBarComponent = ObjectInitializer.CreateDefaultSubobject<USkillBarComponent>(this, FName("Skill Bar Component"));
+	GameplaySkillsComponent = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, FName("Gameplay Skills Component"));
+	// GameplaySkillsComponent = CreateDefaultSubobject<UGameplaySkillsComponent>(AEODCharacterBase::GameplaySkillsComponentName);
 
 	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, FName("Camera Boom"));
 	CameraBoom->bUsePawnControlRotation = true;
@@ -135,6 +137,8 @@ void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// FString Message = GetName();
+	// PrintToScreen(this, Message);
 }
 
 void AEODCharacterBase::PossessedBy(AController* NewController)

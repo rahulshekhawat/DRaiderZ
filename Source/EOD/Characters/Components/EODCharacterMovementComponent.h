@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Core/EODPreprocessors.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -19,6 +20,8 @@ class EOD_API UEODCharacterMovementComponent : public UCharacterMovementComponen
 public:
 
 	UEODCharacterMovementComponent(const FObjectInitializer& ObjectInitializer);
+
+	virtual void BeginPlay() override;
 
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
