@@ -1508,7 +1508,6 @@ void APlayerCharacter::StopNormalAttack()
 
 void APlayerCharacter::UpdateNormalAttackState(float DeltaTime)
 {
-	/*
 	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
 	{
 		return;
@@ -1519,24 +1518,13 @@ void APlayerCharacter::UpdateNormalAttackState(float DeltaTime)
 	{
 		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(NormalAttackMontage);
 		FName ExpectedNextSection = GetNextNormalAttackSectionName(CurrentSection);
-
 		if (ExpectedNextSection != NAME_None)
 		{
-			FString CurrentSectionString = CurrentSection.ToString();
-			if (CurrentSectionString.EndsWith("End"))
-			{
-				PlayAnimationMontage(NormalAttackMontage, ExpectedNextSection);
-				// PlayAnimationMontage(NormalAttackMontage, ExpectedNextSection, ECharacterState::Attacking);
-			}
-			else
-			{
-				SetNextMontageSection(CurrentSection, ExpectedNextSection);
-				// SetNextMontageSection(CurrentSection, NextSection);
-			}
+			PlayNormalAttackAnimation(CurrentSection, ExpectedNextSection);
 		}
+
 		bNormalAttackSectionChangeAllowed = false;
 	}
-	*/
 }
 
 void APlayerCharacter::Destroyed()
@@ -1648,19 +1636,40 @@ void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSect
 	{
 		return;
 	}
+
 	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
 	if (GetMesh()->GetAnimInstance())
 	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (OldSection == NAME_None)
 		{
-			GetMesh()->GetAnimInstance()->Montage_Play(NormalAttackMontage);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(NewSection, NormalAttackMontage);
-			SetCharacterState(ECharacterState::Attacking);
+			AnimInstance->Montage_Play(NormalAttackMontage);
+			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
 		}
 		else
 		{
-
+			FString OldSectionString = OldSection.ToString();
+			if (OldSectionString.EndsWith("End"))
+			{
+				AnimInstance->Montage_Play(NormalAttackMontage);
+				AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+			}
+			else
+			{
+				FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
+				if (CurrentSection == OldSection)
+				{
+					AnimInstance->Montage_SetNextSection(CurrentSection, NewSection, NormalAttackMontage);
+				}
+				else
+				{
+					AnimInstance->Montage_Play(NormalAttackMontage);
+					AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+				}
+			}
 		}
+
+		SetCharacterState(ECharacterState::Attacking);
 	}
 
 	Server_PlayNormalAttackAnimation(OldSection, NewSection);
@@ -2286,16 +2295,36 @@ void APlayerCharacter::Multicast_PlayNormalAttackAnimation_Implementation(FName 
 	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
 	if (GetMesh()->GetAnimInstance())
 	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (OldSection == NAME_None)
 		{
-			GetMesh()->GetAnimInstance()->Montage_Play(NormalAttackMontage);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(NewSection, NormalAttackMontage);
-			SetCharacterState(ECharacterState::Attacking);
+			AnimInstance->Montage_Play(NormalAttackMontage);
+			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
 		}
 		else
 		{
-
+			FString OldSectionString = OldSection.ToString();
+			if (OldSectionString.EndsWith("End"))
+			{
+				AnimInstance->Montage_Play(NormalAttackMontage);
+				AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+			}
+			else
+			{
+				FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
+				if (CurrentSection == OldSection)
+				{
+					AnimInstance->Montage_SetNextSection(CurrentSection, NewSection, NormalAttackMontage);
+				}
+				else
+				{
+					AnimInstance->Montage_Play(NormalAttackMontage);
+					AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+				}
+			}
 		}
+
+		SetCharacterState(ECharacterState::Attacking);
 	}
 }
 
