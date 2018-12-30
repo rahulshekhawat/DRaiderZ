@@ -58,16 +58,14 @@ bool UWeaponLibrary::IsHybridWeapon(EWeaponType WeaponType)
 FWeaponTableRow* UWeaponLibrary::GetWeaponData(FName WeaponID)
 {
 	FWeaponTableRow* WeaponData = nullptr;
-
-	if (GEngine && GEngine->GameSingleton)
+	if (IsValid(GEngine) && IsValid(GEngine->GameSingleton))
 	{
 		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-		if (GameSingleton && GameSingleton->WeaponsDataTable)
+		if (IsValid(GameSingleton) && IsValid(GameSingleton->WeaponsDataTable))
 		{
-			WeaponData = GameSingleton->WeaponsDataTable->FindRow<FWeaponTableRow>(WeaponID, FString("Weapon data lookup"));
+			WeaponData = GameSingleton->WeaponsDataTable->FindRow<FWeaponTableRow>(WeaponID, FString("UWeaponLibrary::GetWeaponData()"));
 		}
 	}
-
 	return WeaponData;
 }
 

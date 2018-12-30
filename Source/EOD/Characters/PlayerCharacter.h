@@ -890,7 +890,7 @@ FORCEINLINE ASecondaryWeapon* APlayerCharacter::GetSecondaryWeapon() const
 
 FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
 {
-	return PrimaryWeapon ? PrimaryWeapon->WeaponType : EWeaponType::None;
+	return PrimaryWeapon ? PrimaryWeapon->GetWeaponType() : EWeaponType::None;
 }
 
 FORCEINLINE UHUDWidget* APlayerCharacter::GetHUDWidget() const
@@ -1023,12 +1023,12 @@ FORCEINLINE bool APlayerCharacter::IsAutoRunning() const
 
 FORCEINLINE bool APlayerCharacter::IsPrimaryWeaponEquippped() const
 {
-	return PrimaryWeaponID != NAME_None && PrimaryWeapon->bEquipped;
+	return PrimaryWeaponID != NAME_None && PrimaryWeapon->IsAttachedToCharacterOwner();
 }
 
 FORCEINLINE bool APlayerCharacter::IsSecondaryWeaponEquipped() const
 {
-	return SecondaryWeaponID != NAME_None && SecondaryWeapon->bEquipped;
+	return SecondaryWeaponID != NAME_None && SecondaryWeapon->IsAttachedToCharacterOwner();
 }
 
 FORCEINLINE bool APlayerCharacter::IsFastRunning() const

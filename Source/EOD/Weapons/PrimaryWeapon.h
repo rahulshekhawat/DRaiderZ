@@ -4,20 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "EOD/Weapons/WeaponBase.h"
+
+#include "Components/SkeletalMeshComponent.h"
 #include "PrimaryWeapon.generated.h"
 
-class USkeletalMeshComponent;
-
-/**
- Determines whether primary weapon is equipped in single hand or both hands
- 
-UENUM(BlueprintType)
-enum class EPrimaryWeaponType : uint8
-{
-	SingleHanded,
-	DualHanded
-};
-*/
 
 /**
  * A PrimaryWeapon is a either a dual handed weapon or a single handed weapon that can be equipped in right hand
@@ -28,23 +18,14 @@ class EOD_API APrimaryWeapon : public AWeaponBase
 	GENERATED_BODY()
 	
 public:
-
 	/** Constructor is used to create this weapon's default skeletal mesh component objects */
 	APrimaryWeapon(const FObjectInitializer& ObjectInitializer);
-	
-	/** Dummy declaration. This actor doesn't tick */
-	virtual void Tick(float DeltaTime) override;
-	
-	/** Called when a new weapon is equipped by a character */
-	virtual void OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData) override;
 
-	virtual void OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset) override;
-	
-	/** Called when this weapon is unequipped by a character */
-	virtual void OnUnEquip() override;	
 
+	////////////////////////////////////////////////////////////////////////////////
+	// Components
+	////////////////////////////////////////////////////////////////////////////////
 private:
-	
 	/** Mesh component that represents the mesh for weapon equipped in left hand */
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* LeftHandWeaponMeshComp;
@@ -53,13 +34,27 @@ private:
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* RightHandWeaponMeshComp;
 		
-	/** Mesh component that represents the mesh for the weapon that has fallen on ground */
+	/** Mesh component that represents the mesh for the weapon fallen on ground */
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* FallenWeaponMeshComp;
 	
 	/** Mesh component that represents the mesh for sheathed weapon */
 	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* SheathedWeaponMeshComp;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// WEAPON INTERFACE
+	////////////////////////////////////////////////////////////////////////////////
+public:
+	/** Called when a new weapon is attached to it's character owner */
+	virtual void OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData) override;
+
+	/** Called when a new weapon is attached to it's character owner */
+	virtual void OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset) override;
+
+	/** Called to detach this weapon is from it's character owner */
+	virtual void OnUnEquip() override;
 
 	
 };

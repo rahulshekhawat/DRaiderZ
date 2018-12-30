@@ -687,7 +687,7 @@ void APlayerCharacter::AddSecondaryWeapon(FName WeaponID)
 	// Since secondary weapon is guaranteed to be single handed
 	RemoveSecondaryWeapon();
 	// RemoveSecondaryWeaponFromDataAsset();
-	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->WeaponType))
+	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->GetWeaponType()))
 	{
 		RemovePrimaryWeapon();
 		// RemovePrimaryWeaponFromDataAsset();
@@ -2223,7 +2223,7 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 
 	// Since secondary weapon is guaranteed to be single handed
 	RemoveSecondaryWeapon();
-	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->WeaponType))
+	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->GetWeaponType()))
 	{
 		RemovePrimaryWeapon();
 	}

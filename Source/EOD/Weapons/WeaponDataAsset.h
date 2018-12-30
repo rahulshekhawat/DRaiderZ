@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "EOD/Statics/WeaponLibrary.h"
 
+#include "Engine/Texture.h"
 #include "Engine/DataAsset.h"
+#include "Engine/SkeletalMesh.h"
 #include "WeaponDataAsset.generated.h"
 
-class UTexture;
-class USkeletalMesh;
-class UStatusEffectBase;
 class UElementalBase;
+class UStatusEffectBase;
 
 /**
  * 
@@ -22,7 +22,6 @@ class EOD_API UWeaponDataAsset : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-
 	UWeaponDataAsset(const FObjectInitializer& ObjectInitializer);
 
 	inline USkeletalMesh* GetWeaponMesh();
@@ -30,7 +29,6 @@ public:
 	inline UTexture* GetIcon();
 
 protected:
-
 	/** The skeletal mesh that represents this weapon */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseInfo)
 	USkeletalMesh* WeaponMesh;
@@ -48,7 +46,6 @@ protected:
 	TSoftObjectPtr<UTexture> IconSoftPtr;
 
 public:
-
 	/** The in-game name used for this weapon */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseInfo)
 	FString DisplayName;
