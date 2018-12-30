@@ -100,6 +100,17 @@ void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 	}
 }
 
+void UEODCharacterMovementComponent::ServerMoveDual_Implementation(float TimeStamp0, FVector_NetQuantize10 InAccel0, uint8 PendingFlags, uint32 View0, float TimeStamp, FVector_NetQuantize10 InAccel, FVector_NetQuantize100 ClientLoc, uint8 NewFlags, uint8 ClientRoll, uint32 View, UPrimitiveComponent * ClientMovementBase, FName ClientBaseBoneName, uint8 ClientMovementMode)
+{
+	ServerMove_Implementation(TimeStamp0, InAccel0, FVector(1.f, 2.f, 3.f), PendingFlags, ClientRoll, View0, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
+	// Prevents anim notifies from being dropped from server
+	if (CharacterOwner)
+	{
+		CharacterOwner->GetMesh()->ConditionallyDispatchQueuedAnimEvents();
+	}
+	ServerMove_Implementation(TimeStamp, InAccel, ClientLoc, NewFlags, ClientRoll, View, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
+}
+
 void UEODCharacterMovementComponent::DoInstantRotation(float InstantRotationYaw)
 {
 	const float AngleTolerance = 1e-3f;
