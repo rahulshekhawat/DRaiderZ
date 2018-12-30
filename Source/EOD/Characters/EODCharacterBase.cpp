@@ -136,9 +136,6 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// FString Message = GetName();
-	// PrintToScreen(this, Message);
 }
 
 void AEODCharacterBase::PossessedBy(AController* NewController)
