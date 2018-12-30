@@ -278,6 +278,7 @@ void APlayerCharacter::BeginPlay()
 	// Since setting master pose component from constructor doesn't work in packaged game
 	SetMasterPoseComponentForMeshes();
 
+	/*
 	if (Controller && Controller->IsLocalPlayerController() && HUDWidgetClass.Get())
 	{
 		if (HUDWidgetClass.Get())
@@ -289,6 +290,7 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 	}
+	*/
 }
 
 USkeletalMeshComponent* APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer)
