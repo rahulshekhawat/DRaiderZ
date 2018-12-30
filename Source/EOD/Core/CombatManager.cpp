@@ -36,7 +36,6 @@ void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const
 		return;
 	}
 	
-	PrintToScreen(this, FString("On Melee Attack"));
 	AEODCharacterBase* InstigatingCharacter = Cast<AEODCharacterBase>(HitInstigator);
 	if (InstigatingCharacter)
 	{
@@ -170,7 +169,6 @@ void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, co
 		return;
 	}
 
-	PrintToScreen(this, FString("Process Character Attack"));
 	for (const FHitResult& HitResult : HitResults)
 	{
 		AActor* HitActor = HitResult.Actor.Get();
@@ -227,11 +225,6 @@ void ACombatManager::CharacterToCharacterAttack(
 {
 	check(HitInstigator && HitCharacter && SkillUsed);
 
-	PrintToScreen(this, FString("Character To Character Attack"));
-
-	// Testing displaying dodge message on a particular client
-	HitCharacter->DisplayTextOnPlayerScreen(FString("Dodge"), DodgeTextColor, HitResult.ImpactPoint);
-
 	bOutHitCharacterReceivedDamage = false;
 	OutDamageInflicted = 0.f;
 	if (!AreEnemies(HitInstigator, HitCharacter))
@@ -241,8 +234,14 @@ void ACombatManager::CharacterToCharacterAttack(
 
 	if (!SkillUsed->bUndodgable && HitCharacter->IsDodgingDamage())
 	{
-
-		// @todo Display dodge message on both HitInstigator and HitCharacter's screen.
+		HitCharacter->DisplayTextOnPlayerScreen(FString("Dodge"), DodgeTextColor, HitResult.ImpactPoint);
+		HitInstigator->DisplayTextOnPlayerScreen(FString("Dodge"), DodgeTextColor, HitResult.ImpactPoint);
+		UAttackDodgedEvent* DodgeEvent = NewObject<UAttackDodgedEvent>();
+		DodgeEvent->AddToRoot();
+		HitCharacter->OnDodgingAttack.Broadcast(HitCharacter, HitInstigator, HitCharacter, DodgeEvent);
+		DodgeEvent->RemoveFromRoot();
+		DodgeEvent->MarkPendingKill();
+		return;
 	}
 
 

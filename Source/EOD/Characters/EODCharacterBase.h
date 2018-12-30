@@ -1071,7 +1071,7 @@ private:
 	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
 
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(Client, Unreliable)
 	void Client_DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 
 	UFUNCTION(Server, Reliable, WithValidation)
