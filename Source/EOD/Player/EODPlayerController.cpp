@@ -1,15 +1,15 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "EODPlayerController.h"
+#include "EOD/Player/EODPlayerController.h"
+#include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Characters/PlayerCharacter.h"
-#include "EOD/Characters/Components/SkillsComponent.h"
+#include "EOD/Characters/Components/SkillTreeComponent.h"
+#include "EOD/Characters/Components/GameplaySkillsComponent.h"
 #include "EOD/Player/Components/InventoryComponent.h"
 #include "EOD/Player/Components/PlayerStatsComponent.h"
 
 #include "EOD/UI/HUDWidget.h"
 #include "EOD/Statics/EODLibrary.h"
-
-#include "Kismet/KismetSystemLibrary.h"
 
 #include "UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
@@ -18,7 +18,7 @@
 AEODPlayerController::AEODPlayerController(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
 	InventoryComponent 	= ObjectInitializer.CreateDefaultSubobject<UInventoryComponent>(this, FName("Player Inventory"));
-	StatsComponent 		= ObjectInitializer.CreateDefaultSubobject<UPlayerStatsComponent>(this, FName("Player Stats"));
+	SkillTreeComponent = ObjectInitializer.CreateDefaultSubobject<USkillTreeComponent>(this, FName("Player Skill Tree"));
 
 	DodgeStaminaCost = 30;
 }
@@ -112,7 +112,8 @@ void AEODPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(AEODPlayerController, bAutoMoveEnabled, COND_SkipOwner);
+	// Why was bAutoMoveEnabled even set to replicate?
+	// DOREPLIFETIME_CONDITION(AEODPlayerController, bAutoMoveEnabled, COND_SkipOwner);
 }
 
 void AEODPlayerController::BeginPlay()
@@ -139,11 +140,18 @@ void AEODPlayerController::Tick(float DeltaTime)
 void AEODPlayerController::Possess(APawn* InPawn)
 {
 	Super::Possess(InPawn);
+	Client_BindStatusIndicatorWidgetDelegates(InPawn);
 }
 
 void AEODPlayerController::UnPossess()
 {
-	Super::UnPossess();
+	// Intentionally called before Super::UnPossess()
+	if (GetPawn())
+	{
+		Client_UnbindStatusIndicatorWidgetDelegates(GetPawn());
+	}
+
+	Super::UnPossess();	
 }
 
 void AEODPlayerController::SetPawn(APawn* InPawn)
@@ -166,6 +174,7 @@ void AEODPlayerController::CreateHUDWidget()
 
 void AEODPlayerController::InitStatusIndicatorWidget()
 {
+	/*
 	if (HUDWidget && HUDWidget->GetStatusIndicatorWidget())
 	{
 		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
@@ -173,11 +182,12 @@ void AEODPlayerController::InitStatusIndicatorWidget()
 		StatsComponent->OnManaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
 		StatsComponent->OnStaminaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
 	}
+	*/
 }
 
 void AEODPlayerController::InitInventoryWidget()
 {
-	if (HUDWidget && HUDWidget->GetInventoryWidget())
+	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetInventoryWidget()))
 	{
 		UInventoryWidget* InvWidget = HUDWidget->GetInventoryWidget();
 		TArray<FInventoryItem> Items = InventoryComponent->GetInventoryItems();
@@ -201,11 +211,11 @@ void AEODPlayerController::InitSkillBarWidget()
 
 void AEODPlayerController::TogglePlayerHUD()
 {
-	if (HUDWidget && HUDWidget->IsVisible())
+	if (IsValid(HUDWidget) && HUDWidget->IsVisible())
 	{
 		HUDWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else if (HUDWidget && !HUDWidget->IsVisible())
+	else if (IsValid(HUDWidget) && !HUDWidget->IsVisible())
 	{
 		HUDWidget->SetVisibility(ESlateVisibility::Visible);
 	}
@@ -213,11 +223,11 @@ void AEODPlayerController::TogglePlayerHUD()
 
 void AEODPlayerController::TogglePlayerSkillTreeUI()
 {
-	if (HUDWidget && HUDWidget->GetSkillTreeWidget() && HUDWidget->GetSkillTreeWidget()->IsVisible())
+	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetSkillTreeWidget()) && HUDWidget->GetSkillTreeWidget()->IsVisible())
 	{
 		HUDWidget->GetSkillTreeWidget()->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else if (HUDWidget && HUDWidget->GetSkillTreeWidget() && !HUDWidget->GetSkillTreeWidget()->IsVisible())
+	else if (IsValid(HUDWidget) && IsValid(HUDWidget->GetSkillTreeWidget()) && !HUDWidget->GetSkillTreeWidget()->IsVisible())
 	{
 		HUDWidget->GetSkillTreeWidget()->SetVisibility(ESlateVisibility::Visible);
 	}
@@ -225,11 +235,11 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 
 void AEODPlayerController::TogglePlayerInventoryUI()
 {
-	if (HUDWidget && HUDWidget->GetInventoryWidget() && HUDWidget->GetInventoryWidget()->IsVisible())
+	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetInventoryWidget()) && HUDWidget->GetInventoryWidget()->IsVisible())
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else if (HUDWidget && HUDWidget->GetInventoryWidget() && !HUDWidget->GetInventoryWidget()->IsVisible())
+	else if (IsValid(HUDWidget) && IsValid(HUDWidget->GetInventoryWidget()) && !HUDWidget->GetInventoryWidget()->IsVisible())
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Visible);
 	}
@@ -237,11 +247,11 @@ void AEODPlayerController::TogglePlayerInventoryUI()
 
 void AEODPlayerController::TogglePlayerStatsUI()
 {
-	if (HUDWidget && HUDWidget->GetPlayerStatsWidget() && HUDWidget->GetPlayerStatsWidget()->IsVisible())
+	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetPlayerStatsWidget()) && HUDWidget->GetPlayerStatsWidget()->IsVisible())
 	{
 		HUDWidget->GetPlayerStatsWidget()->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else if (HUDWidget && HUDWidget->GetPlayerStatsWidget() && !HUDWidget->GetPlayerStatsWidget()->IsVisible())
+	else if (IsValid(HUDWidget) && IsValid(HUDWidget->GetPlayerStatsWidget()) && !HUDWidget->GetPlayerStatsWidget()->IsVisible())
 	{
 		HUDWidget->GetPlayerStatsWidget()->SetVisibility(ESlateVisibility::Visible);
 	}
@@ -296,7 +306,7 @@ void AEODPlayerController::MakePawnJump()
 
 void AEODPlayerController::ZoomInCamera()
 {
-	if (EODCharacter)
+	if (IsValid(EODCharacter))
 	{
 		EODCharacter->ZoomInCamera();
 	}
@@ -304,7 +314,7 @@ void AEODPlayerController::ZoomInCamera()
 
 void AEODPlayerController::ZoomOutCamera()
 {
-	if (EODCharacter)
+	if (IsValid(EODCharacter))
 	{
 		EODCharacter->ZoomOutCamera();
 	}
@@ -340,14 +350,14 @@ void AEODPlayerController::AttemptDodge()
 			DisableAutoMove();
 		}
 
-		int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
-		if (StatsComponent->GetCurrentStamina() >= DodgeCost)
+		int32 DodgeCost = DodgeStaminaCost * EODCharacter->GetStatsComponent()->GetStaminaConsumptionModifier();
+		if (EODCharacter->GetStatsComponent()->GetCurrentStamina() >= DodgeCost)
 		{
 			bool bResult = EODCharacter->StartDodging();
 			// If character successfully started 'dodge'
 			if (bResult)
 			{
-				StatsComponent->ModifyCurrentStamina(-DodgeCost);
+				EODCharacter->GetStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 			}
 		}
 	}
@@ -355,7 +365,7 @@ void AEODPlayerController::AttemptDodge()
 
 void AEODPlayerController::TriggerInteraction()
 {
-	if (EODCharacter)
+	if (IsValid(EODCharacter))
 	{
 		EODCharacter->TriggerInteraction();
 	}
@@ -421,17 +431,17 @@ void AEODPlayerController::OnPressingEscapeKey()
 
 void AEODPlayerController::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
-	if (GetSkillsComponent())
+	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetGameplaySkillsComponent()))
 	{
-		GetSkillsComponent()->OnPressingSkillKey(SkillKeyIndex);
+		EODCharacter->GetGameplaySkillsComponent()->OnPressingSkillKey(SkillKeyIndex);
 	}
 }
 
 void AEODPlayerController::OnReleasingSkillKey(const int32 SkillKeyIndex)
 {
-	if (GetSkillsComponent())
+	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetGameplaySkillsComponent()))
 	{
-		GetSkillsComponent()->OnReleasingSkillKey(SkillKeyIndex);
+		EODCharacter->GetGameplaySkillsComponent()->OnReleasingSkillKey(SkillKeyIndex);
 	}
 }
 
@@ -439,12 +449,28 @@ void AEODPlayerController::SavePlayerState()
 {
 }
 
-void AEODPlayerController::Server_SetAutoMoveEnabled_Implementation(bool bValue)
+void AEODPlayerController::Client_BindStatusIndicatorWidgetDelegates_Implementation(APawn* InPawn)
 {
-	SetAutoMoveEnabled(bValue);
+	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
+	if (IsValid(EODChar) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
+	{
+		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
+		UStatsComponentBase* StatsComponent = EODChar->GetStatsComponent();
+		StatsComponent->OnHealthChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+		StatsComponent->OnManaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+		StatsComponent->OnStaminaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+	}
 }
 
-bool AEODPlayerController::Server_SetAutoMoveEnabled_Validate(bool bValue)
+void AEODPlayerController::Client_UnbindStatusIndicatorWidgetDelegates_Implementation(APawn* InPawn)
 {
-	return true;
+	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
+	if (IsValid(EODChar) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
+	{
+		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
+		UStatsComponentBase* StatsComponent = EODChar->GetStatsComponent();
+		StatsComponent->OnHealthChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+		StatsComponent->OnManaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+		StatsComponent->OnStaminaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+	}
 }

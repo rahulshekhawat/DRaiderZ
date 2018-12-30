@@ -291,6 +291,9 @@ void ACombatManager::CharacterToCharacterAttack(
 	bool bLineHitResultFound;
 	GetLineHitResult(HitInstigator, HitResult.GetComponent(), LineHitResult, bLineHitResultFound);
 
+	// Cause a crash if no line hit result was found
+	check(bLineHitResultFound);
+
 	bool bCritHit = GetCritChanceBoolean(HitInstigator, HitCharacter, SkillUsed->DamageType);
 	float BCAngle = GetBCAngle(HitCharacter, LineHitResult);
 
@@ -300,18 +303,20 @@ void ACombatManager::CharacterToCharacterAttack(
 		bAttackBlocked = BCAngle < BlockDetectionAngle ? true : false;
 		if (bAttackBlocked)
 		{
+			// HitCharacter->OnBlockingAttack.Broadcast()
+			// HitInstigator->OnDeflectingAttack.Broadcast()
 			// @fix
 			// HitCharacter->OnSuccessfulBlock(HitInstigator);
 			// HitInstigator->OnAttackDeflected(HitCharacter, SkillDamageInfo.bIgnoresBlock);
 		}		
 	}
 
-
-
-	/*
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillUsed, bCritHit, bAttackBlocked);
 	HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
 	int32 ResultingHitCharacterHP = HitCharacter->GetStatsComponent()->GetCurrentHealth();
+
+
+	/*
 	bool bCCEApplied = ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillUsed, LineHitResult, BCAngle);
 	if (ResultingHitCharacterHP <= 0)
 	{
@@ -464,6 +469,7 @@ bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 
 bool ACombatManager::AreEnemies(AEODCharacterBase* CharOne, AEODCharacterBase* CharTwo)
 {
-	return CharOne->GetFaction() != CharTwo->GetFaction();
+	// return CharOne->GetFaction() != CharTwo->GetFaction();
 	// @todo Need a better system to determine if two characters are enemies
+	return true;
 }

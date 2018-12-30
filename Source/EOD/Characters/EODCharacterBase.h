@@ -767,7 +767,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get Character State"))
 	ECharacterState BP_GetCharacterState() const;
 
-	FORCEINLINE UStatsComponentBase* GetStatsComponent() const;
+	FORCEINLINE UStatsComponentBase* GetStatsComponent() const { return StatsComp; }
 
 	/** [server + local] Change character max walk speed */
 	FORCEINLINE void SetWalkSpeed(const float WalkSpeed)
@@ -1367,11 +1367,6 @@ FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
 FORCEINLINE ECharacterState AEODCharacterBase::GetCharacterState() const
 {
 	return CharacterState;
-}
-
-FORCEINLINE UStatsComponentBase* AEODCharacterBase::GetStatsComponent() const
-{
-	return StatsComp;
 }
 
 FORCEINLINE EFaction AEODCharacterBase::GetFaction() const

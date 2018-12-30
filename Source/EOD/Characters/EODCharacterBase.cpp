@@ -31,7 +31,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	StatsComp = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, FName("Character Stats Component"));
 	SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
 	GameplaySkillsComponent = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, FName("Gameplay Skills Component"));
-	// GameplaySkillsComponent = CreateDefaultSubobject<UGameplaySkillsComponent>(AEODCharacterBase::GameplaySkillsComponentName);
 
 	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, FName("Camera Boom"));
 	CameraBoom->bUsePawnControlRotation = true;
@@ -136,6 +135,7 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
 void AEODCharacterBase::PossessedBy(AController* NewController)

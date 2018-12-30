@@ -64,6 +64,9 @@ public:
 
 	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return EODCharacterOwner; }
 
+	void OnPressingSkillKey(const int32 SkillKeyIndex);
+
+	void OnReleasingSkillKey(const int32 SkillKeyIndex);
 
 	////////////////////////////////////////////////////////////////////////////////
 	// NETWORK
