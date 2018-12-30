@@ -529,6 +529,11 @@ void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 	//~ @todo : Cleanup old state
 }
 
+void AEODCharacterBase::Client_DisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
+{
+	CreateAndDisplayTextOnPlayerScreen(Message, TextColor, TextPosition);
+}
+
 void AEODCharacterBase::Server_StopBlockingDamage_Implementation()
 {
 	StopBlockingDamage();

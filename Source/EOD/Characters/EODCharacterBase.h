@@ -1030,6 +1030,16 @@ public:
 	FOnGameplayEventMCDelegate OnLeavingCombat;
 	//~ 
 
+	/** [Local] Display status effect message on player screen */
+	FORCEINLINE void DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
+	{
+		Client_DisplayTextOnPlayerScreen(Message, TextColor, TextPosition);
+	}
+
+	/** Displays status effect text on player screen */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "EOD Character")
+	void CreateAndDisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
+
 protected:
 
 	FTimerHandle TargetSwitchTimerHandle;
@@ -1060,6 +1070,9 @@ private:
 	// DEPRECATED
 	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
+
+	UFUNCTION(Client, Reliable)
+	void Client_DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);

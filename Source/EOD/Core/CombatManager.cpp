@@ -5,6 +5,7 @@
 #include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/Events/AttackDodgedEvent.h"
 #include "EOD/Characters/Components/StatsComponentBase.h"
+#include "EOD/Characters/Components/GameplaySkillsComponent.h"
 
 #include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -34,7 +35,8 @@ void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const
 	{
 		return;
 	}
-
+	
+	PrintToScreen(this, FString("On Melee Attack"));
 	AEODCharacterBase* InstigatingCharacter = Cast<AEODCharacterBase>(HitInstigator);
 	if (InstigatingCharacter)
 	{
@@ -46,11 +48,12 @@ void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const
 	}
 }
 
-void ACombatManager::NativeDisplayDamage(const AEODCharacterBase* HitInstigator,
-													 const AEODCharacterBase* HitCharacter,
-													 const FHitResult& LineHitResult,
-													 const float ActualDamage,
-													 const bool bCriticalHit)
+void ACombatManager::NativeDisplayDamage(
+	const AEODCharacterBase* HitInstigator,
+	const AEODCharacterBase* HitCharacter,
+	const FHitResult& LineHitResult,
+	const float ActualDamage,
+	const bool bCriticalHit)
 {
 	// Do no display anything if none of the involved characters is a player character
 	if (!HitInstigator->IsA(APlayerCharacter::StaticClass()) && !HitCharacter->IsA(APlayerCharacter::StaticClass()))
@@ -155,13 +158,42 @@ void ACombatManager::ProcessActorAttack(AActor* HitInstigator, const bool bHit, 
 
 void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
-	FSkillTableRow* HitSkill = HitInstigator->GetCurrentActiveSkill();
+	FSkillTableRow* HitSkill = nullptr;
+	if (IsValid(HitInstigator) && IsValid(HitInstigator->GetGameplaySkillsComponent()))
+	{
+		HitSkill = HitInstigator->GetGameplaySkillsComponent()->GetCurrentActiveSkill();
+	}
+
 	// Do no process if hit with an invalid skill
 	if (!HitSkill)
 	{
 		return;
 	}
 
+	PrintToScreen(this, FString("Process Character Attack"));
+	for (const FHitResult& HitResult : HitResults)
+	{
+		AActor* HitActor = HitResult.Actor.Get();
+		// Do not process if hit actor is not valid
+		if (!IsValid(HitActor))
+		{
+			continue;
+		}
+
+		bool bHitActorWasDamaged;
+		float ActualDamageToHitActor;
+		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitActor);
+		if (HitCharacter && HitCharacter->IsAlive())
+		{
+			CharacterToCharacterAttack(HitInstigator, HitCharacter, HitSkill, HitResult, bHitActorWasDamaged, ActualDamageToHitActor);
+		}
+		else
+		{
+			// CharacterToActorAttack(HitInstigator, HitActor, SkillDamageInfo, HitResult);
+		}
+	}
+
+	/*
 	FSkillDamageInfo SkillDamageInfo = GetSkillDamageInfoFromSkill(HitSkill);
 	for (const FHitResult& HitResult : HitResults)
 	{
@@ -182,6 +214,39 @@ void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, co
 			CharacterToActorAttack(HitInstigator, HitActor, SkillDamageInfo, HitResult);
 		}
 	}
+	*/
+}
+
+void ACombatManager::CharacterToCharacterAttack(
+	AEODCharacterBase* HitInstigator,
+	AEODCharacterBase* HitCharacter,
+	const FSkillTableRow* SkillUsed,
+	const FHitResult& HitResult,
+	bool& bOutHitCharacterReceivedDamage,
+	float& OutDamageInflicted)
+{
+	check(HitInstigator && HitCharacter && SkillUsed);
+
+	PrintToScreen(this, FString("Character To Character Attack"));
+
+	// Testing displaying dodge message on a particular client
+	HitCharacter->DisplayTextOnPlayerScreen(FString("Dodge"), DodgeTextColor, HitResult.ImpactPoint);
+
+	bOutHitCharacterReceivedDamage = false;
+	OutDamageInflicted = 0.f;
+	if (!AreEnemies(HitInstigator, HitCharacter))
+	{
+		return;
+	}
+
+	if (!SkillUsed->bUndodgable && HitCharacter->IsDodgingDamage())
+	{
+
+		// @todo Display dodge message on both HitInstigator and HitCharacter's screen.
+	}
+
+
+	
 }
 
 void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator,
@@ -300,4 +365,5 @@ bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 bool ACombatManager::AreEnemies(AEODCharacterBase* CharOne, AEODCharacterBase* CharTwo)
 {
 	return CharOne->GetFaction() != CharTwo->GetFaction();
+	// @todo Need a better system to determine if two characters are enemies
 }

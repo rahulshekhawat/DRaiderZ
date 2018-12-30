@@ -103,26 +103,29 @@ protected:
 private:
 
 	/** Determines whether the hit actor succesfully blocked an attack based on the positions of itself and the attacking actor */
-	inline bool WasBlockSuccessful(const AActor* HitInstigator,
-								   const AActor* HitActor,
-								   const bool bLineHitResultFound,
-								   const FHitResult& LineHitResult);
+	inline bool WasBlockSuccessful(
+		const AActor* HitInstigator,
+		const AActor* HitActor,
+		const bool bLineHitResultFound,
+		const FHitResult& LineHitResult);
 
 	/**
 	 * Generates a random boolean based on HitInstigator's crit rate and HitCharacter's crit resistance,
 	 * that could be used to determine if the attack was a critical attacl
 	 */
-	inline bool GetCritChanceBoolean(const AEODCharacterBase* HitInstigator,
-				    		  		 const AEODCharacterBase* HitCharacter,
-									 const EDamageType& DamageType) const;
+	inline bool GetCritChanceBoolean(
+		const AEODCharacterBase* HitInstigator,
+		const AEODCharacterBase* HitCharacter,
+		const EDamageType& DamageType) const;
 
 	FORCEINLINE float GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult);
 
-	float GetActualDamage(const AEODCharacterBase* HitInstigator,
-						  const AEODCharacterBase* HitCharacter,
-						  const FSkillDamageInfo& SkillDamageInfo,
-						  const bool bCriticalHit,
-						  const bool bAttackBlocked);
+	float GetActualDamage(
+		const AEODCharacterBase* HitInstigator,
+		const AEODCharacterBase* HitCharacter,
+		const FSkillDamageInfo& SkillDamageInfo,
+		const bool bCriticalHit,
+		const bool bAttackBlocked);
 
 	/**
 	 * Does a line trace from HitInstigator to HitTarget
@@ -133,29 +136,48 @@ private:
 	 */
 	bool GetLineHitResult(const AActor* HitInstigator, const AActor* HitTarget, FHitResult& OutHitResult) const;
 
-	/** Processes an attack from an AActor */
+	/** Processes an attack from an Actor */
 	void ProcessActorAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
 
-	/** Processes an attack from an AEODCharacterBase */
+	/** Processes an attack from an EODCharacterBase */
 	void ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
 
+	/**
+	 * Handles an attack from one character to another character
+	 * @param HitInstigator The character that initiated the collision sweep
+	 * @param HitCharacter The character that got hit by collision sweep
+	 * @param SkillUsed The skill that HitInstigator used to initiate the collision sweep
+	 * @param bOutHitCharacterReceivedDamage Outs true if HitCharacter received any form of damage (i.e., true if HitCharacter didn't dodge or was not an enemy of HitInstigator). OutDamageInflicted may be zero even if bOutHitCharacterReceivedDamage is true.
+	 * @param OutDamageInflicted Actual damage inflicted on HitCharacter
+	 */
+	void CharacterToCharacterAttack(
+		AEODCharacterBase* HitInstigator,
+		AEODCharacterBase* HitCharacter,
+		const FSkillTableRow* SkillUsed,
+		const FHitResult& HitResult,
+		bool& bOutHitCharacterReceivedDamage,
+		float& OutDamageInflicted);
+
 	/** Handles an attack from one character to another character */
-	void CharacterToCharacterAttack(AEODCharacterBase* HitInstigator,
-									AEODCharacterBase* HitCharacter,
-									const FSkillDamageInfo& SkillDamageInfo,
-									const FHitResult& HitResult);
+	void CharacterToCharacterAttack(
+		AEODCharacterBase* HitInstigator,
+		AEODCharacterBase* HitCharacter,
+		const FSkillDamageInfo& SkillDamageInfo,
+		const FHitResult& HitResult);
 
 	/** Handles an attack from a character to an actor */
-	void CharacterToActorAttack(AEODCharacterBase* HitInstigator,
-								AActor* HitActor,
-								const FSkillDamageInfo& SkillDamageInfo,
-								const FHitResult& HitResult);
+	void CharacterToActorAttack(
+		AEODCharacterBase* HitInstigator,
+		AActor* HitActor,
+		const FSkillDamageInfo& SkillDamageInfo,
+		const FHitResult& HitResult);
 
-	bool ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
-						 		  AEODCharacterBase* HitCharacter,
-								  const FSkillDamageInfo& SkillDamageInfo,
-								  const FHitResult& LineHitResult,
-								  const float BCAngle);
+	bool ApplyCrowdControlEffects(
+		AEODCharacterBase* HitInstigator,
+		AEODCharacterBase* HitCharacter,
+		const FSkillDamageInfo& SkillDamageInfo,
+		const FHitResult& LineHitResult,
+		const float BCAngle);
 
 	FORCEINLINE FSkillDamageInfo GetSkillDamageInfoFromSkill(FSkillTableRow* Skill);
 
@@ -172,10 +194,11 @@ FORCEINLINE float ACombatManager::CalculateAngleBetweenVectors(FVector Vec1, FVe
 	return Angle;
 }
 
-inline bool ACombatManager::WasBlockSuccessful(const AActor* HitInstigator,
-											   const AActor* HitActor,
-											   const bool bLineHitResultFound,
-											   const FHitResult& LineHitResult)
+inline bool ACombatManager::WasBlockSuccessful(
+	const AActor* HitInstigator,
+	const AActor* HitActor,
+	const bool bLineHitResultFound,
+	const FHitResult& LineHitResult)
 {
 	FVector HitActorForwardVector = HitActor->GetActorForwardVector();
 	FVector HitNormal = LineHitResult.ImpactNormal;
@@ -184,9 +207,10 @@ inline bool ACombatManager::WasBlockSuccessful(const AActor* HitInstigator,
 	return bResult;
 }
 
-inline bool ACombatManager::GetCritChanceBoolean(const AEODCharacterBase* HitInstigator,
-												 const AEODCharacterBase* HitCharacter,
-												 const EDamageType& DamageType) const
+inline bool ACombatManager::GetCritChanceBoolean(
+	const AEODCharacterBase* HitInstigator,
+	const AEODCharacterBase* HitCharacter,
+	const EDamageType& DamageType) const
 {
 	float CritRate = DamageType == EDamageType::Physical ? HitInstigator->GetStatsComponent()->GetPhysicalCritRate() : HitInstigator->GetStatsComponent()->GetMagickCritRate();
 	bool bResult = CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
