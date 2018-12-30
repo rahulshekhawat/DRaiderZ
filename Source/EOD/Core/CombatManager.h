@@ -128,13 +128,38 @@ private:
 		const bool bAttackBlocked);
 
 	/**
+	 * Calculates and returns the actual damage that should be inflicted by HitInstigator on HitCharacter
+	 * @param HitInstigator The character that initiated the attack
+	 * @param HitCharacter The character that got damage by the attack
+	 * @param SkillUsed The skill that HitInstigator used to attack
+	 * @param bCriticalHit True if the hit was critical
+	 * @param bAttackBlocked True if the HitCharacter blocked the incoming attack from HitInstigator
+	 * @return Returns the actual damage that should be inflicted on HitCharacter
+	 */
+	float GetActualDamage(
+		const AEODCharacterBase* HitInstigator,
+		const AEODCharacterBase* HitCharacter,
+		const FSkillTableRow* SkillUsed,
+		const bool bCriticalHit,
+		const bool bAttackBlocked);
+
+	/**
 	 * Does a line trace from HitInstigator to HitTarget
 	 * @param HitInstigator The actor that initiated the line trace
 	 * @param HitTarget The supposed target that we want to do line trace to
 	 * @param OutHitResult Outs the hit result of line trace
-	 * @return Returns true if line trace actually hit the HitTarget
+	 * @param bOutLineHitResultFound True if line trace actually hit the HitTarget
 	 */
-	bool GetLineHitResult(const AActor* HitInstigator, const AActor* HitTarget, FHitResult& OutHitResult) const;
+	void GetLineHitResult(const AActor* HitInstigator, const AActor* HitTarget, FHitResult& OutHitResult, bool& bOutLineHitResultFound) const;
+
+	/**
+	 * Does a line trace from HitInstigator to HitTarget
+	 * @param HitInstigator The actor that initiated the line trace
+	 * @param HitTarget The supposed target that we want to do line trace to
+	 * @param OutHitResult Outs the hit result of line trace
+	 * @param bOutLineHitResultFound True if line trace actually hit the HitTarget
+	 */
+	void GetLineHitResult(const AActor* HitInstigator, const UPrimitiveComponent* HitComponent, FHitResult& OutHitResult, bool& bOutLineHitResultFound) const;
 
 	/** Processes an attack from an Actor */
 	void ProcessActorAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
@@ -158,19 +183,39 @@ private:
 		bool& bOutHitCharacterReceivedDamage,
 		float& OutDamageInflicted);
 
+	/**
+	 * Handles an attack from one character to another character
+	 * @param HitInstigator The character that initiated the collision sweep
+	 * @param HitActor The actor that got hit by collision sweep
+	 * @param SkillUsed The skill that HitInstigator used to initiate the collision sweep
+	 * @param bOutHitActorReceivedDamage Outs true if HitActor received any form of damage (i.e., true if HitActor didn't dodge or was not an enemy of HitInstigator). OutDamageInflicted may be zero even if bOutHitActorReceivedDamage is true.
+	 * @param OutDamageInflicted Actual damage inflicted on HitCharacter
+	 */
+	void CharacterToActorAttack(
+		AEODCharacterBase* HitInstigator,
+		AActor* HitActor,
+		const FSkillTableRow* SkillUsed,
+		const FHitResult& HitResult,
+		bool& bOutHitActorReceivedDamage,
+		float& OutDamageInflicted);
+
 	/** Handles an attack from one character to another character */
+	/*
 	void CharacterToCharacterAttack(
 		AEODCharacterBase* HitInstigator,
 		AEODCharacterBase* HitCharacter,
 		const FSkillDamageInfo& SkillDamageInfo,
 		const FHitResult& HitResult);
+	*/
 
 	/** Handles an attack from a character to an actor */
+	/*
 	void CharacterToActorAttack(
 		AEODCharacterBase* HitInstigator,
 		AActor* HitActor,
 		const FSkillDamageInfo& SkillDamageInfo,
 		const FHitResult& HitResult);
+	*/
 
 	bool ApplyCrowdControlEffects(
 		AEODCharacterBase* HitInstigator,

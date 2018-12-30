@@ -8,7 +8,7 @@
 #include "EOD/Characters/Components/GameplaySkillsComponent.h"
 
 #include "Engine/World.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "Components/PrimitiveComponent.h"
 
 ACombatManager::ACombatManager(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -120,39 +120,105 @@ float ACombatManager::GetActualDamage(const AEODCharacterBase* HitInstigator,
 	return ActualDamage;
 }
 
-bool ACombatManager::GetLineHitResult(const AActor* HitInstigator, const AActor* HitTarget, FHitResult& OutHitResult) const
+float ACombatManager::GetActualDamage(
+	const AEODCharacterBase* HitInstigator,
+	const AEODCharacterBase* HitCharacter,
+	const FSkillTableRow* SkillUsed,
+	const bool bCriticalHit,
+	const bool bAttackBlocked)
 {
-	TArray<FHitResult> LineHitResults;
-	FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(HitInstigator);
-	FVector LineStart = HitInstigator->GetActorLocation();
-	float LineEndZ = 0.f;
-	if (HitTarget->GetActorLocation().Z < LineEndZ)
-	{
-		LineEndZ = HitTarget->GetActorLocation().Z;
-	}
-	else
-	{
-		LineEndZ = LineStart.Z;
-	}
-	FVector LineEnd = FVector(HitTarget->GetActorLocation().X, HitTarget->GetActorLocation().Y, LineEndZ);
-	GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, Params);
+	check(HitInstigator || HitCharacter || SkillUsed)
 
-	bool bResult = false;
+	float ActualDamage = 0.f;
+	float CritMultiplier = 1.f;
+	float CritBonus = 0.f;
+	float DamageReductionOnBlock = 0.f;
+
+	if (SkillUsed->DamageType == EDamageType::Physical)
+	{
+		ActualDamage = HitInstigator->GetStatsComponent()->GetPhysicalAttack();
+		CritBonus = HitInstigator->GetStatsComponent()->GetPhysicalCritBonus();
+		DamageReductionOnBlock = HitInstigator->GetStatsComponent()->GetPhysicalDamageReductionOnBlock();
+		CritMultiplier = PhysicalCritMultiplier;
+	}
+	else if (SkillUsed->DamageType == EDamageType::Magickal)
+	{
+		ActualDamage = HitInstigator->GetStatsComponent()->GetMagickAttack();
+		CritBonus = HitInstigator->GetStatsComponent()->GetMagickCritBonus();
+		DamageReductionOnBlock = HitInstigator->GetStatsComponent()->GetMagickDamageReductionOnBlock();
+		CritMultiplier = MagickalCritMultiplier;
+	}
+
+	ActualDamage = ActualDamage * SkillUsed->DamagePercent / 100.f;
+
+	if (bCriticalHit)
+	{
+		ActualDamage = ActualDamage * CritMultiplier + CritBonus;
+	}
+
+	if (bAttackBlocked)
+	{
+		ActualDamage = ActualDamage * (1 - DamageReductionOnBlock);
+	}
+
+	return ActualDamage;
+}
+
+void ACombatManager::GetLineHitResult(const AActor* HitInstigator, const AActor* HitTarget, FHitResult& OutHitResult, bool& bOutLineHitResultFound) const
+{
+	bOutLineHitResultFound = false;
+	if (!IsValid(HitInstigator) || !IsValid(HitTarget))
+	{
+		return;
+	}
+
+	FCollisionQueryParams QueryParams = UCombatLibrary::GenerateCombatCollisionQueryParams(HitInstigator);
+	FVector LineStart = HitInstigator->GetActorLocation();
+	FVector LineEnd = HitTarget->GetActorLocation();
+	LineEnd.Z = LineStart.Z < LineEnd.Z ? LineStart.Z : LineEnd.Z;
+
+	TArray<FHitResult> LineHitResults;
+	GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, QueryParams);
 	for (FHitResult& LineHitResult : LineHitResults)
 	{
-		if (LineHitResult.Actor.Get() == HitTarget)
+		if (LineHitResult.GetActor() == HitTarget)
 		{
 			OutHitResult = LineHitResult;
-			bResult = true;
+			bOutLineHitResultFound = true;
 			break;
 		}
 	}
+}
 
-	return bResult;
+void ACombatManager::GetLineHitResult(const AActor* HitInstigator, const UPrimitiveComponent* HitComponent, FHitResult& OutHitResult, bool& bOutLineHitResultFound) const
+{
+	bOutLineHitResultFound = false;
+	if (!IsValid(HitInstigator) || !IsValid(HitComponent))
+	{
+		return;
+	}
+
+	FCollisionQueryParams QueryParams = UCombatLibrary::GenerateCombatCollisionQueryParams(HitInstigator);
+	FVector LineStart = HitInstigator->GetActorLocation();
+	FVector LineEnd = HitComponent->GetComponentLocation();
+	LineEnd.Z = LineStart.Z < LineEnd.Z ? LineStart.Z : LineEnd.Z;
+
+	TArray<FHitResult> LineHitResults;
+	GetWorld()->LineTraceMultiByChannel(LineHitResults, LineStart, LineEnd, COLLISION_COMBAT, QueryParams);
+	for (FHitResult& LineHitResult : LineHitResults)
+	{
+		if (LineHitResult.GetComponent() == HitComponent)
+		{
+			OutHitResult = LineHitResult;
+			bOutLineHitResultFound = true;
+			break;
+		}
+	}
 }
 
 void ACombatManager::ProcessActorAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
+
 }
 
 void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
@@ -171,7 +237,7 @@ void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, co
 
 	for (const FHitResult& HitResult : HitResults)
 	{
-		AActor* HitActor = HitResult.Actor.Get();
+		AActor* HitActor = HitResult.GetActor();
 		// Do not process if hit actor is not valid
 		if (!IsValid(HitActor))
 		{
@@ -187,32 +253,9 @@ void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, co
 		}
 		else
 		{
-			// CharacterToActorAttack(HitInstigator, HitActor, SkillDamageInfo, HitResult);
+			CharacterToActorAttack(HitInstigator, HitActor, HitSkill, HitResult, bHitActorWasDamaged, ActualDamageToHitActor);
 		}
 	}
-
-	/*
-	FSkillDamageInfo SkillDamageInfo = GetSkillDamageInfoFromSkill(HitSkill);
-	for (const FHitResult& HitResult : HitResults)
-	{
-		AActor* HitActor = HitResult.Actor.Get();
-		// Do not process if hit actor is not valid
-		if (!IsValid(HitActor))
-		{
-			continue;
-		}
-
-		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitActor);
-		if (HitCharacter && HitCharacter->IsAlive())
-		{
-			CharacterToCharacterAttack(HitInstigator, HitCharacter, SkillDamageInfo, HitResult);
-		}
-		else
-		{
-			CharacterToActorAttack(HitInstigator, HitActor, SkillDamageInfo, HitResult);
-		}
-	}
-	*/
 }
 
 void ACombatManager::CharacterToCharacterAttack(
@@ -244,10 +287,67 @@ void ACombatManager::CharacterToCharacterAttack(
 		return;
 	}
 
+	FHitResult LineHitResult;
+	bool bLineHitResultFound;
+	GetLineHitResult(HitInstigator, HitResult.GetComponent(), LineHitResult, bLineHitResultFound);
 
-	
+	bool bCritHit = GetCritChanceBoolean(HitInstigator, HitCharacter, SkillUsed->DamageType);
+	float BCAngle = GetBCAngle(HitCharacter, LineHitResult);
+
+	bool bAttackBlocked = false;
+	if (!SkillUsed->bUnblockable && HitCharacter->IsBlockingDamage())
+	{
+		bAttackBlocked = BCAngle < BlockDetectionAngle ? true : false;
+		if (bAttackBlocked)
+		{
+			// @fix
+			// HitCharacter->OnSuccessfulBlock(HitInstigator);
+			// HitInstigator->OnAttackDeflected(HitCharacter, SkillDamageInfo.bIgnoresBlock);
+		}		
+	}
+
+
+
+	/*
+	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillUsed, bCritHit, bAttackBlocked);
+	HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
+	int32 ResultingHitCharacterHP = HitCharacter->GetStatsComponent()->GetCurrentHealth();
+	bool bCCEApplied = ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillUsed, LineHitResult, BCAngle);
+	if (ResultingHitCharacterHP <= 0)
+	{
+		HitCharacter->InitiateDeathSequence();
+	}
+	NativeDisplayDamage(HitInstigator, HitCharacter, LineHitResult, ActualDamage, bCritHit);
+
+	// @todo make camera shake interesting
+	PlayCameraShake(ECameraShakeType::Medium, LineHitResult.ImpactPoint);
+	SpawnHitSFX(LineHitResult.ImpactPoint, LineHitResult.ImpactNormal);
+	PlayHitSound(HitInstigator, LineHitResult.ImpactPoint, bCritHit);
+
+	if (bAttackBlocked)
+	{
+		return;
+	}
+
+	HitCharacter->SetOffTargetSwitch();
+	*/
 }
 
+void ACombatManager::CharacterToActorAttack(
+	AEODCharacterBase* HitInstigator,
+	AActor* HitActor,
+	const FSkillTableRow* SkillUsed,
+	const FHitResult& HitResult,
+	bool& bOutHitActorReceivedDamage,
+	float& OutDamageInflicted)
+{
+	check(HitInstigator && HitActor && SkillUsed);
+
+	bOutHitActorReceivedDamage = false;
+	OutDamageInflicted = 0.f;
+}
+
+/*
 void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator,
 												AEODCharacterBase* HitCharacter,
 												const FSkillDamageInfo& SkillDamageInfo,
@@ -321,6 +421,7 @@ void ACombatManager::CharacterToActorAttack(AEODCharacterBase* HitInstigator, AA
 											const FHitResult& HitResult)
 {
 }
+*/
 
 bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 											  AEODCharacterBase* HitCharacter,
