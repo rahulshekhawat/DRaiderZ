@@ -13,7 +13,7 @@ AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer): Super(Obj
 	SetReplicates(false);
 
 	// Setup stats component
-	StatsComp = ObjectInitializer.CreateDefaultSubobject<UWeaponStatsComponent>(this, FName("Weapon Stats Component"));
+	// StatsComp = ObjectInitializer.CreateDefaultSubobject<UWeaponStatsComponent>(this, FName("Weapon Stats Component"));
 
 	WeaponType = EWeaponType::None;
 }

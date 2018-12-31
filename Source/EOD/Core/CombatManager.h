@@ -257,7 +257,7 @@ inline bool ACombatManager::GetCritChanceBoolean(
 	const AEODCharacterBase* HitCharacter,
 	const EDamageType& DamageType) const
 {
-	float CritRate = DamageType == EDamageType::Physical ? HitInstigator->GetStatsComponent()->GetPhysicalCritRate() : HitInstigator->GetStatsComponent()->GetMagickCritRate();
+	float CritRate = DamageType == EDamageType::Physical ? HitInstigator->GetCharacterStatsComponent()->GetPhysicalCritRate() : HitInstigator->GetCharacterStatsComponent()->GetMagickCritRate();
 	bool bResult = CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
 	return bResult;
 }

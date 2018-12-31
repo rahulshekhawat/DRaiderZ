@@ -64,3 +64,9 @@ inline void PrintEverywhere(UObject* WorldContextObject, const FString& Message,
 #endif // EOD_MESSAGE_LOGGING_ENABLED
 }
 
+class FEODGlobalNames
+{
+public:
+	const static FName NoCollision;
+	const static FName OverlapAllDynamic;
+};

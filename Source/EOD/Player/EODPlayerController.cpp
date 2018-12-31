@@ -15,10 +15,14 @@
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/SpringArmComponent.h"
 
+
+FName AEODPlayerController::InventoryComponentName(TEXT("Player Inventory"));
+FName AEODPlayerController::SkillTreeComponentName(TEXT("Player Skill Tree"));
+
 AEODPlayerController::AEODPlayerController(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
-	InventoryComponent 	= ObjectInitializer.CreateDefaultSubobject<UInventoryComponent>(this, FName("Player Inventory"));
-	SkillTreeComponent = ObjectInitializer.CreateDefaultSubobject<USkillTreeComponent>(this, FName("Player Skill Tree"));
+	InventoryComponent 	= ObjectInitializer.CreateDefaultSubobject<UInventoryComponent>(this, AEODPlayerController::InventoryComponentName);
+	SkillTreeComponent = ObjectInitializer.CreateDefaultSubobject<USkillTreeComponent>(this, AEODPlayerController::SkillTreeComponentName);
 
 	DodgeStaminaCost = 30;
 }
@@ -350,14 +354,14 @@ void AEODPlayerController::AttemptDodge()
 			DisableAutoMove();
 		}
 
-		int32 DodgeCost = DodgeStaminaCost * EODCharacter->GetStatsComponent()->GetStaminaConsumptionModifier();
-		if (EODCharacter->GetStatsComponent()->GetCurrentStamina() >= DodgeCost)
+		int32 DodgeCost = DodgeStaminaCost * EODCharacter->GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
+		if (EODCharacter->GetCharacterStatsComponent()->GetCurrentStamina() >= DodgeCost)
 		{
 			bool bResult = EODCharacter->StartDodging();
 			// If character successfully started 'dodge'
 			if (bResult)
 			{
-				EODCharacter->GetStatsComponent()->ModifyCurrentStamina(-DodgeCost);
+				EODCharacter->GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 			}
 		}
 	}
@@ -452,10 +456,10 @@ void AEODPlayerController::SavePlayerState()
 void AEODPlayerController::Client_BindStatusIndicatorWidgetDelegates_Implementation(APawn* InPawn)
 {
 	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
-	if (IsValid(EODChar) && IsValid(EODChar->GetStatsComponent()) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
+	if (IsValid(EODChar) && IsValid(EODChar->GetCharacterStatsComponent()) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
 	{
 		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
-		UStatsComponentBase* StatsComponent = EODChar->GetStatsComponent();
+		UStatsComponentBase* StatsComponent = EODChar->GetCharacterStatsComponent();
 		StatsComponent->OnHealthChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
 		StatsComponent->OnManaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
 		StatsComponent->OnStaminaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
@@ -465,10 +469,10 @@ void AEODPlayerController::Client_BindStatusIndicatorWidgetDelegates_Implementat
 void AEODPlayerController::Client_UnbindStatusIndicatorWidgetDelegates_Implementation(APawn* InPawn)
 {
 	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
-	if (IsValid(EODChar) && IsValid(EODChar->GetStatsComponent()) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
+	if (IsValid(EODChar) && IsValid(EODChar->GetCharacterStatsComponent()) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
 	{
 		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
-		UStatsComponentBase* StatsComponent = EODChar->GetStatsComponent();
+		UStatsComponentBase* StatsComponent = EODChar->GetCharacterStatsComponent();
 		StatsComponent->OnHealthChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
 		StatsComponent->OnManaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
 		StatsComponent->OnStaminaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);

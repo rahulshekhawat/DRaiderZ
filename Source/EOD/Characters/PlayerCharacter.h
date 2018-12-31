@@ -133,8 +133,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	void SavePlayerState();
 
+	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
+
 private:
 	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player face
+
+	//~ Skills component - manages skills of character // DEPRECATED
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkillsComponent* SkillsComponent;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Hair;
@@ -925,7 +931,7 @@ inline void APlayerCharacter::EnableBlock()
 
 	SetCharacterState(ECharacterState::Blocking);
 	SetUseControllerRotationYaw(true);
-	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetStatsComponent()->GetMovementSpeedModifier());
+	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetCharacterStatsComponent()->GetMovementSpeedModifier());
 
 	// FTimerHandle TimerDelegate;
 	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);

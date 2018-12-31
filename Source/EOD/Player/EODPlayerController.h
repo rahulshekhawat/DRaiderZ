@@ -65,6 +65,10 @@ public:
 
 	FORCEINLINE USkillTreeComponent* GetSkillTreeComponent() const { return SkillTreeComponent; }
 
+	static FName InventoryComponentName;
+	
+	static FName SkillTreeComponentName;
+
 private:
 	//~ Inventory component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

@@ -253,15 +253,15 @@ protected:
 	// COMPONENTS
 	////////////////////////////////////////////////////////////////////////////////
 public:
-	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE USpringArmComponent* GetCameraBoomComponent() const { return CameraBoomComponent; }
 
-	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
+	FORCEINLINE UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 
 	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const { return GameplaySkillsComponent; }
 
-	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
+	FORCEINLINE UStatsComponentBase* GetCharacterStatsComponent() const { return CharacterStatsComponent; }
 
-	FORCEINLINE USphereComponent* GetInteractionSphere() const { return InteractionSphere; }
+	FORCEINLINE USphereComponent* GetInteractionSphereComponent() const { return InteractionSphereComponent; }
 
 	FORCEINLINE void EnableInteractionSphere();
 
@@ -271,13 +271,13 @@ public:
 
 	FORCEINLINE void ZoomOutCamera();
 
-	static FName GameplaySkillsComponentName;
-
-	static FName CharacterStatsComponentName;
+	static FName CameraComponentName;
 
 	static FName SpringArmComponentName;
 
-	static FName CameraComponentName;
+	static FName GameplaySkillsComponentName;
+
+	static FName CharacterStatsComponentName;
 
 	static FName InteractionSphereComponentName;
 
@@ -293,18 +293,14 @@ protected:
 
 private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraBoom;
+	USpringArmComponent* CameraBoomComponent;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* Camera;
+	UCameraComponent* CameraComponent;
 
 	/** StatsComp contains and manages the stats info of this character */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStatsComponentBase* StatsComp;
-
-	//~ Skills component - manages skills of character
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkillsComponent* SkillsComponent;
+	UStatsComponentBase* CharacterStatsComponent;
 
 	//~ Skill bar component - manages skill bar (for player controlled character) and skills of character
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -312,7 +308,7 @@ private:
 
 	//~ Sphere component used to detect interactive objects
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USphereComponent* InteractionSphere;
+	USphereComponent* InteractionSphereComponent;
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -331,7 +327,7 @@ public:
 	{
 		SetGuardActive(true);
 		StartBlockingDamage(DamageBlockTriggerDelay);
-		SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetStatsComponent()->GetMovementSpeedModifier());
+		SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetCharacterStatsComponent()->GetMovementSpeedModifier());
 	}
 
 	FORCEINLINE void DeactivateGuard()
@@ -774,8 +770,6 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get Character State"))
 	ECharacterState BP_GetCharacterState() const;
-
-	FORCEINLINE UStatsComponentBase* GetStatsComponent() const { return StatsComp; }
 
 	/** [server + local] Change character max walk speed */
 	FORCEINLINE void SetWalkSpeed(const float WalkSpeed)
@@ -1230,40 +1224,46 @@ inline float AEODCharacterBase::GetRotationYawFromAxisInput() const
 
 FORCEINLINE void AEODCharacterBase::EnableInteractionSphere()
 {
-	InteractionSphere->Activate();
-	InteractionSphere->SetCollisionProfileName(FName("OverlapAllDynamic"));
+	if (IsValid(InteractionSphereComponent))
+	{
+		InteractionSphereComponent->Activate();
+		InteractionSphereComponent->SetCollisionProfileName(FEODGlobalNames::OverlapAllDynamic);
+	}
 }
 
 FORCEINLINE void AEODCharacterBase::DisableInteractionSphere()
 {
-	InteractionSphere->Deactivate();
-	InteractionSphere->SetCollisionProfileName(FName("NoCollision"));
+	if (IsValid(InteractionSphereComponent))
+	{
+		InteractionSphereComponent->Deactivate();
+		InteractionSphereComponent->SetCollisionProfileName(FEODGlobalNames::NoCollision);
+	}
 }
 
 FORCEINLINE void AEODCharacterBase::ZoomInCamera()
 {
-	if (CameraBoom && CameraBoom->TargetArmLength >= CameraArmMinimumLength)
+	if (IsValid(CameraBoomComponent) && CameraBoomComponent->TargetArmLength >= CameraArmMinimumLength)
 	{
-		CameraBoom->TargetArmLength -= CameraZoomRate;
+		CameraBoomComponent->TargetArmLength -= CameraZoomRate;
 	}
 }
 
 FORCEINLINE void AEODCharacterBase::ZoomOutCamera()
 {
-	if (CameraBoom && CameraBoom->TargetArmLength <= CameraArmMaximumLength)
+	if (IsValid(CameraBoomComponent) && CameraBoomComponent->TargetArmLength <= CameraArmMaximumLength)
 	{
-		CameraBoom->TargetArmLength += CameraZoomRate;
+		CameraBoomComponent->TargetArmLength += CameraZoomRate;
 	}
 }
 
 FORCEINLINE bool AEODCharacterBase::IsAlive() const
 {
-	return StatsComp->GetCurrentHealth() > 0;
+	return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->GetCurrentHealth() > 0 : true;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsDead() const
 {
-	return StatsComp->GetCurrentHealth() <= 0;
+	return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->GetCurrentHealth() <= 0 : false;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsIdle() const
@@ -1334,37 +1334,61 @@ FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 
 FORCEINLINE bool AEODCharacterBase::CanFlinch() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanStun() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockback() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanFreeze() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::NeedsHealing() const
 {
-	return StatsComp->IsLowOnHealth();
+	return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->IsLowOnHealth() : false;
 }
 
 FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
@@ -1385,12 +1409,10 @@ FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 inline FSkillTableRow* AEODCharacterBase::GetSkill(FName SkillID, const FString& ContextString) const
 {
 	FSkillTableRow* Skill = nullptr;
-
-	if (SkillsDataTable)
+	if (IsValid(SkillsDataTable))
 	{
 		Skill = SkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString);
 	}
-
 	return Skill;
 }
 
@@ -1411,7 +1433,7 @@ FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
 
 inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay)
 {
-	if (GetMesh()->GetAnimInstance())
+	if (IsValid(GetMesh()) && IsValid(GetMesh()->GetAnimInstance()))
 	{
 		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
@@ -1420,12 +1442,11 @@ inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay,
 
 inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
-	if (GetMesh()->GetAnimInstance())
+	if (IsValid(GetMesh()) && IsValid(GetMesh()->GetAnimInstance()))
 	{
 		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
 		CharacterState = NewState;
 	}
-
 	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }

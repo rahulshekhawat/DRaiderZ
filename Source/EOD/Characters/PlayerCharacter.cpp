@@ -50,6 +50,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 		GetMesh()->bUseAttachParentBound = true;
 	}
 
+
+	// SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
+
 	// @note : SetMasterPoseComponent() from constructor doesn't work in packaged game (for some weird reason?!)
 
 	Hair			= CreateNewArmorComponent(FName("Hair"), ObjectInitializer);
@@ -174,9 +177,9 @@ void APlayerCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	LoadUnequippedWeaponAnimationReferences();
-	if (IsValid(GetStatsComponent()))
+	if (IsValid(GetCharacterStatsComponent()))
 	{
-		SetWalkSpeed(DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier());
+		SetWalkSpeed(DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier());
 	}
 	else
 	{
@@ -324,10 +327,10 @@ bool APlayerCharacter::CanJump() const
 
 bool APlayerCharacter::CanDodge() const
 {
-	int32 DodgeCost = DodgeStaminaCost * GetStatsComponent()->GetStaminaConsumptionModifier();
+	int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
 
 	// @todo add UsingSkill, Looting, Interacting, etc. to this too
-	if (GetStatsComponent()->GetCurrentStamina() >= DodgeCost &&
+	if (GetCharacterStatsComponent()->GetCurrentStamina() >= DodgeCost &&
 		(IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking()))
 	{
 		return true;
@@ -363,8 +366,8 @@ bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
 	if (Skill)
 	{
 		if ((Skill->SupportedWeapons & (1 << (uint8)GetEquippedWeaponType())) &&
-			GetStatsComponent()->GetCurrentMana() > Skill->ManaRequired &&
-			GetStatsComponent()->GetCurrentStamina() > Skill->StaminaRequired)
+			GetCharacterStatsComponent()->GetCurrentMana() > Skill->ManaRequired &&
+			GetCharacterStatsComponent()->GetCurrentStamina() > Skill->StaminaRequired)
 		{
 			return true;
 		}
@@ -461,7 +464,7 @@ bool APlayerCharacter::CCEFreeze_Implementation(const float Duration)
 
 void APlayerCharacter::CCEUnfreeze_Implementation()
 {
-	CustomTimeDilation = GetStatsComponent()->GetActiveTimeDilation();
+	CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
 }
 
 bool APlayerCharacter::CCEKnockdown_Implementation(const float Duration)
@@ -537,7 +540,7 @@ bool APlayerCharacter::Freeze(const float Duration)
 
 void APlayerCharacter::EndFreeze()
 {
-	CustomTimeDilation = GetStatsComponent()->GetActiveTimeDilation();
+	CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
 }
 
 bool APlayerCharacter::Knockdown(const float Duration)
@@ -885,14 +888,14 @@ void APlayerCharacter::MoveRight(const float Value)
 
 void APlayerCharacter::ZoomInCamera()
 {
-	if (GetCameraBoom()->TargetArmLength >= CameraArmMinimumLength)
-		GetCameraBoom()->TargetArmLength -= CameraZoomRate;
+	if (GetCameraBoomComponent()->TargetArmLength >= CameraArmMinimumLength)
+		GetCameraBoomComponent()->TargetArmLength -= CameraZoomRate;
 }
 
 void APlayerCharacter::ZoomOutCamera()
 {
-	if (GetCameraBoom()->TargetArmLength <= CameraArmMaximumLength)
-		GetCameraBoom()->TargetArmLength += CameraZoomRate;
+	if (GetCameraBoomComponent()->TargetArmLength <= CameraArmMaximumLength)
+		GetCameraBoomComponent()->TargetArmLength += CameraZoomRate;
 }
 
 /*
@@ -991,8 +994,8 @@ void APlayerCharacter::OnDodge()
 
 	if (CanDodge() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Dodge.Get())
 	{
-		int32 DodgeCost = DodgeStaminaCost * GetStatsComponent()->GetStaminaConsumptionModifier();
-		GetStatsComponent()->ModifyCurrentStamina(-DodgeCost);
+		int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
+		GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 
 		// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
 		// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
@@ -1327,7 +1330,7 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 	
 	if (ForwardAxisValue < 0)
 	{
-		float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		float Speed = (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1335,7 +1338,7 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 	}
 	else
 	{
-		float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+		float Speed = DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1424,7 +1427,7 @@ void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 
 	if (ForwardAxisValue < 0)
 	{
-		float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		float Speed = (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1432,7 +1435,7 @@ void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 	}
 	else
 	{
-		float Speed = DefaultRunSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+		float Speed = DefaultRunSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1478,7 +1481,7 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 		SetCharacterMovementDirection(ECharMovementDirection::F);
 	}
 	
-	float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+	float Speed = DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
 	if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 	{
 		SetWalkSpeed(Speed);
@@ -1868,8 +1871,8 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		DisableBlock();
 	}
 
-	GetStatsComponent()->ModifyCurrentMana(-SkillPair.Value->ManaRequired);
-	GetStatsComponent()->ModifyCurrentStamina(-SkillPair.Value->StaminaRequired);
+	GetCharacterStatsComponent()->ModifyCurrentMana(-SkillPair.Value->ManaRequired);
+	GetCharacterStatsComponent()->ModifyCurrentStamina(-SkillPair.Value->StaminaRequired);
 
 	SetCurrentActiveSkillID(SkillPair.Key);
 	SetCurrentActiveSkill(SkillPair.Value);
@@ -1886,7 +1889,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		EndFreeze();
 	}
 
-	GetStatsComponent()->AddCrowdControlImmunitiesFromSkill(SkillPair.Value->CrowdControlImmunities);
+	GetCharacterStatsComponent()->AddCrowdControlImmunitiesFromSkill(SkillPair.Value->CrowdControlImmunities);
 
 	if (bSkillAllowsMovement)
 	{
@@ -2151,9 +2154,9 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	{
 		GetSkillsComponent()->SetOffChainSkillReset();
 
-		if (GetCurrentActiveSkill()->CrowdControlImmunities == GetStatsComponent()->GetCrowdControlImmunitiesFromSkill())
+		if (GetCurrentActiveSkill()->CrowdControlImmunities == GetCharacterStatsComponent()->GetCrowdControlImmunitiesFromSkill())
 		{
-			GetStatsComponent()->RemoveCrowdControlImmunitiesFromSkil();
+			GetCharacterStatsComponent()->RemoveCrowdControlImmunitiesFromSkil();
 		}
 	}
 

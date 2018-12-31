@@ -92,16 +92,16 @@ float ACombatManager::GetActualDamage(const AEODCharacterBase* HitInstigator,
 
 	if (SkillDamageInfo.DamageType == EDamageType::Physical)
 	{
-		ActualDamage = HitInstigator->GetStatsComponent()->GetPhysicalAttack();
-		CritBonus = HitInstigator->GetStatsComponent()->GetPhysicalCritBonus();
-		DamageReductionOnBlock = HitInstigator->GetStatsComponent()->GetPhysicalDamageReductionOnBlock();
+		ActualDamage = HitInstigator->GetCharacterStatsComponent()->GetPhysicalAttack();
+		CritBonus = HitInstigator->GetCharacterStatsComponent()->GetPhysicalCritBonus();
+		DamageReductionOnBlock = HitInstigator->GetCharacterStatsComponent()->GetPhysicalDamageReductionOnBlock();
 		CritMultiplier = PhysicalCritMultiplier;
 	}
 	else if (SkillDamageInfo.DamageType == EDamageType::Magickal)
 	{
-		ActualDamage = HitInstigator->GetStatsComponent()->GetMagickAttack();
-		CritBonus = HitInstigator->GetStatsComponent()->GetMagickCritBonus();
-		DamageReductionOnBlock = HitInstigator->GetStatsComponent()->GetMagickDamageReductionOnBlock();
+		ActualDamage = HitInstigator->GetCharacterStatsComponent()->GetMagickAttack();
+		CritBonus = HitInstigator->GetCharacterStatsComponent()->GetMagickCritBonus();
+		DamageReductionOnBlock = HitInstigator->GetCharacterStatsComponent()->GetMagickDamageReductionOnBlock();
 		CritMultiplier = MagickalCritMultiplier;
 	}
 
@@ -136,16 +136,16 @@ float ACombatManager::GetActualDamage(
 
 	if (SkillUsed->DamageType == EDamageType::Physical)
 	{
-		ActualDamage = HitInstigator->GetStatsComponent()->GetPhysicalAttack();
-		CritBonus = HitInstigator->GetStatsComponent()->GetPhysicalCritBonus();
-		DamageReductionOnBlock = HitInstigator->GetStatsComponent()->GetPhysicalDamageReductionOnBlock();
+		ActualDamage = HitInstigator->GetCharacterStatsComponent()->GetPhysicalAttack();
+		CritBonus = HitInstigator->GetCharacterStatsComponent()->GetPhysicalCritBonus();
+		DamageReductionOnBlock = HitInstigator->GetCharacterStatsComponent()->GetPhysicalDamageReductionOnBlock();
 		CritMultiplier = PhysicalCritMultiplier;
 	}
 	else if (SkillUsed->DamageType == EDamageType::Magickal)
 	{
-		ActualDamage = HitInstigator->GetStatsComponent()->GetMagickAttack();
-		CritBonus = HitInstigator->GetStatsComponent()->GetMagickCritBonus();
-		DamageReductionOnBlock = HitInstigator->GetStatsComponent()->GetMagickDamageReductionOnBlock();
+		ActualDamage = HitInstigator->GetCharacterStatsComponent()->GetMagickAttack();
+		CritBonus = HitInstigator->GetCharacterStatsComponent()->GetMagickCritBonus();
+		DamageReductionOnBlock = HitInstigator->GetCharacterStatsComponent()->GetMagickDamageReductionOnBlock();
 		CritMultiplier = MagickalCritMultiplier;
 	}
 
@@ -312,8 +312,8 @@ void ACombatManager::CharacterToCharacterAttack(
 	}
 
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillUsed, bCritHit, bAttackBlocked);
-	HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
-	int32 ResultingHitCharacterHP = HitCharacter->GetStatsComponent()->GetCurrentHealth();
+	HitCharacter->GetCharacterStatsComponent()->ModifyCurrentHealth(-ActualDamage);
+	int32 ResultingHitCharacterHP = HitCharacter->GetCharacterStatsComponent()->GetCurrentHealth();
 
 
 	/*
@@ -396,8 +396,8 @@ void ACombatManager::CharacterToCharacterAttack(AEODCharacterBase* HitInstigator
 	}
 
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillDamageInfo, bCritHit, bAttackBlocked);
-	HitCharacter->GetStatsComponent()->ModifyCurrentHealth(-ActualDamage);
-	int32 ResultingHitCharacterHP = HitCharacter->GetStatsComponent()->GetCurrentHealth();
+	HitCharacter->GetCharacterStatsComponent()->ModifyCurrentHealth(-ActualDamage);
+	int32 ResultingHitCharacterHP = HitCharacter->GetCharacterStatsComponent()->GetCurrentHealth();
 	bool bCCEApplied = ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillDamageInfo, LineHitResult, BCAngle);
 	if (ResultingHitCharacterHP <= 0)
 	{

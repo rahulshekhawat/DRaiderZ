@@ -42,7 +42,7 @@ void AAICharacterBase::BeginPlay()
 	SetInCombat(false);
 
 	// Following line is used to update the floating health bar widget (floating health bar widget is NULL when CurrentHealth is initially initialized)
-	GetStatsComponent()->ModifyCurrentHealth(0);
+	GetCharacterStatsComponent()->ModifyCurrentHealth(0);
 }
 
 void AAICharacterBase::Destroyed()
@@ -144,7 +144,7 @@ bool AAICharacterBase::CCEFreeze_Implementation(const float Duration)
 
 void AAICharacterBase::CCEUnfreeze_Implementation()
 {
-	CustomTimeDilation = GetStatsComponent()->GetActiveTimeDilation();
+	CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
 }
 
 bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
