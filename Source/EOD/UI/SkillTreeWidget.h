@@ -4,14 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "EOD/Statics/CharacterLibrary.h"
+#include "EOD/UI/SkillTreeItemContainer.h"
 
+#include "Components/Button.h"
 #include "Styling/SlateTypes.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/CanvasPanelSlot.h"
 #include "SkillTreeWidget.generated.h"
 
 class UButton;
 class UWidgetSwitcher;
-class USkillTreeItemContainer;
+// class USkillTreeItemContainer;
 
 /**
  * 
@@ -30,6 +33,11 @@ public:
 
 	virtual void NativeDestruct() override;
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Child Widgets
+	////////////////////////////////////////////////////////////////////////////////
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UWidgetSwitcher* SkillTreeSwitcher;
 
@@ -98,12 +106,20 @@ public:
 	USkillTreeItemContainer* MadnessSkillButton;
 	//~ End berserker skills
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// 
+	////////////////////////////////////////////////////////////////////////////////
+public:
 	FSkillState GetSkillState(const FString& SkillGroup) const;
 
 private:
-	/** Move container to it's designated position */
-	void SetupContainerPosition(USkillTreeItemContainer* Container);
+	UPROPERTY()
+	FButtonStyle DefaultButtonStyle;
 
+	TArray<USkillTreeItemContainer*> BerserkerSkills;
+
+private:
 	UFUNCTION()
 	void ActivateAssassinTab();
 
@@ -119,14 +135,81 @@ private:
 	UFUNCTION()
 	void ActivateSorcererTab();
 
-	void ResetAllTabButtonsStyle();
-
-	void ResetButtonStyle(UButton* Button);
-
-	void SetButtonStyleToSelected(UButton* Button);
-	
-	FButtonStyle DefaultButtonStyle;
-
 	USkillTreeItemContainer* GetSkillTreeSlotFromSkillGroupID(const FString& SkillGroupID);
 
+	/** Get the desired position of container on skill tree widget based on container's row and column */
+	inline FVector2D GetContainerDesiredPosition(int32 RowPosition, int32 ColumnPosition) const;
+
+	/** Move container to it's designated position */
+	inline void SetupContainerPosition(USkillTreeItemContainer* Container);
+
+	/** Initialize a skill tree container of type Berserker */
+	inline void InitializeBerserkerSkillItemContainer(USkillTreeItemContainer* Container);
+
+	/** Change visual style of given button to 'selected' */
+	inline void SetButtonStyleToSelected(UButton* Button);
+
+	/** Resets button style */
+	inline void ResetButtonStyle(UButton* Button);
+
+	/** Reset button style for all skill tree tab buttons */
+	inline void ResetAllTabButtonsStyle();
+
+
 };
+
+inline FVector2D USkillTreeWidget::GetContainerDesiredPosition(int32 RowPosition, int32 ColumnPosition) const
+{
+	FVector2D Position;
+	Position.X = 540 + 180 * ColumnPosition;
+	Position.Y = 25 + 130 * RowPosition;
+	return Position;
+}
+
+inline void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer * Container)
+{
+	UCanvasPanelSlot* CanvasSlot = IsValid(Container) ? Cast<UCanvasPanelSlot>(Container->Slot) : nullptr;
+	if (IsValid(CanvasSlot) && IsValid(Container))
+	{
+		FVector2D DesiredPos = GetContainerDesiredPosition(Container->RowPosition, Container->ColumnPosition);
+		CanvasSlot->SetPosition(DesiredPos);
+	}
+}
+
+inline void USkillTreeWidget::InitializeBerserkerSkillItemContainer(USkillTreeItemContainer * Container)
+{
+	SetupContainerPosition(Container);
+	// @todo load skill icon
+	// @todo set container to disabled state
+	BerserkerSkills.Add(Container);
+}
+
+inline void USkillTreeWidget::SetButtonStyleToSelected(UButton * Button)
+{
+	if (IsValid(Button))
+	{
+		FButtonStyle ButtonStyle;
+		ButtonStyle.SetNormal(DefaultButtonStyle.Pressed);
+		ButtonStyle.SetPressed(DefaultButtonStyle.Pressed);
+		ButtonStyle.SetHovered(DefaultButtonStyle.Pressed);
+
+		Button->SetStyle(ButtonStyle);
+	}
+}
+
+inline void USkillTreeWidget::ResetButtonStyle(UButton* Button)
+{
+	if (IsValid(Button))
+	{
+		Button->SetStyle(DefaultButtonStyle);
+	}
+}
+
+inline void USkillTreeWidget::ResetAllTabButtonsStyle()
+{
+	ResetButtonStyle(AssassinTab);
+	ResetButtonStyle(BerserkerTab);
+	ResetButtonStyle(ClericTab);
+	ResetButtonStyle(DefenderTab);
+	ResetButtonStyle(SorcererTab);
+}

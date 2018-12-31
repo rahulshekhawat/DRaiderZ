@@ -207,6 +207,12 @@ void AEODPlayerController::InitInventoryWidget()
 
 void AEODPlayerController::InitSkillTreeWidget()
 {
+	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetSkillTreeWidget()))
+	{
+
+
+
+	}
 }
 
 void AEODPlayerController::InitSkillBarWidget()

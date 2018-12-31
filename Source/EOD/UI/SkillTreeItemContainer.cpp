@@ -11,6 +11,14 @@ USkillTreeItemContainer::USkillTreeItemContainer(const FObjectInitializer & Obje
 
 bool USkillTreeItemContainer::Initialize()
 {
+	if (Super::Initialize() && SkillUpgradeText)
+	{
+		return true;
+	}
+
+	return false;
+
+	/*
 	if (!(Super::Initialize() && SkillUpgradeText))
 	{
 		return false;
@@ -21,6 +29,7 @@ bool USkillTreeItemContainer::Initialize()
 	RefreshContainerVisuals();
 
 	return true;
+	*/
 }
 
 void USkillTreeItemContainer::NativeConstruct()

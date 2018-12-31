@@ -26,7 +26,6 @@ class EOD_API UEODItemContainer : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-
 	UEODItemContainer(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
@@ -35,6 +34,11 @@ public:
 
 	virtual void NativeDestruct() override;
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// 
+	////////////////////////////////////////////////////////////////////////////////
+public:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
 	bool bCanBeClicked;
 
@@ -107,7 +111,6 @@ public:
 	inline void ResetContainer();
 
 protected:
-
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
@@ -121,7 +124,6 @@ protected:
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 private:
-
 	inline void UpdateItemImage();
 
 	inline void UpdateStackCountText();
@@ -230,18 +232,22 @@ inline void UEODItemContainer::UpdateStackCountText()
 
 inline void UEODItemContainer::SetupEmptyBorderMaterial()
 {
-	if (!EmptyBorderMaterial)
+	if (IsValid(EmptyBorderMaterial))
 	{
-		return;
+		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(EmptyBorderMaterial, this);
+		if (IsValid(DynamicMaterial))
+		{
+			DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
+		}
+
+		FSlateBrush SlateBrush;
+		SlateBrush.ImageSize = FVector2D(64.0, 64.0);
+		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
+		SlateBrush.SetResourceObject(DynamicMaterial);
+		if (IsValid(EmptyBorderImage))
+		{
+			EmptyBorderImage->SetBrush(SlateBrush);
+		}
 	}
-
-	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(EmptyBorderMaterial, this);
-	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
-
-	FSlateBrush SlateBrush;
-	SlateBrush.ImageSize = FVector2D(64.0, 64.0);
-	SlateBrush.DrawAs = ESlateBrushDrawType::Image;
-	SlateBrush.ImageType = ESlateBrushImageType::FullColor;
-	SlateBrush.SetResourceObject(DynamicMaterial);
-	EmptyBorderImage->SetBrush(SlateBrush);
 }

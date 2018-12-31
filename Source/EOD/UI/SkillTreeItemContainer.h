@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "EOD/Core/EODSaveGame.h"
 #include "EOD/Core/GameSingleton.h"
 #include "EOD/UI/EODItemContainer.h"
 #include "EOD/Statics/CharacterLibrary.h"
 
-#include "Components/TextBlock.h"
 #include "Engine/Engine.h"
+#include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "SkillTreeItemContainer.generated.h"
 
@@ -31,6 +30,11 @@ public:
 
 	virtual void NativeDestruct() override;
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// 
+	////////////////////////////////////////////////////////////////////////////////
+public:
 	/**
 	 * Determines the skill group this skill belongs to
 	 * For a skill with SkillID 'BZ1_1', it's skill group is 'BZ1'
@@ -60,7 +64,7 @@ public:
 
 	/** Refresh and update the displayed visuals of this container */
 	virtual void RefreshContainerVisuals() override;
-	
+
 private:
 	inline void UpdateSkillUpgradeText();
 

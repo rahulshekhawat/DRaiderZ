@@ -9,7 +9,7 @@
 #include "Engine/Texture.h"
 
 
-UEODItemContainer::UEODItemContainer(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+UEODItemContainer::UEODItemContainer(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
