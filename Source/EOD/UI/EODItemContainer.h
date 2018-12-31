@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "EOD/Statics/EODLibrary.h"
+#include "EOD/Statics/EODGlobalNames.h"
 
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -33,6 +33,23 @@ public:
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// CHILD WIDGETS
+	////////////////////////////////////////////////////////////////////////////////
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UImage* EmptyBorderImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UImage* ItemImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* StackCountText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* CooldownText;
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -78,18 +95,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UDragVisualWidget> DragVisualClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UImage* EmptyBorderImage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UImage* ItemImage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* StackCountText;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* CooldownText;
-
 	/** Puts this container on cooldown for a given duration */
 	inline void StartCooldown(float Duration, float Interval = 1.f);
 
@@ -105,7 +110,11 @@ public:
 	void BP_StopCooldown();
 
 	/** Refresh and update the displayed visuals of this container */
-	virtual void RefreshContainerVisuals();
+	FORCEINLINE virtual void RefreshContainerVisuals()
+	{
+		UpdateItemImage();
+		UpdateStackCountText();
+	}
 
 	/** Resets and nulls all container variables. Deletes any references */
 	inline void ResetContainer();
@@ -151,93 +160,83 @@ inline void UEODItemContainer::ResetContainer()
 
 inline void UEODItemContainer::StartCooldown(float Duration, float Interval)
 {
-	UWorld* World = nullptr;
-
-	if (GEngine)
+	UWorld* World = IsValid(GEngine) ? GEngine->GetWorldFromContextObjectChecked(this) : nullptr;
+	if (IsValid(World) && IsValid(ItemImage) && IsValid(CooldownText))
 	{
-		World = GEngine->GetWorldFromContextObjectChecked(this);
+		World->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UEODItemContainer::UpdateCooldown, Interval, true, 0.f);
+
+		CooldownTimeRemaining = Duration;
+		CooldownInterval = Interval;
+		bInCooldown = true;
+		ItemImage->SetIsEnabled(false);
+		CooldownText->SetVisibility(ESlateVisibility::Visible);
 	}
-
-	if (!World)
-	{
-		return;
-	}
-
-	World->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UEODItemContainer::UpdateCooldown, Interval, true, 0.f);
-
-	CooldownTimeRemaining = Duration;
-	CooldownInterval = Interval;
-	bInCooldown = true;
-	ItemImage->SetIsEnabled(false);
-	CooldownText->SetVisibility(ESlateVisibility::Visible);
 }
 
 inline void UEODItemContainer::StopCooldown()
 {
-	UWorld* World = nullptr;
-
-	if (GEngine)
+	UWorld* World = IsValid(GEngine) ? GEngine->GetWorldFromContextObjectChecked(this) : nullptr;
+	if (IsValid(World) && IsValid(ItemImage) && IsValid(CooldownText))
 	{
-		World = GEngine->GetWorldFromContextObjectChecked(this);
+		World->GetTimerManager().ClearTimer(CooldownTimerHandle);
+
+		bInCooldown = false;
+		ItemImage->SetIsEnabled(true);
+		CooldownText->SetVisibility(ESlateVisibility::Hidden);
 	}
-
-	if (!World)
-	{
-		return;
-	}
-
-	World->GetTimerManager().ClearTimer(CooldownTimerHandle);
-
-	bInCooldown = false;
-	ItemImage->SetIsEnabled(true);
-	CooldownText->SetVisibility(ESlateVisibility::Hidden);
 }
 
 inline void UEODItemContainer::UpdateItemImage()
 {
-	if (EODItemInfo.Icon)
+	if (IsValid(ItemImage))
 	{
-		FSlateBrush SlateBrush;
-		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
-		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
-		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
-		SlateBrush.SetResourceObject(EODItemInfo.Icon);
-		ItemImage->SetBrush(SlateBrush);
-	}
-	else
-	{
-		FSlateBrush SlateBrush;
-		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
-		SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
-		SlateBrush.ImageType = ESlateBrushImageType::NoImage;
-		ItemImage->SetBrush(SlateBrush);
+		if (IsValid(EODItemInfo.Icon))
+		{
+			FSlateBrush SlateBrush;
+			SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+			SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+			SlateBrush.ImageType = ESlateBrushImageType::FullColor;
+			SlateBrush.SetResourceObject(EODItemInfo.Icon);
+			ItemImage->SetBrush(SlateBrush);
+		}
+		else
+		{
+			FSlateBrush SlateBrush;
+			SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+			SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
+			SlateBrush.ImageType = ESlateBrushImageType::NoImage;
+			ItemImage->SetBrush(SlateBrush);
+		}
 	}
 }
 
 inline void UEODItemContainer::UpdateStackCountText()
 {
-	if (EODItemInfo.StackCount > 1)
+	if (IsValid(StackCountText))
 	{
-		FText Text = FText::FromString(FString::FromInt(EODItemInfo.StackCount));
-		StackCountText->SetText(Text);
-		StackCountText->SetVisibility(ESlateVisibility::Visible);
-	}
-	else
-	{
-		FText Text = FText::FromString(FString(""));
-		StackCountText->SetText(Text);
-		StackCountText->SetVisibility(ESlateVisibility::Hidden);
+		if (EODItemInfo.StackCount > 1)
+		{
+			FText Text = FText::FromString(FString::FromInt(EODItemInfo.StackCount));
+			StackCountText->SetText(Text);
+			StackCountText->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			FText Text = FText::FromString(FString(""));
+			StackCountText->SetText(Text);
+			StackCountText->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 
 inline void UEODItemContainer::SetupEmptyBorderMaterial()
 {
-	if (IsValid(EmptyBorderMaterial))
+	if (IsValid(EmptyBorderMaterial) && IsValid(EmptyBorderImage))
 	{
 		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(EmptyBorderMaterial, this);
 		if (IsValid(DynamicMaterial))
 		{
-			DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
+			DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, NormalBorderColor);
 		}
 
 		FSlateBrush SlateBrush;
@@ -245,9 +244,6 @@ inline void UEODItemContainer::SetupEmptyBorderMaterial()
 		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
 		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
 		SlateBrush.SetResourceObject(DynamicMaterial);
-		if (IsValid(EmptyBorderImage))
-		{
-			EmptyBorderImage->SetBrush(SlateBrush);
-		}
+		EmptyBorderImage->SetBrush(SlateBrush);
 	}
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Statics/EODGlobalNames.h"
 #include "EOD/Statics/EODLibrary.h"
 #include "EOD/Statics/CharacterLibrary.h"
 #include "EOD/StatusEffects/StatusEffectBase.h"

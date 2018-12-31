@@ -15,20 +15,16 @@ UEODItemContainer::UEODItemContainer(const FObjectInitializer& ObjectInitializer
 
 bool UEODItemContainer::Initialize()
 {
-	if (!(Super::Initialize() &&
-		StackCountText &&
-		CooldownText &&
-		ItemImage))
+	if (Super::Initialize() && StackCountText && CooldownText && ItemImage)
 	{
-		return false;
+		StackCountText->SetVisibility(ESlateVisibility::Hidden);
+		CooldownText->SetVisibility(ESlateVisibility::Hidden);
+
+		SetupEmptyBorderMaterial();
+		RefreshContainerVisuals();
+		return true;
 	}
-
-	StackCountText->SetVisibility(ESlateVisibility::Hidden);
-	CooldownText->SetVisibility(ESlateVisibility::Hidden);
-
-	SetupEmptyBorderMaterial();
-	RefreshContainerVisuals();
-	return true;
+	return false;
 }
 
 void UEODItemContainer::NativeConstruct()
@@ -36,7 +32,6 @@ void UEODItemContainer::NativeConstruct()
 	Super::NativeConstruct();
 
 	RefreshContainerVisuals();
-
 }
 
 void UEODItemContainer::NativeDestruct()
@@ -54,18 +49,12 @@ void UEODItemContainer::BP_StopCooldown()
 	StopCooldown();
 }
 
-void UEODItemContainer::RefreshContainerVisuals()
-{
-	UpdateItemImage();
-	UpdateStackCountText();
-}
-
-void UEODItemContainer::NativeOnDragDetected(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent, UDragDropOperation *& OutOperation)
+void UEODItemContainer::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	OnDragDetected(InGeometry, InMouseEvent, OutOperation);
 }
 
-bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDropEvent & InDragDropEvent, UDragDropOperation * InOperation)
+bool UEODItemContainer::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	// Cannot drop anything on skill tree
 	if (ContainerType == EEODContainerType::SkillTree)
@@ -116,25 +105,25 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 	return bResult;
 }
 
-void UEODItemContainer::NativeOnMouseEnter(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+void UEODItemContainer::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), HoveredBorderColor);
+	DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, HoveredBorderColor);
 }
 
-void UEODItemContainer::NativeOnMouseLeave(const FPointerEvent & InMouseEvent)
+void UEODItemContainer::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
+	DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, NormalBorderColor);
 }
 
-FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), PressedBorderColor);
+	DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, PressedBorderColor);
 
 	FReply Reply = FReply::Unhandled();
-	FKey DragKey(TEXT("LeftMouseButton"));
+	FKey DragKey(FEODKeyNames::LeftMouseButton);
 	if (InMouseEvent.GetEffectingButton() == DragKey)
 	{
 		Reply = FReply::Handled();
@@ -148,10 +137,10 @@ FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry & InGeometry, 
 	return Reply;
 }
 
-FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), HoveredBorderColor);
+	DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, HoveredBorderColor);
 
 	return FReply::Handled();
 }

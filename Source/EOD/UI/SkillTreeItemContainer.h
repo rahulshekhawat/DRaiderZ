@@ -73,6 +73,9 @@ private:
 
 	inline void LoadEODItemInfo();
 
+public:
+	void LoadSkillIcon();
+
 };
 
 inline void USkillTreeItemContainer::UpdateSkillUpgradeText()

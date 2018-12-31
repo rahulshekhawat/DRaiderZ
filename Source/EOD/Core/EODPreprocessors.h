@@ -63,10 +63,3 @@ inline void PrintEverywhere(UObject* WorldContextObject, const FString& Message,
 	UKismetSystemLibrary::PrintString(WorldContextObject, Message, bLogScreen, bLogConsole, FLinearColor((0.0), (0.66), (1.0)), Duration);
 #endif // EOD_MESSAGE_LOGGING_ENABLED
 }
-
-class FEODGlobalNames
-{
-public:
-	const static FName NoCollision;
-	const static FName OverlapAllDynamic;
-};
