@@ -22,7 +22,6 @@ class EOD_API USkillTreeWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-
 	USkillTreeWidget(const FObjectInitializer& ObjectInitializer);
 
 	bool Initialize() override;
@@ -102,7 +101,6 @@ public:
 	FSkillState GetSkillState(const FString& SkillGroup) const;
 
 private:
-
 	/** Move container to it's designated position */
 	void SetupContainerPosition(USkillTreeItemContainer* Container);
 

@@ -91,98 +91,110 @@ FSkillState USkillTreeWidget::GetSkillState(const FString & SkillGroup) const
 
 void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer* Container)
 {
-	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(Container->Slot);
-
-	if (!CanvasSlot)
+	UCanvasPanelSlot* CanvasSlot = IsValid(Container) ? Cast<UCanvasPanelSlot>(Container->Slot) : nullptr;
+	if (CanvasSlot)
 	{
-		return;
-	}
+		FVector2D Position;
+		switch (Container->ColumnPosition)
+		{
+		case 0:
+			Position.X = 540;
+			break;
+		case 1:
+			Position.X = 720;
+			break;
+		case 2:
+			Position.X = 900;
+			break;
+		case 3:
+			Position.X = 1080;
+			break;
+		case 4:
+			Position.X = 1260;
+			break;
+		default:
+			break;
+		}
 
-	FVector2D Position;
-	switch (Container->ColumnPosition)
-	{
-	case 0:
-		Position.X = 540;
-		break;
-	case 1:
-		Position.X = 720;
-		break;
-	case 2:
-		Position.X = 900;
-		break;
-	case 3:
-		Position.X = 1080;
-		break;
-	case 4:
-		Position.X = 1260;
-		break;
-	default:
-		break;
-	}
+		switch (Container->RowPosition)
+		{
+		case 0:
+			Position.Y = 25;
+			break;
+		case 1:
+			Position.Y = 155;
+			break;
+		case 2:
+			Position.Y = 285;
+			break;
+		case 3:
+			Position.Y = 415;
+			break;
+		case 4:
+			Position.Y = 545;
+			break;
+		case 5:
+			Position.Y = 675;
+			break;
+		case 6:
+			Position.Y = 805;
+			break;
+		default:
+			break;
+		}
 
-	switch (Container->RowPosition)
-	{
-	case 0:
-		Position.Y = 25;
-		break;
-	case 1:
-		Position.Y = 155;
-		break;
-	case 2:
-		Position.Y = 285;
-		break;
-	case 3:
-		Position.Y = 415;
-		break;
-	case 4:
-		Position.Y = 545;
-		break;
-	case 5:
-		Position.Y = 675;
-		break;
-	case 6:
-		Position.Y = 805;
-		break;
-	default:
-		break;
+		CanvasSlot->SetPosition(Position);
 	}
-
-	CanvasSlot->SetPosition(Position);
 }
 
 void USkillTreeWidget::ActivateAssassinTab()
 {
 	ResetAllTabButtonsStyle();
 	SetButtonStyleToSelected(AssassinTab);
-	SkillTreeSwitcher->SetActiveWidgetIndex(0);
+	if(IsValid(SkillTreeSwitcher))
+	{
+		SkillTreeSwitcher->SetActiveWidgetIndex(0);
+	}
 }
 
 void USkillTreeWidget::ActivateBerserkerTab()
 {
 	ResetAllTabButtonsStyle();
 	SetButtonStyleToSelected(BerserkerTab);
-	SkillTreeSwitcher->SetActiveWidgetIndex(1);
+	if(IsValid(SkillTreeSwitcher))
+	{
+		SkillTreeSwitcher->SetActiveWidgetIndex(1);
+	}
 }
 
 void USkillTreeWidget::ActivateClericTab()
 {
 	ResetAllTabButtonsStyle();
 	SetButtonStyleToSelected(ClericTab);
-	SkillTreeSwitcher->SetActiveWidgetIndex(2);
+	if(IsValid(SkillTreeSwitcher))
+	{
+		SkillTreeSwitcher->SetActiveWidgetIndex(2);
+	}
 }
 
 void USkillTreeWidget::ActivateDefenderTab()
 {
 	ResetAllTabButtonsStyle();
 	SetButtonStyleToSelected(DefenderTab);
-	SkillTreeSwitcher->SetActiveWidgetIndex(3);
+	if(IsValid(SkillTreeSwitcher))
+	{
+		SkillTreeSwitcher->SetActiveWidgetIndex(3);
+	}
 }
 
 void USkillTreeWidget::ActivateSorcererTab()
 {
 	ResetAllTabButtonsStyle();
 	SetButtonStyleToSelected(SorcererTab);
-	SkillTreeSwitcher->SetActiveWidgetIndex(4);
+	if(IsValid(SkillTreeSwitcher))
+	{
+		SkillTreeSwitcher->SetActiveWidgetIndex(4);
+	}
 }
 
 void USkillTreeWidget::ResetAllTabButtonsStyle()
@@ -194,22 +206,28 @@ void USkillTreeWidget::ResetAllTabButtonsStyle()
 	ResetButtonStyle(SorcererTab);
 }
 
-void USkillTreeWidget::ResetButtonStyle(UButton * Button)
+void USkillTreeWidget::ResetButtonStyle(UButton* Button)
 {
-	Button->SetStyle(DefaultButtonStyle);
+	if (Button)
+	{
+		Button->SetStyle(DefaultButtonStyle);
+	}
 }
 
-void USkillTreeWidget::SetButtonStyleToSelected(UButton * Button)
+void USkillTreeWidget::SetButtonStyleToSelected(UButton* Button)
 {
-	FButtonStyle ButtonStyle;
-	ButtonStyle.SetNormal(DefaultButtonStyle.Pressed);
-	ButtonStyle.SetPressed(DefaultButtonStyle.Pressed);
-	ButtonStyle.SetHovered(DefaultButtonStyle.Pressed);
+	if (IsValid(Button))
+	{
+		FButtonStyle ButtonStyle;
+		ButtonStyle.SetNormal(DefaultButtonStyle.Pressed);
+		ButtonStyle.SetPressed(DefaultButtonStyle.Pressed);
+		ButtonStyle.SetHovered(DefaultButtonStyle.Pressed);
 
-	Button->SetStyle(ButtonStyle);
+		Button->SetStyle(ButtonStyle);
+	}
 }
 
-USkillTreeItemContainer* USkillTreeWidget::GetSkillTreeSlotFromSkillGroupID(const FString & SkillGroupID)
+USkillTreeItemContainer* USkillTreeWidget::GetSkillTreeSlotFromSkillGroupID(const FString& SkillGroupID)
 {
 	return nullptr;
 }

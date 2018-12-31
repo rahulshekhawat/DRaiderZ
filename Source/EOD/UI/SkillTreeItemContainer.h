@@ -23,7 +23,6 @@ class EOD_API USkillTreeItemContainer : public UEODItemContainer
 	GENERATED_BODY()
 	
 public:
-
 	USkillTreeItemContainer(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
@@ -63,16 +62,12 @@ public:
 	virtual void RefreshContainerVisuals() override;
 	
 private:
-
 	inline void UpdateSkillUpgradeText();
 
 	/** Load previously saved skill state from current save slot */
 	inline void LoadSkillContainerState();
 
 	inline void LoadEODItemInfo();
-
-
-	
 
 };
 
