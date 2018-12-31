@@ -7,44 +7,47 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-UBTTask_Attack::UBTTask_Attack(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+UBTTask_Attack::UBTTask_Attack(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	NodeName = "Attack";
 	bNotifyTick = true;
 }
 
-EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
+EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
-	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
+	AEODCharacterBase* CharacterOwner = IsValid(AIController) ? Cast<AEODCharacterBase>(AIController->GetPawn()) : nullptr;
+	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
 
-	if (OwningCharacter == nullptr)
+	if (!IsValid(CharacterOwner) || !IsValid(BlackboardComp))
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	FName SkillID = AIController->GetBlackboardComponent()->GetValueAsName(UAILibrary::BBKey_MostWeightedSkillID);
-	bool bResult = OwningCharacter->UseSkill(SkillID);
-
+	FName SkillID = BlackboardComp->GetValueAsName(UAILibrary::BBKey_MostWeightedSkillID);
+	bool bResult = CharacterOwner->UseSkill(SkillID);
 	if (bResult)
 	{
 		return EBTNodeResult::InProgress;
 	}
 
-	return EBTNodeResult::Type();
+	return EBTNodeResult::Failed;
 }
 
 void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
-	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
+	AEODCharacterBase* CharacterOwner = IsValid(AIController) ? Cast<AEODCharacterBase>(AIController->GetPawn()) : nullptr;
+	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
+
+	if (!IsValid(CharacterOwner) || !IsValid(BlackboardComp))
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+	}
 
 	/** The character is supposed to be using most weighted skill during this task */
-	FName MostWeightedSkillID = AIController->GetBlackboardComponent()->GetValueAsName(UAILibrary::BBKey_MostWeightedSkillID);
-
-	EEODTaskStatus TaskStatus = OwningCharacter->CheckSkillStatus(MostWeightedSkillID);
+	FName MostWeightedSkillID = BlackboardComp->GetValueAsName(UAILibrary::BBKey_MostWeightedSkillID);
+	EEODTaskStatus TaskStatus = CharacterOwner->CheckSkillStatus(MostWeightedSkillID);
 	if (TaskStatus == EEODTaskStatus::Active)
 	{
 		return;
@@ -59,12 +62,14 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	}
 	else if (TaskStatus == EEODTaskStatus::Aborted)
 	{
-		// FinishLatentTask(OwnerComp, EBTNodeResult::Aborted);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+
+		//~ @note For some reason, finish latent task with EBTNodeResult::Aborted prevents flow from leaving the task node in behavior tree. I might be missing something.
+		// FinishLatentTask(OwnerComp, EBTNodeResult::Aborted);
 	}
 }
 
-EBTNodeResult::Type UBTTask_Attack::AbortTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
+EBTNodeResult::Type UBTTask_Attack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	return EBTNodeResult::Aborted;
 }

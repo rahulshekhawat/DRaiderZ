@@ -5,7 +5,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 
-AMobController::AMobController(const FObjectInitializer & ObjectInitializer)
+AMobController::AMobController(const FObjectInitializer& ObjectInitializer)
 {
 	AggroActivationRadius = 500;
 	AggroAreaRadius = 5000;
@@ -13,18 +13,17 @@ AMobController::AMobController(const FObjectInitializer & ObjectInitializer)
 	WanderRadius = 3500;
 }
 
-void AMobController::InitializeBlackboardValues(UBlackboardComponent * BlackboardComponent)
+void AMobController::InitializeBlackboardValues(UBlackboardComponent* BlackboardComponent)
 {
-	if (!BlackboardComponent)
+	if (IsValid(BlackboardComponent))
 	{
-		return;
+		if (GetPawn())
+		{
+			BlackboardComponent->SetValueAsVector(UAILibrary::BBKey_SpawnLocation, GetPawn()->GetActorLocation());
+		}
+		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_AggroActivationRadius, AggroActivationRadius);
+		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_MaxEnemyChaseRadius, MaxEnemyChaseRadius);
+		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_AggroAreaRadius, AggroAreaRadius);
+		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_WanderRadius, WanderRadius);
 	}
-
-	BlackboardComponent->SetValueAsVector(UAILibrary::BBKey_SpawnLocation, GetPawn()->GetActorLocation());
-	
-	BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_AggroActivationRadius, AggroActivationRadius);
-	BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_MaxEnemyChaseRadius, MaxEnemyChaseRadius);
-	BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_AggroAreaRadius, AggroAreaRadius);
-	BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_WanderRadius, WanderRadius);
-
 }
