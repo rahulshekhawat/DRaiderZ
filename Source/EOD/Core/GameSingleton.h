@@ -18,7 +18,6 @@ class EOD_API UGameSingleton : public UObject
 	GENERATED_BODY()
 	
 public:
-
 	UGameSingleton(const FObjectInitializer& ObjectInitializer);
 
 	/** A singleton instance of FStreamableManager */

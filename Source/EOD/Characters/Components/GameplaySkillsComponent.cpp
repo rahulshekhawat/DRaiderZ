@@ -65,6 +65,7 @@ void UGameplaySkillsComponent::SetCurrentActiveSkill(const FName SkillID)
 
 void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
+
 }
 
 void UGameplaySkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)

@@ -273,6 +273,14 @@ public:
 
 	static FName GameplaySkillsComponentName;
 
+	static FName CharacterStatsComponentName;
+
+	static FName SpringArmComponentName;
+
+	static FName CameraComponentName;
+
+	static FName InteractionSphereComponentName;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
 	int32 CameraZoomRate;

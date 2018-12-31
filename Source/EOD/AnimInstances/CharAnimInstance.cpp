@@ -26,7 +26,6 @@ void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	if (!EODCharacterOwner)
 	{
-		// If EOD character owner is null, attempt to recast pawn owner to EOD character
 		if (!(EODCharacterOwner = TryGetPawnOwner() ? Cast<AEODCharacterBase>(TryGetPawnOwner()) : nullptr))
 		{
 			return;

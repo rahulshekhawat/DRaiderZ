@@ -16,7 +16,11 @@
 #include "Kismet/KismetSystemLibrary.h"
 
 
-FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("GameplaySkillsComponent"));
+FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
+FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Gameplay Skills"));
+FName AEODCharacterBase::SpringArmComponentName(TEXT("Spring Arm"));
+FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
+FName AEODCharacterBase::InteractionSphereComponentName(TEXT("Interaction Sphere"));
 
 AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UEODCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -28,16 +32,16 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	GetCharacterMovement()->SetIsReplicated(true);
 
 	// Initialize Stats Component
-	StatsComp = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, FName("Character Stats Component"));
+	StatsComp = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, AEODCharacterBase::CharacterStatsComponentName);
+	GameplaySkillsComponent = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, AEODCharacterBase::GameplaySkillsComponentName);
 	SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
-	GameplaySkillsComponent = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, FName("Gameplay Skills Component"));
 
-	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, FName("Camera Boom"));
+	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, AEODCharacterBase::SpringArmComponentName);
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->AddLocalOffset(FVector(0.f, 0.f, 60.f));
 
-	Camera = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, FName("Camera"));
+	Camera = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, AEODCharacterBase::CameraComponentName);
 	Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
 	CameraZoomRate = 15;
@@ -48,7 +52,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	DefaultRunSpeed = 600.f;
 	DefaultWalkSpeedWhileBlocking = 150.f;
 
-	InteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, FName("Interaction Sphere"));
+	InteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, AEODCharacterBase::InteractionSphereComponentName);
 	InteractionSphere->SetupAttachment(RootComponent);
 	InteractionSphere->SetSphereRadius(150.f);
 
