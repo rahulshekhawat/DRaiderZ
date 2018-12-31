@@ -4,16 +4,15 @@
 #include "EOD/AnimInstances/CharAnimInstance.h"
 #include "EOD/Interactives/InteractionInterface.h"
 #include "EOD/Statics/EODBlueprintFunctionLibrary.h"
-#include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 #include "EOD/Player/EODPlayerController.h"
 #include "EOD/AI/EODAIControllerBase.h"
 #include "EOD/Characters/Components/SkillsComponent.h"
 #include "EOD/Characters/Components/StatsComponentBase.h"
 #include "EOD/Characters/Components/GameplaySkillsComponent.h"
+#include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
 #include "UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 
 FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
@@ -752,7 +751,9 @@ void AEODCharacterBase::UpdateMovementState(float DeltaTime)
 {
 	if (ForwardAxisValue < 0)
 	{
-		float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		float Speed = IsValid(GetStatsComponent()) ? (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier()) * 5 / 16 : DefaultWalkSpeed * 5 / 16;
+
+		// float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -760,7 +761,8 @@ void AEODCharacterBase::UpdateMovementState(float DeltaTime)
 	}
 	else
 	{
-		float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+		float Speed = IsValid(GetStatsComponent()) ? DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() : DefaultWalkSpeed;
+		// float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);

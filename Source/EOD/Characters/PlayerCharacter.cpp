@@ -35,7 +35,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(AEODCharacterBase::CharacterStatsComponentName))
+	// Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -173,7 +174,14 @@ void APlayerCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	LoadUnequippedWeaponAnimationReferences();
-	SetWalkSpeed(DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier());
+	if (IsValid(GetStatsComponent()))
+	{
+		SetWalkSpeed(DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier());
+	}
+	else
+	{
+		SetWalkSpeed(DefaultWalkSpeed);
+	}
 
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Instigator = this;

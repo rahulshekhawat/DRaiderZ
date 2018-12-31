@@ -452,7 +452,7 @@ void AEODPlayerController::SavePlayerState()
 void AEODPlayerController::Client_BindStatusIndicatorWidgetDelegates_Implementation(APawn* InPawn)
 {
 	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
-	if (IsValid(EODChar) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
+	if (IsValid(EODChar) && IsValid(EODChar->GetStatsComponent()) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
 	{
 		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
 		UStatsComponentBase* StatsComponent = EODChar->GetStatsComponent();
@@ -465,7 +465,7 @@ void AEODPlayerController::Client_BindStatusIndicatorWidgetDelegates_Implementat
 void AEODPlayerController::Client_UnbindStatusIndicatorWidgetDelegates_Implementation(APawn* InPawn)
 {
 	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
-	if (IsValid(EODChar) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
+	if (IsValid(EODChar) && IsValid(EODChar->GetStatsComponent()) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
 	{
 		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
 		UStatsComponentBase* StatsComponent = EODChar->GetStatsComponent();

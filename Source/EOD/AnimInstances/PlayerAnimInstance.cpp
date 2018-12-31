@@ -31,9 +31,9 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	if (!EODPlayerOwner)
+	if (!IsValid(EODPlayerOwner))
 	{
-		if (!(EODPlayerOwner = TryGetPawnOwner() ? Cast<APlayerCharacter>(TryGetPawnOwner()) : nullptr))
+		if (!IsValid((EODPlayerOwner = TryGetPawnOwner() ? Cast<APlayerCharacter>(TryGetPawnOwner()) : nullptr)))
 		{
 			return;
 		}
@@ -55,6 +55,37 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 
 #if EOD_TEST_CODE_ENABLED
+	if (IsValid(EODPlayerOwner->GetCharacterMovement()) && EODPlayerOwner->GetMovementComponent()->IsFalling())
+	{
+		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
+		if (IsValid(JumpMontage) && !Montage_IsPlaying(JumpMontage))
+		{
+			Montage_Play(JumpMontage);
+			if (EODPlayerOwner->GetCharacterState() != ECharacterState::Jumping)
+			{
+				EODPlayerOwner->SetCharacterState(ECharacterState::Jumping);
+			}
+			return;
+		}
+	}
+	else if (IsValid(EODPlayerOwner->GetCharacterMovement()) && !EODPlayerOwner->GetMovementComponent()->IsFalling())
+	{
+		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
+		if (IsValid(JumpMontage) && Montage_IsPlaying(JumpMontage))
+		{
+			FName CurrentSection = Montage_GetCurrentSection(JumpMontage);
+			if (CurrentSection != UCharacterLibrary::SectionName_JumpEnd)
+			{
+				Montage_JumpToSection(UCharacterLibrary::SectionName_JumpEnd, JumpMontage);
+			}
+			return;
+		}
+		else
+		{
+			// do nothing
+		}
+	}
+
 	if (EODPlayerOwner->IsSwitchingWeapon())
 	{
 		// Movable montage should play based on whether PC is trying to move or not
@@ -137,40 +168,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 	*/
-
-
-	if (EODPlayerOwner->GetMovementComponent()->IsFalling())
-	{
-		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
-		if (JumpMontage && !Montage_IsPlaying(JumpMontage))
-		{
-			Montage_Play(JumpMontage);
-			if (EODPlayerOwner->GetCharacterState() != ECharacterState::Jumping)
-			{
-				EODPlayerOwner->SetCharacterState(ECharacterState::Jumping);
-			}
-			return;
-		}
-
-		return;
-	}
-	else
-	{
-		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
-		if (JumpMontage && Montage_IsPlaying(JumpMontage))
-		{
-			FName CurrentSection = Montage_GetCurrentSection(JumpMontage);
-			if (CurrentSection != UCharacterLibrary::SectionName_JumpEnd)
-			{
-				Montage_JumpToSection(UCharacterLibrary::SectionName_JumpEnd, JumpMontage);
-			}
-			return;
-		}
-		else
-		{
-			// do nothing
-		}
-	}
 	
 	if (EODPlayerOwner->IsUsingAnySkill() && EODPlayerOwner->SkillAllowsMovement())
 	{

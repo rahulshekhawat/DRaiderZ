@@ -61,11 +61,7 @@ public:
 	// COMPONENTS
 	////////////////////////////////////////////////////////////////////////////////
 public:
-	// FORCEINLINE UStatsComponentBase* GetStatsComponent() const;
-
 	FORCEINLINE UInventoryComponent* GetInventoryComponent() const;
-
-	// FORCEINLINE USkillsComponent* GetSkillsComponent() const;
 
 	FORCEINLINE USkillTreeComponent* GetSkillTreeComponent() const { return SkillTreeComponent; }
 
