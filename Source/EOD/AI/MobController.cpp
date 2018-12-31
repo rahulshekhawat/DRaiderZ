@@ -17,7 +17,7 @@ void AMobController::InitializeBlackboardValues(UBlackboardComponent* Blackboard
 {
 	if (IsValid(BlackboardComponent))
 	{
-		if (GetPawn())
+		if (IsValid(GetPawn()))
 		{
 			BlackboardComponent->SetValueAsVector(UAILibrary::BBKey_SpawnLocation, GetPawn()->GetActorLocation());
 		}

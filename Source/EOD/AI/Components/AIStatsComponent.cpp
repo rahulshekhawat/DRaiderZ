@@ -9,7 +9,7 @@
 #include "Components/ProgressBar.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-UAIStatsComponent::UAIStatsComponent(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
+UAIStatsComponent::UAIStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 	OwningAIChar = Cast<AAICharacterBase>(GetOwner());
 }
@@ -17,15 +17,6 @@ UAIStatsComponent::UAIStatsComponent(const FObjectInitializer & ObjectInitialize
 void UAIStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	/*
-	SetMaxHealth(BaseHealth);
-	SetCurrentHealth(BaseHealth);
-
-	SetMaxMana(BaseMana);
-	SetCurrentMana(BaseMana);
-	*/
-
 }
 
 void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

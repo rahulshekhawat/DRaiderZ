@@ -13,28 +13,21 @@ bool USkillTreeItemContainer::Initialize()
 	if (Super::Initialize() && SkillUpgradeText)
 	{
 		LoadSkillIcon();
+		// DisableContainer();
 		return true;
 	}
-
 	return false;
 
 	/*
-	if (!(Super::Initialize() && SkillUpgradeText))
-	{
-		return false;
-	}
-
 	LoadSkillContainerState();
 	LoadEODItemInfo();
 	RefreshContainerVisuals();
-
-	return true;
 	*/
 }
 
 void USkillTreeItemContainer::NativeConstruct()
 {
-	// Super::NativeConstruct();
+	Super::NativeConstruct();
 }
 
 void USkillTreeItemContainer::NativeDestruct()

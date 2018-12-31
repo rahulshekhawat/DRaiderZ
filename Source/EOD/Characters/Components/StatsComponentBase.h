@@ -22,7 +22,6 @@ class EOD_API UStatsComponentBase : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-
 	/** Sets default values for this component's properties */
 	UStatsComponentBase(const FObjectInitializer& ObjectInitializer);
 
@@ -162,7 +161,6 @@ private:
 
 
 public:
-
 	virtual int32 GetHealthRegenRate() const PURE_VIRTUAL(UStatsComponentBase::GetHealthRegenRate, return 0; );
 
 	virtual int32 ModifyHealthRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyHealthRegenRate, return 0; );
@@ -387,8 +385,6 @@ public:
 
 	virtual void SetMagickDamageReductionOnBlock(float Value) PURE_VIRTUAL(UStatsComponentBase::SetMagickDamageReductionOnBlock, );
 
-	// virtual void InitializeComponentWidget() PURE_VIRTUAL(UStatsComponentBase::InitializeComponentWidget, );
-
 	virtual void AddCrowdControlImmunitiesFromSkill(uint8 CCImmunities) PURE_VIRTUAL(UStatsComponentBase::AddCrowdControlImmunitiesFromSkill, );
 
 	virtual void RemoveCrowdControlImmunitiesFromSkil() PURE_VIRTUAL(UStatsComponentBase::RemoveCrowdControlImmunitiesFromSkil, );
@@ -396,9 +392,7 @@ public:
 	virtual uint8 GetCrowdControlImmunitiesFromSkill() const PURE_VIRTUAL(UStatsComponentBase::GetCrowdControlImmunitiesFromSkill, return 0; );
 
 protected:
-
 	//~ @note following booleans are used to initialize timers for derived stats components
-
 	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
 	uint32 bHasHealthRegenration : 1;
 
@@ -408,12 +402,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
 	uint32 bHasStaminaRegenration : 1;
 
-private:
 
-
-
-		
-	
 };
 
 FORCEINLINE bool UStatsComponentBase::IsLowOnHealth() const

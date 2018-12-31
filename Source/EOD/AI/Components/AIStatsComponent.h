@@ -17,79 +17,12 @@ class EOD_API UAIStatsComponent : public UStatsComponentBase
 	GENERATED_BODY()
 	
 public:
-
 	UAIStatsComponent(const FObjectInitializer& ObjectInitializer);
 	
 	virtual void BeginPlay() override;
 	
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
-	/*
-	virtual int32 GetBaseHealth() const override;
-	
-	virtual int32 GetMaxHealth() const override;
-
-	virtual int32 GetCurrentHealth() const override;
-
-	virtual int32 ModifyBaseHealth(int32 Value) override;
-
-	virtual int32 ModifyMaxHealth(int32 Value) override;
-
-	virtual int32 ModifyCurrentHealth(int32 Value) override;
-
-	virtual void SetBaseHealth(int32 Value) override;
-
-	virtual void SetMaxHealth(int32 Value) override;
-
-	virtual void SetCurrentHealth(int32 Value) override;
-
-	virtual bool IsLowOnHealth() const override;
-
-	virtual int32 GetBaseMana() const override;
-
-	virtual int32 GetMaxMana() const override;
-
-	virtual int32 GetCurrentMana() const override;
-	
-	virtual int32 ModifyBaseMana(int32 Value) override;
-
-	virtual int32 ModifyMaxMana(int32 Value) override;
-
-	virtual int32 ModifyCurrentMana(int32 Value) override;
-
-	virtual void SetBaseMana(int32 Value) override;
-
-	virtual void SetMaxMana(int32 Value) override;
-
-	virtual void SetCurrentMana(int32 Value) override;
-	*/
-
-	/** Returns 0 always */
-	// virtual int32 GetBaseStamina() const override;
-	
-	/** Returns 0 always */
-	// virtual int32 GetMaxStamina() const override;
-	
-	/** Returns 0 always */
-	// virtual int32 GetCurrentStamina() const override;
-	
-	/** Override for PURE_VIRTUAL function in BaseStatsComponent. Does nothing */
-	// virtual int32 ModifyBaseStamina(int32 Value) override;
-	
-	/** Override for PURE_VIRTUAL function in BaseStatsComponent. Does nothing */
-	// virtual int32 ModifyMaxStamina(int32 Value) override;
-	
-	/** Override for PURE_VIRTUAL function in BaseStatsComponent. Does nothing */
-	// virtual int32 ModifyCurrentStamina(int32 Value) override;
-
-	/*
-	virtual void SetBaseStamina(int32 Value) override;
-
-	virtual void SetMaxStamina(int32 Value) override;
-
-	virtual void SetCurrentStamina(int32 Value) override;
-	*/
 
 	virtual int32 GetHealthRegenRate() const override;
 

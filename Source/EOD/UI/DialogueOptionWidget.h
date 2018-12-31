@@ -21,7 +21,6 @@ class EOD_API UDialogueOptionWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-
 	UDialogueOptionWidget(const FObjectInitializer& ObjectInitializer);
 
 	bool Initialize() override;
@@ -30,6 +29,7 @@ public:
 
 	virtual void NativeDestruct() override;
 
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UButton* OptionButton;
 
@@ -47,7 +47,6 @@ public:
 	FORCEINLINE bool IsOptionSelected() const;
 
 protected:
-
 	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
 	bool bOptionSelected;
 
@@ -58,7 +57,7 @@ protected:
 	FName OptionEventID;
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
-	UDialogueWindowWidget* OwningDialogueWidget;
+	UDialogueWindowWidget* ParentDialogueWidget;
 
 	UFUNCTION(BlueprintCallable, Category = DialogueWidget)
 	void OnOptionButtonClicked();
@@ -84,9 +83,9 @@ FORCEINLINE void UDialogueOptionWidget::SetOptionEventType(TEnumAsByte<EDialogue
 	OptionEventType = NewOptionEventType;
 }
 
-FORCEINLINE void UDialogueOptionWidget::SetOwningDialogueWidget(UDialogueWindowWidget * NewOwner)
+FORCEINLINE void UDialogueOptionWidget::SetOwningDialogueWidget(UDialogueWindowWidget* NewOwner)
 {
-	OwningDialogueWidget = NewOwner;
+	ParentDialogueWidget = NewOwner;
 }
 
 FORCEINLINE void UDialogueOptionWidget::SetOptionSelected(bool bValue)

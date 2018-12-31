@@ -49,6 +49,12 @@ void UEODItemContainer::BP_StopCooldown()
 	StopCooldown();
 }
 
+void UEODItemContainer::RefreshContainerVisuals()
+{
+	UpdateItemImage();
+	UpdateStackCountText();
+}
+
 void UEODItemContainer::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	OnDragDetected(InGeometry, InMouseEvent, OutOperation);
@@ -63,7 +69,7 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 	}
 
 	UEODItemDragDropOperation* Operation = Cast<UEODItemDragDropOperation>(InOperation);
-	if (!Operation || !Operation->DraggedEODItemWidget)
+	if (!IsValid(Operation) || !IsValid(Operation->DraggedEODItemWidget))
 	{
 		return false;
 	}
@@ -108,19 +114,28 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 void UEODItemContainer::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, HoveredBorderColor);
+	if (IsValid(DynamicMaterial))
+	{
+		DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, HoveredBorderColor);
+	}
 }
 
 void UEODItemContainer::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, NormalBorderColor);
+	if (IsValid(DynamicMaterial))
+	{
+		DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, NormalBorderColor);
+	}
 }
 
 FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, PressedBorderColor);
+	if (IsValid(DynamicMaterial))
+	{
+		DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, PressedBorderColor);
+	}
 
 	FReply Reply = FReply::Unhandled();
 	FKey DragKey(FEODKeyNames::LeftMouseButton);
@@ -133,15 +148,16 @@ FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry& InGeometry, c
 			Reply = Reply.DetectDrag(SlateWidgetDetectingDrag.ToSharedRef(), DragKey);
 		}
 	}
-
 	return Reply;
 }
 
 FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, HoveredBorderColor);
-
+	if (IsValid(DynamicMaterial))
+	{
+		DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, HoveredBorderColor);
+	}
 	return FReply::Handled();
 }
 
@@ -153,6 +169,9 @@ void UEODItemContainer::UpdateCooldown()
 		return;
 	}
 
-	CooldownText->SetText(FText::FromString(FString::FromInt(CooldownTimeRemaining)));
+	if (IsValid(CooldownText))
+	{
+		CooldownText->SetText(FText::FromString(FString::FromInt(CooldownTimeRemaining)));
+	}
 	CooldownTimeRemaining -= CooldownInterval;
 }

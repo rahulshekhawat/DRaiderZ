@@ -24,9 +24,9 @@ void UCharAnimInstance::NativeInitializeAnimation()
 
 void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	if (!EODCharacterOwner)
+	if (!IsValid(EODCharacterOwner))
 	{
-		if (!(EODCharacterOwner = TryGetPawnOwner() ? Cast<AEODCharacterBase>(TryGetPawnOwner()) : nullptr))
+		if (!IsValid((EODCharacterOwner = TryGetPawnOwner() ? Cast<AEODCharacterBase>(TryGetPawnOwner()) : nullptr)))
 		{
 			return;
 		}

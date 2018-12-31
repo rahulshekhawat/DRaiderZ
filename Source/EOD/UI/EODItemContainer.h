@@ -34,10 +34,6 @@ public:
 
 	virtual void NativeDestruct() override;
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// CHILD WIDGETS
-	////////////////////////////////////////////////////////////////////////////////
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* EmptyBorderImage;
@@ -51,10 +47,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* CooldownText;
 
+protected:
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// 
-	////////////////////////////////////////////////////////////////////////////////
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
 public:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
 	bool bCanBeClicked;
@@ -110,27 +115,10 @@ public:
 	void BP_StopCooldown();
 
 	/** Refresh and update the displayed visuals of this container */
-	FORCEINLINE virtual void RefreshContainerVisuals()
-	{
-		UpdateItemImage();
-		UpdateStackCountText();
-	}
+	virtual void RefreshContainerVisuals();
 
 	/** Resets and nulls all container variables. Deletes any references */
 	inline void ResetContainer();
-
-protected:
-	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
-
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-
-	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	
-	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
-
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-
-	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 private:
 	inline void UpdateItemImage();

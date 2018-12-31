@@ -307,9 +307,12 @@ void APlayerCharacter::BeginPlay()
 USkeletalMeshComponent* APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer)
 {
 	USkeletalMeshComponent* Sk = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, Name);
-	Sk->SetupAttachment(GetMesh());
-	Sk->SetMasterPoseComponent(GetMesh());
-	Sk->bUseAttachParentBound = true;
+	if (Sk)
+	{
+		Sk->SetupAttachment(GetMesh());
+		Sk->SetMasterPoseComponent(GetMesh());
+		Sk->bUseAttachParentBound = true;
+	}
 	return Sk;
 }
 
