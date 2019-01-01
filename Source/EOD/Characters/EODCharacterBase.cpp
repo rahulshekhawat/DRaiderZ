@@ -125,12 +125,6 @@ void AEODCharacterBase::Tick(float DeltaTime)
 	}
 }
 
-void AEODCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
 void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -755,6 +749,23 @@ void AEODCharacterBase::UpdateDesiredYawFromAxisInput()
 		}
 	}
 }
+
+void AEODCharacterBase::OnPressedForward()
+{
+}
+
+void AEODCharacterBase::OnPressedBackward()
+{
+}
+
+void AEODCharacterBase::OnReleasedForward()
+{
+}
+
+void AEODCharacterBase::OnReleasedBackward()
+{
+}
+
 
 void AEODCharacterBase::UpdateMovementState(float DeltaTime)
 {

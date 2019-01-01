@@ -136,6 +136,14 @@ public:
 	void TogglePlayerInventoryUI();
 
 private:
+	void OnPressedForward();
+
+	void OnReleasedForward();
+
+	void OnPressedBackward();
+
+	void OnReleasedBackward();
+
 	// UPROPERTY(Replicated)
 	bool bAutoMoveEnabled;
 

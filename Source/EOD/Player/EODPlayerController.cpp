@@ -31,6 +31,11 @@ void AEODPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
+	InputComponent->BindAction("Forward", IE_Pressed, this, &AEODPlayerController::OnPressedForward);
+	InputComponent->BindAction("Forward", IE_Released, this, &AEODPlayerController::OnReleasedForward);
+	InputComponent->BindAction("Backward", IE_Pressed, this, &AEODPlayerController::OnPressedBackward);
+	InputComponent->BindAction("Backward", IE_Released, this, &AEODPlayerController::OnReleasedBackward);
+
 	//~ Mouse Input
 	InputComponent->BindAxis("Turn", this, &AEODPlayerController::AddYawInput);
 	InputComponent->BindAxis("LookUp", this, &AEODPlayerController::AddPitchInput);
@@ -253,6 +258,38 @@ void AEODPlayerController::TogglePlayerInventoryUI()
 	else if (IsValid(HUDWidget) && IsValid(HUDWidget->GetInventoryWidget()) && !HUDWidget->GetInventoryWidget()->IsVisible())
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void AEODPlayerController::OnPressedForward()
+{
+	if (IsValid(EODCharacter))
+	{
+		EODCharacter->OnPressedForward();
+	}
+}
+
+void AEODPlayerController::OnReleasedForward()
+{
+	if (IsValid(EODCharacter))
+	{
+		EODCharacter->OnReleasedForward();
+	}
+}
+
+void AEODPlayerController::OnPressedBackward()
+{
+	if (IsValid(EODCharacter))
+	{
+		EODCharacter->OnPressedBackward();
+	}
+}
+
+void AEODPlayerController::OnReleasedBackward()
+{
+	if (IsValid(EODCharacter))
+	{
+		EODCharacter->OnReleasedBackward();
 	}
 }
 

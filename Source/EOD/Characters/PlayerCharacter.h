@@ -101,7 +101,7 @@ public:
 	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
 
 	/** Called to bind functionality to input */
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	// virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	/** Property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -722,14 +722,16 @@ private:
 
 	void OnDodge();
 
-	void OnPressedForward();
+public:
+	virtual void OnPressedForward() override;
 
-	void OnPressedBackward();
+	virtual void OnPressedBackward() override;
 
-	void OnReleasedForward();
+	// virtual void OnReleasedForward() override;
 
-	void OnReleasedBackward();
+	// virtual void OnReleasedBackward() override;
 
+private:
 	/** Sets the boolean used to enable block to true */
 	void OnPressedBlock();
 	

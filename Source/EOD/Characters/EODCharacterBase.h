@@ -60,9 +60,6 @@ public:
 
 	/** Updates character state every frame */
 	virtual void Tick(float DeltaTime) override;
-
-	/** Called to bind functionality to input */
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -486,6 +483,14 @@ public:
 	FORCEINLINE bool IsBlockKeyPressed() const { return bGuardKeyPressed; }
 
 	FORCEINLINE bool IsNormalAttackKeyPressed()const { return bNormalAttackKeyPressed; }
+
+	virtual void OnPressedForward();
+
+	virtual void OnPressedBackward();
+
+	virtual void OnReleasedForward();
+
+	virtual void OnReleasedBackward();
 
 public:
 	/** Returns true if character is alive */
