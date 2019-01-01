@@ -2,6 +2,7 @@
 
 #include "EOD/Characters/Components/GameplaySkillsComponent.h"
 #include "EOD/Characters/EODCharacterBase.h"
+#include "EOD/Characters/PlayerCharacter.h"
 
 
 UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -10,6 +11,12 @@ UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& Obj
 	SetIsReplicated(true);
 
 	ChainSkillResetDelay = 2.f;
+	MaxNumSkills = 20;
+
+	for (int i = 1; i <= MaxNumSkills; i++)
+	{
+		SBIndexToSGMap.Add(i, FString(""));
+	}
 }
 
 
@@ -65,7 +72,33 @@ void UGameplaySkillsComponent::SetCurrentActiveSkill(const FName SkillID)
 
 void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
+	if (SkillKeyIndex <= 0 || SkillKeyIndex > SBIndexToSGMap.Num())
+	{
+		// Invalid skill key index
+		return;
+	}
 
+	if (!IsValid(EODCharacterOwner) || !EODCharacterOwner->CanUseAnySkill())
+	{
+		return;
+	}
+
+	FString SGToUse = SBIndexToSGMap[SkillKeyIndex];
+	if (SGToUse == FString("") || SGToCooldownMap.Contains(SGToUse))
+	{
+		// Either no skill equipped in given slot or it's in cooldown
+		return;
+	}
+	
+	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(EODCharacterOwner);
+	FString GenderPrefix = PlayerChar ? PlayerChar->GetGenderPrefix() : FString("");
+
+	FString SkillIDString = GenderPrefix + SGToUse + FString("_") + FString::FromInt(1);
+	FSkillTableRow* Skill = GetSkill(FName(*SkillIDString));
+	if (Skill && Skill->AnimMontage.Get())
+	{
+		PlayerChar->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName);
+	}
 
 }
 

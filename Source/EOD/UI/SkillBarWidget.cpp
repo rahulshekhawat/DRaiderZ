@@ -6,6 +6,7 @@
 #include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Core/GameSingleton.h"
 #include "EOD/Statics/CharacterLibrary.h"
+#include "EOD/UI/SkillTreeItemContainer.h"
 
 #include "Components/Button.h"
 #include "Engine/Engine.h"
@@ -39,6 +40,26 @@ bool USkillBarWidget::Initialize()
 		Skill_19 &&
 		Skill_20))
 	{
+		InitiateSkillContainer(Skill_1);
+		InitiateSkillContainer(Skill_2);
+		InitiateSkillContainer(Skill_3);
+		InitiateSkillContainer(Skill_4);
+		InitiateSkillContainer(Skill_5);
+		InitiateSkillContainer(Skill_6);
+		InitiateSkillContainer(Skill_7);
+		InitiateSkillContainer(Skill_8);
+		InitiateSkillContainer(Skill_9);
+		InitiateSkillContainer(Skill_10);
+		InitiateSkillContainer(Skill_11);
+		InitiateSkillContainer(Skill_12);
+		InitiateSkillContainer(Skill_13);
+		InitiateSkillContainer(Skill_14);
+		InitiateSkillContainer(Skill_15);
+		InitiateSkillContainer(Skill_16);
+		InitiateSkillContainer(Skill_17);
+		InitiateSkillContainer(Skill_18);
+		InitiateSkillContainer(Skill_19);
+		InitiateSkillContainer(Skill_20);
 		return false;
 	}
 
@@ -104,6 +125,15 @@ void USkillBarWidget::LoadSkillBarLayout()
 		SkillButton->EODItemInfo.Description = Skill->Description;
 
 		SkillButton->RefreshContainerVisuals();
+	}
+}
+
+void USkillBarWidget::InitiateSkillContainer(UEODItemContainer* Container)
+{
+	if (IsValid(Container))
+	{
+		Container->SetParentWidget(this);
+		SkillContainers.Add(Container);
 	}
 }
 
@@ -181,4 +211,74 @@ void USkillBarWidget::SaveSkillBarLayout()
 
 	EODSaveGame->SkillBarLayout = SkillBarLayout;
 	UGameplayStatics::SaveGameToSlot(EODSaveGame, GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex);
+}
+
+bool USkillBarWidget::OnNewSkillDropped(UEODItemContainer* FromContainer, UEODItemContainer* ToContainer)
+{
+	/*
+	USkillTreeItemContainer* STContainer = Cast<USkillTreeItemContainer>(FromContainer);
+	if (!IsValid(STContainer) || !IsValid(ToContainer) || !SkillContainers.Contains(ToContainer))
+	{
+		return false;
+	}
+	*/
+
+
+
+	// STContainer->SkillGroup
+
+
+	return true;
+
+	/*
+	this->EODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
+	this->RefreshContainerVisuals();
+
+	USkillBarWidget* SkillBarWidget = Cast<USkillBarWidget>(ParentWidget);
+
+	bResult = true;
+
+	return false;
+	*/
+}
+
+bool USkillBarWidget::OnSkillRemoved(UEODItemContainer* Container)
+{
+	return false;
+}
+
+bool USkillBarWidget::OnSkillsSwapped(UEODItemContainer* Container1, UEODItemContainer* Container2)
+{
+	/*
+	FEODItemInfo TempEODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
+
+	Operation->DraggedEODItemWidget->EODItemInfo = this->EODItemInfo;
+	this->EODItemInfo = TempEODItemInfo;
+
+	Operation->DraggedEODItemWidget->RefreshContainerVisuals();
+	this->RefreshContainerVisuals();
+
+	bResult = true;
+	*/
+	return false;
+}
+
+void USkillBarWidget::SkillsSwapped(UEODItemContainer* SC1, UEODItemContainer* SC2)
+{
+}
+
+void USkillBarWidget::SkillRemoved(UEODItemContainer* SC)
+{
+	if (IsValid(SC))
+	{
+
+	}
+}
+
+void USkillBarWidget::SkillAdded(UEODItemContainer* SC)
+{
+	if (IsValid(SC))
+	{
+
+	}
 }

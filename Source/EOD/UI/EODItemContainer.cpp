@@ -1,9 +1,11 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODItemContainer.h"
-#include "EOD/UI/DragVisualWidget.h"
 #include "EOD/Characters/PlayerCharacter.h"
+#include "EOD/UI/SkillBarWidget.h"
+#include "EOD/UI/DragVisualWidget.h"
 #include "EOD/UI/EODItemDragDropOperation.h"
+
 
 #include "Styling/SlateTypes.h"
 #include "Engine/Texture.h"
@@ -72,12 +74,42 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 		return false;
 	}
 
+
 	bool bResult = false;
+	// Cannot drop anything from skill tree to inventory
+	// Cannot drop anything from inventory to skill bar
+	// Cannot drop anything from skill bar to inventory
+	/*
+	if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
+		ContainerType == EEODContainerType::SkillBar)
+	{
+		USkillBarWidget* SkillBarWidget = Cast<USkillBarWidget>(ParentWidget);
+		if (IsValid(SkillBarWidget))
+		{
+			bResult = SkillBarWidget->OnNewSkillDropped(Operation->DraggedEODItemWidget, this);
+		}
+	}
+	else if ((Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
+		ContainerType == EEODContainerType::Inventory) ||
+		(Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillBar &&
+			ContainerType == EEODContainerType::SkillBar))
+	{
+		USkillBarWidget* SkillBarWidget = Cast<USkillBarWidget>(ParentWidget);
+		if (IsValid(SkillBarWidget))
+		{
+			bResult = SkillBarWidget->OnSkillsSwapped(Operation->DraggedEODItemWidget, this);
+		}
+	}
+	*/
+
 	if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
 		ContainerType == EEODContainerType::SkillBar)
 	{
 		this->EODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
 		this->RefreshContainerVisuals();
+
+		USkillBarWidget* SkillBarWidget = Cast<USkillBarWidget>(ParentWidget);
+
 		bResult = true;
 	}
 	else if ((Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
@@ -95,16 +127,6 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 
 		bResult = true;
 	}
-
-	if (bResult && this->ContainerType == EEODContainerType::SkillBar)
-	{
-		APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwningPlayerPawn());
-		// OwningPlayer->AddSkill(EODItemInfo.ItemID, EODItemInfo.StackCount);
-	}
-
-	// Cannot drop anything from skill tree to inventory
-	// Cannot drop anything from inventory to skill bar
-	// Cannot drop anything from skill bar to inventory
 
 	return bResult;
 }

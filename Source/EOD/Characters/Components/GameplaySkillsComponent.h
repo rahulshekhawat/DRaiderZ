@@ -42,7 +42,20 @@ private:
 
 	FSkillTableRow* ActiveSkill;
 
+	/** Skill button index to skill group map (this describes which skill group is placed on which skill bar button) */
+	TMap<int32, FString> SBIndexToSGMap;
+
+	/** Skill group to skill state map */
+	TMap<FString, FSkillState> SGToSSMap;
+
+	/** A map of skill group to a boolean that determines whether the skill group is currently in cooldown or not */
+	TMap<FString, bool> SGToCooldownMap;
+
+
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character Skills")
+	int32 MaxNumSkills;
+
 	UPROPERTY(BlueprintReadOnly, Category = "EOD Character Skills")
 	float ChainSkillResetDelay;
 
@@ -75,5 +88,5 @@ private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCurrentActiveSkill(const FName SkillID);
 
-	
+
 };

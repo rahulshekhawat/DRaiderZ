@@ -108,6 +108,19 @@ public:
 	/** Save current skill bar layout to the current save slot */
 	void SaveSkillBarLayout();
 
+	/** Called when a new skill is dropped on skill bar from skill tree */
+	bool OnNewSkillDropped(UEODItemContainer* FromContainer, UEODItemContainer* ToContainer);
+
+	bool OnSkillRemoved(UEODItemContainer* Container);
+	
+	bool OnSkillsSwapped(UEODItemContainer* Container1, UEODItemContainer* Container2);
+
+	void SkillsSwapped(UEODItemContainer* SC1, UEODItemContainer* SC2);
+
+	void SkillRemoved(UEODItemContainer* SC);
+
+	void SkillAdded(UEODItemContainer* SC);
+
 private:
 	/** Returns EOD item container at given skill index */
 	inline UEODItemContainer* GetSkillButtonAtIndex(int32 ButtonIndex) const;
@@ -117,6 +130,10 @@ private:
 
 	/** Load previously saved skill bar layout from current save slot */
 	void LoadSkillBarLayout();
+
+	void InitiateSkillContainer(UEODItemContainer* Container);
+
+	TArray<UEODItemContainer*> SkillContainers;
 
 };
 

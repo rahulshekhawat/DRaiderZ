@@ -61,6 +61,10 @@ protected:
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
+	/** Index of this container widget in it's parent widget (only used if the parent widget needs containers to be indexed) */
+	UPROPERTY(EditAnywhere)
+	int32 ContainerIndex;
+
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
 	bool bCanBeClicked;
 
@@ -120,6 +124,11 @@ public:
 	/** Resets and nulls all container variables. Deletes any references */
 	inline void ResetContainer();
 
+	FORCEINLINE void SetParentWidget(UUserWidget* Widget)
+	{
+		ParentWidget = IsValid(Widget) ? Widget : nullptr;
+	}
+
 private:
 	inline void UpdateItemImage();
 
@@ -130,6 +139,8 @@ private:
 	void UpdateCooldown();
 
 	FTimerHandle CooldownTimerHandle;
+
+	UUserWidget* ParentWidget;
 
 };
 
