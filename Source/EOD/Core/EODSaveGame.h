@@ -17,7 +17,6 @@ class EOD_API UEODSaveGame : public USaveGame
 	GENERATED_BODY()
 	
 public:
-	
 	/** A map of skill ID to skill bar slot index */
 	UPROPERTY()
 	TMap<FString, int32> SkillBarLayout;

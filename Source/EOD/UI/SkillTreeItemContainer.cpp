@@ -51,24 +51,11 @@ void USkillTreeItemContainer::LoadSkillIcon()
 
 	FString SkillID = FString("F_") + SkillGroup + FString("_1");
 	FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(FName(*SkillID), FString("USkillTreeItemContainer::LoadEODItemInfo(), looking for player skill"));
-	if (Skill && IsValid(ItemImage))
+	if (!Skill || !IsValid(Skill->Icon))
 	{
-		if (IsValid(Skill->Icon))
-		{
-			FSlateBrush SlateBrush;
-			SlateBrush.ImageSize = FVector2D(52.0, 52.0);
-			SlateBrush.DrawAs = ESlateBrushDrawType::Image;
-			SlateBrush.ImageType = ESlateBrushImageType::FullColor;
-			SlateBrush.SetResourceObject(Skill->Icon);
-			ItemImage->SetBrush(SlateBrush);
-		}
-		else
-		{
-			FSlateBrush SlateBrush;
-			SlateBrush.ImageSize = FVector2D(52.0, 52.0);
-			SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
-			SlateBrush.ImageType = ESlateBrushImageType::NoImage;
-			ItemImage->SetBrush(SlateBrush);
-		}
+		return;
 	}
+
+	EODItemInfo.Icon = Skill->Icon;
+	RefreshContainerVisuals();
 }

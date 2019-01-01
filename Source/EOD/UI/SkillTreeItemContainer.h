@@ -30,10 +30,6 @@ public:
 
 	virtual void NativeDestruct() override;
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// 
-	////////////////////////////////////////////////////////////////////////////////
 public:
 	/**
 	 * Determines the skill group this skill belongs to
@@ -65,6 +61,8 @@ public:
 	/** Refresh and update the displayed visuals of this container */
 	virtual void RefreshContainerVisuals() override;
 
+	void LoadSkillIcon();
+
 private:
 	inline void UpdateSkillUpgradeText();
 
@@ -72,9 +70,6 @@ private:
 	inline void LoadSkillContainerState();
 
 	inline void LoadEODItemInfo();
-
-public:
-	void LoadSkillIcon();
 
 };
 

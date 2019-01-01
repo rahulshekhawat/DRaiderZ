@@ -20,7 +20,6 @@ class EOD_API AStatusEffectsManager : public AInfo
 	GENERATED_BODY()
 	
 public:
-
 	AStatusEffectsManager(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;

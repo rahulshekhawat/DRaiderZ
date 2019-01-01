@@ -14,14 +14,11 @@ void AEODLevelScriptActor::BeginPlay()
 {
 	Super::BeginPlay();
 	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
-	if (PC && PC->GetPawn())
+	APlayerCharacter* PlayerPawn = PC ? Cast<APlayerCharacter>(PC->GetPawn()) : nullptr;
+	if (IsValid(PlayerPawn))
 	{
-		APlayerCharacter* PlayerPawn = Cast<APlayerCharacter>(PC->GetPawn());
-		if (PlayerPawn)
-		{
-			PlayerPawn->OnInitiatingCombat.AddDynamic(this, &AEODLevelScriptActor::OnCombatStarted);
-			PlayerPawn->OnLeavingCombat.AddDynamic(this, &AEODLevelScriptActor::OnCombatEnded);
-		}
+		PlayerPawn->OnInitiatingCombat.AddDynamic(this, &AEODLevelScriptActor::OnCombatStarted);
+		PlayerPawn->OnLeavingCombat.AddDynamic(this, &AEODLevelScriptActor::OnCombatEnded);
 	}
 }
 

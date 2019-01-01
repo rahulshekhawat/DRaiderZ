@@ -18,16 +18,13 @@ class EOD_API ASkillsManager : public AInfo
 	GENERATED_BODY()
 	
 public:
-
 	ASkillsManager(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
-	
 
 private:
-
 	// Map of character class to IDToSkillMap
 	// TMap<TSubclassOf<AEODCharacterBase>, TMap<FName, FSkill*>*>
 	

@@ -17,7 +17,6 @@ class EOD_API AEODLevelScriptActor : public ALevelScriptActor
 	GENERATED_BODY()
 
 public:
-
 	AEODLevelScriptActor(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;

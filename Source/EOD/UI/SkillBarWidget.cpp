@@ -10,7 +10,6 @@
 #include "Components/Button.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 USkillBarWidget::USkillBarWidget(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
@@ -60,19 +59,14 @@ void USkillBarWidget::NativeDestruct()
 
 void USkillBarWidget::LoadSkillBarLayout()
 {
-	UGameSingleton* GameSingleton = nullptr;
-	if (GEngine)
-	{
-		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-	}
-
-	if (!GameSingleton)
+	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
+	if (!IsValid(GameSingleton))
 	{
 		return;
 	}
 
 	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex));
-	if (!EODSaveGame)
+	if (!IsValid(EODSaveGame))
 	{
 		return;
 	}
@@ -84,7 +78,7 @@ void USkillBarWidget::LoadSkillBarLayout()
 	{
 		int32 Position = EODSaveGame->SkillBarLayout[SkillGroup];
 		UEODItemContainer* SkillButton = GetSkillButtonAtIndex(Position);
-		if (!SkillButton)
+		if (!IsValid(SkillButton))
 		{
 			continue;
 		}
@@ -96,10 +90,8 @@ void USkillBarWidget::LoadSkillBarLayout()
 		FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
 		if (!Skill)
 		{
-#if MESSAGE_LOGGING_ENABLED
 			FString Message = FString("Couldn't find skill : ") + SkillIDString;
-			UKismetSystemLibrary::PrintString(this, Message);
-#endif // MESSAGE_LOGGING_ENABLED
+			PrintEverywhere(this, Message);
 			continue;
 		}
 
@@ -127,20 +119,20 @@ bool USkillBarWidget::IsSkillGroupInCooldown(const FString& SkillGroup) const
 		}
 	}
 
-	if (SkillContainer)
+	if (IsValid(SkillContainer))
 	{
 		return SkillContainer->bInCooldown;
 	}
 
-	return true;
+	return false;
 }
 
 void USkillBarWidget::PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval)
 {
-	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
-	if (Skill)
+	UEODItemContainer* SkillContainer = GetSkillButtonAtIndex(SkillIndex);
+	if (IsValid(SkillContainer))
 	{
-		Skill->StartCooldown(Duration, Interval);
+		SkillContainer->StartCooldown(Duration, Interval);
 	}
 }
 
@@ -156,7 +148,7 @@ void USkillBarWidget::PutSkillOnCooldownTimer(FString SkillGroup, float Duration
 		}
 	}
 
-	if (SkillContainer)
+	if (IsValid(SkillContainer))
 	{
 		SkillContainer->StartCooldown(Duration, Interval);
 	}
@@ -165,19 +157,14 @@ void USkillBarWidget::PutSkillOnCooldownTimer(FString SkillGroup, float Duration
 
 void USkillBarWidget::SaveSkillBarLayout()
 {
-	UGameSingleton* GameSingleton = nullptr;
-	if (GEngine)
-	{
-		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-	}
-
-	if (!GameSingleton)
+	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
+	if (!IsValid(GameSingleton))
 	{
 		return;
 	}
 
 	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex));
-	if (!EODSaveGame)
+	if (!IsValid(EODSaveGame))
 	{
 		return;
 	}
