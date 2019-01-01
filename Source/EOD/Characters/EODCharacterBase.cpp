@@ -110,6 +110,11 @@ void AEODCharacterBase::Tick(float DeltaTime)
 			UpdateNormalAttackState(DeltaTime);
 		}
 
+		if (GetCharacterMovement()->IsFalling() && bCharacterStateAllowsMovement)
+		{
+			SetCharacterStateAllowsMovement(false);
+		}
+
 		// If the character is either idle or moving, or is in a state that allows movement except guard
 		if (IsIdleOrMoving() || (bCharacterStateAllowsMovement && !IsGuardActive()))
 		{
