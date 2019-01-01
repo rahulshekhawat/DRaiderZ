@@ -12,7 +12,6 @@ bool USkillTreeItemContainer::Initialize()
 {
 	if (Super::Initialize() && SkillUpgradeText)
 	{
-		LoadSkillIcon();
 		// DisableContainer();
 		return true;
 	}
@@ -28,6 +27,7 @@ bool USkillTreeItemContainer::Initialize()
 void USkillTreeItemContainer::NativeConstruct()
 {
 	Super::NativeConstruct();
+	LoadSkillIcon();
 }
 
 void USkillTreeItemContainer::NativeDestruct()
