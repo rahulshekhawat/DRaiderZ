@@ -38,7 +38,6 @@ void USkillTreeItemContainer::NativeDestruct()
 void USkillTreeItemContainer::RefreshContainerVisuals()
 {
 	Super::RefreshContainerVisuals();
-
 	UpdateSkillUpgradeText();
 }
 

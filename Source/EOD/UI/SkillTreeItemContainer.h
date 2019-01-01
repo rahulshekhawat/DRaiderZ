@@ -78,7 +78,10 @@ inline void USkillTreeItemContainer::UpdateSkillUpgradeText()
 	FString String;
 	String = FString::FromInt(SkillState.CurrentUpgradeLevel) + FString("/") + FString::FromInt(SkillState.MaxUpgradeLevel);
 	FText Text = FText::FromString(String);
-	SkillUpgradeText->SetText(Text);
+	if (IsValid(SkillUpgradeText))
+	{
+		SkillUpgradeText->SetText(Text);
+	}
 }
 
 inline void USkillTreeItemContainer::LoadSkillContainerState()
@@ -88,19 +91,14 @@ inline void USkillTreeItemContainer::LoadSkillContainerState()
 		return;
 	}
 
-	UGameSingleton* GameSingleton = nullptr;
-	if (GEngine)
-	{
-		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-	}
-
-	if (!GameSingleton)
+	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
+	if (!IsValid(GameSingleton))
 	{
 		return;
 	}
 
 	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex));
-	if (!EODSaveGame)
+	if (!IsValid(EODSaveGame))
 	{
 		return;
 	}

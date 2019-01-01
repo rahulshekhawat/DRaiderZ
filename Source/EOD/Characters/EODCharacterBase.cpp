@@ -88,7 +88,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 void AEODCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		// If block key is pressed but the character is not blocking

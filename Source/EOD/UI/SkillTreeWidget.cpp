@@ -82,6 +82,17 @@ void USkillTreeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void USkillTreeWidget::RefreshVisuals()
+{
+	for (USkillTreeItemContainer* Cont : BerserkerSkills)
+	{
+		if (IsValid(Cont))
+		{
+			Cont->RefreshContainerVisuals();
+		}
+	}
+}
+
 FSkillState USkillTreeWidget::GetSkillState(const FString& SkillGroup) const
 {
 	return FSkillState();

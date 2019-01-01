@@ -106,6 +106,7 @@ public:
 	USkillTreeItemContainer* MadnessSkillButton;
 	//~ End berserker skills
 
+	void RefreshVisuals();
 
 	////////////////////////////////////////////////////////////////////////////////
 	// 
@@ -166,7 +167,7 @@ inline FVector2D USkillTreeWidget::GetContainerDesiredPosition(int32 RowPosition
 	return Position;
 }
 
-inline void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer * Container)
+inline void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer* Container)
 {
 	UCanvasPanelSlot* CanvasSlot = IsValid(Container) ? Cast<UCanvasPanelSlot>(Container->Slot) : nullptr;
 	if (IsValid(CanvasSlot) && IsValid(Container))
@@ -176,7 +177,7 @@ inline void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer * C
 	}
 }
 
-inline void USkillTreeWidget::InitializeBerserkerSkillItemContainer(USkillTreeItemContainer * Container)
+inline void USkillTreeWidget::InitializeBerserkerSkillItemContainer(USkillTreeItemContainer* Container)
 {
 	SetupContainerPosition(Container);
 	// @todo load skill icon
@@ -184,7 +185,7 @@ inline void USkillTreeWidget::InitializeBerserkerSkillItemContainer(USkillTreeIt
 	BerserkerSkills.Add(Container);
 }
 
-inline void USkillTreeWidget::SetButtonStyleToSelected(UButton * Button)
+inline void USkillTreeWidget::SetButtonStyleToSelected(UButton* Button)
 {
 	if (IsValid(Button))
 	{

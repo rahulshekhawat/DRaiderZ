@@ -240,6 +240,7 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 	else if (IsValid(HUDWidget) && IsValid(HUDWidget->GetSkillTreeWidget()) && !HUDWidget->GetSkillTreeWidget()->IsVisible())
 	{
 		HUDWidget->GetSkillTreeWidget()->SetVisibility(ESlateVisibility::Visible);
+		HUDWidget->GetSkillTreeWidget()->RefreshVisuals();
 	}
 }
 

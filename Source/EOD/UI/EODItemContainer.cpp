@@ -21,7 +21,6 @@ bool UEODItemContainer::Initialize()
 		CooldownText->SetVisibility(ESlateVisibility::Hidden);
 
 		SetupEmptyBorderMaterial();
-		RefreshContainerVisuals();
 		return true;
 	}
 	return false;
@@ -30,7 +29,6 @@ bool UEODItemContainer::Initialize()
 void UEODItemContainer::NativeConstruct()
 {
 	Super::NativeConstruct();
-
 	RefreshContainerVisuals();
 }
 

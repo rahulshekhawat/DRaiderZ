@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Events/GameplayEventBase.h"
+#include "EOD/Events/GameplayEventBase.h"
 #include "AttackDodgedEvent.generated.h"
 
 /**

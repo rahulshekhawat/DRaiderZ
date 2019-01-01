@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Events/EODEventBase.h"
+#include "EOD/Events/EODEventBase.h"
 #include "GameplayEventBase.generated.h"
 
 /**
