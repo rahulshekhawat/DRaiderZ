@@ -6,8 +6,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
-const int32 UEODGameInstance::UserIndex(0);
-const FString UEODGameInstance::DefaultMetaSaveSlotName(TEXT("DefaultSlot"));
+const int32 UEODGameInstance::PlayerIndex(0);
+const FString UEODGameInstance::MetaSaveSlotName(TEXT("DefaultSlot"));
 
 UEODGameInstance::UEODGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -17,17 +17,29 @@ void UEODGameInstance::Init()
 {
 	Super::Init();
 
-	if (UGameplayStatics::DoesSaveGameExist(UEODGameInstance::DefaultMetaSaveSlotName, UEODGameInstance::UserIndex))
+	// Load the meta save game object
+	if (UGameplayStatics::DoesSaveGameExist(UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex))
 	{
-		MetaSaveGameObject = Cast<UMetaSaveGame>(UGameplayStatics::LoadGameFromSlot(UEODGameInstance::DefaultMetaSaveSlotName, UEODGameInstance::UserIndex));
+		MetaSaveGame = Cast<UMetaSaveGame>(UGameplayStatics::LoadGameFromSlot(UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex));
 	}
+	// If the meta save game object doesn't exist yet, create and save one (it will happen during first run)
 	else
 	{
-		MetaSaveGameObject = Cast<UMetaSaveGame>(UGameplayStatics::CreateSaveGameObject(UMetaSaveGame::StaticClass()));
-		if (IsValid(MetaSaveGameObject))
+		MetaSaveGame = Cast<UMetaSaveGame>(UGameplayStatics::CreateSaveGameObject(UMetaSaveGame::StaticClass()));
+		if (IsValid(MetaSaveGame))
 		{
-			UGameplayStatics::SaveGameToSlot(MetaSaveGameObject, UEODGameInstance::DefaultMetaSaveSlotName, UEODGameInstance::UserIndex);
+			UGameplayStatics::SaveGameToSlot(MetaSaveGame, UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex);
 		}
 	}
+
+	if (IsValid(MetaSaveGame))
+	{
+		if (MetaSaveGame->LastUsedSlotName != FString("") && UGameplayStatics::DoesSaveGameExist(MetaSaveGame->LastUsedSlotName, UEODGameInstance::PlayerIndex))
+		{
+			CurrentProfileSaveGame = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(MetaSaveGame->LastUsedSlotName, UEODGameInstance::PlayerIndex));
+		}
+	}
+
+
 
 }

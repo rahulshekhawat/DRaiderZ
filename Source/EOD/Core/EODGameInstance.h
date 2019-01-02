@@ -7,6 +7,7 @@
 #include "EODGameInstance.generated.h"
 
 class UMetaSaveGame;
+class UPlayerSaveGame;
 
 /**
  * 
@@ -22,18 +23,26 @@ public:
 	virtual void Init() override;
 
 public:
-	static const int32 UserIndex;
+	static const int32 PlayerIndex;
 
-	static const FString DefaultMetaSaveSlotName;
+	static const FString MetaSaveSlotName;
 
-	FORCEINLINE UMetaSaveGame* GetMetaSaveGameObject() const { return MetaSaveGameObject; }
+	FORCEINLINE UMetaSaveGame* GetMetaSaveGameObject() const { return MetaSaveGame; }
 
 	UFUNCTION(BlueprintCallable, Category = "Save/Load System", meta = (DisplayName = "Get Meta Save Game Object"))
 	UMetaSaveGame* BP_GetMetaSaveGameObject() const { return GetMetaSaveGameObject(); }
 
+	FORCEINLINE UPlayerSaveGame* GetCurrentProfileSaveGameObject() const { return CurrentProfileSaveGame; }
+
+	UFUNCTION(BlueprintCallable, Category = "Save/Load System", meta = (DisplayName = "Get Current Profile Save Game"))
+	UPlayerSaveGame* BP_GetCurrentProfileSaveGame() const { return GetCurrentProfileSaveGameObject(); }
+
 private:
 	UPROPERTY()
-	UMetaSaveGame* MetaSaveGameObject;
+	UMetaSaveGame* MetaSaveGame;
+
+	UPROPERTY()
+	UPlayerSaveGame* CurrentProfileSaveGame;
 
 
 };

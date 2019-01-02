@@ -3,8 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Misc/DateTime.h"
 #include "GameFramework/SaveGame.h"
 #include "MetaSaveGame.generated.h"
+
+USTRUCT(BlueprintType)
+struct EOD_API FMetaSaveGameData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "Save Game Meta Data")
+	FString SaveSlotName;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Save Game Meta Data")
+	FString CharacterName;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Save Game Meta Data")
+	FDateTime LastSaveTime;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Save Game Meta Data")
+	int32 PlayerIndex;
+
+};
+
 
 /**
  * 
@@ -18,8 +40,11 @@ public:
 	UMetaSaveGame(const FObjectInitializer& ObjectInitializer);
 
 	/** A list of all the save game profiles saved on the system */
-	UPROPERTY()
-	TArray<FString> SavedProfilesList;
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Save Game")
+	TArray<FMetaSaveGameData> SaveSlotMetaDataList;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Save Game")
+	FString LastUsedSlotName;
 
 
 };
