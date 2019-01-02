@@ -23,6 +23,7 @@ void AEODGameModeBase::InitGame(const FString& MapName, const FString& Options, 
 		return;
 	}
 
+	/*
 	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->DefaultSaveSlotName, GameSingleton->UserIndex));
 	// If the default save game profile doesn't exist then create it
 	if (!IsValid(EODSaveGame))
@@ -39,6 +40,7 @@ void AEODGameModeBase::InitGame(const FString& MapName, const FString& Options, 
 		SpawnInfo.ObjectFlags |= RF_Transient;
 		StatusEffectsManager = GetWorld()->SpawnActor<AStatusEffectsManager>(AStatusEffectsManager::StaticClass(), SpawnInfo);
 	}
+	*/
 }
 
 AStatusEffectsManager* AEODGameModeBase::BP_GetStatusEffectsManager() const

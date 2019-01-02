@@ -2,6 +2,7 @@
 
 #include "EOD/Statics/EODGlobalNames.h"
 
+
 namespace MaterialParameterNames
 {
 	const FName BaseColor(TEXT("BaseColor"));
