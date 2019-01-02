@@ -17,5 +17,6 @@ class EOD_API UProfilesSaveGame : public USaveGame
 public:
 	UProfilesSaveGame(const FObjectInitializer& ObjectInitializer);
 
+		
 
 };

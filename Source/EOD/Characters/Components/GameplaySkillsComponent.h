@@ -77,9 +77,14 @@ public:
 
 	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return EODCharacterOwner; }
 
+	FORCEINLINE TMap<int32, FString>& GetSkillBarLayout() { return SBIndexToSGMap; }
+
 	void OnPressingSkillKey(const int32 SkillKeyIndex);
 
 	void OnReleasingSkillKey(const int32 SkillKeyIndex);
+
+	void LoadSkillBarLayout();
+
 
 	////////////////////////////////////////////////////////////////////////////////
 	// NETWORK

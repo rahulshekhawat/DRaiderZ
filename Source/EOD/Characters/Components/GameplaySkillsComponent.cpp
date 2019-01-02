@@ -3,6 +3,8 @@
 #include "EOD/Characters/Components/GameplaySkillsComponent.h"
 #include "EOD/Characters/EODCharacterBase.h"
 #include "EOD/Characters/PlayerCharacter.h"
+#include "EOD/SaveSystem/PlayerSaveGame.h"
+#include "EOD/Core/EODGameInstance.h"
 
 
 UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -23,6 +25,7 @@ UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& Obj
 void UGameplaySkillsComponent::PostLoad()
 {
 	Super::PostLoad();
+	LoadSkillBarLayout();
 }
 
 void UGameplaySkillsComponent::BeginPlay()
@@ -34,7 +37,6 @@ void UGameplaySkillsComponent::BeginPlay()
 	// * GetOwner() in PostLoad() was correct for AI characters spawned along with map, but was incorrect (NULL)  for player character
 	// * GetOwner() has been found to be setup correctly in BeginPlay
 	EODCharacterOwner = Cast<AEODCharacterBase>(GetOwner());
-
 }
 
 void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -104,6 +106,32 @@ void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 
 void UGameplaySkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
 {
+}
+
+void UGameplaySkillsComponent::LoadSkillBarLayout()
+{
+	UEODGameInstance* GameInstance = EODCharacterOwner ? Cast<UEODGameInstance>(EODCharacterOwner->GetGameInstance()) : nullptr;
+	if (!IsValid(GameInstance) || !IsValid(GameInstance->GetCurrentPlayerSaveGameObject()))
+	{
+		return;
+	}
+	
+	UPlayerSaveGame* PlayerSaveGame = GameInstance->GetCurrentPlayerSaveGameObject();
+	TMap<int32, FString>& SBLayout = PlayerSaveGame->SkillBarLayout;
+	TArray<int32> LayoutKeys;
+	SBLayout.GetKeys(LayoutKeys);
+	for (int32 Key : LayoutKeys)
+	{
+		if (SBLayout[Key] == FString(""))
+		{
+			continue;
+		}
+
+		if (SBIndexToSGMap.Contains(Key))
+		{
+			SBIndexToSGMap[Key] = SBLayout[Key];
+		}
+	}
 }
 
 void UGameplaySkillsComponent::Server_SetCurrentActiveSkill_Implementation(const FName SkillID)

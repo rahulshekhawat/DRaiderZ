@@ -79,7 +79,6 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 	// Cannot drop anything from skill tree to inventory
 	// Cannot drop anything from inventory to skill bar
 	// Cannot drop anything from skill bar to inventory
-	/*
 	if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
 		ContainerType == EEODContainerType::SkillBar)
 	{
@@ -100,16 +99,13 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 			bResult = SkillBarWidget->OnSkillsSwapped(Operation->DraggedEODItemWidget, this);
 		}
 	}
-	*/
 
+	/*
 	if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
 		ContainerType == EEODContainerType::SkillBar)
 	{
 		this->EODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
 		this->RefreshContainerVisuals();
-
-		USkillBarWidget* SkillBarWidget = Cast<USkillBarWidget>(ParentWidget);
-
 		bResult = true;
 	}
 	else if ((Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
@@ -127,6 +123,7 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 
 		bResult = true;
 	}
+	*/
 
 	return bResult;
 }

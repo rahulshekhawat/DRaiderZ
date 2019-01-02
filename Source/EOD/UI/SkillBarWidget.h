@@ -115,11 +115,7 @@ public:
 	
 	bool OnSkillsSwapped(UEODItemContainer* Container1, UEODItemContainer* Container2);
 
-	void SkillsSwapped(UEODItemContainer* SC1, UEODItemContainer* SC2);
-
-	void SkillRemoved(UEODItemContainer* SC);
-
-	void SkillAdded(UEODItemContainer* SC);
+	void UpdateSkillBarLayout(TMap<int32, FString>& NewLayout, bool bResize = false);
 
 private:
 	/** Returns EOD item container at given skill index */
@@ -131,9 +127,11 @@ private:
 	/** Load previously saved skill bar layout from current save slot */
 	void LoadSkillBarLayout();
 
-	void InitiateSkillContainer(UEODItemContainer* Container);
+	TArray<UEODItemContainer*> ContainersList;
 
-	TArray<UEODItemContainer*> SkillContainers;
+	TMap<int32, UEODItemContainer*> IndexToContainerMap;
+
+	void InitiateSkillContainer(UEODItemContainer* Container, int32 SkillBarIndex);
 
 };
 

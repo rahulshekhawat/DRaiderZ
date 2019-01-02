@@ -57,6 +57,8 @@ private:
 public:
 	FORCEINLINE AEODCharacterBase* GetEODCharacter() const { return EODCharacter; }
 
+	void LoadPlayerState();
+
 	////////////////////////////////////////////////////////////////////////////////
 	// COMPONENTS
 	////////////////////////////////////////////////////////////////////////////////
@@ -228,11 +230,10 @@ private:
 	////////////////////////////////////////////////////////////////////////////////
 private:
 	UFUNCTION(Client, Reliable)
-	void Client_BindStatusIndicatorWidgetDelegates(APawn* InPawn);
+	void Client_SetupLocalPlayerOnPossess(APawn* InPawn);
 
 	UFUNCTION(Client, Reliable)
-	void Client_UnbindStatusIndicatorWidgetDelegates(APawn* InPawn);
-
+	void Client_SetupLocalPlayerOnUnpossess(APawn* InPawn);
 
 };
 

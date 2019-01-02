@@ -61,10 +61,6 @@ protected:
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
-	/** Index of this container widget in it's parent widget (only used if the parent widget needs containers to be indexed) */
-	UPROPERTY(EditAnywhere)
-	int32 ContainerIndex;
-
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
 	bool bCanBeClicked;
 

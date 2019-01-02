@@ -75,6 +75,7 @@ bool USkillTreeWidget::Initialize()
 void USkillTreeWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	PrintToScreen(this, FString("Skill tree contructed"));
 }
 
 void USkillTreeWidget::NativeDestruct()

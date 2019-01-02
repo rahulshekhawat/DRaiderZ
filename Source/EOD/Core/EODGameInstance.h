@@ -32,10 +32,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Save/Load System", meta = (DisplayName = "Get Meta Save Game Object"))
 	UMetaSaveGame* BP_GetMetaSaveGameObject() const { return GetMetaSaveGameObject(); }
 
-	FORCEINLINE UPlayerSaveGame* GetCurrentProfileSaveGameObject() const { return CurrentProfileSaveGame; }
+	FORCEINLINE UPlayerSaveGame* GetCurrentPlayerSaveGameObject() const { return CurrentProfileSaveGame; }
 
-	UFUNCTION(BlueprintCallable, Category = "Save/Load System", meta = (DisplayName = "Get Current Profile Save Game"))
-	UPlayerSaveGame* BP_GetCurrentProfileSaveGame() const { return GetCurrentProfileSaveGameObject(); }
+	UFUNCTION(BlueprintCallable, Category = "Save/Load System", meta = (DisplayName = "Get Current Player Save Game"))
+	UPlayerSaveGame* BP_GetCurrentPlayerSaveGame() const { return GetCurrentPlayerSaveGameObject(); }
 
 private:
 	UPROPERTY()

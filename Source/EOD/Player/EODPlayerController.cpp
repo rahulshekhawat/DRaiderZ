@@ -2,6 +2,7 @@
 
 #include "EOD/Player/EODPlayerController.h"
 #include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Core/EODGameInstance.h"
 #include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/Characters/Components/SkillTreeComponent.h"
 #include "EOD/Characters/Components/GameplaySkillsComponent.h"
@@ -10,6 +11,7 @@
 
 #include "EOD/UI/HUDWidget.h"
 #include "EOD/Statics/EODLibrary.h"
+#include "EOD/SaveSystem/PlayerSaveGame.h"
 
 #include "UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
@@ -131,9 +133,10 @@ void AEODPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	LoadPlayerState();
 	CreateHUDWidget();
 	// If HUD widget created successfully
-	if (HUDWidget)
+	if (IsValid(HUDWidget))
 	{
 		InitStatusIndicatorWidget();
 		InitInventoryWidget();
@@ -151,7 +154,7 @@ void AEODPlayerController::Tick(float DeltaTime)
 void AEODPlayerController::Possess(APawn* InPawn)
 {
 	Super::Possess(InPawn);
-	Client_BindStatusIndicatorWidgetDelegates(InPawn);
+	Client_SetupLocalPlayerOnPossess(InPawn);
 }
 
 void AEODPlayerController::UnPossess()
@@ -159,9 +162,8 @@ void AEODPlayerController::UnPossess()
 	// Intentionally called before Super::UnPossess()
 	if (GetPawn())
 	{
-		Client_UnbindStatusIndicatorWidgetDelegates(GetPawn());
+		Client_SetupLocalPlayerOnUnpossess(GetPawn());
 	}
-
 	Super::UnPossess();	
 }
 
@@ -171,12 +173,22 @@ void AEODPlayerController::SetPawn(APawn* InPawn)
 	EODCharacter = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
 }
 
+void AEODPlayerController::LoadPlayerState()
+{
+	UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
+	UPlayerSaveGame* PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
+	if (IsValid(PlayerSaveGame) && IsValid(SkillTreeComponent))
+	{
+		// SkillTreeComponent->
+	}
+}
+
 void AEODPlayerController::CreateHUDWidget()
 {
 	if (IsLocalPlayerController() && HUDWidgetClass.Get())
 	{
 		HUDWidget = CreateWidget<UHUDWidget>(this, HUDWidgetClass);
-		if (HUDWidget)
+		if (IsValid(HUDWidget))
 		{
 			HUDWidget->AddToViewport();
 		}
@@ -499,28 +511,41 @@ void AEODPlayerController::SavePlayerState()
 {
 }
 
-void AEODPlayerController::Client_BindStatusIndicatorWidgetDelegates_Implementation(APawn* InPawn)
+void AEODPlayerController::Client_SetupLocalPlayerOnPossess_Implementation(APawn* InPawn)
 {
 	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
-	if (IsValid(EODChar) && IsValid(EODChar->GetCharacterStatsComponent()) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
+	if (IsValid(EODChar) && IsValid(HUDWidget))
 	{
-		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
 		UStatsComponentBase* StatsComponent = EODChar->GetCharacterStatsComponent();
-		StatsComponent->OnHealthChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
-		StatsComponent->OnManaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
-		StatsComponent->OnStaminaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
+		if (IsValid(StatsComponent) && IsValid(StatusIndicatorWidget))
+		{
+			StatsComponent->OnHealthChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+			StatsComponent->OnManaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+			StatsComponent->OnStaminaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+		}
+
+		UGameplaySkillsComponent* SkillComp = EODChar->GetGameplaySkillsComponent();
+		USkillBarWidget* SkillBarWidget = HUDWidget->GetSkillBarWidget();
+		if (IsValid(SkillComp) && IsValid(SkillBarWidget))
+		{
+			SkillBarWidget->UpdateSkillBarLayout(SkillComp->GetSkillBarLayout());
+		}
 	}
 }
 
-void AEODPlayerController::Client_UnbindStatusIndicatorWidgetDelegates_Implementation(APawn* InPawn)
+void AEODPlayerController::Client_SetupLocalPlayerOnUnpossess_Implementation(APawn* InPawn)
 {
 	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
-	if (IsValid(EODChar) && IsValid(EODChar->GetCharacterStatsComponent()) && IsValid(HUDWidget) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
+	if (IsValid(EODChar) && IsValid(HUDWidget))
 	{
-		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
-		UStatsComponentBase* StatsComponent = EODChar->GetCharacterStatsComponent();
-		StatsComponent->OnHealthChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
-		StatsComponent->OnManaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
-		StatsComponent->OnStaminaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+		if (IsValid(EODChar->GetCharacterStatsComponent()) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
+		{
+			UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
+			UStatsComponentBase* StatsComponent = EODChar->GetCharacterStatsComponent();
+			StatsComponent->OnHealthChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+			StatsComponent->OnManaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+			StatsComponent->OnStaminaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+		}
 	}
 }

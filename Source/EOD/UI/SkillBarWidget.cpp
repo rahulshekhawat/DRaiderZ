@@ -3,8 +3,10 @@
 #include "SkillBarWidget.h"
 #include "EOD/UI/EODItemContainer.h"
 #include "EOD/Core/EODSaveGame.h"
+// #include "EOD/Core/EODGameInstance.h"
 #include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Core/GameSingleton.h"
+// #include "EOD/SaveSystem/PlayerSaveGame.h"
 #include "EOD/Statics/CharacterLibrary.h"
 #include "EOD/UI/SkillTreeItemContainer.h"
 
@@ -40,30 +42,28 @@ bool USkillBarWidget::Initialize()
 		Skill_19 &&
 		Skill_20))
 	{
-		InitiateSkillContainer(Skill_1);
-		InitiateSkillContainer(Skill_2);
-		InitiateSkillContainer(Skill_3);
-		InitiateSkillContainer(Skill_4);
-		InitiateSkillContainer(Skill_5);
-		InitiateSkillContainer(Skill_6);
-		InitiateSkillContainer(Skill_7);
-		InitiateSkillContainer(Skill_8);
-		InitiateSkillContainer(Skill_9);
-		InitiateSkillContainer(Skill_10);
-		InitiateSkillContainer(Skill_11);
-		InitiateSkillContainer(Skill_12);
-		InitiateSkillContainer(Skill_13);
-		InitiateSkillContainer(Skill_14);
-		InitiateSkillContainer(Skill_15);
-		InitiateSkillContainer(Skill_16);
-		InitiateSkillContainer(Skill_17);
-		InitiateSkillContainer(Skill_18);
-		InitiateSkillContainer(Skill_19);
-		InitiateSkillContainer(Skill_20);
+		InitiateSkillContainer(Skill_1, 1);
+		InitiateSkillContainer(Skill_2, 2);
+		InitiateSkillContainer(Skill_3, 3);
+		InitiateSkillContainer(Skill_4, 4);
+		InitiateSkillContainer(Skill_5, 5);
+		InitiateSkillContainer(Skill_6, 6);
+		InitiateSkillContainer(Skill_7, 7);
+		InitiateSkillContainer(Skill_8, 8);
+		InitiateSkillContainer(Skill_9, 9);
+		InitiateSkillContainer(Skill_10, 10);
+		InitiateSkillContainer(Skill_11, 11);
+		InitiateSkillContainer(Skill_12, 12);
+		InitiateSkillContainer(Skill_13, 13);
+		InitiateSkillContainer(Skill_14, 14);
+		InitiateSkillContainer(Skill_15, 15);
+		InitiateSkillContainer(Skill_16, 16);
+		InitiateSkillContainer(Skill_17, 17);
+		InitiateSkillContainer(Skill_18, 18);
+		InitiateSkillContainer(Skill_19, 19);
+		InitiateSkillContainer(Skill_20, 20);
 		return false;
 	}
-
-	LoadSkillBarLayout();
 
 	return true;
 }
@@ -80,6 +80,7 @@ void USkillBarWidget::NativeDestruct()
 
 void USkillBarWidget::LoadSkillBarLayout()
 {
+	/*
 	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
 	if (!IsValid(GameSingleton))
 	{
@@ -126,14 +127,15 @@ void USkillBarWidget::LoadSkillBarLayout()
 
 		SkillButton->RefreshContainerVisuals();
 	}
+	*/
 }
 
-void USkillBarWidget::InitiateSkillContainer(UEODItemContainer* Container)
+void USkillBarWidget::InitiateSkillContainer(UEODItemContainer* Container, int32 SkillBarIndex)
 {
 	if (IsValid(Container))
 	{
-		Container->SetParentWidget(this);
-		SkillContainers.Add(Container);
+		ContainersList.Add(Container);
+		IndexToContainerMap.Add(SkillBarIndex, Container);
 	}
 }
 
@@ -215,13 +217,13 @@ void USkillBarWidget::SaveSkillBarLayout()
 
 bool USkillBarWidget::OnNewSkillDropped(UEODItemContainer* FromContainer, UEODItemContainer* ToContainer)
 {
-	/*
 	USkillTreeItemContainer* STContainer = Cast<USkillTreeItemContainer>(FromContainer);
-	if (!IsValid(STContainer) || !IsValid(ToContainer) || !SkillContainers.Contains(ToContainer))
+	if (!IsValid(STContainer) || !IsValid(ToContainer) || !ContainersList.Contains(ToContainer) || !(STContainer->SkillGroup == FString("")))
 	{
 		return false;
 	}
-	*/
+
+	FString SkillGroup = STContainer->SkillGroup;
 
 
 
@@ -263,21 +265,10 @@ bool USkillBarWidget::OnSkillsSwapped(UEODItemContainer* Container1, UEODItemCon
 	return false;
 }
 
-void USkillBarWidget::SkillsSwapped(UEODItemContainer* SC1, UEODItemContainer* SC2)
+void USkillBarWidget::UpdateSkillBarLayout(TMap<int32, FString>& NewLayout, bool bResize)
 {
-}
-
-void USkillBarWidget::SkillRemoved(UEODItemContainer* SC)
-{
-	if (IsValid(SC))
-	{
-
-	}
-}
-
-void USkillBarWidget::SkillAdded(UEODItemContainer* SC)
-{
-	if (IsValid(SC))
+	TArray<int32> NewLayoutKeys;
+	for (int32& Key : NewLayoutKeys)
 	{
 
 	}
