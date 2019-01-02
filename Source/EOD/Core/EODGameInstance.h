@@ -16,7 +16,7 @@ class EOD_API UEODGameInstance : public UGameInstance
 	
 public:
 
-	virtual void Init();
+	virtual void Init() override;
 
 
 };

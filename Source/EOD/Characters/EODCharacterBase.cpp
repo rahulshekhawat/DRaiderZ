@@ -50,7 +50,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 		InteractionSphereComponent->SetSphereRadius(150.f);
 		// No need to enable interaction sphere unless the character is possessed by player controller
 		InteractionSphereComponent->Deactivate();
-		InteractionSphereComponent->SetCollisionProfileName(FEODGlobalNames::NoCollision);
+		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::NoCollision);
 	}
 
 	SetReplicates(true);

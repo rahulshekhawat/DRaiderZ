@@ -235,7 +235,7 @@ inline void UEODItemContainer::SetupEmptyBorderMaterial()
 		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(EmptyBorderMaterial, this);
 		if (IsValid(DynamicMaterial))
 		{
-			DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, NormalBorderColor);
+			DynamicMaterial->SetVectorParameterValue(MaterialParameterNames::BaseColor, NormalBorderColor);
 		}
 
 		FSlateBrush SlateBrush;

@@ -4,16 +4,18 @@
 
 #include "CoreMinimal.h"
 
-class FEODGlobalNames
+namespace MaterialParameterNames
 {
-public:
-	const static FName BaseColor;
-	const static FName NoCollision;
-	const static FName OverlapAllDynamic;
-};
+	extern const FName BaseColor;
+}
 
-class FEODKeyNames
+namespace CollisionProfileNames
 {
-public:
-	const static FName LeftMouseButton;
-};
+	extern const FName NoCollision;
+	extern const FName OverlapAllDynamic;
+}
+
+namespace KeyboardKeysNames
+{
+	extern const FName LeftMouseButton;
+}

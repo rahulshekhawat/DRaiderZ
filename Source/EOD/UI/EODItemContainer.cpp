@@ -136,7 +136,7 @@ void UEODItemContainer::NativeOnMouseEnter(const FGeometry& InGeometry, const FP
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
 	if (IsValid(DynamicMaterial))
 	{
-		DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, HoveredBorderColor);
+		DynamicMaterial->SetVectorParameterValue(MaterialParameterNames::BaseColor, HoveredBorderColor);
 	}
 }
 
@@ -145,7 +145,7 @@ void UEODItemContainer::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
 	if (IsValid(DynamicMaterial))
 	{
-		DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, NormalBorderColor);
+		DynamicMaterial->SetVectorParameterValue(MaterialParameterNames::BaseColor, NormalBorderColor);
 	}
 }
 
@@ -154,11 +154,11 @@ FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry& InGeometry, c
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
 	if (IsValid(DynamicMaterial))
 	{
-		DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, PressedBorderColor);
+		DynamicMaterial->SetVectorParameterValue(MaterialParameterNames::BaseColor, PressedBorderColor);
 	}
 
 	FReply Reply = FReply::Unhandled();
-	FKey DragKey(FEODKeyNames::LeftMouseButton);
+	FKey DragKey(KeyboardKeysNames::LeftMouseButton);
 	if (InMouseEvent.GetEffectingButton() == DragKey)
 	{
 		Reply = FReply::Handled();
@@ -176,7 +176,7 @@ FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry& InGeometry, con
 	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
 	if (IsValid(DynamicMaterial))
 	{
-		DynamicMaterial->SetVectorParameterValue(FEODGlobalNames::BaseColor, HoveredBorderColor);
+		DynamicMaterial->SetVectorParameterValue(MaterialParameterNames::BaseColor, HoveredBorderColor);
 	}
 	return FReply::Handled();
 }

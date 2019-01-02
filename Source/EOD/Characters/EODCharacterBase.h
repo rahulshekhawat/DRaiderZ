@@ -1233,7 +1233,7 @@ FORCEINLINE void AEODCharacterBase::EnableInteractionSphere()
 	if (IsValid(InteractionSphereComponent))
 	{
 		InteractionSphereComponent->Activate();
-		InteractionSphereComponent->SetCollisionProfileName(FEODGlobalNames::OverlapAllDynamic);
+		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::OverlapAllDynamic);
 	}
 }
 
@@ -1242,7 +1242,7 @@ FORCEINLINE void AEODCharacterBase::DisableInteractionSphere()
 	if (IsValid(InteractionSphereComponent))
 	{
 		InteractionSphereComponent->Deactivate();
-		InteractionSphereComponent->SetCollisionProfileName(FEODGlobalNames::NoCollision);
+		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::NoCollision);
 	}
 }
 

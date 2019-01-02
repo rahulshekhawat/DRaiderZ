@@ -2,8 +2,18 @@
 
 #include "EOD/Statics/EODGlobalNames.h"
 
-const FName FEODGlobalNames::BaseColor(TEXT("BaseColor"));
-const FName FEODGlobalNames::NoCollision(TEXT("NoCollision"));
-const FName FEODGlobalNames::OverlapAllDynamic(TEXT("OverlapAllDynamic"));
+namespace MaterialParameterNames
+{
+	const FName BaseColor(TEXT("BaseColor"));
+}
 
-const FName FEODKeyNames::LeftMouseButton(TEXT("LeftMouseButton"));
+namespace CollisionProfileNames
+{
+	const FName NoCollision(TEXT("NoCollision"));
+	const FName OverlapAllDynamic(TEXT("OverlapAllDynamic"));
+}
+
+namespace KeyboardKeysNames
+{
+	const FName LeftMouseButton(TEXT("LeftMouseButton"));
+}
