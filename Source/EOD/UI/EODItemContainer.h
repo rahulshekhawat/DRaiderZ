@@ -125,6 +125,27 @@ public:
 		ParentWidget = IsValid(Widget) ? Widget : nullptr;
 	}
 
+	FORCEINLINE void DisableContainer()
+	{
+		DisableClicking();
+		DisableDragging();
+
+		if (IsValid(ItemImage))
+		{
+			ItemImage->SetIsEnabled(false);
+		}
+	}
+
+	FORCEINLINE void DisableClicking()
+	{
+		bCanBeClicked = false;
+	}
+
+	FORCEINLINE void DisableDragging()
+	{
+		bCanBeDragged = false;
+	}
+
 private:
 	inline void UpdateItemImage();
 

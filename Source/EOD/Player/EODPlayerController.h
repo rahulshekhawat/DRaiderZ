@@ -246,6 +246,7 @@ FORCEINLINE void AEODPlayerController::SwitchToUIInput()
 {
 	bShowMouseCursor = true;
 	FInputModeGameAndUI GameAndUIInputMode;
+	GameAndUIInputMode.SetHideCursorDuringCapture(false);
 	GameAndUIInputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
 	SetInputMode(GameAndUIInputMode);
 }

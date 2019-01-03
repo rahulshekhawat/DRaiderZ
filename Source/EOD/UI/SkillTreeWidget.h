@@ -118,7 +118,15 @@ private:
 	UPROPERTY()
 	FButtonStyle DefaultButtonStyle;
 
+	TArray<USkillTreeItemContainer*> AssassinSkills;
+
 	TArray<USkillTreeItemContainer*> BerserkerSkills;
+
+	TArray<USkillTreeItemContainer*> ClericSkills;
+
+	TArray<USkillTreeItemContainer*> DefenderSkills;
+
+	TArray<USkillTreeItemContainer*> SorcererSkills;
 
 private:
 	UFUNCTION()
