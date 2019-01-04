@@ -21,50 +21,50 @@ USkillBarWidget::USkillBarWidget(const FObjectInitializer & ObjectInitializer): 
 bool USkillBarWidget::Initialize()
 {
 	if (!(Super::Initialize() &&
-		Skill_1 &&
-		Skill_2 &&
-		Skill_3 &&
-		Skill_4 &&
-		Skill_5 &&
-		Skill_6 &&
-		Skill_7 &&
-		Skill_8 &&
-		Skill_9 &&
-		Skill_10 &&
-		Skill_11 &&
-		Skill_12 &&
-		Skill_13 &&
-		Skill_14 &&
-		Skill_15 &&
-		Skill_16 &&
-		Skill_17 &&
-		Skill_18 &&
-		Skill_19 &&
-		Skill_20))
+		SkillContainer_1 &&
+		SkillContainer_2 &&
+		SkillContainer_3 &&
+		SkillContainer_4 &&
+		SkillContainer_5 &&
+		SkillContainer_6 &&
+		SkillContainer_7 &&
+		SkillContainer_8 &&
+		SkillContainer_9 &&
+		SkillContainer_10 &&
+		SkillContainer_11 &&
+		SkillContainer_12 &&
+		SkillContainer_13 &&
+		SkillContainer_14 &&
+		SkillContainer_15 &&
+		SkillContainer_16 &&
+		SkillContainer_17 &&
+		SkillContainer_18 &&
+		SkillContainer_19 &&
+		SkillContainer_20))
 	{
-		InitiateSkillContainer(Skill_1, 1);
-		InitiateSkillContainer(Skill_2, 2);
-		InitiateSkillContainer(Skill_3, 3);
-		InitiateSkillContainer(Skill_4, 4);
-		InitiateSkillContainer(Skill_5, 5);
-		InitiateSkillContainer(Skill_6, 6);
-		InitiateSkillContainer(Skill_7, 7);
-		InitiateSkillContainer(Skill_8, 8);
-		InitiateSkillContainer(Skill_9, 9);
-		InitiateSkillContainer(Skill_10, 10);
-		InitiateSkillContainer(Skill_11, 11);
-		InitiateSkillContainer(Skill_12, 12);
-		InitiateSkillContainer(Skill_13, 13);
-		InitiateSkillContainer(Skill_14, 14);
-		InitiateSkillContainer(Skill_15, 15);
-		InitiateSkillContainer(Skill_16, 16);
-		InitiateSkillContainer(Skill_17, 17);
-		InitiateSkillContainer(Skill_18, 18);
-		InitiateSkillContainer(Skill_19, 19);
-		InitiateSkillContainer(Skill_20, 20);
 		return false;
 	}
 
+	InitializeSkillContainer(SkillContainer_1, 1);
+	InitializeSkillContainer(SkillContainer_2, 2);
+	InitializeSkillContainer(SkillContainer_3, 3);
+	InitializeSkillContainer(SkillContainer_4, 4);
+	InitializeSkillContainer(SkillContainer_5, 5);
+	InitializeSkillContainer(SkillContainer_6, 6);
+	InitializeSkillContainer(SkillContainer_7, 7);
+	InitializeSkillContainer(SkillContainer_8, 8);
+	InitializeSkillContainer(SkillContainer_9, 9);
+	InitializeSkillContainer(SkillContainer_10, 10);
+	InitializeSkillContainer(SkillContainer_11, 11);
+	InitializeSkillContainer(SkillContainer_12, 12);
+	InitializeSkillContainer(SkillContainer_13, 13);
+	InitializeSkillContainer(SkillContainer_14, 14);
+	InitializeSkillContainer(SkillContainer_15, 15);
+	InitializeSkillContainer(SkillContainer_16, 16);
+	InitializeSkillContainer(SkillContainer_17, 17);
+	InitializeSkillContainer(SkillContainer_18, 18);
+	InitializeSkillContainer(SkillContainer_19, 19);
+	InitializeSkillContainer(SkillContainer_20, 20);
 	return true;
 }
 
@@ -78,9 +78,9 @@ void USkillBarWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+/*
 void USkillBarWidget::LoadSkillBarLayout()
 {
-	/*
 	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
 	if (!IsValid(GameSingleton))
 	{
@@ -99,7 +99,7 @@ void USkillBarWidget::LoadSkillBarLayout()
 	for (const FString& SkillGroup : SkillGroups)
 	{
 		int32 Position = EODSaveGame->SkillBarLayout[SkillGroup];
-		UEODItemContainer* SkillButton = GetSkillButtonAtIndex(Position);
+		UEODItemContainer* SkillButton = GetSkillContainerAtIndex(Position);
 		if (!IsValid(SkillButton))
 		{
 			continue;
@@ -127,17 +127,8 @@ void USkillBarWidget::LoadSkillBarLayout()
 
 		SkillButton->RefreshContainerVisuals();
 	}
-	*/
 }
-
-void USkillBarWidget::InitiateSkillContainer(UEODItemContainer* Container, int32 SkillBarIndex)
-{
-	if (IsValid(Container))
-	{
-		ContainersList.Add(Container);
-		IndexToContainerMap.Add(SkillBarIndex, Container);
-	}
-}
+*/
 
 bool USkillBarWidget::IsSkillGroupInCooldown(const FString& SkillGroup) const
 {
@@ -146,7 +137,7 @@ bool USkillBarWidget::IsSkillGroupInCooldown(const FString& SkillGroup) const
 	{
 		if (SkillGroup == GetSkillGroupAtIndex(i))
 		{
-			SkillContainer = GetSkillButtonAtIndex(i);
+			SkillContainer = GetSkillContainerAtIndex(i);
 			break;
 		}
 	}
@@ -161,7 +152,7 @@ bool USkillBarWidget::IsSkillGroupInCooldown(const FString& SkillGroup) const
 
 void USkillBarWidget::PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval)
 {
-	UEODItemContainer* SkillContainer = GetSkillButtonAtIndex(SkillIndex);
+	UEODItemContainer* SkillContainer = GetSkillContainerAtIndex(SkillIndex);
 	if (IsValid(SkillContainer))
 	{
 		SkillContainer->StartCooldown(Duration, Interval);
@@ -175,7 +166,7 @@ void USkillBarWidget::PutSkillOnCooldownTimer(FString SkillGroup, float Duration
 	{
 		if (SkillGroup == GetSkillGroupAtIndex(i))
 		{
-			SkillContainer = GetSkillButtonAtIndex(i);
+			SkillContainer = GetSkillContainerAtIndex(i);
 			break;
 		}
 	}
@@ -218,7 +209,8 @@ void USkillBarWidget::SaveSkillBarLayout()
 bool USkillBarWidget::OnNewSkillDropped(UEODItemContainer* FromContainer, UEODItemContainer* ToContainer)
 {
 	USkillTreeItemContainer* STContainer = Cast<USkillTreeItemContainer>(FromContainer);
-	if (!IsValid(STContainer) || !IsValid(ToContainer) || !ContainersList.Contains(ToContainer) || !(STContainer->SkillGroup == FString("")))
+	// if (!IsValid(STContainer) || !IsValid(ToContainer) || !ContainersList.Contains(ToContainer) || !(STContainer->SkillGroup == FString("")))
+	if (!IsValid(STContainer) || !IsValid(ToContainer) || STContainer->SkillGroup == FString(""))
 	{
 		return false;
 	}

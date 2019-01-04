@@ -28,76 +28,86 @@ public:
 	virtual void NativeDestruct() override;
 
 public:
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_1;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_1;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_2;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_2;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_3;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_3;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_4;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_4;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_5;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_5;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_6;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_6;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_7;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_7;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_8;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_8;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_9;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_9;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_10;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_10;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_11;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_11;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_12;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_12;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_13;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_13;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_14;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_14;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_15;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_15;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_16;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_16;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_17;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_17;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_18;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_18;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_19;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_19;
 
-	UPROPERTY(meta = (BindWidget))
-	UEODItemContainer* Skill_20;
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Bar", meta = (BindWidget))
+	UEODItemContainer* SkillContainer_20;
 
-	/** Get SkillID of skill placed at SkillIndex */
-	inline FName GetSkillIDAtIndex(const int32 SkillIndex) const;
+public:
+	UPROPERTY(Transient)
+	TMap<int32, UEODItemContainer*> IndexToContainerMap;
 
-	inline FString GetSkillGroupAtIndex(const int32 SkillIdex) const;
+public:
+	/** Get ID of skill placed at given index of skill bar */
+	inline FName GetSkillIDAtIndex(const int32 ContainerIndex) const;
 
-	inline FEODItemInfo GetEODItemInfoAtIndex(const int32 SkillIndex) const;
+	/** Get SkillGroup of skill placed at given index of skill bar */
+	inline FString GetSkillGroupAtIndex(const int32 ContainerIndex) const;
+
+	/** Get EODItemInfo of EODItemContainer placed at given index of skill bar */
+	inline FEODItemInfo GetEODItemInfoAtIndex(const int32 ContainerIndex) const;
 
 	/** Returns true if skill at given skill index is in cooldown */
-	inline bool IsSkillInCooldown(int32 SkillIndex) const;
+	inline bool IsSkillInCooldown(const int32 SkillIndex) const;
 
+	inline bool HasSkillContainer(UEODItemContainer* Container) const;
+
+	/** Returns true if the given skill group is in cooldown */
 	bool IsSkillGroupInCooldown(const FString& SkillGroup) const;
 
 	/** Put skill at given skill index on cooldown */
@@ -118,48 +128,35 @@ public:
 	void UpdateSkillBarLayout(TMap<int32, FString>& NewLayout, bool bResize = false);
 
 private:
+	inline void InitializeSkillContainer(UEODItemContainer* Container, const int32 ContainerIndex);
+
 	/** Returns EOD item container at given skill index */
-	inline UEODItemContainer* GetSkillButtonAtIndex(int32 ButtonIndex) const;
+	inline UEODItemContainer* GetSkillContainerAtIndex(const int32 Index) const;
 
 	/** Get the owning EOD player of this widget */
 	FORCEINLINE APlayerCharacter* GetOwningEODPlayer() const;
-
-	/** Load previously saved skill bar layout from current save slot */
-	void LoadSkillBarLayout();
-
-	TArray<UEODItemContainer*> ContainersList;
-
-	TMap<int32, UEODItemContainer*> IndexToContainerMap;
-
-	void InitiateSkillContainer(UEODItemContainer* Container, int32 SkillBarIndex);
 
 };
 
 inline FName USkillBarWidget::GetSkillIDAtIndex(const int32 SkillIndex) const
 {
-	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
-	if (Skill)
-	{
-		return Skill->EODItemInfo.ItemID;
-	}
-
-	return NAME_None;
+	UEODItemContainer* Skill = GetSkillContainerAtIndex(SkillIndex);
+	return IsValid(Skill) ? Skill->EODItemInfo.ItemID : NAME_None;
 }
 
 inline FString USkillBarWidget::GetSkillGroupAtIndex(const int32 SkillIndex) const
 {
-	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
-	if (Skill)
+	UEODItemContainer* Skill = GetSkillContainerAtIndex(SkillIndex);
+	if (IsValid(Skill))
 	{
 		return Skill->EODItemInfo.ItemGroup;
 	}
-
 	return FString("");
 }
 
 inline FEODItemInfo USkillBarWidget::GetEODItemInfoAtIndex(const int32 SkillIndex) const
 {
-	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
+	UEODItemContainer* Skill = GetSkillContainerAtIndex(SkillIndex);
 	if (Skill)
 	{
 		return Skill->EODItemInfo;
@@ -170,7 +167,7 @@ inline FEODItemInfo USkillBarWidget::GetEODItemInfoAtIndex(const int32 SkillInde
 
 inline bool USkillBarWidget::IsSkillInCooldown(int32 SkillIndex) const
 {
-	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
+	UEODItemContainer* Skill = GetSkillContainerAtIndex(SkillIndex);
 	if (Skill)
 	{
 		return Skill->bInCooldown;
@@ -179,50 +176,79 @@ inline bool USkillBarWidget::IsSkillInCooldown(int32 SkillIndex) const
 	return false;
 }
 
-inline UEODItemContainer* USkillBarWidget::GetSkillButtonAtIndex(int32 ButtonIndex) const
+inline bool USkillBarWidget::HasSkillContainer(UEODItemContainer* Container) const
 {
-	switch (ButtonIndex)
+	if (IsValid(Container))
+	{
+		for (int i = 1; i <= 20; i++)
+		{
+			if (Container == GetSkillContainerAtIndex(i))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+inline void USkillBarWidget::InitializeSkillContainer(UEODItemContainer* Container, const int32 SkillBarIndex)
+{
+	if (IsValid(Container))
+	{
+		Container->SetParentWidget(this);
+		if (!IndexToContainerMap.Contains(SkillBarIndex))
+		{
+			IndexToContainerMap.Add(SkillBarIndex, Container);
+		}
+	}
+}
+
+
+inline UEODItemContainer* USkillBarWidget::GetSkillContainerAtIndex(const int32 ContainerIndex) const
+{
+	switch (ContainerIndex)
 	{
 	case 1:
-		return Skill_1;
+		return SkillContainer_1;
 	case 2:
-		return Skill_2;
+		return SkillContainer_2;
 	case 3:
-		return Skill_3;
+		return SkillContainer_3;
 	case 4:
-		return Skill_4;
+		return SkillContainer_4;
 	case 5:
-		return Skill_5;
+		return SkillContainer_5;
 	case 6:
-		return Skill_6;
+		return SkillContainer_6;
 	case 7:
-		return Skill_7;
+		return SkillContainer_7;
 	case 8:
-		return Skill_8;
+		return SkillContainer_8;
 	case 9:
-		return Skill_9;
+		return SkillContainer_9;
 	case 10:
-		return Skill_10;
+		return SkillContainer_10;
 	case 11:
-		return Skill_11;
+		return SkillContainer_11;
 	case 12:
-		return Skill_12;
+		return SkillContainer_12;
 	case 13:
-		return Skill_13;
+		return SkillContainer_13;
 	case 14:
-		return Skill_14;
+		return SkillContainer_14;
 	case 15:
-		return Skill_15;
+		return SkillContainer_15;
 	case 16:
-		return Skill_16;
+		return SkillContainer_16;
 	case 17:
-		return Skill_17;
+		return SkillContainer_17;
 	case 18:
-		return Skill_18;
+		return SkillContainer_18;
 	case 19:
-		return Skill_19;
+		return SkillContainer_19;
 	case 20:
-		return Skill_20;
+		return SkillContainer_20;
 	default:
 		break;
 	}
