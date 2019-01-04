@@ -4,7 +4,7 @@
 
 
 // Sets default values for this component's properties
-UWeaponStatsComponent::UWeaponStatsComponent()
+UWeaponStatsComponent::UWeaponStatsComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// This component doesn't tick
 	PrimaryComponentTick.bCanEverTick = false;

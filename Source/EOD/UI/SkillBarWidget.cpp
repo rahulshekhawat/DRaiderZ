@@ -3,14 +3,16 @@
 #include "SkillBarWidget.h"
 #include "EOD/UI/EODItemContainer.h"
 #include "EOD/Core/EODSaveGame.h"
+// #include "EOD/Core/EODGameInstance.h"
 #include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Core/GameSingleton.h"
+// #include "EOD/SaveSystem/PlayerSaveGame.h"
 #include "EOD/Statics/CharacterLibrary.h"
+#include "EOD/UI/SkillTreeItemContainer.h"
 
 #include "Components/Button.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 USkillBarWidget::USkillBarWidget(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {
@@ -40,10 +42,28 @@ bool USkillBarWidget::Initialize()
 		Skill_19 &&
 		Skill_20))
 	{
+		InitiateSkillContainer(Skill_1, 1);
+		InitiateSkillContainer(Skill_2, 2);
+		InitiateSkillContainer(Skill_3, 3);
+		InitiateSkillContainer(Skill_4, 4);
+		InitiateSkillContainer(Skill_5, 5);
+		InitiateSkillContainer(Skill_6, 6);
+		InitiateSkillContainer(Skill_7, 7);
+		InitiateSkillContainer(Skill_8, 8);
+		InitiateSkillContainer(Skill_9, 9);
+		InitiateSkillContainer(Skill_10, 10);
+		InitiateSkillContainer(Skill_11, 11);
+		InitiateSkillContainer(Skill_12, 12);
+		InitiateSkillContainer(Skill_13, 13);
+		InitiateSkillContainer(Skill_14, 14);
+		InitiateSkillContainer(Skill_15, 15);
+		InitiateSkillContainer(Skill_16, 16);
+		InitiateSkillContainer(Skill_17, 17);
+		InitiateSkillContainer(Skill_18, 18);
+		InitiateSkillContainer(Skill_19, 19);
+		InitiateSkillContainer(Skill_20, 20);
 		return false;
 	}
-
-	LoadSkillBarLayout();
 
 	return true;
 }
@@ -60,19 +80,15 @@ void USkillBarWidget::NativeDestruct()
 
 void USkillBarWidget::LoadSkillBarLayout()
 {
-	UGameSingleton* GameSingleton = nullptr;
-	if (GEngine)
-	{
-		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-	}
-
-	if (!GameSingleton)
+	/*
+	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
+	if (!IsValid(GameSingleton))
 	{
 		return;
 	}
 
 	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex));
-	if (!EODSaveGame)
+	if (!IsValid(EODSaveGame))
 	{
 		return;
 	}
@@ -84,7 +100,7 @@ void USkillBarWidget::LoadSkillBarLayout()
 	{
 		int32 Position = EODSaveGame->SkillBarLayout[SkillGroup];
 		UEODItemContainer* SkillButton = GetSkillButtonAtIndex(Position);
-		if (!SkillButton)
+		if (!IsValid(SkillButton))
 		{
 			continue;
 		}
@@ -96,10 +112,8 @@ void USkillBarWidget::LoadSkillBarLayout()
 		FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
 		if (!Skill)
 		{
-#if MESSAGE_LOGGING_ENABLED
 			FString Message = FString("Couldn't find skill : ") + SkillIDString;
-			UKismetSystemLibrary::PrintString(this, Message);
-#endif // MESSAGE_LOGGING_ENABLED
+			PrintEverywhere(this, Message);
 			continue;
 		}
 
@@ -112,6 +126,16 @@ void USkillBarWidget::LoadSkillBarLayout()
 		SkillButton->EODItemInfo.Description = Skill->Description;
 
 		SkillButton->RefreshContainerVisuals();
+	}
+	*/
+}
+
+void USkillBarWidget::InitiateSkillContainer(UEODItemContainer* Container, int32 SkillBarIndex)
+{
+	if (IsValid(Container))
+	{
+		ContainersList.Add(Container);
+		IndexToContainerMap.Add(SkillBarIndex, Container);
 	}
 }
 
@@ -127,20 +151,20 @@ bool USkillBarWidget::IsSkillGroupInCooldown(const FString& SkillGroup) const
 		}
 	}
 
-	if (SkillContainer)
+	if (IsValid(SkillContainer))
 	{
 		return SkillContainer->bInCooldown;
 	}
 
-	return true;
+	return false;
 }
 
 void USkillBarWidget::PutSkillOnCooldownTimer(int32 SkillIndex, float Duration, float Interval)
 {
-	UEODItemContainer* Skill = GetSkillButtonAtIndex(SkillIndex);
-	if (Skill)
+	UEODItemContainer* SkillContainer = GetSkillButtonAtIndex(SkillIndex);
+	if (IsValid(SkillContainer))
 	{
-		Skill->StartCooldown(Duration, Interval);
+		SkillContainer->StartCooldown(Duration, Interval);
 	}
 }
 
@@ -156,7 +180,7 @@ void USkillBarWidget::PutSkillOnCooldownTimer(FString SkillGroup, float Duration
 		}
 	}
 
-	if (SkillContainer)
+	if (IsValid(SkillContainer))
 	{
 		SkillContainer->StartCooldown(Duration, Interval);
 	}
@@ -165,19 +189,14 @@ void USkillBarWidget::PutSkillOnCooldownTimer(FString SkillGroup, float Duration
 
 void USkillBarWidget::SaveSkillBarLayout()
 {
-	UGameSingleton* GameSingleton = nullptr;
-	if (GEngine)
-	{
-		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-	}
-
-	if (!GameSingleton)
+	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
+	if (!IsValid(GameSingleton))
 	{
 		return;
 	}
 
 	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex));
-	if (!EODSaveGame)
+	if (!IsValid(EODSaveGame))
 	{
 		return;
 	}
@@ -194,4 +213,63 @@ void USkillBarWidget::SaveSkillBarLayout()
 
 	EODSaveGame->SkillBarLayout = SkillBarLayout;
 	UGameplayStatics::SaveGameToSlot(EODSaveGame, GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex);
+}
+
+bool USkillBarWidget::OnNewSkillDropped(UEODItemContainer* FromContainer, UEODItemContainer* ToContainer)
+{
+	USkillTreeItemContainer* STContainer = Cast<USkillTreeItemContainer>(FromContainer);
+	if (!IsValid(STContainer) || !IsValid(ToContainer) || !ContainersList.Contains(ToContainer) || !(STContainer->SkillGroup == FString("")))
+	{
+		return false;
+	}
+
+	FString SkillGroup = STContainer->SkillGroup;
+
+
+
+	// STContainer->SkillGroup
+
+
+	return true;
+
+	/*
+	this->EODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
+	this->RefreshContainerVisuals();
+
+	USkillBarWidget* SkillBarWidget = Cast<USkillBarWidget>(ParentWidget);
+
+	bResult = true;
+
+	return false;
+	*/
+}
+
+bool USkillBarWidget::OnSkillRemoved(UEODItemContainer* Container)
+{
+	return false;
+}
+
+bool USkillBarWidget::OnSkillsSwapped(UEODItemContainer* Container1, UEODItemContainer* Container2)
+{
+	/*
+	FEODItemInfo TempEODItemInfo = Operation->DraggedEODItemWidget->EODItemInfo;
+
+	Operation->DraggedEODItemWidget->EODItemInfo = this->EODItemInfo;
+	this->EODItemInfo = TempEODItemInfo;
+
+	Operation->DraggedEODItemWidget->RefreshContainerVisuals();
+	this->RefreshContainerVisuals();
+
+	bResult = true;
+	*/
+	return false;
+}
+
+void USkillBarWidget::UpdateSkillBarLayout(TMap<int32, FString>& NewLayout, bool bResize)
+{
+	TArray<int32> NewLayoutKeys;
+	for (int32& Key : NewLayoutKeys)
+	{
+
+	}
 }

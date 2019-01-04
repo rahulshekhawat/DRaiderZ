@@ -17,7 +17,6 @@ bool UDialogueOptionWidget::Initialize()
 		OptionButton->OnClicked.AddDynamic(this, &UDialogueOptionWidget::OnOptionButtonClicked);
 		return true;
 	}
-
 	return false;
 }
 
@@ -55,36 +54,40 @@ void UDialogueOptionWidget::OnOptionButtonClicked()
 
 void UDialogueOptionWidget::HandleNewDialogueEvent()
 {
-	if (OwningDialogueWidget)
+	if (IsValid(ParentDialogueWidget))
 	{
-		OwningDialogueWidget->UpdateDialogueWindow(OptionEventID);
+		ParentDialogueWidget->UpdateDialogueWindow(OptionEventID);
 	}
 }
 
 void UDialogueOptionWidget::HandleExitEvent()
 {
-	if (!OwningDialogueWidget || !OwningDialogueWidget->GetOwningPlayerPawn())
+	/*
+	if (!IsValid(ParentDialogueWidget) || !IsValid(ParentDialogueWidget->GetOwningPlayerPawn()))
 	{
 		return;
 	}
 
-	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(OwningDialogueWidget->GetOwningPlayerPawn());
+	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(ParentDialogueWidget->GetOwningPlayerPawn());
 	if (PlayerChar)
 	{
-		PlayerChar->ExitDialogue(OwningDialogueWidget);
+		PlayerChar->ExitDialogue(ParentDialogueWidget);
 	}
+	*/
 }
 
 void UDialogueOptionWidget::HandleFinishEvent()
 {
-	if (!OwningDialogueWidget || !OwningDialogueWidget->GetOwningPlayerPawn())
+	/*
+	if (!ParentDialogueWidget || !ParentDialogueWidget->GetOwningPlayerPawn())
 	{
 		return;
 	}
 
-	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(OwningDialogueWidget->GetOwningPlayerPawn());
+	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(ParentDialogueWidget->GetOwningPlayerPawn());
 	if (PlayerChar)
 	{
-		PlayerChar->FinishDialogue(OwningDialogueWidget);
+		PlayerChar->FinishDialogue(ParentDialogueWidget);
 	}
+	*/
 }

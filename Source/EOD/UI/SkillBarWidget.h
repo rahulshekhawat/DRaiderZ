@@ -19,7 +19,6 @@ class EOD_API USkillBarWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-
 	USkillBarWidget(const FObjectInitializer& ObjectInitializer);
 
 	bool Initialize() override;
@@ -28,6 +27,7 @@ public:
 
 	virtual void NativeDestruct() override;
 
+public:
 	UPROPERTY(meta = (BindWidget))
 	UEODItemContainer* Skill_1;
 
@@ -108,8 +108,16 @@ public:
 	/** Save current skill bar layout to the current save slot */
 	void SaveSkillBarLayout();
 
-private:
+	/** Called when a new skill is dropped on skill bar from skill tree */
+	bool OnNewSkillDropped(UEODItemContainer* FromContainer, UEODItemContainer* ToContainer);
 
+	bool OnSkillRemoved(UEODItemContainer* Container);
+	
+	bool OnSkillsSwapped(UEODItemContainer* Container1, UEODItemContainer* Container2);
+
+	void UpdateSkillBarLayout(TMap<int32, FString>& NewLayout, bool bResize = false);
+
+private:
 	/** Returns EOD item container at given skill index */
 	inline UEODItemContainer* GetSkillButtonAtIndex(int32 ButtonIndex) const;
 
@@ -118,6 +126,12 @@ private:
 
 	/** Load previously saved skill bar layout from current save slot */
 	void LoadSkillBarLayout();
+
+	TArray<UEODItemContainer*> ContainersList;
+
+	TMap<int32, UEODItemContainer*> IndexToContainerMap;
+
+	void InitiateSkillContainer(UEODItemContainer* Container, int32 SkillBarIndex);
 
 };
 
@@ -218,6 +232,5 @@ inline UEODItemContainer* USkillBarWidget::GetSkillButtonAtIndex(int32 ButtonInd
 
 FORCEINLINE APlayerCharacter* USkillBarWidget::GetOwningEODPlayer() const
 {
-	APlayerCharacter* OwningEODPlayer = Cast<APlayerCharacter>(GetOwningPlayerPawn());
-	return OwningEODPlayer;
+	return Cast<APlayerCharacter>(GetOwningPlayerPawn());
 }

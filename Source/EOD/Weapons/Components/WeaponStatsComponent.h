@@ -14,16 +14,12 @@ class EOD_API UWeaponStatsComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-
-	UWeaponStatsComponent();
-
-protected:
+public:
+	UWeaponStatsComponent(const FObjectInitializer& ObjectInitializer);
 
 	/** Called when the game starts */
 	virtual void BeginPlay() override;
 
-public:	
 	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	

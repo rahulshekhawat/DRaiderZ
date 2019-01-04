@@ -19,7 +19,6 @@ class EOD_API UDialogueWindowWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-
 	UDialogueWindowWidget(const FObjectInitializer& ObjectInitializer);
 
 	bool Initialize() override;
@@ -28,6 +27,7 @@ public:
 
 	virtual void NativeDestruct() override;
 
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	URichTextBlock* DialogueText;
 
@@ -52,9 +52,6 @@ public:
 
 	void AddOption_Implementation(FName OptionID);
 
-	// UFUNCTION(BlueprintCallable, Category = DialogueWidget)
-	// void FocusOnFirstOption();
-
 	FORCEINLINE FName GetDialogueWindowID() const;
 
 	void SimulateSelectedOptionClick();
@@ -63,7 +60,6 @@ public:
 	TArray<UDialogueOptionWidget*> DialogueOptions;
 
 protected:
-
 	UPROPERTY(Transient, BlueprintReadWrite, Category = DialogueWidget)
 	FName CurrentDialogueWindowID;
 

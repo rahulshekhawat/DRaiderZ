@@ -12,7 +12,7 @@
 #define EOD_MESSAGE_LOGGING_ENABLED 1
 #define EOD_SCREEN_MESSAGES_ENABLED 1
 #define EOD_CONSOLE_MESSAGES_ENABLED 1
-#define EOD_DRAWING_DEBUG_SHAPES_ENABLED 1
+#define EOD_DRAWING_DEBUG_SHAPES_ENABLED 0
 
 
 #define SURFACETYPE_FLESH       SurfaceType1
@@ -63,4 +63,3 @@ inline void PrintEverywhere(UObject* WorldContextObject, const FString& Message,
 	UKismetSystemLibrary::PrintString(WorldContextObject, Message, bLogScreen, bLogConsole, FLinearColor((0.0), (0.66), (1.0)), Duration);
 #endif // EOD_MESSAGE_LOGGING_ENABLED
 }
-

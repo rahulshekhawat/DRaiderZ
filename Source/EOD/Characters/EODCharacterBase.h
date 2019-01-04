@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Statics/EODGlobalNames.h"
 #include "EOD/Statics/EODLibrary.h"
 #include "EOD/Statics/CharacterLibrary.h"
 #include "EOD/StatusEffects/StatusEffectBase.h"
@@ -26,7 +28,7 @@ class UCameraComponent;
 class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
-class USkillBarComponent;
+class UGameplaySkillsComponent;
 // class USkillTreeComponent;
 
 /** 
@@ -58,9 +60,6 @@ public:
 
 	/** Updates character state every frame */
 	virtual void Tick(float DeltaTime) override;
-
-	/** Called to bind functionality to input */
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -252,15 +251,15 @@ protected:
 	// COMPONENTS
 	////////////////////////////////////////////////////////////////////////////////
 public:
-	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE USpringArmComponent* GetCameraBoomComponent() const { return CameraBoomComponent; }
 
-	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
+	FORCEINLINE UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 
-	FORCEINLINE USkillBarComponent* GetSkillBarComponent() const { return SkillBarComponent; }
+	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const { return GameplaySkillsComponent; }
 
-	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
+	FORCEINLINE UStatsComponentBase* GetCharacterStatsComponent() const { return CharacterStatsComponent; }
 
-	FORCEINLINE USphereComponent* GetInteractionSphere() const { return InteractionSphere; }
+	FORCEINLINE USphereComponent* GetInteractionSphereComponent() const { return InteractionSphereComponent; }
 
 	FORCEINLINE void EnableInteractionSphere();
 
@@ -269,6 +268,16 @@ public:
 	FORCEINLINE void ZoomInCamera();
 
 	FORCEINLINE void ZoomOutCamera();
+
+	static FName CameraComponentName;
+
+	static FName SpringArmComponentName;
+
+	static FName GameplaySkillsComponentName;
+
+	static FName CharacterStatsComponentName;
+
+	static FName InteractionSphereComponentName;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
@@ -282,26 +291,22 @@ protected:
 
 private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraBoom;
+	USpringArmComponent* CameraBoomComponent;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* Camera;
+	UCameraComponent* CameraComponent;
 
 	/** StatsComp contains and manages the stats info of this character */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStatsComponentBase* StatsComp;
-
-	//~ Skills component - manages skills of character
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkillsComponent* SkillsComponent;
+	UStatsComponentBase* CharacterStatsComponent;
 
 	//~ Skill bar component - manages skill bar (for player controlled character) and skills of character
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkillBarComponent* SkillBarComponent;
+	UGameplaySkillsComponent* GameplaySkillsComponent;
 
 	//~ Sphere component used to detect interactive objects
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USphereComponent* InteractionSphere;
+	USphereComponent* InteractionSphereComponent;
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -320,7 +325,7 @@ public:
 	{
 		SetGuardActive(true);
 		StartBlockingDamage(DamageBlockTriggerDelay);
-		SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetStatsComponent()->GetMovementSpeedModifier());
+		SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetCharacterStatsComponent()->GetMovementSpeedModifier());
 	}
 
 	FORCEINLINE void DeactivateGuard()
@@ -478,6 +483,14 @@ public:
 	FORCEINLINE bool IsBlockKeyPressed() const { return bGuardKeyPressed; }
 
 	FORCEINLINE bool IsNormalAttackKeyPressed()const { return bNormalAttackKeyPressed; }
+
+	virtual void OnPressedForward();
+
+	virtual void OnPressedBackward();
+
+	virtual void OnReleasedForward();
+
+	virtual void OnReleasedBackward();
 
 public:
 	/** Returns true if character is alive */
@@ -764,8 +777,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get Character State"))
 	ECharacterState BP_GetCharacterState() const;
 
-	FORCEINLINE UStatsComponentBase* GetStatsComponent() const;
-
 	/** [server + local] Change character max walk speed */
 	FORCEINLINE void SetWalkSpeed(const float WalkSpeed)
 	{
@@ -1027,6 +1038,16 @@ public:
 	FOnGameplayEventMCDelegate OnLeavingCombat;
 	//~ 
 
+	/** [Local] Display status effect message on player screen */
+	FORCEINLINE void DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
+	{
+		Client_DisplayTextOnPlayerScreen(Message, TextColor, TextPosition);
+	}
+
+	/** Displays status effect text on player screen */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "EOD Character")
+	void CreateAndDisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
+
 protected:
 
 	FTimerHandle TargetSwitchTimerHandle;
@@ -1057,6 +1078,9 @@ private:
 	// DEPRECATED
 	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
+
+	UFUNCTION(Client, Unreliable)
+	void Client_DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
@@ -1206,40 +1230,46 @@ inline float AEODCharacterBase::GetRotationYawFromAxisInput() const
 
 FORCEINLINE void AEODCharacterBase::EnableInteractionSphere()
 {
-	InteractionSphere->Activate();
-	InteractionSphere->SetCollisionProfileName(FName("OverlapAllDynamic"));
+	if (IsValid(InteractionSphereComponent))
+	{
+		InteractionSphereComponent->Activate();
+		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::OverlapAllDynamic);
+	}
 }
 
 FORCEINLINE void AEODCharacterBase::DisableInteractionSphere()
 {
-	InteractionSphere->Deactivate();
-	InteractionSphere->SetCollisionProfileName(FName("NoCollision"));
+	if (IsValid(InteractionSphereComponent))
+	{
+		InteractionSphereComponent->Deactivate();
+		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::NoCollision);
+	}
 }
 
 FORCEINLINE void AEODCharacterBase::ZoomInCamera()
 {
-	if (CameraBoom && CameraBoom->TargetArmLength >= CameraArmMinimumLength)
+	if (IsValid(CameraBoomComponent) && CameraBoomComponent->TargetArmLength >= CameraArmMinimumLength)
 	{
-		CameraBoom->TargetArmLength -= CameraZoomRate;
+		CameraBoomComponent->TargetArmLength -= CameraZoomRate;
 	}
 }
 
 FORCEINLINE void AEODCharacterBase::ZoomOutCamera()
 {
-	if (CameraBoom && CameraBoom->TargetArmLength <= CameraArmMaximumLength)
+	if (IsValid(CameraBoomComponent) && CameraBoomComponent->TargetArmLength <= CameraArmMaximumLength)
 	{
-		CameraBoom->TargetArmLength += CameraZoomRate;
+		CameraBoomComponent->TargetArmLength += CameraZoomRate;
 	}
 }
 
 FORCEINLINE bool AEODCharacterBase::IsAlive() const
 {
-	return StatsComp->GetCurrentHealth() > 0;
+	return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->GetCurrentHealth() > 0 : true;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsDead() const
 {
-	return StatsComp->GetCurrentHealth() <= 0;
+	return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->GetCurrentHealth() <= 0 : false;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsIdle() const
@@ -1289,7 +1319,8 @@ FORCEINLINE bool AEODCharacterBase::IsCastingSpell() const
 
 FORCEINLINE bool AEODCharacterBase::IsNormalAttacking() const
 {
-	return CharacterState == ECharacterState::Attacking && GetCurrentActiveSkillID() != NAME_None;
+	// return CharacterState == ECharacterState::Attacking && GetCurrentActiveSkillID() != NAME_None;
+	return CharacterState == ECharacterState::Attacking;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsUsingAnySkill() const
@@ -1309,37 +1340,61 @@ FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 
 FORCEINLINE bool AEODCharacterBase::CanFlinch() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanStun() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockback() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanFreeze() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
 {
-	return IsAlive() && !StatsComp->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
+	if (IsValid(CharacterStatsComponent))
+	{
+		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
+	}
+	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::NeedsHealing() const
 {
-	return StatsComp->IsLowOnHealth();
+	return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->IsLowOnHealth() : false;
 }
 
 FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
@@ -1352,11 +1407,6 @@ FORCEINLINE ECharacterState AEODCharacterBase::GetCharacterState() const
 	return CharacterState;
 }
 
-FORCEINLINE UStatsComponentBase* AEODCharacterBase::GetStatsComponent() const
-{
-	return StatsComp;
-}
-
 FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 {
 	return Faction;
@@ -1365,12 +1415,10 @@ FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 inline FSkillTableRow* AEODCharacterBase::GetSkill(FName SkillID, const FString& ContextString) const
 {
 	FSkillTableRow* Skill = nullptr;
-
-	if (SkillsDataTable)
+	if (IsValid(SkillsDataTable))
 	{
 		Skill = SkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString);
 	}
-
 	return Skill;
 }
 
@@ -1391,7 +1439,7 @@ FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
 
 inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay)
 {
-	if (GetMesh()->GetAnimInstance())
+	if (IsValid(GetMesh()) && IsValid(GetMesh()->GetAnimInstance()))
 	{
 		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
@@ -1400,12 +1448,11 @@ inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay,
 
 inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
-	if (GetMesh()->GetAnimInstance())
+	if (IsValid(GetMesh()) && IsValid(GetMesh()->GetAnimInstance()))
 	{
 		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
 		CharacterState = NewState;
 	}
-
 	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }

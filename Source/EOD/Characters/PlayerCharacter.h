@@ -101,7 +101,7 @@ public:
 	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
 
 	/** Called to bind functionality to input */
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	// virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	/** Property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -133,8 +133,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	void SavePlayerState();
 
+	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
+
 private:
 	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player face
+
+	//~ Skills component - manages skills of character // DEPRECATED
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkillsComponent* SkillsComponent;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Hair;
@@ -716,14 +722,16 @@ private:
 
 	void OnDodge();
 
-	void OnPressedForward();
+public:
+	virtual void OnPressedForward() override;
 
-	void OnPressedBackward();
+	virtual void OnPressedBackward() override;
 
-	void OnReleasedForward();
+	// virtual void OnReleasedForward() override;
 
-	void OnReleasedBackward();
+	// virtual void OnReleasedBackward() override;
 
+private:
 	/** Sets the boolean used to enable block to true */
 	void OnPressedBlock();
 	
@@ -890,7 +898,7 @@ FORCEINLINE ASecondaryWeapon* APlayerCharacter::GetSecondaryWeapon() const
 
 FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
 {
-	return PrimaryWeapon ? PrimaryWeapon->WeaponType : EWeaponType::None;
+	return PrimaryWeapon ? PrimaryWeapon->GetWeaponType() : EWeaponType::None;
 }
 
 FORCEINLINE UHUDWidget* APlayerCharacter::GetHUDWidget() const
@@ -925,7 +933,7 @@ inline void APlayerCharacter::EnableBlock()
 
 	SetCharacterState(ECharacterState::Blocking);
 	SetUseControllerRotationYaw(true);
-	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetStatsComponent()->GetMovementSpeedModifier());
+	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetCharacterStatsComponent()->GetMovementSpeedModifier());
 
 	// FTimerHandle TimerDelegate;
 	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);
@@ -1023,12 +1031,12 @@ FORCEINLINE bool APlayerCharacter::IsAutoRunning() const
 
 FORCEINLINE bool APlayerCharacter::IsPrimaryWeaponEquippped() const
 {
-	return PrimaryWeaponID != NAME_None && PrimaryWeapon->bEquipped;
+	return PrimaryWeaponID != NAME_None && PrimaryWeapon->IsAttachedToCharacterOwner();
 }
 
 FORCEINLINE bool APlayerCharacter::IsSecondaryWeaponEquipped() const
 {
-	return SecondaryWeaponID != NAME_None && SecondaryWeapon->bEquipped;
+	return SecondaryWeaponID != NAME_None && SecondaryWeapon->IsAttachedToCharacterOwner();
 }
 
 FORCEINLINE bool APlayerCharacter::IsFastRunning() const

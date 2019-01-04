@@ -2,7 +2,7 @@
 
 #include "GameSingleton.h"
 
-UGameSingleton::UGameSingleton(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
+UGameSingleton::UGameSingleton(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 	DefaultSaveSlotName = FString("DefaultSlot");
 	CurrentSaveSlotName = FString("DefaultSlot");

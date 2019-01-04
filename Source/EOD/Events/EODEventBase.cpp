@@ -1,6 +1,6 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "EODEventBase.h"
+#include "EOD/Events/EODEventBase.h"
 
 UEODEventBase::UEODEventBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

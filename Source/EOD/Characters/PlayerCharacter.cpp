@@ -16,7 +16,7 @@
 #include "EOD/Statics/DialogueLibrary.h"
 #include "EOD/Weapons/WeaponDataAsset.h"
 // #include "EOD/Weapons/WeaponSlot.h"
-#include "EOD/Characters/Components/SkillBarComponent.h"
+#include "EOD/Characters/Components/GameplaySkillsComponent.h"
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
 #include "Engine/World.h"
@@ -35,7 +35,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(AEODCharacterBase::CharacterStatsComponentName))
+	// Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -48,6 +49,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 		GetMesh()->AddLocalOffset(FVector(0.f, 0.f, -90.f));
 		GetMesh()->bUseAttachParentBound = true;
 	}
+
+
+	// SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
 
 	// @note : SetMasterPoseComponent() from constructor doesn't work in packaged game (for some weird reason?!)
 
@@ -78,24 +82,23 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 
 }
 
-void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
+/*
+void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	
-	/*
-	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::MoveRight);
-	
-	PlayerInputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &APlayerCharacter::ZoomInCamera);
-	PlayerInputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &APlayerCharacter::ZoomOutCamera);
-	*/
 
 	PlayerInputComponent->BindAction("Forward", IE_Pressed, this, &APlayerCharacter::OnPressedForward);
 	PlayerInputComponent->BindAction("Forward", IE_Released, this, &APlayerCharacter::OnReleasedForward);
 	PlayerInputComponent->BindAction("Backward", IE_Pressed, this, &APlayerCharacter::OnPressedBackward);
 	PlayerInputComponent->BindAction("Backward", IE_Released, this, &APlayerCharacter::OnReleasedBackward);
 
-	/*
+	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::MoveRight);
+	
+	PlayerInputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &APlayerCharacter::ZoomInCamera);
+	PlayerInputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &APlayerCharacter::ZoomOutCamera);
+
+
 	PlayerInputComponent->BindAction("Guard", IE_Pressed, this, &APlayerCharacter::OnPressedBlock);
 	PlayerInputComponent->BindAction("Guard", IE_Released, this, &APlayerCharacter::OnReleasedBlock);
 
@@ -112,9 +115,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("ToggleInventory", IE_Pressed, InventoryComponent, &UInventoryComponent::ToggleInventoryUI);
 	PlayerInputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &APlayerCharacter::OnToggleAutoRun);
 	PlayerInputComponent->BindAction("Escape", IE_Pressed, this, &APlayerCharacter::OnPressedEscape);
-	*/
 
-	/*
+
 	PlayerInputComponent->BindAction("Skill_1", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<1>);
 	PlayerInputComponent->BindAction("Skill_2", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<2>);
 	PlayerInputComponent->BindAction("Skill_3", IE_Pressed, this, &APlayerCharacter::PressedSkillKey<3>);
@@ -156,9 +158,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 	PlayerInputComponent->BindAction("Skill_18", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<18>);
 	PlayerInputComponent->BindAction("Skill_19", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<19>);
 	PlayerInputComponent->BindAction("Skill_20", IE_Released, this, &APlayerCharacter::ReleasedSkillKey<20>);
-	*/
-
 }
+*/
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -173,7 +174,14 @@ void APlayerCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	LoadUnequippedWeaponAnimationReferences();
-	SetWalkSpeed(DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier());
+	if (IsValid(GetCharacterStatsComponent()))
+	{
+		SetWalkSpeed(DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier());
+	}
+	else
+	{
+		SetWalkSpeed(DefaultWalkSpeed);
+	}
 
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Instigator = this;
@@ -278,6 +286,7 @@ void APlayerCharacter::BeginPlay()
 	// Since setting master pose component from constructor doesn't work in packaged game
 	SetMasterPoseComponentForMeshes();
 
+	/*
 	if (Controller && Controller->IsLocalPlayerController() && HUDWidgetClass.Get())
 	{
 		if (HUDWidgetClass.Get())
@@ -289,14 +298,18 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 	}
+	*/
 }
 
 USkeletalMeshComponent* APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer)
 {
 	USkeletalMeshComponent* Sk = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, Name);
-	Sk->SetupAttachment(GetMesh());
-	Sk->SetMasterPoseComponent(GetMesh());
-	Sk->bUseAttachParentBound = true;
+	if (Sk)
+	{
+		Sk->SetupAttachment(GetMesh());
+		Sk->SetMasterPoseComponent(GetMesh());
+		Sk->bUseAttachParentBound = true;
+	}
 	return Sk;
 }
 
@@ -314,10 +327,10 @@ bool APlayerCharacter::CanJump() const
 
 bool APlayerCharacter::CanDodge() const
 {
-	int32 DodgeCost = DodgeStaminaCost * GetStatsComponent()->GetStaminaConsumptionModifier();
+	int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
 
 	// @todo add UsingSkill, Looting, Interacting, etc. to this too
-	if (GetStatsComponent()->GetCurrentStamina() >= DodgeCost &&
+	if (GetCharacterStatsComponent()->GetCurrentStamina() >= DodgeCost &&
 		(IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking()))
 	{
 		return true;
@@ -353,8 +366,8 @@ bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
 	if (Skill)
 	{
 		if ((Skill->SupportedWeapons & (1 << (uint8)GetEquippedWeaponType())) &&
-			GetStatsComponent()->GetCurrentMana() > Skill->ManaRequired &&
-			GetStatsComponent()->GetCurrentStamina() > Skill->StaminaRequired)
+			GetCharacterStatsComponent()->GetCurrentMana() > Skill->ManaRequired &&
+			GetCharacterStatsComponent()->GetCurrentStamina() > Skill->StaminaRequired)
 		{
 			return true;
 		}
@@ -451,7 +464,7 @@ bool APlayerCharacter::CCEFreeze_Implementation(const float Duration)
 
 void APlayerCharacter::CCEUnfreeze_Implementation()
 {
-	CustomTimeDilation = GetStatsComponent()->GetActiveTimeDilation();
+	CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
 }
 
 bool APlayerCharacter::CCEKnockdown_Implementation(const float Duration)
@@ -527,7 +540,7 @@ bool APlayerCharacter::Freeze(const float Duration)
 
 void APlayerCharacter::EndFreeze()
 {
-	CustomTimeDilation = GetStatsComponent()->GetActiveTimeDilation();
+	CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
 }
 
 bool APlayerCharacter::Knockdown(const float Duration)
@@ -685,7 +698,7 @@ void APlayerCharacter::AddSecondaryWeapon(FName WeaponID)
 	// Since secondary weapon is guaranteed to be single handed
 	RemoveSecondaryWeapon();
 	// RemoveSecondaryWeaponFromDataAsset();
-	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->WeaponType))
+	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->GetWeaponType()))
 	{
 		RemovePrimaryWeapon();
 		// RemovePrimaryWeaponFromDataAsset();
@@ -875,14 +888,14 @@ void APlayerCharacter::MoveRight(const float Value)
 
 void APlayerCharacter::ZoomInCamera()
 {
-	if (GetCameraBoom()->TargetArmLength >= CameraArmMinimumLength)
-		GetCameraBoom()->TargetArmLength -= CameraZoomRate;
+	if (GetCameraBoomComponent()->TargetArmLength >= CameraArmMinimumLength)
+		GetCameraBoomComponent()->TargetArmLength -= CameraZoomRate;
 }
 
 void APlayerCharacter::ZoomOutCamera()
 {
-	if (GetCameraBoom()->TargetArmLength <= CameraArmMaximumLength)
-		GetCameraBoom()->TargetArmLength += CameraZoomRate;
+	if (GetCameraBoomComponent()->TargetArmLength <= CameraArmMaximumLength)
+		GetCameraBoomComponent()->TargetArmLength += CameraZoomRate;
 }
 
 /*
@@ -981,8 +994,8 @@ void APlayerCharacter::OnDodge()
 
 	if (CanDodge() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Dodge.Get())
 	{
-		int32 DodgeCost = DodgeStaminaCost * GetStatsComponent()->GetStaminaConsumptionModifier();
-		GetStatsComponent()->ModifyCurrentStamina(-DodgeCost);
+		int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
+		GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 
 		// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
 		// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
@@ -1048,26 +1061,33 @@ void APlayerCharacter::OnDodge()
 
 void APlayerCharacter::OnPressedForward()
 {
-	bBackwardPressed = false;
-	bForwardPressed = true;
-	GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableForwardPressed, 0.1f, false);
+	if (GetWorld())
+	{
+		bBackwardPressed = false;
+		bForwardPressed = true;
+		GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableForwardPressed, 0.1f, false);
+	}
 }
 
 void APlayerCharacter::OnPressedBackward()
 {
-	bForwardPressed = false;
-	bBackwardPressed = true;
-	GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableBackwardPressed, 0.1f, false);
+	if (GetWorld())
+	{
+		bForwardPressed = false;
+		bBackwardPressed = true;
+		GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableBackwardPressed, 0.1f, false);
+	}
 }
 
+/*
 void APlayerCharacter::OnReleasedForward()
 {
-	// GetWorld()->GetTimerManager().SetTimer()
 }
 
 void APlayerCharacter::OnReleasedBackward()
 {
 }
+*/
 
 void APlayerCharacter::OnPressedBlock()
 {
@@ -1317,7 +1337,7 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 	
 	if (ForwardAxisValue < 0)
 	{
-		float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		float Speed = (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1325,7 +1345,7 @@ void APlayerCharacter::UpdateMovement(float DeltaTime)
 	}
 	else
 	{
-		float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+		float Speed = DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1414,7 +1434,7 @@ void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 
 	if (ForwardAxisValue < 0)
 	{
-		float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		float Speed = (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1422,7 +1442,7 @@ void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 	}
 	else
 	{
-		float Speed = DefaultRunSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+		float Speed = DefaultRunSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1468,7 +1488,7 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 		SetCharacterMovementDirection(ECharMovementDirection::F);
 	}
 	
-	float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+	float Speed = DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
 	if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 	{
 		SetWalkSpeed(Speed);
@@ -1508,7 +1528,6 @@ void APlayerCharacter::StopNormalAttack()
 
 void APlayerCharacter::UpdateNormalAttackState(float DeltaTime)
 {
-	/*
 	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
 	{
 		return;
@@ -1519,24 +1538,13 @@ void APlayerCharacter::UpdateNormalAttackState(float DeltaTime)
 	{
 		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(NormalAttackMontage);
 		FName ExpectedNextSection = GetNextNormalAttackSectionName(CurrentSection);
-
 		if (ExpectedNextSection != NAME_None)
 		{
-			FString CurrentSectionString = CurrentSection.ToString();
-			if (CurrentSectionString.EndsWith("End"))
-			{
-				PlayAnimationMontage(NormalAttackMontage, ExpectedNextSection);
-				// PlayAnimationMontage(NormalAttackMontage, ExpectedNextSection, ECharacterState::Attacking);
-			}
-			else
-			{
-				SetNextMontageSection(CurrentSection, ExpectedNextSection);
-				// SetNextMontageSection(CurrentSection, NextSection);
-			}
+			PlayNormalAttackAnimation(CurrentSection, ExpectedNextSection);
 		}
+
 		bNormalAttackSectionChangeAllowed = false;
 	}
-	*/
 }
 
 void APlayerCharacter::Destroyed()
@@ -1648,19 +1656,40 @@ void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSect
 	{
 		return;
 	}
+
 	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
 	if (GetMesh()->GetAnimInstance())
 	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (OldSection == NAME_None)
 		{
-			GetMesh()->GetAnimInstance()->Montage_Play(NormalAttackMontage);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(NewSection, NormalAttackMontage);
-			SetCharacterState(ECharacterState::Attacking);
+			AnimInstance->Montage_Play(NormalAttackMontage);
+			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
 		}
 		else
 		{
-
+			FString OldSectionString = OldSection.ToString();
+			if (OldSectionString.EndsWith("End"))
+			{
+				AnimInstance->Montage_Play(NormalAttackMontage);
+				AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+			}
+			else
+			{
+				FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
+				if (CurrentSection == OldSection)
+				{
+					AnimInstance->Montage_SetNextSection(CurrentSection, NewSection, NormalAttackMontage);
+				}
+				else
+				{
+					AnimInstance->Montage_Play(NormalAttackMontage);
+					AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+				}
+			}
 		}
+
+		SetCharacterState(ECharacterState::Attacking);
 	}
 
 	Server_PlayNormalAttackAnimation(OldSection, NewSection);
@@ -1849,8 +1878,8 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		DisableBlock();
 	}
 
-	GetStatsComponent()->ModifyCurrentMana(-SkillPair.Value->ManaRequired);
-	GetStatsComponent()->ModifyCurrentStamina(-SkillPair.Value->StaminaRequired);
+	GetCharacterStatsComponent()->ModifyCurrentMana(-SkillPair.Value->ManaRequired);
+	GetCharacterStatsComponent()->ModifyCurrentStamina(-SkillPair.Value->StaminaRequired);
 
 	SetCurrentActiveSkillID(SkillPair.Key);
 	SetCurrentActiveSkill(SkillPair.Value);
@@ -1867,7 +1896,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		EndFreeze();
 	}
 
-	GetStatsComponent()->AddCrowdControlImmunitiesFromSkill(SkillPair.Value->CrowdControlImmunities);
+	GetCharacterStatsComponent()->AddCrowdControlImmunitiesFromSkill(SkillPair.Value->CrowdControlImmunities);
 
 	if (bSkillAllowsMovement)
 	{
@@ -2132,9 +2161,9 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	{
 		GetSkillsComponent()->SetOffChainSkillReset();
 
-		if (GetCurrentActiveSkill()->CrowdControlImmunities == GetStatsComponent()->GetCrowdControlImmunitiesFromSkill())
+		if (GetCurrentActiveSkill()->CrowdControlImmunities == GetCharacterStatsComponent()->GetCrowdControlImmunitiesFromSkill())
 		{
-			GetStatsComponent()->RemoveCrowdControlImmunitiesFromSkil();
+			GetCharacterStatsComponent()->RemoveCrowdControlImmunitiesFromSkil();
 		}
 	}
 
@@ -2147,6 +2176,11 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	if (GetActiveAnimationReferences()->Flinch.Get() != AnimMontage)
 	{
 		SetCanUseChainSkill(false);
+	}
+
+	if (IsValid(GetGameplaySkillsComponent()) && IsValid(GetController()) && GetController()->IsLocalPlayerController())
+	{
+		GetGameplaySkillsComponent()->SetCurrentActiveSkill(NAME_None);
 	}
 }
 
@@ -2207,7 +2241,7 @@ void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 
 	// Since secondary weapon is guaranteed to be single handed
 	RemoveSecondaryWeapon();
-	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->WeaponType))
+	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->GetWeaponType()))
 	{
 		RemovePrimaryWeapon();
 	}
@@ -2245,79 +2279,9 @@ void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 	SkillIDString += GetWeaponPrefix();
 	SkillIDString += GetNormalAttackSuffix(SectionName);
 
-	/*
-	if (Gender == ECharacterGender::Male)
+	if (IsValid(GetGameplaySkillsComponent()) && IsValid(GetController()) && GetController()->IsLocalPlayerController())
 	{
-		SkillIDString += FString("M_");
-	}
-	else
-	{
-		SkillIDString += FString("F_");
-	}
-
-	switch (GetEquippedWeaponType())
-	{
-	case EWeaponType::GreatSword:
-		SkillIDString += FString("GS_");
-		break;
-	case EWeaponType::WarHammer:
-		SkillIDString += FString("WH_");
-		break;
-	case EWeaponType::LongSword:
-		SkillIDString += FString("LS_");
-		break;
-	case EWeaponType::Mace:
-		SkillIDString += FString("MC_");
-		break;
-	case EWeaponType::Dagger:
-		SkillIDString += FString("DG_");
-		break;
-	case EWeaponType::Staff:
-		SkillIDString += FString("ST_");
-		break;
-	case EWeaponType::Shield:
-		break;
-	case EWeaponType::None:
-		break;
-	default:
-		break;
-	}
-
-	if (SectionName == UCharacterLibrary::SectionName_FirstSwing)
-	{
-		SkillIDString += FString("1");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_SecondSwing)
-	{
-		SkillIDString += FString("2");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_ThirdSwing)
-	{
-		SkillIDString += FString("3");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_FourthSwing)
-	{
-		SkillIDString += FString("4");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_FifthSwing)
-	{
-		SkillIDString += FString("5");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_BackwardSPSwing)
-	{
-		SkillIDString += FString("BSP");
-	}
-	else if (SectionName == UCharacterLibrary::SectionName_ForwardSPSwing)
-	{
-		SkillIDString += FString("FSP");
-	}
-	*/
-
-	// FName SkillID = FName(*SkillIDString);
-	// SetCurrentActiveSkillID(SkillID);
-	if (GetSkillBarComponent())
-	{
-		GetSkillBarComponent()->SetCurrentActiveSkill(FName(*SkillIDString));
+		GetGameplaySkillsComponent()->SetCurrentActiveSkill(FName(*SkillIDString));
 	}
 
 	// @todo set current active skill
@@ -2351,16 +2315,36 @@ void APlayerCharacter::Multicast_PlayNormalAttackAnimation_Implementation(FName 
 	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
 	if (GetMesh()->GetAnimInstance())
 	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (OldSection == NAME_None)
 		{
-			GetMesh()->GetAnimInstance()->Montage_Play(NormalAttackMontage);
-			GetMesh()->GetAnimInstance()->Montage_JumpToSection(NewSection, NormalAttackMontage);
-			SetCharacterState(ECharacterState::Attacking);
+			AnimInstance->Montage_Play(NormalAttackMontage);
+			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
 		}
 		else
 		{
-
+			FString OldSectionString = OldSection.ToString();
+			if (OldSectionString.EndsWith("End"))
+			{
+				AnimInstance->Montage_Play(NormalAttackMontage);
+				AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+			}
+			else
+			{
+				FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
+				if (CurrentSection == OldSection)
+				{
+					AnimInstance->Montage_SetNextSection(CurrentSection, NewSection, NormalAttackMontage);
+				}
+				else
+				{
+					AnimInstance->Montage_Play(NormalAttackMontage);
+					AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+				}
+			}
 		}
+
+		SetCharacterState(ECharacterState::Attacking);
 	}
 }
 

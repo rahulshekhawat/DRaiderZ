@@ -2,7 +2,7 @@
 
 #include "DragVisualWidget.h"
 
-UDragVisualWidget::UDragVisualWidget(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+UDragVisualWidget::UDragVisualWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 

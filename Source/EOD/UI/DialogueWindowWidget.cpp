@@ -17,7 +17,6 @@
 UDialogueWindowWidget::UDialogueWindowWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	DefaultDialogueText = NSLOCTEXT("eod-namespace", "eng-us", "DEFAULT TEXT\n\n<IF YOU ARE READING THIS THEN ACTUAL DIALOGUE TEXT IS MISSING>");
-
 }
 
 bool UDialogueWindowWidget::Initialize()
@@ -26,7 +25,6 @@ bool UDialogueWindowWidget::Initialize()
 	{
 		return true;
 	}
-
 	return false;
 }
 
@@ -42,8 +40,8 @@ void UDialogueWindowWidget::NativeDestruct()
 
 void UDialogueWindowWidget::UpdateDialogueWindow_Implementation(FName DialogueWindowID)
 {
-	UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-	if (GameSingleton)
+	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
+	if (IsValid(GameSingleton) && IsValid(GameSingleton->DialogueWindowsDataTable))
 	{
 		FDialogueWindow* DialogueWin = GameSingleton->DialogueWindowsDataTable->FindRow<FDialogueWindow>(DialogueWindowID, FString("UpdateDialogueWindow() : Looking for dialogue window row"));
 		if (DialogueWin)
@@ -58,7 +56,7 @@ void UDialogueWindowWidget::UpdateDialogueWindow_Implementation(FName DialogueWi
 				AddOption(OptionID);
 			}
 
-			if (DialogueOptions.Num() > 0)
+			if (DialogueOptions.Num() > 0 && IsValid(DialogueOptions[0]))
 			{
 				DialogueOptions[0]->SetOptionSelected(true);
 			}
@@ -77,46 +75,43 @@ void UDialogueWindowWidget::AddOption_Implementation(FName OptionID)
 		return;
 	}
 
-	UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-	if (GameSingleton)
+	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
+	if (IsValid(GameSingleton) && IsValid(GameSingleton->DialogueOptionsDataTable))
 	{
 		FDialogueOption* DialogueOpt = GameSingleton->DialogueOptionsDataTable->FindRow<FDialogueOption>(OptionID, FString("UDialogueWindowWidget::AddOption() : Searching for dialogue option row"));
 		if (DialogueOpt)
 		{
-			// UDialogueOptionWidget* NewOptionWidget = CreateWidget<UDialogueOptionWidget>(GetGameInstance(), UDialogueOptionWidget::StaticClass());
 			UDialogueOptionWidget* NewOptionWidget = CreateWidget<UDialogueOptionWidget>(GetGameInstance(), DialogueOptionWidgetClass);
-			FText Text = FText::FromString(DialogueOpt->OptionText);
-			NewOptionWidget->OptionText->SetText(Text);
-			NewOptionWidget->SetOptionEventID(DialogueOpt->EventID);
-			NewOptionWidget->SetOptionEventType(DialogueOpt->EventType);
-			NewOptionWidget->SetOwningDialogueWidget(this);
+			if (NewOptionWidget)
+			{
+				FText Text = FText::FromString(DialogueOpt->OptionText);
+				NewOptionWidget->OptionText->SetText(Text);
+				NewOptionWidget->SetOptionEventID(DialogueOpt->EventID);
+				NewOptionWidget->SetOptionEventType(DialogueOpt->EventType);
+				NewOptionWidget->SetOwningDialogueWidget(this);
 
-			UVerticalBoxSlot* VBSlot = VertiBox->AddChildToVerticalBox(NewOptionWidget);
-			FMargin SlotPadding = FMargin(0.f, 10.f, 0.f, 0.f);
-			VBSlot->SetPadding(SlotPadding);
+				UVerticalBoxSlot* VBSlot = VertiBox ? VertiBox->AddChildToVerticalBox(NewOptionWidget) : nullptr;
+				if (VBSlot)
+				{
+					FMargin SlotPadding = FMargin(0.f, 10.f, 0.f, 0.f);
+					VBSlot->SetPadding(SlotPadding);
+				}
 
-			DialogueOptions.Add(NewOptionWidget);
+				DialogueOptions.Add(NewOptionWidget);
+			}
 		}
 	}
 }
 
-/*
-void UDialogueWindowWidget::FocusOnFirstOption()
-{
-	if (DialogueOptions.Num() > 0)
-	{
-		DialogueOptions[0]->OptionButton->SetKeyboardFocus();
-	}
-}
-*/
-
 void UDialogueWindowWidget::CleanupOptions_Implementation()
 {
-	for (UDialogueOptionWidget* OptionWidget : DialogueOptions)
+	if (IsValid(VertiBox))
 	{
-		VertiBox->RemoveChild(OptionWidget);
+		for (UDialogueOptionWidget* OptionWidget : DialogueOptions)
+		{
+			VertiBox->RemoveChild(OptionWidget);
+		}
 	}
-
 	DialogueOptions.Empty();
 }
 
@@ -125,14 +120,13 @@ void UDialogueWindowWidget::SimulateSelectedOptionClick()
 	UDialogueOptionWidget* OptionWidget = nullptr;
 	for (UDialogueOptionWidget* DialogueOption : DialogueOptions)
 	{
-		if (DialogueOption->IsOptionSelected())
+		if (IsValid(DialogueOption) && DialogueOption->IsOptionSelected())
 		{
 			OptionWidget = DialogueOption;
 			break;
 		}
 	}
-
-	if (OptionWidget)
+	if (IsValid(OptionWidget) && IsValid(OptionWidget->OptionButton))
 	{
 		OptionWidget->OptionButton->OnClicked.Broadcast();
 	}

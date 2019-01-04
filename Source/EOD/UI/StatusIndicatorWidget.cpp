@@ -2,7 +2,7 @@
 
 #include "StatusIndicatorWidget.h"
 
-UStatusIndicatorWidget::UStatusIndicatorWidget(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+UStatusIndicatorWidget::UStatusIndicatorWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 

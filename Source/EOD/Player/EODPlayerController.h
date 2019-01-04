@@ -57,34 +57,24 @@ private:
 public:
 	FORCEINLINE AEODCharacterBase* GetEODCharacter() const { return EODCharacter; }
 
+	void LoadPlayerState();
+
 	////////////////////////////////////////////////////////////////////////////////
 	// COMPONENTS
 	////////////////////////////////////////////////////////////////////////////////
 public:
-	FORCEINLINE UStatsComponentBase* GetStatsComponent() const;
-
 	FORCEINLINE UInventoryComponent* GetInventoryComponent() const;
 
-	FORCEINLINE USkillsComponent* GetSkillsComponent() const;
-
 	FORCEINLINE USkillTreeComponent* GetSkillTreeComponent() const { return SkillTreeComponent; }
+
+	static FName InventoryComponentName;
+	
+	static FName SkillTreeComponentName;
 
 private:
 	//~ Inventory component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInventoryComponent* InventoryComponent;
-
-	//~ StatsComp contains and manages the stats of player
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStatsComponentBase* StatsComponent;
-
-	/** Primary skills component manages the skills of player's primary character */
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkillsComponent* PrimarySkillsComponent;
-
-	/** Skills component manages the skills of any character possessed by player controller that is not the primary pawn */
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkillsComponent* SkillsComponent;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillTreeComponent* SkillTreeComponent;
@@ -148,7 +138,15 @@ public:
 	void TogglePlayerInventoryUI();
 
 private:
-	UPROPERTY(Replicated)
+	void OnPressedForward();
+
+	void OnReleasedForward();
+
+	void OnPressedBackward();
+
+	void OnReleasedBackward();
+
+	// UPROPERTY(Replicated)
 	bool bAutoMoveEnabled;
 
 	FORCEINLINE bool IsAutoMoveEnabled() const;
@@ -231,30 +229,24 @@ private:
 	// NETWORK
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetAutoMoveEnabled(bool bValue);
+	UFUNCTION(Client, Reliable)
+	void Client_SetupLocalPlayerOnPossess(APawn* InPawn);
+
+	UFUNCTION(Client, Reliable)
+	void Client_SetupLocalPlayerOnUnpossess(APawn* InPawn);
 
 };
-
-FORCEINLINE UStatsComponentBase* AEODPlayerController::GetStatsComponent() const
-{
-	return StatsComponent;
-}
 
 FORCEINLINE UInventoryComponent* AEODPlayerController::GetInventoryComponent() const
 {
 	return InventoryComponent;
 }
 
-FORCEINLINE USkillsComponent* AEODPlayerController::GetSkillsComponent() const
-{
-	return SkillsComponent ? SkillsComponent : PrimarySkillsComponent;
-}
-
 FORCEINLINE void AEODPlayerController::SwitchToUIInput()
 {
 	bShowMouseCursor = true;
 	FInputModeGameAndUI GameAndUIInputMode;
+	GameAndUIInputMode.SetHideCursorDuringCapture(false);
 	GameAndUIInputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
 	SetInputMode(GameAndUIInputMode);
 }
@@ -275,10 +267,6 @@ FORCEINLINE bool AEODPlayerController::IsAutoMoveEnabled() const
 FORCEINLINE void AEODPlayerController::SetAutoMoveEnabled(bool bValue)
 {
 	bAutoMoveEnabled = bValue;
-	if (Role < ROLE_Authority)
-	{
-		Server_SetAutoMoveEnabled(bValue);
-	}
 }
 
 FORCEINLINE void AEODPlayerController::EnableAutoMove()

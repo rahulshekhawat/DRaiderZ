@@ -1,7 +1,6 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
-#include "EOD/Core/EODPreprocessors.h"
 
 #include "UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"
@@ -12,6 +11,11 @@
 UEODCharacterMovementComponent::UEODCharacterMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	RotationRate = FRotator(0.f, 600.f, 0.f);
+}
+
+void UEODCharacterMovementComponent::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 void UEODCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -94,6 +98,17 @@ void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 		DesiredRotation.DiagnosticCheckNaN(TEXT("EODCharacterMovementComponent::PhysicsRotation(): DesiredRotation"));
 		MoveUpdatedComponent(FVector::ZeroVector, DesiredRotation, /*bSweep*/ false);
 	}
+}
+
+void UEODCharacterMovementComponent::ServerMoveDual_Implementation(float TimeStamp0, FVector_NetQuantize10 InAccel0, uint8 PendingFlags, uint32 View0, float TimeStamp, FVector_NetQuantize10 InAccel, FVector_NetQuantize100 ClientLoc, uint8 NewFlags, uint8 ClientRoll, uint32 View, UPrimitiveComponent * ClientMovementBase, FName ClientBaseBoneName, uint8 ClientMovementMode)
+{
+	ServerMove_Implementation(TimeStamp0, InAccel0, FVector(1.f, 2.f, 3.f), PendingFlags, ClientRoll, View0, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
+	// Prevents anim notifies from being dropped from server
+	if (CharacterOwner)
+	{
+		CharacterOwner->GetMesh()->ConditionallyDispatchQueuedAnimEvents();
+	}
+	ServerMove_Implementation(TimeStamp, InAccel, ClientLoc, NewFlags, ClientRoll, View, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
 }
 
 void UEODCharacterMovementComponent::DoInstantRotation(float InstantRotationYaw)

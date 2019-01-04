@@ -1,43 +1,64 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EOD/Characters/EODCharacterBase.h"
-#include "EOD/Core/EODPreprocessors.h"
 #include "EOD/AnimInstances/CharAnimInstance.h"
 #include "EOD/Interactives/InteractionInterface.h"
 #include "EOD/Statics/EODBlueprintFunctionLibrary.h"
-#include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 #include "EOD/Player/EODPlayerController.h"
 #include "EOD/AI/EODAIControllerBase.h"
 #include "EOD/Characters/Components/SkillsComponent.h"
 #include "EOD/Characters/Components/StatsComponentBase.h"
-#include "EOD/Characters/Components/SkillBarComponent.h"
+#include "EOD/Characters/Components/GameplaySkillsComponent.h"
+#include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
 #include "UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 
+
+FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
+FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
+FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
+FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Gameplay Skills"));
+FName AEODCharacterBase::InteractionSphereComponentName(TEXT("Interaction Sphere"));
 
 AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UEODCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	CharacterStatsComponent = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, AEODCharacterBase::CharacterStatsComponentName);
+	GameplaySkillsComponent = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, AEODCharacterBase::GameplaySkillsComponentName);
+
+	CameraBoomComponent = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, AEODCharacterBase::SpringArmComponentName);
+	if (CameraBoomComponent)
+	{
+		CameraBoomComponent->bUsePawnControlRotation = true;
+		CameraBoomComponent->SetupAttachment(RootComponent);
+		CameraBoomComponent->AddLocalOffset(FVector(0.f, 0.f, 60.f));
+	}
+
+	CameraComponent = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, AEODCharacterBase::CameraComponentName);
+	if (CameraComponent)
+	{
+		CameraComponent->SetupAttachment(CameraBoomComponent, USpringArmComponent::SocketName);
+	}
+
+	InteractionSphereComponent = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, AEODCharacterBase::InteractionSphereComponentName);
+	if (InteractionSphereComponent)
+	{
+		InteractionSphereComponent->SetupAttachment(RootComponent);
+		InteractionSphereComponent->SetSphereRadius(150.f);
+		// No need to enable interaction sphere unless the character is possessed by player controller
+		InteractionSphereComponent->Deactivate();
+		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::NoCollision);
+	}
+
 	SetReplicates(true);
 	SetReplicateMovement(true);
-	GetCharacterMovement()->SetIsReplicated(true);
-
-	// Initialize Stats Component
-	StatsComp = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, FName("Character Stats Component"));
-	SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
-	SkillBarComponent = ObjectInitializer.CreateDefaultSubobject<USkillBarComponent>(this, FName("Skill Bar Component"));
-
-	CameraBoom = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, FName("Camera Boom"));
-	CameraBoom->bUsePawnControlRotation = true;
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->AddLocalOffset(FVector(0.f, 0.f, 60.f));
-
-	Camera = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, FName("Camera"));
-	Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->SetIsReplicated(true);
+	}
 
 	CameraZoomRate = 15;
 	CameraArmMinimumLength = 50;
@@ -46,13 +67,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	DefaultWalkSpeed = 400.f;
 	DefaultRunSpeed = 600.f;
 	DefaultWalkSpeedWhileBlocking = 150.f;
-
-	InteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, FName("Interaction Sphere"));
-	InteractionSphere->SetupAttachment(RootComponent);
-	InteractionSphere->SetSphereRadius(150.f);
-
-	// No need to enable interaction sphere unless the character is possessed by player controller
-	DisableInteractionSphere();
 
 	// Initialize variables
 	CharacterState = ECharacterState::IdleWalkRun;
@@ -74,7 +88,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 void AEODCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		// If block key is pressed but the character is not blocking
@@ -97,6 +110,11 @@ void AEODCharacterBase::Tick(float DeltaTime)
 			UpdateNormalAttackState(DeltaTime);
 		}
 
+		if (GetCharacterMovement()->IsFalling() && bCharacterStateAllowsMovement)
+		{
+			SetCharacterStateAllowsMovement(false);
+		}
+
 		// If the character is either idle or moving, or is in a state that allows movement except guard
 		if (IsIdleOrMoving() || (bCharacterStateAllowsMovement && !IsGuardActive()))
 		{
@@ -110,12 +128,6 @@ void AEODCharacterBase::Tick(float DeltaTime)
 			UpdateGuardState(DeltaTime);
 		}
 	}
-}
-
-void AEODCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -477,7 +489,7 @@ void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* Insti
 	else
 	{
 		// Set current hp to 0
-		StatsComp->ModifyBaseHealth(-StatsComp->GetMaxHealth());
+		GetCharacterStatsComponent()->ModifyBaseHealth(-GetCharacterStatsComponent()->GetMaxHealth());
 		SetCharacterState(ECharacterState::Dead);
 
 		// @todo play death animation and death sound
@@ -523,6 +535,14 @@ void AEODCharacterBase::OnRep_GuardActive()
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
 	//~ @todo : Cleanup old state
+}
+
+void AEODCharacterBase::Client_DisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
+{
+	if (IsPlayerControlled())
+	{
+		CreateAndDisplayTextOnPlayerScreen(Message, TextColor, TextPosition);
+	}
 }
 
 void AEODCharacterBase::Server_StopBlockingDamage_Implementation()
@@ -735,11 +755,30 @@ void AEODCharacterBase::UpdateDesiredYawFromAxisInput()
 	}
 }
 
+void AEODCharacterBase::OnPressedForward()
+{
+}
+
+void AEODCharacterBase::OnPressedBackward()
+{
+}
+
+void AEODCharacterBase::OnReleasedForward()
+{
+}
+
+void AEODCharacterBase::OnReleasedBackward()
+{
+}
+
+
 void AEODCharacterBase::UpdateMovementState(float DeltaTime)
 {
 	if (ForwardAxisValue < 0)
 	{
-		float Speed = (DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		float Speed = IsValid(GetCharacterStatsComponent()) ? (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier()) * 5 / 16 : DefaultWalkSpeed * 5 / 16;
+
+		// float Speed = (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -747,7 +786,8 @@ void AEODCharacterBase::UpdateMovementState(float DeltaTime)
 	}
 	else
 	{
-		float Speed = DefaultWalkSpeed * GetStatsComponent()->GetMovementSpeedModifier();
+		float Speed = IsValid(GetCharacterStatsComponent()) ? DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() : DefaultWalkSpeed;
+		// float Speed = DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);

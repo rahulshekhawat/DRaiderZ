@@ -61,17 +61,14 @@ UCharacterLibrary::UCharacterLibrary(const FObjectInitializer& ObjectInitializer
 FSkillTableRow* UCharacterLibrary::GetPlayerSkill(const FName SkillID, const FString& ContextString)
 {
 	FSkillTableRow* Skill = nullptr;
-
 	if (GEngine)
 	{
 		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-
-		if (GameSingleton && GameSingleton->PlayerSkillsDataTable)
+		if (IsValid(GameSingleton) && IsValid(GameSingleton->PlayerSkillsDataTable))
 		{
 			Skill = GameSingleton->PlayerSkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString);
 		}
 	}
-
 	return Skill;
 }
 

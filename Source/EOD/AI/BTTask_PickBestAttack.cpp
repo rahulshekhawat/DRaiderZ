@@ -9,28 +9,28 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 
 
-UBTTask_PickBestAttack::UBTTask_PickBestAttack(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+UBTTask_PickBestAttack::UBTTask_PickBestAttack(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
     NodeName = "Pick Best Attack";
     bNotifyTick = false;
 }
 
-EBTNodeResult::Type UBTTask_PickBestAttack::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
+EBTNodeResult::Type UBTTask_PickBestAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-    AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
-    AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
+	//~ @note The owner of 'OwnerComp' is a controller (not pawn)
+	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
+	AEODCharacterBase* CharacterOwner = IsValid(AIController) ? Cast<AEODCharacterBase>(AIController->GetPawn()) : nullptr;
+	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
 
-	if (OwningCharacter == nullptr)
+	if (!IsValid(CharacterOwner) || !IsValid(BlackboardComp))
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	UObject* KeyValue = OwnerComp.GetBlackboardComponent()->GetValueAsObject(UAILibrary::BBKey_TargetEnemy);
-	AEODCharacterBase* TargetCharacter = Cast<AEODCharacterBase>(KeyValue);
+	AEODCharacterBase* TargetCharacter = Cast<AEODCharacterBase>(BlackboardComp->GetValueAsObject(UAILibrary::BBKey_TargetEnemy));
 
-	FName MostWeightedSkillID = OwningCharacter->GetMostWeightedMeleeSkillID(TargetCharacter);
-	OwnerComp.GetBlackboardComponent()->SetValueAsName(UAILibrary::BBKey_MostWeightedSkillID, MostWeightedSkillID);
-
+	FName MostWeightedSkillID = CharacterOwner->GetMostWeightedMeleeSkillID(TargetCharacter);
+	BlackboardComp->SetValueAsName(UAILibrary::BBKey_MostWeightedSkillID, MostWeightedSkillID);
 	if (MostWeightedSkillID == NAME_None)
 	{
 		return EBTNodeResult::Failed;
@@ -41,12 +41,12 @@ EBTNodeResult::Type UBTTask_PickBestAttack::ExecuteTask(UBehaviorTreeComponent &
 	}
 }
 
-void UBTTask_PickBestAttack::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
+void UBTTask_PickBestAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
     Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 }
 
-EBTNodeResult::Type UBTTask_PickBestAttack::AbortTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
+EBTNodeResult::Type UBTTask_PickBestAttack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	return EBTNodeResult::Aborted;
 }

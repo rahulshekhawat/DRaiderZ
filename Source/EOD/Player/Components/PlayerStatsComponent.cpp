@@ -1,9 +1,9 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "PlayerStatsComponent.h"
-#include "EOD/Characters/PlayerCharacter.h"
+#include "EOD/Player/Components/PlayerStatsComponent.h"
 #include "EOD/UI/HUDWidget.h"
 #include "EOD/UI/StatusIndicatorWidget.h"
+#include "EOD/Characters/PlayerCharacter.h"
 
 #include "UnrealNetwork.h"
 #include "Components/ProgressBar.h"
@@ -11,9 +11,6 @@
 
 UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
-	// AddCrowdControlImmunity(ECrowdControlEffect::Crystalized);
-	// RemoveCrowdControlImmunity(ECrowdControlEffect::Crystalized);
-
 	MovementSpeedModifier			= 1.f;
 	StaminaConsumptionModifier		= 1.f;
 
@@ -35,9 +32,6 @@ UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectIni
 void UPlayerStatsComponent::PostInitProperties()
 {
 	Super::PostInitProperties();
-
-
-	
 }
 
 void UPlayerStatsComponent::BeginPlay()
@@ -46,20 +40,7 @@ void UPlayerStatsComponent::BeginPlay()
 
 	InitializeComponentWidget();
 
-	/*
-	//~ Initialize current variables
-	SetMaxHealth(BaseHealth);
-	SetCurrentHealth(BaseHealth);
-	
-	SetMaxMana(BaseMana);
-	SetCurrentMana(BaseMana);
-
-	SetMaxStamina(BaseStamina);
-	SetCurrentStamina(BaseStamina);
-	*/
-
 	// @todo load damage and resistance stats
-
 	ActivateHealthRegeneration();
 	ActivateManaRegeneration();
 	ActivateStaminaRegeneration();

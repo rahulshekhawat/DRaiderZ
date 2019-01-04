@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "EOD/Core/EODSaveGame.h"
 #include "EOD/Core/GameSingleton.h"
 #include "EOD/UI/EODItemContainer.h"
 #include "EOD/Statics/CharacterLibrary.h"
 
-#include "Components/TextBlock.h"
 #include "Engine/Engine.h"
+#include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "SkillTreeItemContainer.generated.h"
 
@@ -23,7 +22,6 @@ class EOD_API USkillTreeItemContainer : public UEODItemContainer
 	GENERATED_BODY()
 	
 public:
-
 	USkillTreeItemContainer(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
@@ -32,6 +30,7 @@ public:
 
 	virtual void NativeDestruct() override;
 
+public:
 	/**
 	 * Determines the skill group this skill belongs to
 	 * For a skill with SkillID 'BZ1_1', it's skill group is 'BZ1'
@@ -61,18 +60,16 @@ public:
 
 	/** Refresh and update the displayed visuals of this container */
 	virtual void RefreshContainerVisuals() override;
-	
-private:
 
+	void LoadSkillIcon();
+
+private:
 	inline void UpdateSkillUpgradeText();
 
 	/** Load previously saved skill state from current save slot */
 	inline void LoadSkillContainerState();
 
 	inline void LoadEODItemInfo();
-
-
-	
 
 };
 
@@ -81,7 +78,10 @@ inline void USkillTreeItemContainer::UpdateSkillUpgradeText()
 	FString String;
 	String = FString::FromInt(SkillState.CurrentUpgradeLevel) + FString("/") + FString::FromInt(SkillState.MaxUpgradeLevel);
 	FText Text = FText::FromString(String);
-	SkillUpgradeText->SetText(Text);
+	if (IsValid(SkillUpgradeText))
+	{
+		SkillUpgradeText->SetText(Text);
+	}
 }
 
 inline void USkillTreeItemContainer::LoadSkillContainerState()
@@ -91,19 +91,14 @@ inline void USkillTreeItemContainer::LoadSkillContainerState()
 		return;
 	}
 
-	UGameSingleton* GameSingleton = nullptr;
-	if (GEngine)
-	{
-		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-	}
-
-	if (!GameSingleton)
+	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
+	if (!IsValid(GameSingleton))
 	{
 		return;
 	}
 
 	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex));
-	if (!EODSaveGame)
+	if (!IsValid(EODSaveGame))
 	{
 		return;
 	}

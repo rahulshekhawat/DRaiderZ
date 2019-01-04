@@ -8,17 +8,13 @@
 ANPCBase::ANPCBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// If camera is attached to spring arm, it may get blocked in ways that is not intended during player interaction.
-	GetCamera()->SetupAttachment(RootComponent);
-	GetCamera()->AddLocalRotation(FRotator(0.f, 180.f, 0.f));
-	GetCamera()->SetWorldLocation(FVector(300.f, 0.f, -25.f));
+	if (GetCameraComponent())
+	{
+		GetCameraComponent()->SetupAttachment(RootComponent);
+		GetCameraComponent()->AddLocalRotation(FRotator(0.f, 180.f, 0.f));
+		GetCameraComponent()->SetWorldLocation(FVector(300.f, 0.f, -25.f));
+	}
 }
-
-/*
-void ANPCBase::OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget)
-{
-	UKismetSystemLibrary::PrintString(this, FString("On interaction called from interface of ANPCBase"));
-}
-*/
 
 void ANPCBase::OnInteract_Implementation(AEODCharacterBase* Character)
 {
@@ -26,10 +22,16 @@ void ANPCBase::OnInteract_Implementation(AEODCharacterBase* Character)
 
 void ANPCBase::EnableCustomDepth_Implementation()
 {
-	GetMesh()->SetRenderCustomDepth(true);
+	if (IsValid(GetMesh()))
+	{
+		GetMesh()->SetRenderCustomDepth(true);
+	}
 }
 
 void ANPCBase::DisableCustomDepth_Implementation()
 {
-	GetMesh()->SetRenderCustomDepth(false);
+	if (IsValid(GetMesh()))
+	{
+		GetMesh()->SetRenderCustomDepth(false);
+	}
 }

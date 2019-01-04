@@ -9,7 +9,7 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Rotator.h"
 
-UBTTask_EODRotateToFaceBBEntry::UBTTask_EODRotateToFaceBBEntry(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+UBTTask_EODRotateToFaceBBEntry::UBTTask_EODRotateToFaceBBEntry(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	NodeName = "EOD Rotate to face BB entry";
 	bNotifyTick = true;
@@ -20,32 +20,28 @@ UBTTask_EODRotateToFaceBBEntry::UBTTask_EODRotateToFaceBBEntry(const FObjectInit
 	BlackboardKey.AddRotatorFilter(this, GET_MEMBER_NAME_CHECKED(UBTTask_EODRotateToFaceBBEntry, BlackboardKey));
 }
 
-EBTNodeResult::Type UBTTask_EODRotateToFaceBBEntry::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
+EBTNodeResult::Type UBTTask_EODRotateToFaceBBEntry::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	//~ @note The owner of 'OwnerComp' is a controller (not pawn)
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
-	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
+	AEODCharacterBase* CharacterOwner = IsValid(AIController) ? Cast<AEODCharacterBase>(AIController->GetPawn()) : nullptr;
+	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
 
-	// @note if AIController is NULL, the previous line will lead to a crash. Kinda dumb to test for NULL after using it.
-	if (AIController == nullptr || OwningCharacter == nullptr)
+	if (!IsValid(CharacterOwner) || !IsValid(BlackboardComp))
 	{
 		return EBTNodeResult::Failed;
 	}
 
 	EBTNodeResult::Type Result = EBTNodeResult::Failed;
-	FVector OwnerLocation = OwningCharacter->GetActorLocation();
-	// const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
-
+	FVector OwnerLocation = CharacterOwner->GetActorLocation();
 	if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
 	{
-		UObject* KeyValue = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
-		AActor* ActorValue = Cast<AActor>(KeyValue);
-
-		if (ActorValue != nullptr)
+		AActor* ActorValue = Cast<AActor>(BlackboardComp->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID()));
+		if (IsValid( ActorValue))
 		{
 			FVector OrientationVector = ActorValue->GetActorLocation() - OwnerLocation;
 			FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
-
-			bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(OrientationRotator.Yaw, 0.f, Precision);
+			bool bResult = CharacterOwner->DeltaRotateCharacterToDesiredYaw(OrientationRotator.Yaw, 0.f, Precision);
 			if (bResult)
 			{
 				return EBTNodeResult::Succeeded;
@@ -58,12 +54,11 @@ EBTNodeResult::Type UBTTask_EODRotateToFaceBBEntry::ExecuteTask(UBehaviorTreeCom
 	}
 	else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
 	{
-		const FVector KeyValue = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID());
+		const FVector KeyValue = BlackboardComp->GetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID());
 
 		FVector OrientationVector = KeyValue - OwnerLocation;
 		FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
-
-		bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(OrientationRotator.Yaw, 0.f, Precision);
+		bool bResult = CharacterOwner->DeltaRotateCharacterToDesiredYaw(OrientationRotator.Yaw, 0.f, Precision);
 		if (bResult)
 		{
 			return EBTNodeResult::Succeeded;
@@ -75,9 +70,9 @@ EBTNodeResult::Type UBTTask_EODRotateToFaceBBEntry::ExecuteTask(UBehaviorTreeCom
 	}
 	else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Rotator::StaticClass())
 	{
-		const FRotator KeyValue = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Rotator>(BlackboardKey.GetSelectedKeyID());
+		const FRotator KeyValue = BlackboardComp->GetValue<UBlackboardKeyType_Rotator>(BlackboardKey.GetSelectedKeyID());
 
-		bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(KeyValue.Yaw, 0.f, Precision);
+		bool bResult = CharacterOwner->DeltaRotateCharacterToDesiredYaw(KeyValue.Yaw, 0.f, Precision);
 		if (bResult)
 		{
 			return EBTNodeResult::Succeeded;
@@ -87,34 +82,31 @@ EBTNodeResult::Type UBTTask_EODRotateToFaceBBEntry::ExecuteTask(UBehaviorTreeCom
 			return EBTNodeResult::InProgress;
 		}
 	}
-	
 	return Result;
 }
 
-void UBTTask_EODRotateToFaceBBEntry::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
+void UBTTask_EODRotateToFaceBBEntry::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	//~ @note The owner of 'OwnerComp' is a controller (not pawn)
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
-	AEODCharacterBase* OwningCharacter = Cast<AEODCharacterBase>(AIController->GetPawn());
+	AEODCharacterBase* CharacterOwner = IsValid(AIController) ? Cast<AEODCharacterBase>(AIController->GetPawn()) : nullptr;
+	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
 
-	if (AIController == nullptr || OwningCharacter == nullptr)
+	if (!IsValid(CharacterOwner) || !IsValid(BlackboardComp))
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}
 
-	FVector OwnerLocation = OwningCharacter->GetActorLocation();
-	// const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
-
+	FVector OwnerLocation = CharacterOwner->GetActorLocation();
 	if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
 	{
-		UObject* KeyValue = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
-		AActor* ActorValue = Cast<AActor>(KeyValue);
+		AActor* ActorValue = Cast<AActor>(BlackboardComp->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID()));
 
-		if (ActorValue != nullptr)
+		if (IsValid(ActorValue))
 		{
 			FVector OrientationVector = ActorValue->GetActorLocation() - OwnerLocation;
 			FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
-
-			bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(OrientationRotator.Yaw, DeltaSeconds, Precision);
+			bool bResult = CharacterOwner->DeltaRotateCharacterToDesiredYaw(OrientationRotator.Yaw, DeltaSeconds, Precision);
 			if (bResult)
 			{
 				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
@@ -123,12 +115,11 @@ void UBTTask_EODRotateToFaceBBEntry::TickTask(UBehaviorTreeComponent & OwnerComp
 	}
 	else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
 	{
-		const FVector KeyValue = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID());
+		const FVector KeyValue = BlackboardComp->GetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID());
 
 		FVector OrientationVector = KeyValue - OwnerLocation;
 		FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
-
-		bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(OrientationRotator.Yaw, DeltaSeconds, Precision);
+		bool bResult = CharacterOwner->DeltaRotateCharacterToDesiredYaw(OrientationRotator.Yaw, DeltaSeconds, Precision);
 		if (bResult)
 		{
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
@@ -136,9 +127,8 @@ void UBTTask_EODRotateToFaceBBEntry::TickTask(UBehaviorTreeComponent & OwnerComp
 	}
 	else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Rotator::StaticClass())
 	{
-		const FRotator KeyValue = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Rotator>(BlackboardKey.GetSelectedKeyID());
-
-		bool bResult = OwningCharacter->DeltaRotateCharacterToDesiredYaw(KeyValue.Yaw, DeltaSeconds, Precision);
+		const FRotator KeyValue = BlackboardComp->GetValue<UBlackboardKeyType_Rotator>(BlackboardKey.GetSelectedKeyID());
+		bool bResult = CharacterOwner->DeltaRotateCharacterToDesiredYaw(KeyValue.Yaw, DeltaSeconds, Precision);
 		if (bResult)
 		{
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
@@ -146,7 +136,7 @@ void UBTTask_EODRotateToFaceBBEntry::TickTask(UBehaviorTreeComponent & OwnerComp
 	}
 }
 
-EBTNodeResult::Type UBTTask_EODRotateToFaceBBEntry::AbortTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
+EBTNodeResult::Type UBTTask_EODRotateToFaceBBEntry::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	return EBTNodeResult::Aborted;
 }

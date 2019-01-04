@@ -18,7 +18,6 @@ class EOD_API ACombatZoneModeBase : public AEODGameModeBase
 	GENERATED_BODY()
 	
 public:
-
 	ACombatZoneModeBase(const FObjectInitializer& ObjectInitializer);
 
 	/** Used to spawn combat and status effect manager actors */
@@ -30,7 +29,6 @@ public:
 	ACombatManager* BP_GetCombatManager() const;
 
 private:
-
 	UPROPERTY(Transient)
 	ACombatManager* CombatManager;
 

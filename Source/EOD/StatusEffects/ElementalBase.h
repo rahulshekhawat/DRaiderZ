@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StatusEffects/StatusEffectBase.h"
+#include "EOD/StatusEffects/StatusEffectBase.h"
 #include "ElementalBase.generated.h"
 
 class AActor;

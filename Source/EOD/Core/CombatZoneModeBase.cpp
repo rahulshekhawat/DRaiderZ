@@ -14,17 +14,16 @@ void ACombatZoneModeBase::InitGame(const FString& MapName, const FString& Option
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
-	UWorld* World = GetWorld();
+	if (IsValid(GetWorld()))
+	{
+		// @todo Spawn combat and status effect manager only on server
 
-	// @todo Spawn combat and status effect manager only on server
-
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.Instigator = Instigator;
-	// We don't want status effects manager or combat manager to be saved into map
-	SpawnInfo.ObjectFlags |= RF_Transient;
-
-    CombatManager = World->SpawnActor<ACombatManager>(CombatManagerClass, SpawnInfo);
-
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.Instigator = Instigator;
+		// We don't want status effects manager or combat manager to be saved into map
+		SpawnInfo.ObjectFlags |= RF_Transient;
+		CombatManager = GetWorld()->SpawnActor<ACombatManager>(CombatManagerClass, SpawnInfo);
+	}
 }
 
 ACombatManager * ACombatZoneModeBase::BP_GetCombatManager() const

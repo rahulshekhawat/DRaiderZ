@@ -17,7 +17,6 @@ class EOD_API AEODGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
-	
 	AEODGameModeBase(const FObjectInitializer& ObjectInitializer);
 
 	/** Used to spawn combat and status effect manager actors */
@@ -29,7 +28,6 @@ public:
 	AStatusEffectsManager* BP_GetStatusEffectsManager() const;
 
 private:
-
 	UPROPERTY(Transient)
 	AStatusEffectsManager* StatusEffectsManager;
 		

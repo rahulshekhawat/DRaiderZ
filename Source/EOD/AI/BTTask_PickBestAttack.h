@@ -19,7 +19,6 @@ class EOD_API UBTTask_PickBestAttack : public UBTTaskNode
 	GENERATED_BODY()
 	
 public:
-
 	UBTTask_PickBestAttack(const FObjectInitializer& ObjectInitializer);
 	
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

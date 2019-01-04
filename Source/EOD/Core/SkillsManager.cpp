@@ -16,7 +16,4 @@ void ASkillsManager::BeginPlay()
 void ASkillsManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
-
 }

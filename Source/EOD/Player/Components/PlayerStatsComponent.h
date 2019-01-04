@@ -10,6 +10,7 @@
 
 class APlayerCharacter;
 class UStatusIndicatorWidget;
+
 /**
  * PlayerStatsComponent is used to manage stats of a player controlled character
  */
@@ -19,7 +20,6 @@ class EOD_API UPlayerStatsComponent : public UStatsComponentBase
 	GENERATED_BODY()
 	
 public:
-
 	UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer);
 
 	/** Initialize current health, mana, and stamina */
@@ -29,64 +29,6 @@ public:
 
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
-	/*
-	virtual int32 GetBaseHealth() const override;
-	
-	virtual int32 GetMaxHealth() const override;
-
-	virtual int32 GetCurrentHealth() const override;
-
-	virtual int32 ModifyBaseHealth(int32 Value) override;
-
-	virtual int32 ModifyMaxHealth(int32 Value) override;
-
-	virtual int32 ModifyCurrentHealth(int32 Value) override;
-
-	virtual void SetBaseHealth(int32 Value) override;
-
-	virtual void SetMaxHealth(int32 Value) override;
-
-	virtual void SetCurrentHealth(int32 Value) override;
-
-	virtual bool IsLowOnHealth() const override;
-	
-	virtual int32 GetBaseMana() const override;
-
-	virtual int32 GetMaxMana() const override;
-
-	virtual int32 GetCurrentMana() const override;
-	
-	virtual int32 ModifyBaseMana(int32 Value) override;
-
-	virtual int32 ModifyMaxMana(int32 Value) override;
-
-	virtual int32 ModifyCurrentMana(int32 Value) override;
-
-	virtual void SetBaseMana(int32 Value) override;
-
-	virtual void SetMaxMana(int32 Value) override;
-
-	virtual void SetCurrentMana(int32 Value) override;
-	
-	virtual int32 GetBaseStamina() const override;
-
-	virtual int32 GetMaxStamina() const override;
-
-	virtual int32 GetCurrentStamina() const override;
-	
-	virtual int32 ModifyBaseStamina(int32 Value) override;
-
-	virtual int32 ModifyMaxStamina(int32 Value) override;
-
-	virtual int32 ModifyCurrentStamina(int32 Value) override;
-
-	virtual void SetBaseStamina(int32 Value) override;
-
-	virtual void SetMaxStamina(int32 Value) override;
-
-	virtual void SetCurrentStamina(int32 Value) override;
-	*/
 
 	virtual int32 GetHealthRegenRate() const override;
 
@@ -338,41 +280,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 Level;
 
-	/** Maximum health of character without any status effects */
-	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
-	// int32 BaseHealth;
-
-	/** Current maximum health of character - with or without any status effects */
-	// UPROPERTY(Replicated)
-	// int32 MaxHealth;
-
-	/** Current health of character */
-	// UPROPERTY(Replicated)
-	// int32 CurrentHealth;
-	
-	/** Maximum mana of character without any status effects */
-	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
-	// int32 BaseMana;
-
-	/** Current maximum health of character - with or without any status effects */
-	// UPROPERTY(Replicated)
-	// int32 MaxMana;
-	
-	/** Current mana of character */
-	// UPROPERTY(Replicated)
-	// int32 CurrentMana;
-	
-	/** Maximum stamina of character without any status effects */
-	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
-	// int32 BaseStamina;
-	
-	/** Current maximum stamina of character - with or without any status effects */
-	// UPROPERTY(Replicated)
-	// int32 MaxStamina;
-	
-	/** Current stamina of character */
-	// UPROPERTY(Replicated)
-	// int32 CurrentStamina;
 
 	//~ If regeneration rates are not displayed to player in-game then they are not needed to be replicated
 	//~ However, if we do need to replicate regeneration rate then we can simply replicate it to owner only

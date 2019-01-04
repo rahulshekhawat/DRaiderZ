@@ -22,7 +22,6 @@ class EOD_API UStatsComponentBase : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-
 	/** Sets default values for this component's properties */
 	UStatsComponentBase(const FObjectInitializer& ObjectInitializer);
 
@@ -162,65 +161,6 @@ private:
 
 
 public:
-
-	/*
-	virtual int32 GetBaseHealth() const PURE_VIRTUAL(UStatsComponentBase::GetBaseHealth, return 0; );
-	
-	virtual int32 GetMaxHealth() const PURE_VIRTUAL(UStatsComponentBase::GetMaxHealth, return 0; );
-
-	virtual int32 GetCurrentHealth() const PURE_VIRTUAL(UStatsComponentBase::GetCurrentHealth, return 0; );
-
-	virtual int32 ModifyBaseHealth(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyBaseHealth, return 0; );
-
-	virtual int32 ModifyMaxHealth(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyMaxHealth, return 0; );
-
-	virtual int32 ModifyCurrentHealth(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyCurrentHealth, return 0; );
-
-	virtual void SetBaseHealth(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetBaseHealth, );
-
-	virtual void SetMaxHealth(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetMaxHealth, );
-
-	virtual void SetCurrentHealth(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetCurrentHealth, );
-
-	virtual bool IsLowOnHealth() const PURE_VIRTUAL(UStatsComponentBase::IsLowOnHealth, return false; );
-	
-	virtual int32 GetBaseMana() const PURE_VIRTUAL(UStatsComponentBase::GetBaseMana, return 0; );
-
-	virtual int32 GetMaxMana() const PURE_VIRTUAL(UStatsComponentBase::GetMaxMana, return 0; );
-
-	virtual int32 GetCurrentMana() const PURE_VIRTUAL(UStatsComponentBase::GetCurrentMana, return 0; );
-	
-	virtual int32 ModifyBaseMana(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyBaseMana, return 0; );
-
-	virtual int32 ModifyMaxMana(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyMaxMana, return 0; );
-
-	virtual int32 ModifyCurrentMana(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyCurrentMana, return 0; );
-
-	virtual void SetBaseMana(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetBaseMana, );
-
-	virtual void SetMaxMana(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetMaxMana, );
-
-	virtual void SetCurrentMana(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetCurrentMana, );
-	
-	virtual int32 GetBaseStamina() const PURE_VIRTUAL(UStatsComponentBase::GetBaseStamina, return 0; );
-
-	virtual int32 GetMaxStamina() const PURE_VIRTUAL(UStatsComponentBase::GetMaxStamina, return 0; );
-
-	virtual int32 GetCurrentStamina() const PURE_VIRTUAL(UStatsComponentBase::GetCurrentStamina, return 0; );
-	
-	virtual int32 ModifyBaseStamina(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyBaseStamina, return 0; );
-
-	virtual int32 ModifyMaxStamina(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyMaxStamina, return 0; );
-
-	virtual int32 ModifyCurrentStamina(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyCurrentStamina, return 0; );
-
-	virtual void SetBaseStamina(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetBaseStamina, );
-
-	virtual void SetMaxStamina(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetMaxStamina, );
-
-	virtual void SetCurrentStamina(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetCurrentStamina, );
-	*/
-
 	virtual int32 GetHealthRegenRate() const PURE_VIRTUAL(UStatsComponentBase::GetHealthRegenRate, return 0; );
 
 	virtual int32 ModifyHealthRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyHealthRegenRate, return 0; );
@@ -445,8 +385,6 @@ public:
 
 	virtual void SetMagickDamageReductionOnBlock(float Value) PURE_VIRTUAL(UStatsComponentBase::SetMagickDamageReductionOnBlock, );
 
-	// virtual void InitializeComponentWidget() PURE_VIRTUAL(UStatsComponentBase::InitializeComponentWidget, );
-
 	virtual void AddCrowdControlImmunitiesFromSkill(uint8 CCImmunities) PURE_VIRTUAL(UStatsComponentBase::AddCrowdControlImmunitiesFromSkill, );
 
 	virtual void RemoveCrowdControlImmunitiesFromSkil() PURE_VIRTUAL(UStatsComponentBase::RemoveCrowdControlImmunitiesFromSkil, );
@@ -454,9 +392,7 @@ public:
 	virtual uint8 GetCrowdControlImmunitiesFromSkill() const PURE_VIRTUAL(UStatsComponentBase::GetCrowdControlImmunitiesFromSkill, return 0; );
 
 protected:
-
 	//~ @note following booleans are used to initialize timers for derived stats components
-
 	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
 	uint32 bHasHealthRegenration : 1;
 
@@ -466,12 +402,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
 	uint32 bHasStaminaRegenration : 1;
 
-private:
 
-
-
-		
-	
 };
 
 FORCEINLINE bool UStatsComponentBase::IsLowOnHealth() const

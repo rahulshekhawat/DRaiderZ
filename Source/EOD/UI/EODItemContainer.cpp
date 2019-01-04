@@ -1,42 +1,39 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODItemContainer.h"
-#include "EOD/UI/DragVisualWidget.h"
 #include "EOD/Characters/PlayerCharacter.h"
+#include "EOD/UI/SkillBarWidget.h"
+#include "EOD/UI/DragVisualWidget.h"
 #include "EOD/UI/EODItemDragDropOperation.h"
+
 
 #include "Styling/SlateTypes.h"
 #include "Engine/Texture.h"
 
 
-UEODItemContainer::UEODItemContainer(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+UEODItemContainer::UEODItemContainer(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	bCanBeClicked = true;
 }
 
 bool UEODItemContainer::Initialize()
 {
-	if (!(Super::Initialize() &&
-		StackCountText &&
-		CooldownText &&
-		ItemImage))
+	if (Super::Initialize() && StackCountText && CooldownText && ItemImage)
 	{
-		return false;
+		StackCountText->SetVisibility(ESlateVisibility::Hidden);
+		CooldownText->SetVisibility(ESlateVisibility::Hidden);
+
+		SetupEmptyBorderMaterial();
+		DisableContainer();
+		return true;
 	}
-
-	StackCountText->SetVisibility(ESlateVisibility::Hidden);
-	CooldownText->SetVisibility(ESlateVisibility::Hidden);
-
-	SetupEmptyBorderMaterial();
-	RefreshContainerVisuals();
-	return true;
+	return false;
 }
 
 void UEODItemContainer::NativeConstruct()
 {
 	Super::NativeConstruct();
-
 	RefreshContainerVisuals();
-
 }
 
 void UEODItemContainer::NativeDestruct()
@@ -60,12 +57,12 @@ void UEODItemContainer::RefreshContainerVisuals()
 	UpdateStackCountText();
 }
 
-void UEODItemContainer::NativeOnDragDetected(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent, UDragDropOperation *& OutOperation)
+void UEODItemContainer::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	OnDragDetected(InGeometry, InMouseEvent, OutOperation);
 }
 
-bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDropEvent & InDragDropEvent, UDragDropOperation * InOperation)
+bool UEODItemContainer::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	// Cannot drop anything on skill tree
 	if (ContainerType == EEODContainerType::SkillTree)
@@ -74,12 +71,38 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 	}
 
 	UEODItemDragDropOperation* Operation = Cast<UEODItemDragDropOperation>(InOperation);
-	if (!Operation || !Operation->DraggedEODItemWidget)
+	if (!IsValid(Operation) || !IsValid(Operation->DraggedEODItemWidget))
 	{
 		return false;
 	}
 
+
 	bool bResult = false;
+	// Cannot drop anything from skill tree to inventory
+	// Cannot drop anything from inventory to skill bar
+	// Cannot drop anything from skill bar to inventory
+	if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
+		ContainerType == EEODContainerType::SkillBar)
+	{
+		USkillBarWidget* SkillBarWidget = Cast<USkillBarWidget>(ParentWidget);
+		if (IsValid(SkillBarWidget))
+		{
+			bResult = SkillBarWidget->OnNewSkillDropped(Operation->DraggedEODItemWidget, this);
+		}
+	}
+	else if ((Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
+		ContainerType == EEODContainerType::Inventory) ||
+		(Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillBar &&
+			ContainerType == EEODContainerType::SkillBar))
+	{
+		USkillBarWidget* SkillBarWidget = Cast<USkillBarWidget>(ParentWidget);
+		if (IsValid(SkillBarWidget))
+		{
+			bResult = SkillBarWidget->OnSkillsSwapped(Operation->DraggedEODItemWidget, this);
+		}
+	}
+
+	/*
 	if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
 		ContainerType == EEODContainerType::SkillBar)
 	{
@@ -102,57 +125,59 @@ bool UEODItemContainer::NativeOnDrop(const FGeometry & InGeometry, const FDragDr
 
 		bResult = true;
 	}
-
-	if (bResult && this->ContainerType == EEODContainerType::SkillBar)
-	{
-		APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwningPlayerPawn());
-		// OwningPlayer->AddSkill(EODItemInfo.ItemID, EODItemInfo.StackCount);
-	}
-
-	// Cannot drop anything from skill tree to inventory
-	// Cannot drop anything from inventory to skill bar
-	// Cannot drop anything from skill bar to inventory
+	*/
 
 	return bResult;
 }
 
-void UEODItemContainer::NativeOnMouseEnter(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+void UEODItemContainer::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), HoveredBorderColor);
-}
-
-void UEODItemContainer::NativeOnMouseLeave(const FPointerEvent & InMouseEvent)
-{
-	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), NormalBorderColor);
-}
-
-FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
-{
-	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), PressedBorderColor);
-
-	FReply Reply = FReply::Unhandled();
-	FKey DragKey(TEXT("LeftMouseButton"));
-	if (InMouseEvent.GetEffectingButton() == DragKey)
+	if ((bCanBeClicked || bCanBeDragged) && IsValid(EmptyBorderMID))
 	{
-		Reply = FReply::Handled();
-		TSharedPtr<SWidget> SlateWidgetDetectingDrag = this->GetCachedWidget();
-		if (SlateWidgetDetectingDrag.IsValid())
+		EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, HoveredBorderColor);
+	}
+}
+
+void UEODItemContainer::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	if (IsValid(EmptyBorderMID))
+	{
+		EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, NormalBorderColor);
+	}
+}
+
+FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	FReply Reply = FReply::Handled();
+	if (bCanBeClicked)
+	{
+		if (IsValid(EmptyBorderMID))
 		{
-			Reply = Reply.DetectDrag(SlateWidgetDetectingDrag.ToSharedRef(), DragKey);
+			EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, PressedBorderColor);
+		}
+
+		if (bCanBeDragged)
+		{
+			FKey DragKey(KeyboardKeysNames::LeftMouseButton);
+			if (InMouseEvent.GetEffectingButton() == DragKey)
+			{
+				TSharedPtr<SWidget> SlateWidgetDetectingDrag = this->GetCachedWidget();
+				if (SlateWidgetDetectingDrag.IsValid())
+				{
+					Reply = Reply.DetectDrag(SlateWidgetDetectingDrag.ToSharedRef(), DragKey);
+				}
+			}
 		}
 	}
-
 	return Reply;
 }
 
-FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	UMaterialInstanceDynamic* DynamicMaterial = EmptyBorderImage->GetDynamicMaterial();
-	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), HoveredBorderColor);
-
+	if ((bCanBeClicked || bCanBeDragged) && IsValid(EmptyBorderMID))
+	{
+		EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, HoveredBorderColor);
+	}
 	return FReply::Handled();
 }
 
@@ -164,6 +189,9 @@ void UEODItemContainer::UpdateCooldown()
 		return;
 	}
 
-	CooldownText->SetText(FText::FromString(FString::FromInt(CooldownTimeRemaining)));
+	if (IsValid(CooldownText))
+	{
+		CooldownText->SetText(FText::FromString(FString::FromInt(CooldownTimeRemaining)));
+	}
 	CooldownTimeRemaining -= CooldownInterval;
 }

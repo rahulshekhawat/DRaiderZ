@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Statics/CharacterLibrary.h"
 #include "Components/ActorComponent.h"
 #include "SkillTreeComponent.generated.h"
 
@@ -19,5 +20,10 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+public:
+	// void UpdateSkillTree();
+
+
+
+
 };
