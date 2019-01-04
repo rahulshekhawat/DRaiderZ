@@ -61,15 +61,6 @@ protected:
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
-	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
-	bool bCanBeClicked;
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
-	bool bCanBeDragged;
-
-	UPROPERTY(Transient, BlueprintReadWrite, Category = Behavior)
-	bool bInCooldown;
-
 	UPROPERTY(Transient)
 	float CooldownTimeRemaining;
 
@@ -87,6 +78,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* EmptyBorderMaterial;
+
+	UPROPERTY(Transient)
+	UMaterialInstanceDynamic* EmptyBorderMID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FLinearColor NormalBorderColor;
@@ -125,26 +119,26 @@ public:
 		ParentWidget = IsValid(Widget) ? Widget : nullptr;
 	}
 
-	FORCEINLINE void DisableContainer()
-	{
-		DisableClicking();
-		DisableDragging();
+	inline void DisableContainer();
 
-		if (IsValid(ItemImage))
-		{
-			ItemImage->SetIsEnabled(false);
-		}
-	}
+	inline void DisableClicking();
 
-	FORCEINLINE void DisableClicking()
-	{
-		bCanBeClicked = false;
-	}
+	inline void DisableDragging();
 
-	FORCEINLINE void DisableDragging()
-	{
-		bCanBeDragged = false;
-	}
+	inline void EnableContainer();
+
+	inline void EnableClicking();
+
+	inline void EnableDragging();
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
+	bool bCanBeClicked;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
+	bool bCanBeDragged;
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = Behavior)
+	bool bInCooldown;
 
 private:
 	inline void UpdateItemImage();
@@ -157,6 +151,7 @@ private:
 
 	FTimerHandle CooldownTimerHandle;
 
+	UPROPERTY()
 	UUserWidget* ParentWidget;
 
 };
@@ -172,6 +167,53 @@ inline void UEODItemContainer::ResetContainer()
 	CooldownInterval 			= 0;
 	
 	// @note can't and shouldn't reset container type
+}
+
+inline void UEODItemContainer::DisableContainer()
+{
+	DisableClicking();
+	DisableDragging();
+
+	if (IsValid(ItemImage))
+	{
+		ItemImage->SetIsEnabled(false);
+	}
+
+	if (IsValid(EmptyBorderMID))
+	{
+		EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, NormalBorderColor);
+	}
+}
+
+inline void UEODItemContainer::DisableClicking()
+{
+	bCanBeClicked = false;
+}
+
+inline void UEODItemContainer::DisableDragging()
+{
+	bCanBeDragged = false;
+}
+
+inline void UEODItemContainer::EnableContainer()
+{
+	EnableClicking();
+	EnableDragging();
+
+	if (IsValid(ItemImage))
+	{
+		ItemImage->SetIsEnabled(true);
+	}
+}
+
+inline void UEODItemContainer::EnableClicking()
+{
+	bCanBeClicked = true;
+}
+
+inline void UEODItemContainer::EnableDragging()
+{
+	bCanBeDragged = true;
 }
 
 inline void UEODItemContainer::StartCooldown(float Duration, float Interval)
@@ -249,17 +291,17 @@ inline void UEODItemContainer::SetupEmptyBorderMaterial()
 {
 	if (IsValid(EmptyBorderMaterial) && IsValid(EmptyBorderImage))
 	{
-		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(EmptyBorderMaterial, this);
-		if (IsValid(DynamicMaterial))
+		EmptyBorderMID = UMaterialInstanceDynamic::Create(EmptyBorderMaterial, this);
+		if (IsValid(EmptyBorderMID))
 		{
-			DynamicMaterial->SetVectorParameterValue(MaterialParameterNames::BaseColor, NormalBorderColor);
-		}
+			EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, NormalBorderColor);
 
-		FSlateBrush SlateBrush;
-		SlateBrush.ImageSize = FVector2D(64.0, 64.0);
-		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
-		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
-		SlateBrush.SetResourceObject(DynamicMaterial);
-		EmptyBorderImage->SetBrush(SlateBrush);
+			FSlateBrush SlateBrush;
+			SlateBrush.ImageSize = FVector2D(64.0, 64.0);
+			SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+			SlateBrush.ImageType = ESlateBrushImageType::FullColor;
+			SlateBrush.SetResourceObject(EmptyBorderMID);
+			EmptyBorderImage->SetBrush(SlateBrush);
+		}
 	}
 }
