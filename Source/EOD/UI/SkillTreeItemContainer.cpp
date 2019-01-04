@@ -12,6 +12,7 @@ bool USkillTreeItemContainer::Initialize()
 {
 	if (Super::Initialize() && SkillUpgradeText)
 	{
+		LoadDefaultSkillTreeContainerState();
 		// DisableContainer();
 		return true;
 	}
@@ -20,14 +21,12 @@ bool USkillTreeItemContainer::Initialize()
 	/*
 	LoadSkillContainerState();
 	LoadEODItemInfo();
-	RefreshContainerVisuals();
 	*/
 }
 
 void USkillTreeItemContainer::NativeConstruct()
 {
 	Super::NativeConstruct();
-	LoadSkillIcon();
 }
 
 void USkillTreeItemContainer::NativeDestruct()
@@ -41,20 +40,28 @@ void USkillTreeItemContainer::RefreshContainerVisuals()
 	UpdateSkillUpgradeText();
 }
 
-void USkillTreeItemContainer::LoadSkillIcon()
+void USkillTreeItemContainer::LoadDefaultSkillTreeContainerState()
 {
-	if (SkillGroup == FString())
+	if (SkillGroup == FString(""))
 	{
 		return;
 	}
 
 	FString SkillID = FString("F_") + SkillGroup + FString("_1");
-	FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(FName(*SkillID), FString("USkillTreeItemContainer::LoadEODItemInfo(), looking for player skill"));
-	if (!Skill || !IsValid(Skill->Icon))
+	FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(FName(*SkillID), FString("USkillTreeItemContainer::LoadDefaultSkillTreeContainerState(), looking for player skill"));
+	if (!Skill)
 	{
 		return;
 	}
 
-	EODItemInfo.Icon = Skill->Icon;
+	if (IsValid(Skill->Icon))
+	{
+		EODItemInfo.Icon = Skill->Icon;
+	}
+
+	SkillState.bUnlocked = false;
+	SkillState.CurrentUpgradeLevel = 0;
+	SkillState.MaxUpgradeLevel = Skill->MaxUpgrades;
+
 	RefreshContainerVisuals();
 }

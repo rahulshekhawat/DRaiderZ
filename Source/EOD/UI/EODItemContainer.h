@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Statics/EODLibrary.h"
 #include "EOD/Statics/EODGlobalNames.h"
 
@@ -35,16 +36,16 @@ public:
 	virtual void NativeDestruct() override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "EOD Item Container", meta = (BindWidget))
 	UImage* EmptyBorderImage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "EOD Item Container", meta = (BindWidget))
 	UImage* ItemImage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "EOD Item Container", meta = (BindWidget))
 	UTextBlock* StackCountText;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "EOD Item Container", meta = (BindWidget))
 	UTextBlock* CooldownText;
 
 protected:
@@ -61,44 +62,58 @@ protected:
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EOD Item Container")
+	FEODItemInfo EODItemInfo;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Item Container")
+	EEODContainerType ContainerType;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Item Container")
+	bool bInCooldown;
+
+protected:	
+	UPROPERTY(EditDefaultsOnly, Category = "EOD Item Container")
+	UMaterialInterface* EmptyBorderMaterial;
+
+	UPROPERTY(BlueprintReadOnly, Category = "EOD Item Container")
+	UMaterialInstanceDynamic* EmptyBorderMID;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Item Container")
+	FLinearColor NormalBorderColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Item Container")
+	FLinearColor HoveredBorderColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Item Container")
+	FLinearColor PressedBorderColor;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Item Container")
+	bool bCanBeClicked;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Item Container")
+	bool bCanBeDragged;
+
+private:
 	UPROPERTY(Transient)
 	float CooldownTimeRemaining;
 
 	UPROPERTY(Transient)
 	float CooldownInterval;
 
-	UPROPERTY(Transient)
-	UDragVisualWidget* DragVisualWidget;
+	FTimerHandle CooldownTimerHandle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
-	FEODItemInfo EODItemInfo;
+	UPROPERTY()
+	UUserWidget* ParentWidget;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EODItemInfo)
-	EEODContainerType ContainerType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMaterialInterface* EmptyBorderMaterial;
-
-	UPROPERTY(Transient)
-	UMaterialInstanceDynamic* EmptyBorderMID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FLinearColor NormalBorderColor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FLinearColor HoveredBorderColor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FLinearColor PressedBorderColor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UDragVisualWidget> DragVisualClass;
-
+public:
 	/** Puts this container on cooldown for a given duration */
 	inline void StartCooldown(float Duration, float Interval = 1.f);
 
 	/** Removes cooldown from this container */
 	inline void StopCooldown();
+
+	/** Resets and nulls all container variables. Deletes any references */
+	inline void ResetContainer();
 
 	/** Puts this container on cooldown for a given duration */
 	UFUNCTION(BlueprintCallable, Category = EODItemContainer, meta = (DisplayName = "Start Cooldown"))
@@ -110,9 +125,6 @@ public:
 
 	/** Refresh and update the displayed visuals of this container */
 	virtual void RefreshContainerVisuals();
-
-	/** Resets and nulls all container variables. Deletes any references */
-	inline void ResetContainer();
 
 	FORCEINLINE void SetParentWidget(UUserWidget* Widget)
 	{
@@ -131,15 +143,6 @@ public:
 
 	inline void EnableDragging();
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
-	bool bCanBeClicked;
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = Behavior)
-	bool bCanBeDragged;
-
-	UPROPERTY(Transient, BlueprintReadWrite, Category = Behavior)
-	bool bInCooldown;
-
 private:
 	inline void UpdateItemImage();
 
@@ -149,10 +152,6 @@ private:
 
 	void UpdateCooldown();
 
-	FTimerHandle CooldownTimerHandle;
-
-	UPROPERTY()
-	UUserWidget* ParentWidget;
 
 };
 

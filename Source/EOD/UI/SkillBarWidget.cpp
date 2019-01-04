@@ -223,7 +223,10 @@ bool USkillBarWidget::OnNewSkillDropped(UEODItemContainer* FromContainer, UEODIt
 		return false;
 	}
 
-	FString SkillGroup = STContainer->SkillGroup;
+	ToContainer->EODItemInfo = FromContainer->EODItemInfo;
+	ToContainer->RefreshContainerVisuals();
+
+	// FString SkillGroup = STContainer->SkillGroup;
 
 
 

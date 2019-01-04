@@ -157,15 +157,15 @@ struct EOD_API FSkillState
 	GENERATED_USTRUCT_BODY()
 
 	/** The current level that this skill has been upgraded to */
-	UPROPERTY()
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Skill State")
 	int32 CurrentUpgradeLevel;
 
 	/** The maximum level that this skill can be upgraded to */
-	UPROPERTY()
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Skill State")
 	int32 MaxUpgradeLevel;
 
 	/** Determines whether this skill has been unlocked on the skill tree */
-	UPROPERTY()
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Skill State")
 	bool bUnlocked;
 
 	FSkillState()

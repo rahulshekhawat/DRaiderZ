@@ -24,7 +24,7 @@ bool UEODItemContainer::Initialize()
 		CooldownText->SetVisibility(ESlateVisibility::Hidden);
 
 		SetupEmptyBorderMaterial();
-		DisableContainer();
+		EnableContainer();
 		return true;
 	}
 	return false;
