@@ -174,7 +174,7 @@ FReply UEODItemContainer::NativeOnMouseButtonDown(const FGeometry& InGeometry, c
 
 FReply UEODItemContainer::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if (IsValid(EmptyBorderMID))
+	if ((bCanBeClicked || bCanBeDragged) && IsValid(EmptyBorderMID))
 	{
 		EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, HoveredBorderColor);
 	}
