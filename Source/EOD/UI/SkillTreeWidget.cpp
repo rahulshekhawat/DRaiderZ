@@ -2,6 +2,7 @@
 
 #include "SkillTreeWidget.h"
 #include "EOD/Core/EODPreprocessors.h"
+#include "EOD/Core/EODGameInstance.h"
 #include "EOD/UI/SkillTreeItemContainer.h"
 #include "EOD/Characters/PlayerCharacter.h"
 
@@ -135,6 +136,8 @@ bool USkillTreeWidget::Initialize()
 	InitializeDefenderSkillItemContainer(StoneArmorSkillButton);
 	InitializeDefenderSkillItemContainer(ResilianceSkillButton);
 
+	LoadSkillTreeState();
+
 	return true;
 }
 
@@ -217,4 +220,24 @@ void USkillTreeWidget::ActivateSorcererTab()
 USkillTreeItemContainer* USkillTreeWidget::GetSkillTreeSlotFromSkillGroupID(const FString& SkillGroupID)
 {
 	return nullptr;
+}
+
+void USkillTreeWidget::LoadSkillTreeState()
+{
+	/*
+	UEODGameInstance* GI = Cast<UEODGameInstance>(GetGameInstance());
+	if (!IsValid(GI))
+	{
+		return;
+	}
+
+	for (USkillTreeItemContainer* Container : AssassinSkills)
+	{
+		if (GI->SGToSSMap.Contains(Container->SkillGroup))
+		{
+			// Container->SkillState = GI->SGToSSMap[Container->SkillGroup];
+			// Container->();
+		}
+	}
+	*/
 }

@@ -8,10 +8,11 @@
 #include "Kismet/GameplayStatics.h"
 
 const int32 UEODGameInstance::PlayerIndex(0);
-const FString UEODGameInstance::MetaSaveSlotName(TEXT("DefaultSlot"));
+const FString UEODGameInstance::MetaSaveSlotName(TEXT("MetaSaveSlot"));
 
 UEODGameInstance::UEODGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+
 }
 
 void UEODGameInstance::Init()
@@ -41,4 +42,9 @@ void UEODGameInstance::Init()
 		}
 	}
 
+}
+
+void UEODGameInstance::LoadProfile(FString& ProfileName)
+{
+	// @todo
 }

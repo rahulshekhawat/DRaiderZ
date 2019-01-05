@@ -62,6 +62,8 @@ public:
 	/** Refresh and update the displayed visuals of this container */
 	virtual void RefreshContainerVisuals() override;
 
+	void UpdateContainerSkillState(FSkillState& FromSkillState);
+
 private:
 	void LoadDefaultSkillTreeContainerState();
 

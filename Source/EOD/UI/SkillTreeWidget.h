@@ -270,6 +270,8 @@ private:
 	/** Reset button style for all skill tree tab buttons */
 	inline void ResetAllTabButtonsStyle();
 
+	/** Load skill tree from a previous savegame */
+	void LoadSkillTreeState();
 
 };
 
@@ -293,22 +295,32 @@ inline void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer* Co
 
 inline void USkillTreeWidget::InitializeAssassinSkillItemContainer(USkillTreeItemContainer* Container)
 {
-	SetupContainerPosition(Container);
-	AssassinSkills.Add(Container);
+	if (IsValid(Container))
+	{
+		Container->SetParentWidget(this);
+		SetupContainerPosition(Container);
+		AssassinSkills.Add(Container);
+	}
 }
 
 inline void USkillTreeWidget::InitializeBerserkerSkillItemContainer(USkillTreeItemContainer* Container)
 {
-	SetupContainerPosition(Container);
-	// @todo load skill icon
-	// @todo set container to disabled state
-	BerserkerSkills.Add(Container);
+	if (IsValid(Container))
+	{
+		Container->SetParentWidget(this);
+		SetupContainerPosition(Container);
+		BerserkerSkills.Add(Container);
+	}
 }
 
 inline void USkillTreeWidget::InitializeDefenderSkillItemContainer(USkillTreeItemContainer* Container)
 {
-	SetupContainerPosition(Container);
-	DefenderSkills.Add(Container);
+	if (IsValid(Container))
+	{
+		Container->SetParentWidget(this);
+		SetupContainerPosition(Container);
+		DefenderSkills.Add(Container);
+	}
 }
 
 inline void USkillTreeWidget::SetButtonStyleToSelected(UButton* Button)

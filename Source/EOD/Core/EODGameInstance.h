@@ -29,6 +29,8 @@ public:
 public:
 	UPROPERTY()
 	TMap<FString, FSkillState> SGToSSMap;
+
+	TMap<FString, TSharedRef<FSkillState>> SkillGroupToSkillStateMap;
 	//~ End Persistent Player Data
 
 
@@ -37,6 +39,9 @@ public:
 	static const int32 PlayerIndex;
 
 	static const FString MetaSaveSlotName;
+
+public:
+	void LoadProfile(FString& ProfileName);
 
 	FORCEINLINE UMetaSaveGame* GetMetaSaveGameObject() const { return MetaSaveGame; }
 

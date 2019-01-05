@@ -40,6 +40,12 @@ void USkillTreeItemContainer::RefreshContainerVisuals()
 	UpdateSkillUpgradeText();
 }
 
+void USkillTreeItemContainer::UpdateContainerSkillState(FSkillState& FromSkillState)
+{
+	SkillState = FromSkillState;
+	// @todo update container
+}
+
 void USkillTreeItemContainer::LoadDefaultSkillTreeContainerState()
 {
 	if (SkillGroup == FString(""))
