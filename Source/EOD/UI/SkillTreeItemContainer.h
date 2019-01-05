@@ -39,19 +39,19 @@ public:
 	 * Determines the skill group this skill belongs to
 	 * For a skill with SkillID 'BZ1_1', it's skill group is 'BZ1'
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree Item Container")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Item Container")
 	FString SkillGroup;
 
 	/** Skill group that must be unlocked before unlocking this skill */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree Item Container")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Item Container")
 	FString SkillGroupRequiredToUnlock;
 
 	/** The skill tree column that this skill container belongs to */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree Item Container")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Item Container")
 	int32 ColumnPosition;
 
 	/** The skill tree row that this skill container belongs to */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree Item Container")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Item Container")
 	int32 RowPosition;
 
 	/** Current state of this skill */

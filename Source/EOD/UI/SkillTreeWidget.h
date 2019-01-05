@@ -38,73 +38,173 @@ public:
 	// Child Widgets
 	////////////////////////////////////////////////////////////////////////////////
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
 	UWidgetSwitcher* SkillTreeSwitcher;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Tree Tab", meta = (BindWidget))
 	UButton* AssassinTab;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Tree Tab", meta = (BindWidget))
 	UButton* BerserkerTab;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Tree Tab", meta = (BindWidget))
 	UButton* ClericTab;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Tree Tab", meta = (BindWidget))
 	UButton* DefenderTab;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Skill Tree Tab", meta = (BindWidget))
 	UButton* SorcererTab;
 
-	//~ Begin berserker skills
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	//~ Begin Assassin Skills
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* ChaosStingerSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* StormBladesSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* RisingDragonSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* CleaveSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* CycloneKickSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* FatalStabSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* ShadowWalkSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* DragonicLeapSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* VeilOfDarknessSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* PenetrationStingerSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* WhirlingBladeSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* RestorativeElixirSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* ShadowStrikeSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* ShadowDanceSkillButton;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Assassin Skills", meta = (BindWidget))
+	USkillTreeItemContainer* BladeDanceSkillButton;
+	//~ End Assassin Skills
+
+	//~ Begin Berserker Skills
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* CrushSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* NeutralizeSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* DodgeAttackSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* ArmaCrushSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* VanquishSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* UpwardStrikeSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* NocturneSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* BuffaloChargeSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* BashSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* TornadoSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* ScamperSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* EscapeSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* FuriousDashSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* OutrageSkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* TranquilitySkillButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Berserker Skills", meta = (BindWidget))
 	USkillTreeItemContainer* MadnessSkillButton;
-	//~ End berserker skills
+	//~ End Berserker Skills
+
+	//~ Begin Defender Skills
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* StunningSmashSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* ShieldSlamSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* StrikeOfRuinSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* RushSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* RapidAssaultSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* SlamSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* PiercingStrikeSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* ChaoticStrikeSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* CycloneStrikeSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* ComebackSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* BastionSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* VigilanceSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* EvasiveStrikeSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* RetributionSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* MassiveStrikeSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* StoneArmorSkillButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Defender Skills", meta = (BindWidget))
+	USkillTreeItemContainer* ResilianceSkillButton;
+	//~ End Defender Skills
 
 	void RefreshVisuals();
 
@@ -152,8 +252,14 @@ private:
 	/** Move container to it's designated position */
 	inline void SetupContainerPosition(USkillTreeItemContainer* Container);
 
+	/** Initialize a skill tree container of type Assassin */
+	inline void InitializeAssassinSkillItemContainer(USkillTreeItemContainer* Container);
+
 	/** Initialize a skill tree container of type Berserker */
 	inline void InitializeBerserkerSkillItemContainer(USkillTreeItemContainer* Container);
+
+	/** Initialize a skill tree container of type Defender */
+	inline void InitializeDefenderSkillItemContainer(USkillTreeItemContainer* Container);
 
 	/** Change visual style of given button to 'selected' */
 	inline void SetButtonStyleToSelected(UButton* Button);
@@ -185,12 +291,24 @@ inline void USkillTreeWidget::SetupContainerPosition(USkillTreeItemContainer* Co
 	}
 }
 
+inline void USkillTreeWidget::InitializeAssassinSkillItemContainer(USkillTreeItemContainer* Container)
+{
+	SetupContainerPosition(Container);
+	AssassinSkills.Add(Container);
+}
+
 inline void USkillTreeWidget::InitializeBerserkerSkillItemContainer(USkillTreeItemContainer* Container)
 {
 	SetupContainerPosition(Container);
 	// @todo load skill icon
 	// @todo set container to disabled state
 	BerserkerSkills.Add(Container);
+}
+
+inline void USkillTreeWidget::InitializeDefenderSkillItemContainer(USkillTreeItemContainer* Container)
+{
+	SetupContainerPosition(Container);
+	DefenderSkills.Add(Container);
 }
 
 inline void USkillTreeWidget::SetButtonStyleToSelected(UButton* Button)

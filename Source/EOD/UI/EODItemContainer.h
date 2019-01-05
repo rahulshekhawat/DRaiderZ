@@ -62,29 +62,29 @@ protected:
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EOD Item Container")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EOD Item Container")
 	FEODItemInfo EODItemInfo;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Item Container")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Item Container")
 	EEODContainerType ContainerType;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Item Container")
 	bool bInCooldown;
 
 protected:	
-	UPROPERTY(EditDefaultsOnly, Category = "EOD Item Container")
+	UPROPERTY(EditAnywhere, Category = "EOD Item Container")
 	UMaterialInterface* EmptyBorderMaterial;
 
-	UPROPERTY(BlueprintReadOnly, Category = "EOD Item Container")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Item Container")
 	UMaterialInstanceDynamic* EmptyBorderMID;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Item Container")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Item Container")
 	FLinearColor NormalBorderColor;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Item Container")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Item Container")
 	FLinearColor HoveredBorderColor;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Item Container")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Item Container")
 	FLinearColor PressedBorderColor;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "EOD Item Container")

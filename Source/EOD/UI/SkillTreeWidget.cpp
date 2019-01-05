@@ -14,12 +14,27 @@ USkillTreeWidget::USkillTreeWidget(const FObjectInitializer& ObjectInitializer) 
 bool USkillTreeWidget::Initialize()
 {
 	if (!(Super::Initialize() &&
+		SkillTreeSwitcher &&
 		AssassinTab &&
 		BerserkerTab &&
 		ClericTab &&
 		DefenderTab &&
 		SorcererTab &&
-		SkillTreeSwitcher &&
+		ChaosStingerSkillButton &&
+		StormBladesSkillButton &&
+		RisingDragonSkillButton &&
+		CleaveSkillButton &&
+		CycloneKickSkillButton &&
+		FatalStabSkillButton &&
+		ShadowWalkSkillButton &&
+		DragonicLeapSkillButton &&
+		VeilOfDarknessSkillButton &&
+		PenetrationStingerSkillButton &&
+		WhirlingBladeSkillButton &&
+		RestorativeElixirSkillButton &&
+		ShadowStrikeSkillButton &&
+		ShadowDanceSkillButton &&
+		BladeDanceSkillButton &&
 		CrushSkillButton &&
 		NeutralizeSkillButton &&
 		DodgeAttackSkillButton &&
@@ -35,7 +50,24 @@ bool USkillTreeWidget::Initialize()
 		FuriousDashSkillButton &&
 		OutrageSkillButton &&
 		TranquilitySkillButton &&
-		MadnessSkillButton))
+		MadnessSkillButton &&
+		StunningSmashSkillButton &&
+		ShieldSlamSkillButton &&
+		StrikeOfRuinSkillButton &&
+		RushSkillButton &&
+		RapidAssaultSkillButton &&
+		SlamSkillButton &&
+		PiercingStrikeSkillButton &&
+		ChaoticStrikeSkillButton &&
+		CycloneStrikeSkillButton &&
+		ComebackSkillButton &&
+		BastionSkillButton &&
+		VigilanceSkillButton &&
+		EvasiveStrikeSkillButton &&
+		RetributionSkillButton &&
+		MassiveStrikeSkillButton &&
+		StoneArmorSkillButton &&
+		ResilianceSkillButton))
 	{
 		return false;
 	}
@@ -51,6 +83,22 @@ bool USkillTreeWidget::Initialize()
 	ClericTab->OnClicked.AddDynamic(this, &USkillTreeWidget::ActivateClericTab);
 	DefenderTab->OnClicked.AddDynamic(this, &USkillTreeWidget::ActivateDefenderTab);
 	SorcererTab->OnClicked.AddDynamic(this, &USkillTreeWidget::ActivateSorcererTab);
+
+	InitializeAssassinSkillItemContainer(ChaosStingerSkillButton);
+	InitializeAssassinSkillItemContainer(StormBladesSkillButton);
+	InitializeAssassinSkillItemContainer(RisingDragonSkillButton);
+	InitializeAssassinSkillItemContainer(CleaveSkillButton);
+	InitializeAssassinSkillItemContainer(CycloneKickSkillButton);
+	InitializeAssassinSkillItemContainer(FatalStabSkillButton);
+	InitializeAssassinSkillItemContainer(ShadowWalkSkillButton);
+	InitializeAssassinSkillItemContainer(DragonicLeapSkillButton);
+	InitializeAssassinSkillItemContainer(VeilOfDarknessSkillButton);
+	InitializeAssassinSkillItemContainer(PenetrationStingerSkillButton);
+	InitializeAssassinSkillItemContainer(WhirlingBladeSkillButton);
+	InitializeAssassinSkillItemContainer(RestorativeElixirSkillButton);
+	InitializeAssassinSkillItemContainer(ShadowStrikeSkillButton);
+	InitializeAssassinSkillItemContainer(ShadowDanceSkillButton);
+	InitializeAssassinSkillItemContainer(BladeDanceSkillButton);
 
 	InitializeBerserkerSkillItemContainer(CrushSkillButton);
 	InitializeBerserkerSkillItemContainer(NeutralizeSkillButton);
@@ -68,6 +116,24 @@ bool USkillTreeWidget::Initialize()
 	InitializeBerserkerSkillItemContainer(OutrageSkillButton);
 	InitializeBerserkerSkillItemContainer(TranquilitySkillButton);
 	InitializeBerserkerSkillItemContainer(MadnessSkillButton);
+	
+	InitializeDefenderSkillItemContainer(StunningSmashSkillButton);
+	InitializeDefenderSkillItemContainer(ShieldSlamSkillButton);
+	InitializeDefenderSkillItemContainer(StrikeOfRuinSkillButton);
+	InitializeDefenderSkillItemContainer(RushSkillButton);
+	InitializeDefenderSkillItemContainer(RapidAssaultSkillButton);
+	InitializeDefenderSkillItemContainer(SlamSkillButton);
+	InitializeDefenderSkillItemContainer(PiercingStrikeSkillButton);
+	InitializeDefenderSkillItemContainer(ChaoticStrikeSkillButton);
+	InitializeDefenderSkillItemContainer(CycloneStrikeSkillButton);
+	InitializeDefenderSkillItemContainer(ComebackSkillButton);
+	InitializeDefenderSkillItemContainer(BastionSkillButton);
+	InitializeDefenderSkillItemContainer(VigilanceSkillButton);
+	InitializeDefenderSkillItemContainer(EvasiveStrikeSkillButton);
+	InitializeDefenderSkillItemContainer(RetributionSkillButton);
+	InitializeDefenderSkillItemContainer(MassiveStrikeSkillButton);
+	InitializeDefenderSkillItemContainer(StoneArmorSkillButton);
+	InitializeDefenderSkillItemContainer(ResilianceSkillButton);
 
 	return true;
 }
