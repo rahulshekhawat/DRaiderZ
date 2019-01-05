@@ -105,6 +105,7 @@ public:
 	/** Returns true if skill at given skill index is in cooldown */
 	inline bool IsSkillInCooldown(const int32 SkillIndex) const;
 
+	/** Returns true the given skill container exists on skill bar */
 	inline bool HasSkillContainer(UEODItemContainer* Container) const;
 
 	/** Returns true if the given skill group is in cooldown */

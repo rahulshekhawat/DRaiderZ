@@ -6,6 +6,8 @@
 #include "EOD/SaveSystem/PlayerSaveGame.h"
 #include "EOD/Core/EODGameInstance.h"
 
+#include "Kismet/GameplayStatics.h"
+
 
 UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -131,6 +133,17 @@ void UGameplaySkillsComponent::LoadSkillBarLayout()
 		{
 			SBIndexToSGMap[Key] = SBLayout[Key];
 		}
+	}
+}
+
+void UGameplaySkillsComponent::SaveSkillBarLayout()
+{
+	UEODGameInstance* GameInstance = EODCharacterOwner ? Cast<UEODGameInstance>(EODCharacterOwner->GetGameInstance()) : nullptr;
+	UPlayerSaveGame* PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
+	if (IsValid(PlayerSaveGame))
+	{
+		PlayerSaveGame->SkillBarLayout = SBIndexToSGMap;
+		UGameplayStatics::SaveGameToSlot(PlayerSaveGame, GameInstance->GetCurrentPlayerSaveGameName(), GameInstance->PlayerIndex);
 	}
 }
 

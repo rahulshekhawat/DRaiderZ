@@ -78,58 +78,6 @@ void USkillBarWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-/*
-void USkillBarWidget::LoadSkillBarLayout()
-{
-	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
-	if (!IsValid(GameSingleton))
-	{
-		return;
-	}
-
-	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex));
-	if (!IsValid(EODSaveGame))
-	{
-		return;
-	}
-
-	TArray<FString> SkillGroups;
-	EODSaveGame->SkillBarLayout.GetKeys(SkillGroups);
-
-	for (const FString& SkillGroup : SkillGroups)
-	{
-		int32 Position = EODSaveGame->SkillBarLayout[SkillGroup];
-		UEODItemContainer* SkillButton = GetSkillContainerAtIndex(Position);
-		if (!IsValid(SkillButton))
-		{
-			continue;
-		}
-
-		FString SkillIDString = "F_" + SkillGroup + "_1";
-		FName SkillID = FName(*SkillIDString);
-
-		FString ContextString = "USkillBarWidget::LoadSkillBarLayout(), looking for player skill : " + SkillIDString;
-		FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
-		if (!Skill)
-		{
-			FString Message = FString("Couldn't find skill : ") + SkillIDString;
-			PrintEverywhere(this, Message);
-			continue;
-		}
-
-		SkillButton->EODItemInfo.ItemID = SkillID;
-		SkillButton->EODItemInfo.ItemGroup = SkillGroup;
-		SkillButton->EODItemInfo.StackCount = 1;
-		SkillButton->EODItemInfo.InGameName = Skill->InGameName;
-		SkillButton->EODItemInfo.Icon = Skill->Icon;
-		SkillButton->EODItemInfo.EODItemType = EEODItemType::ActiveSkill; // It MUST be an active skill
-		SkillButton->EODItemInfo.Description = Skill->Description;
-
-		SkillButton->RefreshContainerVisuals();
-	}
-}
-*/
-
 bool USkillBarWidget::IsSkillGroupInCooldown(const FString& SkillGroup) const
 {
 	UEODItemContainer* SkillContainer = nullptr;
@@ -262,9 +210,66 @@ bool USkillBarWidget::OnSkillsSwapped(UEODItemContainer* Container1, UEODItemCon
 
 void USkillBarWidget::UpdateSkillBarLayout(TMap<int32, FString>& NewLayout, bool bResize)
 {
-	TArray<int32> NewLayoutKeys;
-	for (int32& Key : NewLayoutKeys)
+	TArray<int32> LayoutKeys;
+	NewLayout.GetKeys(LayoutKeys);
+	for (int32 Key : LayoutKeys)
 	{
+		UEODItemContainer* Container = GetSkillContainerAtIndex(Key);
+		if (IsValid(Container))
+		{
 
+		}
 	}
 }
+
+/*
+void USkillBarWidget::LoadSkillBarLayout()
+{
+	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
+	if (!IsValid(GameSingleton))
+	{
+		return;
+	}
+
+	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->CurrentSaveSlotName, GameSingleton->UserIndex));
+	if (!IsValid(EODSaveGame))
+	{
+		return;
+	}
+
+	TArray<FString> SkillGroups;
+	EODSaveGame->SkillBarLayout.GetKeys(SkillGroups);
+
+	for (const FString& SkillGroup : SkillGroups)
+	{
+		int32 Position = EODSaveGame->SkillBarLayout[SkillGroup];
+		UEODItemContainer* SkillButton = GetSkillContainerAtIndex(Position);
+		if (!IsValid(SkillButton))
+		{
+			continue;
+		}
+
+		FString SkillIDString = "F_" + SkillGroup + "_1";
+		FName SkillID = FName(*SkillIDString);
+
+		FString ContextString = "USkillBarWidget::LoadSkillBarLayout(), looking for player skill : " + SkillIDString;
+		FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, ContextString);
+		if (!Skill)
+		{
+			FString Message = FString("Couldn't find skill : ") + SkillIDString;
+			PrintEverywhere(this, Message);
+			continue;
+		}
+
+		SkillButton->EODItemInfo.ItemID = SkillID;
+		SkillButton->EODItemInfo.ItemGroup = SkillGroup;
+		SkillButton->EODItemInfo.StackCount = 1;
+		SkillButton->EODItemInfo.InGameName = Skill->InGameName;
+		SkillButton->EODItemInfo.Icon = Skill->Icon;
+		SkillButton->EODItemInfo.EODItemType = EEODItemType::ActiveSkill; // It MUST be an active skill
+		SkillButton->EODItemInfo.Description = Skill->Description;
+
+		SkillButton->RefreshContainerVisuals();
+	}
+}
+*/

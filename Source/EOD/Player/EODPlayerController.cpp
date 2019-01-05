@@ -509,6 +509,14 @@ void AEODPlayerController::OnReleasingSkillKey(const int32 SkillKeyIndex)
 
 void AEODPlayerController::SavePlayerState()
 {
+	if (IsValid(EODCharacter))
+	{
+		UGameplaySkillsComponent* GSComp = EODCharacter->GetGameplaySkillsComponent();
+		if (IsValid(GSComp))
+		{
+			GSComp->SaveSkillBarLayout();
+		}
+	}
 }
 
 void AEODPlayerController::Client_SetupLocalPlayerOnPossess_Implementation(APawn* InPawn)

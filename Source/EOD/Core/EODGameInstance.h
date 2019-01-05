@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Statics/CharacterLibrary.h"
+
 #include "Engine/GameInstance.h"
 #include "EODGameInstance.generated.h"
 
@@ -22,6 +24,15 @@ public:
 
 	virtual void Init() override;
 
+
+	//~ Begin Persistent Player Data
+public:
+	UPROPERTY()
+	TMap<FString, FSkillState> SGToSSMap;
+	//~ End Persistent Player Data
+
+
+	//~ Begin Load/Save System
 public:
 	static const int32 PlayerIndex;
 
@@ -37,6 +48,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Save/Load System", meta = (DisplayName = "Get Current Player Save Game"))
 	UPlayerSaveGame* BP_GetCurrentPlayerSaveGame() const { return GetCurrentPlayerSaveGameObject(); }
 
+	FORCEINLINE FString GetCurrentPlayerSaveGameName() const { return CurrentProfileName; }
+
 private:
 	UPROPERTY()
 	UMetaSaveGame* MetaSaveGame;
@@ -44,5 +57,7 @@ private:
 	UPROPERTY()
 	UPlayerSaveGame* CurrentProfileSaveGame;
 
-
+	UPROPERTY()
+	FString CurrentProfileName;
+	//~ End Load/Save System
 };

@@ -2,6 +2,7 @@
 
 #include "EODGameInstance.h"
 #include "EOD/SaveSystem/MetaSaveGame.h"
+#include "EOD/SaveSystem/PlayerSaveGame.h"
 #include "EOD/Statics/EODGlobalNames.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -22,7 +23,7 @@ void UEODGameInstance::Init()
 	{
 		MetaSaveGame = Cast<UMetaSaveGame>(UGameplayStatics::LoadGameFromSlot(UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex));
 	}
-	// If the meta save game object doesn't exist yet, create and save one (it will happen during first run)
+	// If the meta save game object doesn't exist yet (running game for first time), create and save one 
 	else
 	{
 		MetaSaveGame = Cast<UMetaSaveGame>(UGameplayStatics::CreateSaveGameObject(UMetaSaveGame::StaticClass()));
@@ -39,7 +40,5 @@ void UEODGameInstance::Init()
 			CurrentProfileSaveGame = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(MetaSaveGame->LastUsedSlotName, UEODGameInstance::PlayerIndex));
 		}
 	}
-
-
 
 }

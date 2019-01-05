@@ -27,31 +27,25 @@ public:
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// EOD
-	////////////////////////////////////////////////////////////////////////////////
 private:
-	UPROPERTY()
+	UPROPERTY(Transient)
 	AEODCharacterBase* CharacterOwner;
 
-	UPROPERTY()
 	FName ActiveSkillID;
 
 	FSkillTableRow* ActiveSkill;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "EOD Character Skills")
+	/** The time it should take for chain skill use window to close */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character Skills")
 	float ChainSkillResetDelay;
 
 	/** Data table for character skills */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character Skills")
 	UDataTable* SkillsDataTable;
 
-	FORCEINLINE FSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const
-	{
-		return SkillsDataTable ? SkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString) : nullptr;
-	}
+	/** Returns a player skill corresponding to a given skill ID */
+	FORCEINLINE FSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
 
 public:
 	void SetCurrentActiveSkill(const FName SkillID);
@@ -60,14 +54,15 @@ public:
 
 	FORCEINLINE FSkillTableRow* GetCurrentActiveSkill() const { return ActiveSkill; }
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// NETWORK
-	////////////////////////////////////////////////////////////////////////////////
+	//~ Begin network code
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCurrentActiveSkill(const FName SkillID);
+	//~ End network coe
 
-
-		
 };
+
+FORCEINLINE FSkillTableRow* USkillBarComponent::GetSkill(FName SkillID, const FString& ContextString) const
+{
+	return SkillsDataTable ? SkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString) : nullptr;
+}
