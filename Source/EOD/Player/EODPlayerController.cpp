@@ -151,11 +151,12 @@ void AEODPlayerController::Tick(float DeltaTime)
 
 }
 
+/*
 void AEODPlayerController::Possess(APawn* InPawn)
 {
 	Super::Possess(InPawn);
-	Client_SetupLocalPlayerOnPossess(InPawn);
 }
+*/
 
 void AEODPlayerController::UnPossess()
 {
@@ -405,7 +406,7 @@ void AEODPlayerController::OnReleasingNormalAttackKey()
 
 void AEODPlayerController::AttemptDodge()
 {
-	if (IsValid(EODCharacter))
+	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetCharacterStatsComponent()))
 	{
 		if (IsAutoMoveEnabled())
 		{
@@ -515,29 +516,6 @@ void AEODPlayerController::SavePlayerState()
 		if (IsValid(GSComp))
 		{
 			GSComp->SaveSkillBarLayout();
-		}
-	}
-}
-
-void AEODPlayerController::Client_SetupLocalPlayerOnPossess_Implementation(APawn* InPawn)
-{
-	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
-	if (IsValid(EODChar) && IsValid(HUDWidget))
-	{
-		UStatsComponentBase* StatsComponent = EODChar->GetCharacterStatsComponent();
-		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
-		if (IsValid(StatsComponent) && IsValid(StatusIndicatorWidget))
-		{
-			StatsComponent->OnHealthChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
-			StatsComponent->OnManaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
-			StatsComponent->OnStaminaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
-		}
-
-		UGameplaySkillsComponent* SkillComp = EODChar->GetGameplaySkillsComponent();
-		USkillBarWidget* SkillBarWidget = HUDWidget->GetSkillBarWidget();
-		if (IsValid(SkillComp) && IsValid(SkillBarWidget))
-		{
-			SkillBarWidget->UpdateSkillBarLayout(SkillComp->GetSkillBarLayout());
 		}
 	}
 }

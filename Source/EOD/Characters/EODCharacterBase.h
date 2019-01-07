@@ -71,6 +71,7 @@ public:
 
 	virtual void UnPossessed() override;
 
+	virtual void Restart() override;
 
 	////////////////////////////////////////////////////////////////////////////////
 	// EOD CHARACTER

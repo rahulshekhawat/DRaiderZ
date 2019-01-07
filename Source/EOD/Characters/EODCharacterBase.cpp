@@ -6,6 +6,7 @@
 #include "EOD/Statics/EODBlueprintFunctionLibrary.h"
 #include "EOD/Player/EODPlayerController.h"
 #include "EOD/AI/EODAIControllerBase.h"
+#include "EOD/UI/HUDWidget.h"
 #include "EOD/Characters/Components/SkillsComponent.h"
 #include "EOD/Characters/Components/StatsComponentBase.h"
 #include "EOD/Characters/Components/GameplaySkillsComponent.h"
@@ -153,6 +154,7 @@ void AEODCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
+	// @todo - Enable interaction sphere on client.
 	if (NewController && NewController->IsLocalPlayerController())
 	{
 		EnableInteractionSphere();
@@ -166,6 +168,32 @@ void AEODCharacterBase::PossessedBy(AController* NewController)
 void AEODCharacterBase::UnPossessed()
 {
 	Super::UnPossessed();
+}
+
+void AEODCharacterBase::Restart()
+{
+	Super::Restart();
+
+	if (GetController() && GetController()->IsLocalPlayerController())
+	{
+		AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
+		if (IsValid(PC) && IsValid(PC->GetHUDWidget()))
+		{
+			UStatusIndicatorWidget* StatusIndicatorWidget = PC->GetHUDWidget()->GetStatusIndicatorWidget();
+			if (IsValid(CharacterStatsComponent) && IsValid(StatusIndicatorWidget))
+			{
+				CharacterStatsComponent->OnHealthChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+				CharacterStatsComponent->OnManaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+				CharacterStatsComponent->OnStaminaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+			}
+
+			USkillBarWidget* SkillBarWidget = PC->GetHUDWidget()->GetSkillBarWidget();
+			if (IsValid(GameplaySkillsComponent) && IsValid(SkillBarWidget))
+			{
+				SkillBarWidget->UpdateSkillBarLayout(GameplaySkillsComponent->GetSkillBarLayout());
+			}
+		}
+	}
 }
 
 float AEODCharacterBase::BP_GetRotationYawFromAxisInput() const

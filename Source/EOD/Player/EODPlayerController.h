@@ -41,7 +41,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Possess(APawn* InPawn) override;
+	// virtual void Possess(APawn* InPawn) override;
 
 	virtual void UnPossess() override;
 
@@ -229,9 +229,6 @@ private:
 	// NETWORK
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	UFUNCTION(Client, Reliable)
-	void Client_SetupLocalPlayerOnPossess(APawn* InPawn);
-
 	UFUNCTION(Client, Reliable)
 	void Client_SetupLocalPlayerOnUnpossess(APawn* InPawn);
 
