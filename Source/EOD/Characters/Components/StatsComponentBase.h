@@ -133,7 +133,8 @@ protected:
 	int32 MaxStamina;
 
 	/** Current stamina of character */
-	UPROPERTY(Replicated)
+	// UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentStamina)
 	int32 CurrentStamina;
 
 public:
@@ -402,6 +403,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
 	uint32 bHasStaminaRegenration : 1;
 
+	//~ Begin network code
+private:
+	UFUNCTION()
+	void OnRep_CurrentStamina();
 
 };
 

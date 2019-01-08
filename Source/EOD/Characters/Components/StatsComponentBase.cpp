@@ -50,3 +50,8 @@ void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 }
+
+void UStatsComponentBase::OnRep_CurrentStamina()
+{
+	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
+}

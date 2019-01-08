@@ -420,6 +420,7 @@ void AEODPlayerController::AttemptDodge()
 			// If character successfully started 'dodge'
 			if (bResult)
 			{
+				Server_OnSuccessfulDodge();
 				// EODCharacter->GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 			}
 		}
@@ -518,6 +519,20 @@ void AEODPlayerController::SavePlayerState()
 			GSComp->SaveSkillBarLayout();
 		}
 	}
+}
+
+void AEODPlayerController::Server_OnSuccessfulDodge_Implementation()
+{
+	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetCharacterStatsComponent()))
+	{
+		int32 DodgeCost = DodgeStaminaCost * EODCharacter->GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
+		EODCharacter->GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
+	}
+}
+
+bool AEODPlayerController::Server_OnSuccessfulDodge_Validate()
+{
+	return true;
 }
 
 void AEODPlayerController::Client_SetupLocalPlayerOnUnpossess_Implementation(APawn* InPawn)

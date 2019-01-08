@@ -232,6 +232,9 @@ private:
 	UFUNCTION(Client, Reliable)
 	void Client_SetupLocalPlayerOnUnpossess(APawn* InPawn);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_OnSuccessfulDodge();
+
 };
 
 FORCEINLINE UInventoryComponent* AEODPlayerController::GetInventoryComponent() const
