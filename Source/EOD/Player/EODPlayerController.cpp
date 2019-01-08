@@ -151,12 +151,10 @@ void AEODPlayerController::Tick(float DeltaTime)
 
 }
 
-/*
 void AEODPlayerController::Possess(APawn* InPawn)
 {
 	Super::Possess(InPawn);
 }
-*/
 
 void AEODPlayerController::UnPossess()
 {

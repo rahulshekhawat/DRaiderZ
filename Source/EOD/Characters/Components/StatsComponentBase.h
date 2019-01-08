@@ -47,11 +47,11 @@ protected:
 	float LowHealthPercent;
 
 	/** Current maximum health of character (with or without any status effects) */
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth)
 	int32 MaxHealth;
 
 	/** Current health of character */
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth)
 	int32 CurrentHealth;
 
 public:
@@ -89,11 +89,11 @@ protected:
 	int32 BaseMana;
 
 	/** Current maximum mana of character - with or without any status effects */
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_MaxMana)
 	int32 MaxMana;
 
 	/** Current mana of character */
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentMana)
 	int32 CurrentMana;
 	
 public:
@@ -129,11 +129,10 @@ protected:
 	int32 BaseStamina;
 
 	/** Current maximum stamina of character - with or without any status effects */
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_MaxStamina)
 	int32 MaxStamina;
 
 	/** Current stamina of character */
-	// UPROPERTY(Replicated)
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentStamina)
 	int32 CurrentStamina;
 
@@ -405,6 +404,21 @@ protected:
 
 	//~ Begin network code
 private:
+	UFUNCTION()
+	void OnRep_MaxHealth();
+
+	UFUNCTION()
+	void OnRep_CurrentHealth();
+
+	UFUNCTION()
+	void OnRep_MaxMana();
+
+	UFUNCTION()
+	void OnRep_CurrentMana();
+
+	UFUNCTION()
+	void OnRep_MaxStamina();
+
 	UFUNCTION()
 	void OnRep_CurrentStamina();
 

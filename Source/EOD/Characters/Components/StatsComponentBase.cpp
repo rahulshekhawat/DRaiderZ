@@ -51,7 +51,33 @@ void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 }
 
+void UStatsComponentBase::OnRep_MaxHealth()
+{
+	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
+}
+
+void UStatsComponentBase::OnRep_CurrentHealth()
+{
+	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
+}
+
+void UStatsComponentBase::OnRep_MaxMana()
+{
+	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
+}
+
+void UStatsComponentBase::OnRep_CurrentMana()
+{
+	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
+}
+
+void UStatsComponentBase::OnRep_MaxStamina()
+{
+	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
+}
+
 void UStatsComponentBase::OnRep_CurrentStamina()
 {
 	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
 }
+

@@ -41,7 +41,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	// virtual void Possess(APawn* InPawn) override;
+	virtual void Possess(APawn* InPawn) override;
 
 	virtual void UnPossess() override;
 
