@@ -34,7 +34,7 @@ public:
 	// EOD
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	UPROPERTY()
+	UPROPERTY(Transient)
 	AEODCharacterBase* EODCharacterOwner;
 
 	UPROPERTY()

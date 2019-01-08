@@ -420,7 +420,7 @@ void AEODPlayerController::AttemptDodge()
 			// If character successfully started 'dodge'
 			if (bResult)
 			{
-				EODCharacter->GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
+				// EODCharacter->GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 			}
 		}
 	}

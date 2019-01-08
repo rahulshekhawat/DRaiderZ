@@ -426,7 +426,7 @@ FORCEINLINE int32 UStatsComponentBase::GetCurrentHealth() const
 	return CurrentHealth;
 }
 
-inline void UStatsComponentBase::ModifyBaseHealth(int32 Value, bool bPercent)
+FORCEINLINE void UStatsComponentBase::ModifyBaseHealth(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -444,7 +444,7 @@ inline void UStatsComponentBase::ModifyBaseHealth(int32 Value, bool bPercent)
 	}
 }
 
-inline void UStatsComponentBase::ModifyMaxHealth(int32 Value, bool bPercent)
+FORCEINLINE void UStatsComponentBase::ModifyMaxHealth(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -462,7 +462,7 @@ inline void UStatsComponentBase::ModifyMaxHealth(int32 Value, bool bPercent)
 	}
 }
 
-inline void UStatsComponentBase::ModifyCurrentHealth(int32 Value, bool bPercent)
+FORCEINLINE void UStatsComponentBase::ModifyCurrentHealth(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -513,7 +513,7 @@ FORCEINLINE int32 UStatsComponentBase::GetCurrentMana() const
 	return CurrentMana;
 }
 
-inline void UStatsComponentBase::ModifyBaseMana(int32 Value, bool bPercent)
+FORCEINLINE void UStatsComponentBase::ModifyBaseMana(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -531,7 +531,7 @@ inline void UStatsComponentBase::ModifyBaseMana(int32 Value, bool bPercent)
 	}
 }
 
-inline void UStatsComponentBase::ModifyMaxMana(int32 Value, bool bPercent)
+FORCEINLINE void UStatsComponentBase::ModifyMaxMana(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -549,7 +549,7 @@ inline void UStatsComponentBase::ModifyMaxMana(int32 Value, bool bPercent)
 	}
 }
 
-inline void UStatsComponentBase::ModifyCurrentMana(int32 Value, bool bPercent)
+FORCEINLINE void UStatsComponentBase::ModifyCurrentMana(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -600,7 +600,7 @@ FORCEINLINE int32 UStatsComponentBase::GetCurrentStamina() const
 	return CurrentStamina;
 }
 
-inline void UStatsComponentBase::ModifyBaseStamina(int32 Value, bool bPercent)
+FORCEINLINE void UStatsComponentBase::ModifyBaseStamina(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -618,7 +618,7 @@ inline void UStatsComponentBase::ModifyBaseStamina(int32 Value, bool bPercent)
 	}
 }
 
-inline void UStatsComponentBase::ModifyMaxStamina(int32 Value, bool bPercent)
+FORCEINLINE void UStatsComponentBase::ModifyMaxStamina(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -636,7 +636,7 @@ inline void UStatsComponentBase::ModifyMaxStamina(int32 Value, bool bPercent)
 	}
 }
 
-inline void UStatsComponentBase::ModifyCurrentStamina(int32 Value, bool bPercent)
+FORCEINLINE void UStatsComponentBase::ModifyCurrentStamina(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -654,19 +654,19 @@ inline void UStatsComponentBase::ModifyCurrentStamina(int32 Value, bool bPercent
 	}
 }
 
-inline void UStatsComponentBase::SetBaseStamina(int32 Value)
+FORCEINLINE void UStatsComponentBase::SetBaseStamina(int32 Value)
 {
 	BaseStamina = Value <= 0 ? 0 : Value;
 	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
 }
 
-inline void UStatsComponentBase::SetMaxStamina(int32 Value)
+FORCEINLINE void UStatsComponentBase::SetMaxStamina(int32 Value)
 {
 	MaxStamina = Value <= 0 ? 0 : Value;
 	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
 }
 
-inline void UStatsComponentBase::SetCurrentStamina(int32 Value)
+FORCEINLINE void UStatsComponentBase::SetCurrentStamina(int32 Value)
 {
 	CurrentStamina = Value <= 0 ? 0 : Value;
 	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
