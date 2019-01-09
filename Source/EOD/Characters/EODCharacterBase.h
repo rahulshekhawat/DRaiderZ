@@ -235,6 +235,9 @@ public:
 		}
 	}
 
+	/** [server + local] Plays an animation montage and changes character state over network */
+	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+
 protected:
 	/** Max speed of character when it's walking */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
@@ -247,9 +250,6 @@ protected:
 	/** Max speed of character when it's moving while blocking attacks */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
 	float DefaultWalkSpeedWhileBlocking;
-
-	/** [server + local] Plays an animation montage and changes character state over network */
-	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
 
 	////////////////////////////////////////////////////////////////////////////////

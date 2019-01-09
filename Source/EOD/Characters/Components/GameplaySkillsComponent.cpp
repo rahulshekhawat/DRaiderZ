@@ -101,10 +101,8 @@ void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 	FSkillTableRow* Skill = GetSkill(FName(*SkillIDString));
 	if (Skill && Skill->AnimMontage.Get())
 	{
-		PlayerChar->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName);
+		PlayerChar->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	}
-
-	
 
 }
 
