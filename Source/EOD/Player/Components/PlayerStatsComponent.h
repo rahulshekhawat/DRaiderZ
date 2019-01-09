@@ -280,19 +280,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 Level;
 
-
-	//~ If regeneration rates are not displayed to player in-game then they are not needed to be replicated
-	//~ However, if we do need to replicate regeneration rate then we can simply replicate it to owner only
-
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
-	int32 HealthRegenRate;
-	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
-	int32 ManaRegenRate;
-	
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
-	int32 StaminaRegenRate;
-
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats)
 	int32 PhysicalAttack;
 	
@@ -407,63 +394,22 @@ private:
 	UPROPERTY(Transient)
 	float MagickDamageReductionOnBlock;
 
-	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
-	float HealthRegenTickInterval;
-
-	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
-	float ManaRegenTickInterval;
-
-	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
-	float StaminaRegenTickInterval;
-
-	UPROPERTY(Transient)
-	bool bIsRegeneratingHealth;
-
-	UPROPERTY(Transient)
-	bool bIsRegeneratingMana;
-
-	UPROPERTY(Transient)
-	bool bIsRegeneratingStamina;
-
 	UPROPERTY(Transient)
 	UStatusIndicatorWidget* StatusIndicatorWidget;
 
 	UPROPERTY(EditAnywhere, Category = Widgets, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UStatusIndicatorWidget> StatusIndicatorWidgetClass;
 
-	FTimerHandle HealthRegenTimerHandle;
-
-	FTimerHandle ManaRegenTimerHandle;
-
-	FTimerHandle StaminaRegenTimerHandle;
-
 	FWeaponTableRow* PrimaryWeaponData;
 
 	FWeaponTableRow* SecondaryWeaponData;
 
-	/** Starts health regeneration on player. Automatically stops once the health is full or if manually stopped */
-	void ActivateHealthRegeneration();
-
-	/** Starts health regeneration on player. Automatically stops once the mana is full or if manually stopped */
-	void ActivateManaRegeneration();
-
-	//~ @note maybe its better to never stop stamina regeneration
-	/** Starts health regeneration on player. Automatically stops once the stamina is full or if manually stopped */
-	void ActivateStaminaRegeneration();
-
-	/** Stops health regeneration */
-	void DeactivateHealthRegeneration();
-
-	/** Stops mana regeneration */
-	void DeactivateManaRegeneration();
-
-	/** Stops stamina regeneration */
-	void DeactivateStaminaRegeneration();
-
+	/*
 	void RegenerateHealth();
 
 	void RegenerateMana();
 
 	void RegenerateStamina();
+	*/
 
 };

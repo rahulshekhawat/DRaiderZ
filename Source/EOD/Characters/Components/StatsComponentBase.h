@@ -393,14 +393,76 @@ public:
 
 protected:
 	//~ @note following booleans are used to initialize timers for derived stats components
-	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
 	uint32 bHasHealthRegenration : 1;
 
-	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
 	uint32 bHasManaRegenration : 1;
 
-	UPROPERTY(EditDefaultsOnly, Category = Regeneration)
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
 	uint32 bHasStaminaRegenration : 1;
+
+	UPROPERTY(Transient)
+	uint32 bIsRegeneratingHealth : 1;
+
+	UPROPERTY(Transient)
+	uint32 bIsRegeneratingMana : 1;
+
+	UPROPERTY(Transient)
+	uint32 bIsRegeneratingStamina : 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
+	float HealthRegenTickInterval;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
+	float ManaRegenTickInterval;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
+	float StaminaRegenTickInterval;
+
+	//~ If regeneration rates are not displayed to player in-game then they are not needed to be replicated
+	//~ However, if we do need to replicate regeneration rate then we can simply replicate it to owner only
+	//~ UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration", AdvancedDisplay)
+	int32 HealthRegenRate;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration", AdvancedDisplay)
+	int32 ManaRegenRate;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration", AdvancedDisplay)
+	int32 StaminaRegenRate;
+
+	FTimerHandle HealthRegenTimerHandle;
+
+	FTimerHandle ManaRegenTimerHandle;
+
+	FTimerHandle StaminaRegenTimerHandle;
+
+	/** Starts health regeneration on player. Automatically stops once the health is full or if manually stopped */
+	void ActivateHealthRegeneration();
+
+	/** Starts health regeneration on player. Automatically stops once the mana is full or if manually stopped */
+	void ActivateManaRegeneration();
+
+	//~ @note maybe its better to never stop stamina regeneration
+	/** Starts health regeneration on player. Automatically stops once the stamina is full or if manually stopped */
+	void ActivateStaminaRegeneration();
+
+	/** Stops health regeneration */
+	void DeactivateHealthRegeneration();
+
+	/** Stops mana regeneration */
+	void DeactivateManaRegeneration();
+
+	/** Stops stamina regeneration */
+	void DeactivateStaminaRegeneration();
+
+	void RegenerateHealth();
+
+	void RegenerateMana();
+
+	void RegenerateStamina();
 
 	//~ Begin network code
 private:
@@ -515,6 +577,10 @@ FORCEINLINE void UStatsComponentBase::SetCurrentHealth(int32 Value)
 {
 	CurrentHealth = Value <= 0 ? 0 : Value;
 	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
+	if (bHasHealthRegenration && CurrentHealth < MaxHealth && !bIsRegeneratingHealth)
+	{
+		ActivateHealthRegeneration();
+	}
 }
 
 FORCEINLINE int32 UStatsComponentBase::GetBaseMana() const
@@ -602,6 +668,10 @@ FORCEINLINE void UStatsComponentBase::SetCurrentMana(int32 Value)
 {
 	CurrentMana = Value <= 0 ? 0 : Value;
 	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
+	if (bHasManaRegenration && CurrentMana < MaxMana && !bIsRegeneratingMana)
+	{
+		ActivateManaRegeneration();
+	}
 }
 
 FORCEINLINE int32 UStatsComponentBase::GetBaseStamina() const
@@ -689,4 +759,8 @@ FORCEINLINE void UStatsComponentBase::SetCurrentStamina(int32 Value)
 {
 	CurrentStamina = Value <= 0 ? 0 : Value;
 	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
+	if (bHasStaminaRegenration && CurrentStamina < MaxStamina && !bIsRegeneratingStamina)
+	{
+		ActivateStaminaRegeneration();
+	}
 }

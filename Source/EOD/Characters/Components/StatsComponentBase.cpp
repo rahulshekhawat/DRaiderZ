@@ -3,6 +3,8 @@
 #include "StatsComponentBase.h"
 
 #include "UnrealNetwork.h"
+#include "TimerManager.h"
+#include "Engine/World.h"
 
 UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
@@ -81,3 +83,95 @@ void UStatsComponentBase::OnRep_CurrentStamina()
 	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
 }
 
+void UStatsComponentBase::ActivateHealthRegeneration()
+{
+	if (IsValid(GetWorld()) && HealthRegenTickInterval > 0.f)
+	{
+		GetWorld()->GetTimerManager().SetTimer(HealthRegenTimerHandle,
+			this,
+			&UStatsComponentBase::RegenerateHealth,
+			HealthRegenTickInterval,
+			true);
+		bIsRegeneratingHealth = true;
+	}
+}
+
+void UStatsComponentBase::ActivateManaRegeneration()
+{
+	if (IsValid(GetWorld()) && ManaRegenTickInterval > 0.f)
+	{
+		GetWorld()->GetTimerManager().SetTimer(ManaRegenTimerHandle,
+			this,
+			&UStatsComponentBase::RegenerateMana,
+			ManaRegenTickInterval,
+			true);
+		bIsRegeneratingMana = true;
+	}
+}
+
+void UStatsComponentBase::ActivateStaminaRegeneration()
+{
+	if (IsValid(GetWorld()) && StaminaRegenTickInterval > 0.f)
+	{
+		GetWorld()->GetTimerManager().SetTimer(StaminaRegenTimerHandle,
+			this,
+			&UStatsComponentBase::RegenerateStamina,
+			StaminaRegenTickInterval,
+			true);
+		bIsRegeneratingStamina = true;
+	}
+}
+
+void UStatsComponentBase::DeactivateHealthRegeneration()
+{
+	if (IsValid(GetWorld()))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(HealthRegenTimerHandle);
+	}
+	bIsRegeneratingHealth = false;
+}
+
+void UStatsComponentBase::DeactivateManaRegeneration()
+{
+	if (IsValid(GetWorld()))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ManaRegenTimerHandle);
+	}
+	bIsRegeneratingMana = false;
+}
+
+void UStatsComponentBase::DeactivateStaminaRegeneration()
+{
+	if (IsValid(GetWorld()))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(StaminaRegenTimerHandle);
+	}
+	bIsRegeneratingStamina = false;
+}
+
+void UStatsComponentBase::RegenerateHealth()
+{
+	ModifyCurrentHealth(HealthRegenRate);
+	if (CurrentHealth >= MaxHealth)
+	{
+		DeactivateHealthRegeneration();
+	}
+}
+
+void UStatsComponentBase::RegenerateMana()
+{
+	ModifyCurrentMana(ManaRegenRate);
+	if (CurrentMana >= MaxMana)
+	{
+		DeactivateManaRegeneration();
+	}
+}
+
+void UStatsComponentBase::RegenerateStamina()
+{
+	ModifyCurrentStamina(StaminaRegenRate);
+	if (CurrentStamina >= MaxStamina)
+	{
+		DeactivateStaminaRegeneration();
+	}
+}

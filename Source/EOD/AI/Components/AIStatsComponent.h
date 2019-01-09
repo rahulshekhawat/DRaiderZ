@@ -287,11 +287,11 @@ private:
 	//~ @note Assuming the regeneration rates for AI wouldn't change, they do not need to be replicated
 	//~ If they do change, however, server should handle any changes in character health and mana
 
-	UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
-	int32 HealthRegenRate;
+	// UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
+	// int32 HealthRegenRate;
 	
-	UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
-	int32 ManaRegenRate;
+	// UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
+	// int32 ManaRegenRate;
 
 	//~ @note Since server will handle all calculations for damage, combat stats are not needed to be replicated to client
 

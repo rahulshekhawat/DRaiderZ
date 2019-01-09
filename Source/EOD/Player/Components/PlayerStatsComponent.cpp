@@ -38,7 +38,7 @@ void UPlayerStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializeComponentWidget();
+	// InitializeComponentWidget();
 
 	// @todo load damage and resistance stats
 	ActivateHealthRegeneration();
@@ -1062,6 +1062,7 @@ uint8 UPlayerStatsComponent::GetCrowdControlImmunitiesFromSkill() const
 	return CrowdControlImmunitiesFromSkill;
 }
 
+/*
 void UPlayerStatsComponent::ActivateHealthRegeneration()
 {
 	GetWorld()->GetTimerManager().SetTimer(HealthRegenTimerHandle,
@@ -1109,7 +1110,9 @@ void UPlayerStatsComponent::DeactivateStaminaRegeneration()
 	GetWorld()->GetTimerManager().ClearTimer(StaminaRegenTimerHandle);
 	bIsRegeneratingStamina = false;
 }
+*/
 
+/*
 void UPlayerStatsComponent::RegenerateHealth()
 {
 	ModifyCurrentHealth(HealthRegenRate);
@@ -1140,3 +1143,4 @@ void UPlayerStatsComponent::RegenerateStamina()
 		DeactivateStaminaRegeneration();
 	}
 }
+*/
