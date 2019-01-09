@@ -24,19 +24,13 @@ public:
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual int32 GetHealthRegenRate() const override;
-
 	virtual int32 ModifyHealthRegenRate(int32 Value) override;
 
 	virtual void SetHealthRegenRate(int32 Value) override;
 
-	virtual int32 GetManaRegenRate() const override;
-
 	virtual int32 ModifyManaRegenRate(int32 Value) override;
 
 	virtual void SetManaRegenRate(int32 Value) override;
-
-	virtual int32 GetStaminaRegenRate() const override;
 
 	virtual int32 ModifyStaminaRegenRate(int32 Value) override;
 
@@ -259,39 +253,6 @@ private:
 	/** Current character level */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 Level;
-
-	/** Maximum health of character without any status effects */
-	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
-	// int32 BaseHealth;
-
-	/** Current maximum health of character - with or without any status effects */
-	// UPROPERTY(Replicated)
-	// int32 MaxHealth;
-
-	/** Current health of character */
-	// UPROPERTY(Replicated)
-	// int32 CurrentHealth;
-	
-	/** Maximum mana of character without any status effects */
-	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
-	// int32 BaseMana;
-
-	/** Current maximum mana of character - with or without any status effects */
-	// UPROPERTY(Replicated)
-	// int32 MaxMana;
-
-	/** Current mana of character */
-	// UPROPERTY(Replicated)
-	// int32 CurrentMana;
-	
-	//~ @note Assuming the regeneration rates for AI wouldn't change, they do not need to be replicated
-	//~ If they do change, however, server should handle any changes in character health and mana
-
-	// UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
-	// int32 HealthRegenRate;
-	
-	// UPROPERTY(EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
-	// int32 ManaRegenRate;
 
 	//~ @note Since server will handle all calculations for damage, combat stats are not needed to be replicated to client
 

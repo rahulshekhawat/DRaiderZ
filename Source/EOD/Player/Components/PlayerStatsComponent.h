@@ -30,19 +30,13 @@ public:
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual int32 GetHealthRegenRate() const override;
-
 	virtual int32 ModifyHealthRegenRate(int32 Value) override;
 
 	virtual void SetHealthRegenRate(int32 Value) override;
 
-	virtual int32 GetManaRegenRate() const override;
-
 	virtual int32 ModifyManaRegenRate(int32 Value) override;
 
 	virtual void SetManaRegenRate(int32 Value) override;
-
-	virtual int32 GetStaminaRegenRate() const override;
 
 	virtual int32 ModifyStaminaRegenRate(int32 Value) override;
 

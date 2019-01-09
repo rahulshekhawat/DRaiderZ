@@ -161,19 +161,19 @@ private:
 
 
 public:
-	virtual int32 GetHealthRegenRate() const PURE_VIRTUAL(UStatsComponentBase::GetHealthRegenRate, return 0; );
+	FORCEINLINE int32 GetHealthRegenRate() const;
 
 	virtual int32 ModifyHealthRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyHealthRegenRate, return 0; );
 
 	virtual void SetHealthRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetHealthRegenRate, );
 
-	virtual int32 GetManaRegenRate() const PURE_VIRTUAL(UStatsComponentBase::GetManaRegenRate, return 0; );
+	FORCEINLINE int32 GetManaRegenRate() const;
 
 	virtual int32 ModifyManaRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyManaRegenRate, return 0; );
 
 	virtual void SetManaRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetManaRegenRate, );
 
-	virtual int32 GetStaminaRegenRate() const PURE_VIRTUAL(UStatsComponentBase::GetStaminaRegenRate, return 0; );
+	FORCEINLINE int32 GetStaminaRegenRate() const;
 
 	virtual int32 ModifyStaminaRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyStaminaRegenRate, return 0; );
 
@@ -763,4 +763,19 @@ FORCEINLINE void UStatsComponentBase::SetCurrentStamina(int32 Value)
 	{
 		ActivateStaminaRegeneration();
 	}
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetHealthRegenRate() const
+{
+	return HealthRegenRate;
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetManaRegenRate() const
+{
+	return ManaRegenRate;
+}
+
+FORCEINLINE int32 UStatsComponentBase::GetStaminaRegenRate() const
+{
+	return StaminaRegenRate;
 }

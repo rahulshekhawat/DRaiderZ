@@ -24,13 +24,6 @@ void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	/*
-	DOREPLIFETIME(UAIStatsComponent, MaxHealth);
-	DOREPLIFETIME(UAIStatsComponent, CurrentHealth);
-	DOREPLIFETIME(UAIStatsComponent, MaxMana);
-	DOREPLIFETIME(UAIStatsComponent, CurrentMana);
-	*/
-
-	/*
 	DOREPLIFETIME(UAIStatsComponent, MovementSpeedModifier);
 	DOREPLIFETIME(UAIStatsComponent, ActiveTimeDilation);
 	DOREPLIFETIME(UAIStatsComponent, SpellCastingSpeedModifier);
@@ -38,167 +31,6 @@ void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(UAIStatsComponent, Darkness);
 	*/
 
-}
-
-/*
-int32 UAIStatsComponent::GetBaseHealth() const
-{
-	return BaseHealth;
-}
-
-int32 UAIStatsComponent::GetMaxHealth() const
-{
-	return MaxHealth;
-}
-
-int32 UAIStatsComponent::GetCurrentHealth() const
-{
-	return CurrentHealth;
-}
-
-int32 UAIStatsComponent::ModifyBaseHealth(int32 Value)
-{
-	BaseHealth += Value;
-	return BaseHealth;
-}
-
-int32 UAIStatsComponent::ModifyMaxHealth(int32 Value)
-{
-	MaxHealth += Value;
-	return MaxHealth;
-}
-
-int32 UAIStatsComponent::ModifyCurrentHealth(int32 Value)
-{
-	int32 Result = CurrentHealth + Value;
-	Result = Result <= 0 ? 0 : Result;
-	SetCurrentHealth(Result);
-	return Result;
-}
-
-void UAIStatsComponent::SetBaseHealth(int32 Value)
-{
-}
-
-void UAIStatsComponent::SetMaxHealth(int32 Value)
-{
-	MaxHealth = Value;
-}
-
-void UAIStatsComponent::SetCurrentHealth(int32 Value)
-{
-	CurrentHealth = Value;
-
-	UFloatingHealthBarWidget* HealthWidget = Cast<UFloatingHealthBarWidget>(OwningAIChar->GetHealthWidgetComp()->GetUserWidgetObject());
-	if (HealthWidget && MaxHealth != 0)
-	{
-		float Percent = (float)CurrentHealth / (float)MaxHealth;
-		HealthWidget->HealthBar->SetPercent(Percent);
-	}
-}
-
-bool UAIStatsComponent::IsLowOnHealth() const
-{
-	return (CurrentHealth / MaxHealth) <= 0.25;
-}
-
-int32 UAIStatsComponent::GetBaseMana() const
-{
-	return BaseMana;
-}
-
-int32 UAIStatsComponent::GetMaxMana() const
-{
-	return MaxMana;
-}
-
-int32 UAIStatsComponent::GetCurrentMana() const
-{
-	return CurrentMana;
-}
-
-int32 UAIStatsComponent::ModifyBaseMana(int32 Value)
-{
-	BaseMana += Value;
-	return BaseMana;
-}
-
-int32 UAIStatsComponent::ModifyMaxMana(int32 Value)
-{
-	MaxMana += Value;
-	return MaxMana;
-}
-
-int32 UAIStatsComponent::ModifyCurrentMana(int32 Value)
-{
-	CurrentMana += Value;
-	return CurrentMana;
-}
-
-void UAIStatsComponent::SetBaseMana(int32 Value)
-{
-}
-
-void UAIStatsComponent::SetMaxMana(int32 Value)
-{
-}
-
-void UAIStatsComponent::SetCurrentMana(int32 Value)
-{
-}
-
-int32 UAIStatsComponent::GetBaseStamina() const
-{
-	// AI stats component does not implement BaseStamina
-	return 0;
-}
-
-int32 UAIStatsComponent::GetMaxStamina() const
-{
-	// AI stats component does not implement MaxStamina
-	return 0;
-}
-
-int32 UAIStatsComponent::GetCurrentStamina() const
-{
-	// AI stats component does not implement CurrentStamina
-	return 0;
-}
-
-int32 UAIStatsComponent::ModifyBaseStamina(int32 Value)
-{
-	// empty definition
-	return 0;
-}
-
-int32 UAIStatsComponent::ModifyMaxStamina(int32 Value)
-{
-	// empty definition
-	return 0;
-}
-
-int32 UAIStatsComponent::ModifyCurrentStamina(int32 Value)
-{
-	// empty definition
-	return 0;
-}
-
-void UAIStatsComponent::SetBaseStamina(int32 Value)
-{
-}
-
-void UAIStatsComponent::SetMaxStamina(int32 Value)
-{
-}
-
-void UAIStatsComponent::SetCurrentStamina(int32 Value)
-{
-}
-*/
-
-int32 UAIStatsComponent::GetHealthRegenRate() const
-{
-	return HealthRegenRate;
 }
 
 int32 UAIStatsComponent::ModifyHealthRegenRate(int32 Value)
@@ -210,11 +42,6 @@ void UAIStatsComponent::SetHealthRegenRate(int32 Value)
 {
 }
 
-int32 UAIStatsComponent::GetManaRegenRate() const
-{
-	return ManaRegenRate;
-}
-
 int32 UAIStatsComponent::ModifyManaRegenRate(int32 Value)
 {
 	return int32();
@@ -222,12 +49,6 @@ int32 UAIStatsComponent::ModifyManaRegenRate(int32 Value)
 
 void UAIStatsComponent::SetManaRegenRate(int32 Value)
 {
-}
-
-int32 UAIStatsComponent::GetStaminaRegenRate() const
-{
-	// AI stats component does not implement StaminaRegenRate
-	return 0;
 }
 
 int32 UAIStatsComponent::ModifyStaminaRegenRate(int32 Value)
