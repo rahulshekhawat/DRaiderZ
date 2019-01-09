@@ -87,6 +87,8 @@ public:
 
 	void SaveSkillBarLayout();
 
+	UFUNCTION()
+	void AddNewSkill(int32 SkillIndex, FString SkillGroup);
 
 	////////////////////////////////////////////////////////////////////////////////
 	// NETWORK

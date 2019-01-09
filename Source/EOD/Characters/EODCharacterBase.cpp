@@ -19,7 +19,7 @@
 FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
 FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
 FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
-FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Gameplay Skills"));
+FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Skill Manager"));
 FName AEODCharacterBase::InteractionSphereComponentName(TEXT("Interaction Sphere"));
 
 AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
@@ -28,7 +28,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	PrimaryActorTick.bCanEverTick = true;
 
 	CharacterStatsComponent = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, AEODCharacterBase::CharacterStatsComponentName);
-	GameplaySkillsComponent = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, AEODCharacterBase::GameplaySkillsComponentName);
+	SkillManager = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, AEODCharacterBase::GameplaySkillsComponentName);
 
 	CameraBoomComponent = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, AEODCharacterBase::SpringArmComponentName);
 	if (CameraBoomComponent)
@@ -374,9 +374,10 @@ void AEODCharacterBase::BindUIDelegates()
 			}
 
 			USkillBarWidget* SkillBarWidget = PC->GetHUDWidget()->GetSkillBarWidget();
-			if (IsValid(GameplaySkillsComponent) && IsValid(SkillBarWidget))
+			if (IsValid(SkillManager) && IsValid(SkillBarWidget))
 			{
-				SkillBarWidget->UpdateSkillBarLayout(GameplaySkillsComponent->GetSkillBarLayout());
+				SkillBarWidget->UpdateSkillBarLayout(SkillManager->GetSkillBarLayout());
+				SkillBarWidget->OnNewSkillAdded.AddUniqueDynamic(SkillManager, &UGameplaySkillsComponent::AddNewSkill);
 			}
 		}
 	}

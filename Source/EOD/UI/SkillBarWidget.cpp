@@ -157,12 +157,20 @@ void USkillBarWidget::SaveSkillBarLayout()
 bool USkillBarWidget::OnNewSkillDropped(UEODItemContainer* FromContainer, UEODItemContainer* ToContainer)
 {
 	USkillTreeItemContainer* STContainer = Cast<USkillTreeItemContainer>(FromContainer);
-	// if (!IsValid(STContainer) || !IsValid(ToContainer) || !ContainersList.Contains(ToContainer) || !(STContainer->SkillGroup == FString("")))
 	if (!IsValid(STContainer) || !IsValid(ToContainer) || STContainer->SkillGroup == FString(""))
 	{
 		return false;
 	}
 
+	int32 ToContainerIndex = GetIndexOfSkillContainer(ToContainer);
+	if (ToContainerIndex <= 0 || ToContainerIndex > 20)
+	{
+		return false;
+	}
+
+	OnNewSkillAdded.Broadcast(ToContainerIndex, STContainer->SkillGroup);
+
+	// if (!IsValid(STContainer) || !IsValid(ToContainer) || !ContainersList.Contains(ToContainer) || !(STContainer->SkillGroup == FString("")))
 	ToContainer->EODItemInfo = FromContainer->EODItemInfo;
 	ToContainer->RefreshContainerVisuals();
 

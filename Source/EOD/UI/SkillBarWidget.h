@@ -10,6 +10,10 @@
 #include "Blueprint/UserWidget.h"
 #include "SkillBarWidget.generated.h"
 
+
+/** Delegate for when a new skill from skill tree is dropped on skill bar */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNewSkillAddedMCDelegate, int32, SkillBarIndex, FString, SkillGroup);
+
 /**
  * 
  */
@@ -92,6 +96,9 @@ public:
 	UPROPERTY(Transient)
 	TMap<int32, UEODItemContainer*> IndexToContainerMap;
 
+	UPROPERTY(BlueprintAssignable, Category = "Skill Bar")
+	FOnNewSkillAddedMCDelegate OnNewSkillAdded;
+
 public:
 	/** Get ID of skill placed at given index of skill bar */
 	inline FName GetSkillIDAtIndex(const int32 ContainerIndex) const;
@@ -133,6 +140,9 @@ private:
 
 	/** Returns EOD item container at given skill index */
 	inline UEODItemContainer* GetSkillContainerAtIndex(const int32 Index) const;
+
+	/** Returns the skill index of given container. Returns -1 if the container couldn't be found. */
+	inline int32 GetIndexOfSkillContainer(UEODItemContainer* Container) const;
 
 	/** Get the owning EOD player of this widget */
 	FORCEINLINE APlayerCharacter* GetOwningEODPlayer() const;
@@ -205,7 +215,6 @@ inline void USkillBarWidget::InitializeSkillContainer(UEODItemContainer* Contain
 	}
 }
 
-
 inline UEODItemContainer* USkillBarWidget::GetSkillContainerAtIndex(const int32 ContainerIndex) const
 {
 	switch (ContainerIndex)
@@ -255,6 +264,20 @@ inline UEODItemContainer* USkillBarWidget::GetSkillContainerAtIndex(const int32 
 	}
 
 	return nullptr;
+}
+
+inline int32 USkillBarWidget::GetIndexOfSkillContainer(UEODItemContainer* Container) const
+{
+	for (int i = 1; i <= 20; i++)
+	{
+		if (Container == GetSkillContainerAtIndex(i))
+		{
+			return i;
+		}
+	}
+
+	// return invalid index if the container couldn't be found
+	return -1;
 }
 
 FORCEINLINE APlayerCharacter* USkillBarWidget::GetOwningEODPlayer() const

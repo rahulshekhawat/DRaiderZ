@@ -27,7 +27,7 @@ UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& Obj
 void UGameplaySkillsComponent::PostLoad()
 {
 	Super::PostLoad();
-	LoadSkillBarLayout();
+	// LoadSkillBarLayout();
 }
 
 void UGameplaySkillsComponent::BeginPlay()
@@ -104,6 +104,8 @@ void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 		PlayerChar->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName);
 	}
 
+	
+
 }
 
 void UGameplaySkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
@@ -145,6 +147,11 @@ void UGameplaySkillsComponent::SaveSkillBarLayout()
 		PlayerSaveGame->SkillBarLayout = SBIndexToSGMap;
 		UGameplayStatics::SaveGameToSlot(PlayerSaveGame, GameInstance->GetCurrentPlayerSaveGameName(), GameInstance->PlayerIndex);
 	}
+}
+
+void UGameplaySkillsComponent::AddNewSkill(int32 SkillIndex, FString SkillGroup)
+{
+	SBIndexToSGMap.Add(SkillIndex, SkillGroup);
 }
 
 void UGameplaySkillsComponent::Server_SetCurrentActiveSkill_Implementation(const FName SkillID)

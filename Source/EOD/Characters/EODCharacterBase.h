@@ -260,7 +260,7 @@ public:
 
 	FORCEINLINE UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 
-	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const { return GameplaySkillsComponent; }
+	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const { return SkillManager; }
 
 	FORCEINLINE UStatsComponentBase* GetCharacterStatsComponent() const { return CharacterStatsComponent; }
 
@@ -307,7 +307,7 @@ private:
 
 	//~ Skill bar component - manages skill bar (for player controlled character) and skills of character
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UGameplaySkillsComponent* GameplaySkillsComponent;
+	UGameplaySkillsComponent* SkillManager;
 
 	//~ Sphere component used to detect interactive objects
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
