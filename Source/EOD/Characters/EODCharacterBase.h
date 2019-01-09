@@ -104,6 +104,10 @@ private:
 	UPROPERTY(Replicated)
 	float BlockMovementDirectionYaw;
 
+	void BindUIDelegates();
+
+	void UnbindUIDelegates();
+
 protected:
 	UPROPERTY()
 	float DesiredRotationYawFromAxisInput;

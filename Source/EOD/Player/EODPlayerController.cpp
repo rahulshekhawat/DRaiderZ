@@ -18,8 +18,8 @@
 #include "GameFramework/SpringArmComponent.h"
 
 
-FName AEODPlayerController::InventoryComponentName(TEXT("Player Inventory"));
-FName AEODPlayerController::SkillTreeComponentName(TEXT("Player Skill Tree"));
+const FName AEODPlayerController::InventoryComponentName(TEXT("Player Inventory"));
+const FName AEODPlayerController::SkillTreeComponentName(TEXT("Player Skill Tree"));
 
 AEODPlayerController::AEODPlayerController(const FObjectInitializer & ObjectInitializer): Super(ObjectInitializer)
 {

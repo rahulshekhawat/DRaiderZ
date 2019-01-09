@@ -148,6 +148,8 @@ void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Intentional additional call to BindUIDelegates (another in Restart())
+	BindUIDelegates();
 }
 
 void AEODCharacterBase::PossessedBy(AController* NewController)
@@ -174,26 +176,8 @@ void AEODCharacterBase::Restart()
 {
 	Super::Restart();
 
-	if (GetController() && GetController()->IsLocalPlayerController())
-	{
-		AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
-		if (IsValid(PC) && IsValid(PC->GetHUDWidget()))
-		{
-			UStatusIndicatorWidget* StatusIndicatorWidget = PC->GetHUDWidget()->GetStatusIndicatorWidget();
-			if (IsValid(CharacterStatsComponent) && IsValid(StatusIndicatorWidget))
-			{
-				CharacterStatsComponent->OnHealthChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
-				CharacterStatsComponent->OnManaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
-				CharacterStatsComponent->OnStaminaChanged.AddDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
-			}
-
-			USkillBarWidget* SkillBarWidget = PC->GetHUDWidget()->GetSkillBarWidget();
-			if (IsValid(GameplaySkillsComponent) && IsValid(SkillBarWidget))
-			{
-				SkillBarWidget->UpdateSkillBarLayout(GameplaySkillsComponent->GetSkillBarLayout());
-			}
-		}
-	}
+	// Intentional additional call to BindUIDelegates (another in BeginPlay())
+	BindUIDelegates();
 }
 
 float AEODCharacterBase::BP_GetRotationYawFromAxisInput() const
@@ -372,6 +356,34 @@ void AEODCharacterBase::EnableiFrames(float Duration)
 void AEODCharacterBase::DisableiFrames()
 {
 	bActiveiFrames = false;
+}
+
+void AEODCharacterBase::BindUIDelegates()
+{
+	if (GetController() && GetController()->IsLocalPlayerController())
+	{
+		AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
+		if (IsValid(PC) && IsValid(PC->GetHUDWidget()))
+		{
+			UStatusIndicatorWidget* StatusIndicatorWidget = PC->GetHUDWidget()->GetStatusIndicatorWidget();
+			if (IsValid(CharacterStatsComponent) && IsValid(StatusIndicatorWidget))
+			{
+				CharacterStatsComponent->OnHealthChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+				CharacterStatsComponent->OnManaChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+				CharacterStatsComponent->OnStaminaChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+			}
+
+			USkillBarWidget* SkillBarWidget = PC->GetHUDWidget()->GetSkillBarWidget();
+			if (IsValid(GameplaySkillsComponent) && IsValid(SkillBarWidget))
+			{
+				SkillBarWidget->UpdateSkillBarLayout(GameplaySkillsComponent->GetSkillBarLayout());
+			}
+		}
+	}
+}
+
+void AEODCharacterBase::UnbindUIDelegates()
+{
 }
 
 void AEODCharacterBase::EnableDamageBlocking()

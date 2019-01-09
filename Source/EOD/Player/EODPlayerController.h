@@ -67,9 +67,9 @@ public:
 
 	FORCEINLINE USkillTreeComponent* GetSkillTreeComponent() const { return SkillTreeComponent; }
 
-	static FName InventoryComponentName;
+	static const FName InventoryComponentName;
 	
-	static FName SkillTreeComponentName;
+	static const FName SkillTreeComponentName;
 
 private:
 	//~ Inventory component
