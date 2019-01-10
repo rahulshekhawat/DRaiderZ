@@ -36,11 +36,6 @@ void AHumanCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
-void AHumanCharacter::PostInitProperties()
-{
-	Super::PostInitProperties();
-}
-
 void AHumanCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

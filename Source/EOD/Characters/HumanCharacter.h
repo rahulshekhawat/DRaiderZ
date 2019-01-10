@@ -33,8 +33,6 @@ public:
 	/** Spawn default weapon(s) */
 	virtual void PostInitializeComponents() override;
 
-	virtual void PostInitProperties() override;
-
 	virtual void Tick(float DeltaTime) override;
 
 	/** Initializes player animation references. Creates player HUD widget and adds it to the viewport. */
@@ -135,14 +133,14 @@ private:
 
 FORCEINLINE void AHumanCharacter::SetMasterPoseComponentForMeshes()
 {
-	if (GetMesh())
+	if (IsValid(GetMesh()))
 	{
-		Hair->SetMasterPoseComponent(GetMesh());
-		HatItem->SetMasterPoseComponent(GetMesh());
-		FaceItem->SetMasterPoseComponent(GetMesh());
-		Chest->SetMasterPoseComponent(GetMesh());
-		Hands->SetMasterPoseComponent(GetMesh());
-		Legs->SetMasterPoseComponent(GetMesh());
-		Feet->SetMasterPoseComponent(GetMesh());
+		if (IsValid(Hair))		{ Hair->SetMasterPoseComponent(GetMesh()); }
+		if (IsValid(HatItem))	{ HatItem->SetMasterPoseComponent(GetMesh()); }
+		if (IsValid(FaceItem))	{ FaceItem->SetMasterPoseComponent(GetMesh()); }
+		if (IsValid(Chest))		{ Chest->SetMasterPoseComponent(GetMesh()); }
+		if (IsValid(Hands))		{ Hands->SetMasterPoseComponent(GetMesh()); }
+		if (IsValid(Legs))		{ Legs->SetMasterPoseComponent(GetMesh()); }
+		if (IsValid(Feet))		{ Feet->SetMasterPoseComponent(GetMesh()); }
 	}
 }
