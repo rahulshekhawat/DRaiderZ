@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODLevelScriptActor.h"
+#include "EOD/Characters/EODCharacterBase.h"
 #include "EOD/Characters/PlayerCharacter.h"
 
 #include "Kismet/KismetSystemLibrary.h"
@@ -27,10 +28,10 @@ void AEODLevelScriptActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AEODLevelScriptActor::OnCombatStarted_Implementation(APlayerCharacter* PlayerCharacter)
+void AEODLevelScriptActor::OnCombatStarted_Implementation(AEODCharacterBase* PlayerCharacter)
 {
 }
 
-void AEODLevelScriptActor::OnCombatEnded_Implementation(APlayerCharacter* PlayerCharacter)
+void AEODLevelScriptActor::OnCombatEnded_Implementation(AEODCharacterBase* PlayerCharacter)
 {
 }

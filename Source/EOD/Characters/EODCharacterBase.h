@@ -30,6 +30,10 @@ class UGameplayEventBase;
 class UStatsComponentBase;
 class UGameplaySkillsComponent;
 // class USkillTreeComponent;
+class AEODCharacterBase;
+
+/** Delegate for when a character either enters or leaves combat */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCombatStateChangedMCDelegate, AEODCharacterBase*, Character);
 
 /** 
  * Delegate for when a gameplay event occurs
@@ -1038,10 +1042,16 @@ public:
 
 	FOnGameplayEventMCDelegate OnLowHealth;
 
-	FOnGameplayEventMCDelegate OnEnteringCombat;
+	// FOnGameplayEventMCDelegate OnEnteringCombat;
 
-	FOnGameplayEventMCDelegate OnLeavingCombat;
+	// FOnGameplayEventMCDelegate OnLeavingCombat;
 	//~ 
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
+	FOnCombatStateChangedMCDelegate OnInitiatingCombat;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
+	FOnCombatStateChangedMCDelegate OnLeavingCombat;
 
 	/** [Local] Display status effect message on player screen */
 	FORCEINLINE void DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)

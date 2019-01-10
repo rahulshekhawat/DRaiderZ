@@ -6,7 +6,7 @@
 #include "Engine/LevelScriptActor.h"
 #include "EODLevelScriptActor.generated.h"
 
-class APlayerCharacter;
+class AEODCharacterBase;
 
 /**
  * 
@@ -24,14 +24,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Combat)
-	void OnCombatStarted(APlayerCharacter* PlayerCharacter);
+	void OnCombatStarted(AEODCharacterBase* PlayerCharacter);
 
-	virtual void OnCombatStarted_Implementation(APlayerCharacter* PlayerCharacter);
+	virtual void OnCombatStarted_Implementation(AEODCharacterBase* PlayerCharacter);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Combat)
-	void OnCombatEnded(APlayerCharacter* PlayerCharacter);
+	void OnCombatEnded(AEODCharacterBase* PlayerCharacter);
 
-	virtual void OnCombatEnded_Implementation(APlayerCharacter* PlayerCharacter);
+	virtual void OnCombatEnded_Implementation(AEODCharacterBase* PlayerCharacter);
 
 
 };

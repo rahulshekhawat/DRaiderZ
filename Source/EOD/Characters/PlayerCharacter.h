@@ -30,13 +30,6 @@ class UDialogueWindowWidget;
 class UWeaponDataAsset;
 class APlayerCharacter;
 
-/**
- * Delegate for when a player either enters or leaves combat
- * 
- * PlayerCharacter = Player that entered or left the combat state
- */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCombatStateChangedMCDelegate, APlayerCharacter*, PlayerCharacter);
-
 /** Delegate for when a player changes it's weapon */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, WeaponID, UWeaponDataAsset*, WeaponDataAsset);
 
@@ -464,12 +457,6 @@ public:
 	void ExitDialogue(UDialogueWindowWidget* Widget);
 
 	virtual void ExitDialogue_Implementation(UDialogueWindowWidget* Widget);
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
-	FOnCombatStateChangedMCDelegate OnInitiatingCombat;
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
-	FOnCombatStateChangedMCDelegate OnLeavingCombat;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
 	FOnWeaponChangedMCDelegate OnPrimaryWeaponEquipped;
