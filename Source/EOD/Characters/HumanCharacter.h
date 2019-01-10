@@ -43,10 +43,6 @@ public:
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
 
-	virtual void PossessedBy(AController* NewController) override;
-
-	virtual void UnPossessed() override;
-
 
 	////////////////////////////////////////////////////////////////////////////////
 	// COMPONENTS

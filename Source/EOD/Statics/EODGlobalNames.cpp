@@ -6,6 +6,7 @@
 namespace MaterialParameterNames
 {
 	const FName BaseColor(TEXT("BaseColor"));
+	const FName TargetSwitchOn(TEXT("Target_Switch_On"));
 }
 
 namespace CollisionProfileNames

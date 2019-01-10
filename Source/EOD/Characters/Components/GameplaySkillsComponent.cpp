@@ -99,6 +99,7 @@ void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 
 	FString SkillIDString = GenderPrefix + SGToUse + FString("_") + FString::FromInt(1);
 	FSkillTableRow* Skill = GetSkill(FName(*SkillIDString));
+
 	if (Skill && Skill->AnimMontage.Get())
 	{
 		PlayerChar->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);

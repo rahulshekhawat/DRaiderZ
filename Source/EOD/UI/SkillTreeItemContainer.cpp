@@ -13,7 +13,6 @@ bool USkillTreeItemContainer::Initialize()
 	if (Super::Initialize() && SkillUpgradeText)
 	{
 		LoadDefaultSkillTreeContainerState();
-		// DisableContainer();
 		return true;
 	}
 	return false;

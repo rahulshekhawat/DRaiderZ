@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EOD/Characters/HumanCharacter.h"
+#include "EOD/Statics/EODGlobalNames.h"
 
 #include "GameFramework/PlayerController.h"
 
@@ -55,17 +56,6 @@ void AHumanCharacter::BeginPlay()
 void AHumanCharacter::Destroyed()
 {
 	Super::Destroyed();
-}
-
-void AHumanCharacter::PossessedBy(AController* NewController)
-{
-	Super::PossessedBy(NewController);
-}
-
-void AHumanCharacter::UnPossessed()
-{
-	Super::UnPossessed();
-
 }
 
 USkeletalMeshComponent* AHumanCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer)
@@ -137,14 +127,13 @@ void AHumanCharacter::TurnOnTargetSwitch()
 	{
 		Super::TurnOnTargetSwitch();
 
-		FName ParamName = FName("Target_Switch_On");
-		Hair->SetScalarParameterValueOnMaterials(ParamName, 1.f);
-		HatItem->SetScalarParameterValueOnMaterials(ParamName, 1.f);
-		FaceItem->SetScalarParameterValueOnMaterials(ParamName, 1.f);
-		Chest->SetScalarParameterValueOnMaterials(ParamName, 1.f);
-		Hands->SetScalarParameterValueOnMaterials(ParamName, 1.f);
-		Legs->SetScalarParameterValueOnMaterials(ParamName, 1.f);
-		Feet->SetScalarParameterValueOnMaterials(ParamName, 1.f);
+		Hair->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 1.f);
+		HatItem->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 1.f);
+		FaceItem->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 1.f);
+		Chest->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 1.f);
+		Hands->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 1.f);
+		Legs->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 1.f);
+		Feet->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 1.f);
 	}
 }
 
@@ -156,13 +145,12 @@ void AHumanCharacter::TurnOffTargetSwitch()
 	{
 		Super::TurnOnTargetSwitch();
 
-		FName ParamName = FName("Target_Switch_On");
-		Hair->SetScalarParameterValueOnMaterials(ParamName, 0.f);
-		HatItem->SetScalarParameterValueOnMaterials(ParamName, 0.f);
-		FaceItem->SetScalarParameterValueOnMaterials(ParamName, 0.f);
-		Chest->SetScalarParameterValueOnMaterials(ParamName, 0.f);
-		Hands->SetScalarParameterValueOnMaterials(ParamName, 0.f);
-		Legs->SetScalarParameterValueOnMaterials(ParamName, 0.f);
-		Feet->SetScalarParameterValueOnMaterials(ParamName, 0.f);
+		Hair->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
+		HatItem->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
+		FaceItem->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
+		Chest->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
+		Hands->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
+		Legs->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
+		Feet->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
 	}
 }
