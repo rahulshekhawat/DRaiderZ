@@ -78,7 +78,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	bWeaponSheathed = true;
 
 	// MaxNumberOfSkills = 30;
-	DodgeStaminaCost = 20;
+	DodgeStaminaCost = 30;
 	DodgeImmunityTriggerDelay = 0.1f;
 	DodgeImmunityDuration = 0.4;
 	DamageBlockTriggerDelay = 0.2f;
@@ -696,6 +696,16 @@ void AEODCharacterBase::MultiCast_PlayAnimationMontage_Implementation(UAnimMonta
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
 		CharacterState = NewState;
 	}
+}
+
+void AEODCharacterBase::StartDodge()
+{
+	// @todo
+}
+
+void AEODCharacterBase::StopDodge()
+{
+	// @todo
 }
 
 bool AEODCharacterBase::StartDodging()

@@ -1566,7 +1566,7 @@ void APlayerCharacter::Destroyed()
 	UnloadEquippedWeaponAnimationReferences();
 }
 
-void APlayerCharacter::SavePlayerState()
+void APlayerCharacter::SaveCharacterState()
 {
 	if (HUDWidget)
 	{

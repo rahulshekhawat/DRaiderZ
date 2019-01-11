@@ -53,6 +53,10 @@ void AHumanCharacter::Destroyed()
 	Super::Destroyed();
 }
 
+void AHumanCharacter::SaveCharacterState()
+{
+}
+
 USkeletalMeshComponent* AHumanCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer)
 {
 	USkeletalMeshComponent* Sk = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, Name);
@@ -62,6 +66,40 @@ USkeletalMeshComponent* AHumanCharacter::CreateNewArmorComponent(const FName Nam
 		Sk->bUseAttachParentBound = true;
 	}
 	return Sk;
+}
+
+bool AHumanCharacter::CanDodge() const
+{
+	return IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking();
+}
+
+void AHumanCharacter::StartDodge()
+{
+	if (IsValid(GetCharacterStatsComponent()))
+	{
+		int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
+		if (GetCharacterStatsComponent()->GetCurrentStamina() >= DodgeCost && CanDodge())
+		{
+			if (bCharacterStateAllowsMovement)
+			{
+				SetCharacterStateAllowsMovement(false);
+			}
+			if (Role < ROLE_Authority)
+			{
+
+				Server_StartDodge();
+			}
+			else
+			{
+				GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
+
+			}
+		}
+	}
+}
+
+void AHumanCharacter::StopDodge()
+{
 }
 
 bool AHumanCharacter::StartDodging()
@@ -148,4 +186,12 @@ void AHumanCharacter::TurnOffTargetSwitch()
 		Legs->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
 		Feet->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
 	}
+}
+
+void AHumanCharacter::Server_StartDodge()
+{
+}
+
+void AHumanCharacter::Multicast_StartDodge()
+{
 }

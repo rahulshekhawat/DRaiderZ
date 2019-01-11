@@ -242,6 +242,10 @@ public:
 	/** [server + local] Plays an animation montage and changes character state over network */
 	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
+	/** Saves current character state */
+	UFUNCTION(BlueprintCallable, Category = "EOD Character")
+	virtual void SaveCharacterState() { ; }
+
 protected:
 	/** Max speed of character when it's walking */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
@@ -322,6 +326,10 @@ private:
 	// ACTIONS
 	////////////////////////////////////////////////////////////////////////////////
 public:
+	virtual void StartDodge();
+
+	virtual void StopDodge();
+
 	virtual bool StartDodging();
 
 	virtual bool StopDodging();

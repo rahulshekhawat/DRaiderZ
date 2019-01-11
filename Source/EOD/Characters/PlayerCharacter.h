@@ -123,8 +123,7 @@ public:
 	virtual void Destroyed() override;
 
 	/** Saves current player state */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
-	void SavePlayerState();
+	virtual void SaveCharacterState() override;
 
 	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
 

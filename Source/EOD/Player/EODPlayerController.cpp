@@ -57,7 +57,7 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("NormalAttack", IE_Released, this, &AEODPlayerController::OnReleasingNormalAttackKey);
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AEODPlayerController::MakePawnJump);
-	InputComponent->BindAction("Dodge", IE_Pressed, this, &AEODPlayerController::AttemptDodge);
+	InputComponent->BindAction("Dodge", IE_Pressed, this, &AEODPlayerController::MakePawnDodge);
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AEODPlayerController::TriggerInteraction);
 
 	InputComponent->BindAction("Escape", IE_Pressed, this, &AEODPlayerController::OnPressingEscapeKey);
@@ -422,6 +422,14 @@ void AEODPlayerController::AttemptDodge()
 				// EODCharacter->GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 			}
 		}
+	}
+}
+
+void AEODPlayerController::MakePawnDodge()
+{
+	if (IsValid(EODCharacter))
+	{
+		EODCharacter->StartDodge();
 	}
 }
 

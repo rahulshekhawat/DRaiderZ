@@ -41,10 +41,14 @@ public:
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
 
+	//~
+public:
+	/** Saves current player state */
+	virtual void SaveCharacterState() override;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// COMPONENTS
-	////////////////////////////////////////////////////////////////////////////////
+	//~
+
+	//~ Begin Components
 private:
 	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player face
 
@@ -69,16 +73,26 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Feet;
 
+	// For playing hit sound effects
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAudioComponent* AudioComponent;
+
 	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
 
 	FORCEINLINE void SetMasterPoseComponentForMeshes();
+	//~ End Components
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// ACTIONS
-	////////////////////////////////////////////////////////////////////////////////
+	//~ Begin Character Action Handling
 public:
+	/** Returns true if character can dodge */
+	virtual bool CanDodge() const;
+
+	virtual void StartDodge() override;
+
+	virtual void StopDodge() override;
+
 	virtual bool StartDodging() override;
 
 	virtual bool StopDodging() override;
@@ -86,10 +100,9 @@ public:
 	virtual void EnableCharacterGuard() override;
 
 	virtual void DisableCharacterGuard() override;
+	//~ End Character Action Handling
 
-	////////////////////////////////////////////////////////////////////////////////
-	// INPUT
-	////////////////////////////////////////////////////////////////////////////////
+	//~ Begin Input Handling
 private:
 	void OnPressedForward();
 
@@ -111,21 +124,25 @@ private:
 
 	UFUNCTION()
 	void DisableBackwardPressed();
+	//~ End Input Handling
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// MATERIALS
-	////////////////////////////////////////////////////////////////////////////////
+	//~ Begin Materials
 public:
 	virtual void TurnOnTargetSwitch() override;
 
 	virtual void TurnOffTargetSwitch() override;
+	//~ End Materials
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// NETWORK
-	////////////////////////////////////////////////////////////////////////////////
+	//~ Begin Network Code
 private:
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_StartDodge();
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void Multicast_StartDodge();
+	//~ End Network Code
 	
 
 
