@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EOD/Weapons/PrimaryWeapon.h"
+#include "EOD/Statics/CharacterLibrary.h"
 #include "EOD/Characters/EODCharacterBase.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "HumanCharacter.generated.h"
 
-class AController;
-class USkillsComponent;
+
 class UAudioComponent;
 class USkeletalMeshComponent;
 
@@ -45,7 +46,6 @@ public:
 public:
 	/** Saves current player state */
 	virtual void SaveCharacterState() override;
-
 	//~
 
 	//~ Begin Components
@@ -82,6 +82,31 @@ private:
 
 	FORCEINLINE void SetMasterPoseComponentForMeshes();
 	//~ End Components
+
+
+	//~ Begin Animation Handling
+public:
+	inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
+
+private:
+	/** Animations for this player when it has a weapon equipped */
+	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
+
+	/** Animations for this player when it does not have a weapon equipped */
+	FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
+	//~ End Animation Handling
+
+
+	//~ Begin Weapon System
+public:
+	/** Returns the weapon type of primary weapon */
+	FORCEINLINE EWeaponType GetEquippedWeaponType() const;
+
+private:
+	/** An actor for primary weapon equipped by the player */
+	UPROPERTY(Transient)
+	APrimaryWeapon* PrimaryWeapon;
+	//~ End Weapon System
 
 
 	//~ Begin Character Action Handling
@@ -160,4 +185,18 @@ FORCEINLINE void AHumanCharacter::SetMasterPoseComponentForMeshes()
 		if (IsValid(Legs))		{ Legs->SetMasterPoseComponent(GetMesh()); }
 		if (IsValid(Feet))		{ Feet->SetMasterPoseComponent(GetMesh()); }
 	}
+}
+
+inline FPlayerAnimationReferencesTableRow* AHumanCharacter::GetActiveAnimationReferences() const
+{
+	if (IsWeaponSheathed() || GetEquippedWeaponType() == EWeaponType::None)
+	{
+		return UnequippedWeaponAnimationReferences;
+	}
+	return EquippedWeaponAnimationReferences;
+}
+
+EWeaponType AHumanCharacter::GetEquippedWeaponType() const
+{
+	return PrimaryWeapon ? PrimaryWeapon->GetWeaponType() : EWeaponType::None;
 }

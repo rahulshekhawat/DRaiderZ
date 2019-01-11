@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EOD/Characters/HumanCharacter.h"
+#include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 #include "EOD/Statics/EODGlobalNames.h"
 
 #include "GameFramework/PlayerController.h"
@@ -80,10 +81,32 @@ void AHumanCharacter::StartDodge()
 		int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
 		if (GetCharacterStatsComponent()->GetCurrentStamina() >= DodgeCost && CanDodge())
 		{
+			if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->Dodge.Get())
+			{
+				return;
+			}
+
 			if (bCharacterStateAllowsMovement)
 			{
 				SetCharacterStateAllowsMovement(false);
 			}
+
+			float DesiredYaw = ForwardAxisValue != 0 ? DesiredRotationYawFromAxisInput : GetControllerRotationYaw();
+
+			// Instantly rotate character
+			SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+			// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
+			UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+			if (MoveComp)
+			{
+				MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+			}
+
+			UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
+
+
+
+
 			if (Role < ROLE_Authority)
 			{
 
