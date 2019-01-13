@@ -37,7 +37,7 @@ private:
 	UPROPERTY(Transient)
 	AEODCharacterBase* EODCharacterOwner;
 
-	UPROPERTY()
+	// UPROPERTY(ReplicatedUsing = OnRep_ActiveSkillID)
 	FName ActiveSkillID;
 
 	FSkillTableRow* ActiveSkill;
@@ -68,6 +68,8 @@ protected:
 		return SkillsDataTable ? SkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString) : nullptr;
 	}
 
+	void UseSkill(FName SkillID);
+
 public:
 	void SetCurrentActiveSkill(const FName SkillID);
 
@@ -94,6 +96,9 @@ public:
 	// NETWORK
 	////////////////////////////////////////////////////////////////////////////////
 private:
+	// UFUNCTION()
+	// void OnRep_ActiveSkillID();
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCurrentActiveSkill(const FName SkillID);
 

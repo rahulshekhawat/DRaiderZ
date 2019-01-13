@@ -50,6 +50,11 @@ void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 void UGameplaySkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+}
+
+void UGameplaySkillsComponent::UseSkill(FName SkillID)
+{
 }
 
 void UGameplaySkillsComponent::SetCurrentActiveSkill(const FName SkillID)
@@ -76,7 +81,7 @@ void UGameplaySkillsComponent::SetCurrentActiveSkill(const FName SkillID)
 
 void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
-	if (SkillKeyIndex <= 0 || SkillKeyIndex > SBIndexToSGMap.Num())
+	if (SkillKeyIndex <= 0 || !SBIndexToSGMap.Contains(SkillKeyIndex))
 	{
 		// Invalid skill key index
 		return;
@@ -152,6 +157,12 @@ void UGameplaySkillsComponent::AddNewSkill(int32 SkillIndex, FString SkillGroup)
 {
 	SBIndexToSGMap.Add(SkillIndex, SkillGroup);
 }
+
+/*
+void UGameplaySkillsComponent::OnRep_ActiveSkillID()
+{
+}
+*/
 
 void UGameplaySkillsComponent::Server_SetCurrentActiveSkill_Implementation(const FName SkillID)
 {
