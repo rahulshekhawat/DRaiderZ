@@ -326,13 +326,9 @@ private:
 	// ACTIONS
 	////////////////////////////////////////////////////////////////////////////////
 public:
-	virtual void StartDodge();
+	virtual bool StartDodge();
 
-	virtual void StopDodge();
-
-	virtual bool StartDodging();
-
-	virtual bool StopDodging();
+	virtual bool StopDodge();
 
 	virtual void EnableCharacterGuard();
 

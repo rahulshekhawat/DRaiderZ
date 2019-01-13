@@ -698,17 +698,7 @@ void AEODCharacterBase::MultiCast_PlayAnimationMontage_Implementation(UAnimMonta
 	}
 }
 
-void AEODCharacterBase::StartDodge()
-{
-	// @todo
-}
-
-void AEODCharacterBase::StopDodge()
-{
-	// @todo
-}
-
-bool AEODCharacterBase::StartDodging()
+bool AEODCharacterBase::StartDodge()
 {
 	if (CanDodge())
 	{
@@ -719,7 +709,7 @@ bool AEODCharacterBase::StartDodging()
 	return false;
 }
 
-bool AEODCharacterBase::StopDodging()
+bool AEODCharacterBase::StopDodge()
 {
 	if (IsDodging())
 	{
@@ -744,7 +734,6 @@ void AEODCharacterBase::DisableCharacterGuard()
 {
 	SetCharacterState(ECharacterState::IdleWalkRun);
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
-
 }
 
 void AEODCharacterBase::TriggerInteraction()

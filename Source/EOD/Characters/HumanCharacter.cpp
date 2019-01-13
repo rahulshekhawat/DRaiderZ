@@ -74,63 +74,12 @@ bool AHumanCharacter::CanDodge() const
 	return IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking();
 }
 
-void AHumanCharacter::StartDodge()
-{
-	if (IsValid(GetCharacterStatsComponent()))
-	{
-		int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
-		if (GetCharacterStatsComponent()->GetCurrentStamina() >= DodgeCost && CanDodge())
-		{
-			if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->Dodge.Get())
-			{
-				return;
-			}
-
-			if (bCharacterStateAllowsMovement)
-			{
-				SetCharacterStateAllowsMovement(false);
-			}
-
-			float DesiredYaw = ForwardAxisValue != 0 ? DesiredRotationYawFromAxisInput : GetControllerRotationYaw();
-
-			// Instantly rotate character
-			SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-			// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
-			UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-			if (MoveComp)
-			{
-				MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
-			}
-
-			UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
-
-
-
-
-			if (Role < ROLE_Authority)
-			{
-
-				Server_StartDodge();
-			}
-			else
-			{
-				GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
-
-			}
-		}
-	}
-}
-
-void AHumanCharacter::StopDodge()
-{
-}
-
-bool AHumanCharacter::StartDodging()
+bool AHumanCharacter::StartDodge()
 {
 	return false;
 }
 
-bool AHumanCharacter::StopDodging()
+bool AHumanCharacter::StopDodge()
 {
 	return false;
 }
@@ -177,9 +126,8 @@ void AHumanCharacter::DisableBackwardPressed()
 
 void AHumanCharacter::TurnOnTargetSwitch()
 {
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	// Change material parameter only if character is NOT controlled by player
-	if (!PC)
+	// Change material parameter only if character is NOT controlled by local player
+	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		Super::TurnOnTargetSwitch();
 
@@ -195,9 +143,8 @@ void AHumanCharacter::TurnOnTargetSwitch()
 
 void AHumanCharacter::TurnOffTargetSwitch()
 {
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	// Change material parameter only if character is NOT controlled by player
-	if (!PC)
+	// Change material parameter only if character is NOT controlled by local player
+	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		Super::TurnOnTargetSwitch();
 
@@ -209,12 +156,23 @@ void AHumanCharacter::TurnOffTargetSwitch()
 		Legs->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
 		Feet->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
 	}
+
+
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC)
+	{
+	}
 }
 
-void AHumanCharacter::Server_StartDodge()
+void AHumanCharacter::Server_StartDodge_Implementation()
 {
 }
 
-void AHumanCharacter::Multicast_StartDodge()
+bool AHumanCharacter::Server_StartDodge_Validate()
+{
+	return true;
+}
+
+void AHumanCharacter::Multicast_StartDodge_Implementation()
 {
 }

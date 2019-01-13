@@ -327,16 +327,9 @@ bool APlayerCharacter::CanJump() const
 
 bool APlayerCharacter::CanDodge() const
 {
-	int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
-
 	// @todo add UsingSkill, Looting, Interacting, etc. to this too
-	if (GetCharacterStatsComponent()->GetCurrentStamina() >= DodgeCost &&
-		(IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking()))
-	{
-		return true;
-	}
-
-	return false;
+	// return IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking();
+	return IsIdleOrMoving() || IsGuardActive() || IsCastingSpell() || IsNormalAttacking();
 }
 
 bool APlayerCharacter::CanGuardAgainstAttacks() const
@@ -916,72 +909,87 @@ void APlayerCharacter::SetActiveWeaponSlotIndex(int32 NewSlotIndex)
 	ActiveWeaponSlotIndex = NewSlotIndex;
 }
 
-bool APlayerCharacter::StartDodging()
+bool APlayerCharacter::StartDodge()
 {
 	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->Dodge.Get())
 	{
 		return false;
 	}
 
-	// If the animations for dodge are missing
-	UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
-	if (IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking())
+	if (!CanDodge())
 	{
-		// Disable movement during dodge
-		if (bCharacterStateAllowsMovement)
-		{
-			SetCharacterStateAllowsMovement(false);
-		}
+		return false;
+	}
 
-		// Rotate character
-		float DesiredYaw = GetControllerRotationYaw();
-		if (ForwardAxisValue != 0)
-		{
-			DesiredYaw = DesiredRotationYawFromAxisInput;
-		}
+	if (IsGuardActive())
+	{
+		DeactivateGuard();
 
-		// Instantly rotate character
-		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-		// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
-		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-		if (MoveComp)
-		{
-			MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
-		}
+		// Because desired rotation yaw from axis input wouldn't have updated if guard was active
+		UpdateDesiredYawFromAxisInput();
+	}
+	else if (IsCastingSpell())
+	{
+		// @todo stop casting spell
+	}
+	else if (IsNormalAttacking())
+	{
+		StopNormalAttack();
+	}
 
-		FName SectionToPlay;
-		if (ForwardAxisValue == 0)
+	UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
+	// Disable movement during dodge
+	if (bCharacterStateAllowsMovement)
+	{
+		SetCharacterStateAllowsMovement(false);
+	}
+
+	// Rotate character
+	float DesiredYaw = GetControllerRotationYaw();
+	if (ForwardAxisValue != 0)
+	{
+		DesiredYaw = DesiredRotationYawFromAxisInput;
+	}
+
+	// Instantly rotate character
+	SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+	// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (MoveComp)
+	{
+		MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+	}
+
+	FName SectionToPlay;
+	if (ForwardAxisValue == 0)
+	{
+		if (RightAxisValue > 0)
 		{
-			if (RightAxisValue > 0)
-			{
-				SectionToPlay = UCharacterLibrary::SectionName_RightDodge;
-			}
-			else if (RightAxisValue < 0)
-			{
-				SectionToPlay = UCharacterLibrary::SectionName_LeftDodge;
-			}
-			else
-			{
-				SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
-			}
+			SectionToPlay = UCharacterLibrary::SectionName_RightDodge;
+		}
+		else if (RightAxisValue < 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_LeftDodge;
 		}
 		else
 		{
-			if (ForwardAxisValue > 0)
-			{
-				SectionToPlay = UCharacterLibrary::SectionName_ForwardDodge;
-			}
-			else if (ForwardAxisValue < 0)
-			{
-				SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
-			}
+			SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
 		}
-		PlayAnimationMontage(DodgeMontage, SectionToPlay, ECharacterState::Dodging);
-		TriggeriFrames(DodgeImmunityDuration, DodgeImmunityTriggerDelay);
-		return true;
 	}
-
-	return false;
+	else
+	{
+		if (ForwardAxisValue > 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_ForwardDodge;
+		}
+		else if (ForwardAxisValue < 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
+		}
+	}
+	PlayAnimationMontage(DodgeMontage, SectionToPlay, ECharacterState::Dodging);
+	TriggeriFrames(DodgeImmunityDuration, DodgeImmunityTriggerDelay);
+	return true;
 }
 
 void APlayerCharacter::OnDodge()

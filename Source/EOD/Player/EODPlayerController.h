@@ -180,8 +180,6 @@ private:
 
 	void AttemptDodge();
 
-	void MakePawnDodge();
-
 	void TriggerInteraction();
 
 	void ToggleAutoMove();

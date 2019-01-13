@@ -57,7 +57,7 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("NormalAttack", IE_Released, this, &AEODPlayerController::OnReleasingNormalAttackKey);
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AEODPlayerController::MakePawnJump);
-	InputComponent->BindAction("Dodge", IE_Pressed, this, &AEODPlayerController::MakePawnDodge);
+	InputComponent->BindAction("Dodge", IE_Pressed, this, &AEODPlayerController::AttemptDodge);
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AEODPlayerController::TriggerInteraction);
 
 	InputComponent->BindAction("Escape", IE_Pressed, this, &AEODPlayerController::OnPressingEscapeKey);
@@ -414,22 +414,13 @@ void AEODPlayerController::AttemptDodge()
 		int32 DodgeCost = DodgeStaminaCost * EODCharacter->GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
 		if (EODCharacter->GetCharacterStatsComponent()->GetCurrentStamina() >= DodgeCost)
 		{
-			bool bResult = EODCharacter->StartDodging();
+			bool bResult = EODCharacter->StartDodge();
 			// If character successfully started 'dodge'
 			if (bResult)
 			{
 				Server_OnSuccessfulDodge();
-				// EODCharacter->GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 			}
 		}
-	}
-}
-
-void AEODPlayerController::MakePawnDodge()
-{
-	if (IsValid(EODCharacter))
-	{
-		EODCharacter->StartDodge();
 	}
 }
 
