@@ -44,7 +44,51 @@ void UEODGameInstance::Init()
 
 }
 
-void UEODGameInstance::LoadProfile(FString& ProfileName)
+void UEODGameInstance::CreateNewProfile(const FString& ProfileName)
 {
-	// @todo
+	if (IsValid(MetaSaveGame))
+	{
+		UPlayerSaveGame* PlayerSaveGame = Cast<UPlayerSaveGame>(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
+		if (IsValid(PlayerSaveGame))
+		{
+			bool bResult = UGameplayStatics::SaveGameToSlot(PlayerSaveGame, ProfileName, UEODGameInstance::PlayerIndex);
+			if (bResult)
+			{
+				FMetaSaveGameData TempMSGData;
+				TempMSGData.SaveSlotName = ProfileName;
+				TempMSGData.CharacterName = ProfileName;
+				TempMSGData.PlayerIndex = UEODGameInstance::PlayerIndex;
+				TempMSGData.LastSaveTime = FDateTime::Now();
+
+				MetaSaveGame->SaveSlotMetaDataList.Add(TempMSGData);
+				UGameplayStatics::SaveGameToSlot(MetaSaveGame, UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex);
+			}
+		}
+	}
+
+}
+
+UPlayerSaveGame* UEODGameInstance::LoadProfileAsCurrent(const FString& ProfileName)
+{
+	if (ProfileName == CurrentProfileName)
+	{
+		return CurrentProfileSaveGame;
+	}
+	else
+	{
+		if (IsValid(MetaSaveGame))
+		{
+			UPlayerSaveGame* PlayerSaveGame = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(ProfileName, UEODGameInstance::PlayerIndex));
+			if (IsValid(PlayerSaveGame))
+			{
+				CurrentProfileSaveGame = PlayerSaveGame;
+				CurrentProfileName = ProfileName;
+				MetaSaveGame->LastUsedSlotName = ProfileName;
+				UGameplayStatics::SaveGameToSlot(MetaSaveGame, UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex);
+				return CurrentProfileSaveGame;
+			}
+		}
+	}
+
+	return nullptr;
 }

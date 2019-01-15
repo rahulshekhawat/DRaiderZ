@@ -12,7 +12,6 @@ struct EOD_API FMetaSaveGameData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
 	UPROPERTY(BlueprintReadOnly, Category = "Save Game Meta Data")
 	FString SaveSlotName;
 
@@ -24,7 +23,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Save Game Meta Data")
 	int32 PlayerIndex;
-
 };
 
 

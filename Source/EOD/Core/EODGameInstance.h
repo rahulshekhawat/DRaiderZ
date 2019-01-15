@@ -41,7 +41,9 @@ public:
 	static const FString MetaSaveSlotName;
 
 public:
-	void LoadProfile(FString& ProfileName);
+	void CreateNewProfile(const FString& ProfileName);
+
+	UPlayerSaveGame* LoadProfileAsCurrent(const FString& ProfileName);
 
 	FORCEINLINE UMetaSaveGame* GetMetaSaveGameObject() const { return MetaSaveGame; }
 

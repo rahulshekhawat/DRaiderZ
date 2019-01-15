@@ -51,7 +51,10 @@ protected:
 
 
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
-	void HandleAnyKeyEvent(const FKey& Key);
+	void CreateAndLoadNewProfile(const FString& NewProfileName);
+
+	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	void HandleTitleScreenAnyKeyEvent(const FKey& Key);
 	//~ 
 private:
 

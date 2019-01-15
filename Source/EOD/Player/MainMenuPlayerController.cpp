@@ -1,6 +1,8 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "MainMenuPlayerController.h"
+#include "EOD/Player/MainMenuPlayerController.h"
+#include "EOD/Core/EODGameInstance.h"
+#include "EOD/SaveSystem/PlayerSaveGame.h"
 
 AMainMenuPlayerController::AMainMenuPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -31,40 +33,72 @@ void AMainMenuPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AMainMenuPlayerController::HandleAnyKeyEvent(const FKey& Key)
+void AMainMenuPlayerController::CreateAndLoadNewProfile(const FString& NewProfileName)
 {
-	if (Key.IsMouseButton() || Key == EKeys::Escape)
+	UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
+	if (IsValid(GameInstance) && IsValid(ActiveWidget) && ActiveWidget == CreateNewProfileWidget)
 	{
-		return;
-	}
+		ActiveWidget->RemoveFromParent();
 
-	if (ActiveWidget == TitleScreenWidget)
-	{
-		if (CreateNewProfileWidgetClass.Get())
+		GameInstance->CreateNewProfile(NewProfileName);
+		UPlayerSaveGame* PlayerSaveGame = GameInstance->LoadProfileAsCurrent(NewProfileName);
+		if (IsValid(PlayerSaveGame))
 		{
-			ActiveWidget->RemoveFromParent();
-			CreateNewProfileWidget = CreateWidget<UUserWidget>(this, CreateNewProfileWidgetClass);
-			if (IsValid(CreateNewProfileWidget))
+			if (!IsValid(MainMenuWidget) && MainMenuWidgetClass.Get())
 			{
-				ActiveWidget = CreateNewProfileWidget;
-				ActiveWidget->AddToViewport();
+				MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
 			}
-		}
 
-
-		/*
-		if (MainMenuWidgetClass.Get())
-		{
-			TitleScreenWidget->RemoveFromParent();
-			MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
 			if (IsValid(MainMenuWidget))
 			{
 				ActiveWidget = MainMenuWidget;
 				ActiveWidget->AddToViewport();
 			}
 		}
-		*/
+	}
+
+}
+
+void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent(const FKey& Key)
+{
+	if (Key.IsMouseButton() || Key == EKeys::Escape)
+	{
+		return;
+	}
+
+	if (IsValid(ActiveWidget) && ActiveWidget == TitleScreenWidget)
+	{
+		ActiveWidget->RemoveFromParent();
+		ActiveWidget = nullptr;
 	}
 
 
+	UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
+	UPlayerSaveGame* PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
+	if (IsValid(PlayerSaveGame))
+	{
+		if (!IsValid(MainMenuWidget) && MainMenuWidgetClass.Get())
+		{
+			MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
+		}
+
+		if (IsValid(MainMenuWidget))
+		{
+			ActiveWidget = MainMenuWidget;
+			ActiveWidget->AddToViewport();
+		}
+	}
+	else
+	{
+		if (!IsValid(CreateNewProfileWidget) && CreateNewProfileWidgetClass.Get())
+		{
+			CreateNewProfileWidget = CreateWidget<UUserWidget>(this, CreateNewProfileWidgetClass);
+		}
+
+		if (IsValid(CreateNewProfileWidget))
+		{
+			ActiveWidget = CreateNewProfileWidget;
+			ActiveWidget->AddToViewport();
+		}
+	}
 }
