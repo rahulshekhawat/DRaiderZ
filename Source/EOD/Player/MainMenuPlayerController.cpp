@@ -33,30 +33,91 @@ void AMainMenuPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AMainMenuPlayerController::SwitchToTitleScreenWidget()
+{
+}
+
+void AMainMenuPlayerController::SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSaveGame)
+{
+	// If a proper player save game was not passed as an argument, we try to get the current player save game object from game instance
+	if (!IsValid(PlayerSaveGame))
+	{
+		UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
+		PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
+	}
+
+	if (IsValid(ActiveWidget) && ActiveWidget != MainMenuWidget)
+	{
+		ActiveWidget->RemoveFromParent();
+		ActiveWidget = nullptr;
+	}
+
+	if (!IsValid(MainMenuWidget) && MainMenuWidgetClass.Get())
+	{
+		MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
+	}
+
+	if (IsValid(MainMenuWidget))
+	{
+		ActiveWidget = MainMenuWidget;
+		ActiveWidget->AddToViewport();
+
+		// @todo load main menu widget state from player save game
+	}
+}
+
+void AMainMenuPlayerController::SwitchToCreateNewProfileWidget()
+{
+	if (IsValid(ActiveWidget) && ActiveWidget != CreateNewProfileWidget)
+	{
+		ActiveWidget->RemoveFromParent();
+		ActiveWidget = nullptr;
+	}
+
+	if (!IsValid(CreateNewProfileWidget) && CreateNewProfileWidgetClass.Get())
+	{
+		CreateNewProfileWidget = CreateWidget<UUserWidget>(this, CreateNewProfileWidgetClass);
+	}
+
+	if (IsValid(CreateNewProfileWidget))
+	{
+		ActiveWidget = CreateNewProfileWidget;
+		ActiveWidget->AddToViewport();
+	}
+}
+
+void AMainMenuPlayerController::SwitchToMultiplayerWidget()
+{
+	if (IsValid(ActiveWidget) && ActiveWidget != MultiplayerWidget)
+	{
+		ActiveWidget->RemoveFromParent();
+		ActiveWidget = nullptr;
+	}
+
+	if (!IsValid(MultiplayerWidget) && MultiplayerWidgetClass.Get())
+	{
+		MultiplayerWidget = CreateWidget<UUserWidget>(this, MultiplayerWidgetClass);
+	}
+
+	if (IsValid(MultiplayerWidget))
+	{
+		ActiveWidget = MultiplayerWidget;
+		ActiveWidget->AddToViewport();
+	}
+}
+
 void AMainMenuPlayerController::CreateAndLoadNewProfile(const FString& NewProfileName)
 {
 	UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
 	if (IsValid(GameInstance) && IsValid(ActiveWidget) && ActiveWidget == CreateNewProfileWidget)
 	{
-		ActiveWidget->RemoveFromParent();
-
 		GameInstance->CreateNewProfile(NewProfileName);
 		UPlayerSaveGame* PlayerSaveGame = GameInstance->LoadProfileAsCurrent(NewProfileName);
 		if (IsValid(PlayerSaveGame))
 		{
-			if (!IsValid(MainMenuWidget) && MainMenuWidgetClass.Get())
-			{
-				MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
-			}
-
-			if (IsValid(MainMenuWidget))
-			{
-				ActiveWidget = MainMenuWidget;
-				ActiveWidget->AddToViewport();
-			}
+			SwitchToMainMenuWidget(PlayerSaveGame);
 		}
 	}
-
 }
 
 void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent(const FKey& Key)
@@ -66,39 +127,15 @@ void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent(const FKey& Key)
 		return;
 	}
 
-	if (IsValid(ActiveWidget) && ActiveWidget == TitleScreenWidget)
-	{
-		ActiveWidget->RemoveFromParent();
-		ActiveWidget = nullptr;
-	}
-
-
 	UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
 	UPlayerSaveGame* PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
+
 	if (IsValid(PlayerSaveGame))
 	{
-		if (!IsValid(MainMenuWidget) && MainMenuWidgetClass.Get())
-		{
-			MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
-		}
-
-		if (IsValid(MainMenuWidget))
-		{
-			ActiveWidget = MainMenuWidget;
-			ActiveWidget->AddToViewport();
-		}
+		SwitchToMainMenuWidget(PlayerSaveGame);
 	}
 	else
 	{
-		if (!IsValid(CreateNewProfileWidget) && CreateNewProfileWidgetClass.Get())
-		{
-			CreateNewProfileWidget = CreateWidget<UUserWidget>(this, CreateNewProfileWidgetClass);
-		}
-
-		if (IsValid(CreateNewProfileWidget))
-		{
-			ActiveWidget = CreateNewProfileWidget;
-			ActiveWidget->AddToViewport();
-		}
+		SwitchToCreateNewProfileWidget();
 	}
 }

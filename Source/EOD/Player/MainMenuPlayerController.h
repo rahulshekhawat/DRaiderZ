@@ -7,6 +7,9 @@
 #include "GameFramework/PlayerController.h"
 #include "MainMenuPlayerController.generated.h"
 
+
+class UPlayerSaveGame;
+
 /**
  * 
  */
@@ -23,6 +26,26 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	//~ Begin UI
+public:
+	// UFUNCTION(BlueprintNativeEvent, Category = "Main Menu UI")
+	// void SwitchToCreateNewPlayerWidget();
+
+	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	void SwitchToTitleScreenWidget();
+
+	/**
+	 * Replaces current widget with main menu widget.
+	 * @param PlayerSaveGame It is used to initialize the main menu widget state (e.g., to determine whether 'CONTINUE' button should be enabled in main menu)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	void SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSaveGame = nullptr);
+
+	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	void SwitchToCreateNewProfileWidget();
+
+	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	void SwitchToMultiplayerWidget();
+
 protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
 	UUserWidget* ActiveWidget;
@@ -45,11 +68,15 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
 	UUserWidget* CreateNewProfileWidget;
 
-	// UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	// UUserWidget* OptionsWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
+	TSubclassOf<UUserWidget> MultiplayerWidgetClass;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
+	UUserWidget* MultiplayerWidget;
 	//~ End UI
 
 
+	/** This method can only be called from 'CreateNewProfileWidget' */
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void CreateAndLoadNewProfile(const FString& NewProfileName);
 
