@@ -122,7 +122,7 @@ void AMainMenuPlayerController::CreateAndLoadNewProfile(const FString& NewProfil
 
 void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent(const FKey& Key)
 {
-	if (Key.IsMouseButton() || Key == EKeys::Escape)
+	if (Key.IsMouseButton() || Key == EKeys::Escape || (IsValid(ActiveWidget) && ActiveWidget != TitleScreenWidget))
 	{
 		return;
 	}
