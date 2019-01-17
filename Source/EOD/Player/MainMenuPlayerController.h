@@ -27,9 +27,6 @@ public:
 
 	//~ Begin UI
 public:
-	// UFUNCTION(BlueprintNativeEvent, Category = "Main Menu UI")
-	// void SwitchToCreateNewPlayerWidget();
-
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void SwitchToTitleScreenWidget();
 
@@ -45,6 +42,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void SwitchToMultiplayerWidget();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Main Menu UI")
+	void StartNewCampaign();
+
+	void StartNewCampaign_Implementation();
+
+	// UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+
 
 protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")

@@ -106,6 +106,11 @@ void AMainMenuPlayerController::SwitchToMultiplayerWidget()
 	}
 }
 
+void AMainMenuPlayerController::StartNewCampaign_Implementation()
+{
+	// empty definition
+}
+
 void AMainMenuPlayerController::CreateAndLoadNewProfile(const FString& NewProfileName)
 {
 	UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
