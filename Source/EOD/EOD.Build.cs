@@ -8,8 +8,22 @@ public class EOD : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "AssetRegistry", 
-															"AIModule", "GameplayTasks", "XmlParser", "Json"  });
+        PublicDependencyModuleNames.AddRange(
+            new string[] {
+                "Core",
+                "CoreUObject",
+                "Engine",
+                "InputCore",
+                "UMG",
+                "AssetRegistry",
+                "AIModule",
+                "GameplayTasks",
+                "XmlParser",
+                "Json",
+                "MoviePlayer",
+                "EODLoadingScreen"
+            }
+        );
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 
