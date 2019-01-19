@@ -38,15 +38,21 @@ public:
 	void SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSaveGame = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
-	void SwitchToCreateNewProfileWidget();
+	void SwitchToNewProfileCreationWidget();
 
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void SwitchToMultiplayerWidget();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Main Menu UI")
+	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	void SwitchToSettingsWidget();
+
+	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void StartNewCampaign();
 
-	void StartNewCampaign_Implementation();
+	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Main Menu UI")
+	// void StartNewCampaign();
+
+	// void StartNewCampaign_Implementation();
 
 	// UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 
@@ -68,16 +74,24 @@ protected:
 	UUserWidget* MainMenuWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> CreateNewProfileWidgetClass;
+	TSubclassOf<UUserWidget> NewProfileCreationWidgetClass;
+	// TSubclassOf<UUserWidget> CreateNewProfileWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* CreateNewProfileWidget;
+	UUserWidget* NewProfileCreationWidget;
+	// UUserWidget* CreateNewProfileWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
 	TSubclassOf<UUserWidget> MultiplayerWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
 	UUserWidget* MultiplayerWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
+	TSubclassOf<UUserWidget> SettingsWidgetClass;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
+	UUserWidget* SettingsWidget;
 	//~ End UI
 
 
@@ -89,8 +103,15 @@ protected:
 	void HandleTitleScreenAnyKeyEvent(const FKey& Key);
 	//~ 
 private:
-
 	inline void SwitchToUIInput();
+
+	void CreatePlayerMenu();
+
+	inline void CreateTitleScreenWidget();
+	inline void CreateMainMenuWidget();
+	inline void CreateSettingsWidget();
+	inline void CreateMultiplayerWidget();
+	inline void CreateNewProfileCreationWidget();
 
 
 };
@@ -102,4 +123,44 @@ inline void AMainMenuPlayerController::SwitchToUIInput()
 	GameAndUIInputMode.SetHideCursorDuringCapture(false);
 	GameAndUIInputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
 	SetInputMode(GameAndUIInputMode);
+}
+
+inline void AMainMenuPlayerController::CreateTitleScreenWidget()
+{
+	if (!IsValid(TitleScreenWidget) && TitleScreenWidgetClass.Get())
+	{
+		TitleScreenWidget = CreateWidget<UUserWidget>(this, TitleScreenWidgetClass);
+	}
+}
+
+inline void AMainMenuPlayerController::CreateMainMenuWidget()
+{
+	if (!IsValid(MainMenuWidget) && MainMenuWidgetClass.Get())
+	{
+		MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
+	}
+}
+
+inline void AMainMenuPlayerController::CreateSettingsWidget()
+{
+	if (!IsValid(SettingsWidget) && SettingsWidgetClass.Get())
+	{
+		SettingsWidget = CreateWidget<UUserWidget>(this, SettingsWidgetClass);
+	}
+}
+
+inline void AMainMenuPlayerController::CreateMultiplayerWidget()
+{
+	if (!IsValid(MultiplayerWidget) && MultiplayerWidgetClass.Get())
+	{
+		MultiplayerWidget = CreateWidget<UUserWidget>(this, MultiplayerWidgetClass);
+	}
+}
+
+inline void AMainMenuPlayerController::CreateNewProfileCreationWidget()
+{
+	if (!IsValid(NewProfileCreationWidget) && NewProfileCreationWidgetClass.Get())
+	{
+		NewProfileCreationWidget = CreateWidget<UUserWidget>(this, NewProfileCreationWidgetClass);
+	}
 }

@@ -4,6 +4,8 @@
 #include "EOD/Core/EODGameInstance.h"
 #include "EOD/SaveSystem/PlayerSaveGame.h"
 
+#include "Kismet/GameplayStatics.h"
+
 AMainMenuPlayerController::AMainMenuPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// PrimaryActorTick.bCanEverTick = false;
@@ -12,20 +14,8 @@ AMainMenuPlayerController::AMainMenuPlayerController(const FObjectInitializer& O
 void AMainMenuPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (IsLocalPlayerController())
-	{
-		SwitchToUIInput();
-		if (TitleScreenWidgetClass.Get())
-		{
-			TitleScreenWidget = CreateWidget<UUserWidget>(this, TitleScreenWidgetClass);
-			if (IsValid(TitleScreenWidget))
-			{
-				ActiveWidget = TitleScreenWidget;
-				ActiveWidget->AddToViewport();
-			}
-		}
-	}
+
+	CreatePlayerMenu();
 }
 
 void AMainMenuPlayerController::Tick(float DeltaTime)
@@ -35,6 +25,19 @@ void AMainMenuPlayerController::Tick(float DeltaTime)
 
 void AMainMenuPlayerController::SwitchToTitleScreenWidget()
 {
+	if (IsValid(ActiveWidget) && ActiveWidget != TitleScreenWidget)
+	{
+		ActiveWidget->RemoveFromParent();
+		ActiveWidget = nullptr;
+	}
+
+	CreateTitleScreenWidget();
+
+	if (IsValid(TitleScreenWidget))
+	{
+		ActiveWidget = TitleScreenWidget;
+		ActiveWidget->AddToViewport();
+	}
 }
 
 void AMainMenuPlayerController::SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSaveGame)
@@ -52,10 +55,7 @@ void AMainMenuPlayerController::SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSa
 		ActiveWidget = nullptr;
 	}
 
-	if (!IsValid(MainMenuWidget) && MainMenuWidgetClass.Get())
-	{
-		MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
-	}
+	CreateMainMenuWidget();
 
 	if (IsValid(MainMenuWidget))
 	{
@@ -66,22 +66,19 @@ void AMainMenuPlayerController::SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSa
 	}
 }
 
-void AMainMenuPlayerController::SwitchToCreateNewProfileWidget()
+void AMainMenuPlayerController::SwitchToNewProfileCreationWidget()
 {
-	if (IsValid(ActiveWidget) && ActiveWidget != CreateNewProfileWidget)
+	if (IsValid(ActiveWidget) && ActiveWidget != NewProfileCreationWidget)
 	{
 		ActiveWidget->RemoveFromParent();
 		ActiveWidget = nullptr;
 	}
 
-	if (!IsValid(CreateNewProfileWidget) && CreateNewProfileWidgetClass.Get())
-	{
-		CreateNewProfileWidget = CreateWidget<UUserWidget>(this, CreateNewProfileWidgetClass);
-	}
+	CreateNewProfileCreationWidget();
 
-	if (IsValid(CreateNewProfileWidget))
+	if (IsValid(NewProfileCreationWidget))
 	{
-		ActiveWidget = CreateNewProfileWidget;
+		ActiveWidget = NewProfileCreationWidget;
 		ActiveWidget->AddToViewport();
 	}
 }
@@ -94,10 +91,7 @@ void AMainMenuPlayerController::SwitchToMultiplayerWidget()
 		ActiveWidget = nullptr;
 	}
 
-	if (!IsValid(MultiplayerWidget) && MultiplayerWidgetClass.Get())
-	{
-		MultiplayerWidget = CreateWidget<UUserWidget>(this, MultiplayerWidgetClass);
-	}
+	CreateMultiplayerWidget();
 
 	if (IsValid(MultiplayerWidget))
 	{
@@ -106,15 +100,32 @@ void AMainMenuPlayerController::SwitchToMultiplayerWidget()
 	}
 }
 
-void AMainMenuPlayerController::StartNewCampaign_Implementation()
+void AMainMenuPlayerController::SwitchToSettingsWidget()
 {
-	// empty definition
+	if (IsValid(ActiveWidget) && ActiveWidget != SettingsWidget)
+	{
+		ActiveWidget->RemoveFromParent();
+		ActiveWidget = nullptr;
+	}
+
+	CreateSettingsWidget();
+
+	if (IsValid(SettingsWidget))
+	{
+		ActiveWidget = SettingsWidget;
+		ActiveWidget->AddToViewport();
+	}
+}
+
+void AMainMenuPlayerController::StartNewCampaign()
+{
+	UGameplayStatics::OpenLevel(this, FName("Level0_Haddon"));
 }
 
 void AMainMenuPlayerController::CreateAndLoadNewProfile(const FString& NewProfileName)
 {
 	UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
-	if (IsValid(GameInstance) && IsValid(ActiveWidget) && ActiveWidget == CreateNewProfileWidget)
+	if (IsValid(GameInstance) && IsValid(ActiveWidget) && ActiveWidget == NewProfileCreationWidget)
 	{
 		GameInstance->CreateNewProfile(NewProfileName);
 		UPlayerSaveGame* PlayerSaveGame = GameInstance->LoadProfileAsCurrent(NewProfileName);
@@ -141,6 +152,25 @@ void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent(const FKey& Key)
 	}
 	else
 	{
-		SwitchToCreateNewProfileWidget();
+		SwitchToNewProfileCreationWidget();
+	}
+}
+
+void AMainMenuPlayerController::CreatePlayerMenu()
+{
+	if (IsLocalPlayerController())
+	{
+		CreateTitleScreenWidget();
+		CreateMainMenuWidget();
+		CreateSettingsWidget();
+		CreateNewProfileCreationWidget();
+
+		if (IsValid(TitleScreenWidget))
+		{
+			ActiveWidget = TitleScreenWidget;
+			ActiveWidget->AddToViewport();
+		}
+
+		SwitchToUIInput();
 	}
 }

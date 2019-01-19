@@ -8,6 +8,30 @@ public class EOD : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+        PublicIncludePaths.AddRange(
+            new string[] {
+
+            }
+        );
+
+        PrivateIncludePaths.AddRange(
+            new string[] {
+                "EOD/AI",
+                "EOD/AnimInstances",
+                "EOD/Characters",
+                "EOD/Core",
+                "EOD/Events",
+                "EOD/Interactives",
+                "EOD/Notifies",
+                "EOD/Player",
+                "EOD/SaveSystem",
+                "EOD/Statics",
+                "EOD/StatusEffects",
+                "EOD/UI",
+                "EOD/Weapons",
+            }
+        );
+
         PublicDependencyModuleNames.AddRange(
             new string[] {
                 "Core",
