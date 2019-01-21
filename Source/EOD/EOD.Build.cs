@@ -44,8 +44,7 @@ public class EOD : ModuleRules
                 "GameplayTasks",
                 "XmlParser",
                 "Json",
-                "MoviePlayer",
-                "EODLoadingScreen"
+                "MoviePlayer"
             }
         );
 

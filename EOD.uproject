@@ -28,11 +28,6 @@
 				"EOD",
 				"UnrealEd"
 			]
-		},
-		{
-			"Name": "EODLoadingScreen",
-			"Type": "Runtime",
-			"LoadingPhase": "PreLoadingScreen"
 		}
 	],
 	"Plugins": [

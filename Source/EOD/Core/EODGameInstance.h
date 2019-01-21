@@ -8,6 +8,8 @@
 #include "Engine/GameInstance.h"
 #include "EODGameInstance.generated.h"
 
+class UWorld;
+class UUserWidget;
 class UMetaSaveGame;
 class UPlayerSaveGame;
 
@@ -40,7 +42,6 @@ public:
 
 	static const FString MetaSaveSlotName;
 
-public:
 	void CreateNewProfile(const FString& ProfileName);
 
 	UPlayerSaveGame* LoadProfileAsCurrent(const FString& ProfileName);
@@ -57,6 +58,11 @@ public:
 
 	FORCEINLINE FString GetCurrentPlayerSaveGameName() const { return CurrentProfileName; }
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
+
+	UUserWidget* LoadingScreenWidget;
+
 private:
 	UPROPERTY()
 	UMetaSaveGame* MetaSaveGame;
@@ -69,4 +75,16 @@ private:
 
 	// void SetupSaveGameForFirstRun();
 	//~ End Load/Save System
+
+
+	//~ Loading Screen
+private:
+	void ShowLoadingScreen();
+
+	void PostLoadMap(UWorld* WorldObj);
+
+	void OnPreLoadMap(const FString& MapName);
+
+	void OnPostLoadMap(UWorld* WorldObj);
+
 };
