@@ -4,8 +4,6 @@
 #include "EOD/SaveSystem/MetaSaveGame.h"
 #include "EOD/SaveSystem/PlayerSaveGame.h"
 #include "EOD/Statics/EODGlobalNames.h"
-#include "EOD/Core/EODGameViewportClient.h"
-#include "EODLoadingScreen/Public/EODLoadingScreen.h"
 
 #include "MoviePlayer.h"
 #include "Blueprint/UserWidget.h"
@@ -47,8 +45,8 @@ void UEODGameInstance::Init()
 		}
 	}
 
-	// FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UEODGameInstance::OnPreLoadMap);
-	// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEODGameInstance::OnPostLoadMap);
+	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UEODGameInstance::OnPreLoadMap);
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEODGameInstance::OnPostLoadMap);
 }
 
 void UEODGameInstance::CreateNewProfile(const FString& ProfileName)
@@ -100,34 +98,13 @@ UPlayerSaveGame* UEODGameInstance::LoadProfileAsCurrent(const FString& ProfileNa
 	return nullptr;
 }
 
-void UEODGameInstance::ShowLoadingScreen()
-{
-	IEODLoadingScreenModule* const EODScreenModule = FModuleManager::LoadModulePtr<IEODLoadingScreenModule>("EODLoadingScreen");
-	if (EODScreenModule != nullptr)
-	{
-		EODScreenModule->StartInGameLoadingScreen();
-	}
-
-	UEODGameViewportClient* EODViewport = Cast<UEODGameViewportClient>(GetGameViewportClient());
-	if (EODViewport != nullptr)
-	{
-		EODViewport->ShowLoadingScreen();
-	}
-}
-
-void UEODGameInstance::PostLoadMap(UWorld* WorldObj)
-{
-	// Make sure we hide the loading screen when the level is done loading
-	UEODGameViewportClient* EODViewport = Cast<UEODGameViewportClient>(GetGameViewportClient());
-
-	if (EODViewport != nullptr)
-	{
-		EODViewport->HideLoadingScreen();
-	}
-}
-
 void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 {
+	if (GetMoviePlayer()->IsStartupMoviePlaying())
+	{
+		return;
+	}
+
 	if (!IsValid(LoadingScreenWidget))
 	{
 		LoadingScreenWidget = CreateWidget<UUserWidget>(this, LoadingScreenWidgetClass);

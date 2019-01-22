@@ -79,10 +79,6 @@ private:
 
 	//~ Loading Screen
 private:
-	void ShowLoadingScreen();
-
-	void PostLoadMap(UWorld* WorldObj);
-
 	void OnPreLoadMap(const FString& MapName);
 
 	void OnPostLoadMap(UWorld* WorldObj);
