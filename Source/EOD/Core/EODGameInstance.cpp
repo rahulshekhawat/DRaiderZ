@@ -105,6 +105,9 @@ void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 		return;
 	}
 
+	
+	// @note following code works fine for single player but causes a crash in PIE multiplayer tests. Temporarily disabled.
+	/*
 	if (!IsValid(LoadingScreenWidget))
 	{
 		LoadingScreenWidget = CreateWidget<UUserWidget>(this, LoadingScreenWidgetClass);
@@ -115,6 +118,16 @@ void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 		FLoadingScreenAttributes LoadingScreen;
 		LoadingScreen.bAutoCompleteWhenLoadingCompletes = true;
 		LoadingScreen.WidgetLoadingScreen = LoadingScreenWidget->TakeWidget();
+
+		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
+	}
+	*/
+
+	if (GetMoviePlayer())
+	{
+		FLoadingScreenAttributes LoadingScreen;
+		LoadingScreen.bAutoCompleteWhenLoadingCompletes = true;
+		LoadingScreen.WidgetLoadingScreen = FLoadingScreenAttributes::NewTestLoadingScreenWidget();
 
 		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
 	}
