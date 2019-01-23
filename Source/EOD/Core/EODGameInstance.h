@@ -27,6 +27,12 @@ public:
 	virtual void Init() override;
 
 
+public:
+	/** The title of the game that will be displayed to player on title screen */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Global Variables")
+	FText GameTitle;
+
+
 	//~ Begin Persistent Player Data
 public:
 	UPROPERTY()
