@@ -184,7 +184,7 @@ void AEODPlayerController::LoadPlayerState()
 
 void AEODPlayerController::CreateHUDWidget()
 {
-	if (IsLocalPlayerController() && HUDWidgetClass.Get())
+	if (!IsValid(HUDWidget) && IsLocalPlayerController() && HUDWidgetClass.Get())
 	{
 		HUDWidget = CreateWidget<UHUDWidget>(this, HUDWidgetClass);
 		if (IsValid(HUDWidget))

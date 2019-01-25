@@ -363,7 +363,16 @@ void AEODCharacterBase::BindUIDelegates()
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
-		if (IsValid(PC) && IsValid(PC->GetHUDWidget()))
+		if (IsValid(PC))
+		{
+			PC->CreateHUDWidget();
+		}
+		else
+		{
+			return;
+		}
+
+		if (IsValid(PC->GetHUDWidget()))
 		{
 			UStatusIndicatorWidget* StatusIndicatorWidget = PC->GetHUDWidget()->GetStatusIndicatorWidget();
 			if (IsValid(CharacterStatsComponent) && IsValid(StatusIndicatorWidget))

@@ -86,6 +86,8 @@ private:
 public:
 	FORCEINLINE UHUDWidget* GetHUDWidget() const;
 
+	void CreateHUDWidget();
+
 private:
 	/** Player's head-up display widget */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI", meta = (AllowPrivateAccess = "true"))
@@ -108,8 +110,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<UPauseMenuWidget> PauseMenuWidgetClass;
-
-	void CreateHUDWidget();
 
 	void InitStatusIndicatorWidget();
 
