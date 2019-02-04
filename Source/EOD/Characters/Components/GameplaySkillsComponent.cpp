@@ -53,6 +53,68 @@ void UGameplaySkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 }
 
+void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
+{
+	// return if the character is incapable of using any skill right now
+	if (!CanUseAnySkill())
+	{
+		return;
+	}
+
+	FString SGToUse = GetSkillGroupFromSkillKeyIndex(SkillKeyIndex);
+	if (SGToUse == FString("") || SGToCooldownMap.Contains(SGToUse))
+	{
+		// Either no skill equipped in given slot or it's in cooldown
+		return;
+	}
+
+	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(EODCharacterOwner);
+	FString GenderPrefix = PlayerChar ? PlayerChar->GetGenderPrefix() : FString("");
+
+	FString SkillIDString = GenderPrefix + SGToUse + FString("_") + FString::FromInt(1);
+	FSkillTableRow* Skill = GetSkill(FName(*SkillIDString));
+
+	if (Skill && Skill->AnimMontage.Get())
+	{
+		PlayerChar->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+	}
+}
+
+void UGameplaySkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
+{
+}
+
+bool UGameplaySkillsComponent::CanUseAnySkill() const
+{
+	return IsValid(EODCharacterOwner) && EODCharacterOwner->CanUseAnySkill();
+}
+
+bool UGameplaySkillsComponent::CanUseSkill(FName SkillID) const
+{
+	return false;
+}
+
+bool UGameplaySkillsComponent::CanUseSkillAtIndex(const int32 SkillKeyIndex) const
+{
+	return false;
+}
+
+FString UGameplaySkillsComponent::GetSkillGroupFromSkillKeyIndex(const int32 SkillKeyIndex) const
+{
+	if (IsSkillKeyIndexInvalid(SkillKeyIndex))
+	{
+		// Invalid skill key index
+		return FString("");
+	}
+
+	if (ActiveSupersedingChainSkillGroup.Key == SkillKeyIndex)
+	{
+		return ActiveSupersedingChainSkillGroup.Value;
+	}
+
+	return SBIndexToSGMap[SkillKeyIndex];
+}
+
 void UGameplaySkillsComponent::UseSkill(FName SkillID)
 {
 }
@@ -77,43 +139,6 @@ void UGameplaySkillsComponent::SetCurrentActiveSkill(const FName SkillID)
 	{
 		Server_SetCurrentActiveSkill(SkillID);
 	}
-}
-
-void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
-{
-	if (SkillKeyIndex <= 0 || !SBIndexToSGMap.Contains(SkillKeyIndex))
-	{
-		// Invalid skill key index
-		return;
-	}
-
-	if (!IsValid(EODCharacterOwner) || !EODCharacterOwner->CanUseAnySkill())
-	{
-		return;
-	}
-
-	FString SGToUse = SBIndexToSGMap[SkillKeyIndex];
-	if (SGToUse == FString("") || SGToCooldownMap.Contains(SGToUse))
-	{
-		// Either no skill equipped in given slot or it's in cooldown
-		return;
-	}
-	
-	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(EODCharacterOwner);
-	FString GenderPrefix = PlayerChar ? PlayerChar->GetGenderPrefix() : FString("");
-
-	FString SkillIDString = GenderPrefix + SGToUse + FString("_") + FString::FromInt(1);
-	FSkillTableRow* Skill = GetSkill(FName(*SkillIDString));
-
-	if (Skill && Skill->AnimMontage.Get())
-	{
-		PlayerChar->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-	}
-
-}
-
-void UGameplaySkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
-{
 }
 
 void UGameplaySkillsComponent::LoadSkillBarLayout()

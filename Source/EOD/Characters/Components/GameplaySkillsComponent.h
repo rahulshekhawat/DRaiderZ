@@ -28,7 +28,29 @@ public:
 
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+public:
+	void OnPressingSkillKey(const int32 SkillKeyIndex);
+
+	void OnReleasingSkillKey(const int32 SkillKeyIndex);
 	
+private:
+	/** Returns true if skill key index is invalid */
+	inline bool IsSkillKeyIndexInvalid(const int32 SkillKeyIndex) const;
+
+	bool CanUseAnySkill() const;
+
+	bool CanUseSkill(FName SkillID) const;
+
+	bool CanUseSkillAtIndex(const int32 SkillKeyIndex) const;
+
+	/**
+	 * Returns the skill group that should be used when pressing a skill key.
+	 * @note It won't necessarily return the skill placed at the skill key index
+	 */
+	FString GetSkillGroupFromSkillKeyIndex(const int32 SkillKeyIndex) const;
+
+	TPair<int32, FString> ActiveSupersedingChainSkillGroup;
 
 	////////////////////////////////////////////////////////////////////////////////
 	// EOD
@@ -81,9 +103,6 @@ public:
 
 	FORCEINLINE TMap<int32, FString>& GetSkillBarLayout() { return SBIndexToSGMap; }
 
-	void OnPressingSkillKey(const int32 SkillKeyIndex);
-
-	void OnReleasingSkillKey(const int32 SkillKeyIndex);
 
 	void LoadSkillBarLayout();
 
@@ -91,6 +110,7 @@ public:
 
 	UFUNCTION()
 	void AddNewSkill(int32 SkillIndex, FString SkillGroup);
+
 
 	////////////////////////////////////////////////////////////////////////////////
 	// NETWORK
@@ -104,3 +124,8 @@ private:
 
 
 };
+
+inline bool UGameplaySkillsComponent::IsSkillKeyIndexInvalid(const int32 SkillKeyIndex) const
+{
+	return (SkillKeyIndex <= 0) || !SBIndexToSGMap.Contains(SkillKeyIndex);
+}
