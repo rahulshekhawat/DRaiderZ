@@ -11,6 +11,24 @@
 
 class AEODCharacterBase;
 
+/** Struct containing information regarding skill's cooldown */
+USTRUCT(BlueprintType)
+struct EOD_API FSkillCooldownStatus
+{
+	GENERATED_USTRUCT_BODY()
+
+	bool bIsInCooldown;
+
+	float CooldownRemaining;
+
+	FTimerHandle CooldownTimerHandle;
+
+	FSkillCooldownStatus()
+	{
+		bIsInCooldown = false;
+		CooldownRemaining = 0.f;
+	}
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EOD_API UGameplaySkillsComponent : public UActorComponent
@@ -34,6 +52,11 @@ public:
 
 	void OnReleasingSkillKey(const int32 SkillKeyIndex);
 	
+// protected:
+	// void TriggerSkill(FName SkillID);
+
+	// void ReleaseSkill(FName SkillID);
+
 private:
 	/** Returns true if skill key index is invalid */
 	inline bool IsSkillKeyIndexInvalid(const int32 SkillKeyIndex) const;
@@ -44,13 +67,30 @@ private:
 
 	bool CanUseSkillAtIndex(const int32 SkillKeyIndex) const;
 
+	FName GetSkillIDFromSkillGroup(FString& SkillGroup) const;
+
 	/**
 	 * Returns the skill group that should be used when pressing a skill key.
 	 * @note It won't necessarily return the skill placed at the skill key index
 	 */
 	FString GetSkillGroupFromSkillKeyIndex(const int32 SkillKeyIndex) const;
 
+	/**
+	 * The skill group that will get triggered on pressing the skill key at index 'ActiveSupersedingChainSkillGroup.Key'
+	 * This will auto deactivate after 'ChainSkillResetDelay' seconds.
+	 */
 	TPair<int32, FString> ActiveSupersedingChainSkillGroup;
+
+	/**
+	 * The skill that the player last used. 
+	 * This is used to determine whether a skill that requires a 'ActivePrecedingChainSkillGroup' type skill to be used previously, can be used
+	 * It will auto deactivate after 'ChainSkillResetDelay' seconds.
+	 */
+	FString ActivePrecedingChainSkillGroup;
+
+	/** The skill that the character used last time */
+	FString LastUsedSkillGroup;
+
 
 	////////////////////////////////////////////////////////////////////////////////
 	// EOD
@@ -73,6 +113,8 @@ private:
 	/** A map of skill group to a boolean that determines whether the skill group is currently in cooldown or not */
 	TMap<FString, bool> SGToCooldownMap;
 
+	/** A map of skill group to it's cooldown status info */
+	TMap<FString, FSkillCooldownStatus> SGToCooldownStatusMap;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character Skills")
@@ -102,7 +144,6 @@ public:
 	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return EODCharacterOwner; }
 
 	FORCEINLINE TMap<int32, FString>& GetSkillBarLayout() { return SBIndexToSGMap; }
-
 
 	void LoadSkillBarLayout();
 

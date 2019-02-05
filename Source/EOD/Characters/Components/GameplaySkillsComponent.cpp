@@ -68,11 +68,25 @@ void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 		return;
 	}
 
+	// FName SkillID = get
+
 	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(EODCharacterOwner);
 	FString GenderPrefix = PlayerChar ? PlayerChar->GetGenderPrefix() : FString("");
 
 	FString SkillIDString = GenderPrefix + SGToUse + FString("_") + FString::FromInt(1);
 	FSkillTableRow* Skill = GetSkill(FName(*SkillIDString));
+
+	if (!Skill)
+	{
+		// Invalid Skill ID
+		return;
+	}
+
+	// If the player hasn't used the required preceding group 
+	if (!Skill->PrecedingSkillGroups.Contains(LastUsedSkillGroup))
+	{
+		return;
+	}
 
 	if (Skill && Skill->AnimMontage.Get())
 	{
@@ -97,6 +111,11 @@ bool UGameplaySkillsComponent::CanUseSkill(FName SkillID) const
 bool UGameplaySkillsComponent::CanUseSkillAtIndex(const int32 SkillKeyIndex) const
 {
 	return false;
+}
+
+FName UGameplaySkillsComponent::GetSkillIDFromSkillGroup(FString& SkillGroup) const
+{
+	return FName();
 }
 
 FString UGameplaySkillsComponent::GetSkillGroupFromSkillKeyIndex(const int32 SkillKeyIndex) const

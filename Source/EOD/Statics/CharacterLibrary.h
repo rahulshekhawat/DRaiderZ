@@ -131,7 +131,7 @@ enum class EVocations : uint8
 
 /** Struct containing information regarding last used character skill */
 USTRUCT(BlueprintType)
-struct FLastUsedSkillInfo
+struct EOD_API FLastUsedSkillInfo
 {
 	GENERATED_USTRUCT_BODY()
 
