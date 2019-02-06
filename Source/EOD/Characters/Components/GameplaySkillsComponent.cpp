@@ -39,6 +39,7 @@ void UGameplaySkillsComponent::BeginPlay()
 	// * GetOwner() in PostLoad() was correct for AI characters spawned along with map, but was incorrect (NULL)  for player character
 	// * GetOwner() has been found to be setup correctly in BeginPlay
 	EODCharacterOwner = Cast<AEODCharacterBase>(GetOwner());
+	LoadSkillBarLayout();
 }
 
 void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -68,13 +69,8 @@ void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 		return;
 	}
 
-	// FName SkillID = get
-
-	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(EODCharacterOwner);
-	FString GenderPrefix = PlayerChar ? PlayerChar->GetGenderPrefix() : FString("");
-
-	FString SkillIDString = GenderPrefix + SGToUse + FString("_") + FString::FromInt(1);
-	FSkillTableRow* Skill = GetSkill(FName(*SkillIDString));
+	FName SkillID = GetPlayerSkillIDFromSG(SGToUse);
+	FSkillTableRow* Skill = GetSkill(SkillID);
 
 	if (!Skill)
 	{
@@ -83,18 +79,54 @@ void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 	}
 
 	// If the player hasn't used the required preceding group 
-	if (!Skill->PrecedingSkillGroups.Contains(LastUsedSkillGroup))
+	if (Skill->PrecedingSkillGroups.Num() > 0 && !Skill->PrecedingSkillGroups.Contains(LastUsedSkillGroup))
 	{
 		return;
 	}
 
+	TriggerSkill(SkillID, Skill);
+
+	/*
 	if (Skill && Skill->AnimMontage.Get())
 	{
-		PlayerChar->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+		EODCharacterOwner->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	}
+	*/
 }
 
 void UGameplaySkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
+{
+}
+
+void UGameplaySkillsComponent::TriggerSkill(FName SkillID, FSkillTableRow* Skill)
+{
+	if (!IsValid(EODCharacterOwner))
+	{
+		return;
+	}
+
+	if (!Skill)
+	{
+		Skill = GetSkill(SkillID);
+	}
+
+	// UAnimMontage* MontageToPlay = 
+
+	if (Skill && Skill->AnimMontage.Get())
+	{
+		EODCharacterOwner->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+	}
+
+	/*
+	if (EODCharacterOwner->Role < ROLE_Authority)
+	{
+		ActiveSkillID = SkillID;
+		Server_TriggerSkill(SkillID);
+	}
+	*/
+}
+
+void UGameplaySkillsComponent::ReleaseSkill(FName SkillID, FSkillTableRow* Skill)
 {
 }
 
@@ -113,9 +145,12 @@ bool UGameplaySkillsComponent::CanUseSkillAtIndex(const int32 SkillKeyIndex) con
 	return false;
 }
 
-FName UGameplaySkillsComponent::GetSkillIDFromSkillGroup(FString& SkillGroup) const
+FName UGameplaySkillsComponent::GetPlayerSkillIDFromSG(FString& SkillGroup) const
 {
-	return FName();
+	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(EODCharacterOwner);
+	FString GenderPrefix = PlayerChar ? PlayerChar->GetGenderPrefix() : FString("");
+	FString SkillIDString = GenderPrefix + SkillGroup + FString("_") + FString::FromInt(1);
+	return FName(*SkillIDString);
 }
 
 FString UGameplaySkillsComponent::GetSkillGroupFromSkillKeyIndex(const int32 SkillKeyIndex) const
@@ -207,6 +242,16 @@ void UGameplaySkillsComponent::OnRep_ActiveSkillID()
 {
 }
 */
+
+void UGameplaySkillsComponent::Server_TriggerSkill_Implementation(FName SkillID)
+{
+	// TriggerSkill(SkillID);
+}
+
+bool UGameplaySkillsComponent::Server_TriggerSkill_Validate(FName SkillID)
+{
+	return true;
+}
 
 void UGameplaySkillsComponent::Server_SetCurrentActiveSkill_Implementation(const FName SkillID)
 {

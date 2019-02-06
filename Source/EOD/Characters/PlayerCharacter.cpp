@@ -1576,9 +1576,9 @@ void APlayerCharacter::Destroyed()
 
 void APlayerCharacter::SaveCharacterState()
 {
-	if (HUDWidget)
+	if (IsValid(GetGameplaySkillsComponent()))
 	{
-		HUDWidget->SaveHUDLayout();
+		GetGameplaySkillsComponent()->SaveSkillBarLayout();
 	}
 }
 

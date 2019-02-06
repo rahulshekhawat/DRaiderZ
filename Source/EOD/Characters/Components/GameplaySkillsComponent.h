@@ -52,10 +52,10 @@ public:
 
 	void OnReleasingSkillKey(const int32 SkillKeyIndex);
 	
-// protected:
-	// void TriggerSkill(FName SkillID);
+protected:
+	void TriggerSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
 
-	// void ReleaseSkill(FName SkillID);
+	void ReleaseSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
 
 private:
 	/** Returns true if skill key index is invalid */
@@ -67,7 +67,7 @@ private:
 
 	bool CanUseSkillAtIndex(const int32 SkillKeyIndex) const;
 
-	FName GetSkillIDFromSkillGroup(FString& SkillGroup) const;
+	FName GetPlayerSkillIDFromSG(FString& SkillGroup) const;
 
 	/**
 	 * Returns the skill group that should be used when pressing a skill key.
@@ -159,6 +159,9 @@ public:
 private:
 	// UFUNCTION()
 	// void OnRep_ActiveSkillID();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_TriggerSkill(FName SkillID);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCurrentActiveSkill(const FName SkillID);
