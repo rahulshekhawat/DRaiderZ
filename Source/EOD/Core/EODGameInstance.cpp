@@ -42,6 +42,7 @@ void UEODGameInstance::Init()
 		if (MetaSaveGame->LastUsedSlotName != FString("") && UGameplayStatics::DoesSaveGameExist(MetaSaveGame->LastUsedSlotName, UEODGameInstance::PlayerIndex))
 		{
 			CurrentProfileSaveGame = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(MetaSaveGame->LastUsedSlotName, UEODGameInstance::PlayerIndex));
+			CurrentProfileName = MetaSaveGame->LastUsedSlotName;
 		}
 	}
 

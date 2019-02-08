@@ -39,7 +39,11 @@ void UGameplaySkillsComponent::BeginPlay()
 	// * GetOwner() in PostLoad() was correct for AI characters spawned along with map, but was incorrect (NULL)  for player character
 	// * GetOwner() has been found to be setup correctly in BeginPlay
 	EODCharacterOwner = Cast<AEODCharacterBase>(GetOwner());
-	LoadSkillBarLayout();
+
+	if (IsValid(EODCharacterOwner) && EODCharacterOwner->IsLocallyControlled() && EODCharacterOwner->IsPlayerControlled())
+	{
+		LoadSkillBarLayout();
+	}
 }
 
 void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -204,6 +208,7 @@ void UGameplaySkillsComponent::LoadSkillBarLayout()
 	}
 	
 	UPlayerSaveGame* PlayerSaveGame = GameInstance->GetCurrentPlayerSaveGameObject();
+
 	TMap<int32, FString>& SBLayout = PlayerSaveGame->SkillBarLayout;
 	TArray<int32> LayoutKeys;
 	SBLayout.GetKeys(LayoutKeys);
