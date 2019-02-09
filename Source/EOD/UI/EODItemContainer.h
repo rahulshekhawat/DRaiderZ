@@ -143,6 +143,8 @@ public:
 
 	inline void EnableDragging();
 
+	void AddSkill(FString& SkillGroup);
+
 private:
 	inline void UpdateItemImage();
 

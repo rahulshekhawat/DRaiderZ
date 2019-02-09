@@ -385,6 +385,8 @@ void AEODCharacterBase::BindUIDelegates()
 			USkillBarWidget* SkillBarWidget = PC->GetHUDWidget()->GetSkillBarWidget();
 			if (IsValid(SkillManager) && IsValid(SkillBarWidget))
 			{
+				// The saved skill bar layout may not have already been loaded
+				SkillManager->LoadSkillBarLayout();
 				SkillBarWidget->UpdateSkillBarLayout(SkillManager->GetSkillBarLayout());
 				SkillBarWidget->OnNewSkillAdded.AddUniqueDynamic(SkillManager, &UGameplaySkillsComponent::AddNewSkill);
 			}

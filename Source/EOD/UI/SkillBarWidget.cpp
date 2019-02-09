@@ -225,7 +225,7 @@ void USkillBarWidget::UpdateSkillBarLayout(TMap<int32, FString>& NewLayout, bool
 		UEODItemContainer* Container = GetSkillContainerAtIndex(Key);
 		if (IsValid(Container))
 		{
-
+			// Container->EODItemInfo.
 		}
 	}
 }

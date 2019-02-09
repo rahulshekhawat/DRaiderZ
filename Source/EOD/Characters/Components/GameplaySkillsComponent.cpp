@@ -42,7 +42,7 @@ void UGameplaySkillsComponent::BeginPlay()
 
 	if (IsValid(EODCharacterOwner) && EODCharacterOwner->IsLocallyControlled() && EODCharacterOwner->IsPlayerControlled())
 	{
-		LoadSkillBarLayout();
+		// LoadSkillBarLayout();
 	}
 }
 

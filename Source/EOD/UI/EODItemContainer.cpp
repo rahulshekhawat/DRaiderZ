@@ -57,6 +57,11 @@ void UEODItemContainer::RefreshContainerVisuals()
 	UpdateStackCountText();
 }
 
+void UEODItemContainer::AddSkill(FString& SkillGroup)
+{
+	
+}
+
 void UEODItemContainer::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	OnDragDetected(InGeometry, InMouseEvent, OutOperation);
