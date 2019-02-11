@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODItemContainer.h"
+#include "EOD/Core/EODPreprocessors.h"
 #include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/UI/SkillBarWidget.h"
 #include "EOD/UI/DragVisualWidget.h"
@@ -59,7 +60,28 @@ void UEODItemContainer::RefreshContainerVisuals()
 
 void UEODItemContainer::AddSkill(FString& SkillGroup)
 {
-	
+#if EOD_TEST_CODE_ENABLED
+	// AEODCharacterBase* PlayerChar = GetOwningPlayer() ? Cast<AEODCharacterBase>(GetOwningPlayer()->GetPawn()) : nullptr;
+	APlayerCharacter* PlayerChar = GetOwningPlayer() ? Cast<APlayerCharacter>(GetOwningPlayer()->GetPawn()) : nullptr;
+	if (IsValid(PlayerChar))
+	{
+		FString SkillIDString = PlayerChar->GetGenderPrefix() + SkillGroup + FString("_") + FString::FromInt(1);
+		FName SkillID = FName(*SkillIDString);
+		FSkillTableRow* Skill = UCharacterLibrary::GetPlayerSkill(SkillID, FString("UEODItemContainer::AddSkill()"));
+		if (Skill)
+		{
+			EODItemInfo.Description = Skill->Description;
+			EODItemInfo.EODItemType = EEODItemType::ActiveSkill;
+			EODItemInfo.Icon = Skill->Icon;
+			EODItemInfo.InGameName = Skill->InGameName;
+			EODItemInfo.ItemGroup = SkillGroup;
+			EODItemInfo.ItemID = SkillID;
+			EODItemInfo.StackCount = 1;
+
+			RefreshContainerVisuals();
+		}
+	}
+#endif // EOD_TEST_CODE_ENABLED
 }
 
 void UEODItemContainer::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
