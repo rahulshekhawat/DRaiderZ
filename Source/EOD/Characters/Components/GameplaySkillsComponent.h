@@ -47,6 +47,8 @@ public:
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	////////////////////////////////////////////////////////////////////////////////
+	// Input handling
 public:
 	void OnPressingSkillKey(const int32 SkillKeyIndex);
 
@@ -149,13 +151,16 @@ public:
 
 	void SaveSkillBarLayout();
 
+	/**
+	 * Add new skill to the skill bar.
+	 * Used to add new skills to the skill bar through UI
+	 */
 	UFUNCTION()
 	void AddNewSkill(int32 SkillIndex, FString SkillGroup);
 
 
 	////////////////////////////////////////////////////////////////////////////////
-	// NETWORK
-	////////////////////////////////////////////////////////////////////////////////
+	// Network
 private:
 	// UFUNCTION()
 	// void OnRep_ActiveSkillID();

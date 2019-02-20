@@ -61,9 +61,6 @@ class EOD_API AEODCharacterBase : public ACharacter
 public:
 	/** Sets default values for this character's properties */
 	AEODCharacterBase(const FObjectInitializer& ObjectInitializer);
-
-	/** Updates character state every frame */
-	virtual void Tick(float DeltaTime) override;
 	
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -71,15 +68,24 @@ public:
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
+	/** Updates character state every frame */
+	virtual void Tick(float DeltaTime) override;
+
+	/**
+	 * Called when this Pawn is possessed. Only called on the server (or in standalone).
+	 * @param NewController The controller possessing this pawn
+	 */
 	virtual void PossessedBy(AController* NewController) override;
 
+	/** Called when our Controller no longer possesses us. Only called on the server (or in standalone). */
 	virtual void UnPossessed() override;
 
+	/** Called when the Pawn is being restarted (usually by being possessed by a Controller). Called on both server and owning client. */
 	virtual void Restart() override;
 
+
 	////////////////////////////////////////////////////////////////////////////////
-	// EOD CHARACTER
-	////////////////////////////////////////////////////////////////////////////////
+	// 
 private:
 	/**
 	 * The direction character is trying to move relative to it's controller rotation
