@@ -85,6 +85,16 @@ public:
 
 
 	////////////////////////////////////////////////////////////////////////////////
+	// Combat
+public:
+
+
+protected:
+	/** Determines if invincibility frames are active */
+	uint32 bActiveiFrames : 1;
+
+
+	////////////////////////////////////////////////////////////////////////////////
 	// 
 private:
 	/**
@@ -102,9 +112,6 @@ private:
 	UFUNCTION()
 	void DisableiFrames();
 
-	/** Determines if invincibility frames are active */
-	UPROPERTY(Transient)
-	bool bActiveiFrames;
 
 	/** Determines if character is blocking any incoming damage */
 	UPROPERTY(Transient)

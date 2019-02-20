@@ -11,23 +11,25 @@
 UEODCharacterMovementComponent::UEODCharacterMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	RotationRate = FRotator(0.f, 600.f, 0.f);
-}
-
-void UEODCharacterMovementComponent::BeginPlay()
-{
-	Super::BeginPlay();
+	bCanRotate = true;
 }
 
 void UEODCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// DOREPLIFETIME(UEODCharacterMovementComponent, DesiredCustomRotationYaw);
+	DOREPLIFETIME_CONDITION(UEODCharacterMovementComponent, bCanRotate, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(UEODCharacterMovementComponent, DesiredCustomRotationYaw, COND_SkipOwner);
 }
 
 void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 {
+	// If the character can't rotate at all
+	if (!bCanRotate)
+	{
+		return;
+	}
+
 	const float AngleTolerance = 1e-3f;
 	FRotator CurrentRotation = UpdatedComponent->GetComponentRotation(); // Normalized
 	CurrentRotation.DiagnosticCheckNaN(TEXT("EODCharacterMovementComponent::PhysicsRotation(): CurrentRotation"));
@@ -131,6 +133,16 @@ void UEODCharacterMovementComponent::DoInstantRotation(float InstantRotationYaw)
 	{
 		Server_DoInstantRotation(InstantRotationYaw);
 	}
+}
+
+void UEODCharacterMovementComponent::Server_SetCanRotate_Implementation(bool bValue)
+{
+	SetCanRotate(bValue);
+}
+
+bool UEODCharacterMovementComponent::Server_SetCanRotate_Validate(bool bValue)
+{
+	return true;
 }
 
 void UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Implementation(float NewRotationYaw)

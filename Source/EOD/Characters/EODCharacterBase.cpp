@@ -84,6 +84,9 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	DamageBlockTriggerDelay = 0.2f;
 
 	Faction = EFaction::Player;
+
+	bActiveiFrames = false;
+
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
