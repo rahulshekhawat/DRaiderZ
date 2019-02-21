@@ -29,17 +29,24 @@ public:
 	//~ @note: Overriding the default definition to fix a bug where Server drops/skips animation notifies.
 	virtual void ServerMoveDual_Implementation(float TimeStamp0, FVector_NetQuantize10 InAccel0, uint8 PendingFlags, uint32 View0, float TimeStamp, FVector_NetQuantize10 InAccel, FVector_NetQuantize100 ClientLoc, uint8 NewFlags, uint8 ClientRoll, uint32 View, UPrimitiveComponent* ClientMovementBase, FName ClientBaseBoneName, uint8 ClientMovementMode) override;
 
+
 	////////////////////////////////////////////////////////////////////////////////
 	// Rotation
 public:
 	/** Returns the desired rotation yaw of pawn owner */
-	FORCEINLINE float GetDesiredCustomRotationYaw() const { return DesiredCustomRotationYaw; }
+	FORCEINLINE float GetDesiredCustomRotationYaw() const
+	{
+		return DesiredCustomRotationYaw;
+	}
 
 	inline void SetDesiredCustomRotationYaw(float NewRotationYaw);
 
 	/** Returns true if the pawn owner can rotate at all */
-	FORCEINLINE bool CanRotate() const { return bCanRotate; }
-
+	FORCEINLINE bool CanRotate() const
+	{
+		return bCanRotate;
+	}
+	
 	inline void SetCanRotate(bool bValue);
 
 	void DoInstantRotation(float InstantRotationYaw);

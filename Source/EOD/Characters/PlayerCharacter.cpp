@@ -926,7 +926,7 @@ bool APlayerCharacter::StartDodge()
 		DeactivateGuard();
 
 		// Because desired rotation yaw from axis input wouldn't have updated if guard was active
-		UpdateDesiredYawFromAxisInput();
+		InitiateRotationToYawFromAxisInput();
 	}
 	else if (IsCastingSpell())
 	{

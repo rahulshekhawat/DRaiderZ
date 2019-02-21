@@ -87,23 +87,14 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 	// Combat
 public:
-
+	/**
+	 * [server + local]
+	 * Enables immunity frames after a given Delay for a given Duration on the server copy of this character.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Combat System", meta = (DisplayName = "Trigger iFrames"))
+	void TriggeriFrames(float Duration = 0.4f, float Delay = 0.f);
 
 protected:
-	/** Determines if invincibility frames are active */
-	uint32 bActiveiFrames : 1;
-
-
-	////////////////////////////////////////////////////////////////////////////////
-	// 
-private:
-	/**
-	 * The direction character is trying to move relative to it's controller rotation
-	 * If the character is controlled by player, it is determined by the movement keys pressed by player
-	 */
-	UPROPERTY(Replicated)
-	ECharMovementDirection CharacterMovementDirection;
-
 	/** Enables immunity frames for a given duration */
 	UFUNCTION()
 	void EnableiFrames(float Duration = 0.f);
@@ -112,170 +103,186 @@ private:
 	UFUNCTION()
 	void DisableiFrames();
 
+	inline void ActivateGuard();
+
+	inline void DeactivateGuard();
+
+	/** [local] Transition to character guard animation */
+	UFUNCTION()
+	virtual void EnableCharacterGuard();
+
+	/** [local] Transition out of character guard animation */
+	UFUNCTION()
+	virtual void DisableCharacterGuard();
+
+	inline void StartBlockingDamage(float Delay = 0.2f);
+
+	inline void StopBlockingDamage();
+
+	/** Determines whether character is currently engaged in combat or not */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Combat System")
+	bool bInCombat;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
+	float DodgeImmunityTriggerDelay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
+	float DodgeImmunityDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
+	float DamageBlockTriggerDelay;
+
+private:
+	/** Determines if invincibility frames are active */
+	UPROPERTY(Transient)
+	uint32 bActiveiFrames : 1;
 
 	/** Determines if character is blocking any incoming damage */
 	UPROPERTY(Transient)
-	bool bBlockingDamage;
+	uint32 bBlockingDamage : 1;
+
+	/** Determines whether the character has it's guard up */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_GuardActive)
+	uint32 bGuardActive : 1;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Character stats
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Stats|Constants")
+	int DodgeStaminaCost;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Movement
+public:
+	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const
+	{
+		return CharacterMovementDirection;
+	}
+
+	FORCEINLINE float GetBlockMovementDirectionYaw() const
+	{
+		return BlockMovementDirectionYaw;
+	}
+
+protected:
+	/** [server + local] Sets whether current character state allows movement */
+	inline void SetCharacterStateAllowsMovement(bool bNewValue);
+
+	/** [server + local] Sets the current character movement direction */
+	inline void SetCharacterMovementDirection(ECharMovementDirection NewDirection);
+
+	/** [server + local] Set the yaw for player's movement direction relative to player's forward direction */
+	inline void SetBlockMovementDirectionYaw(float NewYaw);
+
+	//~ @todo see if it's possible to use bCharacterStateAllowsMovement without needing replication
+	/** This boolean is used to determine if the character can move even if it's not in 'IdleWalkRun' state. e.g., moving while casting spell. */
+	UPROPERTY(Replicated)
+	uint32 bCharacterStateAllowsMovement : 1;
+
+	/** Max speed of character when it's walking */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Constants")
+	float DefaultWalkSpeed;
+
+	/** Max speed of character when it's running */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Constants")
+	float DefaultRunSpeed;
+
+	/** Max speed of character when it's moving while blocking attacks */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Constants")
+	float DefaultWalkSpeedWhileBlocking;
+
+private:
+	/**
+	 * The direction character is trying to move relative to it's controller rotation
+	 * If the character is controlled by player, it is determined by the movement keys pressed by player
+	 */
+	UPROPERTY(Replicated)
+	ECharMovementDirection CharacterMovementDirection;
 
 	/** The relative yaw of character's movement direction from the direction character is facing while blocking */
 	UPROPERTY(Replicated)
 	float BlockMovementDirectionYaw;
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Input
+public:
+	/** Returns the yaw that this pawn wants to rotate to based on the movement input from player */
+	UFUNCTION(BlueprintCallable, Category = "Input|Rotation", meta = (DisplayName = "Get Rotation Yaw From Axis Input"))
+	float BP_GetRotationYawFromAxisInput();
+
+	/** Returns the yaw that this pawn wants to rotate to based on the movement input from player */
+	inline float GetRotationYawFromAxisInput();
+
+	/** Updates the DesiredCustomRotationYaw in pawn's movement component to the DesiredRotationYawFromAxisInput */
+	void InitiateRotationToYawFromAxisInput();
+
+	/** Zoom in player camera */
+	inline void ZoomInCamera();
+
+	/** Zooms out player camera */
+	inline void ZoomOutCamera();
+
+protected:
+	/** Determines whether the cached value of DesiredRotationYawFromAxisInput was updated this frame */
+	uint32 bDesiredRotationYawFromAxisInputUpdated : 1;
+
+	/** Cached value of the yaw that this pawn wants to rotate to this frame based on the movement input from player */
+	UPROPERTY(Transient)
+	float DesiredRotationYawFromAxisInput;
+
+private:
+	/** Calculates and returns rotation yaw from axis input */
+	inline float CalculateRotationYawFromAxisInput() const;
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// UI
+private:
 	void BindUIDelegates();
 
 	void UnbindUIDelegates();
 
-protected:
-	UPROPERTY()
-	float DesiredRotationYawFromAxisInput;
 
-	/**
-	 * This bool is used to determine if the character can move even if it's not in 'IdleWalkRun' state.
-	 * e.g., moving while casting spell.
-	 */
-	UPROPERTY(Replicated)
-	bool bCharacterStateAllowsMovement;
-
-	/** [server + local] Sets whether current character state allows movement */
-	FORCEINLINE void SetCharacterStateAllowsMovement(bool bNewValue)
-	{
-		bCharacterStateAllowsMovement = bNewValue;
-		if (Role < ROLE_Authority)
-		{
-			Server_SetCharacterStateAllowsMovement(bNewValue);
-		}
-	}
-
-	/** [server + local] Sets the current character movement direction */
-	FORCEINLINE void SetCharacterMovementDirection(ECharMovementDirection NewDirection)
-	{
-		CharacterMovementDirection = NewDirection;
-		if (Role < ROLE_Authority)
-		{
-			Server_SetCharMovementDir(NewDirection);
-		}
-	}
-
-	/** [server + local] Set the yaw for player's movement direction relative to player's forward direction */
-	FORCEINLINE void SetBlockMovementDirectionYaw(float NewYaw)
-	{
-		BlockMovementDirectionYaw = NewYaw;
-		if (Role < ROLE_Authority)
-		{
-			Server_SetBlockMovementDirectionYaw(NewYaw);
-		}
-	}
-
+	////////////////////////////////////////////////////////////////////////////////
+	// Utility
 public:
-	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const { return CharacterMovementDirection; }
-
-	FORCEINLINE float GetBlockMovementDirectionYaw() const { return BlockMovementDirectionYaw; }
-
-	inline float GetRotationYawFromAxisInput() const;
-
-	/** Returns the expected rotation yaw of character based on current Axis Input */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Get Rotation Yaw From Axis Input"))
-	float BP_GetRotationYawFromAxisInput() const;
-
 	/**
 	 * Returns controller rotation yaw in -180/180 range.
 	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
 	 */
-	FORCEINLINE float GetControllerRotationYaw() const
-	{
-		if (GetController())
-		{
-			return FMath::UnwindDegrees(GetController()->GetControlRotation().Yaw);
-		}
-		return 0.f;
-	}
-
-	/**
-	 * Returns controller rotation yaw in -180/180 range.
-	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
-	 */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Get Controller Rotation Yaw"))
+	UFUNCTION(BlueprintCallable, Category = "Utility", meta = (DisplayName = "Get Controller Rotation Yaw"))
 	float BP_GetControllerRotationYaw() const;
 
 	/**
-	 * [server + local] 
-	 * Enables immunity frames after a given Delay for a given Duration on the server copy of this character.
+	 * Returns controller rotation yaw in -180/180 range.
+	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
 	 */
-	FORCEINLINE void TriggeriFrames(float Duration = 0.4f, float Delay = 0.f)
-	{
-		if (Role < ROLE_Authority)
-		{
-			Server_TriggeriFrames(Duration, Delay);
-		}
-		else
-		{
-			if (GetWorld())
-			{
-				FTimerDelegate TimerDelegate;
-				TimerDelegate.BindUFunction(this, FName("EnableiFrames"), Duration);
-				GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
-			}
-		}
-	}
-
-	/**
-	 * [server + local]
-	 * Enables immunity frames after a given Delay for a given Duration on the server copy of this character.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Trigger iFrames"))
-	void BP_TriggeriFrames(float Duration = 0.4f, float Delay = 0.f);
-
-	FORCEINLINE void StartBlockingDamage(float Delay = 0.2f)
-	{
-		if (Role < ROLE_Authority)
-		{
-			Server_StartBlockingDamage(Delay);
-		}
-		else
-		{
-			if (GetWorld())
-			{
-				GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &AEODCharacterBase::EnableDamageBlocking, Delay, false);
-			}
-		}
-	}
-
-	FORCEINLINE void StopBlockingDamage()
-	{
-		if (Role < ROLE_Authority)
-		{
-			Server_StopBlockingDamage();
-		}
-		else
-		{
-			DisableDamageBlocking();
-		}
-	}
+	inline float GetControllerRotationYaw() const;
 
 	/** [server + local] Plays an animation montage and changes character state over network */
 	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Save/load
+public:
 	/** Saves current character state */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	virtual void SaveCharacterState() { ; }
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Save/load
 protected:
-	/** Max speed of character when it's walking */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
-	float DefaultWalkSpeed;
-
-	/** Max speed of character when it's running */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
-	float DefaultRunSpeed;
-
-	/** Max speed of character when it's moving while blocking attacks */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EOD Character")
-	float DefaultWalkSpeedWhileBlocking;
+	/** Resets tick dependent data. Intended to be called at the beginning of tick function */
+	virtual void ResetTickDependentData();
 
 
 	////////////////////////////////////////////////////////////////////////////////
-	// COMPONENTS
-	////////////////////////////////////////////////////////////////////////////////
+	// Components
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoomComponent() const { return CameraBoomComponent; }
 
@@ -287,13 +294,9 @@ public:
 
 	FORCEINLINE USphereComponent* GetInteractionSphereComponent() const { return InteractionSphereComponent; }
 
-	FORCEINLINE void EnableInteractionSphere();
+	inline void EnableInteractionSphere();
 
-	FORCEINLINE void DisableInteractionSphere();
-
-	FORCEINLINE void ZoomInCamera();
-
-	FORCEINLINE void ZoomOutCamera();
+	inline void DisableInteractionSphere();
 
 	static FName CameraComponentName;
 
@@ -343,23 +346,6 @@ public:
 
 	virtual bool StopDodge();
 
-	virtual void EnableCharacterGuard();
-
-	virtual void DisableCharacterGuard();
-
-	FORCEINLINE void ActivateGuard()
-	{
-		SetGuardActive(true);
-		StartBlockingDamage(DamageBlockTriggerDelay);
-		SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetCharacterStatsComponent()->GetMovementSpeedModifier());
-	}
-
-	FORCEINLINE void DeactivateGuard()
-	{
-		SetGuardActive(false);
-		StopBlockingDamage();
-	}
-
 	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void TriggerInteraction();
 
@@ -402,10 +388,6 @@ private:
 	/** Determines whether weapon is currently sheathed or not */
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
 	bool bWeaponSheathed;
-
-	/** Determines whether the character has it's guard up */
-	UPROPERTY(ReplicatedUsing = OnRep_GuardActive)
-	bool bGuardActive;
 
 protected:
 	/** [server + local] Sets whether this character's weapon is sheathed or not */
@@ -460,8 +442,6 @@ protected:
 	inline void UpdatePCTryingToMove();
 
 	inline void UpdateCharacterMovementDirection();
-
-	void UpdateDesiredYawFromAxisInput();
 
 	virtual void UpdateMovementState(float DeltaTime);
 
@@ -1008,22 +988,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EOD Character")
 	float TargetSwitchDuration;
 
-	/** Determines whether character is currently engaged in combat or not */
-	UPROPERTY(Transient)
-	bool bInCombat;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	int DodgeStaminaCost;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	float DodgeImmunityTriggerDelay;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	float DodgeImmunityDuration;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Constants)
-	float DamageBlockTriggerDelay;
-
 public:
 
 	/** Called on dodging an enemy attack */
@@ -1175,6 +1139,78 @@ private:
 	
 };
 
+inline void AEODCharacterBase::ActivateGuard()
+{
+	SetGuardActive(true);
+	StartBlockingDamage(DamageBlockTriggerDelay);
+	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetCharacterStatsComponent()->GetMovementSpeedModifier());
+}
+
+inline void AEODCharacterBase::DeactivateGuard()
+{
+	SetGuardActive(false);
+	StopBlockingDamage();
+}
+
+inline void AEODCharacterBase::StartBlockingDamage(float Delay)
+{
+	if (Role < ROLE_Authority)
+	{
+		Server_StartBlockingDamage(Delay);
+	}
+	else
+	{
+		if (GetWorld())
+		{
+			GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &AEODCharacterBase::EnableDamageBlocking, Delay, false);
+		}
+	}
+}
+
+inline void AEODCharacterBase::StopBlockingDamage()
+{
+	if (Role < ROLE_Authority)
+	{
+		Server_StopBlockingDamage();
+	}
+	else
+	{
+		DisableDamageBlocking();
+	}
+}
+
+inline void AEODCharacterBase::SetCharacterStateAllowsMovement(bool bNewValue)
+{
+	bCharacterStateAllowsMovement = bNewValue;
+	if (Role < ROLE_Authority)
+	{
+		Server_SetCharacterStateAllowsMovement(bNewValue);
+	}
+}
+
+inline void AEODCharacterBase::SetCharacterMovementDirection(ECharMovementDirection NewDirection)
+{
+	CharacterMovementDirection = NewDirection;
+	if (Role < ROLE_Authority)
+	{
+		Server_SetCharMovementDir(NewDirection);
+	}
+}
+
+inline void AEODCharacterBase::SetBlockMovementDirectionYaw(float NewYaw)
+{
+	BlockMovementDirectionYaw = NewYaw;
+	if (Role < ROLE_Authority)
+	{
+		Server_SetBlockMovementDirectionYaw(NewYaw);
+	}
+}
+
+inline float AEODCharacterBase::GetControllerRotationYaw() const
+{
+	return (Controller ? FMath::UnwindDegrees(Controller->GetControlRotation().Yaw) : 0.0f);
+}
+
 inline void AEODCharacterBase::UpdatePCTryingToMove()
 {
 	if (ForwardAxisValue == 0 && RightAxisValue == 0)
@@ -1229,7 +1265,18 @@ inline void AEODCharacterBase::UpdateCharacterMovementDirection()
 	}
 }
 
-inline float AEODCharacterBase::GetRotationYawFromAxisInput() const
+inline float AEODCharacterBase::GetRotationYawFromAxisInput()
+{
+	if (!bDesiredRotationYawFromAxisInputUpdated)
+	{
+		bDesiredRotationYawFromAxisInputUpdated = true;
+		DesiredRotationYawFromAxisInput = CalculateRotationYawFromAxisInput();
+	}
+
+	return DesiredRotationYawFromAxisInput;
+}
+
+inline float AEODCharacterBase::CalculateRotationYawFromAxisInput() const
 {
 	float ResultingRotation = GetActorRotation().Yaw;
 	float ControlRotationYaw = GetControllerRotationYaw();
@@ -1260,7 +1307,7 @@ inline float AEODCharacterBase::GetRotationYawFromAxisInput() const
 	return FMath::UnwindDegrees(ResultingRotation);
 }
 
-FORCEINLINE void AEODCharacterBase::EnableInteractionSphere()
+inline void AEODCharacterBase::EnableInteractionSphere()
 {
 	if (IsValid(InteractionSphereComponent))
 	{
@@ -1269,7 +1316,7 @@ FORCEINLINE void AEODCharacterBase::EnableInteractionSphere()
 	}
 }
 
-FORCEINLINE void AEODCharacterBase::DisableInteractionSphere()
+inline void AEODCharacterBase::DisableInteractionSphere()
 {
 	if (IsValid(InteractionSphereComponent))
 	{
@@ -1278,17 +1325,17 @@ FORCEINLINE void AEODCharacterBase::DisableInteractionSphere()
 	}
 }
 
-FORCEINLINE void AEODCharacterBase::ZoomInCamera()
+inline void AEODCharacterBase::ZoomInCamera()
 {
-	if (IsValid(CameraBoomComponent) && CameraBoomComponent->TargetArmLength >= CameraArmMinimumLength)
+	if (CameraBoomComponent && CameraBoomComponent->TargetArmLength >= CameraArmMinimumLength)
 	{
 		CameraBoomComponent->TargetArmLength -= CameraZoomRate;
 	}
 }
 
-FORCEINLINE void AEODCharacterBase::ZoomOutCamera()
+inline void AEODCharacterBase::ZoomOutCamera()
 {
-	if (IsValid(CameraBoomComponent) && CameraBoomComponent->TargetArmLength <= CameraArmMaximumLength)
+	if (CameraBoomComponent && CameraBoomComponent->TargetArmLength <= CameraArmMaximumLength)
 	{
 		CameraBoomComponent->TargetArmLength += CameraZoomRate;
 	}

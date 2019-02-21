@@ -85,13 +85,14 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 
 	Faction = EFaction::Player;
 
-	bActiveiFrames = false;
-
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	ResetTickDependentData();
+
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		// If block key is pressed but the character is not blocking
@@ -124,7 +125,7 @@ void AEODCharacterBase::Tick(float DeltaTime)
 		{
 			UpdatePCTryingToMove();
 			UpdateCharacterMovementDirection();
-			UpdateDesiredYawFromAxisInput();
+			InitiateRotationToYawFromAxisInput();
 			UpdateMovementState(DeltaTime);
 		}
 		else if (IsGuardActive())
@@ -183,19 +184,32 @@ void AEODCharacterBase::Restart()
 	BindUIDelegates();
 }
 
-float AEODCharacterBase::BP_GetRotationYawFromAxisInput() const
+float AEODCharacterBase::BP_GetRotationYawFromAxisInput()
 {
 	return GetRotationYawFromAxisInput();
 }
 
 float AEODCharacterBase::BP_GetControllerRotationYaw() const
 {
-	return GetControllerRotationYaw();
+	return (Controller ? FMath::UnwindDegrees(Controller->GetControlRotation().Yaw) : 0.0f);
 }
 
-void AEODCharacterBase::BP_TriggeriFrames(float Duration, float Delay)
+void AEODCharacterBase::TriggeriFrames(float Duration, float Delay)
 {
-	TriggeriFrames(Duration, Delay);
+	if (Role < ROLE_Authority)
+	{
+		Server_TriggeriFrames(Duration, Delay);
+	}
+	else
+	{
+		if (GetWorld())
+		{
+			FTimerDelegate TimerDelegate;
+			// TimerDelegate.BindUFunction(this, FName("EnableiFrames"), Duration);
+			TimerDelegate.BindUObject(this, &AEODCharacterBase::EnableiFrames, Duration);
+			GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
+		}
+	}
 }
 
 bool AEODCharacterBase::BP_IsDead() const
@@ -349,8 +363,7 @@ void AEODCharacterBase::BlockAttack()
 void AEODCharacterBase::EnableiFrames(float Duration)
 {
 	bActiveiFrames = true;
-
-	if (Duration > 0)
+	if (Duration > 0.f && GetWorld())
 	{
 		GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, this, &AEODCharacterBase::DisableiFrames, Duration, false);
 	}
@@ -399,6 +412,11 @@ void AEODCharacterBase::BindUIDelegates()
 
 void AEODCharacterBase::UnbindUIDelegates()
 {
+}
+
+void AEODCharacterBase::ResetTickDependentData()
+{
+	bDesiredRotationYawFromAxisInputUpdated = false;
 }
 
 void AEODCharacterBase::EnableDamageBlocking()
@@ -576,7 +594,7 @@ void AEODCharacterBase::OnRep_WeaponSheathed()
 
 void AEODCharacterBase::OnRep_GuardActive()
 {
-	if (IsGuardActive())
+	if (bGuardActive)
 	{
 		EnableCharacterGuard();
 	}
@@ -584,7 +602,6 @@ void AEODCharacterBase::OnRep_GuardActive()
 	{
 		DisableCharacterGuard();
 	}
-	// ActivateGuard();
 }
 
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
@@ -795,16 +812,16 @@ void AEODCharacterBase::PlayToggleSheatheAnimation()
 {
 }
 
-void AEODCharacterBase::UpdateDesiredYawFromAxisInput()
+void AEODCharacterBase::InitiateRotationToYawFromAxisInput()
 {
-	DesiredRotationYawFromAxisInput = GetRotationYawFromAxisInput();
+	float UpdatedYaw = GetRotationYawFromAxisInput();
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
 	{
 		const float AngleTolerance = 1e-3f;
-		if (!FMath::IsNearlyEqual(MoveComp->GetDesiredCustomRotationYaw(), DesiredRotationYawFromAxisInput, AngleTolerance))
+		if (!FMath::IsNearlyEqual(MoveComp->GetDesiredCustomRotationYaw(), UpdatedYaw, AngleTolerance))
 		{
-			MoveComp->SetDesiredCustomRotationYaw(DesiredRotationYawFromAxisInput);
+			MoveComp->SetDesiredCustomRotationYaw(UpdatedYaw);
 		}
 	}
 }
