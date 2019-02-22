@@ -767,6 +767,19 @@ void AEODCharacterBase::DisableCharacterGuard()
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 }
 
+void AEODCharacterBase::MoveForward(const float Value)
+{
+	FRotator Rotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
+	FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
+	AddMovementInput(Direction, Value);
+}
+
+void AEODCharacterBase::MoveRight(const float Value)
+{
+	FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
+	AddMovementInput(Direction, Value);
+}
+
 void AEODCharacterBase::TriggerInteraction()
 {
 	// If Character is already interacting

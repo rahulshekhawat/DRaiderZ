@@ -14,4 +14,9 @@ class EOD_API ARideBase : public AEODCharacterBase
 {
 	GENERATED_BODY()
 	
+public:
+	ARideBase(const FObjectInitializer& ObjectInitializer);
+
+
+
 };

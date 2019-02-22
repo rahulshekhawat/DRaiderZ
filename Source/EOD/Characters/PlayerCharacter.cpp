@@ -850,35 +850,6 @@ void APlayerCharacter::RemoveSecondaryWeapon()
 	// @todo remove weapon stats
 }
 
-void APlayerCharacter::MoveForward(const float Value)
-{
-	if (Value != 0 && CanMove())
-	{
-		if (IsAutoRunning())
-		{
-			DisableAutoRun();
-		}
-
-		FRotator Rotation = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
-		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
-	}
-}
-
-void APlayerCharacter::MoveRight(const float Value)
-{
-	if (Value != 0 && CanMove())
-	{
-		if (IsAutoRunning())
-		{
-			DisableAutoRun();
-		}
-
-		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
-		AddMovementInput(Direction, Value);
-	}
-}
-
 void APlayerCharacter::ZoomInCamera()
 {
 	if (GetCameraBoomComponent()->TargetArmLength >= CameraArmMinimumLength)

@@ -331,9 +331,7 @@ void AEODPlayerController::MovePawnForward(const float Value)
 				DisableAutoMove();
 			}
 
-			FRotator Rotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
-			FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
-			EODCharacter->AddMovementInput(Direction, Value);
+			EODCharacter->MoveForward(Value);
 		}
 	}
 }
@@ -351,8 +349,7 @@ void AEODPlayerController::MovePawnRight(const float Value)
 				DisableAutoMove();
 			}
 
-			FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
-			EODCharacter->AddMovementInput(Direction, Value);
+			EODCharacter->MoveRight(Value);
 		}
 	}
 }

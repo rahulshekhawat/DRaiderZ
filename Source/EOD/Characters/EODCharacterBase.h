@@ -166,6 +166,12 @@ public:
 		return BlockMovementDirectionYaw;
 	}
 
+	/** Move character forward/backward */
+	virtual void MoveForward(const float Value);
+
+	/** Move character left/right */
+	virtual void MoveRight(const float Value);
+
 protected:
 	/** [server + local] Sets whether current character state allows movement */
 	inline void SetCharacterStateAllowsMovement(bool bNewValue);
