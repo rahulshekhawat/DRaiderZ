@@ -149,6 +149,10 @@ void AEODPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsAutoMoveEnabled() && IsValid(EODCharacter))
+	{
+		EODCharacter->MoveForward(1.f);
+	}
 }
 
 void AEODPlayerController::Possess(APawn* InPawn)
@@ -320,37 +324,27 @@ void AEODPlayerController::TogglePlayerStatsUI()
 
 void AEODPlayerController::MovePawnForward(const float Value)
 {
+	if (Value != 0 && IsAutoMoveEnabled())
+	{
+		DisableAutoMove();
+	}
+
 	if (IsValid(EODCharacter))
 	{
-		EODCharacter->ForwardAxisValue = Value;
-
-		if (EODCharacter->CanMove() && Value != 0)
-		{
-			if (IsAutoMoveEnabled())
-			{
-				DisableAutoMove();
-			}
-
-			EODCharacter->MoveForward(Value);
-		}
+		EODCharacter->MoveForward(Value);
 	}
 }
 
 void AEODPlayerController::MovePawnRight(const float Value)
 {
+	if (Value != 0 && IsAutoMoveEnabled())
+	{
+		DisableAutoMove();
+	}
+
 	if (IsValid(EODCharacter))
 	{
-		EODCharacter->RightAxisValue = Value;
-
-		if (EODCharacter->CanMove() && Value != 0)
-		{
-			if (IsAutoMoveEnabled())
-			{
-				DisableAutoMove();
-			}
-
-			EODCharacter->MoveRight(Value);
-		}
+		EODCharacter->MoveRight(Value);
 	}
 }
 

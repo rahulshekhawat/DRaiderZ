@@ -769,15 +769,25 @@ void AEODCharacterBase::DisableCharacterGuard()
 
 void AEODCharacterBase::MoveForward(const float Value)
 {
-	FRotator Rotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
-	FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
-	AddMovementInput(Direction, Value);
+	ForwardAxisValue = Value;
+
+	if (Value != 0 && CanMove())
+	{
+		FRotator Rotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
+		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
+		AddMovementInput(Direction, Value);
+	}
 }
 
 void AEODCharacterBase::MoveRight(const float Value)
 {
-	FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
-	AddMovementInput(Direction, Value);
+	RightAxisValue = Value;
+
+	if (Value != 0 && CanMove())
+	{
+		FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
+		AddMovementInput(Direction, Value);
+	}
 }
 
 void AEODCharacterBase::TriggerInteraction()
