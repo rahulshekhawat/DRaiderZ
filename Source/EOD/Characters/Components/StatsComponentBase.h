@@ -35,8 +35,7 @@ public:
 	
 
 	////////////////////////////////////////////////////////////////////////////////
-	// HEALTH
-	////////////////////////////////////////////////////////////////////////////////
+	// Health
 protected:
 	/** Maximum health of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
@@ -81,8 +80,7 @@ private:
 
 	
 	////////////////////////////////////////////////////////////////////////////////
-	// MANA
-	////////////////////////////////////////////////////////////////////////////////
+	// Mana
 protected:
 	/** Maximum mana of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
@@ -121,8 +119,7 @@ private:
 
 
 	////////////////////////////////////////////////////////////////////////////////
-	// STAMINA
-	////////////////////////////////////////////////////////////////////////////////
+	// Stamina
 protected:
 	/** Maximum mana of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
@@ -158,6 +155,23 @@ private:
 	FORCEINLINE void SetMaxStamina(int32 Value);
 
 	FORCEINLINE void SetCurrentStamina(int32 Value);
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Stamina
+protected:
+	UPROPERTY(Replicated)
+	float MovementSpeedModifier;
+
+public:
+	/*
+	FORCEINLINE float GetMovementSpeedModifier() const 
+	{
+		return MovementSpeedModifier;
+	}
+	*/
+
+	virtual float GetMovementSpeedModifier() const { return MovementSpeedModifier; }
 
 
 public:
@@ -332,8 +346,6 @@ public:
 	virtual float GetDropRateModifier() const PURE_VIRTUAL(UStatsComponentBase::GetDropRateModifier, return 0.f; );
 
 	virtual float GetStaminaConsumptionModifier() const PURE_VIRTUAL(UStatsComponentBase::GetStaminaConsumptionModifier, return 0.f; );
-
-	virtual float GetMovementSpeedModifier() const PURE_VIRTUAL(UStatsComponentBase::GetMovementSpeedModifier, return 0.f; );
 
 	virtual float GetActiveTimeDilation() const PURE_VIRTUAL(UStatsComponentBase::GetActiveTimeDilation, return 0.f; );
 	

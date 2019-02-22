@@ -284,15 +284,30 @@ protected:
 	////////////////////////////////////////////////////////////////////////////////
 	// Components
 public:
-	FORCEINLINE USpringArmComponent* GetCameraBoomComponent() const { return CameraBoomComponent; }
+	FORCEINLINE USpringArmComponent* GetCameraBoomComponent() const
+	{
+		return CameraBoomComponent;
+	}
 
-	FORCEINLINE UCameraComponent* GetCameraComponent() const { return CameraComponent; }
+	FORCEINLINE UCameraComponent* GetCameraComponent() const
+	{
+		return CameraComponent;
+	}
 
-	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const { return SkillManager; }
+	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const
+	{
+		return SkillManager;
+	}
 
-	FORCEINLINE UStatsComponentBase* GetCharacterStatsComponent() const { return CharacterStatsComponent; }
+	FORCEINLINE UStatsComponentBase* GetCharacterStatsComponent() const
+	{ 
+		return CharacterStatsComponent;
+	}
 
-	FORCEINLINE USphereComponent* GetInteractionSphereComponent() const { return InteractionSphereComponent; }
+	FORCEINLINE USphereComponent* GetInteractionSphereComponent() const
+	{ 
+		return InteractionSphereComponent;
+	}
 
 	inline void EnableInteractionSphere();
 
@@ -309,13 +324,13 @@ public:
 	static FName InteractionSphereComponentName;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera|Constants")
 	int32 CameraZoomRate;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera|Constants")
 	int CameraArmMinimumLength;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera|Constants")
 	int CameraArmMaximumLength;
 
 private:

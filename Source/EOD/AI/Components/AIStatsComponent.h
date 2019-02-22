@@ -336,8 +336,8 @@ private:
 	
 	//~ @note MovementSpeedModifier, AnimationSpeedModifier, and SpellCastingSpeedModifier will be replicated to all clients
 
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
-	float MovementSpeedModifier;
+	// UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
+	// float MovementSpeedModifier;
 	
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float ActiveTimeDilation;
