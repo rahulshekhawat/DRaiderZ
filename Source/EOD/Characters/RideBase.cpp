@@ -11,3 +11,8 @@ ARideBase::ARideBase(const FObjectInitializer& ObjectInitializer) : Super(Object
 		SpringArm->AddLocalOffset(FVector(0.f, 0.f, 40.f));
 	}
 }
+
+void ARideBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
