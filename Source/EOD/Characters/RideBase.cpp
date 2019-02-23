@@ -29,7 +29,7 @@ void ARideBase::Tick(float DeltaTime)
 
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
-		// UpdateRotation(DeltaTime);
+		UpdateRotation(DeltaTime);
 	}
 }
 
@@ -83,11 +83,54 @@ void ARideBase::UpdateRotation(float DeltaTime)
 		return;
 	}
 
+	FRotator NewDesiredRotation = FRotator::ZeroRotator;
+	FRotator ControllerRotation = GetControlRotation();
+	FRotator ActorRotation = GetActorRotation();
+
 	if (ForwardAxisValue == 0 && RightAxisValue == 0)
 	{
-		
-		// MoveComp->SetDesiredCustomRotationYaw();
-
-
+		NewDesiredRotation.Yaw = ActorRotation.Yaw;
 	}
+	else
+	{
+		if (ForwardAxisValue == 0)
+		{
+			if (RightAxisValue > 0)
+			{
+				NewDesiredRotation.Yaw = FMath::UnwindDegrees(ControllerRotation.Yaw + 90.f);
+			}
+			else if (RightAxisValue < 0)
+			{
+				NewDesiredRotation.Yaw = FMath::UnwindDegrees(ControllerRotation.Yaw - 90.f);
+			}
+		}
+		else
+		{
+			NewDesiredRotation.Pitch = FMath::UnwindDegrees(ControllerRotation.Pitch);
+			float DeltaAngle;
+			if (ForwardAxisValue > 0)
+			{
+				// NewDesiredRotation.Pitch = FMath::UnwindDegrees(ControllerRotation.Pitch - 5.f);
+				DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
+			}
+			else if (ForwardAxisValue < 0)
+			{
+				// NewDesiredRotation.Pitch = FMath::UnwindDegrees(ControllerRotation.Pitch + 5.f);
+				DeltaAngle = FMath::RadiansToDegrees(FMath::Atan2(-RightAxisValue, -ForwardAxisValue));
+			}
+			NewDesiredRotation.Yaw = FMath::UnwindDegrees(ControllerRotation.Yaw + DeltaAngle);
+
+		}
+
+		if (RightAxisValue > 0)
+		{
+			// NewDesiredRotation.Roll = 15;
+		}
+		else if (RightAxisValue < 0)
+		{
+			// NewDesiredRotation.Roll = -15;
+		}
+	}
+
+	MoveComp->SetDesiredCustomRotation(NewDesiredRotation);
 }

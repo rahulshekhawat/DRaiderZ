@@ -928,7 +928,10 @@ bool APlayerCharacter::StartDodge()
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
 	{
+		/*
+		@TOFIX
 		MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+		*/
 	}
 
 	FName SectionToPlay;

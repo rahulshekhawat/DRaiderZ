@@ -45,52 +45,92 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 	// Rotation
 public:
-	/** Returns the desired rotation yaw of pawn owner */
+	FORCEINLINE FRotator GetDesiredCustomRotation() const
+	{
+		return DesiredCustomRotation;
+	}
+
+	inline void SetDesiredCustomRotation(const FRotator& NewRotation);
+
+protected:
+	/**
+	 * Desired rotation of pawn owner. The character owner will always try to rotate smoothly to this DesiredCustomRotationYaw unless the 
+	 * rotation behavior is overriden by setting 'bOrientRotationToMovement' or 'bUseControllerDesiredRotation' to true.
+	 */
+	UPROPERTY(Replicated)
+	FRotator DesiredCustomRotation;
+
+
+
+
+
+public:
+	/** Returns the desired rotation yaw of pawn owner
 	FORCEINLINE float GetDesiredCustomRotationYaw() const
 	{
 		return DesiredCustomRotationYaw;
 	}
+	*/
 
-	inline void SetDesiredCustomRotationYaw(float NewRotationYaw);
+	// inline void SetDesiredCustomRotationYaw(float NewRotationYaw);
 
-	/** Returns true if the pawn owner can rotate at all */
+	/** Returns true if the pawn owner can rotate at all 
 	FORCEINLINE bool CanRotate() const
 	{
 		return bCanRotate;
 	}
+	*/
 	
-	inline void SetCanRotate(bool bValue);
+	// inline void SetCanRotate(bool bValue);
 
-	void DoInstantRotation(float InstantRotationYaw);
+	// void DoInstantRotation(float InstantRotationYaw);
+	
 
 private:
 	/** Determines whether the pawn owner can currently rotate at all */
-	UPROPERTY(Replicated)
-	uint32 bCanRotate : 1;
+	// UPROPERTY(Replicated)
+	// uint32 bCanRotate : 1;
 
 	/**
 	 * Desired rotation yaw of pawn owner. The character owner will always try to rotate smoothly to
 	 * this DesiredCustomRotationYaw unless the rotation behavior is overriden by setting 'bOrientRotationToMovement'
 	 * or 'bUseControllerDesiredRotation' to true.
 	 */
-	UPROPERTY(Replicated)
-	float DesiredCustomRotationYaw;
+	// UPROPERTY(Replicated)
+	// float DesiredCustomRotationYaw;
 
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Network
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetCanRotate(bool bValue);
+	void Server_SetDesiredCustomRotation(const FRotator& NewRotation);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetDesiredCustomRotationYaw(float NewRotationYaw);
+	// UFUNCTION(Server, Reliable, WithValidation)
+	// void Server_SetCanRotate(bool bValue);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_DoInstantRotation(float InstantRotationYaw);
+	// UFUNCTION(Server, Reliable, WithValidation)
+	// void Server_SetDesiredCustomRotationYaw(float NewRotationYaw);
+
+	// UFUNCTION(Server, Reliable, WithValidation)
+	// void Server_DoInstantRotation(float InstantRotationYaw);
 
 };
 
+inline void UEODCharacterMovementComponent::SetDesiredCustomRotation(const FRotator& NewRotation)
+{
+	const float AngleTolerance = 1e-3f;
+	if (!DesiredCustomRotation.Equals(NewRotation, AngleTolerance))
+	{
+		DesiredCustomRotation = NewRotation;
+		if (CharacterOwner && CharacterOwner->Role < ROLE_Authority)
+		{
+			Server_SetDesiredCustomRotation(NewRotation);
+		}
+	}
+}
+
+/*
 inline void UEODCharacterMovementComponent::SetDesiredCustomRotationYaw(float NewRotationYaw)
 {
 	if (DesiredCustomRotationYaw != NewRotationYaw)
@@ -114,3 +154,4 @@ inline void UEODCharacterMovementComponent::SetCanRotate(bool bValue)
 		}
 	}
 }
+*/

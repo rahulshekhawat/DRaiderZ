@@ -101,6 +101,7 @@ void AEODCharacterBase::Tick(float DeltaTime)
 
 	ResetTickDependentData();
 
+	/*
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		// If block key is pressed but the character is not blocking
@@ -141,6 +142,7 @@ void AEODCharacterBase::Tick(float DeltaTime)
 			UpdateGuardState(DeltaTime);
 		}
 	}
+	*/
 }
 
 void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -850,6 +852,9 @@ void AEODCharacterBase::PlayToggleSheatheAnimation()
 
 void AEODCharacterBase::InitiateRotationToYawFromAxisInput()
 {
+	/*
+	@TOFIX
+
 	float UpdatedYaw = GetRotationYawFromAxisInput();
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
@@ -860,6 +865,7 @@ void AEODCharacterBase::InitiateRotationToYawFromAxisInput()
 			MoveComp->SetDesiredCustomRotationYaw(UpdatedYaw);
 		}
 	}
+	*/
 }
 
 void AEODCharacterBase::OnPressedForward()
