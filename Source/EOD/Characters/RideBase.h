@@ -22,6 +22,9 @@ public:
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
+	/** Updates character state every frame */
+	virtual void Tick(float DeltaTime) override;
+
 	/** Called when the Pawn is being restarted (usually by being possessed by a Controller). Called on both server and owning client. */
 	virtual void Restart() override;
 
@@ -41,11 +44,14 @@ private:
 	// Movement
 public:
 	/** Move character forward/backward */
-	virtual void MoveForward(const float Value);
+	virtual void MoveForward(const float Value) override;
 
 	/** Move character left/right */
-	virtual void MoveRight(const float Value);
+	virtual void MoveRight(const float Value) override;
 
+protected:
+	/** Updates the rotation of character */
+	virtual void UpdateRotation(float DeltaTime) override;
 
 
 };

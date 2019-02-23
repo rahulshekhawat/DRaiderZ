@@ -1,8 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "RideBase.h"
-
-#include "GameFramework/CharacterMovementComponent.h"
+#include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
 
 ARideBase::ARideBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -22,8 +21,16 @@ void ARideBase::PostInitializeComponents()
 void ARideBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
+void ARideBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 
+	if (GetController() && GetController()->IsLocalPlayerController())
+	{
+		// UpdateRotation(DeltaTime);
+	}
 }
 
 void ARideBase::Restart()
@@ -39,7 +46,6 @@ void ARideBase::Restart()
 			MoveComp->SetMovementMode(EMovementMode::MOVE_Flying);
 		}
 	}
-
 }
 
 void ARideBase::MoveForward(const float Value)
@@ -61,5 +67,27 @@ void ARideBase::MoveRight(const float Value)
 	{
 		FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
 		AddMovementInput(Direction, Value);
+	}
+}
+
+void ARideBase::UpdateRotation(float DeltaTime)
+{
+	if (!bCanFly)
+	{
+		Super::UpdateRotation(DeltaTime);
+	}
+
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (!MoveComp)
+	{
+		return;
+	}
+
+	if (ForwardAxisValue == 0 && RightAxisValue == 0)
+	{
+		
+		// MoveComp->SetDesiredCustomRotationYaw();
+
+
 	}
 }

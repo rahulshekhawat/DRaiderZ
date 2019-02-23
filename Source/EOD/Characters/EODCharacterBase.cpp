@@ -16,6 +16,12 @@
 #include "Camera/CameraComponent.h"
 
 
+/**
+ * EOD Character stats
+ */
+DECLARE_CYCLE_STAT(TEXT("EOD ChararaterTick"), STAT_EODCharacterTick, STATGROUP_EOD);
+
+
 FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
 FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
 FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
@@ -89,6 +95,8 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 
 void AEODCharacterBase::Tick(float DeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_EODCharacterTick);
+
 	Super::Tick(DeltaTime);
 
 	ResetTickDependentData();
@@ -788,6 +796,11 @@ void AEODCharacterBase::MoveRight(const float Value)
 		FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void AEODCharacterBase::UpdateRotation(float DeltaTime)
+{
+
 }
 
 void AEODCharacterBase::TriggerInteraction()

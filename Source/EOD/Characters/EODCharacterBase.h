@@ -19,6 +19,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EODCharacterBase.generated.h"
 
+DECLARE_STATS_GROUP(TEXT("EOD"), STATGROUP_EOD, STATCAT_Advanced);
+
 class UAnimMontage;
 class USkillsComponent;
 class UInputComponent;
@@ -173,6 +175,9 @@ public:
 	virtual void MoveRight(const float Value);
 
 protected:
+	/** Updates the rotation of character */
+	virtual void UpdateRotation(float DeltaTime);
+
 	/** [server + local] Sets whether current character state allows movement */
 	inline void SetCharacterStateAllowsMovement(bool bNewValue);
 

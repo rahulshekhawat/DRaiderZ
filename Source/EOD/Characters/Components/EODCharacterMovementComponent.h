@@ -27,7 +27,19 @@ public:
 	virtual void PhysicsRotation(float DeltaTime) override;
 
 	//~ @note: Overriding the default definition to fix a bug where Server drops/skips animation notifies.
-	virtual void ServerMoveDual_Implementation(float TimeStamp0, FVector_NetQuantize10 InAccel0, uint8 PendingFlags, uint32 View0, float TimeStamp, FVector_NetQuantize10 InAccel, FVector_NetQuantize100 ClientLoc, uint8 NewFlags, uint8 ClientRoll, uint32 View, UPrimitiveComponent* ClientMovementBase, FName ClientBaseBoneName, uint8 ClientMovementMode) override;
+	virtual void ServerMoveDual_Implementation(float TimeStamp0,
+		FVector_NetQuantize10 InAccel0,
+		uint8 PendingFlags,
+		uint32 View0,
+		float TimeStamp,
+		FVector_NetQuantize10 InAccel,
+		FVector_NetQuantize100 ClientLoc,
+		uint8 NewFlags,
+		uint8 ClientRoll,
+		uint32 View,
+		UPrimitiveComponent* ClientMovementBase,
+		FName ClientBaseBoneName,
+		uint8 ClientMovementMode) override;
 
 
 	////////////////////////////////////////////////////////////////////////////////
