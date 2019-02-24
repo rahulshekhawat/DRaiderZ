@@ -922,16 +922,15 @@ bool APlayerCharacter::StartDodge()
 		DesiredYaw = DesiredRotationYawFromAxisInput;
 	}
 
+	FRotator DesiredRotation = FRotator(0.f, DesiredYaw, 0.f);
+
 	// Instantly rotate character
-	SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+	SetCharacterRotation(DesiredRotation);
 	// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
 	{
-		/*
-		@TOFIX
-		MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
-		*/
+		MoveComp->SetDesiredCustomRotation(DesiredRotation);
 	}
 
 	FName SectionToPlay;

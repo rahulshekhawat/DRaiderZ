@@ -852,20 +852,13 @@ void AEODCharacterBase::PlayToggleSheatheAnimation()
 
 void AEODCharacterBase::InitiateRotationToYawFromAxisInput()
 {
-	/*
-	@TOFIX
-
 	float UpdatedYaw = GetRotationYawFromAxisInput();
+	FRotator DesiredRotation = FRotator(0.f, GetRotationYawFromAxisInput(), 0.f);
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
 	{
-		const float AngleTolerance = 1e-3f;
-		if (!FMath::IsNearlyEqual(MoveComp->GetDesiredCustomRotationYaw(), UpdatedYaw, AngleTolerance))
-		{
-			MoveComp->SetDesiredCustomRotationYaw(UpdatedYaw);
-		}
+		MoveComp->SetDesiredCustomRotation(DesiredRotation);
 	}
-	*/
 }
 
 void AEODCharacterBase::OnPressedForward()

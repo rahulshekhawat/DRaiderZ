@@ -21,17 +21,12 @@ void UAnimNotify_NormalAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 		PlayerCharacter->OnNormalAttackSectionStart(SectionName);
 
 		// Set off smooth rotation
-		float DesiredYaw = PlayerCharacter->GetControllerRotationYaw();
+		FRotator DesiredRotation = FRotator(0.f, PlayerCharacter->GetControllerRotationYaw(), 0.f);
 		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(PlayerCharacter->GetCharacterMovement());
-		/*
-		@TOFIX
-		if (MoveComp->GetDesiredCustomRotationYaw() != DesiredYaw)
+		if (MoveComp)
 		{
-			MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+			MoveComp->SetDesiredCustomRotation(DesiredRotation);
 		}
-		*/
-		// Following line of code removed because this method of rotation is now deprecated
-		// PlayerCharacter->SetOffSmoothRotation(PlayerCharacter->GetControllerRotationYaw());
 	}
 #endif // EOD_TEST_CODE_ENABLED
 
