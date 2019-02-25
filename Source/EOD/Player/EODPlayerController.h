@@ -158,11 +158,6 @@ private:
 
 	FORCEINLINE void DisableAutoMove();
 
-	FORCEINLINE bool IsBlockKeyPressed() const
-	{
-		return IsValid(EODCharacter) ? EODCharacter->IsBlockKeyPressed() : false;
-	}
-
 	/** Move controlled pawn forward/backward */
 	void MovePawnForward(const float Value);
 

@@ -61,59 +61,11 @@ protected:
 	FRotator DesiredCustomRotation;
 
 
-
-
-
-public:
-	/** Returns the desired rotation yaw of pawn owner
-	FORCEINLINE float GetDesiredCustomRotationYaw() const
-	{
-		return DesiredCustomRotationYaw;
-	}
-	*/
-
-	// inline void SetDesiredCustomRotationYaw(float NewRotationYaw);
-
-	/** Returns true if the pawn owner can rotate at all 
-	FORCEINLINE bool CanRotate() const
-	{
-		return bCanRotate;
-	}
-	*/
-	
-	// inline void SetCanRotate(bool bValue);
-
-	// void DoInstantRotation(float InstantRotationYaw);
-	
-
-private:
-	/** Determines whether the pawn owner can currently rotate at all */
-	// UPROPERTY(Replicated)
-	// uint32 bCanRotate : 1;
-
-	/**
-	 * Desired rotation yaw of pawn owner. The character owner will always try to rotate smoothly to
-	 * this DesiredCustomRotationYaw unless the rotation behavior is overriden by setting 'bOrientRotationToMovement'
-	 * or 'bUseControllerDesiredRotation' to true.
-	 */
-	// UPROPERTY(Replicated)
-	// float DesiredCustomRotationYaw;
-
-
 	////////////////////////////////////////////////////////////////////////////////
 	// Network
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetDesiredCustomRotation(const FRotator& NewRotation);
-
-	// UFUNCTION(Server, Reliable, WithValidation)
-	// void Server_SetCanRotate(bool bValue);
-
-	// UFUNCTION(Server, Reliable, WithValidation)
-	// void Server_SetDesiredCustomRotationYaw(float NewRotationYaw);
-
-	// UFUNCTION(Server, Reliable, WithValidation)
-	// void Server_DoInstantRotation(float InstantRotationYaw);
 
 };
 
@@ -129,29 +81,3 @@ inline void UEODCharacterMovementComponent::SetDesiredCustomRotation(const FRota
 		}
 	}
 }
-
-/*
-inline void UEODCharacterMovementComponent::SetDesiredCustomRotationYaw(float NewRotationYaw)
-{
-	if (DesiredCustomRotationYaw != NewRotationYaw)
-	{
-		DesiredCustomRotationYaw = NewRotationYaw;
-		if (CharacterOwner && CharacterOwner->Role < ROLE_Authority)
-		{
-			Server_SetDesiredCustomRotationYaw(NewRotationYaw);
-		}
-	}
-}
-
-inline void UEODCharacterMovementComponent::SetCanRotate(bool bValue)
-{
-	if (bCanRotate != bValue)
-	{
-		bCanRotate = bValue;
-		if (CharacterOwner && CharacterOwner->Role < ROLE_Authority)
-		{
-			Server_SetCanRotate(bValue);
-		}
-	}
-}
-*/

@@ -374,13 +374,13 @@ void AEODPlayerController::ZoomOutCamera()
 
 void AEODPlayerController::OnPressingNormalAttackKey()
 {
+	if (IsAutoMoveEnabled())
+	{
+		DisableAutoMove();
+	}
+
 	if (IsValid(EODCharacter))
 	{
-		if (IsAutoMoveEnabled())
-		{
-			DisableAutoMove();
-		}
-
 		EODCharacter->SetNormalAttackKeyPressed(true);
 	}
 }
@@ -457,14 +457,14 @@ void AEODPlayerController::ToggleSheathe()
 
 void AEODPlayerController::OnPressingGuardKey()
 {
+	if (IsAutoMoveEnabled())
+	{
+		DisableAutoMove();
+	}
+
 	if (IsValid(EODCharacter))
 	{
-		if (IsAutoMoveEnabled())
-		{
-			DisableAutoMove();
-		}
-
-		EODCharacter->SetGuardKeyPressed(true);
+		EODCharacter->SetWantsToGuard(true);
 	}
 }
 
@@ -472,7 +472,7 @@ void AEODPlayerController::OnReleasingGuardKey()
 {
 	if (IsValid(EODCharacter))
 	{
-		EODCharacter->SetGuardKeyPressed(false);
+		EODCharacter->SetWantsToGuard(false);
 	}
 }
 

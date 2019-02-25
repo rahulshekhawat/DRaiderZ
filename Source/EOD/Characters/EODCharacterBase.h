@@ -147,6 +147,9 @@ private:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_GuardActive)
 	uint32 bGuardActive : 1;
 
+	/** Determines whether the character wants to guard right now */
+	UPROPERTY(Transient)
+	uint32 bWantsToGuard : 1;
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Character stats
@@ -168,6 +171,12 @@ public:
 		return BlockMovementDirectionYaw;
 	}
 
+	/** [server + local] Change character max walk speed */
+	inline void SetWalkSpeed(const float WalkSpeed);
+
+	/** [Server + local] Set whether character should use controller rotation yaw or not */
+	inline void SetUseControllerRotationYaw(const bool bNewBool);
+
 	/** Move character forward/backward */
 	virtual void MoveForward(const float Value);
 
@@ -175,9 +184,6 @@ public:
 	virtual void MoveRight(const float Value);
 
 protected:
-	/** Updates the rotation of character */
-	virtual void UpdateRotation(float DeltaTime);
-
 	/** [server + local] Sets whether current character state allows movement */
 	inline void SetCharacterStateAllowsMovement(bool bNewValue);
 
@@ -191,6 +197,9 @@ protected:
 	/** This boolean is used to determine if the character can move even if it's not in 'IdleWalkRun' state. e.g., moving while casting spell. */
 	UPROPERTY(Replicated)
 	uint32 bCharacterStateAllowsMovement : 1;
+
+	UPROPERTY()
+	uint32 bCharacterStateAllowsRotation : 1;
 
 	/** Max speed of character when it's walking */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Constants")
@@ -220,6 +229,12 @@ private:
 	////////////////////////////////////////////////////////////////////////////////
 	// Input
 public:
+	/** Sets whether character wants to guard or not */
+	FORCEINLINE void SetWantsToGuard(bool bNewValue)
+	{
+		bWantsToGuard = bNewValue;
+	}
+
 	/** Returns the yaw that this pawn wants to rotate to based on the movement input from player */
 	UFUNCTION(BlueprintCallable, Category = "Input|Rotation", meta = (DisplayName = "Get Rotation Yaw From Axis Input"))
 	float BP_GetRotationYawFromAxisInput();
@@ -243,6 +258,11 @@ protected:
 	/** Cached value of the yaw that this pawn wants to rotate to this frame based on the movement input from player */
 	UPROPERTY(Transient)
 	float DesiredRotationYawFromAxisInput;
+
+	//~ @todo DEPRECATED remove
+	/** Determines whether guard key is pressed or not */
+	// UPROPERTY(Transient)
+	// uint32 bGuardKeyPressed : 1;
 
 private:
 	/** Calculates and returns rotation yaw from axis input */
@@ -286,10 +306,31 @@ public:
 
 
 	////////////////////////////////////////////////////////////////////////////////
-	// Save/load
+	// Update character state
 protected:
 	/** Resets tick dependent data. Intended to be called at the beginning of tick function */
 	virtual void ResetTickDependentData();
+
+	/** Updates whether player controller is currently trying to move or not */
+	inline void UpdatePCTryingToMove();
+
+	/** Updates character rotation every frame */
+	virtual void UpdateRotation(float DeltaTime);
+
+	/** Updates character movement every frame */
+	virtual void UpdateMovement(float DeltaTime);
+
+	/** Updates character fall state every frame if the character is falling */
+	virtual void UpdateFallState(float DeltaTime);
+
+	/** Updates character normal attck state every frame if the character wants to normal attack */
+	virtual void UpdateNormalAttackState(float DeltaTime);
+
+	/** Updates character guard state every frame if the character wants to guard */
+	virtual void UpdateGuardState(float DeltaTime);
+
+	/** Updates character movement every frame */
+	virtual void UpdateMovementState(float DeltaTime);
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -392,8 +433,6 @@ public:
 
 	virtual void StopNormalAttack();
 
-	virtual void UpdateNormalAttackState(float DeltaTime);
-
 	virtual void PlayToggleSheatheAnimation();
 
 
@@ -465,13 +504,7 @@ protected:
 		}
 	}
 
-	inline void UpdatePCTryingToMove();
-
 	inline void UpdateCharacterMovementDirection();
-
-	virtual void UpdateMovementState(float DeltaTime);
-
-	virtual void UpdateGuardState(float DeltaTime);
 
 public:
 	FORCEINLINE bool IsWeaponSheathed() const { return bWeaponSheathed; }
@@ -488,9 +521,6 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 private:
 	UPROPERTY(Transient)
-	bool bGuardKeyPressed;
-
-	UPROPERTY(Transient)
 	bool bNormalAttackKeyPressed;
 
 public:
@@ -502,17 +532,10 @@ public:
 	UPROPERTY()
 	float RightAxisValue;
 
-	FORCEINLINE void SetGuardKeyPressed(bool bNewValue)
-	{
-		bGuardKeyPressed = bNewValue;
-	}
-
 	FORCEINLINE void SetNormalAttackKeyPressed(bool bNewValue)
 	{
 		bNormalAttackKeyPressed = bNewValue;
 	}
-
-	FORCEINLINE bool IsBlockKeyPressed() const { return bGuardKeyPressed; }
 
 	FORCEINLINE bool IsNormalAttackKeyPressed()const { return bNormalAttackKeyPressed; }
 
@@ -810,16 +833,6 @@ public:
 	ECharacterState BP_GetCharacterState() const;
 
 	/** [server + local] Change character max walk speed */
-	FORCEINLINE void SetWalkSpeed(const float WalkSpeed)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-		if (Role < ROLE_Authority)
-		{
-			Server_SetWalkSpeed(WalkSpeed);
-		}
-	}
-
-	/** [server + local] Change character max walk speed */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Walk Speed"))
 	void BP_SetWalkSpeed(const float WalkSpeed);
 
@@ -841,15 +854,6 @@ public:
 	/** [server + client] Change character rotation. Do not use this for consecutive rotation change */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character Rotation"))
 	void BP_SetCharacterRotation(const FRotator NewRotation);
-
-	FORCEINLINE void SetUseControllerRotationYaw(const bool bNewBool)
-	{
-		GetCharacterMovement()->bUseControllerDesiredRotation = bNewBool;
-		if (Role < ROLE_Authority)
-		{
-			Server_SetUseControllerRotationYaw(bNewBool);
-		}
-	}
 
 	/** [server + client] Set whether character should use controller rotation yaw or not */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Use Controller Rotation Yaw"))
@@ -1169,7 +1173,6 @@ inline void AEODCharacterBase::ActivateGuard()
 {
 	SetGuardActive(true);
 	StartBlockingDamage(DamageBlockTriggerDelay);
-	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetCharacterStatsComponent()->GetMovementSpeedModifier());
 }
 
 inline void AEODCharacterBase::DeactivateGuard()
@@ -1202,6 +1205,32 @@ inline void AEODCharacterBase::StopBlockingDamage()
 	else
 	{
 		DisableDamageBlocking();
+	}
+}
+
+inline void AEODCharacterBase::SetWalkSpeed(const float WalkSpeed)
+{
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	if (MoveComp && MoveComp->MaxWalkSpeed != WalkSpeed)
+	{
+		MoveComp->MaxWalkSpeed = WalkSpeed;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetWalkSpeed(WalkSpeed);
+		}
+	}
+}
+
+inline void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)
+{
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	if (MoveComp && MoveComp->bUseControllerDesiredRotation != bNewBool)
+	{
+		MoveComp->bUseControllerDesiredRotation = bNewBool;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetUseControllerRotationYaw(bNewBool);
+		}
 	}
 }
 
@@ -1241,14 +1270,14 @@ inline void AEODCharacterBase::UpdatePCTryingToMove()
 {
 	if (ForwardAxisValue == 0 && RightAxisValue == 0)
 	{
-		if (IsPCTryingToMove())
+		if (bPCTryingToMove)
 		{
 			SetPCTryingToMove(false);
 		}
 	}
 	else
 	{
-		if (!IsPCTryingToMove())
+		if (!bPCTryingToMove)
 		{
 			SetPCTryingToMove(true);
 		}

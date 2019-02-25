@@ -21,7 +21,6 @@
  */
 DECLARE_CYCLE_STAT(TEXT("EOD ChararaterTick"), STAT_EODCharacterTick, STATGROUP_EOD);
 
-
 FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
 FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
 FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
@@ -75,7 +74,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	DefaultRunSpeed = 600.f;
 	DefaultWalkSpeedWhileBlocking = 150.f;
 
-	// Initialize variables
+	bCharacterStateAllowsRotation = true;
 	CharacterState = ECharacterState::IdleWalkRun;
 	bGodMode = false;
 	TargetSwitchDuration = 0.1f;
@@ -100,6 +99,31 @@ void AEODCharacterBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	ResetTickDependentData();
+
+	if (Controller && Controller->IsLocalPlayerController())
+	{
+		// Update guard state only if either the character wants to guard or if character guard is active
+		if (bWantsToGuard || IsGuardActive())
+		{
+			UpdateGuardState(DeltaTime);
+		}
+
+		// Update normal attack state only if either the character wants to normal attack or if character is actively normal attacking
+		if (bNormalAttackKeyPressed || IsNormalAttacking())
+		{
+			UpdateNormalAttackState(DeltaTime);
+		}
+
+		// Update fall state only if either the character is failling or jumping
+		UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+		if ((MoveComp && MoveComp->IsFalling()) || IsJumping())
+		{
+			UpdateFallState(DeltaTime);
+		}
+
+		UpdateMovement(DeltaTime);
+		UpdateRotation(DeltaTime);
+	}
 
 	/*
 	if (GetController() && GetController()->IsLocalPlayerController())
@@ -768,13 +792,13 @@ void AEODCharacterBase::EnableCharacterGuard()
 		StopNormalAttack();
 	}
 	SetCharacterState(ECharacterState::Blocking);
-	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	// GetCharacterMovement()->bUseControllerDesiredRotation = true;
 }
 
 void AEODCharacterBase::DisableCharacterGuard()
 {
 	SetCharacterState(ECharacterState::IdleWalkRun);
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	// GetCharacterMovement()->bUseControllerDesiredRotation = false;
 }
 
 void AEODCharacterBase::MoveForward(const float Value)
@@ -802,7 +826,56 @@ void AEODCharacterBase::MoveRight(const float Value)
 
 void AEODCharacterBase::UpdateRotation(float DeltaTime)
 {
+	if (IsGuardActive())
+	{
+		SetUseControllerRotationYaw(true);
+	}
 
+	if (CharacterState == ECharacterState::IdleWalkRun || bCharacterStateAllowsRotation)
+	{
+		SetUseControllerRotationYaw(false);
+		FRotator DesiredRotation = FRotator(0.f, GetRotationYawFromAxisInput(), 0.f);
+		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+		if (MoveComp)
+		{
+			MoveComp->SetDesiredCustomRotation(DesiredRotation);
+		}
+	}
+}
+
+void AEODCharacterBase::UpdateMovement(float DeltaTime)
+{
+	UStatsComponentBase* StatsComp = GetCharacterStatsComponent();
+	if (!StatsComp)
+	{
+		return;
+	}	
+
+	if (IsGuardActive())
+	{
+		float NewSpeed = DefaultWalkSpeedWhileBlocking * StatsComp->GetMovementSpeedModifier();
+		SetWalkSpeed(NewSpeed);
+	}
+	else if (CharacterState == ECharacterState::IdleWalkRun || bCharacterStateAllowsMovement)
+	{
+		UpdatePCTryingToMove();
+		UpdateCharacterMovementDirection();
+
+		if (ForwardAxisValue < 0)
+		{
+			float NewSpeed = (DefaultWalkSpeed * StatsComp->GetMovementSpeedModifier()) * (5.f / 16.f);
+			SetWalkSpeed(NewSpeed);
+		}
+		else
+		{
+			float NewSpeed = DefaultWalkSpeed * StatsComp->GetMovementSpeedModifier();
+			SetWalkSpeed(NewSpeed);
+		}
+	}
+}
+
+void AEODCharacterBase::UpdateFallState(float DeltaTime)
+{
 }
 
 void AEODCharacterBase::TriggerInteraction()
@@ -877,7 +950,6 @@ void AEODCharacterBase::OnReleasedBackward()
 {
 }
 
-
 void AEODCharacterBase::UpdateMovementState(float DeltaTime)
 {
 	if (ForwardAxisValue < 0)
@@ -912,30 +984,44 @@ void AEODCharacterBase::UpdateMovementState(float DeltaTime)
 
 void AEODCharacterBase::UpdateGuardState(float DeltaTime)
 {
-	if (ForwardAxisValue == 0)
+	// If character wants to guard but the guard is not yet active 
+	if (bWantsToGuard && !IsGuardActive() && CanGuardAgainstAttacks())
 	{
-		if (RightAxisValue > 0)
+		ActivateGuard();
+	}
+	// If character doesn't want to guard but the guard is still active
+	else if (!bWantsToGuard && IsGuardActive())
+	{
+		DeactivateGuard();
+	}
+
+	if (IsGuardActive())
+	{
+		if (ForwardAxisValue == 0)
 		{
-			if (BlockMovementDirectionYaw != 90.f)
-				SetBlockMovementDirectionYaw(90.f);
-		}
-		else if (RightAxisValue < 0)
-		{
-			if (BlockMovementDirectionYaw != -90.f)
-				SetBlockMovementDirectionYaw(-90.f);
+			if (RightAxisValue > 0)
+			{
+				if (BlockMovementDirectionYaw != 90.f)
+					SetBlockMovementDirectionYaw(90.f);
+			}
+			else if (RightAxisValue < 0)
+			{
+				if (BlockMovementDirectionYaw != -90.f)
+					SetBlockMovementDirectionYaw(-90.f);
+			}
+			else
+			{
+				if (BlockMovementDirectionYaw != 0.f)
+					SetBlockMovementDirectionYaw(0.f);
+			}
 		}
 		else
 		{
-			if (BlockMovementDirectionYaw != 0.f)
-				SetBlockMovementDirectionYaw(0.f);
-		}
-	}
-	else
-	{
-		float NewYaw = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
-		if (BlockMovementDirectionYaw != NewYaw)
-		{
-			SetBlockMovementDirectionYaw(NewYaw);
+			float NewYaw = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
+			if (BlockMovementDirectionYaw != NewYaw)
+			{
+				SetBlockMovementDirectionYaw(NewYaw);
+			}
 		}
 	}
 }

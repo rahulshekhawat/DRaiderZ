@@ -107,7 +107,7 @@ void ARideBase::UpdateRotation(float DeltaTime)
 		else
 		{
 			NewDesiredRotation.Pitch = FMath::UnwindDegrees(ControllerRotation.Pitch);
-			float DeltaAngle;
+			float DeltaAngle = 0;
 			if (ForwardAxisValue > 0)
 			{
 				// NewDesiredRotation.Pitch = FMath::UnwindDegrees(ControllerRotation.Pitch - 5.f);
