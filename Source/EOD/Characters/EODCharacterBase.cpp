@@ -830,8 +830,7 @@ void AEODCharacterBase::UpdateRotation(float DeltaTime)
 	{
 		SetUseControllerRotationYaw(true);
 	}
-
-	if (CharacterState == ECharacterState::IdleWalkRun || bCharacterStateAllowsRotation)
+	else if (CharacterState == ECharacterState::IdleWalkRun || bCharacterStateAllowsRotation)
 	{
 		SetUseControllerRotationYaw(false);
 		FRotator DesiredRotation = FRotator(0.f, GetRotationYawFromAxisInput(), 0.f);
