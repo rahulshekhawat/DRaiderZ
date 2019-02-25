@@ -11,7 +11,7 @@
 
 UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicated(true);
 
 	ChainSkillResetDelay = 2.f;
@@ -49,6 +49,8 @@ void UGameplaySkillsComponent::BeginPlay()
 void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+
 
 }
 

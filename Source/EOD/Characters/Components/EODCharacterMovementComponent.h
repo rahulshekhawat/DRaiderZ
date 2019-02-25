@@ -18,10 +18,7 @@ class EOD_API UEODCharacterMovementComponent : public UCharacterMovementComponen
 	GENERATED_BODY()
 	
 public:
-
 	UEODCharacterMovementComponent(const FObjectInitializer& ObjectInitializer);
-
-	virtual void BeginPlay() override;
 
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -29,42 +26,58 @@ public:
 	/** Perform rotation over deltaTime */
 	virtual void PhysicsRotation(float DeltaTime) override;
 
-	virtual void ServerMoveDual_Implementation(float TimeStamp0, FVector_NetQuantize10 InAccel0, uint8 PendingFlags, uint32 View0, float TimeStamp, FVector_NetQuantize10 InAccel, FVector_NetQuantize100 ClientLoc, uint8 NewFlags, uint8 ClientRoll, uint32 View, UPrimitiveComponent* ClientMovementBase, FName ClientBaseBoneName, uint8 ClientMovementMode) override;
+	//~ @note: Overriding the default definition to fix a bug where Server drops/skips animation notifies.
+	virtual void ServerMoveDual_Implementation(float TimeStamp0,
+		FVector_NetQuantize10 InAccel0,
+		uint8 PendingFlags,
+		uint32 View0,
+		float TimeStamp,
+		FVector_NetQuantize10 InAccel,
+		FVector_NetQuantize100 ClientLoc,
+		uint8 NewFlags,
+		uint8 ClientRoll,
+		uint32 View,
+		UPrimitiveComponent* ClientMovementBase,
+		FName ClientBaseBoneName,
+		uint8 ClientMovementMode) override;
+
 
 	////////////////////////////////////////////////////////////////////////////////
-	// 
-	////////////////////////////////////////////////////////////////////////////////
-private:
-	/**
-	 * Desired rotation yaw of CharacterOwner. The character owner will always try to rotate smoothly to
-	 * this DesiredCustomRotationYaw unless the rotation behavior is overriden by setting 'bOrientRotationToMovement'
-	 * or 'bUseControllerDesiredRotation' to true.
-	 */
-	UPROPERTY(Replicated)
-	float DesiredCustomRotationYaw;
-
+	// Rotation
 public:
-	FORCEINLINE float GetDesiredCustomRotationYaw() const { return DesiredCustomRotationYaw; }
-
-	FORCEINLINE void SetDesiredCustomRotationYaw(float NewRotationYaw)
+	FORCEINLINE FRotator GetDesiredCustomRotation() const
 	{
-		DesiredCustomRotationYaw = NewRotationYaw;
-		if (CharacterOwner && CharacterOwner->Role < ROLE_Authority)
-		{
-			Server_SetDesiredCustomRotationYaw(NewRotationYaw);
-		}
+		return DesiredCustomRotation;
 	}
 
-	void DoInstantRotation(float InstantRotationYaw);
+	inline void SetDesiredCustomRotation(const FRotator& NewRotation);
+
+protected:
+	/**
+	 * Desired rotation of pawn owner. The character owner will always try to rotate smoothly to this DesiredCustomRotationYaw unless the 
+	 * rotation behavior is overriden by setting 'bOrientRotationToMovement' or 'bUseControllerDesiredRotation' to true.
+	 */
+	UPROPERTY(Replicated)
+	FRotator DesiredCustomRotation;
+
 
 	////////////////////////////////////////////////////////////////////////////////
-	// NETWORK
-	////////////////////////////////////////////////////////////////////////////////
+	// Network
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetDesiredCustomRotationYaw(float NewRotationYaw);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_DoInstantRotation(float InstantRotationYaw);
+	void Server_SetDesiredCustomRotation(const FRotator& NewRotation);
 
 };
+
+inline void UEODCharacterMovementComponent::SetDesiredCustomRotation(const FRotator& NewRotation)
+{
+	const float AngleTolerance = 1e-3f;
+	if (!DesiredCustomRotation.Equals(NewRotation, AngleTolerance))
+	{
+		DesiredCustomRotation = NewRotation;
+		if (CharacterOwner && CharacterOwner->Role < ROLE_Authority)
+		{
+			Server_SetDesiredCustomRotation(NewRotation);
+		}
+	}
+}

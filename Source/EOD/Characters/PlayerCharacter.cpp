@@ -850,35 +850,6 @@ void APlayerCharacter::RemoveSecondaryWeapon()
 	// @todo remove weapon stats
 }
 
-void APlayerCharacter::MoveForward(const float Value)
-{
-	if (Value != 0 && CanMove())
-	{
-		if (IsAutoRunning())
-		{
-			DisableAutoRun();
-		}
-
-		FRotator Rotation = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
-		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
-	}
-}
-
-void APlayerCharacter::MoveRight(const float Value)
-{
-	if (Value != 0 && CanMove())
-	{
-		if (IsAutoRunning())
-		{
-			DisableAutoRun();
-		}
-
-		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
-		AddMovementInput(Direction, Value);
-	}
-}
-
 void APlayerCharacter::ZoomInCamera()
 {
 	if (GetCameraBoomComponent()->TargetArmLength >= CameraArmMinimumLength)
@@ -926,7 +897,7 @@ bool APlayerCharacter::StartDodge()
 		DeactivateGuard();
 
 		// Because desired rotation yaw from axis input wouldn't have updated if guard was active
-		UpdateDesiredYawFromAxisInput();
+		InitiateRotationToYawFromAxisInput();
 	}
 	else if (IsCastingSpell())
 	{
@@ -951,13 +922,15 @@ bool APlayerCharacter::StartDodge()
 		DesiredYaw = DesiredRotationYawFromAxisInput;
 	}
 
+	FRotator DesiredRotation = FRotator(0.f, DesiredYaw, 0.f);
+
 	// Instantly rotate character
-	SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
+	SetCharacterRotation(DesiredRotation);
 	// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
 	{
-		MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+		MoveComp->SetDesiredCustomRotation(DesiredRotation);
 	}
 
 	FName SectionToPlay;

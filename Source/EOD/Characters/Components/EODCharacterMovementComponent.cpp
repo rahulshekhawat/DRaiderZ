@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
+#include "EOD/Core/EOD.h"
 
 #include "UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"
@@ -10,20 +11,15 @@
 
 UEODCharacterMovementComponent::UEODCharacterMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	RotationRate = FRotator(0.f, 600.f, 0.f);
-}
-
-void UEODCharacterMovementComponent::BeginPlay()
-{
-	Super::BeginPlay();
+	RotationRate = FRotator(300.f, 600.f, 300.f);
+	// bCanRotate = true;
 }
 
 void UEODCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// DOREPLIFETIME(UEODCharacterMovementComponent, DesiredCustomRotationYaw);
-	DOREPLIFETIME_CONDITION(UEODCharacterMovementComponent, DesiredCustomRotationYaw, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(UEODCharacterMovementComponent, DesiredCustomRotation, COND_SkipOwner);
 }
 
 void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
@@ -32,12 +28,9 @@ void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 	FRotator CurrentRotation = UpdatedComponent->GetComponentRotation(); // Normalized
 	CurrentRotation.DiagnosticCheckNaN(TEXT("EODCharacterMovementComponent::PhysicsRotation(): CurrentRotation"));
 
-	if (!(bOrientRotationToMovement || bUseControllerDesiredRotation || !FMath::IsNearlyEqual(CurrentRotation.Yaw, DesiredCustomRotationYaw, AngleTolerance)))
-	{
-		return;
-	}
-
-	if (!HasValidData() || (!CharacterOwner->Controller && !bRunPhysicsWithNoController))
+	if (!(bOrientRotationToMovement || bUseControllerDesiredRotation || !CurrentRotation.Equals(DesiredCustomRotation, AngleTolerance)) ||
+		!HasValidData() ||
+		(!CharacterOwner->Controller && !bRunPhysicsWithNoController))
 	{
 		return;
 	}
@@ -54,13 +47,9 @@ void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 	{
 		DesiredRotation = CharacterOwner->Controller->GetDesiredRotation();
 	}
-	else if(!FMath::IsNearlyEqual(CurrentRotation.Yaw, DesiredCustomRotationYaw, AngleTolerance))
-	{
-		DesiredRotation.Yaw = DesiredCustomRotationYaw;
-	}
 	else
 	{
-		return;
+		DesiredRotation = DesiredCustomRotation;
 	}
 
 	if (ShouldRemainVertical())
@@ -111,44 +100,12 @@ void UEODCharacterMovementComponent::ServerMoveDual_Implementation(float TimeSta
 	ServerMove_Implementation(TimeStamp, InAccel, ClientLoc, NewFlags, ClientRoll, View, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
 }
 
-void UEODCharacterMovementComponent::DoInstantRotation(float InstantRotationYaw)
+void UEODCharacterMovementComponent::Server_SetDesiredCustomRotation_Implementation(const FRotator& NewRotation)
 {
-	const float AngleTolerance = 1e-3f;
-	FRotator CurrentRotation = UpdatedComponent->GetComponentRotation(); // Normalized
-	CurrentRotation.DiagnosticCheckNaN(TEXT("EODCharacterMovementComponent::PhysicsRotation(): CurrentRotation"));
-	FRotator DesiredRotation = CurrentRotation;
-	DesiredRotation.Yaw = FRotator::NormalizeAxis(InstantRotationYaw);
-
-	if (!CurrentRotation.Equals(DesiredRotation, AngleTolerance))
-	{
-		DesiredCustomRotationYaw = InstantRotationYaw;
-		// SetDesiredCustomRotationYaw(InstantRotationYaw);
-		DesiredRotation.DiagnosticCheckNaN(TEXT("EODCharacterMovementComponent::PhysicsRotation(): DesiredRotation"));
-		MoveUpdatedComponent(FVector::ZeroVector, DesiredRotation, /*bSweep*/ false);
-	}
-
-	if (IsValid(CharacterOwner) && CharacterOwner->Role < ROLE_Authority)
-	{
-		Server_DoInstantRotation(InstantRotationYaw);
-	}
+	SetDesiredCustomRotation(NewRotation);
 }
 
-void UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Implementation(float NewRotationYaw)
-{
-	SetDesiredCustomRotationYaw(NewRotationYaw);
-}
-
-bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Validate(float NewRotationYaw)
-{
-	return true;
-}
-
-void UEODCharacterMovementComponent::Server_DoInstantRotation_Implementation(float InstantRotationYaw)
-{
-	DoInstantRotation(InstantRotationYaw);
-}
-
-bool UEODCharacterMovementComponent::Server_DoInstantRotation_Validate(float InstantRotationYaw)
+bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotation_Validate(const FRotator& NewRotation)
 {
 	return true;
 }

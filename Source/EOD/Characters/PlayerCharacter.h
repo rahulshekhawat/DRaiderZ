@@ -696,12 +696,6 @@ private:
 	/** Handles player releasing a skill key */
 	void OnReleasingSkillKey(const uint32 SkillButtonIndex);
 	
-	/** Move player forward/backward */
- 	void MoveForward(const float Value);
-
-	/** Move player left/right */
-	void MoveRight(const float Value);
-	
 	void ZoomInCamera();
 
 	void ZoomOutCamera();

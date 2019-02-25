@@ -149,6 +149,10 @@ void AEODPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsAutoMoveEnabled() && IsValid(EODCharacter))
+	{
+		EODCharacter->MoveForward(1.f);
+	}
 }
 
 void AEODPlayerController::Possess(APawn* InPawn)
@@ -320,40 +324,27 @@ void AEODPlayerController::TogglePlayerStatsUI()
 
 void AEODPlayerController::MovePawnForward(const float Value)
 {
+	if (Value != 0 && IsAutoMoveEnabled())
+	{
+		DisableAutoMove();
+	}
+
 	if (IsValid(EODCharacter))
 	{
-		EODCharacter->ForwardAxisValue = Value;
-
-		if (EODCharacter->CanMove() && Value != 0)
-		{
-			if (IsAutoMoveEnabled())
-			{
-				DisableAutoMove();
-			}
-
-			FRotator Rotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
-			FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
-			EODCharacter->AddMovementInput(Direction, Value);
-		}
+		EODCharacter->MoveForward(Value);
 	}
 }
 
 void AEODPlayerController::MovePawnRight(const float Value)
 {
+	if (Value != 0 && IsAutoMoveEnabled())
+	{
+		DisableAutoMove();
+	}
+
 	if (IsValid(EODCharacter))
 	{
-		EODCharacter->RightAxisValue = Value;
-
-		if (EODCharacter->CanMove() && Value != 0)
-		{
-			if (IsAutoMoveEnabled())
-			{
-				DisableAutoMove();
-			}
-
-			FVector Direction = FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y);
-			EODCharacter->AddMovementInput(Direction, Value);
-		}
+		EODCharacter->MoveRight(Value);
 	}
 }
 
@@ -383,13 +374,13 @@ void AEODPlayerController::ZoomOutCamera()
 
 void AEODPlayerController::OnPressingNormalAttackKey()
 {
+	if (IsAutoMoveEnabled())
+	{
+		DisableAutoMove();
+	}
+
 	if (IsValid(EODCharacter))
 	{
-		if (IsAutoMoveEnabled())
-		{
-			DisableAutoMove();
-		}
-
 		EODCharacter->SetNormalAttackKeyPressed(true);
 	}
 }
@@ -466,14 +457,14 @@ void AEODPlayerController::ToggleSheathe()
 
 void AEODPlayerController::OnPressingGuardKey()
 {
+	if (IsAutoMoveEnabled())
+	{
+		DisableAutoMove();
+	}
+
 	if (IsValid(EODCharacter))
 	{
-		if (IsAutoMoveEnabled())
-		{
-			DisableAutoMove();
-		}
-
-		EODCharacter->SetGuardKeyPressed(true);
+		EODCharacter->SetWantsToGuard(true);
 	}
 }
 
@@ -481,7 +472,7 @@ void AEODPlayerController::OnReleasingGuardKey()
 {
 	if (IsValid(EODCharacter))
 	{
-		EODCharacter->SetGuardKeyPressed(false);
+		EODCharacter->SetWantsToGuard(false);
 	}
 }
 

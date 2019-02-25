@@ -17,6 +17,7 @@ UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitial
 	bHasStaminaRegenration = false;
 
 	LowHealthPercent = 0.15f;
+	MovementSpeedModifier = 1.0f;
 }
 
 void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
