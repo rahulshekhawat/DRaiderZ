@@ -21,6 +21,7 @@
 
 DECLARE_STATS_GROUP(TEXT("EOD"), STATGROUP_EOD, STATCAT_Advanced);
 
+class ARideBase;
 class UAnimMontage;
 class USkillsComponent;
 class UInputComponent;
@@ -332,6 +333,21 @@ protected:
 	/** Updates character movement every frame */
 	virtual void UpdateMovementState(float DeltaTime);
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Ride System
+public:
+	/** Reference to the rideable character that this character may be currently riding */
+	// UPROPERTY(ReplicatedUsing = OnRep_CurrentRide)
+	UPROPERTY(Replicated)
+	ARideBase* CurrentRide;
+
+	/** Spawns a rideable character and mounts this character on the rideable character */
+	UFUNCTION(BlueprintCallable, Category = "Ride System")
+	void SpawnAndMountRideableCharacter(TSubclassOf<ARideBase> RideCharacterClass);
+
+	/** Called when this character successfully mounts a rideable character */
+	void OnMountingRide(ARideBase* RideCharacter);
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Components
@@ -1092,8 +1108,7 @@ protected:
 
 
 	////////////////////////////////////////////////////////////////////////////////
-	// NETWORK
-	////////////////////////////////////////////////////////////////////////////////
+	// Network
 private:
 	UFUNCTION()
 	void OnRep_WeaponSheathed();
@@ -1104,6 +1119,12 @@ private:
 	// DEPRECATED
 	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
+
+	// UFUNCTION()
+	// void OnRep_CurrentRide(ARideBase* OldRide);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SpawnAndMountRideableCharacter(TSubclassOf<ARideBase> RideCharacterClass);
 
 	UFUNCTION(Client, Unreliable)
 	void Client_DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);

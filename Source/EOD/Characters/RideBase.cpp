@@ -3,6 +3,9 @@
 #include "RideBase.h"
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
+#include "UnrealNetwork.h"
+
+FName ARideBase::MountSocketName(TEXT("ride_DummySocket"));
 
 ARideBase::ARideBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -18,6 +21,14 @@ void ARideBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
+void ARideBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARideBase, MountedCharacter);
+
+}
+
 void ARideBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -26,11 +37,6 @@ void ARideBase::BeginPlay()
 void ARideBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (GetController() && GetController()->IsLocalPlayerController())
-	{
-		UpdateRotation(DeltaTime);
-	}
 }
 
 void ARideBase::Restart()
@@ -46,6 +52,17 @@ void ARideBase::Restart()
 			MoveComp->SetMovementMode(EMovementMode::MOVE_Flying);
 		}
 	}
+}
+
+void ARideBase::MountCharacter(AEODCharacterBase* Character)
+{
+	MountedCharacter = Character;
+	if (IsValid(MountedCharacter))
+	{
+		MountedCharacter->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, MountSocketName);
+		MountedCharacter->OnMountingRide(this);
+	}
+	
 }
 
 void ARideBase::MoveForward(const float Value)
@@ -72,9 +89,11 @@ void ARideBase::MoveRight(const float Value)
 
 void ARideBase::UpdateRotation(float DeltaTime)
 {
+	// If the ride can't fly, just use the default rotation method 
 	if (!bCanFly)
 	{
 		Super::UpdateRotation(DeltaTime);
+		return;
 	}
 
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
@@ -133,4 +152,12 @@ void ARideBase::UpdateRotation(float DeltaTime)
 	}
 
 	MoveComp->SetDesiredCustomRotation(NewDesiredRotation);
+}
+
+void ARideBase::OnRep_MountedCharacter(AEODCharacterBase* OldCharacter)
+{
+	if (IsValid(MountedCharacter))
+	{
+		MountedCharacter->OnMountingRide(this);
+	}
 }

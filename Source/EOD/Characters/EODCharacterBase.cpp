@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EOD/Characters/EODCharacterBase.h"
+#include "EOD/Characters/RideBase.h"
 #include "EOD/AnimInstances/CharAnimInstance.h"
 #include "EOD/Interactives/InteractionInterface.h"
 #include "EOD/Statics/EODBlueprintFunctionLibrary.h"
@@ -14,6 +15,7 @@
 
 #include "UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 
 
 /**
@@ -172,6 +174,8 @@ void AEODCharacterBase::Tick(float DeltaTime)
 void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AEODCharacterBase, CurrentRide);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bIsRunning, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bGuardActive, COND_SkipOwner);
@@ -643,6 +647,22 @@ void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 	//~ @todo : Cleanup old state
 }
 
+/*
+void AEODCharacterBase::OnRep_CurrentRide(ARideBase* OldRide)
+{
+}
+*/
+
+void AEODCharacterBase::Server_SpawnAndMountRideableCharacter_Implementation(TSubclassOf<ARideBase> RideCharacterClass)
+{
+	SpawnAndMountRideableCharacter(RideCharacterClass);
+}
+
+bool AEODCharacterBase::Server_SpawnAndMountRideableCharacter_Validate(TSubclassOf<ARideBase> RideCharacterClass)
+{
+	return true;
+}
+
 void AEODCharacterBase::Client_DisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
 {
 	if (IsPlayerControlled())
@@ -979,6 +999,56 @@ void AEODCharacterBase::UpdateMovementState(float DeltaTime)
 		DeltaRotateCharacterToDesiredYaw(DesiredRotationYaw, DeltaTime);
 	}
 	*/
+}
+
+void AEODCharacterBase::SpawnAndMountRideableCharacter(TSubclassOf<ARideBase> RideCharacterClass)
+{
+	// Only call the server RPC if RideCharacterClass points to a valid class
+	if (Role < ROLE_Authority && RideCharacterClass.Get())
+	{
+		Server_SpawnAndMountRideableCharacter(RideCharacterClass);
+		return;
+	}
+
+	//~ @todo Cleanup/destroy ride spawned previously
+
+	UWorld* World = GetWorld();
+	AController* PlayerController = GetController();
+	if (World && PlayerController && RideCharacterClass.Get())
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Instigator = this;
+		SpawnParams.Owner = this->Controller;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		CurrentRide = World->SpawnActor<ARideBase>(RideCharacterClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+
+		if (CurrentRide)
+		{
+			PlayerController->Possess(CurrentRide);
+			CurrentRide->MountCharacter(this);
+		}
+	}
+}
+
+void AEODCharacterBase::OnMountingRide(ARideBase* RideCharacter)
+{
+	if (IsValid(RideCharacter))
+	{
+		UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+		UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+		// Disable movement and collision
+		if (MoveComp && CapsuleComp)
+		{
+			MoveComp->DisableMovement();
+			CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+
+		UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+		if (AnimInstance)
+		{
+			AnimInstance->Montage_Play(RideCharacter->MountedCharacter_IdealAnimation);
+		}
+	}
 }
 
 void AEODCharacterBase::UpdateGuardState(float DeltaTime)
