@@ -895,6 +895,8 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 
 void AEODCharacterBase::UpdateFallState(float DeltaTime)
 {
+	SetCharacterStateAllowsMovement(false);
+	SetCharacterStateAllowsRotation(false);
 }
 
 void AEODCharacterBase::TriggerInteraction()

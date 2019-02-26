@@ -184,10 +184,13 @@ public:
 	/** Move character left/right */
 	virtual void MoveRight(const float Value);
 
-protected:
 	/** [server + local] Sets whether current character state allows movement */
 	inline void SetCharacterStateAllowsMovement(bool bNewValue);
 
+	/** [local] Sets whether current character allows rotation */
+	inline void SetCharacterStateAllowsRotation(bool bValue);
+
+protected:
 	/** [server + local] Sets the current character movement direction */
 	inline void SetCharacterMovementDirection(ECharMovementDirection NewDirection);
 
@@ -1262,6 +1265,11 @@ inline void AEODCharacterBase::SetCharacterStateAllowsMovement(bool bNewValue)
 	{
 		Server_SetCharacterStateAllowsMovement(bNewValue);
 	}
+}
+
+inline void AEODCharacterBase::SetCharacterStateAllowsRotation(bool bValue)
+{
+	bCharacterStateAllowsRotation = bValue;
 }
 
 inline void AEODCharacterBase::SetCharacterMovementDirection(ECharMovementDirection NewDirection)
