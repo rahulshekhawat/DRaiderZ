@@ -76,7 +76,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	DefaultRunSpeed = 600.f;
 	DefaultWalkSpeedWhileBlocking = 150.f;
 
-	bCharacterStateAllowsRotation = true;
 	CharacterState = ECharacterState::IdleWalkRun;
 	bGodMode = false;
 	TargetSwitchDuration = 0.1f;
@@ -114,6 +113,11 @@ void AEODCharacterBase::Tick(float DeltaTime)
 		if (bNormalAttackKeyPressed || IsNormalAttacking())
 		{
 			UpdateNormalAttackState(DeltaTime);
+		}
+
+		if (IsDodging())
+		{
+
 		}
 
 		// Update fall state only if either the character is failling or jumping

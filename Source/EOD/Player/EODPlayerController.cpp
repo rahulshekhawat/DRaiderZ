@@ -409,6 +409,7 @@ void AEODPlayerController::AttemptDodge()
 			// If character successfully started 'dodge'
 			if (bResult)
 			{
+				EODCharacter->SetCharacterStateAllowsRotation(false);
 				Server_OnSuccessfulDodge();
 			}
 		}

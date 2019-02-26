@@ -32,7 +32,7 @@ class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
 class UGameplaySkillsComponent;
-// class USkillTreeComponent;
+class UAudioComponent;
 class AEODCharacterBase;
 
 /** Delegate for when a character either enters or leaves combat */
@@ -199,10 +199,10 @@ protected:
 
 	//~ @todo see if it's possible to use bCharacterStateAllowsMovement without needing replication
 	/** This boolean is used to determine if the character can move even if it's not in 'IdleWalkRun' state. e.g., moving while casting spell. */
-	UPROPERTY(Replicated)
+	UPROPERTY(Transient, Replicated)
 	uint32 bCharacterStateAllowsMovement : 1;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	uint32 bCharacterStateAllowsRotation : 1;
 
 	/** Max speed of character when it's walking */
@@ -352,33 +352,19 @@ public:
 	/** Called when this character successfully mounts a rideable character */
 	void OnMountingRide(ARideBase* RideCharacter);
 
+
 	////////////////////////////////////////////////////////////////////////////////
 	// Components
 public:
-	FORCEINLINE USpringArmComponent* GetCameraBoomComponent() const
-	{
-		return CameraBoomComponent;
-	}
+	FORCEINLINE USpringArmComponent* GetCameraBoomComponent() const { return CameraBoomComponent; }
 
-	FORCEINLINE UCameraComponent* GetCameraComponent() const
-	{
-		return CameraComponent;
-	}
+	FORCEINLINE UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 
-	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const
-	{
-		return SkillManager;
-	}
+	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const { return SkillManager; }
 
-	FORCEINLINE UStatsComponentBase* GetCharacterStatsComponent() const
-	{ 
-		return CharacterStatsComponent;
-	}
+	FORCEINLINE UStatsComponentBase* GetCharacterStatsComponent() const { return CharacterStatsComponent; }
 
-	FORCEINLINE USphereComponent* GetInteractionSphereComponent() const
-	{ 
-		return InteractionSphereComponent;
-	}
+	FORCEINLINE USphereComponent* GetInteractionSphereComponent() const { return InteractionSphereComponent; }
 
 	inline void EnableInteractionSphere();
 
@@ -405,9 +391,11 @@ protected:
 	int CameraArmMaximumLength;
 
 private:
+	/** Spring arm for camera */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoomComponent;
 
+	/** Camera */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComponent;
 
@@ -419,9 +407,13 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGameplaySkillsComponent* SkillManager;
 
-	//~ Sphere component used to detect interactive objects
+	/** Sphere component used to detect interactives objects */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USphereComponent* InteractionSphereComponent;
+
+	/** Audio component for playing hit effect sounds */
+	UPROPERTY(Transient)
+	UAudioComponent* HitAudioComponent;
 
 
 	////////////////////////////////////////////////////////////////////////////////

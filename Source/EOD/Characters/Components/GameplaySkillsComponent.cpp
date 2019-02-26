@@ -9,6 +9,11 @@
 #include "Kismet/GameplayStatics.h"
 
 
+/**
+ * EOD Character stats
+ */
+DECLARE_CYCLE_STAT(TEXT("EOD GameplaySkillsTick"), STAT_EODGameplaySkillsTick, STATGROUP_EOD);
+
 UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -22,7 +27,6 @@ UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& Obj
 		SBIndexToSGMap.Add(i, FString(""));
 	}
 }
-
 
 void UGameplaySkillsComponent::PostLoad()
 {
@@ -48,10 +52,16 @@ void UGameplaySkillsComponent::BeginPlay()
 
 void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	SCOPE_CYCLE_COUNTER(STAT_EODGameplaySkillsTick);
+
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (EODCharacterOwner && EODCharacterOwner->IsLocallyControlled())
+	{
 
 
+
+	}
 }
 
 void UGameplaySkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -242,6 +252,8 @@ void UGameplaySkillsComponent::SaveSkillBarLayout()
 void UGameplaySkillsComponent::AddNewSkill(int32 SkillIndex, FString SkillGroup)
 {
 	SBIndexToSGMap.Add(SkillIndex, SkillGroup);
+
+	//~ @todo load animations for the skill
 }
 
 /*

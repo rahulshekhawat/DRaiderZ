@@ -23,10 +23,8 @@ class EOD_API AHumanCharacter : public AEODCharacterBase
 	GENERATED_BODY()
 
 public:
+	/** Create and initialize skeletal armor mesh, camera, and inventory components. */
 	AHumanCharacter(const FObjectInitializer& ObjectInitializer);
-
-	/** Called to bind functionality to input that is specific to this character */
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	/** Property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -34,21 +32,40 @@ public:
 	/** Spawn default weapon(s) */
 	virtual void PostInitializeComponents() override;
 
-	virtual void Tick(float DeltaTime) override;
-
 	/** Initializes player animation references. Creates player HUD widget and adds it to the viewport. */
 	virtual void BeginPlay() override;
+
+	/** Update character state every frame */
+	virtual void Tick(float DeltaTime) override;
 
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
 
-	//~
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Save/load system
 public:
 	/** Saves current player state */
 	virtual void SaveCharacterState() override;
-	//~
 
-	//~ Begin Components
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Components
+public:
+	static FName HairComponentName;
+
+	static FName HatItemComponentName;
+
+	static FName FaceItemComponentName;
+
+	static FName ChestComponentName;
+
+	static FName HandsComponentName;
+
+	static FName LegsComponentName;
+
+	static FName FeetComponentName;
+
 private:
 	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player face
 
@@ -72,10 +89,6 @@ private:
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Feet;
-
-	// For playing hit sound effects
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UAudioComponent* AudioComponent;
 
 	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);

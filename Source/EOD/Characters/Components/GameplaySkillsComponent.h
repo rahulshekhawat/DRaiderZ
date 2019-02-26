@@ -47,14 +47,18 @@ public:
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+
 	////////////////////////////////////////////////////////////////////////////////
 	// Input handling
 public:
 	void OnPressingSkillKey(const int32 SkillKeyIndex);
 
 	void OnReleasingSkillKey(const int32 SkillKeyIndex);
-	
-protected:
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Skill System	
+public:
 	void TriggerSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
 
 	void ReleaseSkill(FName SkillID, FSkillTableRow* Skill = nullptr);

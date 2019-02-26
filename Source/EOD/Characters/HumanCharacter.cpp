@@ -6,25 +6,35 @@
 
 #include "GameFramework/PlayerController.h"
 
+FName AHumanCharacter::HairComponentName(TEXT("Hair"));
+FName AHumanCharacter::HatItemComponentName(TEXT("Hat Item"));
+FName AHumanCharacter::FaceItemComponentName(TEXT("Face Item"));
+FName AHumanCharacter::ChestComponentName(TEXT("Chest"));
+FName AHumanCharacter::HandsComponentName(TEXT("Hands"));
+FName AHumanCharacter::LegsComponentName(TEXT("Legs"));
+FName AHumanCharacter::FeetComponentName(TEXT("Feet"));
+
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	Hair				= CreateNewArmorComponent(FName("Hair"), ObjectInitializer);
-	HatItem				= CreateNewArmorComponent(FName("Hat Item"), ObjectInitializer);
-	FaceItem			= CreateNewArmorComponent(FName("Face Item"), ObjectInitializer);
-	Chest				= CreateNewArmorComponent(FName("Chest"), ObjectInitializer);
-	Hands				= CreateNewArmorComponent(FName("Hands"), ObjectInitializer);
-	Legs				= CreateNewArmorComponent(FName("Legs"), ObjectInitializer);
-	Feet				= CreateNewArmorComponent(FName("Feet"), ObjectInitializer);
-}
+	// @note Defaul skeletal mesh component inherited from ACharacter class will contain face mesh
+	if (GetMesh())
+	{
+		GetMesh()->AddLocalOffset(FVector(0.f, 0.f, -90.f));
+		GetMesh()->bUseAttachParentBound = true;
+	}
 
-void AHumanCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	// @note : SetMasterPoseComponent() from constructor doesn't work in packaged game (for some weird reason?!)
 
-	PlayerInputComponent->BindAction("Forward", IE_Pressed, this, &AHumanCharacter::OnPressedForward);
-	PlayerInputComponent->BindAction("Forward", IE_Released, this, &AHumanCharacter::OnReleasedForward);
-	PlayerInputComponent->BindAction("Backward", IE_Pressed, this, &AHumanCharacter::OnPressedBackward);
-	PlayerInputComponent->BindAction("Backward", IE_Released, this, &AHumanCharacter::OnReleasedBackward);
+	Hair				= CreateNewArmorComponent(AHumanCharacter::HairComponentName, ObjectInitializer);
+	HatItem				= CreateNewArmorComponent(AHumanCharacter::HatItemComponentName, ObjectInitializer);
+	FaceItem			= CreateNewArmorComponent(AHumanCharacter::FaceItemComponentName, ObjectInitializer);
+	Chest				= CreateNewArmorComponent(AHumanCharacter::ChestComponentName, ObjectInitializer);
+	Hands				= CreateNewArmorComponent(AHumanCharacter::HandsComponentName, ObjectInitializer);
+	Legs				= CreateNewArmorComponent(AHumanCharacter::LegsComponentName, ObjectInitializer);
+	Feet				= CreateNewArmorComponent(AHumanCharacter::FeetComponentName, ObjectInitializer);
+
+	bUseControllerRotationYaw = false;
+
 }
 
 void AHumanCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

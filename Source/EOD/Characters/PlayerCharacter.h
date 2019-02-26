@@ -89,12 +89,8 @@ class EOD_API APlayerCharacter : public AEODCharacterBase
 	GENERATED_BODY()
 	
 public:
-
 	/** Create and initialize skeletal armor mesh, camera, and inventory components. */
 	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
-
-	/** Called to bind functionality to input */
-	// virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	/** Property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
