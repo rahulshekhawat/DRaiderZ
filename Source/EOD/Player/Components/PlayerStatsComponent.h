@@ -196,7 +196,7 @@ public:
 
 	virtual float GetStaminaConsumptionModifier() const override;
 
-	virtual float GetMovementSpeedModifier() const override;
+	// virtual float GetMovementSpeedModifier() const override;
 
 	virtual float GetActiveTimeDilation() const override;
 	
@@ -210,7 +210,7 @@ public:
 	
 	virtual float ModifyStaminaConsumptionModifier(float Value) override;
 	
-	virtual float ModifyMovementSpeedModifier(float Value) override;
+	// virtual float ModifyMovementSpeedModifier(float Value) override;
 	
 	virtual float ModifyActiveTimeDilation(float Value) override;
 	
@@ -224,7 +224,7 @@ public:
 	
 	virtual void SetStaminaConsumptionModifier(float Value) override;
 	
-	virtual void SetMovementSpeedModifier(float Value) override;
+	// virtual void SetMovementSpeedModifier(float Value) override;
 	
 	virtual void SetActiveTimeDilation(float Value) override;
 	

@@ -36,6 +36,24 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Health
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
+	FOnStatChanged OnHealthChanged;
+
+	FORCEINLINE bool IsLowOnHealth() const;
+
+	FORCEINLINE int32 GetBaseHealth() const;
+
+	FORCEINLINE int32 GetMaxHealth() const;
+
+	FORCEINLINE int32 GetCurrentHealth() const;
+
+	inline void ModifyBaseHealth(int32 Value, bool bPercent = false);
+
+	inline void ModifyMaxHealth(int32 Value, bool bPercent = false);
+
+	inline void ModifyCurrentHealth(int32 Value, bool bPercent = false);
+
 protected:
 	/** Maximum health of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
@@ -53,24 +71,6 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth)
 	int32 CurrentHealth;
 
-public:
-	UPROPERTY(BlueprintAssignable, Category = "Stats Component")			
-	FOnStatChanged OnHealthChanged;
-
-	FORCEINLINE bool IsLowOnHealth() const;
-
-	FORCEINLINE int32 GetBaseHealth() const;
-
-	FORCEINLINE int32 GetMaxHealth() const;
-
-	FORCEINLINE int32 GetCurrentHealth() const;
-
-	FORCEINLINE void ModifyBaseHealth(int32 Value, bool bPercent = false);
-
-	FORCEINLINE void ModifyMaxHealth(int32 Value, bool bPercent = false);
-
-	FORCEINLINE void ModifyCurrentHealth(int32 Value, bool bPercent = false);
-
 private:
 	FORCEINLINE void SetBaseHealth(int32 Value);
 
@@ -81,6 +81,22 @@ private:
 	
 	////////////////////////////////////////////////////////////////////////////////
 	// Mana
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
+	FOnStatChanged OnManaChanged;
+
+	FORCEINLINE int32 GetBaseMana() const;
+
+	FORCEINLINE int32 GetMaxMana() const;
+
+	FORCEINLINE int32 GetCurrentMana() const;
+
+	inline void ModifyBaseMana(int32 Value, bool bPercent = false);
+
+	inline void ModifyMaxMana(int32 Value, bool bPercent = false);
+
+	inline void ModifyCurrentMana(int32 Value, bool bPercent = false);
+
 protected:
 	/** Maximum mana of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
@@ -93,22 +109,6 @@ protected:
 	/** Current mana of character */
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentMana)
 	int32 CurrentMana;
-	
-public:
-	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
-	FOnStatChanged OnManaChanged;
-
-	FORCEINLINE int32 GetBaseMana() const;
-
-	FORCEINLINE int32 GetMaxMana() const;
-
-	FORCEINLINE int32 GetCurrentMana() const;
-
-	FORCEINLINE void ModifyBaseMana(int32 Value, bool bPercent = false);
-
-	FORCEINLINE void ModifyMaxMana(int32 Value, bool bPercent = false);
-
-	FORCEINLINE void ModifyCurrentMana(int32 Value, bool bPercent = false);
 
 private:
 	FORCEINLINE void SetBaseMana(int32 Value);
@@ -120,6 +120,22 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Stamina
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
+	FOnStatChanged OnStaminaChanged;
+
+	FORCEINLINE int32 GetBaseStamina() const;
+
+	FORCEINLINE int32 GetMaxStamina() const;
+
+	FORCEINLINE int32 GetCurrentStamina() const;
+
+	inline void ModifyBaseStamina(int32 Value, bool bPercent = false);
+
+	inline void ModifyMaxStamina(int32 Value, bool bPercent = false);
+
+	inline void ModifyCurrentStamina(int32 Value, bool bPercent = false);
+
 protected:
 	/** Maximum mana of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
@@ -133,22 +149,6 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentStamina)
 	int32 CurrentStamina;
 
-public:
-	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
-	FOnStatChanged OnStaminaChanged;
-
-	FORCEINLINE int32 GetBaseStamina() const;
-
-	FORCEINLINE int32 GetMaxStamina() const;
-
-	FORCEINLINE int32 GetCurrentStamina() const;
-
-	FORCEINLINE void ModifyBaseStamina(int32 Value, bool bPercent = false);
-
-	FORCEINLINE void ModifyMaxStamina(int32 Value, bool bPercent = false);
-
-	FORCEINLINE void ModifyCurrentStamina(int32 Value, bool bPercent = false);
-
 private:
 	FORCEINLINE void SetBaseStamina(int32 Value);
 
@@ -158,21 +158,18 @@ private:
 
 
 	////////////////////////////////////////////////////////////////////////////////
-	// Stamina
+	// 
+public:
+	FORCEINLINE float GetMovementSpeedModifier() const { return MovementSpeedModifier; }
+
 protected:
 	UPROPERTY(Replicated)
 	float MovementSpeedModifier;
 
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Regen rates
 public:
-	/*
-	FORCEINLINE float GetMovementSpeedModifier() const 
-	{
-		return MovementSpeedModifier;
-	}
-	*/
-
-	virtual float GetMovementSpeedModifier() const { return MovementSpeedModifier; }
-
 
 public:
 	FORCEINLINE int32 GetHealthRegenRate() const;
@@ -517,8 +514,7 @@ FORCEINLINE int32 UStatsComponentBase::GetMaxHealth() const
 FORCEINLINE int32 UStatsComponentBase::GetCurrentHealth() const
 {
 	return CurrentHealth;
-}
-
+}inline
 FORCEINLINE void UStatsComponentBase::ModifyBaseHealth(int32 Value, bool bPercent)
 {
 	if (Value == 0)
@@ -537,7 +533,7 @@ FORCEINLINE void UStatsComponentBase::ModifyBaseHealth(int32 Value, bool bPercen
 	}
 }
 
-FORCEINLINE void UStatsComponentBase::ModifyMaxHealth(int32 Value, bool bPercent)
+inline void UStatsComponentBase::ModifyMaxHealth(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -555,7 +551,7 @@ FORCEINLINE void UStatsComponentBase::ModifyMaxHealth(int32 Value, bool bPercent
 	}
 }
 
-FORCEINLINE void UStatsComponentBase::ModifyCurrentHealth(int32 Value, bool bPercent)
+inline void UStatsComponentBase::ModifyCurrentHealth(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -610,7 +606,7 @@ FORCEINLINE int32 UStatsComponentBase::GetCurrentMana() const
 	return CurrentMana;
 }
 
-FORCEINLINE void UStatsComponentBase::ModifyBaseMana(int32 Value, bool bPercent)
+inline void UStatsComponentBase::ModifyBaseMana(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -628,7 +624,7 @@ FORCEINLINE void UStatsComponentBase::ModifyBaseMana(int32 Value, bool bPercent)
 	}
 }
 
-FORCEINLINE void UStatsComponentBase::ModifyMaxMana(int32 Value, bool bPercent)
+inline void UStatsComponentBase::ModifyMaxMana(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -646,7 +642,7 @@ FORCEINLINE void UStatsComponentBase::ModifyMaxMana(int32 Value, bool bPercent)
 	}
 }
 
-FORCEINLINE void UStatsComponentBase::ModifyCurrentMana(int32 Value, bool bPercent)
+inline void UStatsComponentBase::ModifyCurrentMana(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -701,7 +697,7 @@ FORCEINLINE int32 UStatsComponentBase::GetCurrentStamina() const
 	return CurrentStamina;
 }
 
-FORCEINLINE void UStatsComponentBase::ModifyBaseStamina(int32 Value, bool bPercent)
+inline void UStatsComponentBase::ModifyBaseStamina(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -719,7 +715,7 @@ FORCEINLINE void UStatsComponentBase::ModifyBaseStamina(int32 Value, bool bPerce
 	}
 }
 
-FORCEINLINE void UStatsComponentBase::ModifyMaxStamina(int32 Value, bool bPercent)
+inline void UStatsComponentBase::ModifyMaxStamina(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -737,7 +733,7 @@ FORCEINLINE void UStatsComponentBase::ModifyMaxStamina(int32 Value, bool bPercen
 	}
 }
 
-FORCEINLINE void UStatsComponentBase::ModifyCurrentStamina(int32 Value, bool bPercent)
+inline void UStatsComponentBase::ModifyCurrentStamina(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{

@@ -585,10 +585,12 @@ float UPlayerStatsComponent::GetStaminaConsumptionModifier() const
 	return StaminaConsumptionModifier;
 }
 
+/*
 float UPlayerStatsComponent::GetMovementSpeedModifier() const
 {
 	return MovementSpeedModifier;
 }
+*/
 
 float UPlayerStatsComponent::GetActiveTimeDilation() const
 {
@@ -632,6 +634,7 @@ float UPlayerStatsComponent::ModifyStaminaConsumptionModifier(float Value)
 	return Result;
 }
 
+/*
 float UPlayerStatsComponent::ModifyMovementSpeedModifier(float Value)
 {
 	float Result = MovementSpeedModifier + Value;
@@ -639,6 +642,7 @@ float UPlayerStatsComponent::ModifyMovementSpeedModifier(float Value)
 	SetMovementSpeedModifier(Result);
 	return Result;
 }
+*/
 
 float UPlayerStatsComponent::ModifyActiveTimeDilation(float Value)
 {
@@ -676,10 +680,12 @@ void UPlayerStatsComponent::SetStaminaConsumptionModifier(float Value)
 	StaminaConsumptionModifier = Value;
 }
 
+/*
 void UPlayerStatsComponent::SetMovementSpeedModifier(float Value)
 {
 	MovementSpeedModifier = Value;
 }
+*/
 
 void UPlayerStatsComponent::SetActiveTimeDilation(float Value)
 {

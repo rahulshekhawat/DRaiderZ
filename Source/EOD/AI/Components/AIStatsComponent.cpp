@@ -389,10 +389,12 @@ float UAIStatsComponent::GetStaminaConsumptionModifier() const
 	return 1;
 }
 
+/*
 float UAIStatsComponent::GetMovementSpeedModifier() const
 {
 	return MovementSpeedModifier;
 }
+*/
 
 float UAIStatsComponent::GetActiveTimeDilation() const
 {
@@ -426,9 +428,11 @@ void UAIStatsComponent::SetStaminaConsumptionModifier(float Value)
 {
 }
 
+/*
 void UAIStatsComponent::SetMovementSpeedModifier(float Value)
 {
 }
+*/
 
 void UAIStatsComponent::SetActiveTimeDilation(float Value)
 {
@@ -463,10 +467,12 @@ float UAIStatsComponent::ModifyStaminaConsumptionModifier(float Value)
 	return 0.0f;
 }
 
+/*
 float UAIStatsComponent::ModifyMovementSpeedModifier(float Value)
 {
 	return 0.0f;
 }
+*/
 
 int32 UAIStatsComponent::GetDarkness() const
 {

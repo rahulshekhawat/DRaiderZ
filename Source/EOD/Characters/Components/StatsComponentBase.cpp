@@ -29,7 +29,8 @@ void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(UStatsComponentBase, MaxMana);
 	DOREPLIFETIME(UStatsComponentBase, CurrentMana);
 	DOREPLIFETIME(UStatsComponentBase, MaxStamina);
-	DOREPLIFETIME(UStatsComponentBase, CurrentStamina);	
+	DOREPLIFETIME(UStatsComponentBase, CurrentStamina);
+	DOREPLIFETIME(UStatsComponentBase, MovementSpeedModifier);
 }
 
 void UStatsComponentBase::BeginPlay()
@@ -125,9 +126,10 @@ void UStatsComponentBase::ActivateStaminaRegeneration()
 
 void UStatsComponentBase::DeactivateHealthRegeneration()
 {
-	if (IsValid(GetWorld()))
+	UWorld* World = GetWorld();
+	if (World)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(HealthRegenTimerHandle);
+		World->GetTimerManager().ClearTimer(HealthRegenTimerHandle);
 	}
 	bIsRegeneratingHealth = false;
 }
