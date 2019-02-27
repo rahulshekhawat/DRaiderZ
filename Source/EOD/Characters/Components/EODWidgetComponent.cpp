@@ -6,11 +6,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "Camera/PlayerCameraManager.h"
 
-void UEODWidgetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction)
+void UEODWidgetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (GetUserWidgetObject() && GetUserWidgetObject()->IsVisible())
+	UUserWidget* WidgetObj = GetUserWidgetObject();
+	if (WidgetObj && WidgetObj->IsVisible())
 	{
 		APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 		if (CameraManager)
@@ -21,6 +22,5 @@ void UEODWidgetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 			FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(WidgetLocation, CameraManagerLocation);
 			this->SetWorldRotation(LookAtRotation);
 		}
-
 	}
 }

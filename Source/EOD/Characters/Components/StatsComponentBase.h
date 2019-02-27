@@ -10,7 +10,7 @@
 
 
 /** Delegate for whenever one of the health, mana, or stamina changes */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStatChanged, int32, BaseStatValue, int32, MaxStatValue, int32, CurrentStatValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStatChangedMCDelegate, int32, BaseStatValue, int32, MaxStatValue, int32, CurrentStatValue);
 
 
 /**
@@ -38,7 +38,7 @@ public:
 	// Health
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
-	FOnStatChanged OnHealthChanged;
+	FOnStatChangedMCDelegate OnHealthChanged;
 
 	FORCEINLINE bool IsLowOnHealth() const;
 
@@ -83,7 +83,7 @@ private:
 	// Mana
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
-	FOnStatChanged OnManaChanged;
+	FOnStatChangedMCDelegate OnManaChanged;
 
 	FORCEINLINE int32 GetBaseMana() const;
 
@@ -122,7 +122,7 @@ private:
 	// Stamina
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
-	FOnStatChanged OnStaminaChanged;
+	FOnStatChangedMCDelegate OnStaminaChanged;
 
 	FORCEINLINE int32 GetBaseStamina() const;
 
@@ -158,7 +158,7 @@ private:
 
 
 	////////////////////////////////////////////////////////////////////////////////
-	// 
+	// Character attribute modifiers
 public:
 	FORCEINLINE float GetMovementSpeedModifier() const { return MovementSpeedModifier; }
 
@@ -272,6 +272,19 @@ private:
 	inline void SetManaRegenRate(int32 Value);
 
 	inline void SetStaminaRegenRate(int32 Value);
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Attack
+public:
+	// virtual void GetPhysicalAttack
+
+protected:
+
+
+
+private:
+
 
 
 public:
