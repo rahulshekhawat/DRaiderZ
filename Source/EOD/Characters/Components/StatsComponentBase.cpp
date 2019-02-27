@@ -31,6 +31,11 @@ void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(UStatsComponentBase, MaxStamina);
 	DOREPLIFETIME(UStatsComponentBase, CurrentStamina);
 	DOREPLIFETIME(UStatsComponentBase, MovementSpeedModifier);
+
+	DOREPLIFETIME_CONDITION(UStatsComponentBase, HealthRegenRate, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UStatsComponentBase, ManaRegenRate, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UStatsComponentBase, StaminaRegenRate, COND_OwnerOnly);
+
 }
 
 void UStatsComponentBase::BeginPlay()

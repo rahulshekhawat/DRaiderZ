@@ -94,45 +94,6 @@ void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	*/
 }
 
-int32 UPlayerStatsComponent::ModifyHealthRegenRate(int32 Value)
-{
-	int32 Result = HealthRegenRate + Value;
-	// Result = Result <= 0 ? 0 : Result; // Health regen rate can be negative
-	SetHealthRegenRate(Result);
-	return Result;
-}
-
-void UPlayerStatsComponent::SetHealthRegenRate(int32 Value)
-{
-	HealthRegenRate = Value;
-}
-
-int32 UPlayerStatsComponent::ModifyManaRegenRate(int32 Value)
-{
-	int32 Result = ManaRegenRate + Value;
-	// Result = Result <= 0 ? 0 : Result; // Mana regen rate can be negative
-	SetManaRegenRate(Result);
-	return Result;
-}
-
-void UPlayerStatsComponent::SetManaRegenRate(int32 Value)
-{
-	ManaRegenRate = Value;
-}
-
-int32 UPlayerStatsComponent::ModifyStaminaRegenRate(int32 Value)
-{
-	int32 Result = StaminaRegenRate + Value;
-	// Result = Result <= 0 ? 0 : Result; // Stamina regen rate can be negative
-	SetStaminaRegenRate(Result);
-	return Result;
-}
-
-void UPlayerStatsComponent::SetStaminaRegenRate(int32 Value)
-{
-	StaminaRegenRate = Value;
-}
-
 int32 UPlayerStatsComponent::GetPhysicalAttack() const
 {
 	return PhysicalAttack;

@@ -162,34 +162,119 @@ private:
 public:
 	FORCEINLINE float GetMovementSpeedModifier() const { return MovementSpeedModifier; }
 
+	inline void ModifyMovementSpeedModifier(float Value);
+
 protected:
 	UPROPERTY(Replicated)
 	float MovementSpeedModifier;
 
+private:
+	inline void SetMovementSpeedModifier(float Value);
+
 
 	////////////////////////////////////////////////////////////////////////////////
-	// Regen rates
-public:
-
+	// Regeneration
 public:
 	FORCEINLINE int32 GetHealthRegenRate() const;
 
-	virtual int32 ModifyHealthRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyHealthRegenRate, return 0; );
-
-	virtual void SetHealthRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetHealthRegenRate, );
-
 	FORCEINLINE int32 GetManaRegenRate() const;
-
-	virtual int32 ModifyManaRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyManaRegenRate, return 0; );
-
-	virtual void SetManaRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetManaRegenRate, );
 
 	FORCEINLINE int32 GetStaminaRegenRate() const;
 
-	virtual int32 ModifyStaminaRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyStaminaRegenRate, return 0; );
+	inline void ModifyHealthRegenRate(int32 Value);
 
-	virtual void SetStaminaRegenRate(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetStaminaRegenRate, );
+	inline void ModifyManaRegenRate(int32 Value);
 
+	inline void ModifyStaminaRegenRate(int32 Value);
+
+protected:
+	/** Determines whether this character can regenerate health at all */
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
+	uint32 bHasHealthRegenration : 1;
+
+	/** Determines whether this character can regenerate mana at all */
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
+	uint32 bHasManaRegenration : 1;
+
+	/** Determines whether this character can regenerate stamina at all */
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
+	uint32 bHasStaminaRegenration : 1;
+
+	/** Determines whether this character is currently regenerating health */
+	UPROPERTY(Transient)
+	uint32 bIsRegeneratingHealth : 1;
+
+	/** Determines whether this character is currently regenerating mana */
+	UPROPERTY(Transient)
+	uint32 bIsRegeneratingMana : 1;
+
+	/** Determines whether this character is currently regenerating stamina */
+	UPROPERTY(Transient)
+	uint32 bIsRegeneratingStamina : 1;
+
+	/** Delay between health regeneration update */
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
+	float HealthRegenTickInterval;
+
+	/** Delay between mana regeneration update */
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
+	float ManaRegenTickInterval;
+
+	/** Delay between stamina regeneration update */
+	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
+	float StaminaRegenTickInterval;
+
+	//~ @note If regeneration rates are not displayed to player in-game then they are not needed to be replicated
+
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
+	int32 HealthRegenRate;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
+	int32 ManaRegenRate;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
+	int32 StaminaRegenRate;
+
+	FTimerHandle HealthRegenTimerHandle;
+
+	FTimerHandle ManaRegenTimerHandle;
+
+	FTimerHandle StaminaRegenTimerHandle;
+
+	/** Starts health regeneration on player. Automatically stops once the health is full or if manually stopped */
+	void ActivateHealthRegeneration();
+
+	/** Starts health regeneration on player. Automatically stops once the mana is full or if manually stopped */
+	void ActivateManaRegeneration();
+
+	//~ @note maybe its better to never stop stamina regeneration
+	/** Starts health regeneration on player. Automatically stops once the stamina is full or if manually stopped */
+	void ActivateStaminaRegeneration();
+
+	/** Stops health regeneration */
+	void DeactivateHealthRegeneration();
+
+	/** Stops mana regeneration */
+	void DeactivateManaRegeneration();
+
+	/** Stops stamina regeneration */
+	void DeactivateStaminaRegeneration();
+
+private:
+	void RegenerateHealth();
+
+	void RegenerateMana();
+
+	void RegenerateStamina();
+
+	inline void SetHealthRegenRate(int32 Value);
+
+	inline void SetManaRegenRate(int32 Value);
+
+	inline void SetStaminaRegenRate(int32 Value);
+
+
+public:
 	virtual int32 GetPhysicalAttack() const PURE_VIRTUAL(UStatsComponentBase::GetPhysicalAttack, return 0; );
 
 	virtual int32 GetMagickAttack() const PURE_VIRTUAL(UStatsComponentBase::GetMagickAttack, return 0; );
@@ -356,7 +441,7 @@ public:
 	
 	virtual float ModifyStaminaConsumptionModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyStaminaConsumptionModifier, return 0.f; );
 	
-	virtual float ModifyMovementSpeedModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyMovementSpeedModifier, return 0.f; );
+	// virtual float ModifyMovementSpeedModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyMovementSpeedModifier, return 0.f; );
 	
 	virtual float ModifyActiveTimeDilation(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyActiveTimeDilation, return 0.f; );
 	
@@ -370,7 +455,7 @@ public:
 	
 	virtual void SetStaminaConsumptionModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::SetStaminaConsumptionModifier, );
 	
-	virtual void SetMovementSpeedModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::SetMovementSpeedModifier, );
+	// virtual void SetMovementSpeedModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::SetMovementSpeedModifier, );
 	
 	virtual void SetActiveTimeDilation(float Value) PURE_VIRTUAL(UStatsComponentBase::SetActiveTimeDilation, );
 	
@@ -401,77 +486,6 @@ public:
 	virtual uint8 GetCrowdControlImmunitiesFromSkill() const PURE_VIRTUAL(UStatsComponentBase::GetCrowdControlImmunitiesFromSkill, return 0; );
 
 protected:
-	//~ @note following booleans are used to initialize timers for derived stats components
-	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
-	uint32 bHasHealthRegenration : 1;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
-	uint32 bHasManaRegenration : 1;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
-	uint32 bHasStaminaRegenration : 1;
-
-	UPROPERTY(Transient)
-	uint32 bIsRegeneratingHealth : 1;
-
-	UPROPERTY(Transient)
-	uint32 bIsRegeneratingMana : 1;
-
-	UPROPERTY(Transient)
-	uint32 bIsRegeneratingStamina : 1;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
-	float HealthRegenTickInterval;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
-	float ManaRegenTickInterval;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
-	float StaminaRegenTickInterval;
-
-	//~ If regeneration rates are not displayed to player in-game then they are not needed to be replicated
-	//~ However, if we do need to replicate regeneration rate then we can simply replicate it to owner only
-	//~ UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Regeneration", AdvancedDisplay)
-	int32 HealthRegenRate;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Regeneration", AdvancedDisplay)
-	int32 ManaRegenRate;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Regeneration", AdvancedDisplay)
-	int32 StaminaRegenRate;
-
-	FTimerHandle HealthRegenTimerHandle;
-
-	FTimerHandle ManaRegenTimerHandle;
-
-	FTimerHandle StaminaRegenTimerHandle;
-
-	/** Starts health regeneration on player. Automatically stops once the health is full or if manually stopped */
-	void ActivateHealthRegeneration();
-
-	/** Starts health regeneration on player. Automatically stops once the mana is full or if manually stopped */
-	void ActivateManaRegeneration();
-
-	//~ @note maybe its better to never stop stamina regeneration
-	/** Starts health regeneration on player. Automatically stops once the stamina is full or if manually stopped */
-	void ActivateStaminaRegeneration();
-
-	/** Stops health regeneration */
-	void DeactivateHealthRegeneration();
-
-	/** Stops mana regeneration */
-	void DeactivateManaRegeneration();
-
-	/** Stops stamina regeneration */
-	void DeactivateStaminaRegeneration();
-
-	void RegenerateHealth();
-
-	void RegenerateMana();
-
-	void RegenerateStamina();
 
 	//~ Begin network code
 private:
@@ -514,8 +528,9 @@ FORCEINLINE int32 UStatsComponentBase::GetMaxHealth() const
 FORCEINLINE int32 UStatsComponentBase::GetCurrentHealth() const
 {
 	return CurrentHealth;
-}inline
-FORCEINLINE void UStatsComponentBase::ModifyBaseHealth(int32 Value, bool bPercent)
+}
+
+inline void UStatsComponentBase::ModifyBaseHealth(int32 Value, bool bPercent)
 {
 	if (Value == 0)
 	{
@@ -773,6 +788,16 @@ FORCEINLINE void UStatsComponentBase::SetCurrentStamina(int32 Value)
 	}
 }
 
+inline void UStatsComponentBase::ModifyMovementSpeedModifier(float Value)
+{
+	SetMovementSpeedModifier(MovementSpeedModifier + Value);
+}
+
+inline void UStatsComponentBase::SetMovementSpeedModifier(float Value)
+{
+	MovementSpeedModifier = Value;
+}
+
 FORCEINLINE int32 UStatsComponentBase::GetHealthRegenRate() const
 {
 	return HealthRegenRate;
@@ -786,4 +811,34 @@ FORCEINLINE int32 UStatsComponentBase::GetManaRegenRate() const
 FORCEINLINE int32 UStatsComponentBase::GetStaminaRegenRate() const
 {
 	return StaminaRegenRate;
+}
+
+inline void UStatsComponentBase::ModifyHealthRegenRate(int32 Value)
+{
+	SetHealthRegenRate(HealthRegenRate + Value);
+}
+
+inline void UStatsComponentBase::ModifyManaRegenRate(int32 Value)
+{
+	SetManaRegenRate(ManaRegenRate + Value);
+}
+
+inline void UStatsComponentBase::ModifyStaminaRegenRate(int32 Value)
+{
+	SetStaminaRegenRate(StaminaRegenRate + Value);
+}
+
+inline void UStatsComponentBase::SetHealthRegenRate(int32 Value)
+{
+	HealthRegenRate = Value;
+}
+
+inline void UStatsComponentBase::SetManaRegenRate(int32 Value)
+{
+	ManaRegenRate = Value;
+}
+
+inline void UStatsComponentBase::SetStaminaRegenRate(int32 Value)
+{
+	StaminaRegenRate = Value;
 }

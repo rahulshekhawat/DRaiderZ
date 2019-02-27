@@ -33,33 +33,6 @@ void UAIStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 }
 
-int32 UAIStatsComponent::ModifyHealthRegenRate(int32 Value)
-{
-	return int32();
-}
-
-void UAIStatsComponent::SetHealthRegenRate(int32 Value)
-{
-}
-
-int32 UAIStatsComponent::ModifyManaRegenRate(int32 Value)
-{
-	return int32();
-}
-
-void UAIStatsComponent::SetManaRegenRate(int32 Value)
-{
-}
-
-int32 UAIStatsComponent::ModifyStaminaRegenRate(int32 Value)
-{
-	return int32();
-}
-
-void UAIStatsComponent::SetStaminaRegenRate(int32 Value)
-{
-}
-
 int32 UAIStatsComponent::GetPhysicalAttack() const
 {
 	return PhysicalAttack;
