@@ -59,9 +59,26 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 	// Skill System	
 public:
+	/**
+	 * Trigger a skill
+	 * @note This may result in either instantly activating a skill (e.g. Nocturne) or this may start charging the skill (for skills that can be
+	 *		 charged by holding down the attack key)
+	 */
 	void TriggerSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
 
+	/**
+	 * If the character is currently charging a chargeable skill then this activates the skill. Otherwise it does nothing
+	 */
 	void ReleaseSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
+
+	/** Cancels the skill that the character is currently using */
+	void CancelCurrentSkill();
+
+	/** If the character is currently using skill with ID same as the function argument, then cancel it. Otherwise do nothing. */
+	void CancelSkill(FName SkillID);
+
+	//~ @todo
+	// void EndSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
 
 private:
 	/** Returns true if skill key index is invalid */

@@ -102,12 +102,6 @@ void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 
 	TriggerSkill(SkillID, Skill);
 
-	/*
-	if (Skill && Skill->AnimMontage.Get())
-	{
-		EODCharacterOwner->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-	}
-	*/
 }
 
 void UGameplaySkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
@@ -143,6 +137,14 @@ void UGameplaySkillsComponent::TriggerSkill(FName SkillID, FSkillTableRow* Skill
 }
 
 void UGameplaySkillsComponent::ReleaseSkill(FName SkillID, FSkillTableRow* Skill)
+{
+}
+
+void UGameplaySkillsComponent::CancelCurrentSkill()
+{
+}
+
+void UGameplaySkillsComponent::CancelSkill(FName SkillID)
 {
 }
 

@@ -959,6 +959,16 @@ void AEODCharacterBase::InitiateRotationToYawFromAxisInput()
 	}
 }
 
+void AEODCharacterBase::Jump()
+{
+	if (IsGuardActive())
+	{
+		DeactivateGuard();
+	}
+
+	Super::Jump();
+}
+
 void AEODCharacterBase::OnPressedForward()
 {
 }
@@ -1064,10 +1074,14 @@ void AEODCharacterBase::UpdateGuardState(float DeltaTime)
 	{
 		ActivateGuard();
 	}
-	// If character doesn't want to guard but the guard is still active
-	else if (!bWantsToGuard && IsGuardActive())
+	else
 	{
 		DeactivateGuard();
+	}
+	// If character doesn't want to guard but the guard is still active
+	// else if (!bWantsToGuard && IsGuardActive())
+	{
+		// DeactivateGuard();
 	}
 
 	if (IsGuardActive())
