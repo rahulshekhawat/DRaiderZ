@@ -864,6 +864,10 @@ void AEODCharacterBase::UpdateRotation(float DeltaTime)
 			MoveComp->SetDesiredCustomRotation(DesiredRotation);
 		}
 	}
+	else if (CharacterState == ECharacterState::Jumping)
+	{
+		SetUseControllerRotationYaw(false);
+	}
 }
 
 void AEODCharacterBase::UpdateMovement(float DeltaTime)
@@ -966,6 +970,7 @@ void AEODCharacterBase::Jump()
 		DeactivateGuard();
 	}
 
+	SetCharacterStateAllowsRotation(false);
 	Super::Jump();
 }
 
@@ -1074,14 +1079,9 @@ void AEODCharacterBase::UpdateGuardState(float DeltaTime)
 	{
 		ActivateGuard();
 	}
-	else
+	else if (!bWantsToGuard && IsGuardActive())
 	{
 		DeactivateGuard();
-	}
-	// If character doesn't want to guard but the guard is still active
-	// else if (!bWantsToGuard && IsGuardActive())
-	{
-		// DeactivateGuard();
 	}
 
 	if (IsGuardActive())
