@@ -26,6 +26,12 @@ public:
 	/** Event called when this state is interrupted */
 	virtual void OnInterruptState();
 
+	/** Returns true if the character can leave this state right now */
+	virtual bool CanLeaveState();
+
+	/** Returns true if this state can be interrupted at all */
+	virtual bool IsStateInterruptible();
+
 	//~ @todo
 	// virtual void UpdateState();
 

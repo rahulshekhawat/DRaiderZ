@@ -196,6 +196,12 @@ void AEODCharacterBase::BeginPlay()
 
 	// Intentional additional call to BindUIDelegates (another in Restart())
 	BindUIDelegates();
+
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (MoveComp)
+	{
+		MoveComp->SetDesiredCustomRotation(GetActorRotation());
+	}
 }
 
 void AEODCharacterBase::PossessedBy(AController* NewController)
@@ -853,8 +859,15 @@ void AEODCharacterBase::UpdateRotation(float DeltaTime)
 	if (IsGuardActive())
 	{
 		SetUseControllerRotationYaw(true);
+		return;
+		
 	}
-	else if (CharacterState == ECharacterState::IdleWalkRun || bCharacterStateAllowsRotation)
+	else
+	{
+		SetUseControllerRotationYaw(false);
+	}
+	
+	if (CharacterState == ECharacterState::IdleWalkRun || bCharacterStateAllowsRotation)
 	{
 		SetUseControllerRotationYaw(false);
 		FRotator DesiredRotation = FRotator(0.f, GetRotationYawFromAxisInput(), 0.f);
@@ -863,10 +876,6 @@ void AEODCharacterBase::UpdateRotation(float DeltaTime)
 		{
 			MoveComp->SetDesiredCustomRotation(DesiredRotation);
 		}
-	}
-	else if (CharacterState == ECharacterState::Jumping)
-	{
-		SetUseControllerRotationYaw(false);
 	}
 }
 

@@ -22,3 +22,13 @@ void UCharacterStateBase::OnInterruptState()
 {
 	//~ empty
 }
+
+bool UCharacterStateBase::CanLeaveState()
+{
+	return false;
+}
+
+bool UCharacterStateBase::IsStateInterruptible()
+{
+	return false;
+}

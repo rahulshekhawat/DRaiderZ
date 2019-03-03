@@ -1046,6 +1046,7 @@ void APlayerCharacter::ToggleSheathe()
 		bool bNewValue = !IsWeaponSheathed();
 		SetWeaponSheathed(bNewValue);
 		SetCharacterStateAllowsMovement(true);
+		SetCharacterStateAllowsRotation(true);
 	}
 }
 

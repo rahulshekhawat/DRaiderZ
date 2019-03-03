@@ -127,6 +127,8 @@ void UGameplaySkillsComponent::TriggerSkill(FName SkillID, FSkillTableRow* Skill
 		EODCharacterOwner->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	}
 
+	EODCharacterOwner->SetCharacterStateAllowsRotation(false);
+
 	/*
 	if (EODCharacterOwner->Role < ROLE_Authority)
 	{

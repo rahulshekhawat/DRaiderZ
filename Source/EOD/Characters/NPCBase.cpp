@@ -3,7 +3,7 @@
 #include "NPCBase.h"
 
 #include "Camera/CameraComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ANPCBase::ANPCBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -14,6 +14,23 @@ ANPCBase::ANPCBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectIn
 		GetCameraComponent()->AddLocalRotation(FRotator(0.f, 180.f, 0.f));
 		GetCameraComponent()->SetWorldLocation(FVector(300.f, 0.f, -25.f));
 	}
+
+	bNPCNeedsMovement = false;
+}
+
+void ANPCBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (!bNPCNeedsMovement)
+	{
+		GetCharacterMovement()->DisableMovement();
+	}
+}
+
+void ANPCBase::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 void ANPCBase::OnInteract_Implementation(AEODCharacterBase* Character)
