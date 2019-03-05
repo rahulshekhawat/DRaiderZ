@@ -11,6 +11,17 @@
 
 class AEODCharacterBase;
 
+/*
+USTRUCT(BlueprintType)
+struct EOD_API FSkillStatus
+{
+	GENERATED_USTRUCT_BODY()
+public:
+
+
+};
+*/
+
 /** Struct containing information regarding skill's cooldown */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillCooldownStatus

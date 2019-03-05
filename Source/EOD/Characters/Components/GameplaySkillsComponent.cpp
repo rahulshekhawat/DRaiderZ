@@ -178,6 +178,8 @@ FString UGameplaySkillsComponent::GetSkillGroupFromSkillKeyIndex(const int32 Ski
 		return FString("");
 	}
 
+
+
 	if (ActiveSupersedingChainSkillGroup.Key == SkillKeyIndex)
 	{
 		return ActiveSupersedingChainSkillGroup.Value;
