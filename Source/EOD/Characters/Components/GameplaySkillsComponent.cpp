@@ -5,6 +5,7 @@
 #include "EOD/Characters/PlayerCharacter.h"
 #include "EOD/SaveSystem/PlayerSaveGame.h"
 #include "EOD/Core/EODGameInstance.h"
+#include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -120,22 +121,18 @@ void UGameplaySkillsComponent::TriggerSkill(FName SkillID, FSkillTableRow* Skill
 		Skill = GetSkill(SkillID);
 	}
 
-	// UAnimMontage* MontageToPlay = 
-
 	if (Skill && Skill->AnimMontage.Get())
 	{
 		EODCharacterOwner->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 	}
 
 	EODCharacterOwner->SetCharacterStateAllowsRotation(false);
-
-	/*
-	if (EODCharacterOwner->Role < ROLE_Authority)
+	float ControlRotationYaw = EODCharacterOwner->GetControllerRotationYaw();
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(EODCharacterOwner->GetCharacterMovement());
+	if (MoveComp)
 	{
-		ActiveSkillID = SkillID;
-		Server_TriggerSkill(SkillID);
+		MoveComp->SetDesiredCustomRotation(FRotator(0.f, ControlRotationYaw, 0.f));
 	}
-	*/
 }
 
 void UGameplaySkillsComponent::ReleaseSkill(FName SkillID, FSkillTableRow* Skill)
