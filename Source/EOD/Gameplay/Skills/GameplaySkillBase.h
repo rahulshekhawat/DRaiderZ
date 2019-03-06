@@ -49,8 +49,6 @@ protected:
 	/** Returns true if this skill can be cancelled */
 	virtual bool CanCancelSkill() const;
 
-protected:
-
 	// --------------------------------------
 	//	Constants : Default values that are not supposed to be modified
 	// --------------------------------------

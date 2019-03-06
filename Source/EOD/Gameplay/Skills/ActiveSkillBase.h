@@ -38,8 +38,6 @@ protected:
 	/** Returns true if this skill can be cancelled */
 	virtual bool CanCancelSkill() const override;
 
-protected:
-
 	// --------------------------------------
 	//	Constants : Default values that are not supposed to be modified
 	// --------------------------------------
@@ -93,10 +91,6 @@ protected:
 	/** Mana cost for using this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	int32 ManaCost;
-
-	/** Determines whether this skill can be used while character has been hit */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	bool bCanBeUsedWhileHit;
 
 	/** Skills, any of which MUST be used before using this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)

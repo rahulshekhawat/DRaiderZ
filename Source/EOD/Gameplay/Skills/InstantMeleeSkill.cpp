@@ -2,3 +2,6 @@
 
 #include "InstantMeleeSkill.h"
 
+UInstantMeleeSkill::UInstantMeleeSkill(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+}

@@ -3,15 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Gameplay/Skills/GameplaySkillBase.h"
+#include "Gameplay/Skills/ActiveSkillBase.h"
 #include "InstantMeleeSkill.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API UInstantMeleeSkill : public UGameplaySkillBase
+class EOD_API UInstantMeleeSkill : public UActiveSkillBase
 {
 	GENERATED_BODY()
 	
+public:
+	UInstantMeleeSkill(const FObjectInitializer& ObjectInitializer);
+
 };
