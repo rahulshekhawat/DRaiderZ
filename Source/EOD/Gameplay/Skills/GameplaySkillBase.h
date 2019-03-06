@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CharacterLibrary.h"
+#include "GameplayTagContainer.h"
 #include "UObject/NoExportTypes.h"
 #include "GameplaySkillBase.generated.h"
 
@@ -21,15 +22,32 @@ class EOD_API UGameplaySkillBase : public UObject
 public:
 	UGameplaySkillBase(const FObjectInitializer& ObjectInitializer);
 
+	// --------------------------------------
+	//	Gameplay Skill Interface
+	// --------------------------------------
+
 	/** Initialize this skill. Intended to be called immediately after the skill object is created */
 	virtual void InitSkill(AEODCharacterBase* Instigator, AController* Owner);
 
-	//~ @todo methods to manage skills
 	/** Activate this skill */
-	// virtual void ActivateSkill();
+	virtual void ActivateSkill();
+
+	/** Cancel this skill */
+	virtual void CancelSkill();
 
 	/** Deactivate this skill */
-	// virtual void EndSkill();
+	virtual void EndSkill();
+
+	/** Returns true if this skill is valid, i.e, skill belongs to a valid skill group */
+	FORCEINLINE bool IsValid() const { return SkillGroup != NAME_None; }
+
+protected:
+
+	/** Returns true if this activity can be activated */
+	virtual bool CanActivateSkill() const;
+
+	/** Returns true if this skill can be cancelled */
+	virtual bool CanCancelSkill() const;
 
 protected:
 
@@ -48,6 +66,25 @@ protected:
 	/** Icon used to represent this skill inside the game */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constants|Base Information")
 	TSoftObjectPtr<UTexture> Icon;
+
+	/** Maximum upgrades available for this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constants|Base Information")
+	int32 MaxUpgrades;
+
+	/** Skill group of this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constants|Base Information")
+	FName SkillGroup;
+
+	// --------------------------------------
+	//	Gameplay Tags
+	// --------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tags")
+	FGameplayTagContainer AbilityTags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tags")
+	FGameplayTagContainer ActivationOwnedTags;
+
 
 
 

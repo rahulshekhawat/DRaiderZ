@@ -17,6 +17,26 @@ class EOD_API UActiveSkillBase : public UGameplaySkillBase
 public:
 	UActiveSkillBase(const FObjectInitializer& ObjectInitializer);
 
+	// --------------------------------------
+	//	Gameplay Skill Interface
+	// --------------------------------------
+
+	/** Activate this skill */
+	virtual void ActivateSkill() override;
+
+	/** Cancel this skill */
+	virtual void CancelSkill() override;
+
+	/** Deactivate this skill */
+	virtual void EndSkill() override;
+
+protected:
+
+	/** Returns true if this activity can be activated */
+	virtual bool CanActivateSkill() const override;
+
+	/** Returns true if this skill can be cancelled */
+	virtual bool CanCancelSkill() const override;
 
 protected:
 
@@ -74,18 +94,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	int32 ManaCost;
 
-	/** Determines whether this skill can be used while moving */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	bool bAllowsMovement;
-
-	/** Determines whether this skill has different animations to be used while walking in different directions */
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	// bool bHasDirectionalAnimations;
-
-	/** Determines whether this skill is a passive skill or an active skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	bool bPassiveSkill;
-
 	/** Determines whether this skill can be used while character has been hit */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	bool bCanBeUsedWhileHit;
@@ -115,10 +123,6 @@ protected:
 	/** Current upgrade level of this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
 	int32 CurrentUpgradeLevel;
-
-	/** Maximum upgrades available for this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	int32 MaxUpgrades;
 
 	/** The status effect required to use this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)

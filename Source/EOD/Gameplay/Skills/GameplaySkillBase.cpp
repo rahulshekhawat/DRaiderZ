@@ -5,8 +5,31 @@
 
 UGameplaySkillBase::UGameplaySkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	SkillGroup = NAME_None;
 }
 
 void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
 {
+}
+
+void UGameplaySkillBase::ActivateSkill()
+{
+}
+
+void UGameplaySkillBase::CancelSkill()
+{
+}
+
+void UGameplaySkillBase::EndSkill()
+{
+}
+
+bool UGameplaySkillBase::CanActivateSkill() const
+{
+	return false;
+}
+
+bool UGameplaySkillBase::CanCancelSkill() const
+{
+	return false;
 }

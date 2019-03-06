@@ -10,6 +10,7 @@
 #include "EOD/StatusEffects/StatusEffectBase.h"
 #include "EOD/Characters/Components/StatsComponentBase.h"
 
+#include "GameplayTagContainer.h"
 #include "Animation/AnimInstance.h"
 #include "Components/SphereComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -448,6 +449,8 @@ public:
 
 	virtual void PlayToggleSheatheAnimation();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gameplay")
+	FGameplayTagContainer GameplayTagContainer;
 
 	////////////////////////////////////////////////////////////////////////////////
 	// CHARACTER STATE
