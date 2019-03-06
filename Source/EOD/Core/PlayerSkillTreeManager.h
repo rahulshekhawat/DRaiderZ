@@ -15,12 +15,11 @@ struct EOD_API FSkillTreeSlot
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	/** Determines if the skill placed in this slot is unlocked by default */
+	/** Determines if this slot is unlocked by default */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bUnlockedByDefault;
 
-	/** Vocation that this skill slot belongs to */
+	/** Vocation that this slot belongs to */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EVocations Vocation;
 
@@ -28,19 +27,26 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UGameplaySkillBase> PlayerSkill;
 
-	int32 GetMaxSkillSlotLevel() const { return 0; } // SlotSkills.Num(); }
+	/** The skill tree column that this slot should be placed in */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 ColumnPosition;
+
+	/** The skill tree row that this slot should be placed in */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 RowPosition;
 
 	FSkillTreeSlot()
 	{
 		bUnlockedByDefault = true;
 		Vocation = EVocations::Berserker;
-
+		PlayerSkill = NULL;
+		ColumnPosition = -1;
+		RowPosition = -1;
 	}
 };
 
-
 /**
- * 
+ * Skill tree manager class for locally controlled player
  */
 UCLASS(BlueprintType, Blueprintable)
 class EOD_API APlayerSkillTreeManager : public AInfo
@@ -50,9 +56,15 @@ class EOD_API APlayerSkillTreeManager : public AInfo
 public:
 	APlayerSkillTreeManager(const FObjectInitializer& ObjectInitializer);
 	
+	/** A map of skill group to it's skill tree slot info */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
+	TMap<FName, FSkillTreeSlot> SkillTreeLayout;
+
 	/** Classes of all the player skills that this skill tree contains */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree|Skill Layout")
-	TArray<TSubclassOf<UGameplaySkillBase>> PlayerSkillClasses;
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree|Skill Layout")
+	// TArray<TSubclassOf<UGameplaySkillBase>> PlayerSkillClasses;
+
+
 
 
 

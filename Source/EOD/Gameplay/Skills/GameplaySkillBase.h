@@ -41,6 +41,8 @@ public:
 	/** Returns true if this skill is valid, i.e, skill belongs to a valid skill group */
 	FORCEINLINE bool IsValid() const { return SkillGroup != NAME_None; }
 
+	FORCEINLINE int32 GetMaxUpgradeLevel() const { return MaxUpgrades; }
+
 protected:
 
 	/** Returns true if this activity can be activated */
