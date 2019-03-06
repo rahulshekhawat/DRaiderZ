@@ -395,6 +395,27 @@ void AEODPlayerController::OnReleasingNormalAttackKey()
 
 void AEODPlayerController::AttemptDodge()
 {
+	if (IsValid(EODCharacter))
+	{
+		
+
+		bool bResult = EODCharacter->StartDodge();
+
+
+
+		// int32 DodgeCost = DodgeStaminaCost * EODCharacter->
+
+
+
+	}
+
+
+
+	// if (IsValid(EODCharacter) && IsValid(EODCharacter))
+
+
+
+
 	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetCharacterStatsComponent()))
 	{
 		if (IsAutoMoveEnabled())

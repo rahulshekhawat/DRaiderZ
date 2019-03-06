@@ -8,6 +8,26 @@ UCharacterStateBase::UCharacterStateBase(const FObjectInitializer& ObjectInitial
 
 }
 
+bool UCharacterStateBase::CanEnterState()
+{
+	return false;
+}
+
+bool UCharacterStateBase::CanLeaveState()
+{
+	return false;
+}
+
+bool UCharacterStateBase::CanInterruptState()
+{
+	return false;
+}
+
+bool UCharacterStateBase::IsStateInterruptible() const
+{
+	return false;
+}
+
 void UCharacterStateBase::OnEnterState()
 {
 	//~ empty
@@ -23,12 +43,6 @@ void UCharacterStateBase::OnInterruptState()
 	//~ empty
 }
 
-bool UCharacterStateBase::CanLeaveState()
+void UCharacterStateBase::UpdateState(float DeltaTime)
 {
-	return false;
-}
-
-bool UCharacterStateBase::IsStateInterruptible()
-{
-	return false;
 }

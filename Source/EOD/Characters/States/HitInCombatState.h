@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Characters/States/CharacterStateBase.h"
-#include "CombatHitState.generated.h"
+#include "HitInCombatState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API UCombatHitState : public UCharacterStateBase
+class EOD_API UHitInCombatState : public UCharacterStateBase
 {
 	GENERATED_BODY()
 	

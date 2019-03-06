@@ -27,6 +27,7 @@ class UAnimMontage;
 class USkillsComponent;
 class UInputComponent;
 class UCameraComponent;
+class UCharacterStateBase;
 // class AEODPlayerController;
 // class AEODAIControllerBase;
 class UStatusEffectBase;
@@ -417,6 +418,19 @@ private:
 	/** Audio component for playing hit effect sounds */
 	UPROPERTY(Transient)
 	UAudioComponent* HitAudioComponent;
+
+
+public:
+
+	// --------------------------------------
+	//	Character States
+	// --------------------------------------
+
+	UPROPERTY(Transient)
+	TMap<FName, UCharacterStateBase*> CharacterStatesMap;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character State")
+	TMap<FName, TSubclassOf<UCharacterStateBase>> DefaultCharacterStateClasses;
 
 
 	////////////////////////////////////////////////////////////////////////////////

@@ -13,6 +13,8 @@
 #include "EOD/Characters/Components/GameplaySkillsComponent.h"
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
+#include "States/IdleWalkRunState.h"
+
 #include "UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -90,6 +92,10 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	DamageBlockTriggerDelay = 0.2f;
 
 	Faction = EFaction::Player;
+
+
+	DefaultCharacterStateClasses.Add(FName("IdleWalkRun"), UIdleWalkRunState::StaticClass());
+
 
 }
 

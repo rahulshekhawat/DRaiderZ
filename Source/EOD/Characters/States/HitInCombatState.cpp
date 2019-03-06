@@ -1,4 +1,4 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-#include "CombatHitState.h"
+#include "HitInCombatState.h"
 
