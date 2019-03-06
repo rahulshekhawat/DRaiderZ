@@ -29,6 +29,7 @@ public class EOD : ModuleRules
                 "EOD/StatusEffects",
                 "EOD/UI",
                 "EOD/Weapons",
+                "EOD/Gameplay/Skills",
             }
         );
 

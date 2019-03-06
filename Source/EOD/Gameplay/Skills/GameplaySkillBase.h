@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CharacterLibrary.h"
 #include "UObject/NoExportTypes.h"
 #include "GameplaySkillBase.generated.h"
 
@@ -21,7 +22,6 @@ public:
 	UGameplaySkillBase(const FObjectInitializer& ObjectInitializer);
 
 	void Initialize(AEODCharacterBase* Instigator, AController* Owner);
-
 
 
 
