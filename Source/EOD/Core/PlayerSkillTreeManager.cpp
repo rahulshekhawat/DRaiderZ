@@ -4,4 +4,8 @@
 
 APlayerSkillTreeManager::APlayerSkillTreeManager(const FObjectInitializer& ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = false;
+	SetReplicates(false);
+	SetReplicateMovement(false);
+
 }
