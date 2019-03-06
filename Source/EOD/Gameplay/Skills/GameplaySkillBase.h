@@ -14,7 +14,7 @@ class AController;
 /**
  * The base class for all gameplay skills
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class EOD_API UGameplaySkillBase : public UObject
 {
 	GENERATED_BODY()
@@ -54,23 +54,23 @@ protected:
 	// --------------------------------------
 
 	/** Name of this skill that will be displayed to player inside the game */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constants|Base Information")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
 	FString InGameName;
 
 	/** Description of this skill that will be displayed to player inside the game */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constants|Base Information")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
 	FString Description;
 
 	/** Icon used to represent this skill inside the game */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constants|Base Information")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
 	TSoftObjectPtr<UTexture> Icon;
 
 	/** Maximum upgrades available for this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constants|Base Information")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	int32 MaxUpgrades;
 
 	/** Skill group of this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constants|Base Information")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	FName SkillGroup;
 
 	// --------------------------------------

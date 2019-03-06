@@ -4,6 +4,7 @@
 
 UActiveSkillBase::UActiveSkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	SupersedingSkillGroup = NAME_None;
 }
 
 void UActiveSkillBase::ActivateSkill()
