@@ -97,9 +97,23 @@ enum class ECharacterState : uint8
 	Dead
 };
 
+//~ @todo replace ESkillType with ESkillEffect
 /** This enum describes the skill type */
 UENUM(BlueprintType)
 enum class ESkillType : uint8
+{
+	DamageMelee,
+	DamageRanged,
+	HealSelf,
+	HealParty,
+	BuffSelf,
+	BuffParty,
+	DebuffEnemy
+};
+
+/** This enum describes the effect of this skill */
+UENUM(BlueprintType)
+enum class ESkillEffect : uint8
 {
 	DamageMelee,
 	DamageRanged,
@@ -287,8 +301,8 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "EWeaponType"))
 	uint8 SupportedWeapons;
-	
-	/** Type of damage inflicted from this skill */
+
+	/** Type of damage inflicted by this skill if this skill can inflict damage */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
 	EDamageType DamageType;
 
