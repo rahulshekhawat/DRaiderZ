@@ -7,7 +7,6 @@ UGameplaySkillBase::UGameplaySkillBase(const FObjectInitializer& ObjectInitializ
 {
 }
 
-void UGameplaySkillBase::Initialize(AEODCharacterBase* Instigator, AController* Owner)
+void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
 {
-
 }
