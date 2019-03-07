@@ -417,7 +417,7 @@ void AEODPlayerController::AttemptDodge()
 		}
 	}
 
-
+	/*
 	if (IsValid(EODCharacter))
 	{
 		UCharacterStateBase* StateObj = EODCharacter->CharacterStatesMap[AEODCharacterBase::DodgeStateName];
@@ -427,6 +427,7 @@ void AEODPlayerController::AttemptDodge()
 			StateObj->OnEnterState();
 		}
 	}
+	*/
 }
 
 void AEODPlayerController::TriggerInteraction()
