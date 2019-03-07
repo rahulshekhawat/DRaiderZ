@@ -417,47 +417,6 @@ void AEODPlayerController::AttemptDodge()
 			Server_OnSuccessfulDodge();
 		}
 	}
-
-	/*
-	if (IsValid(EODCharacter) && EODCharacter->CanDodge())
-	{
-		EODCharacter->StartDodge();
-	}
-	*/
-
-	/*
-	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetCharacterStatsComponent()))
-	{
-		if (IsAutoMoveEnabled())
-		{
-			DisableAutoMove();
-		}
-
-		int32 DodgeCost = DodgeStaminaCost * EODCharacter->GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
-		if (EODCharacter->GetCharacterStatsComponent()->GetCurrentStamina() >= DodgeCost)
-		{
-			bool bResult = EODCharacter->StartDodge();
-			// If character successfully started 'dodge'
-			if (bResult)
-			{
-				EODCharacter->SetCharacterStateAllowsRotation(false);
-				Server_OnSuccessfulDodge();
-			}
-		}
-	}
-	*/
-
-	/*
-	if (IsValid(EODCharacter))
-	{
-		UCharacterStateBase* StateObj = EODCharacter->CharacterStatesMap[AEODCharacterBase::DodgeStateName];
-		check(StateObj);
-		if (StateObj->CanEnterState())
-		{
-			StateObj->OnEnterState();
-		}
-	}
-	*/
 }
 
 void AEODPlayerController::TriggerInteraction()

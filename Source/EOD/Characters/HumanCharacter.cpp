@@ -102,16 +102,24 @@ void AHumanCharacter::DisableCharacterGuard()
 
 void AHumanCharacter::OnPressedForward()
 {
-	bBackwardPressed = false;
-	bForwardPressed = true;
-	GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &AHumanCharacter::DisableForwardPressed, 0.1f, false);
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		bBackwardPressed = false;
+		bForwardPressed = true;
+		World->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &AHumanCharacter::DisableForwardPressed, 0.1f, false);
+	}
 }
 
 void AHumanCharacter::OnPressedBackward()
 {
-	bForwardPressed = false;
-	bBackwardPressed = true;
-	GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &AHumanCharacter::DisableBackwardPressed, 0.1f, false);
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		bForwardPressed = false;
+		bBackwardPressed = true;
+		World->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &AHumanCharacter::DisableBackwardPressed, 0.1f, false);
+	}
 }
 
 void AHumanCharacter::OnReleasedForward()

@@ -703,10 +703,6 @@ public:
 
 	virtual void OnPressedBackward() override;
 
-	// virtual void OnReleasedForward() override;
-
-	// virtual void OnReleasedBackward() override;
-
 private:
 	/** Sets the boolean used to enable block to true */
 	void OnPressedBlock();

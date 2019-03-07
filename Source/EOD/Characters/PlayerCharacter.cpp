@@ -1031,33 +1031,25 @@ void APlayerCharacter::OnDodge()
 
 void APlayerCharacter::OnPressedForward()
 {
-	if (GetWorld())
+	UWorld* World = GetWorld();
+	if (World)
 	{
 		bBackwardPressed = false;
 		bForwardPressed = true;
-		GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableForwardPressed, 0.1f, false);
+		World->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableForwardPressed, 0.1f, false);
 	}
 }
 
 void APlayerCharacter::OnPressedBackward()
 {
-	if (GetWorld())
+	UWorld* World = GetWorld();
+	if (World)
 	{
 		bForwardPressed = false;
 		bBackwardPressed = true;
-		GetWorld()->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableBackwardPressed, 0.1f, false);
+		World->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableBackwardPressed, 0.1f, false);
 	}
 }
-
-/*
-void APlayerCharacter::OnReleasedForward()
-{
-}
-
-void APlayerCharacter::OnReleasedBackward()
-{
-}
-*/
 
 void APlayerCharacter::OnPressedBlock()
 {
