@@ -248,9 +248,14 @@ bool APlayerCharacter::CanJump() const
 
 bool APlayerCharacter::CanDodge() const
 {
+	FPlayerAnimationReferencesTableRow* AnimationRef = GetActiveAnimationReferences();
+	UAnimMontage* Animation = AnimationRef ? AnimationRef->Dodge.Get() : nullptr;
+
 	// @todo add UsingSkill, Looting, Interacting, etc. to this too
-	// return IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking();
-	return IsIdleOrMoving() || IsGuardActive() || IsCastingSpell() || IsNormalAttacking();
+	bool bStateAllowsDodge = IsIdleOrMoving() || IsGuardActive() || IsCastingSpell() || IsNormalAttacking();
+
+	// If we have a valid animation for dodge and the character state allows dodging
+	return Animation && bStateAllowsDodge;
 }
 
 bool APlayerCharacter::CanGuardAgainstAttacks() const
@@ -801,16 +806,78 @@ void APlayerCharacter::SetActiveWeaponSlotIndex(int32 NewSlotIndex)
 	ActiveWeaponSlotIndex = NewSlotIndex;
 }
 
-bool APlayerCharacter::StartDodge()
+void APlayerCharacter::StartDodge()
 {
+	UAnimMontage* DodgeMontage = GetActiveAnimationReferences() ? GetActiveAnimationReferences()->Dodge.Get() : nullptr;
+
+	// StartDodge() must always be called after calling CanDodge(), which checks whether the animation references are valid or not.
+	// If StartDodge() has been called, DodgeMontage MUST be valid.
+	check(DodgeMontage);
+
+	//~ @todo clean up old states
+	SetUseControllerRotationYaw(false);
+	SetCharacterStateAllowsMovement(false);
+	SetCharacterStateAllowsRotation(false);
+
+	// Rotate character
+	float DesiredYaw = GetControllerRotationYaw();
+	if (ForwardAxisValue != 0)
+	{
+		DesiredYaw = DesiredRotationYawFromAxisInput;
+	}
+
+	FRotator DesiredRotation = FRotator(0.f, DesiredYaw, 0.f);
+
+	// Instantly rotate character
+	SetCharacterRotation(DesiredRotation);
+	// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (MoveComp)
+	{
+		MoveComp->SetDesiredCustomRotation(DesiredRotation);
+	}
+
+	FName SectionToPlay;
+	if (ForwardAxisValue == 0)
+	{
+		if (RightAxisValue > 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_RightDodge;
+		}
+		else if (RightAxisValue < 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_LeftDodge;
+		}
+		else
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
+		}
+	}
+	else
+	{
+		if (ForwardAxisValue > 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_ForwardDodge;
+		}
+		else if (ForwardAxisValue < 0)
+		{
+			SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
+		}
+	}
+	PlayAnimationMontage(DodgeMontage, SectionToPlay, ECharacterState::Dodging);
+	TriggeriFrames(DodgeImmunityDuration, DodgeImmunityTriggerDelay);
+
+
+
+	/*
 	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->Dodge.Get())
 	{
-		return false;
+		// return false;
 	}
 
 	if (!CanDodge())
 	{
-		return false;
+		// return false;
 	}
 
 	if (IsGuardActive())
@@ -883,7 +950,8 @@ bool APlayerCharacter::StartDodge()
 	}
 	PlayAnimationMontage(DodgeMontage, SectionToPlay, ECharacterState::Dodging);
 	TriggeriFrames(DodgeImmunityDuration, DodgeImmunityTriggerDelay);
-	return true;
+	// return true;
+	*/
 }
 
 void APlayerCharacter::OnDodge()

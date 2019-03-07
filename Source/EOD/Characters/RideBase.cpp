@@ -65,6 +65,11 @@ void ARideBase::MountCharacter(AEODCharacterBase* Character)
 	
 }
 
+bool ARideBase::CanDodge() const
+{
+	return false;
+}
+
 void ARideBase::MoveForward(const float Value)
 {
 	ForwardAxisValue = Value;

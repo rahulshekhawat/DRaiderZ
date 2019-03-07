@@ -807,25 +807,16 @@ void AEODCharacterBase::MultiCast_PlayAnimationMontage_Implementation(UAnimMonta
 	}
 }
 
-bool AEODCharacterBase::StartDodge()
+void AEODCharacterBase::StartDodge()
 {
-	if (CanDodge())
-	{
-		// @dodge logic
-		return true;
-	}
-
-	return false;
 }
 
-bool AEODCharacterBase::StopDodge()
+void AEODCharacterBase::CancelDodge()
 {
-	if (IsDodging())
-	{
-		// @stop dodge
-	}
+}
 
-	return true;
+void AEODCharacterBase::FinishDodge()
+{
 }
 
 void AEODCharacterBase::EnableCharacterGuard()

@@ -127,9 +127,9 @@ public:
 	/** Returns true if character can dodge */
 	virtual bool CanDodge() const;
 
-	virtual bool StartDodge() override;
+	virtual void StartDodge() override;
 
-	virtual bool StopDodge() override;
+	virtual void FinishDodge() override;
 
 	virtual void EnableCharacterGuard() override;
 

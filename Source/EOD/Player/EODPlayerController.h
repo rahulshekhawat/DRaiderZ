@@ -17,6 +17,7 @@ class USkillsComponent;
 class UInventoryComponent;
 class UStatsComponentBase;
 class UDialogueWindowWidget;
+class UPlayerStatsComponent;
 
 /**
  * EmberPlayerController is the base (and final c++) class for EOD's player controller
@@ -26,7 +27,7 @@ UCLASS()
 class EOD_API AEODPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 public:
 	AEODPlayerController(const FObjectInitializer& ObjectInitializer);
 
@@ -70,6 +71,8 @@ public:
 	
 	static const FName SkillTreeComponentName;
 
+	static const FName StatsComponentName;
+
 private:
 	//~ Inventory component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -78,14 +81,20 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillTreeComponent* SkillTreeComponent;
 
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPlayerStatsComponent* StatsComponent;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// UI
-	////////////////////////////////////////////////////////////////////////////////
 public:
-	FORCEINLINE UHUDWidget* GetHUDWidget() const;
 
-	void CreateHUDWidget();
+	// --------------------------------------
+	//  UI
+	// --------------------------------------
+
+	FORCEINLINE UHUDWidget* GetHUDWidget() const { return HUDWidget; }
+
+	FORCEINLINE UDialogueWindowWidget* GetDialogueWidget() const { return DialogueWidget; }
+
+	FORCEINLINE UPauseMenuWidget* GetPauseMenuWidget() const { return PauseMenuWidget; }
 
 private:
 	/** Player's head-up display widget */
@@ -110,20 +119,22 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<UPauseMenuWidget> PauseMenuWidgetClass;
 
+	void CreateHUDWidget();
+
 	void InitStatusIndicatorWidget();
 
-	/** Initialized inventory widget and also sets up proper delegates */
 	void InitInventoryWidget();
 
 	void InitSkillTreeWidget();
 
 	void InitSkillBarWidget();
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// INPUT HANDLING
-	////////////////////////////////////////////////////////////////////////////////
 public:
+
+	// --------------------------------------
+	//  Input Handling
+	// --------------------------------------
+
 	FORCEINLINE void SwitchToUIInput();
 
 	FORCEINLINE void SwitchToGameInput();
@@ -145,7 +156,6 @@ private:
 
 	void OnReleasedBackward();
 
-	// UPROPERTY(Replicated)
 	bool bAutoMoveEnabled;
 
 	FORCEINLINE bool IsAutoMoveEnabled() const;
@@ -228,6 +238,8 @@ private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_OnSuccessfulDodge();
 
+	friend class AEODCharacterBase;
+
 };
 
 FORCEINLINE UInventoryComponent* AEODPlayerController::GetInventoryComponent() const
@@ -278,11 +290,6 @@ FORCEINLINE void AEODPlayerController::DisableAutoMove()
 	{
 		EODCharacter->SetUseControllerRotationYaw(false);
 	}
-}
-
-FORCEINLINE UHUDWidget* AEODPlayerController::GetHUDWidget() const
-{
-	return HUDWidget;
 }
 
 template<uint32 SkillKeyIndex>

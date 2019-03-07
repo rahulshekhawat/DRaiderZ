@@ -65,8 +65,11 @@ public:
 
 
 	////////////////////////////////////////////////////////////////////////////////
-	// Update Character State
+	// Character States
 protected:
+	/** Returns true if character can dodge */
+	virtual bool CanDodge() const override;
+
 	/** Updates character rotation every frame */
 	virtual void UpdateRotation(float DeltaTime) override;
 

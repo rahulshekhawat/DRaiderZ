@@ -595,7 +595,7 @@ public:
 
 	void SetActiveWeaponSlotIndex(int32 NewSlotIndex);
 
-	virtual bool StartDodge() override;
+	virtual void StartDodge() override;
 
 private:
 

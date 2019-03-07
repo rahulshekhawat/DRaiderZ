@@ -428,15 +428,29 @@ public:
 	//	Character States
 	// --------------------------------------
 
+	/** Character state determines the current action character is doing */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
+	ECharacterState CharacterState;
+
+	/** Returns true if character can dodge */
+	virtual bool CanDodge() const;
+
+	/** Start dodging */
+	virtual void StartDodge();
+
+	/** Cancel dodging */
+	virtual void CancelDodge();
+
+	/** Finish dodging */
+	virtual void FinishDodge();
+
+
+
 
 	////////////////////////////////////////////////////////////////////////////////
 	// ACTIONS
 	////////////////////////////////////////////////////////////////////////////////
 public:
-	virtual bool StartDodge();
-
-	virtual bool StopDodge();
-
 	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void TriggerInteraction();
 
@@ -639,9 +653,6 @@ public:
 	
 	/** Returns true if character can jump */
 	virtual bool CanJump() const;
-
-	/** Returns true if character can dodge */
-	virtual bool CanDodge() const;
 
 	/** Returns true if character can guard against incoming attacks */
 	virtual bool CanGuardAgainstAttacks() const;
@@ -1014,10 +1025,6 @@ private:
 	/** Information of last used skill */
 	UPROPERTY(Transient)
 	FLastUsedSkillInfo LastUsedSkillInfo;
-
-	/** Character state determines the current action character is doing */
-	UPROPERTY(ReplicatedUsing = OnRep_CharacterState)
-	ECharacterState CharacterState;
 
 protected:
 

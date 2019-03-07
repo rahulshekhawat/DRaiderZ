@@ -84,14 +84,12 @@ bool AHumanCharacter::CanDodge() const
 	return IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking();
 }
 
-bool AHumanCharacter::StartDodge()
+void AHumanCharacter::StartDodge()
 {
-	return false;
 }
 
-bool AHumanCharacter::StopDodge()
+void AHumanCharacter::FinishDodge()
 {
-	return false;
 }
 
 void AHumanCharacter::EnableCharacterGuard()
