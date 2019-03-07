@@ -48,7 +48,7 @@ void UAnimNotify_FootStepBase::GetFootstepHitResults(USkeletalMeshComponent* Mes
 	Params.bTraceComplex = false;
 	Params.bReturnPhysicalMaterial = true;
 	Params.bReturnFaceIndex = false;
-	Params.bTraceAsyncScene = true;
+	// Params.bTraceAsyncScene = true;
 	Params.AddIgnoredActor(MeshComp->GetOwner());
 	MeshComp->GetWorld()->LineTraceSingleByChannel(OutHitResults, TraceStart, TraceEnd, ECC_Visibility, Params);
 }

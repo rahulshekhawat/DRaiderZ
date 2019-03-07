@@ -157,11 +157,7 @@ void AEODPlayerController::Tick(float DeltaTime)
 	}
 }
 
-void AEODPlayerController::Possess(APawn* InPawn)
-{
-	Super::Possess(InPawn);
-}
-
+/*
 void AEODPlayerController::UnPossess()
 {
 	// Intentionally called before Super::UnPossess()
@@ -171,6 +167,7 @@ void AEODPlayerController::UnPossess()
 	}
 	Super::UnPossess();	
 }
+*/
 
 void AEODPlayerController::SetPawn(APawn* InPawn)
 {
