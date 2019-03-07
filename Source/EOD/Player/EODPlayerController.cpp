@@ -66,7 +66,9 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Dodge", IE_Pressed, this, &AEODPlayerController::AttemptDodge);
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AEODPlayerController::TriggerInteraction);
 
-	InputComponent->BindAction("Escape", IE_Pressed, this, &AEODPlayerController::OnPressingEscapeKey);
+	FInputActionBinding& EscapeBinding = InputComponent->BindAction("Escape", IE_Pressed, this, &AEODPlayerController::OnPressingEscapeKey);
+	EscapeBinding.bExecuteWhenPaused = true;
+
 	InputComponent->BindAction("ToggleSheathe", IE_Pressed, this, &AEODPlayerController::ToggleSheathe);
 	InputComponent->BindAction("ToggleAutoRun", IE_Pressed, this, &AEODPlayerController::ToggleAutoMove);
 	InputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &AEODPlayerController::ToggleMouseCursor);
@@ -521,7 +523,14 @@ void AEODPlayerController::OnReleasingGuardKey()
 
 void AEODPlayerController::OnPressingEscapeKey()
 {
-	// SetPause()
+	if (IsPaused())
+	{
+		SetPause(false);
+	}
+	else
+	{
+		SetPause(true);
+	}
 }
 
 void AEODPlayerController::OnPressingSkillKey(const int32 SkillKeyIndex)
