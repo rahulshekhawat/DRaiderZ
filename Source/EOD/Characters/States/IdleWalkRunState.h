@@ -14,4 +14,7 @@ class EOD_API UIdleWalkRunState : public UCharacterStateBase
 {
 	GENERATED_BODY()
 	
+public:
+	UIdleWalkRunState(const FObjectInitializer& ObjectInitializer);
+
 };

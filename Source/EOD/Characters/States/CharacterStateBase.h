@@ -6,6 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "CharacterStateBase.generated.h"
 
+class AEODCharacterBase;
+
 /**
  * 
  */
@@ -16,6 +18,12 @@ class EOD_API UCharacterStateBase : public UObject
 	
 public:
 	UCharacterStateBase(const FObjectInitializer& ObjectInitializer);
+
+	/**
+	 * Initialize this state with a proper state owner
+	 * Inteded to be called right after state is instantiated
+	 */
+	void InitState(AEODCharacterBase* NewOwner);
 
 	/** Returns true if character can enter this state right now */
 	virtual bool CanEnterState();
@@ -62,7 +70,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	uint32 bAllowsMovement : 1;
 
-
+protected:
+	UPROPERTY(Transient)
+	AEODCharacterBase* StateOwner;
 
 
 };

@@ -2,3 +2,6 @@
 
 #include "IdleWalkRunState.h"
 
+UIdleWalkRunState::UIdleWalkRunState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+}

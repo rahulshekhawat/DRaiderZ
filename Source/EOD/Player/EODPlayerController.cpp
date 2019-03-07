@@ -13,6 +13,8 @@
 #include "EOD/Statics/EODLibrary.h"
 #include "EOD/SaveSystem/PlayerSaveGame.h"
 
+#include "States/CharacterStateBase.h"
+
 #include "UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -395,27 +397,6 @@ void AEODPlayerController::OnReleasingNormalAttackKey()
 
 void AEODPlayerController::AttemptDodge()
 {
-	if (IsValid(EODCharacter))
-	{
-		
-
-		bool bResult = EODCharacter->StartDodge();
-
-
-
-		// int32 DodgeCost = DodgeStaminaCost * EODCharacter->
-
-
-
-	}
-
-
-
-	// if (IsValid(EODCharacter) && IsValid(EODCharacter))
-
-
-
-
 	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetCharacterStatsComponent()))
 	{
 		if (IsAutoMoveEnabled())
@@ -433,6 +414,17 @@ void AEODPlayerController::AttemptDodge()
 				EODCharacter->SetCharacterStateAllowsRotation(false);
 				Server_OnSuccessfulDodge();
 			}
+		}
+	}
+
+
+	if (IsValid(EODCharacter))
+	{
+		UCharacterStateBase* StateObj = EODCharacter->CharacterStatesMap[AEODCharacterBase::DodgeStateName];
+		check(StateObj);
+		if (StateObj->CanEnterState())
+		{
+			StateObj->OnEnterState();
 		}
 	}
 }

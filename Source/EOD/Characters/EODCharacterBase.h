@@ -62,7 +62,7 @@ UCLASS(Abstract)
 class EOD_API AEODCharacterBase : public ACharacter
 {
 	GENERATED_BODY()
-		
+
 public:
 	/** Sets default values for this character's properties */
 	AEODCharacterBase(const FObjectInitializer& ObjectInitializer);
@@ -72,6 +72,8 @@ public:
 
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
+
+	virtual void PostInitializeComponents() override;
 
 	/** Updates character state every frame */
 	virtual void Tick(float DeltaTime) override;
@@ -426,11 +428,37 @@ public:
 	//	Character States
 	// --------------------------------------
 
+	/** The state that this character is in on server machine */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_ServerCharacterState)
+	FName ServerCharacterState;
+
+	/** The state that this character is on client machine */
+	UPROPERTY(Transient)
+	FName LocalCharacterState;
+
+	UPROPERTY(Transient)
+	UCharacterStateBase* DefaultState;
+
 	UPROPERTY(Transient)
 	TMap<FName, UCharacterStateBase*> CharacterStatesMap;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character State")
 	TMap<FName, TSubclassOf<UCharacterStateBase>> DefaultCharacterStateClasses;
+
+	static FName DefaultStateName;
+	static FName IdleWalkRunStateName;
+	static FName DeadStateName;
+	static FName DodgeStateName;
+	static FName GuardStateName;
+	static FName HitInCombatStateName;
+	static FName NormalAttackStateName;
+	static FName UsingSkillStateName;
+
+	UPROPERTY(Transient)
+	uint32 bStateAllowsMovement : 1;
+
+	UPROPERTY(Transient)
+	uint32 bStateAllowsRotation : 1;
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -1134,6 +1162,9 @@ private:
 	UFUNCTION()
 	void OnRep_CharacterState(ECharacterState OldState);
 
+	UFUNCTION()
+	void OnRep_ServerCharacterState(FName LastState);
+
 	// UFUNCTION()
 	// void OnRep_CurrentRide(ARideBase* OldRide);
 
@@ -1200,7 +1231,10 @@ private:
 	
 	UFUNCTION(NetMultiCast, Reliable)
 	void MultiCast_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
-	
+
+
+	friend class AEODPlayerController;
+	friend class UCharacterStateBase;
 	
 };
 

@@ -8,6 +8,11 @@ UCharacterStateBase::UCharacterStateBase(const FObjectInitializer& ObjectInitial
 
 }
 
+void UCharacterStateBase::InitState(AEODCharacterBase* NewOwner)
+{
+	StateOwner = NewOwner;
+}
+
 bool UCharacterStateBase::CanEnterState()
 {
 	return false;

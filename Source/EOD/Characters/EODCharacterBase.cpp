@@ -14,6 +14,12 @@
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
 #include "States/IdleWalkRunState.h"
+#include "States/DeadState.h"
+#include "States/DodgeState.h"
+#include "States/GuardState.h"
+#include "States/HitInCombatState.h"
+#include "States/NormalAttackState.h"
+#include "States/UsingSkillState.h"
 
 #include "UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
@@ -30,6 +36,15 @@ FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
 FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
 FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Skill Manager"));
 FName AEODCharacterBase::InteractionSphereComponentName(TEXT("Interaction Sphere"));
+
+FName AEODCharacterBase::DefaultStateName(TEXT("IdleWalkRun"));
+FName AEODCharacterBase::IdleWalkRunStateName(TEXT("IdleWalkRun"));
+FName AEODCharacterBase::HitInCombatStateName(TEXT("HitInCombat"));
+FName AEODCharacterBase::DeadStateName(TEXT("Dead"));
+FName AEODCharacterBase::DodgeStateName(TEXT("Dodge"));
+FName AEODCharacterBase::GuardStateName(TEXT("Guard"));
+FName AEODCharacterBase::NormalAttackStateName(TEXT("NormalAttack"));
+FName AEODCharacterBase::UsingSkillStateName(TEXT("UsingSkill"));
 
 AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UEODCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -94,8 +109,13 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	Faction = EFaction::Player;
 
 
-	DefaultCharacterStateClasses.Add(FName("IdleWalkRun"), UIdleWalkRunState::StaticClass());
-
+	DefaultCharacterStateClasses.Add(AEODCharacterBase::IdleWalkRunStateName, UIdleWalkRunState::StaticClass());
+	DefaultCharacterStateClasses.Add(AEODCharacterBase::HitInCombatStateName, UHitInCombatState::StaticClass());
+	DefaultCharacterStateClasses.Add(AEODCharacterBase::DeadStateName, UDeadState::StaticClass());
+	DefaultCharacterStateClasses.Add(AEODCharacterBase::DodgeStateName, UDodgeState::StaticClass());
+	DefaultCharacterStateClasses.Add(AEODCharacterBase::GuardStateName, UGuardState::StaticClass());
+	DefaultCharacterStateClasses.Add(AEODCharacterBase::NormalAttackStateName, UNormalAttackState::StaticClass());
+	DefaultCharacterStateClasses.Add(AEODCharacterBase::UsingSkillStateName, UUsingSkillState::StaticClass());
 
 }
 
@@ -186,6 +206,7 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AEODCharacterBase, CurrentRide);
+	DOREPLIFETIME(AEODCharacterBase, ServerCharacterState);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bIsRunning, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bGuardActive, COND_SkipOwner);
@@ -208,6 +229,31 @@ void AEODCharacterBase::BeginPlay()
 	{
 		MoveComp->SetDesiredCustomRotation(GetActorRotation());
 	}
+
+	check(DefaultState);
+	DefaultState->OnEnterState();
+
+	int Size = sizeof(AEODCharacterBase);
+	PrintToScreen(this, FString::FromInt(Size), 10.f);
+}
+
+void AEODCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	TArray<FName> CharacterStateNames;
+	DefaultCharacterStateClasses.GetKeys(CharacterStateNames);
+
+	for (FName StateName : CharacterStateNames)
+	{
+		TSubclassOf<UCharacterStateBase> StateClass = DefaultCharacterStateClasses[StateName];
+		UCharacterStateBase* StateObj = NewObject<UCharacterStateBase>(this, StateName, RF_Transient);
+		check(StateObj);
+		StateObj->InitState(this);
+		CharacterStatesMap.Add(StateName, StateObj);
+	}
+
+	DefaultState = CharacterStatesMap[AEODCharacterBase::DefaultStateName];
 }
 
 void AEODCharacterBase::PossessedBy(AController* NewController)
@@ -663,11 +709,10 @@ void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 	//~ @todo : Cleanup old state
 }
 
-/*
-void AEODCharacterBase::OnRep_CurrentRide(ARideBase* OldRide)
+void AEODCharacterBase::OnRep_ServerCharacterState(FName LastState)
 {
+	
 }
-*/
 
 void AEODCharacterBase::Server_SpawnAndMountRideableCharacter_Implementation(TSubclassOf<ARideBase> RideCharacterClass)
 {
