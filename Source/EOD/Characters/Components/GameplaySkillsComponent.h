@@ -10,6 +10,7 @@
 #include "GameplaySkillsComponent.generated.h"
 
 class AEODCharacterBase;
+class UGameplaySkillBase;
 
 /*
 USTRUCT(BlueprintType)
@@ -190,6 +191,9 @@ public:
 	UFUNCTION()
 	void AddNewSkill(int32 SkillIndex, FString SkillGroup);
 
+
+	UPROPERTY(EditDefaultsOnly, Category = Skills)
+	TSoftClassPtr<UGameplaySkillBase> TestSkill;
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Network
