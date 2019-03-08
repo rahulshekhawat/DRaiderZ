@@ -54,7 +54,7 @@ void UGameplaySkillsComponent::BeginPlay()
 		// LoadSkillBarLayout();
 		if (TestSkill.Get())
 		{
-			TS = NewObject<UGameplaySkillBase>(this, NAME_None, RF_Transient);
+			TS = NewObject<UGameplaySkillBase>(this, TestSkill, NAME_None, RF_Transient);
 			if (TS)
 			{
 				TS->InitSkill(EODCharacterOwner, EODCharacterOwner->Controller);
@@ -86,8 +86,11 @@ void UGameplaySkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
+	if (TS)
+	{
+		TS->ActivateSkill();
+	}
 	
-
 	/*
 	// return if the character is incapable of using any skill right now
 	if (!CanUseAnySkill())

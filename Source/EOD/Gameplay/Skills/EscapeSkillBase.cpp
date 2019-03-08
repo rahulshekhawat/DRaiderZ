@@ -9,6 +9,7 @@ UEscapeSkillBase::UEscapeSkillBase(const FObjectInitializer& ObjectInitializer) 
 
 void UEscapeSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
 {
+	Super::InitSkill(Instigator, Owner);
 }
 
 void UEscapeSkillBase::ActivateSkill()

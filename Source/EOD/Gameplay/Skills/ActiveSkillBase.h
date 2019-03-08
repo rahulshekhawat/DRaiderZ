@@ -27,6 +27,9 @@ public:
 	/** Initialize this skill. Intended to be called immediately after the skill object is created */
 	virtual void InitSkill(AEODCharacterBase* Instigator, AController* Owner) override;
 
+	/** Reinitialize this skill. Intended to be called when the skill owner changes weapons */
+	virtual void Reinitialize() override;
+
 	/** Activate this skill */
 	virtual void ActivateSkill() override;
 

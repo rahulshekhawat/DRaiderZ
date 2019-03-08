@@ -14,6 +14,10 @@ void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* O
 	SkillOwner = Owner;
 }
 
+void UGameplaySkillBase::Reinitialize()
+{
+}
+
 void UGameplaySkillBase::ActivateSkill()
 {
 }

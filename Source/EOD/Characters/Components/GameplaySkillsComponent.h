@@ -193,7 +193,7 @@ public:
 
 
 	UPROPERTY(EditDefaultsOnly, Category = Skills)
-	TSoftClassPtr<UGameplaySkillBase> TestSkill;
+	TSubclassOf<UGameplaySkillBase> TestSkill;
 
 	UPROPERTY(Transient)
 	UGameplaySkillBase* TS;

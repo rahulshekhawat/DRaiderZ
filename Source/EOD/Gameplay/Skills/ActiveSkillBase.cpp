@@ -14,6 +14,8 @@ void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Own
 
 	if (Instigator)
 	{
+
+
 		if (Instigator->Gender == ECharacterGender::Male)
 		{
 		}
@@ -24,8 +26,13 @@ void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Own
 	}
 }
 
+void UActiveSkillBase::Reinitialize()
+{
+}
+
 void UActiveSkillBase::ActivateSkill()
 {
+
 }
 
 void UActiveSkillBase::CancelSkill()
