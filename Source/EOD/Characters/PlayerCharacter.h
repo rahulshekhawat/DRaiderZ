@@ -220,7 +220,7 @@ public:
 	FORCEINLINE ASecondaryWeapon* GetSecondaryWeapon() const;
 
 	/** Returns the weapon type of primary weapon */
-	FORCEINLINE EWeaponType GetEquippedWeaponType() const;
+	virtual EWeaponType GetEquippedWeaponType() const override;
 
 	/** Returns HUD widget */
 	FORCEINLINE UHUDWidget* GetHUDWidget() const;
@@ -632,10 +632,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	TSubclassOf<UHUDWidget> HUDWidgetClass;
 
-	/** Player gender : determines the animations and armor meshes to use. */
-	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
-	ECharacterGender Gender;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills, meta = (AllowPrivateAccess = "true"))
 	uint8 MaxNumberOfSkills;
 
@@ -866,11 +862,6 @@ FORCEINLINE APrimaryWeapon* APlayerCharacter::GetPrimaryWeapon() const
 FORCEINLINE ASecondaryWeapon* APlayerCharacter::GetSecondaryWeapon() const
 {
 	return SecondaryWeapon;
-}
-
-FORCEINLINE EWeaponType APlayerCharacter::GetEquippedWeaponType() const
-{
-	return PrimaryWeapon ? PrimaryWeapon->GetWeaponType() : EWeaponType::None;
 }
 
 FORCEINLINE UHUDWidget* APlayerCharacter::GetHUDWidget() const

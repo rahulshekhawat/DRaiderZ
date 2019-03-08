@@ -64,9 +64,10 @@ class EOD_API AEODCharacterBase : public ACharacter
 	GENERATED_BODY()
 
 public:
+
 	/** Sets default values for this character's properties */
 	AEODCharacterBase(const FObjectInitializer& ObjectInitializer);
-	
+
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -90,10 +91,12 @@ public:
 	/** Called when the Pawn is being restarted (usually by being possessed by a Controller). Called on both server and owning client. */
 	virtual void Restart() override;
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Combat
 public:
+
+	// --------------------------------------
+	//	Combat
+	// --------------------------------------
+
 	/**
 	 * [server + local]
 	 * Enables immunity frames after a given Delay for a given Duration on the server copy of this character.
@@ -101,7 +104,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat System", meta = (DisplayName = "Trigger iFrames"))
 	void TriggeriFrames(float Duration = 0.4f, float Delay = 0.f);
 
+	/** Returns the weapon type of weapon currently equipped by this character */
+	virtual EWeaponType GetEquippedWeaponType() const { return EWeaponType::None; }
+
 protected:
+
 	/** Enables immunity frames for a given duration */
 	UFUNCTION()
 	void EnableiFrames(float Duration = 0.f);
@@ -140,6 +147,7 @@ protected:
 	float DamageBlockTriggerDelay;
 
 private:
+
 	/** Determines if invincibility frames are active */
 	UPROPERTY(Transient)
 	uint32 bActiveiFrames : 1;
@@ -156,25 +164,24 @@ private:
 	UPROPERTY(Transient)
 	uint32 bWantsToGuard : 1;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Character stats
 protected:
+
+	// --------------------------------------
+	//	Character Stats
+	// --------------------------------------
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Stats|Constants")
 	int DodgeStaminaCost;
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Movement
 public:
-	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const
-	{
-		return CharacterMovementDirection;
-	}
 
-	FORCEINLINE float GetBlockMovementDirectionYaw() const
-	{
-		return BlockMovementDirectionYaw;
-	}
+	// --------------------------------------
+	//	Movement
+	// --------------------------------------
+
+	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const { return CharacterMovementDirection; }
+
+	FORCEINLINE float GetBlockMovementDirectionYaw() const { return BlockMovementDirectionYaw; }
 
 	/** [server + local] Change character max walk speed */
 	inline void SetWalkSpeed(const float WalkSpeed);
@@ -233,15 +240,14 @@ private:
 	UPROPERTY(Replicated)
 	float BlockMovementDirectionYaw;
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Input
 public:
+
+	// --------------------------------------
+	//	Input Handling
+	// --------------------------------------
+
 	/** Sets whether character wants to guard or not */
-	FORCEINLINE void SetWantsToGuard(bool bNewValue)
-	{
-		bWantsToGuard = bNewValue;
-	}
+	FORCEINLINE void SetWantsToGuard(bool bNewValue) { bWantsToGuard = bNewValue; }
 
 	/** Returns the yaw that this pawn wants to rotate to based on the movement input from player */
 	UFUNCTION(BlueprintCallable, Category = "Input|Rotation", meta = (DisplayName = "Get Rotation Yaw From Axis Input"))
@@ -444,7 +450,13 @@ public:
 	/** Finish dodging */
 	virtual void FinishDodge();
 
+	// --------------------------------------
+	//	Character Determinants
+	// --------------------------------------
 
+	/** Player gender : determines the animations and armor meshes to use. */
+	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
+	ECharacterGender Gender;
 
 
 	////////////////////////////////////////////////////////////////////////////////

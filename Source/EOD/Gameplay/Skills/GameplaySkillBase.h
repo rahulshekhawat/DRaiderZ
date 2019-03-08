@@ -85,7 +85,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tags")
 	FGameplayTagContainer ActivationOwnedTags;
 
+	// --------------------------------------
+	//	Cache
+	// --------------------------------------
 
+	UPROPERTY(Transient)
+	TWeakObjectPtr<AEODCharacterBase> SkillInstigator;
+
+	UPROPERTY(Transient)
+	TWeakObjectPtr<AController> SkillOwner;
 
 
 };

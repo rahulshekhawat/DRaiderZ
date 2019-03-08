@@ -295,6 +295,11 @@ bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
 	return false;
 }
 
+EWeaponType APlayerCharacter::GetEquippedWeaponType() const
+{
+	return PrimaryWeapon ? PrimaryWeapon->GetWeaponType() : EWeaponType::None;
+}
+
 UHUDWidget* APlayerCharacter::BP_GetHUDWidget() const
 {
 	return GetHUDWidget();

@@ -24,6 +24,9 @@ public:
 	//	Gameplay Skill Interface
 	// --------------------------------------
 
+	/** Initialize this skill. Intended to be called immediately after the skill object is created */
+	virtual void InitSkill(AEODCharacterBase* Instigator, AController* Owner) override;
+
 	/** Activate this skill */
 	virtual void ActivateSkill() override;
 
@@ -146,6 +149,12 @@ protected:
 	//~ @todo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
 	TSoftClassPtr<UStatusEffectBase> StatusEffectSoftClass;
+
+public:
+
+	UPROPERTY(Transient)
+	UAnimMontage* SkillAnimation;
+
 
 
 	

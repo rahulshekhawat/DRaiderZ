@@ -10,6 +10,8 @@ UGameplaySkillBase::UGameplaySkillBase(const FObjectInitializer& ObjectInitializ
 
 void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
 {
+	SkillInstigator = Instigator;
+	SkillOwner = Owner;
 }
 
 void UGameplaySkillBase::ActivateSkill()

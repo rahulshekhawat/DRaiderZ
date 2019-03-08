@@ -7,6 +7,8 @@
 #include "EOD/Core/EODGameInstance.h"
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
+#include "Gameplay/Skills/GameplaySkillBase.h"
+
 #include "Kismet/GameplayStatics.h"
 
 
@@ -33,6 +35,8 @@ void UGameplaySkillsComponent::PostLoad()
 {
 	Super::PostLoad();
 	// LoadSkillBarLayout();
+
+
 }
 
 void UGameplaySkillsComponent::BeginPlay()
@@ -48,7 +52,16 @@ void UGameplaySkillsComponent::BeginPlay()
 	if (IsValid(EODCharacterOwner) && EODCharacterOwner->IsLocallyControlled() && EODCharacterOwner->IsPlayerControlled())
 	{
 		// LoadSkillBarLayout();
+		if (TestSkill.Get())
+		{
+			TS = NewObject<UGameplaySkillBase>(this, NAME_None, RF_Transient);
+			if (TS)
+			{
+				TS->InitSkill(EODCharacterOwner, EODCharacterOwner->Controller);
+			}
+		}
 	}
+
 }
 
 void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -73,6 +86,9 @@ void UGameplaySkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
+	
+
+	/*
 	// return if the character is incapable of using any skill right now
 	if (!CanUseAnySkill())
 	{
@@ -102,7 +118,7 @@ void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 	}
 
 	TriggerSkill(SkillID, Skill);
-
+	*/
 }
 
 void UGameplaySkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
