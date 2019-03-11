@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Camera/CameraShake.h"
+
+#include "Engine/StreamableManager.h"
 #include "Gameplay/Skills/GameplaySkillBase.h"
 #include "ActiveSkillBase.generated.h"
 
@@ -145,12 +147,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
 	TSoftClassPtr<UStatusEffectBase> StatusEffectSoftClass;
 
-private:
+protected:
 
 	UPROPERTY(Transient)
 	TMap<EWeaponType, UAnimMontage*> SkillAnimations;
 
+	TSharedPtr<FStreamableHandle> AnimationsHandle;
 
+	void LoadFemaleAnimations();
 
+	void LoadMaleAnimations();
 	
+	void OnFemaleAnimationsLoaded();
+
+	void OnMaleAnimationsLoaded();
+
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "EOD/Statics/CharacterLibrary.h"
 
+#include "Engine/StreamableManager.h"
 #include "Engine/GameInstance.h"
 #include "EODGameInstance.generated.h"
 
@@ -26,6 +27,8 @@ public:
 
 	virtual void Init() override;
 
+	/** A global instance of FStreamableManager */
+	FStreamableManager StreamableManager;
 
 public:
 	/** The title of the game that will be displayed to player on title screen */

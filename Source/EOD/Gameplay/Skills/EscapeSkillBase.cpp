@@ -14,6 +14,16 @@ void UEscapeSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Own
 
 void UEscapeSkillBase::ActivateSkill()
 {
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (Instigator)
+	{
+		EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
+		UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
+		if (Montage)
+		{
+			Instigator->PlayAnimationMontage(Montage, AnimationStartSectionName, ECharacterState::UsingActiveSkill);
+		}
+	}
 }
 
 void UEscapeSkillBase::CancelSkill()
