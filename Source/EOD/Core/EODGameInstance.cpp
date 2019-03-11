@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODGameInstance.h"
+#include "EODPreprocessors.h"
 #include "EOD/SaveSystem/MetaSaveGame.h"
 #include "EOD/SaveSystem/PlayerSaveGame.h"
 #include "EOD/Statics/EODGlobalNames.h"
@@ -9,6 +10,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Modules/ModuleManager.h"
 #include "Kismet/GameplayStatics.h"
+
 
 const int32 UEODGameInstance::PlayerIndex(0);
 const FString UEODGameInstance::MetaSaveSlotName(TEXT("MetaSaveSlot"));
@@ -48,6 +50,20 @@ void UEODGameInstance::Init()
 
 	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UEODGameInstance::OnPreLoadMap);
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEODGameInstance::OnPostLoadMap);
+
+}
+
+void UEODGameInstance::StartNewCampaign()
+{
+}
+
+void UEODGameInstance::ContinuePreviousCampaign()
+{
+}
+
+bool UEODGameInstance::CanContinuePreviousCampaign() const
+{
+	return false;
 }
 
 void UEODGameInstance::CreateNewProfile(const FString& ProfileName)
@@ -101,6 +117,7 @@ UPlayerSaveGame* UEODGameInstance::LoadProfileAsCurrent(const FString& ProfileNa
 
 void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 {
+	// if (GetMoviePlayer()->IsStartupMoviePlaying() || IsRunningDedicatedServer())
 	if (GetMoviePlayer()->IsStartupMoviePlaying())
 	{
 		return;
@@ -109,16 +126,17 @@ void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 	
 	// @note following code works fine for single player but causes a crash in PIE multiplayer tests. Temporarily disabled.
 	/*
-	if (!IsValid(LoadingScreenWidget))
+	if (!IsValid(LoadingScreenWidget) && !IsRunningDedicatedServer())
 	{
 		LoadingScreenWidget = CreateWidget<UUserWidget>(this, LoadingScreenWidgetClass);
 	}
 
-	if (IsValid(LoadingScreenWidget) && !IsRunningDedicatedServer())
+	if (IsValid(LoadingScreenWidget))
 	{
 		FLoadingScreenAttributes LoadingScreen;
 		LoadingScreen.bAutoCompleteWhenLoadingCompletes = true;
 		LoadingScreen.WidgetLoadingScreen = LoadingScreenWidget->TakeWidget();
+
 
 		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
 	}

@@ -23,73 +23,114 @@ class EOD_API UEODGameInstance : public UGameInstance
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//	UE4 Method Overrides
+	// --------------------------------------
+
 	UEODGameInstance(const FObjectInitializer& ObjectInitializer);
 
 	virtual void Init() override;
 
-	/** A global instance of FStreamableManager */
-	FStreamableManager StreamableManager;
+	// --------------------------------------
+	//	Global Variables
+	// --------------------------------------
 
-public:
 	/** The title of the game that will be displayed to player on title screen */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Global Variables")
 	FText GameTitle;
 
+	/** Name of map where the player starts a new campaign */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Global Variables")
+	FName StartupMapName;
 
-	//~ Begin Persistent Player Data
-public:
-	UPROPERTY()
-	TMap<FString, FSkillState> SGToSSMap;
+	// --------------------------------------
+	//	Campaign
+	// --------------------------------------
 
-	TMap<FString, TSharedRef<FSkillState>> SkillGroupToSkillStateMap;
-	//~ End Persistent Player Data
+	/** Start a new campaign with currently selected character */
+	UFUNCTION(BlueprintCallable, Category = "Campaign")
+	void StartNewCampaign();
 
+	/** Continue a previously saved campaign */
+	UFUNCTION(BlueprintCallable, Category = "Campaign")
+	void ContinuePreviousCampaign();
+ 
+	/** Returns true if player has a previously saved campaign and can continue it */
+	UFUNCTION(BlueprintCallable, Category = "Campaign")
+	bool CanContinuePreviousCampaign() const;
 
-	//~ Begin Load/Save System
-public:
+	// --------------------------------------
+	//	Player Save Game System
+	// --------------------------------------
+
 	static const int32 PlayerIndex;
-
 	static const FString MetaSaveSlotName;
 
+	/** A global instance of FStreamableManager to handle asset loading */
+	FStreamableManager StreamableManager;
+
+	/** Create and save a new save game profile */
 	void CreateNewProfile(const FString& ProfileName);
 
+	/** Load a save game profile and replace current save game profile with it */
 	UPlayerSaveGame* LoadProfileAsCurrent(const FString& ProfileName);
 
-	FORCEINLINE UMetaSaveGame* GetMetaSaveGameObject() const { return MetaSaveGame; }
-
-	UFUNCTION(BlueprintCallable, Category = "Save/Load System", meta = (DisplayName = "Get Meta Save Game Object"))
-	UMetaSaveGame* BP_GetMetaSaveGameObject() const { return GetMetaSaveGameObject(); }
-
+	/** Get current save game object containing player data */
 	FORCEINLINE UPlayerSaveGame* GetCurrentPlayerSaveGameObject() const { return CurrentProfileSaveGame; }
 
+	/** Get name of currently loaded save game profile */
+	FORCEINLINE FString GetCurrentPlayerSaveGameName() const { return CurrentProfileName; }
+
+	/** Get current save game object containing player data */
 	UFUNCTION(BlueprintCallable, Category = "Save/Load System", meta = (DisplayName = "Get Current Player Save Game"))
 	UPlayerSaveGame* BP_GetCurrentPlayerSaveGame() const { return GetCurrentPlayerSaveGameObject(); }
 
-	FORCEINLINE FString GetCurrentPlayerSaveGameName() const { return CurrentProfileName; }
+protected:
 
-	UPROPERTY(EditDefaultsOnly)
+	FORCEINLINE UMetaSaveGame* GetMetaSaveGameObject() const { return MetaSaveGame; }
+
+private:
+
+	/** Name of currently loaded save game profile */
+	FString CurrentProfileName;
+
+	/** Save game object containing player save profiles */
+	UPROPERTY(Transient)
+	UMetaSaveGame* MetaSaveGame;
+
+	/** Player save game object containing player data */
+	UPROPERTY(Transient)
+	UPlayerSaveGame* CurrentProfileSaveGame;
+
+protected:
+
+	// --------------------------------------
+	//	Loading Screen
+	// --------------------------------------
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
 
+	UPROPERTY(Transient)
 	UUserWidget* LoadingScreenWidget;
 
 private:
-	UPROPERTY()
-	UMetaSaveGame* MetaSaveGame;
 
-	UPROPERTY()
-	UPlayerSaveGame* CurrentProfileSaveGame;
-
-	UPROPERTY()
-	FString CurrentProfileName;
-
-	// void SetupSaveGameForFirstRun();
-	//~ End Load/Save System
-
-
-	//~ Loading Screen
-private:
 	void OnPreLoadMap(const FString& MapName);
 
 	void OnPostLoadMap(UWorld* WorldObj);
+
+public:
+
+	// --------------------------------------
+	//	Persistent Player Data
+	// --------------------------------------
+
+	UPROPERTY(Transient)
+	TMap<FString, FSkillState> SGToSSMap;
+
+	TMap<FString, TSharedRef<FSkillState>> SkillGroupToSkillStateMap;
+
 
 };

@@ -19,14 +19,24 @@ class EOD_API AMainMenuPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+
+	// --------------------------------------
+	//	UE4 Method Overrides
+	// --------------------------------------
+
 	AMainMenuPlayerController(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
 
-	//~ Begin UI
 public:
+
+	// --------------------------------------
+	//	User Interface
+	// --------------------------------------
+
+	/** Replaces current widget with title screen widget. */
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void SwitchToTitleScreenWidget();
 
@@ -37,15 +47,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSaveGame = nullptr);
 
+	/** Replaces current widget with new profile creation widget. */
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void SwitchToNewProfileCreationWidget();
 
+	/** Replaces current widget with multiplayer options widget. */
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void SwitchToMultiplayerWidget();
 
+	/** Replaces current widget with settings widget. */
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void SwitchToSettingsWidget();
 
+	/** Begin a new campaign */
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
 	void StartNewCampaign();
 
