@@ -118,15 +118,14 @@ UPlayerSaveGame* UEODGameInstance::LoadProfileAsCurrent(const FString& ProfileNa
 void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 {
 	// if (GetMoviePlayer()->IsStartupMoviePlaying() || IsRunningDedicatedServer())
-	if (GetMoviePlayer()->IsStartupMoviePlaying())
+	if (GetMoviePlayer()->IsStartupMoviePlaying() || IsRunningDedicatedServer())
 	{
 		return;
 	}
 
 	
 	// @note following code works fine for single player but causes a crash in PIE multiplayer tests. Temporarily disabled.
-	/*
-	if (!IsValid(LoadingScreenWidget) && !IsRunningDedicatedServer())
+	if (!IsValid(LoadingScreenWidget))
 	{
 		LoadingScreenWidget = CreateWidget<UUserWidget>(this, LoadingScreenWidgetClass);
 	}
@@ -140,8 +139,8 @@ void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 
 		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
 	}
-	*/
 
+	/*
 	if (GetMoviePlayer())
 	{
 		FLoadingScreenAttributes LoadingScreen;
@@ -150,6 +149,7 @@ void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 
 		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
 	}
+	*/
 }
 
 void UEODGameInstance::OnPostLoadMap(UWorld* WorldObj)
