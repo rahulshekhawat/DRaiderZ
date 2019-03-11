@@ -13,6 +13,7 @@ class UWorld;
 class UUserWidget;
 class UMetaSaveGame;
 class UPlayerSaveGame;
+class APlayerSkillTreeManager;
 
 /**
  * 
@@ -124,7 +125,7 @@ private:
 public:
 
 	// --------------------------------------
-	//	Persistent Player Data
+	//	Player Skill Tree
 	// --------------------------------------
 
 	UPROPERTY(Transient)
@@ -132,5 +133,10 @@ public:
 
 	TMap<FString, TSharedRef<FSkillState>> SkillGroupToSkillStateMap;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree")
+	TSubclassOf<APlayerSkillTreeManager> PlayerSkillTreeManagerClass;
+
+	UPROPERTY(Transient)
+	APlayerSkillTreeManager* SkillTreeManager;
 
 };

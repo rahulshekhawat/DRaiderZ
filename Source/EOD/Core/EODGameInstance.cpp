@@ -2,6 +2,7 @@
 
 #include "EODGameInstance.h"
 #include "EODPreprocessors.h"
+#include "PlayerSkillTreeManager.h"
 #include "EOD/SaveSystem/MetaSaveGame.h"
 #include "EOD/SaveSystem/PlayerSaveGame.h"
 #include "EOD/Statics/EODGlobalNames.h"
@@ -117,6 +118,14 @@ UPlayerSaveGame* UEODGameInstance::LoadProfileAsCurrent(const FString& ProfileNa
 
 void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 {
+	//~ @todo
+	/*
+	if (SkillTreeManager)
+	{
+		SkillTreeManager->Destroy();
+	}
+	*/
+
 	// if (GetMoviePlayer()->IsStartupMoviePlaying() || IsRunningDedicatedServer())
 	if (GetMoviePlayer()->IsStartupMoviePlaying() || IsRunningDedicatedServer())
 	{
@@ -154,4 +163,10 @@ void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 
 void UEODGameInstance::OnPostLoadMap(UWorld* WorldObj)
 {
+	if (WorldObj)
+	{
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SkillTreeManager = WorldObj->SpawnActor <APlayerSkillTreeManager>(PlayerSkillTreeManagerClass.Get(), SpawnInfo);
+	}
 }

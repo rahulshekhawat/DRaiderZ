@@ -7,6 +7,8 @@
 #include "GameFramework/Info.h"
 #include "PlayerSkillTreeManager.generated.h"
 
+class UEODGameInstance;
+class USkillTreeWidget;
 class UGameplaySkillBase;
 
 /** Struct containing skill tree slot information */
@@ -54,17 +56,38 @@ class EOD_API APlayerSkillTreeManager : public AInfo
 	GENERATED_BODY()
 
 public:
+
+	// --------------------------------------
+	//	UE4 Method Overrides
+	// --------------------------------------
+
 	APlayerSkillTreeManager(const FObjectInitializer& ObjectInitializer);
-	
+
+	/** Called when the game starts or when spawned */
+	virtual void BeginPlay() override;
+
+	/** Called once this actor has been deleted */
+	virtual void Destroyed() override;
+
+public:
+
+	// --------------------------------------
+	//	Skill Tree
+	// --------------------------------------
+
+	void CreateSkillTreeWidget(UEODGameInstance* GameInstance = nullptr);
+
+protected:
+
 	/** A map of skill group to it's skill tree slot info */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
 	TMap<FName, FSkillTreeSlot> SkillTreeLayout;
 
-	/** Classes of all the player skills that this skill tree contains */
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree|Skill Layout")
-	// TArray<TSubclassOf<UGameplaySkillBase>> PlayerSkillClasses;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<USkillTreeWidget> SkillTreeWidgetClass;
 
-
+	UPROPERTY(Transient)
+	USkillTreeWidget* SkillTreeWidget;
 
 
 

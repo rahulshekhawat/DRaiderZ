@@ -17,10 +17,19 @@ class EOD_API AEODGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//	UE4 Method Overrides
+	// --------------------------------------
+
 	AEODGameModeBase(const FObjectInitializer& ObjectInitializer);
 
-	/** Used to spawn combat and status effect manager actors */
+	/** Spawns actors of manager classes */
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
+
+	// --------------------------------------
+	//	Manager Classes
+	// --------------------------------------
 
 	FORCEINLINE AStatusEffectsManager* GetStatusEffectsManager() const;
 
@@ -28,6 +37,7 @@ public:
 	AStatusEffectsManager* BP_GetStatusEffectsManager() const;
 
 private:
+
 	UPROPERTY(Transient)
 	AStatusEffectsManager* StatusEffectsManager;
 		
