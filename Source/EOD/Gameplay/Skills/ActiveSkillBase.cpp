@@ -14,10 +14,9 @@ void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Own
 
 	if (Instigator)
 	{
-
-
 		if (Instigator->Gender == ECharacterGender::Male)
 		{
+
 		}
 		else
 		{

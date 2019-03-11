@@ -25,7 +25,6 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 
-
 /**
  * EOD Character stats
  */

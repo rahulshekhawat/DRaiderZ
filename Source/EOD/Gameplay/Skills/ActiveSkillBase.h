@@ -39,25 +39,17 @@ public:
 	/** Deactivate this skill */
 	virtual void EndSkill() override;
 
-protected:
-
 	/** Returns true if this activity can be activated */
 	virtual bool CanActivateSkill() const override;
 
 	/** Returns true if this skill can be cancelled */
 	virtual bool CanCancelSkill() const override;
 
+protected:
+
 	// --------------------------------------
 	//	Constants : Default values that are not supposed to be modified
 	// --------------------------------------
-
-	/** Animation montage containing skill animation for male version of character */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
-	TSoftObjectPtr<UAnimMontage> MaleAnimationMontage;
-
-	/** Animation montage containing skill animation for female version of character */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
-	TSoftObjectPtr<UAnimMontage> FemaleAnimationMontage;
 	
 	/**
 	 * A map of weapons supported by this skill to their animation montages for male version of character
@@ -153,10 +145,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
 	TSoftClassPtr<UStatusEffectBase> StatusEffectSoftClass;
 
-public:
+private:
 
 	UPROPERTY(Transient)
-	UAnimMontage* SkillAnimation;
+	TMap<EWeaponType, UAnimMontage*> SkillAnimations;
 
 
 

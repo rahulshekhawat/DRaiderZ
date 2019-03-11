@@ -39,3 +39,7 @@ bool UGameplaySkillBase::CanCancelSkill() const
 {
 	return false;
 }
+
+void UGameplaySkillBase::OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData)
+{
+}

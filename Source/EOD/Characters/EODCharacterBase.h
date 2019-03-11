@@ -54,6 +54,21 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnGameplayEventMCDelegate,
 											  AActor*, Target,
 											  UGameplayEventBase*, GameplayEvent);
 
+/** 
+ * Delegate for when a new weapon is equipped by character
+ *
+ * @param FName					New weapon ID
+ * @param FWeaponTableRow*		New Weapon Data
+ * @param FName					Old Weapon ID
+ * @param FWeaponTableRow*		Old Weapon Data
+ */
+DECLARE_MULTICAST_DELEGATE_FourParams(FOnWeaponChangedDelegate,
+									  FName,
+									  FWeaponTableRow*,
+									  FName,
+									  FWeaponTableRow*);
+
+
 /**
  * An abstract base class to handle the behavior of in-game characters.
  * All in-game characters must inherit from this class.
@@ -64,6 +79,10 @@ class EOD_API AEODCharacterBase : public ACharacter
 	GENERATED_BODY()
 
 public:
+
+	// --------------------------------------
+	//	UE4 Method Overrides
+	// --------------------------------------
 
 	/** Sets default values for this character's properties */
 	AEODCharacterBase(const FObjectInitializer& ObjectInitializer);

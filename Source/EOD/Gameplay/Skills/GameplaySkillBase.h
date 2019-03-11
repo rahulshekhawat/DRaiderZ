@@ -52,6 +52,9 @@ public:
 
 	FORCEINLINE int32 GetMaxUpgradeLevel() const { return MaxUpgrades; }
 
+	/** Event called when skill owner changes it's weapon */
+	virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
+
 protected:
 
 	// --------------------------------------
