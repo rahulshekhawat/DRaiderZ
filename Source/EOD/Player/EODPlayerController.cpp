@@ -163,7 +163,7 @@ void AEODPlayerController::BeginPlay()
 			SkillTreeWidget = LocalSkillTreeManager ? LocalSkillTreeManager->GetSkillTreeWidget() : nullptr;
 			if (SkillTreeWidget)
 			{
-				SkillTreeWidget->AddToViewport();
+				// SkillTreeWidget->AddToViewport();
 			}
 		}
 	}
@@ -277,18 +277,7 @@ void AEODPlayerController::TogglePlayerHUD()
 
 void AEODPlayerController::TogglePlayerSkillTreeUI()
 {
-	if (SkillTreeWidget && SkillTreeWidget->IsVisible())
-	{
-		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
-	else if (SkillTreeWidget && !SkillTreeWidget->IsVisible())
-	{
-		SkillTreeWidget->SetVisibility(ESlateVisibility::Visible);
-		SkillTreeWidget->RefreshVisuals();
-	}
-
 	/*
-	USkillTreeWidget* SkillTreeWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
 	if (SkillTreeWidget && SkillTreeWidget->IsVisible())
 	{
 		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -299,6 +288,17 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 		SkillTreeWidget->RefreshVisuals();
 	}
 	*/
+
+	USkillTreeWidget* SkillTreeWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
+	if (SkillTreeWidget && SkillTreeWidget->IsVisible())
+	{
+		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else if (SkillTreeWidget && !SkillTreeWidget->IsVisible())
+	{
+		SkillTreeWidget->SetVisibility(ESlateVisibility::Visible);
+		SkillTreeWidget->RefreshVisuals();
+	}
 }
 
 void AEODPlayerController::TogglePlayerInventoryUI()

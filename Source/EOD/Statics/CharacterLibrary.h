@@ -10,6 +10,7 @@
 #include "UObject/NoExportTypes.h"
 #include "CharacterLibrary.generated.h"
 
+class UGameplaySkillBase;
 class UAnimMontage;
 class UStatusEffectBase;
 
@@ -259,6 +260,54 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	// TSoftObjectPtr<UAnimMontage> SpecialMovement;
 
+};
+
+/** Struct containing skill tree slot information */
+USTRUCT(BlueprintType)
+struct EOD_API FSkillTreeSlot : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** Determines if this slot is unlocked by default */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bUnlockedByDefault;
+
+	/** Vocation that this slot belongs to */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EVocations Vocation;
+
+	/** Player skill associated with this slot */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplaySkillBase> PlayerSkill;
+
+	/** The skill tree column that this slot should be placed in */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 ColumnPosition;
+
+	/** The skill tree row that this slot should be placed in */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 RowPosition;
+
+	/** The skill slot that must be unlocked first before unlocking this slot */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName SkillRequiredToUnlock;
+
+	/** Returns true if this skill tree slot contains valid information */
+	bool IsValidSlot() const
+	{
+		return (ColumnPosition >= 0) && (RowPosition >= 0);
+	}
+
+	FSkillTreeSlot()
+	{
+		bUnlockedByDefault = true;
+		Vocation = EVocations::Berserker;
+		PlayerSkill = NULL;
+		ColumnPosition = -1;
+		RowPosition = -1;
+		SkillRequiredToUnlock = NAME_None;
+
+	}
 };
 
 /** Struct for in-game skills */
