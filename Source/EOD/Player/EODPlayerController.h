@@ -11,8 +11,8 @@
 class UHUDWidget;
 class UPauseMenuWidget;
 class USkillTreeComponent;
-// class UPlayerStatsWidget;
-// class AEODCharacterBase;
+class APlayerSkillTreeManager;
+class USkillTreeWidget;
 class USkillsComponent;
 class UInventoryComponent;
 class UStatsComponentBase;
@@ -29,9 +29,13 @@ class EOD_API AEODPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	AEODPlayerController(const FObjectInitializer& ObjectInitializer);
 
-	/** Binds functionality for mouse axis input */
 	virtual void SetupInputComponent() override;
 
 	virtual void PostInitializeComponents() override;
@@ -59,10 +63,12 @@ private:
 	AEODCharacterBase* EODCharacter;
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// COMPONENTS
-	////////////////////////////////////////////////////////////////////////////////
 public:
+
+	// --------------------------------------
+	//  Components
+	// --------------------------------------
+
 	FORCEINLINE UInventoryComponent* GetInventoryComponent() const;
 
 	FORCEINLINE USkillTreeComponent* GetSkillTreeComponent() const { return SkillTreeComponent; }
@@ -87,7 +93,25 @@ private:
 public:
 
 	// --------------------------------------
-	//  UI
+	//  Player Skill Tree
+	// --------------------------------------
+
+	FORCEINLINE APlayerSkillTreeManager* GetLocalSkillTreeManager() const { return LocalSkillTreeManager; }
+
+	FORCEINLINE USkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
+
+private:
+
+	UPROPERTY(Transient)
+	APlayerSkillTreeManager* LocalSkillTreeManager;
+
+	UPROPERTY(Transient)
+	USkillTreeWidget* SkillTreeWidget;
+
+public:
+
+	// --------------------------------------
+	//  User Interface
 	// --------------------------------------
 
 	FORCEINLINE UHUDWidget* GetHUDWidget() const { return HUDWidget; }
@@ -211,27 +235,32 @@ private:
 	template<uint32 SkillKeyIndex>
 	inline void ReleasedSkillKey();
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// SAVE/LOAD SYSTEM
-	////////////////////////////////////////////////////////////////////////////////
 public:
+
+	// --------------------------------------
+	//  Save/Load System
+	// --------------------------------------
+
 	/** Saves current player state */
 	UFUNCTION(BlueprintCallable, Category = "Save/Load System")
 	void SavePlayerState();
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// CONSTANTS
-	////////////////////////////////////////////////////////////////////////////////
 private:
+
+	// --------------------------------------
+	//  
+	// --------------------------------------
+
 	UPROPERTY(EditDefaultsOnly, Category = "Player Constants")
 	int32 DodgeStaminaCost;
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Network
 private:
+
+	// --------------------------------------
+	//  Network : RPCs and Rep Notifies
+	// --------------------------------------
+
 	UFUNCTION(Client, Reliable)
 	void Client_SetupLocalPlayerOnUnpossess(APawn* InPawn);
 

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "CharacterLibrary.h"
+
+#include "Engine/DataTable.h"
 #include "GameFramework/Info.h"
 #include "PlayerSkillTreeManager.generated.h"
 
@@ -13,7 +15,7 @@ class UGameplaySkillBase;
 
 /** Struct containing skill tree slot information */
 USTRUCT(BlueprintType)
-struct EOD_API FSkillTreeSlot
+struct EOD_API FSkillTreeSlot : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -97,6 +99,8 @@ protected:
 	UPROPERTY(Transient)
 	USkillTreeWidget* SkillTreeWidget;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
+	UDataTable* SkillTreeLayoutTable;
 
 
 };

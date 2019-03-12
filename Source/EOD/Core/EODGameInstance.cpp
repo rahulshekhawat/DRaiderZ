@@ -2,6 +2,7 @@
 
 #include "EODGameInstance.h"
 #include "EODPreprocessors.h"
+#include "EODPlayerController.h"
 #include "PlayerSkillTreeManager.h"
 #include "EOD/SaveSystem/MetaSaveGame.h"
 #include "EOD/SaveSystem/PlayerSaveGame.h"
@@ -18,7 +19,8 @@ const FString UEODGameInstance::MetaSaveSlotName(TEXT("MetaSaveSlot"));
 
 UEODGameInstance::UEODGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-
+	GameTitle = FText::FromString("Dark RaiderZ");
+	StartupMapName = FName("Level0_Haddon");
 }
 
 void UEODGameInstance::Init()
@@ -56,6 +58,7 @@ void UEODGameInstance::Init()
 
 void UEODGameInstance::StartNewCampaign()
 {
+	UGameplayStatics::OpenLevel(this, StartupMapName);
 }
 
 void UEODGameInstance::ContinuePreviousCampaign()

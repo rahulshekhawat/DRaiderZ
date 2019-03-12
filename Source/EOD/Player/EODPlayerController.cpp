@@ -13,8 +13,7 @@
 #include "EOD/Statics/EODLibrary.h"
 #include "EOD/SaveSystem/PlayerSaveGame.h"
 
-#include "States/CharacterStateBase.h"
-
+#include "PlayerSkillTreeManager.h"
 #include "Components/PlayerStatsComponent.h"
 
 #include "UnrealNetwork.h"
@@ -38,6 +37,11 @@ AEODPlayerController::AEODPlayerController(const FObjectInitializer & ObjectInit
 void AEODPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
+
+	if (!InputComponent)
+	{
+		return;
+	}
 
 	InputComponent->BindAction("Forward", IE_Pressed, this, &AEODPlayerController::OnPressedForward);
 	InputComponent->BindAction("Forward", IE_Released, this, &AEODPlayerController::OnReleasedForward);
@@ -149,6 +153,20 @@ void AEODPlayerController::BeginPlay()
 		InitSkillTreeWidget();
 		InitSkillBarWidget();
 	}
+
+	if (IsLocalController())
+	{
+		UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
+		if (EODGI)
+		{
+			LocalSkillTreeManager = EODGI->SkillTreeManager;
+			SkillTreeWidget = LocalSkillTreeManager ? LocalSkillTreeManager->GetSkillTreeWidget() : nullptr;
+			if (SkillTreeWidget)
+			{
+				SkillTreeWidget->AddToViewport();
+			}
+		}
+	}
 }
 
 void AEODPlayerController::Tick(float DeltaTime)
@@ -259,6 +277,17 @@ void AEODPlayerController::TogglePlayerHUD()
 
 void AEODPlayerController::TogglePlayerSkillTreeUI()
 {
+	if (SkillTreeWidget && SkillTreeWidget->IsVisible())
+	{
+		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else if (SkillTreeWidget && !SkillTreeWidget->IsVisible())
+	{
+		SkillTreeWidget->SetVisibility(ESlateVisibility::Visible);
+		SkillTreeWidget->RefreshVisuals();
+	}
+
+	/*
 	USkillTreeWidget* SkillTreeWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
 	if (SkillTreeWidget && SkillTreeWidget->IsVisible())
 	{
@@ -269,6 +298,7 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 		SkillTreeWidget->SetVisibility(ESlateVisibility::Visible);
 		SkillTreeWidget->RefreshVisuals();
 	}
+	*/
 }
 
 void AEODPlayerController::TogglePlayerInventoryUI()
