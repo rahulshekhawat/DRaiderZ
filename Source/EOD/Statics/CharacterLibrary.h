@@ -281,16 +281,21 @@ struct EOD_API FSkillTreeSlot : public FTableRowBase
 	TSubclassOf<UGameplaySkillBase> PlayerSkill;
 
 	/** The skill tree column that this slot should be placed in */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Slot Position")
 	int32 ColumnPosition;
 
 	/** The skill tree row that this slot should be placed in */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Slot Position")
 	int32 RowPosition;
 
 	/** The skill slot that must be unlocked first before unlocking this slot */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName SkillRequiredToUnlock;
+
+	//~ @note this will be determined by the row position of slot
+	/** Minimum skill points required to be invested in vocation tree to unlock the first upgrade of this skill slot */
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	// int32 MinPointsToUnlock;
 
 	/** Returns true if this skill tree slot contains valid information */
 	bool IsValidSlot() const
@@ -306,7 +311,6 @@ struct EOD_API FSkillTreeSlot : public FTableRowBase
 		ColumnPosition = -1;
 		RowPosition = -1;
 		SkillRequiredToUnlock = NAME_None;
-
 	}
 };
 
