@@ -49,6 +49,8 @@ void UGameplaySkillsComponent::BeginPlay()
 	// * GetOwner() has been found to be setup correctly in BeginPlay
 	EODCharacterOwner = Cast<AEODCharacterBase>(GetOwner());
 
+	//~ @note The result of IsPlayerControlled() is not correct during BeginPlay because PlayerState has not finished replicating.
+	
 	if (IsValid(EODCharacterOwner) && EODCharacterOwner->IsLocallyControlled() && EODCharacterOwner->IsPlayerControlled())
 	{
 		// LoadSkillBarLayout();

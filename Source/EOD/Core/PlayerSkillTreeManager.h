@@ -37,6 +37,12 @@ struct EOD_API FSkillTreeSlot
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 RowPosition;
 
+	/** Returns true if this skill tree slot contains valid information */
+	bool IsValidSlot() const
+	{
+		return (ColumnPosition >= 0) && (RowPosition >= 0);
+	}
+
 	FSkillTreeSlot()
 	{
 		bUnlockedByDefault = true;
@@ -76,6 +82,8 @@ public:
 	// --------------------------------------
 
 	void CreateSkillTreeWidget(UEODGameInstance* GameInstance = nullptr);
+
+	FORCEINLINE USkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
 
 protected:
 

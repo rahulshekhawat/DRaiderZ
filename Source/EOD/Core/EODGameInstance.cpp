@@ -163,10 +163,11 @@ void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 
 void UEODGameInstance::OnPostLoadMap(UWorld* WorldObj)
 {
-	if (WorldObj)
-	{
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SkillTreeManager = WorldObj->SpawnActor <APlayerSkillTreeManager>(PlayerSkillTreeManagerClass.Get(), SpawnInfo);
-	}
+	check(WorldObj);
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SkillTreeManager = WorldObj->SpawnActor <APlayerSkillTreeManager>(PlayerSkillTreeManagerClass.Get(), SpawnInfo);
+
+	check(SkillTreeManager);
+	SkillTreeManager->CreateSkillTreeWidget(this);
 }

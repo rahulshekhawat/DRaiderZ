@@ -24,6 +24,12 @@ void APlayerSkillTreeManager::Destroyed()
 
 void APlayerSkillTreeManager::CreateSkillTreeWidget(UEODGameInstance* GameInstance)
 {
+	// If skill tree widget already exists
+	if (SkillTreeWidget)
+	{
+		return;
+	}
+
 	UGameInstance* GInst = GameInstance ? GameInstance : GetGameInstance();
 	if (GInst)
 	{
