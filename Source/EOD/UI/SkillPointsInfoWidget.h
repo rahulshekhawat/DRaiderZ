@@ -25,6 +25,8 @@ public:
 
 	virtual void NativeDestruct() override;
 
+protected:
+
 	// --------------------------------------
 	//	Necessary Child Widget
 	// --------------------------------------
@@ -56,5 +58,38 @@ public:
 	/** A text block displaying the number of used skill points in sorcerer tree */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* SorcererPointsNumText;
+
+public:
+
+	UFUNCTION()
+	void UpdateAvailableSkillPointsText(int32 Points);
+
+	UFUNCTION()
+	void UpdateUsedSkillPointsText(int32 Points);
+
+	UFUNCTION()
+	void UpdateAssassinPointsText(int32 Points);
+
+	UFUNCTION()
+	void UpdateBerserkerPointsText(int32 Points);
+
+	UFUNCTION()
+	void UpdateClericPointsText(int32 Points);
+
+	UFUNCTION()
+	void UpdateDefenderPointsText(int32 Points);
+
+	UFUNCTION()
+	void UpdateSorcererPointsText(int32 Points);
+
+private:
+
+	int32 Cache_AvailableSkillPoints;
+	int32 Cache_UsedSkillPoints;
+	int32 Cache_AssassinPoints;
+	int32 Cache_BerserkerPoints;
+	int32 Cache_ClericPoints;
+	int32 Cache_DefenderPoints;
+	int32 Cache_SorcererPoints;
 
 };
