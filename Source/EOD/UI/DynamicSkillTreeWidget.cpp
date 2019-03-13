@@ -3,6 +3,8 @@
 
 #include "DynamicSkillTreeWidget.h"
 #include "SkillPointsInfoWidget.h"
+#include "EODPreprocessors.h"
+#include "SkillTreeItemContainer.h"
 
 #include "Button.h"
 #include "Components/CanvasPanel.h"
@@ -59,6 +61,81 @@ void UDynamicSkillTreeWidget::NativeConstruct()
 void UDynamicSkillTreeWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
+
+void UDynamicSkillTreeWidget::InitializeSkillSlots(UDataTable* SkillLayoutTable)
+{
+	if (!SkillLayoutTable)
+	{
+		return;
+	}
+
+	FString ContextString = FString("UDynamicSkillTreeWidget::InitializeSkillSlots()");
+	TArray<FName> RowNames = SkillLayoutTable->GetRowNames();
+	for (FName RowName : RowNames)
+	{
+		FSkillTreeSlot* SkillTreeSlot = SkillLayoutTable->FindRow<FSkillTreeSlot>(RowName, ContextString);
+		AddNewSkillSlot(SkillTreeSlot);
+	}
+}
+
+void UDynamicSkillTreeWidget::AddNewSkillSlot(FSkillTreeSlot* SlotInfo)
+{
+	if (!SlotInfo || !SkillTreeSlotClass.Get())
+	{
+		return;
+	}
+
+	USkillTreeItemContainer* NewItemContainer = CreateWidget<USkillTreeItemContainer>(GetOwningPlayer(), SkillTreeSlotClass);
+	if (NewItemContainer)
+	{
+		SetupSlotPosition(NewItemContainer, SlotInfo->Vocation, SlotInfo->ColumnPosition, SlotInfo->RowPosition);
+		// NewItemContainer->EODItemInfo.Icon = 
+	}
+}
+
+void UDynamicSkillTreeWidget::SetupSlotPosition(USkillTreeItemContainer* ItemContainer, EVocations Vocation, int32 Column, int32 Row)
+{
+	UCanvasPanel* CPanel = nullptr;
+
+	switch (Vocation)
+	{
+	case EVocations::Assassin:
+		CPanel = AssassinCanvas;
+		break;
+	case EVocations::Berserker:
+		CPanel = BerserkerCanvas;
+		break;
+	case EVocations::Cleric:
+		CPanel = ClericCanvas;
+		break;
+	case EVocations::Defender:
+		CPanel = DefenderCanvas;
+		break;
+	case EVocations::Sorcerer:
+		CPanel = SorcererCanvas;
+		break;
+	default:
+		break;
+	}
+
+	if (!CPanel)
+	{
+		return;
+	}
+
+	int32 XPosition = 540 + Column * 180;
+	int32 YPosition = 25 + Row * 130;
+
+	FVector2D Size(90.f, 90.f);
+
+	UCanvasPanelSlot* CPSlot = CPanel->AddChildToCanvas(ItemContainer);
+	if (CPSlot)
+	{
+		CPSlot->SetPosition(FVector2D(XPosition, YPosition));
+		CPSlot->SetSize(Size);
+		ItemContainer->RefreshContainerVisuals();
+	}
 }
 
 void UDynamicSkillTreeWidget::ActivateAssassinTab()

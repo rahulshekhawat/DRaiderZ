@@ -40,5 +40,12 @@ void USkillTreeComponent::CreateAndInitializeSkillTreeWidget()
 		{
 			SkillTreeWidget->AddToViewport();
 		}
+
+		//~ @todo add skill tree widget to hud widget
+
+		if (SkillTreeWidget)
+		{
+			SkillTreeWidget->InitializeSkillSlots(SkillTreeLayoutTable);
+		}
 	}
 }

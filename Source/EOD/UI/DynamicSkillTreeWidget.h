@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#include "CharacterLibrary.h"
+#include "Engine/DataTable.h"
 #include "Components/Button.h"
 #include "Styling/SlateTypes.h"
 #include "Blueprint/UserWidget.h"
@@ -92,11 +94,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Selection Tab", meta = (BindWidget))
 	USkillPointsInfoWidget* SkillPointsInfo;
 
-private:
+	// --------------------------------------
+	//	Adding Skills Dynamically
+	// --------------------------------------
 
-	// --------------------------------------
-	//	Dynamically Added Skills
-	// --------------------------------------
+	/** Create and add skill slots to this skill tree from the data table containing skill tree layout info */
+	void InitializeSkillSlots(UDataTable* SkillLayoutTable);
+
+protected:
+
+	/** The class to use for creating skill slot widgets */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Class")
+	TSubclassOf<USkillTreeItemContainer> SkillTreeSlotClass;
+
+private:
 
 	/** A list of all the assassin skills available in the skill tree */
 	UPROPERTY(Transient)
@@ -117,6 +128,10 @@ private:
 	/** A list of all the sorcerer skills available in the skill tree */
 	UPROPERTY(Transient)
 	TArray<USkillTreeItemContainer*> SorcererSkills;
+
+	void AddNewSkillSlot(FSkillTreeSlot* SlotInfo);
+
+	void SetupSlotPosition(USkillTreeItemContainer* ItemContainer, EVocations Vocation, int32 Column, int32 Row);
 
 	// --------------------------------------
 	//	Tab Switching
