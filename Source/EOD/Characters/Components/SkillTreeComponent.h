@@ -10,8 +10,8 @@
 #include "SkillTreeComponent.generated.h"
 
 class UGameplaySkillBase;
-class USkillTreeWidget;
 class USkillPointsInfoWidget;
+class UDynamicSkillTreeWidget;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EOD_API USkillTreeComponent : public UActorComponent
@@ -34,9 +34,11 @@ public:
 	//	User Interface
 	// --------------------------------------
 
-	FORCEINLINE USkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
+	FORCEINLINE UDynamicSkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
 
 	FORCEINLINE USkillPointsInfoWidget* GetSkillPointsInfoWidget() const { return SkillPointsInfoWidget; }
+
+	void ToggleSkillTreeUI();
 
 protected:
 
@@ -44,15 +46,18 @@ protected:
 	TSubclassOf<USkillPointsInfoWidget> SkillPointsInfoWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	TSubclassOf<USkillTreeWidget> SkillTreeWidgetClass;
+	TSubclassOf<UDynamicSkillTreeWidget> SkillTreeWidgetClass;
 
 private:
 
 	UPROPERTY(Transient)
-	USkillTreeWidget* SkillTreeWidget;
+	UDynamicSkillTreeWidget* SkillTreeWidget;
 
 	UPROPERTY(Transient)
 	USkillPointsInfoWidget* SkillPointsInfoWidget;
+
+	/** Create skill tree widget and initialize the skill tree layout */
+	void CreateAndInitializeSkillTreeWidget();
 
 public:
 
