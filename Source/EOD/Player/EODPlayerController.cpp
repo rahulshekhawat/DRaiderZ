@@ -13,6 +13,7 @@
 #include "EOD/Statics/EODLibrary.h"
 #include "EOD/SaveSystem/PlayerSaveGame.h"
 
+#include "Components/SkillTreeComponent.h"
 #include "PlayerSkillTreeManager.h"
 #include "Components/PlayerStatsComponent.h"
 
@@ -78,7 +79,8 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &AEODPlayerController::ToggleMouseCursor);
 
 	InputComponent->BindAction("ToggleStats", IE_Pressed, this, &AEODPlayerController::TogglePlayerStatsUI);
-	InputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &AEODPlayerController::TogglePlayerSkillTreeUI);
+	// InputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &AEODPlayerController::TogglePlayerSkillTreeUI);
+	InputComponent->BindAction("ToggleSkillTree", IE_Pressed, SkillTreeComponent, &USkillTreeComponent::ToggleSkillTreeUI);
 	InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AEODPlayerController::TogglePlayerInventoryUI);
 
 	InputComponent->BindAction("Skill_1", IE_Pressed, this, &AEODPlayerController::PressedSkillKey<1>);

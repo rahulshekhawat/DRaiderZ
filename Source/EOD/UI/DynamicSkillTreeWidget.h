@@ -3,10 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Components/Button.h"
+#include "Styling/SlateTypes.h"
 #include "Blueprint/UserWidget.h"
 #include "DynamicSkillTreeWidget.generated.h"
 
+class UButton;
 class UCanvasPanel;
+class UWidgetSwitcher;
 class USkillTreeItemContainer;
 
 /**
@@ -65,7 +70,29 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UCanvasPanel* SorcererInfoCanvas;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UWidgetSwitcher* SkillTreeSwitcher;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UButton* AssassinTab;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UButton* BerserkerTab;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UButton* ClericTab;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UButton* DefenderTab;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UButton* SorcererTab;
+
 private:
+
+	// --------------------------------------
+	//	Dynamically Added Skills
+	// --------------------------------------
 
 	/** A list of all the assassin skills available in the skill tree */
 	UPROPERTY(Transient)
@@ -87,7 +114,77 @@ private:
 	UPROPERTY(Transient)
 	TArray<USkillTreeItemContainer*> SorcererSkills;
 
+	// --------------------------------------
+	//	Tab Switching
+	// --------------------------------------
 
+	UPROPERTY()
+	FButtonStyle DefaultButtonStyle;
 
+	UFUNCTION()
+	void ActivateAssassinTab();
+
+	UFUNCTION()
+	void ActivateBerserkerTab();
+
+	UFUNCTION()
+	void ActivateClericTab();
+
+	UFUNCTION()
+	void ActivateDefenderTab();
+
+	UFUNCTION()
+	void ActivateSorcererTab();
+
+	/** Change visual style of given button to 'selected' */
+	inline void SetButtonStyleToSelected(UButton* Button);
+
+	/** Resets button style */
+	inline void ResetButtonStyle(UButton* Button);
+
+	inline void ResetTabStyleByIndex(int32 Index);
+
+	/** Index of tab currently selected/active in skill tree */
+	int32 CurrentActiveTabIndex;
 
 };
+
+inline void UDynamicSkillTreeWidget::SetButtonStyleToSelected(UButton* Button)
+{
+	if (Button)
+	{
+		FButtonStyle ButtonStyle;
+		ButtonStyle.SetNormal(DefaultButtonStyle.Pressed);
+		ButtonStyle.SetPressed(DefaultButtonStyle.Pressed);
+		ButtonStyle.SetHovered(DefaultButtonStyle.Pressed);
+
+		Button->SetStyle(ButtonStyle);
+	}
+}
+
+inline void UDynamicSkillTreeWidget::ResetButtonStyle(UButton* Button)
+{
+	if (Button)
+	{
+		Button->SetStyle(DefaultButtonStyle);
+	}
+}
+
+inline void UDynamicSkillTreeWidget::ResetTabStyleByIndex(int32 Index)
+{
+	switch (Index)
+	{
+	case 0:
+		ResetButtonStyle(AssassinTab);
+	case 1:
+		ResetButtonStyle(BerserkerTab);
+	case 2:
+		ResetButtonStyle(ClericTab);
+	case 3:
+		ResetButtonStyle(DefenderTab);
+	case 4:
+		ResetButtonStyle(SorcererTab);
+	default:
+		break;
+	}
+}
