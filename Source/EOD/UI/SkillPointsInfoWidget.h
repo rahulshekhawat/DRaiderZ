@@ -84,6 +84,10 @@ public:
 
 private:
 
+	// --------------------------------------
+	//	Cache
+	// --------------------------------------
+
 	int32 Cache_AvailableSkillPoints;
 	int32 Cache_UsedSkillPoints;
 	int32 Cache_AssassinPoints;

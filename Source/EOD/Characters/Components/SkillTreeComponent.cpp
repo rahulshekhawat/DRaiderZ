@@ -5,18 +5,11 @@
 
 USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	PrimaryComponentTick.bCanEverTick = false;
+	SetIsReplicated(false);
 }
 
 void USkillTreeComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
 }
-
-void USkillTreeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-}
-
