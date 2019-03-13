@@ -292,10 +292,13 @@ struct EOD_API FSkillTreeSlot : public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName SkillRequiredToUnlock;
 
-	//~ @note this will be determined by the row position of slot
 	/** Minimum skill points required to be invested in vocation tree to unlock the first upgrade of this skill slot */
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	// int32 MinPointsToUnlock;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 MinimumPointsToUnlock;
+
+	/** The number of additional points required to be invested in tree above MinimumPointsToUnlock for each skill upgrade */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 UpgradePointsGap;
 
 	/** Returns true if this skill tree slot contains valid information */
 	bool IsValidSlot() const
@@ -311,6 +314,8 @@ struct EOD_API FSkillTreeSlot : public FTableRowBase
 		ColumnPosition = -1;
 		RowPosition = -1;
 		SkillRequiredToUnlock = NAME_None;
+		MinimumPointsToUnlock = 0;
+		UpgradePointsGap = 0;
 	}
 };
 
