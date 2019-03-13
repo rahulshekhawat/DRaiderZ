@@ -31,7 +31,7 @@ public:
 
 	UHUDWidget(const FObjectInitializer& ObjectInitializer);
 
-	bool Initialize() override;	
+	virtual bool Initialize() override;	
 
 	virtual void NativeConstruct() override;
 

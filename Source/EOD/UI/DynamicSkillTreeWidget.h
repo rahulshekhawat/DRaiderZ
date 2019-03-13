@@ -153,6 +153,7 @@ private:
 	
 	void AddSkillPointsInfoToCanvas(UCanvasPanel* CPanel);
 
+
 };
 
 inline void UDynamicSkillTreeWidget::SetButtonStyleToSelected(UButton* Button)
