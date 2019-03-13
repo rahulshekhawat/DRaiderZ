@@ -12,6 +12,7 @@
 class UButton;
 class UCanvasPanel;
 class UWidgetSwitcher;
+class USkillPointsInfoWidget;
 class USkillTreeItemContainer;
 
 /**
@@ -70,23 +71,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UCanvasPanel* SorcererInfoCanvas;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Selection Tab", meta = (BindWidget))
 	UWidgetSwitcher* SkillTreeSwitcher;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Selection Tab", meta = (BindWidget))
 	UButton* AssassinTab;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Selection Tab", meta = (BindWidget))
 	UButton* BerserkerTab;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Selection Tab", meta = (BindWidget))
 	UButton* ClericTab;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Selection Tab", meta = (BindWidget))
 	UButton* DefenderTab;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree", meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Selection Tab", meta = (BindWidget))
 	UButton* SorcererTab;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Selection Tab", meta = (BindWidget))
+	USkillPointsInfoWidget* SkillPointsInfo;
 
 private:
 
