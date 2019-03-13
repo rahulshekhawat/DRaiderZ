@@ -2,9 +2,12 @@
 
 
 #include "DynamicSkillTreeWidget.h"
+#include "SkillPointsInfoWidget.h"
 
 #include "Button.h"
+#include "Components/CanvasPanel.h"
 #include "Components/WidgetSwitcher.h"
+#include "Components/CanvasPanelSlot.h"
 
 UDynamicSkillTreeWidget::UDynamicSkillTreeWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -66,6 +69,8 @@ void UDynamicSkillTreeWidget::ActivateAssassinTab()
 		SetButtonStyleToSelected(AssassinTab);
 		SkillTreeSwitcher->SetActiveWidgetIndex(0);
 		CurrentActiveTabIndex = 0;
+
+		AddSkillPointsInfoToCanvas(AssassinInfoCanvas);
 	}
 }
 
@@ -77,6 +82,8 @@ void UDynamicSkillTreeWidget::ActivateBerserkerTab()
 		SetButtonStyleToSelected(BerserkerTab);
 		SkillTreeSwitcher->SetActiveWidgetIndex(1);
 		CurrentActiveTabIndex = 1;
+
+		AddSkillPointsInfoToCanvas(BerserkerInfoCanvas);
 	}
 }
 
@@ -88,6 +95,8 @@ void UDynamicSkillTreeWidget::ActivateClericTab()
 		SetButtonStyleToSelected(ClericTab);
 		SkillTreeSwitcher->SetActiveWidgetIndex(2);
 		CurrentActiveTabIndex = 2;
+
+		AddSkillPointsInfoToCanvas(ClericInfoCanvas);
 	}
 }
 
@@ -99,6 +108,8 @@ void UDynamicSkillTreeWidget::ActivateDefenderTab()
 		SetButtonStyleToSelected(DefenderTab);
 		SkillTreeSwitcher->SetActiveWidgetIndex(3);
 		CurrentActiveTabIndex = 3;
+
+		AddSkillPointsInfoToCanvas(DefenderInfoCanvas);
 	}
 }
 
@@ -110,5 +121,19 @@ void UDynamicSkillTreeWidget::ActivateSorcererTab()
 		SetButtonStyleToSelected(SorcererTab);
 		SkillTreeSwitcher->SetActiveWidgetIndex(4);
 		CurrentActiveTabIndex = 4;
+
+		AddSkillPointsInfoToCanvas(SorcererInfoCanvas);
+	}
+}
+
+void UDynamicSkillTreeWidget::AddSkillPointsInfoToCanvas(UCanvasPanel* CPanel)
+{
+	if (CPanel && SkillPointsInfo)
+	{
+		UCanvasPanelSlot* CPSlot = CPanel->AddChildToCanvas(SkillPointsInfo);
+		CPSlot->SetSize(FVector2D(400.f, 320.f));
+		CPSlot->SetPosition(FVector2D(0.f, -25.f));
+		CPSlot->SetAnchors(FAnchors(0.5f, 1.f, 0.5f, 1.f));
+		CPSlot->SetAlignment(FVector2D(0.5f, 1.f));
 	}
 }

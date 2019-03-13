@@ -150,6 +150,8 @@ private:
 
 	/** Index of tab currently selected/active in skill tree */
 	int32 CurrentActiveTabIndex;
+	
+	void AddSkillPointsInfoToCanvas(UCanvasPanel* CPanel);
 
 };
 
