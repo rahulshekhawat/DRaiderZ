@@ -5,6 +5,7 @@
 #include "SkillPointsInfoWidget.h"
 #include "EODPreprocessors.h"
 #include "SkillTreeItemContainer.h"
+#include "GameplaySkillBase.h"
 
 #include "Button.h"
 #include "Components/CanvasPanel.h"
@@ -63,7 +64,7 @@ void UDynamicSkillTreeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UDynamicSkillTreeWidget::InitializeSkillSlots(UDataTable* SkillLayoutTable)
+void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* SkillLayoutTable)
 {
 	if (!SkillLayoutTable)
 	{
@@ -75,11 +76,37 @@ void UDynamicSkillTreeWidget::InitializeSkillSlots(UDataTable* SkillLayoutTable)
 	for (FName RowName : RowNames)
 	{
 		FSkillTreeSlot* SkillTreeSlot = SkillLayoutTable->FindRow<FSkillTreeSlot>(RowName, ContextString);
-		AddNewSkillSlot(SkillTreeSlot);
+		AddNewSkillSlot(RowName, SkillTreeSlot);
 	}
 }
 
-void UDynamicSkillTreeWidget::AddNewSkillSlot(FSkillTreeSlot* SlotInfo)
+void UDynamicSkillTreeWidget::InitializeSkillTreeSlots(const TMap<FName, UGameplaySkillBase*>& PlayerSkillsMap)
+{
+	TArray<FName> Keys;
+	PlayerSkillsMap.GetKeys(Keys);
+	for (FName Key : Keys)
+	{
+		UGameplaySkillBase* Skill = PlayerSkillsMap[Key];
+		if (SkillContainersMap.Contains(Key) && Skill)
+		{
+			USkillTreeItemContainer* Container = SkillContainersMap[Key];
+			if (Container)
+			{
+				Container->EODItemInfo.InGameName = Skill->GetInGameSkillName();
+				Container->EODItemInfo.Description = Skill->GetInGameDescription();
+				Container->EODItemInfo.EODItemType = EEODItemType::ActiveSkill;
+				Container->EODItemInfo.Icon = Skill->GetSkillIcon();
+				Container->EODItemInfo.ItemGroup = Key.ToString();
+				Container->SkillGroup = Key.ToString();
+				Container->SkillState.CurrentUpgradeLevel = Skill->CurrentUpgrade;
+				Container->SkillState.MaxUpgradeLevel = Skill->GetMaxUpgradeLevel();
+				Container->RefreshContainerVisuals();
+			}
+		}
+	}
+}
+
+void UDynamicSkillTreeWidget::AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* SlotInfo)
 {
 	if (!SlotInfo || !SkillTreeSlotClass.Get())
 	{
@@ -90,7 +117,7 @@ void UDynamicSkillTreeWidget::AddNewSkillSlot(FSkillTreeSlot* SlotInfo)
 	if (NewItemContainer)
 	{
 		SetupSlotPosition(NewItemContainer, SlotInfo->Vocation, SlotInfo->ColumnPosition, SlotInfo->RowPosition);
-		// NewItemContainer->EODItemInfo.Icon = 
+		SkillContainersMap.Add(SkillGroup, NewItemContainer);
 	}
 }
 

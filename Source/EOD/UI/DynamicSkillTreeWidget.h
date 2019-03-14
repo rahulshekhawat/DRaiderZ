@@ -98,8 +98,11 @@ public:
 	//	Adding Skills Dynamically
 	// --------------------------------------
 
-	/** Create and add skill slots to this skill tree from the data table containing skill tree layout info */
-	void InitializeSkillSlots(UDataTable* SkillLayoutTable);
+	/** Initialize skill tree layout from SkillLayoutTable, i.e., create and add skill slots to the skill tree */
+	void InitializeSkillTreeLayout(UDataTable* SkillLayoutTable);
+
+	/** Initialize skill tree slots (add skill icon and information regarding current and maximum upgrades available) from PlayerSkillsMap */
+	void InitializeSkillTreeSlots(const TMap<FName, UGameplaySkillBase*>& PlayerSkillsMap);
 
 protected:
 
@@ -108,6 +111,10 @@ protected:
 	TSubclassOf<USkillTreeItemContainer> SkillTreeSlotClass;
 
 private:
+
+	/** A map of skill group to it's respective skill slot container */
+	UPROPERTY(Transient)
+	TMap<FName, USkillTreeItemContainer*> SkillContainersMap;
 
 	/** A list of all the assassin skills available in the skill tree */
 	UPROPERTY(Transient)
@@ -129,7 +136,7 @@ private:
 	UPROPERTY(Transient)
 	TArray<USkillTreeItemContainer*> SorcererSkills;
 
-	void AddNewSkillSlot(FSkillTreeSlot* SlotInfo);
+	void AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* SlotInfo);
 
 	void SetupSlotPosition(USkillTreeItemContainer* ItemContainer, EVocations Vocation, int32 Column, int32 Row);
 

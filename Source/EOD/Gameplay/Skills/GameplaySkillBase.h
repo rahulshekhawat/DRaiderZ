@@ -54,6 +54,10 @@ public:
 
 	FORCEINLINE UTexture* GetSkillIcon() const { return Cache_Icon; }
 
+	FORCEINLINE FString	GetInGameSkillName() const { return InGameName; }
+
+	FORCEINLINE FString	GetInGameDescription() const { return Description; }
+
 	/** Event called when skill owner changes it's weapon */
 	virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
 

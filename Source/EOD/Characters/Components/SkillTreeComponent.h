@@ -9,6 +9,8 @@
 #include "Components/ActorComponent.h"
 #include "SkillTreeComponent.generated.h"
 
+class UPlayerSaveGame;
+class AEODCharacterBase;
 class UGameplaySkillBase;
 class USkillPointsInfoWidget;
 class UDynamicSkillTreeWidget;
@@ -65,7 +67,7 @@ public:
 	//	Skill Tree Layout
 	// --------------------------------------
 
-	FORCEINLINE TMap<FName, UGameplaySkillBase*> GetActivePlayerSkillsMap() const { return ActivePlayerSkillsMap; }
+	FORCEINLINE TMap<FName, UGameplaySkillBase*> GetActivePlayerSkillsMap() const { return PlayerSkillsMap; }
 
 protected:
 
@@ -73,6 +75,17 @@ protected:
 	UDataTable* SkillTreeLayoutTable;
 
 	UPROPERTY(Transient)
-	TMap<FName, UGameplaySkillBase*> ActivePlayerSkillsMap;
+	TMap<FName, UGameplaySkillBase*> PlayerSkillsMap;
+
+private:
+
+	void InitializeSkills();
+
+	void InitializeSkillTreeSlots();
+	
+	void Internal_LoadSkill(const FName& SkillGroup,
+		const TSubclassOf<UGameplaySkillBase>& SkillClass,
+		AEODCharacterBase* const SkillOwner,
+		UPlayerSaveGame* const SaveGame);
 
 };

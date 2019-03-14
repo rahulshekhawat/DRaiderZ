@@ -8,7 +8,7 @@ UElementalBase::UElementalBase(const FObjectInitializer & ObjectInitializer) : S
 {
 }
 
-void UElementalBase::Initialize(AEODCharacterBase * Owner, AActor * Instigator)
+void UElementalBase::Initialize(AEODCharacterBase* Owner, AActor* Instigator)
 {
 	// Make sure instigator is a weapon
 	AWeaponBase* WeaponBase = Cast<AWeaponBase>(Instigator);
