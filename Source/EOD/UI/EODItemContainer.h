@@ -27,6 +27,11 @@ class EOD_API UEODItemContainer : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//	UE4 Method Overrides
+	// --------------------------------------
+
 	UEODItemContainer(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
@@ -35,7 +40,11 @@ public:
 
 	virtual void NativeDestruct() override;
 
-public:
+
+	// --------------------------------------
+	//	Necessary Child Widgets
+	// --------------------------------------
+
 	UPROPERTY(BlueprintReadOnly, Category = "EOD Item Container", meta = (BindWidget))
 	UImage* EmptyBorderImage;
 
@@ -49,6 +58,11 @@ public:
 	UTextBlock* CooldownText;
 
 protected:
+
+	// --------------------------------------
+	//	Handle Mouse Events
+	// --------------------------------------
+
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
