@@ -52,6 +52,8 @@ public:
 
 	FORCEINLINE int32 GetMaxUpgradeLevel() const { return MaxUpgrades; }
 
+	FORCEINLINE UTexture* GetSkillIcon() const { return Cache_Icon; }
+
 	/** Event called when skill owner changes it's weapon */
 	virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
 
@@ -101,5 +103,14 @@ protected:
 	UPROPERTY(Transient)
 	TWeakObjectPtr<AController> SkillOwner;
 
+	UPROPERTY(Transient)
+	UTexture* Cache_Icon;
 
+public:
+
+	// --------------------------------------
+	//	Skill State
+	// --------------------------------------
+
+	int32 CurrentUpgrade;
 };

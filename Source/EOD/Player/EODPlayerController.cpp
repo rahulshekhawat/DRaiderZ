@@ -291,15 +291,15 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 	}
 	*/
 
-	USkillTreeWidget* SkillTreeWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
-	if (SkillTreeWidget && SkillTreeWidget->IsVisible())
+	USkillTreeWidget* STWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
+	if (STWidget && STWidget->IsVisible())
 	{
-		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+		STWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else if (SkillTreeWidget && !SkillTreeWidget->IsVisible())
+	else if (STWidget && !STWidget->IsVisible())
 	{
-		SkillTreeWidget->SetVisibility(ESlateVisibility::Visible);
-		SkillTreeWidget->RefreshVisuals();
+		STWidget->SetVisibility(ESlateVisibility::Visible);
+		STWidget->RefreshVisuals();
 	}
 }
 
@@ -580,10 +580,10 @@ void AEODPlayerController::Client_SetupLocalPlayerOnUnpossess_Implementation(APa
 		if (IsValid(EODChar->GetCharacterStatsComponent()) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
 		{
 			UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
-			UStatsComponentBase* StatsComponent = EODChar->GetCharacterStatsComponent();
-			StatsComponent->OnHealthChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
-			StatsComponent->OnManaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
-			StatsComponent->OnStaminaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+			UStatsComponentBase* StatsComp = EODChar->GetCharacterStatsComponent();
+			StatsComp->OnHealthChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+			StatsComp->OnManaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+			StatsComp->OnStaminaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
 		}
 	}
 }

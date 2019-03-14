@@ -6,12 +6,15 @@
 UGameplaySkillBase::UGameplaySkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	SkillGroup = NAME_None;
+	CurrentUpgrade = 0;
 }
 
 void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
 {
 	SkillInstigator = Instigator;
 	SkillOwner = Owner;
+
+	Cache_Icon = Icon.LoadSynchronous();
 }
 
 void UGameplaySkillBase::Reinitialize()
