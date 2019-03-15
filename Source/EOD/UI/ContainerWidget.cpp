@@ -3,7 +3,11 @@
 
 #include "ContainerWidget.h"
 #include "DynamicSkillTreeWidget.h"
+#include "EODGlobalNames.h"
 
+#include "Components/Image.h"
+#include "Components/TextBlock.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 UContainerWidget::UContainerWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -12,15 +16,26 @@ UContainerWidget::UContainerWidget(const FObjectInitializer& ObjectInitializer) 
 
 bool UContainerWidget::Initialize()
 {
+	if (Super::Initialize() && SubText && CooldownText && ItemImage)
+	{
+		SubText->SetVisibility(ESlateVisibility::Hidden);
+		CooldownText->SetVisibility(ESlateVisibility::Hidden);
+
+		InitializeContainer();
+		return true;
+	}
 	return false;
 }
 
 void UContainerWidget::NativeConstruct()
 {
+	Super::NativeConstruct();
+	InitializeContainer();
 }
 
 void UContainerWidget::NativeDestruct()
 {
+	Super::NativeDestruct();
 }
 
 void UContainerWidget::InitializeWithParent(UUserWidget* ParentWidget)
@@ -64,4 +79,20 @@ FReply UContainerWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, cons
 
 void UContainerWidget::UpdateDescription(const FString& NewDescription)
 {
+}
+
+void UContainerWidget::InitializeContainer()
+{
+	if (BorderImage)
+	{
+		if (!EmptyBorderMID)
+		{
+			EmptyBorderMID = BorderImage->GetDynamicMaterial();
+		}
+
+		if (EmptyBorderMID)
+		{
+			EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, NormalBorderColor);
+		}
+	}
 }

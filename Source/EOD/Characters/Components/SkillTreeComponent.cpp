@@ -13,6 +13,7 @@ USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitial
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicated(false);
+	// SetIsReplicated(true);
 }
 
 void USkillTreeComponent::BeginPlay()
@@ -65,8 +66,21 @@ void USkillTreeComponent::InitializeSkills()
 	}
 
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetOwner());
+	if (PC)
+	{
+		PrintToScreen(this, PC->GetName(), 10.f);
+	}
+
 	AEODCharacterBase* SkillOwner = PC ? Cast<AEODCharacterBase>(PC->GetPawn()) : nullptr;
-	check(SkillOwner);
+	if (SkillOwner)
+	{
+	}
+	else
+	{
+		return;
+	}
+
+	// check(SkillOwner);
 
 	UEODGameInstance* GI = Cast<UEODGameInstance>(SkillOwner->GetGameInstance());
 	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;

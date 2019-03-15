@@ -9,6 +9,7 @@
 
 class UImage;
 class UTextBlock;
+class UMaterialInstanceDynamic;
 
 /** Determines the type of container widget */
 UENUM(BlueprintType)
@@ -143,6 +144,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Container Constants")
 	EContainerType ContainerType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Container Constants")
+	FLinearColor NormalBorderColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Container Constants")
+	FLinearColor HoveredBorderColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Container Constants")
+	FLinearColor PressedBorderColor;
+
 	// --------------------------------------
 	//	Container Data and Cache
 	// --------------------------------------
@@ -152,8 +162,21 @@ protected:
 
 public:
 
+	// --------------------------------------
+	//	Updating Child Widgets
+	// --------------------------------------
+
 	UFUNCTION()
 	void UpdateDescription(const FString& NewDescription);
+
+protected:
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Child")
+	UMaterialInstanceDynamic* EmptyBorderMID;
+
+private:
+
+	void InitializeContainer();
 
 
 };
