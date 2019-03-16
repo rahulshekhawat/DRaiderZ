@@ -8,7 +8,12 @@
 
 class UTextBlock;
 class UCanvasPanel;
+class USkillBarWidget;
+class UInventoryWidget;
+class UPlayerStatsWidget;
 class UStatusIndicatorWidget;
+class UDialogueWindowWidget;
+class UDynamicSkillTreeWidget;
 
 /**
  * 
@@ -32,21 +37,82 @@ public:
 
 	virtual void NativeDestruct() override;
 
+protected:
+
 	// --------------------------------------
 	//	Child Widgets
 	// --------------------------------------
-
-	/** Widget containing health, mana, and stamina bars */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UStatusIndicatorWidget* StatusIndicatorWidget;
 
 	/** The main canvas that contains all the child widgets */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UCanvasPanel* MainCanvas;
 
-	/** Used to display character level */
+	/** Widget containing health, mana, and stamina bars */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UTextBlock* LevelText;
+	UStatusIndicatorWidget* StatusIndicatorWidget;
+
+	/** Widget containing player stats info */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UPlayerStatsWidget* PlayerStatsWidget;
+
+	/** Widget containing player inventory items */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UInventoryWidget* InventoryWidget;
+
+	/** Widget containing skills that can be used by player */
+	UPROPERTY(Transient, BlueprintReadOnly, meta = (BindWidget))
+	USkillBarWidget* SkillBarWidget;
+
+	/** Widget containing skill trees of all vocations */
+	UPROPERTY(Transient, BlueprintReadOnly, meta = (BindWidget))
+	UDynamicSkillTreeWidget* SkillTreeWidget;
+
+public:
+
+	FORCEINLINE UCanvasPanel* GetMainCanvas() const { return MainCanvas; }
+
+	FORCEINLINE UStatusIndicatorWidget* GetStatusIndicatorWidget() const { return StatusIndicatorWidget; }
+
+	FORCEINLINE USkillBarWidget* GetSkillBarWidget() const { return SkillBarWidget; }
+
+	FORCEINLINE UInventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
+
+	FORCEINLINE UDynamicSkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
+
+	FORCEINLINE UPlayerStatsWidget* GetPlayerStatsWidget() const { return PlayerStatsWidget; }
+
+	/** Add skill bar widget as a child to HUD widget */
+	void AddSkillBarWidget(USkillBarWidget* NewWidget);
+
+	/** Add skill tree widget as a child to HUD widget */
+	void AddSkillTreeWidget(UDynamicSkillTreeWidget* NewWidget);
+
+	/** Add dialogue widget as a child to HUD widget */
+	void AddDialogueWidget(UDialogueWindowWidget* NewWidget);
+
+private:
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D DialogueWidgetSize;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D DialogueWidgetPosition;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D SkillBarWidgetSize;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D SkillBarWidgetPosition;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FAnchors SkillBarWidgetAnchor;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D SkillTreeWidgetSize;
+
+	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector2D SkillTreeWidgetPosition;
+
 
 
 };
