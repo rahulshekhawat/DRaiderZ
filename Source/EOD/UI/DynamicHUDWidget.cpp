@@ -24,7 +24,6 @@ bool UDynamicHUDWidget::Initialize()
 		PlayerStatsWidget)
 	{
 		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
-		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
 		PlayerStatsWidget->SetVisibility(ESlateVisibility::Hidden);
 
 		return true;

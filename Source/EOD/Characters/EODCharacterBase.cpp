@@ -13,6 +13,8 @@
 #include "EOD/Characters/Components/GameplaySkillsComponent.h"
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
 
+#include "DynamicHUDWidget.h"
+
 #include "States/IdleWalkRunState.h"
 #include "States/DeadState.h"
 #include "States/DodgeState.h"

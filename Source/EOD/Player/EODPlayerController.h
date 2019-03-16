@@ -9,6 +9,7 @@
 #include "EODPlayerController.generated.h"
 
 class UHUDWidget;
+class UDynamicHUDWidget;
 class UPauseMenuWidget;
 class USkillTreeComponent;
 class APlayerSkillTreeManager;
@@ -114,7 +115,7 @@ public:
 	//  User Interface
 	// --------------------------------------
 
-	FORCEINLINE UHUDWidget* GetHUDWidget() const { return HUDWidget; }
+	FORCEINLINE UDynamicHUDWidget* GetHUDWidget() const { return HUDWidget; }
 
 	FORCEINLINE UDialogueWindowWidget* GetDialogueWidget() const { return DialogueWidget; }
 
@@ -123,11 +124,11 @@ public:
 private:
 	/** Player's head-up display widget */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI", meta = (AllowPrivateAccess = "true"))
-	UHUDWidget* HUDWidget;
+	UDynamicHUDWidget* HUDWidget;
 
 	/** The widget class to use for player's head-up display */
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
-	TSubclassOf<UHUDWidget> HUDWidgetClass;
+	TSubclassOf<UDynamicHUDWidget> HUDWidgetClass;
 
 	/** Dialogue widget used to display NPC dialogues */
 	UPROPERTY(Transient, BlueprintReadWrite, Category = "Player UI", meta = (AllowPrivateAccess = "true"))

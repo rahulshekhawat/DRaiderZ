@@ -60,11 +60,11 @@ protected:
 	UInventoryWidget* InventoryWidget;
 
 	/** Widget containing skills that can be used by player */
-	UPROPERTY(Transient, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(Transient, BlueprintReadOnly)
 	USkillBarWidget* SkillBarWidget;
 
 	/** Widget containing skill trees of all vocations */
-	UPROPERTY(Transient, BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(Transient, BlueprintReadOnly)
 	UDynamicSkillTreeWidget* SkillTreeWidget;
 
 public:

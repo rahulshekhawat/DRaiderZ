@@ -9,7 +9,13 @@
 #include "EOD/Player/Components/InventoryComponent.h"
 #include "EOD/Player/Components/PlayerStatsComponent.h"
 
-#include "EOD/UI/HUDWidget.h"
+#include "DynamicHUDWidget.h"
+#include "StatusIndicatorWidget.h"
+#include "InventoryWidget.h"
+#include "PlayerStatsWidget.h"
+#include "SkillBarWidget.h"
+#include "DynamicSkillTreeWidget.h"
+
 #include "EOD/Statics/EODLibrary.h"
 #include "EOD/SaveSystem/PlayerSaveGame.h"
 
@@ -213,7 +219,7 @@ void AEODPlayerController::CreateHUDWidget()
 {
 	if (!IsValid(HUDWidget) && IsLocalPlayerController() && HUDWidgetClass.Get())
 	{
-		HUDWidget = CreateWidget<UHUDWidget>(this, HUDWidgetClass);
+		HUDWidget = CreateWidget<UDynamicHUDWidget>(this, HUDWidgetClass);
 		if (IsValid(HUDWidget))
 		{
 			HUDWidget->AddToViewport();
@@ -291,7 +297,7 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 	}
 	*/
 
-	USkillTreeWidget* STWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
+	UDynamicSkillTreeWidget* STWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
 	if (STWidget && STWidget->IsVisible())
 	{
 		STWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -299,7 +305,7 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 	else if (STWidget && !STWidget->IsVisible())
 	{
 		STWidget->SetVisibility(ESlateVisibility::Visible);
-		STWidget->RefreshVisuals();
+		// STWidget->RefreshVisuals();
 	}
 }
 
