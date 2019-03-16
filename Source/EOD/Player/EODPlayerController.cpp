@@ -532,6 +532,7 @@ void AEODPlayerController::OnPressingEscapeKey()
 
 void AEODPlayerController::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
+
 	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetGameplaySkillsComponent()))
 	{
 		EODCharacter->GetGameplaySkillsComponent()->OnPressingSkillKey(SkillKeyIndex);

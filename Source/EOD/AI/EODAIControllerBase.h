@@ -6,6 +6,8 @@
 #include "AIController.h"
 #include "EODAIControllerBase.generated.h"
 
+class UAIStatsComponent;
+
 /**
  * 
  */
@@ -14,4 +16,34 @@ class EOD_API AEODAIControllerBase : public AAIController
 {
 	GENERATED_BODY()
 	
+public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
+	AEODAIControllerBase(const FObjectInitializer& ObjectInitializer);
+
+	virtual void PostInitializeComponents() override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
+
+	// --------------------------------------
+	//  Components
+	// --------------------------------------
+
+	
+
+private:
+
+	UPROPERTY(Category = Components, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAIStatsComponent* StatsComponent;
+
+
+
+
 };

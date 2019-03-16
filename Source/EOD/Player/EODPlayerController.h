@@ -47,22 +47,21 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	// virtual void UnPossess() override;
-
 	virtual void SetPawn(APawn* InPawn) override;
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// 
-public:
+	// --------------------------------------
+	//  
+	// --------------------------------------
+
 	FORCEINLINE AEODCharacterBase* GetEODCharacter() const { return EODCharacter; }
 
 	void LoadPlayerState();
 
 private:
+
 	UPROPERTY()
 	AEODCharacterBase* EODCharacter;
-
 
 public:
 
@@ -70,9 +69,11 @@ public:
 	//  Components
 	// --------------------------------------
 
-	FORCEINLINE UInventoryComponent* GetInventoryComponent() const;
+	FORCEINLINE UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 
 	FORCEINLINE USkillTreeComponent* GetSkillTreeComponent() const { return SkillTreeComponent; }
+
+	FORCEINLINE UPlayerStatsComponent* GetStatsComponent() const { return StatsComponent; }
 
 	static const FName InventoryComponentName;
 	
@@ -81,14 +82,17 @@ public:
 	static const FName StatsComponentName;
 
 private:
-	//~ Inventory component
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+
+	/** Player inventory */
+	UPROPERTY(Category = Components, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInventoryComponent* InventoryComponent;
 
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	/** Player skill tree */
+	UPROPERTY(Category = Components, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillTreeComponent* SkillTreeComponent;
 
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	/** Player Stats */
+	UPROPERTY(Category = Components, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UPlayerStatsComponent* StatsComponent;
 
 public:
@@ -249,7 +253,7 @@ public:
 private:
 
 	// --------------------------------------
-	//  
+	//  Constants
 	// --------------------------------------
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player Constants")
@@ -271,11 +275,6 @@ private:
 	friend class AEODCharacterBase;
 
 };
-
-FORCEINLINE UInventoryComponent* AEODPlayerController::GetInventoryComponent() const
-{
-	return InventoryComponent;
-}
 
 FORCEINLINE void AEODPlayerController::SwitchToUIInput()
 {
