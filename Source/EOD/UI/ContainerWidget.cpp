@@ -21,7 +21,7 @@ bool UContainerWidget::Initialize()
 		SubText->SetVisibility(ESlateVisibility::Hidden);
 		CooldownText->SetVisibility(ESlateVisibility::Hidden);
 
-		InitializeContainer();
+		Internal_InitializeContainer();
 		return true;
 	}
 	return false;
@@ -30,7 +30,7 @@ bool UContainerWidget::Initialize()
 void UContainerWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	InitializeContainer();
+	Internal_InitializeContainer();
 }
 
 void UContainerWidget::NativeDestruct()
@@ -77,11 +77,56 @@ FReply UContainerWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, cons
 	return Reply;
 }
 
+void UContainerWidget::SetIsEnabled(bool bInIsEnabled)
+{
+	Super::SetIsEnabled(bInIsEnabled);
+}
+
+void UContainerWidget::SetCanBeClicked(bool bValue)
+{
+	bCanBeClicked = bValue;
+	//~ @todo Update container's border material
+}
+
+void UContainerWidget::SetCanBeDragged(bool bValue)
+{
+	bCanBeDragged = bValue;
+	//~ @todo Update container's border material
+}
+
 void UContainerWidget::UpdateDescription(const FString& NewDescription)
 {
 }
 
-void UContainerWidget::InitializeContainer()
+void UContainerWidget::UpdateIcon(UTexture* NewIcon)
+{
+	if (ItemImage)
+	{
+		// If the NewIcon is a valid texture
+		if (NewIcon)
+		{
+			FSlateBrush SlateBrush;
+			SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+			SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+			SlateBrush.ImageType = ESlateBrushImageType::FullColor;
+			SlateBrush.SetResourceObject(NewIcon);
+			ItemImage->SetBrush(SlateBrush);
+		}
+		// If the NewIcon is NULL, we simply remove the previously set image inside ItemImage
+		else
+		{
+			FSlateBrush SlateBrush;
+			SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+			SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
+			SlateBrush.ImageType = ESlateBrushImageType::NoImage;
+			ItemImage->SetBrush(SlateBrush);
+		}
+
+		ContainerData.Icon = NewIcon;
+	}
+}
+
+void UContainerWidget::Internal_InitializeContainer()
 {
 	if (BorderImage)
 	{

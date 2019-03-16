@@ -10,6 +10,7 @@
 class UImage;
 class UTextBlock;
 class UMaterialInstanceDynamic;
+class UTooltipWidget;
 
 /** Determines the type of container widget */
 UENUM(BlueprintType)
@@ -119,6 +120,11 @@ public:
 	/** Returns true if this container is initialized */
 	inline bool IsContainerInitialized() const { return IsContainerValid(); }
 
+private:
+
+	/** Internal method (private) to initialie and do some initial setup on child widgets */
+	void Internal_InitializeContainer();
+
 protected:
 
 	// --------------------------------------
@@ -140,6 +146,9 @@ protected:
 	// --------------------------------------
 	//	Constants : Variables that aren't meant to be changed once initialized
 	// --------------------------------------
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Constants")
+	UMaterialInstanceDynamic* EmptyBorderMID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Container Constants")
 	EContainerType ContainerType;
@@ -163,20 +172,47 @@ protected:
 public:
 
 	// --------------------------------------
-	//	Updating Child Widgets
+	//	Container Behaviour
 	// --------------------------------------
 
-	UFUNCTION()
-	void UpdateDescription(const FString& NewDescription);
+	/** Sets the current enabled status of this container */
+	virtual void SetIsEnabled(bool bInIsEnabled) override;
+
+	/** Sets whether this container can be clicked */
+	void SetCanBeClicked(bool bValue);
+
+	/** Sets whether this container can be dragged */
+	void SetCanBeDragged(bool bValue);
 
 protected:
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Child")
-	UMaterialInstanceDynamic* EmptyBorderMID;
+	/** Determines whether this container can be clicked */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Behaviour")
+	uint32 bCanBeClicked : 1;
+
+	/** Determines whether this container can be dragged */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Behaviour")
+	uint32 bCanBeDragged : 1;
+
+public:
+
+	// --------------------------------------
+	//	Updating Container and it's Child Widgets
+	// --------------------------------------
+
+	/** Update the description for this container */
+	UFUNCTION()
+	void UpdateDescription(const FString& NewDescription);
+
+	/** Update the display icon of this container */
+	UFUNCTION()
+	void UpdateIcon(UTexture* NewIcon);
+
+protected:
+
 
 private:
 
-	void InitializeContainer();
 
 
 };

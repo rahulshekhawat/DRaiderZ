@@ -7,7 +7,7 @@
 #include "TooltipWidget.generated.h"
 
 /**
- * UITooltipWidget pops up on hovering over a relevant UI element (e.g. inventory item)
+ * UTooltipWidget pops up on hovering over a relevant UI element (e.g. inventory item)
  * and is used to display information of that particular item.
  */
 UCLASS()

@@ -13,7 +13,6 @@ USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitial
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicated(false);
-	// SetIsReplicated(true);
 }
 
 void USkillTreeComponent::BeginPlay()

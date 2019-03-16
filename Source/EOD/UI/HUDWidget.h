@@ -20,7 +20,7 @@
 #include "HUDWidget.generated.h"
 
 /**
-* HUDWidget is used to display player HUD
+ * HUDWidget is used to display player HUD
  */
 UCLASS()
 class EOD_API UHUDWidget : public UUserWidget
@@ -28,6 +28,10 @@ class EOD_API UHUDWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//	UE4 Method Overrides
+	// --------------------------------------
 
 	UHUDWidget(const FObjectInitializer& ObjectInitializer);
 
@@ -37,10 +41,10 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// CHILD WIDGETS
-	////////////////////////////////////////////////////////////////////////////////
-protected:
+	// --------------------------------------
+	//	Child Widgets
+	// --------------------------------------
+
 	/** Widget containing health, mana, and stamina bars */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UStatusIndicatorWidget* StatusIndicatorWidget;

@@ -40,7 +40,7 @@ public:
 	virtual void NativeDestruct() override;
 
 	// --------------------------------------
-	//	Necessary Child Widget
+	//	Child Widgets
 	// --------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
