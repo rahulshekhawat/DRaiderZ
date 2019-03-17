@@ -39,6 +39,8 @@ AEODPlayerController::AEODPlayerController(const FObjectInitializer & ObjectInit
 	StatsComponent = ObjectInitializer.CreateDefaultSubobject<UPlayerStatsComponent>(this, AEODPlayerController::StatsComponentName);
 
 	DodgeStaminaCost = 30;
+	bEnableTouchEvents = false;
+	bForceFeedbackEnabled = false;
 }
 
 void AEODPlayerController::SetupInputComponent()
@@ -164,6 +166,7 @@ void AEODPlayerController::BeginPlay()
 
 	if (IsLocalController())
 	{
+		/*
 		UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
 		if (EODGI)
 		{
@@ -174,6 +177,7 @@ void AEODPlayerController::BeginPlay()
 				// SkillTreeWidget->AddToViewport();
 			}
 		}
+		*/
 	}
 }
 
@@ -211,6 +215,7 @@ void AEODPlayerController::LoadPlayerState()
 	UPlayerSaveGame* PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
 	if (IsValid(PlayerSaveGame) && IsValid(SkillTreeComponent))
 	{
+		
 		// SkillTreeComponent->
 	}
 }

@@ -10,7 +10,7 @@
 
 class UHUDWidget;
 class UDynamicHUDWidget;
-class UPauseMenuWidget;
+class UInGameMenuWidget;
 class USkillTreeComponent;
 class APlayerSkillTreeManager;
 class USkillTreeWidget;
@@ -49,6 +49,7 @@ public:
 
 	virtual void SetPawn(APawn* InPawn) override;
 
+public:
 
 	// --------------------------------------
 	//  
@@ -123,11 +124,12 @@ public:
 
 	FORCEINLINE UDialogueWindowWidget* GetDialogueWidget() const { return DialogueWidget; }
 
-	FORCEINLINE UPauseMenuWidget* GetPauseMenuWidget() const { return PauseMenuWidget; }
+	FORCEINLINE UInGameMenuWidget* GetPauseMenuWidget() const { return InGameMenuWidget; }
 
-private:
+protected:
+
 	/** Player's head-up display widget */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI")
 	UDynamicHUDWidget* HUDWidget;
 
 	/** The widget class to use for player's head-up display */
@@ -135,18 +137,22 @@ private:
 	TSubclassOf<UDynamicHUDWidget> HUDWidgetClass;
 
 	/** Dialogue widget used to display NPC dialogues */
-	UPROPERTY(Transient, BlueprintReadWrite, Category = "Player UI", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Player UI")
 	UDialogueWindowWidget* DialogueWidget;
 
 	/** The widget class used for dialogue widget */
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<UDialogueWindowWidget> DialogueWidgetClass;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI", meta = (AllowPrivateAccess = "true"))
-	UPauseMenuWidget* PauseMenuWidget;
+	/** In-game menu widget that can be brought up when player presses escape key */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI")
+	UInGameMenuWidget* InGameMenuWidget;
 
+	/** The widget class used for in-game widget */
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
-	TSubclassOf<UPauseMenuWidget> PauseMenuWidgetClass;
+	TSubclassOf<UInGameMenuWidget> PauseMenuWidgetClass;
+
+private:
 
 	void CreateHUDWidget();
 
@@ -164,36 +170,64 @@ public:
 	//  Input Handling
 	// --------------------------------------
 
-	FORCEINLINE void SwitchToUIInput();
+	/** Returns true if auto move is enabled */
+	FORCEINLINE bool IsAutoMoveEnabled() const { return bAutoMoveEnabled; }
 
-	FORCEINLINE void SwitchToGameInput();
+	/** Switch to UI input mode */
+	inline void SwitchToUIInput();
 
+	/** Switch to game input mode */
+	inline void SwitchToGameInput();
+
+	/** Toggle display of PlayerStatsWidget */
 	void TogglePlayerStatsUI();
 
+	/** Toggle display of HUDWidget */
 	void TogglePlayerHUD();
 
+	/** Toggle display of SkillTreeWidget */
 	void TogglePlayerSkillTreeUI();
 
+	/** Toggle display of InventoryWidget */
 	void TogglePlayerInventoryUI();
 
 private:
-	void OnPressedForward();
 
-	void OnReleasedForward();
-
-	void OnPressedBackward();
-
-	void OnReleasedBackward();
-
+	/** Determines whether automatic movement is enabled on possessed pawn */
 	bool bAutoMoveEnabled;
 
-	FORCEINLINE bool IsAutoMoveEnabled() const;
+	/** 
+	 * Event called when player presses the forward key.
+	 * This is used to set bForwardPressed boolean that is used to initiate forward lunging atack
+	 */
+	void OnPressedForward();
 
+	/**
+	 * Event called when player presses the forward key.
+	 * This is used to set bForwardPressed boolean that is used to initiate forward lunging atack
+	 */
+	void OnReleasedForward();
+
+	/**
+	 * Event called when player presses the backward key.
+	 * This is used to set bBackwardPressed boolean that is used to initiate backward lunging atack
+	 */
+	void OnPressedBackward();
+
+	/**
+	 * Event called when player presses the backward key.
+	 * This is used to set bBackwardPressed boolean that is used to initiate backward lunging atack
+	 */
+	void OnReleasedBackward();
+
+	/** Set whether possessed pawn should move automatically or not */
 	FORCEINLINE void SetAutoMoveEnabled(bool bValue);
 
-	FORCEINLINE void EnableAutoMove();
+	/** Enable automatic movement */
+	inline void EnableAutoMove();
 
-	FORCEINLINE void DisableAutoMove();
+	/** Disable automatic movement */
+	inline void DisableAutoMove();
 
 	/** Move controlled pawn forward/backward */
 	void MovePawnForward(const float Value);
@@ -201,42 +235,56 @@ private:
 	/** Move controlled pawn left/right */
 	void MovePawnRight(const float Value);
 
+	/** Make the possessed pawn jump */
 	void MakePawnJump();
 
+	/** Zoom in pawn camera */
 	void ZoomInCamera();
 
+	/** Zoom out pawn camera */
 	void ZoomOutCamera();
 
+	/** Event called on pressing the normal attack key */
 	void OnPressingNormalAttackKey();
 
+	/** Event called on releasing the normal attack key */
 	void OnReleasingNormalAttackKey();
 
+	/** Attempt to make the possessed pawn dodge */
 	void AttemptDodge();
 
+	/** Attempt to interact with the nearest interactive actor */
 	void TriggerInteraction();
 
+	/** Enable or disable auto move */
 	void ToggleAutoMove();
 
+	/** Show or hide mouse cursor */
 	void ToggleMouseCursor();
 
 	/** Put or remove weapon inside sheath */
 	void ToggleSheathe();
 
+	/** Event called when player presses guard key */
 	void OnPressingGuardKey();
-
+	
+	/** Event called when player releases guard key */
 	void OnReleasingGuardKey();
 
+	/** Event called when player presses escape key */
 	void OnPressingEscapeKey();
 
+	/** Called when player presses a skill key at given skill index */
 	void OnPressingSkillKey(const int32 SkillKeyIndex);
 
+	/** Called when player releases a skill key at given skill index */
 	void OnReleasingSkillKey(const int32 SkillKeyIndex);
 
-	/** Called when player presses a skill key */
+	/** Method bound to player input : called when a skill key is pressed */
 	template<uint32 SkillKeyIndex>
 	inline void PressedSkillKey();
 
-	/** Called when player releases a skill key */
+	/** Method bound to player input : called when a skill key is released */
 	template<uint32 SkillKeyIndex>
 	inline void ReleasedSkillKey();
 
@@ -276,7 +324,7 @@ private:
 
 };
 
-FORCEINLINE void AEODPlayerController::SwitchToUIInput()
+inline void AEODPlayerController::SwitchToUIInput()
 {
 	bShowMouseCursor = true;
 	FInputModeGameAndUI GameAndUIInputMode;
@@ -285,7 +333,7 @@ FORCEINLINE void AEODPlayerController::SwitchToUIInput()
 	SetInputMode(GameAndUIInputMode);
 }
 
-FORCEINLINE void AEODPlayerController::SwitchToGameInput()
+inline void AEODPlayerController::SwitchToGameInput()
 {
 	bShowMouseCursor = false;
 	FInputModeGameOnly GameOnlyInputMode;
@@ -293,17 +341,12 @@ FORCEINLINE void AEODPlayerController::SwitchToGameInput()
 	SetInputMode(GameOnlyInputMode);
 }
 
-FORCEINLINE bool AEODPlayerController::IsAutoMoveEnabled() const
-{
-	return bAutoMoveEnabled;
-}
-
 FORCEINLINE void AEODPlayerController::SetAutoMoveEnabled(bool bValue)
 {
 	bAutoMoveEnabled = bValue;
 }
 
-FORCEINLINE void AEODPlayerController::EnableAutoMove()
+inline void AEODPlayerController::EnableAutoMove()
 {
 	SetAutoMoveEnabled(true);
 	if (EODCharacter)
@@ -312,7 +355,7 @@ FORCEINLINE void AEODPlayerController::EnableAutoMove()
 	}
 }
 
-FORCEINLINE void AEODPlayerController::DisableAutoMove()
+inline void AEODPlayerController::DisableAutoMove()
 {
 	SetAutoMoveEnabled(false);
 	if (EODCharacter)

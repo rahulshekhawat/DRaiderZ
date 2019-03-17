@@ -136,7 +136,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree")
 	TSubclassOf<APlayerSkillTreeManager> PlayerSkillTreeManagerClass;
 
-	UPROPERTY(Transient)
-	APlayerSkillTreeManager* SkillTreeManager;
+	// UPROPERTY(Transient)
+	// APlayerSkillTreeManager* SkillTreeManager;
 
 };

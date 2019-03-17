@@ -166,6 +166,7 @@ void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 
 void UEODGameInstance::OnPostLoadMap(UWorld* WorldObj)
 {
+	/*
 	check(WorldObj);
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -173,4 +174,5 @@ void UEODGameInstance::OnPostLoadMap(UWorld* WorldObj)
 
 	check(SkillTreeManager);
 	SkillTreeManager->CreateSkillTreeWidget(this);
+	*/
 }
