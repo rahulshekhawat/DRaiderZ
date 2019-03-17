@@ -83,9 +83,8 @@ public:
 
 	virtual void NativeDestruct() override;
 
-
 	// --------------------------------------
-	//	Necessary Child Widgets
+	//	Child Widgets
 	// --------------------------------------
 
 	/** The border around the icon */
