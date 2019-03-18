@@ -98,7 +98,7 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeSlots(const TMap<FName, UGamepl
 				Container->EODItemInfo.Icon = Skill->GetSkillIcon();
 				Container->EODItemInfo.ItemGroup = Key.ToString();
 				Container->SkillGroup = Key.ToString();
-				Container->SkillState.CurrentUpgradeLevel = Skill->CurrentUpgrade;
+				Container->SkillState.CurrentUpgradeLevel = Skill->GetCurrentUpgrade();
 				Container->SkillState.MaxUpgradeLevel = Skill->GetMaxUpgradeLevel();
 				Container->RefreshContainerVisuals();
 			}

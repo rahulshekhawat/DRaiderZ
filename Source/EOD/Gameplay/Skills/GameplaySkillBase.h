@@ -52,7 +52,7 @@ public:
 
 	FORCEINLINE int32 GetMaxUpgradeLevel() const { return MaxUpgrades; }
 
-	FORCEINLINE UTexture* GetSkillIcon() const { return Cache_Icon; }
+	FORCEINLINE UTexture* GetSkillIcon() const { return Icon; }
 
 	FORCEINLINE FString	GetInGameSkillName() const { return InGameName; }
 
@@ -77,7 +77,7 @@ protected:
 
 	/** Icon used to represent this skill inside the game */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
-	TSoftObjectPtr<UTexture> Icon;
+	UTexture* Icon;
 
 	/** Maximum upgrades available for this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
@@ -107,14 +107,20 @@ protected:
 	UPROPERTY(Transient)
 	TWeakObjectPtr<AController> SkillOwner;
 
-	UPROPERTY(Transient)
-	UTexture* Cache_Icon;
-
 public:
 
 	// --------------------------------------
 	//	Skill State
 	// --------------------------------------
 
+	FORCEINLINE int32 GetCurrentUpgrade()const { return CurrentUpgrade; }
+
+	//~ @todo add check to make sure current upgrade is not more than maxupgrade
+	void SetCurrentUpgrade(int32 Value) { CurrentUpgrade = Value; }
+
+protected:
+
 	int32 CurrentUpgrade;
+
+
 };

@@ -11,6 +11,74 @@
 
 class UStatusEffectBase;
 
+
+USTRUCT(BlueprintType)
+struct EOD_API FActiveSkillLevelUpInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** Stamina cost for using this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Costs")
+	int32 StaminaCost;
+
+	/** Mana cost for using this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Costs")
+	int32 ManaCost;
+
+	/** Damage in percentage of player's magickal or physical attack that will be inflicted on enemy */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
+	int32 DamagePercent;
+
+	/** Determines if this skill can be blocked */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
+	bool bUnblockable;
+
+	/** Determines if this skill can be dodged */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
+	bool bUndodgable;
+
+	/** Determines if the 'skill deflected' animation should play on getting blocked. Only applicable if this skill can be blocked */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
+	bool bIgnoresBlock;
+
+	/** Crowd control effect on hit */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
+	ECrowdControlEffect CrowdControlEffect;
+
+	/** The duration for which the crowd control effect should last (if applicable) */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
+	float CrowdControlEffectDuration;
+
+	/** Immunities from crowd control effects granted on using this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information", meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	uint8 CrowdControlImmunities;
+
+	/** The duration before which the same skill can be used again */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
+	float Cooldown;
+
+	//~ @todo
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
+	TSoftClassPtr<UStatusEffectBase> StatusEffectSoftClass;
+
+
+	FActiveSkillLevelUpInfo()
+	{
+		StaminaCost = 0;
+		ManaCost = 0;
+		DamagePercent = 0;
+		bUnblockable = false;
+		bUndodgable = false;
+		bIgnoresBlock = false;
+		CrowdControlEffect = ECrowdControlEffect::Flinch;
+		CrowdControlEffectDuration = 0.f;
+		CrowdControlImmunities = 0;
+		Cooldown = 0.f;
+		StatusEffectSoftClass = NULL;
+	}
+
+};
+
 /**
  * Base class for all active skills
  */
@@ -87,14 +155,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
 	ESkillEffect SkillEffect;
 
-	/** Stamina cost for using this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Costs")
-	int32 StaminaCost;
-
-	/** Mana cost for using this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Costs")
-	int32 ManaCost;
-
 	/** Skills, any of which MUST be used before using this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	TArray<FName> PrecedingSkillGroups;
@@ -107,45 +167,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	FGameplayTag RequiredOwnerGameplayTag;
 
-	/** Damage in percentage of player's magickal or physical attack that will be inflicted on enemy */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	int32 DamagePercent;
-
-	/** Determines if this skill can be blocked */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	bool bUnblockable;
-
-	/** Determines if this skill can be dodged */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	bool bUndodgable;
-
-	/** Determines if the 'skill deflected' animation should play on getting blocked. Only applicable if this skill can be blocked */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	bool bIgnoresBlock;
-
-	/** Crowd control effect on hit */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	ECrowdControlEffect CrowdControlEffect;
-
-	/** The duration for which the crowd control effect should last (if applicable) */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	float CrowdControlEffectDuration;
-
-	/** Immunities from crowd control effects granted on using this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information", meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
-	uint8 CrowdControlImmunities;
-
-	/** The duration before which the same skill can be used again */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	float Cooldown;
-
 	/** The camera to play when this skill hits an enemy */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
 	TSoftClassPtr<UCameraShake> CameraShakeOnHitSoftClass;
 
-	//~ @todo
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
-	TSoftClassPtr<UStatusEffectBase> StatusEffectSoftClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Level Up Info")
+	TArray<FActiveSkillLevelUpInfo> SkillLevelUpsInfo;
 
 protected:
 

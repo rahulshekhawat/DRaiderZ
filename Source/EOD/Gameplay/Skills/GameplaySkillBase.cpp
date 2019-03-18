@@ -13,8 +13,6 @@ void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* O
 {
 	SkillInstigator = Instigator;
 	SkillOwner = Owner;
-
-	Cache_Icon = Icon.LoadSynchronous();
 }
 
 void UGameplaySkillBase::Reinitialize()

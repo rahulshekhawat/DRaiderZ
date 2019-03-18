@@ -120,7 +120,7 @@ void USkillTreeComponent::Internal_LoadSkill(const FName& SkillGroup,
 		Skill->InitSkill(SkillOwner, nullptr);
 		if (SaveGame && SaveGame->SkillTreeSlotsSaveData.Contains(SkillGroup))
 		{
-			Skill->CurrentUpgrade = SaveGame->SkillTreeSlotsSaveData[SkillGroup].CurrentUpgrade;
+			Skill->SetCurrentUpgrade(SaveGame->SkillTreeSlotsSaveData[SkillGroup].CurrentUpgrade);
 		}
 		PlayerSkillsMap.Add(SkillGroup, Skill);
 	}
