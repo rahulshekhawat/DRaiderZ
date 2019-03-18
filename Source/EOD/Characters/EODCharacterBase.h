@@ -470,7 +470,7 @@ public:
 	virtual void FinishDodge();
 
 	// --------------------------------------
-	//	Character Determinants
+	//	Character Constants
 	// --------------------------------------
 
 	/** Player gender : determines the animations and armor meshes to use. */
