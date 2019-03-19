@@ -61,22 +61,6 @@ void UDynamicHUDWidget::AddSkillBarWidget(USkillBarWidget* NewWidget)
 	SkillBarWidget = NewWidget;
 }
 
-void UDynamicHUDWidget::AddSkillTreeWidget(UDynamicSkillTreeWidget* NewWidget)
-{
-	if (SkillTreeWidget == NewWidget || NewWidget == nullptr)
-	{
-		return;
-	}
-
-	UCanvasPanelSlot* CPSlot = MainCanvas->AddChildToCanvas(NewWidget);
-	if (CPSlot)
-	{
-		CPSlot->SetSize(SkillTreeWidgetSize);
-		CPSlot->SetPosition(SkillTreeWidgetPosition);
-	}
-	SkillTreeWidget = NewWidget;
-}
-
 void UDynamicHUDWidget::AddDialogueWidget(UDialogueWindowWidget* NewWidget)
 {
 	// @todo - improve?

@@ -84,9 +84,6 @@ public:
 	/** Add skill bar widget as a child to HUD widget */
 	void AddSkillBarWidget(USkillBarWidget* NewWidget);
 
-	/** Add skill tree widget as a child to HUD widget */
-	void AddSkillTreeWidget(UDynamicSkillTreeWidget* NewWidget);
-
 	/** Add dialogue widget as a child to HUD widget */
 	void AddDialogueWidget(UDialogueWindowWidget* NewWidget);
 
@@ -106,13 +103,5 @@ private:
 
 	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FAnchors SkillBarWidgetAnchor;
-
-	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	FVector2D SkillTreeWidgetSize;
-
-	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	FVector2D SkillTreeWidgetPosition;
-
-
 
 };

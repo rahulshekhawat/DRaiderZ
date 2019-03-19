@@ -62,7 +62,7 @@ struct EOD_API FContainerData
 		InGameName = FString("");
 		Description = FString("");
 		EODItemType = EEODItemType::None;
-		CurrentValue = 1;
+		CurrentValue = 0;
 		MaxValue = 1;
 	}
 };
@@ -234,7 +234,6 @@ public:
 
 	UFUNCTION()
 	void SetMaxValue(int32 NewValue);
-
 
 protected:
 

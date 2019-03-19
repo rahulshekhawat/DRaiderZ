@@ -68,7 +68,21 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* const SkillL
 {
 	InitializeSkillTreeLayout(SkillLayoutTable);
 
-	// @todo skillTreeSlotSaveData load
+	TArray<FName> Keys;
+	SkillContainersMap.GetKeys(Keys);
+
+	for (FName Key : Keys)
+	{
+		if (SkillTreeSlotSaveData.Contains(Key))
+		{
+			UContainerWidget* Container = SkillContainersMap[Key];
+			FSkillTreeSlotSaveData TempSlotData = SkillTreeSlotSaveData[Key];
+			if (Container)
+			{
+				Container->SetCurrentValue(TempSlotData.CurrentUpgrade);
+			}
+		}
+	}
 }
 
 void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* SkillLayoutTable)
@@ -87,34 +101,6 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* SkillLayoutT
 	}
 }
 
-/*
-void UDynamicSkillTreeWidget::InitializeSkillTreeSlots(const TMap<FName, UGameplaySkillBase*>& PlayerSkillsMap)
-{
-	TArray<FName> Keys;
-	PlayerSkillsMap.GetKeys(Keys);
-	for (FName Key : Keys)
-	{
-		UGameplaySkillBase* Skill = PlayerSkillsMap[Key];
-		if (SkillContainersMap.Contains(Key) && Skill)
-		{
-			UContainerWidget* Container = SkillContainersMap[Key];
-			if (Container)
-			{
-				Container->EODItemInfo.InGameName = Skill->GetInGameSkillName();
-				Container->EODItemInfo.Description = Skill->GetInGameDescription();
-				Container->EODItemInfo.EODItemType = EEODItemType::ActiveSkill;
-				Container->EODItemInfo.Icon = Skill->GetSkillIcon();
-				Container->EODItemInfo.ItemGroup = Key.ToString();
-				Container->SkillGroup = Key.ToString();
-				Container->SkillState.CurrentUpgradeLevel = Skill->GetCurrentUpgrade();
-				Container->SkillState.MaxUpgradeLevel = Skill->GetMaxUpgradeLevel();
-				Container->RefreshContainerVisuals();
-			}
-		}
-	}
-}
-*/
-
 void UDynamicSkillTreeWidget::AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* SlotInfo)
 {
 	if (!SlotInfo || !SkillTreeSlotClass.Get())
@@ -125,15 +111,21 @@ void UDynamicSkillTreeWidget::AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* 
 	UContainerWidget* NewItemContainer = CreateWidget<UContainerWidget>(GetOwningPlayer(), SkillTreeSlotClass);
 	if (NewItemContainer)
 	{
-		SetupSlotPosition(NewItemContainer, SlotInfo->Vocation, SlotInfo->ColumnPosition, SlotInfo->RowPosition);
-		SkillContainersMap.Add(SkillGroup, NewItemContainer);
+		NewItemContainer->InitializeWithParent(this);
+
 		UGameplaySkillBase* SkillObj = Cast<UGameplaySkillBase>(SlotInfo->PlayerSkill.Get()->GetDefaultObject());
 		if (SkillObj)
 		{
 			NewItemContainer->SetIcon(SkillObj->GetSkillIcon());
+			NewItemContainer->SetInGameName(SkillObj->GetInGameSkillName());
+			NewItemContainer->SetDescription(SkillObj->GetInGameDescription());
 		}
-
+		NewItemContainer->SetMaxValue(SlotInfo->MaxUpgrades);
+		NewItemContainer->SetItemID(SkillGroup);
+		NewItemContainer->SetItemGroup(SkillGroup);
 		
+		SetupSlotPosition(NewItemContainer, SlotInfo->Vocation, SlotInfo->ColumnPosition, SlotInfo->RowPosition);
+		SkillContainersMap.Add(SkillGroup, NewItemContainer);
 	}
 }
 

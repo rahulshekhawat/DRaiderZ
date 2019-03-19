@@ -15,6 +15,20 @@ class EOD_API UTooltipWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+
+	// --------------------------------------
+	//	UE4 Method Overrides
+	// --------------------------------------
+
+	UTooltipWidget(const FObjectInitializer& ObjectInitializer);
+
+	virtual bool Initialize() override;
+
+	virtual void NativeConstruct() override;
+
+	virtual void NativeDestruct() override;
+
 	
 	
 	

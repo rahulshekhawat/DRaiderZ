@@ -117,9 +117,6 @@ public:
 	 */
 	void InitializeSkillTreeLayout(UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData);
 
-	/** Initialize skill tree slots (add skill icon and information regarding current and maximum upgrades available) from PlayerSkillsMap */
-	// void InitializeSkillTreeSlots(const TMap<FName, UGameplaySkillBase*>& PlayerSkillsMap);
-
 protected:
 
 	/** The class to use for creating skill slot widgets */
@@ -131,26 +128,6 @@ private:
 	/** A map of skill group to it's respective skill slot container */
 	UPROPERTY(Transient)
 	TMap<FName, UContainerWidget*> SkillContainersMap;
-
-	/** A list of all the assassin skills available in the skill tree */
-	UPROPERTY(Transient)
-	TArray<UContainerWidget*> AssassinSkills;
-
-	/** A list of all the berserker skills available in the skill tree */
-	UPROPERTY(Transient)
-	TArray<UContainerWidget*> BerserkerSkills;
-
-	/** A list of all the cleric skills available in the skill tree */
-	UPROPERTY(Transient)
-	TArray<UContainerWidget*> ClericSkills;
-
-	/** A list of all the defender skills available in the skill tree */
-	UPROPERTY(Transient)
-	TArray<UContainerWidget*> DefenderSkills;
-
-	/** A list of all the sorcerer skills available in the skill tree */
-	UPROPERTY(Transient)
-	TArray<UContainerWidget*> SorcererSkills;
 
 	void AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* SlotInfo);
 
