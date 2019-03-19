@@ -124,6 +124,11 @@ void UDynamicSkillTreeWidget::AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* 
 		NewItemContainer->SetItemID(SkillGroup);
 		NewItemContainer->SetItemGroup(SkillGroup);
 		
+		if (SlotInfo->bUnlockedByDefault)
+		{
+			NewItemContainer->SetIsEnabled(true);
+		}
+
 		SetupSlotPosition(NewItemContainer, SlotInfo->Vocation, SlotInfo->ColumnPosition, SlotInfo->RowPosition);
 		SkillContainersMap.Add(SkillGroup, NewItemContainer);
 	}

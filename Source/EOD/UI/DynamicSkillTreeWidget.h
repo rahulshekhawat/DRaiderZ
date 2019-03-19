@@ -117,6 +117,8 @@ public:
 	 */
 	void InitializeSkillTreeLayout(UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData);
 
+	FORCEINLINE TMap<FName, UContainerWidget*> GetSkillContainersMap() const { return SkillContainersMap; }
+
 protected:
 
 	/** The class to use for creating skill slot widgets */

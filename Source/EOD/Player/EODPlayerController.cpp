@@ -596,7 +596,6 @@ void AEODPlayerController::SavePlayerState()
 
 void AEODPlayerController::Server_SetGender_Implementation(ECharacterGender NewGender)
 {
-	PrintToScreen(this, FString("RPC CALLED"), 10.f);
 	SetGender(NewGender);
 
 	APawn* TempPawn = GetPawn();

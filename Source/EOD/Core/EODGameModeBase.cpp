@@ -48,8 +48,6 @@ void AEODGameModeBase::InitGame(const FString& MapName, const FString& Options, 
 
 UClass* AEODGameModeBase::GetDefaultPawnClassForController_Implementation(AController* InController)
 {
-	PrintToScreen(this, FString("Default pawn class accessed"), 10.f);
-
 	AEODPlayerController* PC = Cast<AEODPlayerController>(InController);
 	if (PC)
 	{

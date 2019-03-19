@@ -32,7 +32,6 @@ bool UContainerWidget::Initialize()
 void UContainerWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	Internal_InitializeContainer();
 }
 
 void UContainerWidget::NativeDestruct()
@@ -43,7 +42,8 @@ void UContainerWidget::NativeDestruct()
 void UContainerWidget::InitializeWithParent(UUserWidget* ParentWidget)
 {
 	check(ParentWidget); // ParentWidget shouldn't be NULL
-
+	
+	ContainerParentWidget = ParentWidget;
 	if (ParentWidget->IsA(UDynamicSkillTreeWidget::StaticClass()))
 	{
 		ContainerType = EContainerType::SkillTree;
@@ -140,6 +140,8 @@ FReply UContainerWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 				}
 			}
 		}
+
+		OnClicked.Broadcast();
 	}
 	return Reply;
 }

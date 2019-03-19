@@ -12,6 +12,8 @@ class UTextBlock;
 class UMaterialInstanceDynamic;
 class UTooltipWidget;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainerClickedMCDelegate);
+
 /** Determines the type of container widget */
 UENUM(BlueprintType)
 enum class EContainerType : uint8
@@ -128,11 +130,15 @@ private:
 	/** Internal method (private) to initialie and do some initial setup on child widgets */
 	void Internal_InitializeContainer();
 
-protected:
+public:
 
 	// --------------------------------------
 	//	Handle Mouse Events
 	// --------------------------------------
+
+	FOnContainerClickedMCDelegate OnClicked;
+
+protected:
 
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 
@@ -168,6 +174,10 @@ protected:
 	/** Determines whether the sub text should be displayed in the form of 'current_value / max_value' ratio, or just as 'current_value' */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Container Behaviour")
 	bool bDisplaySubTextAsRatio;
+
+	/** Parent widget of this container */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Behaviour")
+	UUserWidget* ContainerParentWidget;
 
 	// --------------------------------------
 	//	Container Data and Cache
@@ -234,12 +244,7 @@ public:
 
 	UFUNCTION()
 	void SetMaxValue(int32 NewValue);
-
-protected:
-
-
-private:
-
+	
 
 
 };

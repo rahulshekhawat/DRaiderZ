@@ -55,4 +55,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
 	TMap<FName, FSkillTreeSlotSaveData> SkillTreeSlotsSaveData;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
+	int32 UnlockedSkillPoints;
+
 };
