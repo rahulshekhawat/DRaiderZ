@@ -9,8 +9,10 @@
 #include "Components/ActorComponent.h"
 #include "SkillTreeComponent.generated.h"
 
+class UDynamicHUDWidget;
 class UPlayerSaveGame;
 class AEODCharacterBase;
+class AEODPlayerController;
 class UGameplaySkillBase;
 class USkillPointsInfoWidget;
 class UDynamicSkillTreeWidget;
@@ -40,20 +42,8 @@ public:
 
 	FORCEINLINE USkillPointsInfoWidget* GetSkillPointsInfoWidget() const { return SkillPointsInfoWidget; }
 
-	void ToggleSkillTreeUI();
-
-	// void InitializeSkillTreeWidget();
-
-	/** Create skill tree widget and initialize the skill tree layout */
-	void CreateAndInitializeSkillTreeWidget();
-
-protected:
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	TSubclassOf<USkillPointsInfoWidget> SkillPointsInfoWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	TSubclassOf<UDynamicSkillTreeWidget> SkillTreeWidgetClass;
+	/** Initializes the skill tree widget. Called from Player Controller */
+	void InitializeSkillTreeWidget();
 
 private:
 

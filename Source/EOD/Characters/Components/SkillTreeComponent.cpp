@@ -3,11 +3,11 @@
 #include "SkillTreeComponent.h"
 #include "EODCharacterBase.h"
 #include "EODPlayerController.h"
-#include "DynamicSkillTreeWidget.h"
 #include "GameplaySkillBase.h"
 #include "EODGameInstance.h"
 #include "PlayerSaveGame.h"
 #include "DynamicHUDWidget.h"
+#include "DynamicSkillTreeWidget.h"
 
 USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -17,43 +17,28 @@ USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitial
 
 void USkillTreeComponent::BeginPlay()
 {
-	Super::BeginPlay();
-
-	// CreateAndInitializeSkillTreeWidget();
-
-
-	// InitializeSkills();
-	// InitializeSkillTreeSlots();
-	
+	Super::BeginPlay();	
 }
 
-void USkillTreeComponent::ToggleSkillTreeUI()
-{
-	if (SkillTreeWidget && SkillTreeWidget->IsVisible())
-	{
-		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
-	else if (SkillTreeWidget && !SkillTreeWidget->IsVisible())
-	{
-		SkillTreeWidget->SetVisibility(ESlateVisibility::Visible);
-	}
-}
-
-void USkillTreeComponent::CreateAndInitializeSkillTreeWidget()
+void USkillTreeComponent::InitializeSkillTreeWidget()
 {
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetOuter());
-	if (PC && PC->IsLocalController())
-	{
-		UDynamicHUDWidget* HUDWidget = PC->GetHUDWidget();
-		if (HUDWidget && !SkillTreeWidget && SkillTreeWidgetClass.Get())
-		{
-			SkillTreeWidget = CreateWidget<UDynamicSkillTreeWidget>(PC, SkillTreeWidgetClass);
-			HUDWidget->AddSkillTreeWidget(SkillTreeWidget);
+	UDynamicHUDWidget* HUDWidget = PC ? PC->GetHUDWidget() : nullptr;
+	SkillTreeWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
 
-			if (SkillTreeWidget)
-			{
-				SkillTreeWidget->InitializeSkillTreeLayout(SkillTreeLayoutTable);
-			}
+	UEODGameInstance* GI = Cast<UEODGameInstance>(PC->GetGameInstance());
+	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
+
+	if (SkillTreeWidget && SaveGame)
+	{
+		SkillPointsInfoWidget = SkillTreeWidget->GetSkillPointsInfoWidget();
+		if (SaveGame)
+		{
+			SkillTreeWidget->InitializeSkillTreeLayout(SkillTreeLayoutTable, SaveGame->SkillTreeSlotsSaveData);
+		}
+		else
+		{
+			SkillTreeWidget->InitializeSkillTreeLayout(SkillTreeLayoutTable);
 		}
 	}
 }
@@ -101,7 +86,7 @@ void USkillTreeComponent::InitializeSkillTreeSlots()
 {
 	if (SkillTreeWidget)
 	{
-		SkillTreeWidget->InitializeSkillTreeSlots(PlayerSkillsMap);
+		// SkillTreeWidget->InitializeSkillTreeSlots(PlayerSkillsMap);
 	}
 }
 

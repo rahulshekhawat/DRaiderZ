@@ -4,8 +4,8 @@
 #include "DynamicSkillTreeWidget.h"
 #include "SkillPointsInfoWidget.h"
 #include "EODPreprocessors.h"
-#include "SkillTreeItemContainer.h"
 #include "GameplaySkillBase.h"
+#include "ContainerWidget.h"
 
 #include "Button.h"
 #include "Components/CanvasPanel.h"
@@ -64,6 +64,13 @@ void UDynamicSkillTreeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData)
+{
+
+
+
+}
+
 void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* SkillLayoutTable)
 {
 	if (!SkillLayoutTable)
@@ -82,6 +89,7 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* SkillLayoutT
 
 void UDynamicSkillTreeWidget::InitializeSkillTreeSlots(const TMap<FName, UGameplaySkillBase*>& PlayerSkillsMap)
 {
+	/*
 	TArray<FName> Keys;
 	PlayerSkillsMap.GetKeys(Keys);
 	for (FName Key : Keys)
@@ -89,7 +97,7 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeSlots(const TMap<FName, UGamepl
 		UGameplaySkillBase* Skill = PlayerSkillsMap[Key];
 		if (SkillContainersMap.Contains(Key) && Skill)
 		{
-			USkillTreeItemContainer* Container = SkillContainersMap[Key];
+			UContainerWidget* Container = SkillContainersMap[Key];
 			if (Container)
 			{
 				Container->EODItemInfo.InGameName = Skill->GetInGameSkillName();
@@ -104,6 +112,7 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeSlots(const TMap<FName, UGamepl
 			}
 		}
 	}
+	*/
 }
 
 void UDynamicSkillTreeWidget::AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* SlotInfo)
@@ -113,7 +122,7 @@ void UDynamicSkillTreeWidget::AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* 
 		return;
 	}
 
-	USkillTreeItemContainer* NewItemContainer = CreateWidget<USkillTreeItemContainer>(GetOwningPlayer(), SkillTreeSlotClass);
+	UContainerWidget* NewItemContainer = CreateWidget<UContainerWidget>(GetOwningPlayer(), SkillTreeSlotClass);
 	if (NewItemContainer)
 	{
 		SetupSlotPosition(NewItemContainer, SlotInfo->Vocation, SlotInfo->ColumnPosition, SlotInfo->RowPosition);
@@ -121,7 +130,7 @@ void UDynamicSkillTreeWidget::AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* 
 	}
 }
 
-void UDynamicSkillTreeWidget::SetupSlotPosition(USkillTreeItemContainer* ItemContainer, EVocations Vocation, int32 Column, int32 Row)
+void UDynamicSkillTreeWidget::SetupSlotPosition(UContainerWidget* ItemContainer, EVocations Vocation, int32 Column, int32 Row)
 {
 	UCanvasPanel* CPanel = nullptr;
 
@@ -161,7 +170,8 @@ void UDynamicSkillTreeWidget::SetupSlotPosition(USkillTreeItemContainer* ItemCon
 	{
 		CPSlot->SetPosition(FVector2D(XPosition, YPosition));
 		CPSlot->SetSize(Size);
-		ItemContainer->RefreshContainerVisuals();
+		//~ @todo
+		// ItemContainer->RefreshContainerVisuals();
 	}
 }
 

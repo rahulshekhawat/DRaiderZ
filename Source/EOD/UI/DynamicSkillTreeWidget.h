@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "CharacterLibrary.h"
+#include "PlayerSaveGame.h"
+
 #include "Engine/DataTable.h"
 #include "Components/Button.h"
 #include "Styling/SlateTypes.h"
@@ -15,7 +16,7 @@ class UButton;
 class UCanvasPanel;
 class UWidgetSwitcher;
 class USkillPointsInfoWidget;
-class USkillTreeItemContainer;
+class UContainerWidget;
 
 /**
  * 
@@ -42,6 +43,10 @@ public:
 	// --------------------------------------
 	//	Child Widgets
 	// --------------------------------------
+
+	FORCEINLINE USkillPointsInfoWidget* GetSkillPointsInfoWidget() const { return SkillPointsInfo; }
+
+protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UCanvasPanel* AssassinCanvas;
@@ -94,12 +99,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Tree Selection Tab", meta = (BindWidget))
 	USkillPointsInfoWidget* SkillPointsInfo;
 
+public:
+
 	// --------------------------------------
 	//	Adding Skills Dynamically
 	// --------------------------------------
 
-	/** Initialize skill tree layout from SkillLayoutTable, i.e., create and add skill slots to the skill tree */
+	/**
+	 * Initialize skill tree layout from SkillLayoutTable, i.e., create and add skill slots to the skill tree
+	 * @note Use this version to initialize skill tree if there is no player save game present (i.e., we don't have access to SkillTreeSlotSaveData)
+	 */
 	void InitializeSkillTreeLayout(UDataTable* SkillLayoutTable);
+
+	/**
+	 * Initialize skill tree layout from SkillLayoutTable, i.e., create and add skill slots to the skill tree
+	 * Update skill tree slot information from SkillTreeSlotSaveData
+	 */
+	void InitializeSkillTreeLayout(UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData);
 
 	/** Initialize skill tree slots (add skill icon and information regarding current and maximum upgrades available) from PlayerSkillsMap */
 	void InitializeSkillTreeSlots(const TMap<FName, UGameplaySkillBase*>& PlayerSkillsMap);
@@ -108,37 +124,37 @@ protected:
 
 	/** The class to use for creating skill slot widgets */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Class")
-	TSubclassOf<USkillTreeItemContainer> SkillTreeSlotClass;
+	TSubclassOf<UContainerWidget> SkillTreeSlotClass;
 
 private:
 
 	/** A map of skill group to it's respective skill slot container */
 	UPROPERTY(Transient)
-	TMap<FName, USkillTreeItemContainer*> SkillContainersMap;
+	TMap<FName, UContainerWidget*> SkillContainersMap;
 
 	/** A list of all the assassin skills available in the skill tree */
 	UPROPERTY(Transient)
-	TArray<USkillTreeItemContainer*> AssassinSkills;
+	TArray<UContainerWidget*> AssassinSkills;
 
 	/** A list of all the berserker skills available in the skill tree */
 	UPROPERTY(Transient)
-	TArray<USkillTreeItemContainer*> BerserkerSkills;
+	TArray<UContainerWidget*> BerserkerSkills;
 
 	/** A list of all the cleric skills available in the skill tree */
 	UPROPERTY(Transient)
-	TArray<USkillTreeItemContainer*> ClericSkills;
+	TArray<UContainerWidget*> ClericSkills;
 
 	/** A list of all the defender skills available in the skill tree */
 	UPROPERTY(Transient)
-	TArray<USkillTreeItemContainer*> DefenderSkills;
+	TArray<UContainerWidget*> DefenderSkills;
 
 	/** A list of all the sorcerer skills available in the skill tree */
 	UPROPERTY(Transient)
-	TArray<USkillTreeItemContainer*> SorcererSkills;
+	TArray<UContainerWidget*> SorcererSkills;
 
 	void AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* SlotInfo);
 
-	void SetupSlotPosition(USkillTreeItemContainer* ItemContainer, EVocations Vocation, int32 Column, int32 Row);
+	void SetupSlotPosition(UContainerWidget* ItemContainer, EVocations Vocation, int32 Column, int32 Row);
 
 	// --------------------------------------
 	//	Tab Switching
