@@ -445,7 +445,8 @@ void AEODCharacterBase::BindUIDelegates()
 		AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
 		if (IsValid(PC))
 		{
-			PC->CreateHUDWidget();
+			PC->InitializeHUDWidget();
+			// PC->CreateHUDWidget();
 		}
 		else
 		{

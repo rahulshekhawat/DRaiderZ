@@ -300,6 +300,13 @@ struct EOD_API FSkillTreeSlot : public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 UpgradePointsGap;
 
+	/**
+	 * Maximum number of upgrades available for this skill
+	 * This should match the MaxUpgrades value in PlayerSkill.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 MaxUpgrades;
+
 	/** Returns true if this skill tree slot contains valid information */
 	bool IsValidSlot() const
 	{
@@ -316,6 +323,7 @@ struct EOD_API FSkillTreeSlot : public FTableRowBase
 		SkillRequiredToUnlock = NAME_None;
 		MinimumPointsToUnlock = 0;
 		UpgradePointsGap = 0;
+		MaxUpgrades = 1;
 	}
 };
 

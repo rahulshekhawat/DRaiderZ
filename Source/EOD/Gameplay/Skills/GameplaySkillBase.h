@@ -10,6 +10,7 @@
 
 class AEODCharacterBase;
 class AController;
+class UGameplaySkillsComponent;
 
 /**
  * The base class for all gameplay skills
@@ -101,9 +102,15 @@ protected:
 	//	Cache
 	// --------------------------------------
 
+	/** This skill's instigator */
 	UPROPERTY(Transient)
 	TWeakObjectPtr<AEODCharacterBase> SkillInstigator;
 
+	/** Skill component of this skill's instigator */
+	UPROPERTY(Transient)
+	TWeakObjectPtr<UGameplaySkillsComponent> InstigatorSkillComponent;
+
+	/** This skill's owner (player controller or ai controller) */
 	UPROPERTY(Transient)
 	TWeakObjectPtr<AController> SkillOwner;
 

@@ -89,8 +89,7 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("ToggleMouseCursor", IE_Pressed, this, &AEODPlayerController::ToggleMouseCursor);
 
 	InputComponent->BindAction("ToggleStats", IE_Pressed, this, &AEODPlayerController::TogglePlayerStatsUI);
-	// InputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &AEODPlayerController::TogglePlayerSkillTreeUI);
-	InputComponent->BindAction("ToggleSkillTree", IE_Pressed, SkillTreeComponent, &USkillTreeComponent::ToggleSkillTreeUI);
+	InputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &AEODPlayerController::TogglePlayerSkillTreeUI);
 	InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AEODPlayerController::TogglePlayerInventoryUI);
 
 	InputComponent->BindAction("Skill_1", IE_Pressed, this, &AEODPlayerController::PressedSkillKey<1>);
@@ -156,15 +155,7 @@ void AEODPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	LoadPlayerState();
-	CreateHUDWidget();
-	// If HUD widget created successfully
-	if (IsValid(HUDWidget))
-	{
-		InitStatusIndicatorWidget();
-		InitInventoryWidget();
-		InitSkillTreeWidget();
-		InitSkillBarWidget();
-	}
+	InitializeWidgets();
 
 	if (IsLocalController())
 	{
@@ -244,12 +235,37 @@ void AEODPlayerController::SetGender(ECharacterGender NewGender)
 	}
 }
 
-void AEODPlayerController::CreateHUDWidget()
+void AEODPlayerController::InitializeWidgets()
 {
-	if (!IsValid(HUDWidget) && IsLocalPlayerController() && HUDWidgetClass.Get())
+	if (!IsLocalPlayerController())
+	{
+		return;
+	}
+	
+	InitializeHUDWidget();
+
+	// InitializeHUDWidget();
+	
+	// SkillTreeComponent->InitializeSkillTreeWidget();
+	/*
+	// CreateHUDWidget();
+	// If HUD widget created successfully
+	if (IsValid(HUDWidget))
+	{
+		InitStatusIndicatorWidget();
+		InitInventoryWidget();
+		InitSkillTreeWidget();
+		InitSkillBarWidget();
+	}
+	*/
+}
+
+void AEODPlayerController::InitializeHUDWidget()
+{
+	if (!HUDWidget && IsLocalPlayerController() && HUDWidgetClass.Get())
 	{
 		HUDWidget = CreateWidget<UDynamicHUDWidget>(this, HUDWidgetClass);
-		if (IsValid(HUDWidget))
+		if (HUDWidget)
 		{
 			HUDWidget->AddToViewport();
 		}
@@ -314,18 +330,6 @@ void AEODPlayerController::TogglePlayerHUD()
 
 void AEODPlayerController::TogglePlayerSkillTreeUI()
 {
-	/*
-	if (SkillTreeWidget && SkillTreeWidget->IsVisible())
-	{
-		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
-	else if (SkillTreeWidget && !SkillTreeWidget->IsVisible())
-	{
-		SkillTreeWidget->SetVisibility(ESlateVisibility::Visible);
-		SkillTreeWidget->RefreshVisuals();
-	}
-	*/
-
 	UDynamicSkillTreeWidget* STWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
 	if (STWidget && STWidget->IsVisible())
 	{
@@ -340,11 +344,12 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 
 void AEODPlayerController::TogglePlayerInventoryUI()
 {
-	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetInventoryWidget()) && HUDWidget->GetInventoryWidget()->IsVisible())
+	UInventoryWidget* InventoryWidget = HUDWidget ? HUDWidget->GetInventoryWidget() : nullptr;
+	if (InventoryWidget && InventoryWidget->IsVisible())
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else if (IsValid(HUDWidget) && IsValid(HUDWidget->GetInventoryWidget()) && !HUDWidget->GetInventoryWidget()->IsVisible())
+	else if (InventoryWidget && !InventoryWidget->IsVisible())
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Visible);
 	}

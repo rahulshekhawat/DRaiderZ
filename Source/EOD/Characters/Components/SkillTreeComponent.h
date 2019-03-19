@@ -42,6 +42,11 @@ public:
 
 	void ToggleSkillTreeUI();
 
+	// void InitializeSkillTreeWidget();
+
+	/** Create skill tree widget and initialize the skill tree layout */
+	void CreateAndInitializeSkillTreeWidget();
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
@@ -57,9 +62,6 @@ private:
 
 	UPROPERTY(Transient)
 	USkillPointsInfoWidget* SkillPointsInfoWidget;
-
-	/** Create skill tree widget and initialize the skill tree layout */
-	void CreateAndInitializeSkillTreeWidget();
 
 public:
 

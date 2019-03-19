@@ -59,13 +59,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UInventoryWidget* InventoryWidget;
 
+	/** Widget containing skill trees of all vocations */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UDynamicSkillTreeWidget* SkillTreeWidget;
+
 	/** Widget containing skills that can be used by player */
 	UPROPERTY(Transient, BlueprintReadOnly)
 	USkillBarWidget* SkillBarWidget;
-
-	/** Widget containing skill trees of all vocations */
-	UPROPERTY(Transient, BlueprintReadOnly)
-	UDynamicSkillTreeWidget* SkillTreeWidget;
 
 public:
 

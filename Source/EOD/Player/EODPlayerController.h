@@ -110,24 +110,6 @@ private:
 public:
 
 	// --------------------------------------
-	//  Player Skill Tree
-	// --------------------------------------
-
-	FORCEINLINE APlayerSkillTreeManager* GetLocalSkillTreeManager() const { return LocalSkillTreeManager; }
-
-	FORCEINLINE USkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
-
-private:
-
-	UPROPERTY(Transient)
-	APlayerSkillTreeManager* LocalSkillTreeManager;
-
-	UPROPERTY(Transient)
-	USkillTreeWidget* SkillTreeWidget;
-
-public:
-
-	// --------------------------------------
 	//  User Interface
 	// --------------------------------------
 
@@ -165,7 +147,9 @@ protected:
 
 private:
 
-	void CreateHUDWidget();
+	void InitializeWidgets();
+
+	void InitializeHUDWidget();
 
 	void InitStatusIndicatorWidget();
 

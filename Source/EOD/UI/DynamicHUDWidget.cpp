@@ -21,7 +21,8 @@ bool UDynamicHUDWidget::Initialize()
 		MainCanvas &&
 		StatusIndicatorWidget &&
 		InventoryWidget &&
-		PlayerStatsWidget)
+		PlayerStatsWidget &&
+		SkillTreeWidget)
 	{
 		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 		PlayerStatsWidget->SetVisibility(ESlateVisibility::Hidden);

@@ -7,7 +7,7 @@
 #include "GameplaySkillBase.h"
 #include "EODGameInstance.h"
 #include "PlayerSaveGame.h"
-
+#include "DynamicHUDWidget.h"
 
 USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -19,9 +19,11 @@ void USkillTreeComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializeSkills();
-	CreateAndInitializeSkillTreeWidget();
-	InitializeSkillTreeSlots();
+	// CreateAndInitializeSkillTreeWidget();
+
+
+	// InitializeSkills();
+	// InitializeSkillTreeSlots();
 	
 }
 
@@ -40,19 +42,18 @@ void USkillTreeComponent::ToggleSkillTreeUI()
 void USkillTreeComponent::CreateAndInitializeSkillTreeWidget()
 {
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetOuter());
-	if (!SkillTreeWidget && SkillTreeWidgetClass.Get() && PC && PC->IsLocalController())
+	if (PC && PC->IsLocalController())
 	{
-		SkillTreeWidget = CreateWidget<UDynamicSkillTreeWidget>(PC, SkillTreeWidgetClass);
-		if (SkillTreeWidget)
+		UDynamicHUDWidget* HUDWidget = PC->GetHUDWidget();
+		if (HUDWidget && !SkillTreeWidget && SkillTreeWidgetClass.Get())
 		{
-			SkillTreeWidget->AddToViewport();
-		}
+			SkillTreeWidget = CreateWidget<UDynamicSkillTreeWidget>(PC, SkillTreeWidgetClass);
+			HUDWidget->AddSkillTreeWidget(SkillTreeWidget);
 
-		//~ @todo add skill tree widget to hud widget
-
-		if (SkillTreeWidget)
-		{
-			SkillTreeWidget->InitializeSkillTreeLayout(SkillTreeLayoutTable);
+			if (SkillTreeWidget)
+			{
+				SkillTreeWidget->InitializeSkillTreeLayout(SkillTreeLayoutTable);
+			}
 		}
 	}
 }
