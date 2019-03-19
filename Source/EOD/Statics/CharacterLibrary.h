@@ -263,6 +263,21 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 };
 
 USTRUCT(BlueprintType)
+struct EOD_API FSkillTreeSlotSaveData
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** The slot upgrade level that player has unlocked  */
+	UPROPERTY()
+	int32 CurrentUpgrade;
+
+	FSkillTreeSlotSaveData()
+	{
+		CurrentUpgrade = 0;
+	}
+};
+
+USTRUCT(BlueprintType)
 struct EOD_API FSkillPointsAllocationInfo
 {
 	GENERATED_USTRUCT_BODY()

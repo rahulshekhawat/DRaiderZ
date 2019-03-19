@@ -94,7 +94,27 @@ bool USkillTreeComponent::CanAllocatePointToSlot(FName SkillGroup)
 		return false;
 	}
 
-	// SkillTreeSlot
+	int32 CurrentSkillGroupUpgrade = SkillTreeSlotsSaveData.Contains(SkillGroup) ? SkillTreeSlotsSaveData[SkillGroup].CurrentUpgrade : 0;
+	// If the skill upgrade is already maxxed out
+	if (CurrentSkillGroupUpgrade == SkillTreeSlot->MaxUpgrades)
+	{
+		return false;
+	}
+
+	int32 UsedSkillPointsRequired = SkillTreeSlot->MinimumPointsToUnlock + CurrentSkillGroupUpgrade * SkillTreeSlot->UpgradePointsGap;
+	if (SkillPointsAllocationInfo.UsedSkillPoints < UsedSkillPointsRequired)
+	{
+		return false;
+	}
+
+	if (SkillTreeSlot->SkillRequiredToUnlock != NAME_None)
+	{
+		int32 UnlockSkillUpgradeLevel = SkillTreeSlotsSaveData.Contains(SkillTreeSlot->SkillRequiredToUnlock) ? SkillTreeSlotsSaveData[SkillTreeSlot->SkillRequiredToUnlock].CurrentUpgrade : 0;
+		if (UnlockSkillUpgradeLevel == 0)
+		{
+			return false;
+		}
+	}
 
 	return true;
 }
