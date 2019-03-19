@@ -56,12 +56,15 @@ private:
 public:
 
 	// --------------------------------------
-	//	Skill Tree Layout
+	//	Skill Tree Layout and Points Allocation
 	// --------------------------------------
 
 	FORCEINLINE TMap<FName, UGameplaySkillBase*> GetActivePlayerSkillsMap() const { return PlayerSkillsMap; }
 
 protected:
+
+	UPROPERTY(Transient)
+	FSkillPointsAllocationInfo SkillPointsAllocationInfo;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
 	int32 SkillPointsUnlockedByDefault;

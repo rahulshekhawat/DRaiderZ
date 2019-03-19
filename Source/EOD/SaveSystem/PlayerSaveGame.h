@@ -58,4 +58,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
 	int32 UnlockedSkillPoints;
 
+	/** Information of how players has allocated his skill points */
+	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
+	FSkillPointsAllocationInfo SkillPointsAllocationInfo;
+
 };

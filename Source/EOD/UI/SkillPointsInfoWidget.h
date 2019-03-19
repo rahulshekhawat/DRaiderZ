@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CharacterLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "SkillPointsInfoWidget.generated.h"
 
@@ -61,6 +62,9 @@ protected:
 
 public:
 
+	UFUNCTION()
+	void UpdateSkillPointAllocationText(const FSkillPointsAllocationInfo& SkillPointsAllocationInfo);
+	
 	UFUNCTION()
 	void UpdateAvailableSkillPointsText(int32 Points);
 

@@ -35,6 +35,17 @@ void USkillPointsInfoWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void USkillPointsInfoWidget::UpdateSkillPointAllocationText(const FSkillPointsAllocationInfo& SkillPointsAllocationInfo)
+{
+	UpdateAvailableSkillPointsText(SkillPointsAllocationInfo.AvailableSkillPoints);
+	UpdateUsedSkillPointsText(SkillPointsAllocationInfo.UsedSkillPoints);
+	UpdateAssassinPointsText(SkillPointsAllocationInfo.AssassinPoints);
+	UpdateBerserkerPointsText(SkillPointsAllocationInfo.BerserkerPoints);
+	UpdateClericPointsText(SkillPointsAllocationInfo.ClericPoints);
+	UpdateDefenderPointsText(SkillPointsAllocationInfo.DefenderPoints);
+	UpdateSorcererPointsText(SkillPointsAllocationInfo.SorcererPoints);
+}
+
 void USkillPointsInfoWidget::UpdateAvailableSkillPointsText(int32 Points)
 {
 	if (Points != Cache_AvailableSkillPoints && AvailableSkillPointsNumText)

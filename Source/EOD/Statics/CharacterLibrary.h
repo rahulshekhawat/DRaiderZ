@@ -262,6 +262,44 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 
 };
 
+USTRUCT(BlueprintType)
+struct EOD_API FSkillPointsAllocationInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	int32 AvailableSkillPoints;
+
+	UPROPERTY()
+	int32 UsedSkillPoints;
+
+	UPROPERTY()
+	int32 AssassinPoints;
+
+	UPROPERTY()
+	int32 BerserkerPoints;
+
+	UPROPERTY()
+	int32 ClericPoints;
+
+	UPROPERTY()
+	int32 DefenderPoints;
+
+	UPROPERTY()
+	int32 SorcererPoints;
+
+	FSkillPointsAllocationInfo()
+	{
+		AvailableSkillPoints = 0;
+		UsedSkillPoints = 0;
+		AssassinPoints = 0;
+		BerserkerPoints = 0;
+		ClericPoints = 0;
+		DefenderPoints = 0;
+		SorcererPoints = 0;
+	}
+};
+
 /** Struct containing skill tree slot information */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillTreeSlot : public FTableRowBase
