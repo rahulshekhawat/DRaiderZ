@@ -59,12 +59,19 @@ public:
 	//	Skill Tree Layout and Points Allocation
 	// --------------------------------------
 
-	FORCEINLINE TMap<FName, UGameplaySkillBase*> GetActivePlayerSkillsMap() const { return PlayerSkillsMap; }
+	/** Attempt to allocate a skill point to a slot associated with the given SkillGroup. Returns true if the point allocation was successful */
+	bool AttemptPointAllocationToSlot(FName SkillGroup);
+
+	/** Returns true if player can currently allocate a point to slot associated with the given SkillGroup */
+	bool CanAllocatePointToSlot(FName SkillGroup);
 
 protected:
 
 	UPROPERTY(Transient)
 	FSkillPointsAllocationInfo SkillPointsAllocationInfo;
+
+	UPROPERTY(Transient)
+	TMap<FName, FSkillTreeSlotSaveData> SkillTreeSlotsSaveData;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
 	int32 SkillPointsUnlockedByDefault;
@@ -72,7 +79,5 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
 	UDataTable* SkillTreeLayoutTable;
 
-	UPROPERTY(Transient)
-	TMap<FName, UGameplaySkillBase*> PlayerSkillsMap;
 
 };

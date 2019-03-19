@@ -6,6 +6,7 @@
 #include "EODPreprocessors.h"
 #include "GameplaySkillBase.h"
 #include "ContainerWidget.h"
+#include "Components/SkillTreeComponent.h"
 
 #include "Button.h"
 #include "Components/CanvasPanel.h"
@@ -64,9 +65,9 @@ void UDynamicSkillTreeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData)
+void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(USkillTreeComponent* SkillTreeComponent, UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData)
 {
-	InitializeSkillTreeLayout(SkillLayoutTable);
+	InitializeSkillTreeLayout(SkillTreeComponent, SkillLayoutTable);
 
 	TArray<FName> Keys;
 	SkillContainersMap.GetKeys(Keys);
@@ -85,12 +86,14 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* const SkillL
 	}
 }
 
-void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* SkillLayoutTable)
+void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(USkillTreeComponent* SkillTreeComponent, UDataTable* SkillLayoutTable)
 {
-	if (!SkillLayoutTable)
+	if (!SkillLayoutTable || !SkillTreeComponent)
 	{
 		return;
 	}
+
+	SkillTreeComp = SkillTreeComponent;
 
 	FString ContextString = FString("UDynamicSkillTreeWidget::InitializeSkillSlots()");
 	TArray<FName> RowNames = SkillLayoutTable->GetRowNames();
@@ -131,6 +134,8 @@ void UDynamicSkillTreeWidget::AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* 
 
 		SetupSlotPosition(NewItemContainer, SlotInfo->Vocation, SlotInfo->ColumnPosition, SlotInfo->RowPosition);
 		SkillContainersMap.Add(SkillGroup, NewItemContainer);
+
+		NewItemContainer->OnClicked.AddDynamic(this, &UDynamicSkillTreeWidget::OnSkillSlotClicked);
 	}
 }
 
@@ -254,4 +259,12 @@ void UDynamicSkillTreeWidget::AddSkillPointsInfoToCanvas(UCanvasPanel* CPanel)
 		CPSlot->SetAnchors(FAnchors(0.5f, 1.f, 0.5f, 1.f));
 		CPSlot->SetAlignment(FVector2D(0.5f, 1.f));
 	}
+}
+
+void UDynamicSkillTreeWidget::OnSkillSlotClicked(UContainerWidget* Widget, UUserWidget* ParentWidget)
+{
+	check(this == ParentWidget && Widget && SkillTreeComp);
+
+	FContainerData ContData = Widget->GetContainerData();
+	bool bAllocationSuccessful = SkillTreeComp->AttemptPointAllocationToSlot(ContData.ItemID);
 }

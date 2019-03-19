@@ -13,10 +13,12 @@
 #include "DynamicSkillTreeWidget.generated.h"
 
 class UButton;
+class USoundBase;
 class UCanvasPanel;
 class UWidgetSwitcher;
 class USkillPointsInfoWidget;
 class UContainerWidget;
+class USkillTreeComponent;
 
 /**
  * 
@@ -102,6 +104,17 @@ protected:
 public:
 
 	// --------------------------------------
+	//	Constants : Variables that aren't meant to be changed once initialized
+	// --------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	USoundBase* SkillPointAllocatedSound;
+
+	/** The skill tree component responsible for managing this skill tree widget */
+	UPROPERTY(Transient)
+	USkillTreeComponent* SkillTreeComp;
+
+	// --------------------------------------
 	//	Adding Skills Dynamically
 	// --------------------------------------
 
@@ -109,13 +122,13 @@ public:
 	 * Initialize skill tree layout from SkillLayoutTable, i.e., create and add skill slots to the skill tree
 	 * @note Use this version to initialize skill tree if there is no player save game present (i.e., we don't have access to SkillTreeSlotSaveData)
 	 */
-	void InitializeSkillTreeLayout(UDataTable* SkillLayoutTable);
+	void InitializeSkillTreeLayout(USkillTreeComponent* SkillTreeComponent, UDataTable* SkillLayoutTable);
 
 	/**
 	 * Initialize skill tree layout from SkillLayoutTable, i.e., create and add skill slots to the skill tree
 	 * Update skill tree slot information from SkillTreeSlotSaveData
 	 */
-	void InitializeSkillTreeLayout(UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData);
+	void InitializeSkillTreeLayout(USkillTreeComponent* SkillTreeComponent, UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData);
 
 	FORCEINLINE TMap<FName, UContainerWidget*> GetSkillContainersMap() const { return SkillContainersMap; }
 
@@ -170,6 +183,8 @@ private:
 	
 	void AddSkillPointsInfoToCanvas(UCanvasPanel* CPanel);
 
+	UFUNCTION()
+	void OnSkillSlotClicked(UContainerWidget* Widget, UUserWidget* ParentWidget);
 
 };
 

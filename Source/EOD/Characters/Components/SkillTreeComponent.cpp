@@ -42,11 +42,11 @@ void USkillTreeComponent::InitializeSkillTreeWidget()
 		SkillPointsInfoWidget = SkillTreeWidget->GetSkillPointsInfoWidget();
 		if (SaveGame)
 		{
-			SkillTreeWidget->InitializeSkillTreeLayout(SkillTreeLayoutTable, SaveGame->SkillTreeSlotsSaveData);
+			SkillTreeWidget->InitializeSkillTreeLayout(this, SkillTreeLayoutTable, SaveGame->SkillTreeSlotsSaveData);
 		}
 		else
 		{
-			SkillTreeWidget->InitializeSkillTreeLayout(SkillTreeLayoutTable);
+			SkillTreeWidget->InitializeSkillTreeLayout(this, SkillTreeLayoutTable);
 		}
 	}
 
@@ -64,4 +64,37 @@ void USkillTreeComponent::InitializeSkillTreeWidget()
 
 	SkillPointsInfoWidget->UpdateSkillPointAllocationText(SkillPointsAllocationInfo);
 
+}
+
+bool USkillTreeComponent::AttemptPointAllocationToSlot(FName SkillGroup)
+{
+	if (!CanAllocatePointToSlot(SkillGroup))
+	{
+		return false;
+	}
+
+	
+
+	return true;
+}
+
+bool USkillTreeComponent::CanAllocatePointToSlot(FName SkillGroup)
+{
+	if (SkillPointsAllocationInfo.AvailableSkillPoints == 0 || SkillTreeLayoutTable == nullptr)
+	{
+		return false;
+	}
+
+	FString ContextString = FString("USkillTreeComponent::CanAllocatePointToSlot()");
+	FSkillTreeSlot* SkillTreeSlot = SkillTreeLayoutTable->FindRow<FSkillTreeSlot>(SkillGroup, ContextString);
+	
+	// If skil tree slot was not found
+	if (SkillTreeSlot == nullptr)
+	{
+		return false;
+	}
+
+	// SkillTreeSlot
+
+	return true;
 }

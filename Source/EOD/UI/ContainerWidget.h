@@ -189,6 +189,8 @@ protected:
 
 public:
 
+	FORCEINLINE FContainerData GetContainerData() const { return ContainerData; }
+
 	// --------------------------------------
 	//	Container Behaviour
 	// --------------------------------------
