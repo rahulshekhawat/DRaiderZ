@@ -12,6 +12,7 @@
 UContainerWidget::UContainerWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	ContainerType = EContainerType::None;
+	bDisplaySubTextAsRatio = false;
 }
 
 bool UContainerWidget::Initialize()
@@ -45,6 +46,7 @@ void UContainerWidget::InitializeWithParent(UUserWidget* ParentWidget)
 	if (ParentWidget->StaticClass() == UDynamicSkillTreeWidget::StaticClass())
 	{
 		ContainerType = EContainerType::SkillTree;
+		bDisplaySubTextAsRatio = true;
 	}
 }
 
@@ -94,11 +96,11 @@ void UContainerWidget::SetCanBeDragged(bool bValue)
 	//~ @todo Update container's border material
 }
 
-void UContainerWidget::UpdateDescription(const FString& NewDescription)
+void UContainerWidget::SetDescription(const FString& NewDescription)
 {
 }
 
-void UContainerWidget::UpdateIcon(UTexture* NewIcon)
+void UContainerWidget::SetIcon(UTexture* NewIcon)
 {
 	if (ItemImage)
 	{
@@ -124,6 +126,30 @@ void UContainerWidget::UpdateIcon(UTexture* NewIcon)
 
 		ContainerData.Icon = NewIcon;
 	}
+}
+
+void UContainerWidget::SetInGameName(const FString& NewInGameName)
+{
+}
+
+void UContainerWidget::SetItemType(EEODItemType EODItemType)
+{
+}
+
+void UContainerWidget::SetCurrentValue(int32 NewValue)
+{
+}
+
+void UContainerWidget::SetMaxValue(int32 NewValue)
+{
+}
+
+void UContainerWidget::SetItemID(FName NewID)
+{
+}
+
+void UContainerWidget::SetItemGroup(FName NewItemGroup)
+{
 }
 
 void UContainerWidget::Internal_InitializeContainer()

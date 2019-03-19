@@ -118,7 +118,7 @@ public:
 	void InitializeSkillTreeLayout(UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData);
 
 	/** Initialize skill tree slots (add skill icon and information regarding current and maximum upgrades available) from PlayerSkillsMap */
-	void InitializeSkillTreeSlots(const TMap<FName, UGameplaySkillBase*>& PlayerSkillsMap);
+	// void InitializeSkillTreeSlots(const TMap<FName, UGameplaySkillBase*>& PlayerSkillsMap);
 
 protected:
 

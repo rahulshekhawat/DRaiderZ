@@ -66,9 +66,9 @@ void UDynamicSkillTreeWidget::NativeDestruct()
 
 void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData)
 {
+	InitializeSkillTreeLayout(SkillLayoutTable);
 
-
-
+	// @todo skillTreeSlotSaveData load
 }
 
 void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* SkillLayoutTable)
@@ -87,9 +87,9 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(UDataTable* SkillLayoutT
 	}
 }
 
+/*
 void UDynamicSkillTreeWidget::InitializeSkillTreeSlots(const TMap<FName, UGameplaySkillBase*>& PlayerSkillsMap)
 {
-	/*
 	TArray<FName> Keys;
 	PlayerSkillsMap.GetKeys(Keys);
 	for (FName Key : Keys)
@@ -112,8 +112,8 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeSlots(const TMap<FName, UGamepl
 			}
 		}
 	}
-	*/
 }
+*/
 
 void UDynamicSkillTreeWidget::AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* SlotInfo)
 {
@@ -127,6 +127,13 @@ void UDynamicSkillTreeWidget::AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* 
 	{
 		SetupSlotPosition(NewItemContainer, SlotInfo->Vocation, SlotInfo->ColumnPosition, SlotInfo->RowPosition);
 		SkillContainersMap.Add(SkillGroup, NewItemContainer);
+		UGameplaySkillBase* SkillObj = Cast<UGameplaySkillBase>(SlotInfo->PlayerSkill.Get()->GetDefaultObject());
+		if (SkillObj)
+		{
+			NewItemContainer->SetIcon(SkillObj->GetSkillIcon());
+		}
+
+		
 	}
 }
 

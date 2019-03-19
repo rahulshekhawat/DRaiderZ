@@ -49,7 +49,10 @@ struct EOD_API FContainerData
 	EEODItemType EODItemType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 StackCount;
+	int32 CurrentValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxValue;
 
 	FContainerData()
 	{
@@ -59,7 +62,8 @@ struct EOD_API FContainerData
 		InGameName = FString("");
 		Description = FString("");
 		EODItemType = EEODItemType::None;
-		StackCount = 1;
+		CurrentValue = 1;
+		MaxValue = 1;
 	}
 };
 
@@ -161,6 +165,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Container Constants")
 	FLinearColor PressedBorderColor;
 
+	/** Determines whether the sub text should be displayed in the form of 'current_value / max_value' ratio, or just as 'current_value' */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Container Behaviour")
+	bool bDisplaySubTextAsRatio;
+
 	// --------------------------------------
 	//	Container Data and Cache
 	// --------------------------------------
@@ -199,13 +207,34 @@ public:
 	//	Updating Container and it's Child Widgets
 	// --------------------------------------
 
-	/** Update the description for this container */
 	UFUNCTION()
-	void UpdateDescription(const FString& NewDescription);
+	void SetItemID(FName NewID);
+
+	UFUNCTION()
+	void SetItemGroup(FName NewItemGroup);
 
 	/** Update the display icon of this container */
 	UFUNCTION()
-	void UpdateIcon(UTexture* NewIcon);
+	void SetIcon(UTexture* NewIcon);
+
+	/** Update the description for this container */
+	UFUNCTION()
+	void SetInGameName(const FString& NewInGameName);
+
+	/** Update the description for this container */
+	UFUNCTION()
+	void SetDescription(const FString& NewDescription);
+
+	/** Set the type of item placed in this container */
+	UFUNCTION()
+	void SetItemType(EEODItemType EODItemType);
+
+	UFUNCTION()
+	void SetCurrentValue(int32 NewValue);
+
+	UFUNCTION()
+	void SetMaxValue(int32 NewValue);
+
 
 protected:
 
