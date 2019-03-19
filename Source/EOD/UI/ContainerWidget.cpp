@@ -141,7 +141,7 @@ FReply UContainerWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 			}
 		}
 
-		OnClicked.Broadcast();
+		OnClicked.Broadcast(this, ContainerParentWidget);
 	}
 	return Reply;
 }

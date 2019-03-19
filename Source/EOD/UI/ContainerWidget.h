@@ -11,8 +11,9 @@ class UImage;
 class UTextBlock;
 class UMaterialInstanceDynamic;
 class UTooltipWidget;
+class UContainerWidget;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainerClickedMCDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnContainerClickedMCDelegate, UContainerWidget*, ClickedContainer, UUserWidget*, ParentWidget);
 
 /** Determines the type of container widget */
 UENUM(BlueprintType)

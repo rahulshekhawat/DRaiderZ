@@ -64,20 +64,12 @@ public:
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
+	int32 SkillPointsUnlockedByDefault;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
 	UDataTable* SkillTreeLayoutTable;
 
 	UPROPERTY(Transient)
 	TMap<FName, UGameplaySkillBase*> PlayerSkillsMap;
-
-private:
-
-	void InitializeSkills();
-
-	void InitializeSkillTreeSlots();
-	
-	void Internal_LoadSkill(const FName& SkillGroup,
-		const TSubclassOf<UGameplaySkillBase>& SkillClass,
-		AEODCharacterBase* const SkillOwner,
-		UPlayerSaveGame* const SaveGame);
 
 };
