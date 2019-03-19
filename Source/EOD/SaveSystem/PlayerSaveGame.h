@@ -39,6 +39,10 @@ class EOD_API UPlayerSaveGame : public USaveGame
 public:
 	UPlayerSaveGame(const FObjectInitializer& ObjectInitializer);
 
+	/** Character gender that player selected during character creation */
+	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
+	ECharacterGender CharacterGender;
+
 	/** Skill button index to skill group map for skill bar  */
 	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
 	TMap<int32, FString> SkillBarLayout;

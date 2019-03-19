@@ -10,6 +10,7 @@
 #include "EOD/Player/Components/PlayerStatsComponent.h"
 
 #include "DynamicHUDWidget.h"
+#include "EODGameModeBase.h"
 #include "StatusIndicatorWidget.h"
 #include "InventoryWidget.h"
 #include "PlayerStatsWidget.h"
@@ -23,6 +24,7 @@
 #include "PlayerSkillTreeManager.h"
 #include "Components/PlayerStatsComponent.h"
 
+#include "Engine/World.h"
 #include "UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -211,12 +213,34 @@ void AEODPlayerController::SetPawn(APawn* InPawn)
 
 void AEODPlayerController::LoadPlayerState()
 {
+	if (IsLocalController())
+	{
+		UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
+		UPlayerSaveGame* PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
+
+		if (IsValid(PlayerSaveGame))
+		{
+			SetGender(PlayerSaveGame->CharacterGender);
+		}
+	}
+
+	/*
 	UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
 	UPlayerSaveGame* PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
 	if (IsValid(PlayerSaveGame) && IsValid(SkillTreeComponent))
 	{
 		
 		// SkillTreeComponent->
+	}
+	*/
+}
+
+void AEODPlayerController::SetGender(ECharacterGender NewGender)
+{
+	Gender = NewGender;
+	if (Role < ROLE_Authority)
+	{
+		Server_SetGender(NewGender);
 	}
 }
 
@@ -562,6 +586,24 @@ void AEODPlayerController::SavePlayerState()
 			GSComp->SaveSkillBarLayout();
 		}
 	}
+}
+
+void AEODPlayerController::Server_SetGender_Implementation(ECharacterGender NewGender)
+{
+	PrintToScreen(this, FString("RPC CALLED"), 10.f);
+	SetGender(NewGender);
+
+	APawn* TempPawn = GetPawn();
+	UnPossess();
+	TempPawn->Destroy();
+
+	/* Just in case we didn't get the PawnClass on the Server in time... */
+	GetWorld()->GetAuthGameMode()->RestartPlayer(this);
+}
+
+bool AEODPlayerController::Server_SetGender_Validate(ECharacterGender NewGender)
+{
+	return true;
 }
 
 void AEODPlayerController::Server_OnSuccessfulDodge_Implementation()

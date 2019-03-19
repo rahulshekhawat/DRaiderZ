@@ -6,6 +6,8 @@
 #include "EOD/Core/GameSingleton.h"
 #include "EOD/Core/StatusEffectsManager.h"
 
+#include "EODPlayerController.h"
+
 #include "Engine/World.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
@@ -42,6 +44,25 @@ void AEODGameModeBase::InitGame(const FString& MapName, const FString& Options, 
 		StatusEffectsManager = GetWorld()->SpawnActor<AStatusEffectsManager>(AStatusEffectsManager::StaticClass(), SpawnInfo);
 	}
 	*/
+}
+
+UClass* AEODGameModeBase::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+	PrintToScreen(this, FString("Default pawn class accessed"), 10.f);
+
+	AEODPlayerController* PC = Cast<AEODPlayerController>(InController);
+	if (PC)
+	{
+		if (PC->GetGender() == ECharacterGender::Female)
+		{
+			return FemalePawnClass;
+		}
+		else
+		{
+			return MalePawnClass;
+		}
+	}
+	return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
 
 AStatusEffectsManager* AEODGameModeBase::BP_GetStatusEffectsManager() const

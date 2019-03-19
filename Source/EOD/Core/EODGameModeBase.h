@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "EODGameModeBase.generated.h"
 
+class AEODCharacterBase;
 class AStatusEffectsManager;
 
 /**
@@ -27,6 +28,8 @@ public:
 	/** Spawns actors of manager classes */
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
 
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+
 	// --------------------------------------
 	//	Manager Classes
 	// --------------------------------------
@@ -35,6 +38,14 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Managers, meta = (DisplayName = "Get Status Effects Manager"))
 	AStatusEffectsManager* BP_GetStatusEffectsManager() const;
+
+	/** Blueprint class used for spawning female characters */
+	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
+	TSubclassOf<AEODCharacterBase> FemalePawnClass;
+
+	/** Blueprint class used for spawning male characters */
+	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
+	TSubclassOf<AEODCharacterBase> MalePawnClass;
 
 private:
 

@@ -21,7 +21,7 @@ class UDialogueWindowWidget;
 class UPlayerStatsComponent;
 
 /**
- * EmberPlayerController is the base (and final c++) class for EOD's player controller
+ * EODPlayerController is the base (and final c++) class for in-game player controller
  * @note All blueprint classes for player controller must inherit from EmberPlayerController
  */
 UCLASS()
@@ -57,12 +57,23 @@ public:
 
 	FORCEINLINE AEODCharacterBase* GetEODCharacter() const { return EODCharacter; }
 
+	/** Returns the gender of the pawn that the player selected during player creation */
+	FORCEINLINE ECharacterGender GetGender() const { return Gender; }
+
 	void LoadPlayerState();
+
+protected:
+
+	void SetGender(ECharacterGender NewGender);
 
 private:
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	AEODCharacterBase* EODCharacter;
+
+	/** The gender of the pawn that the player selected during player creation */
+	UPROPERTY(Transient)
+	ECharacterGender Gender;
 
 public:
 
@@ -313,6 +324,10 @@ private:
 	// --------------------------------------
 	//  Network : RPCs and Rep Notifies
 	// --------------------------------------
+
+	/** Call this to set gender of player pawn on server */
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetGender(ECharacterGender NewGender);
 
 	UFUNCTION(Client, Reliable)
 	void Client_SetupLocalPlayerOnUnpossess(APawn* InPawn);
