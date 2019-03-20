@@ -132,6 +132,9 @@ public:
 
 	FORCEINLINE TMap<FName, UContainerWidget*> GetSkillContainersMap() const { return SkillContainersMap; }
 
+	/** Iterates over all skill slots in this tree and updates the bIsEnabled, bCanBeDragged, bCanBeClicked state of skill slot */
+	void UpdateSkillSlots();
+
 protected:
 
 	/** The class to use for creating skill slot widgets */

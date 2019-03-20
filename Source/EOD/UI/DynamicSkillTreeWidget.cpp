@@ -86,6 +86,10 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(USkillTreeComponent* Ski
 	}
 }
 
+void UDynamicSkillTreeWidget::UpdateSkillSlots()
+{
+}
+
 void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(USkillTreeComponent* SkillTreeComponent, UDataTable* SkillLayoutTable)
 {
 	if (!SkillLayoutTable || !SkillTreeComponent)
@@ -267,4 +271,9 @@ void UDynamicSkillTreeWidget::OnSkillSlotClicked(UContainerWidget* Widget, UUser
 
 	FContainerData ContData = Widget->GetContainerData();
 	bool bAllocationSuccessful = SkillTreeComp->AttemptPointAllocationToSlot(ContData.ItemID);
+
+	if (bAllocationSuccessful)
+	{
+
+	}
 }

@@ -60,10 +60,10 @@ public:
 	// --------------------------------------
 
 	/** Attempt to allocate a skill point to a slot associated with the given SkillGroup. Returns true if the point allocation was successful */
-	bool AttemptPointAllocationToSlot(FName SkillGroup);
+	bool AttemptPointAllocationToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
 
 	/** Returns true if player can currently allocate a point to slot associated with the given SkillGroup */
-	bool CanAllocatePointToSlot(FName SkillGroup);
+	bool CanAllocatePointToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
 
 protected:
 
