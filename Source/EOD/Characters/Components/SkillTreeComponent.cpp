@@ -150,7 +150,29 @@ bool USkillTreeComponent::IsSkillAvailable(FName SkillGroup, FSkillTreeSlot* Ski
 	}
 
 	int32 UsedSkillPointsRequired = SkillTreeSlot->MinimumPointsToUnlock + CurrentSkillGroupUpgrade * SkillTreeSlot->UpgradePointsGap;
-	if (SkillPointsAllocationInfo.UsedSkillPoints < UsedSkillPointsRequired)
+	int32 AllocatedPoints = 0;
+	switch (SkillTreeSlot->Vocation)
+	{
+	case EVocations::Assassin:
+		AllocatedPoints = SkillPointsAllocationInfo.AssassinPoints;
+		break;
+	case EVocations::Berserker:
+		AllocatedPoints = SkillPointsAllocationInfo.BerserkerPoints;
+		break;
+	case EVocations::Cleric:
+		AllocatedPoints = SkillPointsAllocationInfo.ClericPoints;
+		break;
+	case EVocations::Defender:
+		AllocatedPoints = SkillPointsAllocationInfo.DefenderPoints;
+		break;
+	case EVocations::Sorcerer:
+		AllocatedPoints = SkillPointsAllocationInfo.SorcererPoints;
+		break;
+	default:
+		break;
+	}
+
+	if (AllocatedPoints < UsedSkillPointsRequired)
 	{
 		return false;
 	}
