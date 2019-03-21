@@ -144,6 +144,15 @@ enum class EVocations : uint8
 	Sorcerer
 };
 
+UENUM(BlueprintType)
+enum class ESkillSlotStatus : uint8
+{
+	Blocked,
+	Unblocked,
+	Available,
+};
+
+
 /** Struct containing information regarding last used character skill */
 USTRUCT(BlueprintType)
 struct EOD_API FLastUsedSkillInfo

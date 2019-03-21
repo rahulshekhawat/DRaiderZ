@@ -82,26 +82,26 @@ bool USkillTreeComponent::AttemptPointAllocationToSlot(FName SkillGroup, FSkillT
 	switch (SkillTreeSlot->Vocation)
 	{
 	case EVocations::Assassin:
-		SkillPointsAllocationInfo.AssassinPoints += 1;
+		ModifyAllocatedPointsAssassin(1);
 		break;
 	case EVocations::Berserker:
-		SkillPointsAllocationInfo.BerserkerPoints += 1;
+		ModifyAllocatedPointsBerserker(1);
 		break;
 	case EVocations::Cleric:
-		SkillPointsAllocationInfo.ClericPoints += 1;
+		ModifyAllocatedPointsCleric(1);
 		break;
 	case EVocations::Defender:
-		SkillPointsAllocationInfo.DefenderPoints += 1;
+		ModifyAllocatedPointsDefender(1);
 		break;
 	case EVocations::Sorcerer:
-		SkillPointsAllocationInfo.SorcererPoints += 1;
+		ModifyAllocatedPointsSorcerer(1);
 		break;
 	default:
 		break;
-	}	
+	}
 
-	SkillPointsAllocationInfo.AvailableSkillPoints -= 1;
-	SkillPointsAllocationInfo.UsedSkillPoints += 1;
+	ModifyAvailableSkillPoints(-1);
+	ModifyUsedSkillPoints(1);
 
 	return true;
 }
@@ -150,4 +150,72 @@ bool USkillTreeComponent::CanAllocatePointToSlot(FName SkillGroup, FSkillTreeSlo
 	}
 
 	return true;
+}
+
+ESkillSlotStatus USkillTreeComponent::GetSkillSlotStatus(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo)
+{
+	return ESkillSlotStatus();
+}
+
+void USkillTreeComponent::SetAllocatedPointsAssassin(int32 Value)
+{
+	SkillPointsAllocationInfo.AssassinPoints = Value;
+	if (SkillPointsInfoWidget)
+	{
+		SkillPointsInfoWidget->UpdateAssassinPointsText(Value);
+	}
+}
+
+void USkillTreeComponent::SetAllocatedPointsBerserker(int32 Value)
+{
+	SkillPointsAllocationInfo.BerserkerPoints = Value;
+	if (SkillPointsInfoWidget)
+	{
+		SkillPointsInfoWidget->UpdateBerserkerPointsText(Value);
+	}
+}
+
+void USkillTreeComponent::SetAllocatedPointsCleric(int32 Value)
+{
+	SkillPointsAllocationInfo.ClericPoints = Value;
+	if (SkillPointsInfoWidget)
+	{
+		SkillPointsInfoWidget->UpdateClericPointsText(Value);
+	}
+}
+
+void USkillTreeComponent::SetAllocatedPointsDefender(int32 Value)
+{
+	SkillPointsAllocationInfo.DefenderPoints = Value;
+	if (SkillPointsInfoWidget)
+	{
+		SkillPointsInfoWidget->UpdateDefenderPointsText(Value);
+	}
+}
+
+void USkillTreeComponent::SetAllocatedPointsSorcerer(int32 Value)
+{
+	SkillPointsAllocationInfo.SorcererPoints = Value;
+	if (SkillPointsInfoWidget)
+	{
+		SkillPointsInfoWidget->UpdateSorcererPointsText(Value);
+	}
+}
+
+void USkillTreeComponent::SetAvailableSkillPoints(int32 Value)
+{
+	SkillPointsAllocationInfo.AvailableSkillPoints = Value;
+	if (SkillPointsInfoWidget)
+	{
+		SkillPointsInfoWidget->UpdateAvailableSkillPointsText(Value);
+	}
+}
+
+void USkillTreeComponent::SetUsedSkillPoints(int32 Value)
+{
+	SkillPointsAllocationInfo.UsedSkillPoints = Value;
+	if (SkillPointsInfoWidget)
+	{
+		SkillPointsInfoWidget->UpdateUsedSkillPointsText(Value);
+	}
 }
