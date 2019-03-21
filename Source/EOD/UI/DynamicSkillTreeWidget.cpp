@@ -8,10 +8,14 @@
 #include "ContainerWidget.h"
 #include "Components/SkillTreeComponent.h"
 
-#include "Button.h"
+#include "Components/Image.h"
+#include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Kismet/GameplayStatics.h"
+#include "Blueprint/WidgetTree.h"
+#include "Materials/MaterialInterface.h"
 
 UDynamicSkillTreeWidget::UDynamicSkillTreeWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -88,6 +92,17 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(USkillTreeComponent* Ski
 
 void UDynamicSkillTreeWidget::UpdateSkillSlots()
 {
+
+}
+
+UContainerWidget* UDynamicSkillTreeWidget::GetSkillSlotForSkillGroup(FName SkillGroup)
+{
+	if (SkillContainersMap.Contains(SkillGroup))
+	{
+		return SkillContainersMap[SkillGroup];
+	}
+
+	return nullptr;
 }
 
 void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(USkillTreeComponent* SkillTreeComponent, UDataTable* SkillLayoutTable)
@@ -101,10 +116,31 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(USkillTreeComponent* Ski
 
 	FString ContextString = FString("UDynamicSkillTreeWidget::InitializeSkillSlots()");
 	TArray<FName> RowNames = SkillLayoutTable->GetRowNames();
+	// Initialize skill slots
 	for (FName RowName : RowNames)
 	{
 		FSkillTreeSlot* SkillTreeSlot = SkillLayoutTable->FindRow<FSkillTreeSlot>(RowName, ContextString);
 		AddNewSkillSlot(RowName, SkillTreeSlot);
+
+		// Draw connector arrow
+		if (SkillTreeSlot->SkillRequiredToUnlock != NAME_None)
+		{
+			FSkillTreeSlot* UnlockSlot = SkillLayoutTable->FindRow<FSkillTreeSlot>(SkillTreeSlot->SkillRequiredToUnlock, ContextString);
+			if (UnlockSlot)
+			{
+				UImage* TempImage = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
+				if (TempImage)
+				{
+					FSlateBrush SlateBrush;
+					SlateBrush.SetResourceObject(ArrowTexture);
+					SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+					SlateBrush.Tiling = ESlateBrushTileType::NoTile;
+					TempImage->SetBrush(SlateBrush);
+				}
+				SetupArrowPosition(TempImage, UnlockSlot->Vocation, UnlockSlot->ColumnPosition, UnlockSlot->RowPosition);
+				ConnectorArrows.Add(TempImage);
+			}
+		}
 	}
 }
 
@@ -183,8 +219,49 @@ void UDynamicSkillTreeWidget::SetupSlotPosition(UContainerWidget* ItemContainer,
 	{
 		CPSlot->SetPosition(FVector2D(XPosition, YPosition));
 		CPSlot->SetSize(Size);
-		//~ @todo
-		// ItemContainer->RefreshContainerVisuals();
+	}
+}
+
+void UDynamicSkillTreeWidget::SetupArrowPosition(UImage* ArrowImage, EVocations Vocation, int32 ParentColumn, int32 ParentRow)
+{
+	UCanvasPanel* CPanel = nullptr;
+
+	switch (Vocation)
+	{
+	case EVocations::Assassin:
+		CPanel = AssassinCanvas;
+		break;
+	case EVocations::Berserker:
+		CPanel = BerserkerCanvas;
+		break;
+	case EVocations::Cleric:
+		CPanel = ClericCanvas;
+		break;
+	case EVocations::Defender:
+		CPanel = DefenderCanvas;
+		break;
+	case EVocations::Sorcerer:
+		CPanel = SorcererCanvas;
+		break;
+	default:
+		break;
+	}
+
+	if (!CPanel)
+	{
+		return;
+	}
+
+	int32 XPosition = 540 + ParentColumn * 180 + 5;
+	int32 YPosition = 25 + ParentRow * 130 + 85;
+
+	FVector2D Size(80.f, 50.f);
+
+	UCanvasPanelSlot* CPSlot = CPanel->AddChildToCanvas(ArrowImage);
+	if (CPSlot)
+	{
+		CPSlot->SetPosition(FVector2D(XPosition, YPosition));
+		CPSlot->SetSize(Size);
 	}
 }
 
@@ -274,6 +351,7 @@ void UDynamicSkillTreeWidget::OnSkillSlotClicked(UContainerWidget* Widget, UUser
 
 	if (bAllocationSuccessful)
 	{
-
-	}
+		UpdateSkillSlots();
+		UGameplayStatics::PlaySound2D(this, SkillPointAllocatedSound);
+	}	
 }

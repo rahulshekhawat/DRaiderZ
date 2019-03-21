@@ -9,6 +9,7 @@
 #include "DynamicHUDWidget.h"
 #include "DynamicSkillTreeWidget.h"
 #include "SkillPointsInfoWidget.h"
+#include "ContainerWidget.h"
 
 USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -102,6 +103,8 @@ bool USkillTreeComponent::AttemptPointAllocationToSlot(FName SkillGroup, FSkillT
 
 	ModifyAvailableSkillPoints(-1);
 	ModifyUsedSkillPoints(1);
+
+	ModifySkillSlotUpgrade(SkillGroup, 1);
 
 	return true;
 }
@@ -218,4 +221,35 @@ void USkillTreeComponent::SetUsedSkillPoints(int32 Value)
 	{
 		SkillPointsInfoWidget->UpdateUsedSkillPointsText(Value);
 	}
+}
+
+void USkillTreeComponent::ModifySkillSlotUpgrade(FName SkillGroup, int32 Value)
+{
+	if (SkillTreeSlotsSaveData.Contains(SkillGroup))
+	{
+		FSkillTreeSlotSaveData& SaveData = SkillTreeSlotsSaveData[SkillGroup];
+		SetSkillSlotUpgrade(SkillGroup, SaveData.CurrentUpgrade + Value);
+	}
+	else
+	{
+		FSkillTreeSlotSaveData SaveData;
+		SaveData.CurrentUpgrade += Value;
+		SkillTreeSlotsSaveData.Add(SkillGroup, SaveData);
+		SetSkillSlotUpgrade(SkillGroup, SaveData.CurrentUpgrade);
+	}
+}
+
+void USkillTreeComponent::SetSkillSlotUpgrade(FName SkillGroup, int32 Value)
+{
+	check(SkillTreeSlotsSaveData.Contains(SkillGroup));
+	FSkillTreeSlotSaveData& SaveData = SkillTreeSlotsSaveData[SkillGroup];
+	SaveData.CurrentUpgrade = Value;
+
+	UContainerWidget* SlotWidget = SkillTreeWidget ? SkillTreeWidget->GetSkillSlotForSkillGroup(SkillGroup) : nullptr;
+	if (SlotWidget)
+	{
+		SlotWidget->SetCurrentValue(Value);
+	}
+
+	//~ @todo store new upgrade info to save game?
 }

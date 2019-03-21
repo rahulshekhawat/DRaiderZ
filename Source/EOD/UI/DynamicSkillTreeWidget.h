@@ -12,6 +12,8 @@
 #include "Blueprint/UserWidget.h"
 #include "DynamicSkillTreeWidget.generated.h"
 
+class UMaterialInterface;
+class UImage;
 class UButton;
 class USoundBase;
 class UCanvasPanel;
@@ -135,13 +137,22 @@ public:
 	/** Iterates over all skill slots in this tree and updates the bIsEnabled, bCanBeDragged, bCanBeClicked state of skill slot */
 	void UpdateSkillSlots();
 
+	UContainerWidget* GetSkillSlotForSkillGroup(FName SkillGroup);
+
 protected:
 
 	/** The class to use for creating skill slot widgets */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Class")
 	TSubclassOf<UContainerWidget> SkillTreeSlotClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	UMaterialInterface* ArrowTexture;
+
 private:
+
+	/** Images of an arrow linking skill slots */
+	UPROPERTY(Transient)
+	TArray<UImage*> ConnectorArrows;
 
 	/** A map of skill group to it's respective skill slot container */
 	UPROPERTY(Transient)
@@ -150,6 +161,8 @@ private:
 	void AddNewSkillSlot(FName SkillGroup, FSkillTreeSlot* SlotInfo);
 
 	void SetupSlotPosition(UContainerWidget* ItemContainer, EVocations Vocation, int32 Column, int32 Row);
+
+	void SetupArrowPosition(UImage* ArrowImage, EVocations Vocation, int32 ParentColumn, int32 ParentRow);
 
 	// --------------------------------------
 	//	Tab Switching

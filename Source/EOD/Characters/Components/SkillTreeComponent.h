@@ -65,9 +65,6 @@ public:
 	/** Attempt to allocate a skill point to a slot associated with the given SkillGroup. Returns true if the point allocation was successful */
 	bool AttemptPointAllocationToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
 
-	/** Returns true if player can currently allocate a point to slot associated with the given SkillGroup */
-	bool CanAllocatePointToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
-
 	/** Returns the status of this skill slot */
 	ESkillSlotStatus GetSkillSlotStatus(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
 
@@ -96,6 +93,9 @@ private:
 	UPROPERTY(Transient)
 	FSkillPointsAllocationInfo SkillPointsAllocationInfo;
 
+	/** Returns true if player can currently allocate a point to slot associated with the given SkillGroup */
+	bool CanAllocatePointToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
+
 	// --------------------------------------
 	//	Skill points modification
 	// --------------------------------------
@@ -116,6 +116,8 @@ private:
 	void SetAvailableSkillPoints(int32 Value);
 	void SetUsedSkillPoints(int32 Value);
 
+	void ModifySkillSlotUpgrade(FName SkillGroup, int32 Value);
+	void SetSkillSlotUpgrade(FName SkillGroup, int32 Value);
 };
 
 void USkillTreeComponent::ModifyAllocatedPointsAssassin(int32 Value)
