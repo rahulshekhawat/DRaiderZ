@@ -132,12 +132,11 @@ public:
 	 */
 	void InitializeSkillTreeLayout(USkillTreeComponent* SkillTreeComponent, UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData);
 
-	FORCEINLINE TMap<FName, UContainerWidget*> GetSkillContainersMap() const { return SkillContainersMap; }
+	/** Get skill slot associated with with the SkillGroup */
+	UContainerWidget* GetSkillSlotForSkillGroup(FName SkillGroup);
 
 	/** Iterates over all skill slots in this tree and updates the bIsEnabled, bCanBeDragged, bCanBeClicked state of skill slot */
 	void UpdateSkillSlots();
-
-	UContainerWidget* GetSkillSlotForSkillGroup(FName SkillGroup);
 
 protected:
 
@@ -163,6 +162,10 @@ private:
 	void SetupSlotPosition(UContainerWidget* ItemContainer, EVocations Vocation, int32 Column, int32 Row);
 
 	void SetupArrowPosition(UImage* ArrowImage, EVocations Vocation, int32 ParentColumn, int32 ParentRow);
+
+	void UpdateSkillSlots_NoSkillPointAvailable();
+
+	void UpdateSkillSlots_SkillPointsAvailable();
 
 	// --------------------------------------
 	//	Tab Switching

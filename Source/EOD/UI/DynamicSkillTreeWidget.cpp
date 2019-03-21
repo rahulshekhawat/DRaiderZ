@@ -92,7 +92,18 @@ void UDynamicSkillTreeWidget::InitializeSkillTreeLayout(USkillTreeComponent* Ski
 
 void UDynamicSkillTreeWidget::UpdateSkillSlots()
 {
+	check(SkillTreeComp);
+	TArray<FName> Keys;
+	SkillContainersMap.GetKeys(Keys);
 
+	if (SkillTreeComp->IsAnySkillPointAvailable())
+	{
+		UpdateSkillSlots_SkillPointsAvailable();
+	}
+	else
+	{
+		UpdateSkillSlots_NoSkillPointAvailable();
+	}
 }
 
 UContainerWidget* UDynamicSkillTreeWidget::GetSkillSlotForSkillGroup(FName SkillGroup)
@@ -262,6 +273,33 @@ void UDynamicSkillTreeWidget::SetupArrowPosition(UImage* ArrowImage, EVocations 
 	{
 		CPSlot->SetPosition(FVector2D(XPosition, YPosition));
 		CPSlot->SetSize(Size);
+	}
+}
+
+void UDynamicSkillTreeWidget::UpdateSkillSlots_NoSkillPointAvailable()
+{
+	
+}
+
+void UDynamicSkillTreeWidget::UpdateSkillSlots_SkillPointsAvailable()
+{
+	for (FName SkillGroup : Keys)
+	{
+		UContainerWidget* Wiget = SkillContainersMap[SkillGroup];
+		// if (SkillTreeComp->Is)
+
+
+		// If no skill point is allocated to this widget
+		if (!SkillTreeComp->IsAnySkillPointAllocatedToSlot(SkillGroup))
+		{
+			// if ()
+		}
+
+		if (SkillTreeComp->IsAnySkillPointAllocatedToSlot(SkillGroup))
+		{
+
+		}
+		// SkillTreeComp->Is
 	}
 }
 

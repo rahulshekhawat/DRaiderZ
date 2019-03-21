@@ -111,19 +111,42 @@ bool USkillTreeComponent::AttemptPointAllocationToSlot(FName SkillGroup, FSkillT
 
 bool USkillTreeComponent::CanAllocatePointToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo)
 {
-	// If there is no point available for allocation or if our skill tree reference table is missing or if SkillGroup is invalid
-	if (SkillPointsAllocationInfo.AvailableSkillPoints == 0 || SkillTreeLayoutTable == nullptr || SkillGroup == NAME_None)
+	if (IsSkillAvailable(SkillGroup, SkillSlotInfo) && IsAnySkillPointAvailable())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool USkillTreeComponent::IsAnySkillPointAllocatedToSlot(FName SkillGroup)
+{
+	if (SkillTreeSlotsSaveData.Contains(SkillGroup))
+	{
+		FSkillTreeSlotSaveData& SaveData = SkillTreeSlotsSaveData[SkillGroup];
+		if (SaveData.CurrentUpgrade > 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool USkillTreeComponent::IsSkillAvailable(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo)
+{
+	if (SkillGroup == NAME_None)
 	{
 		return false;
 	}
 
 	FSkillTreeSlot* SkillTreeSlot = SkillSlotInfo;
-	if (SkillTreeSlot == nullptr)
+	if (SkillTreeSlot == nullptr && SkillTreeLayoutTable)
 	{
 		FString ContextString = FString("USkillTreeComponent::CanAllocatePointToSlot()");
 		SkillTreeSlot = SkillTreeLayoutTable->FindRow<FSkillTreeSlot>(SkillGroup, ContextString);
 	}
-	
+
 	// If skil tree slot was not found
 	if (SkillTreeSlot == nullptr)
 	{
