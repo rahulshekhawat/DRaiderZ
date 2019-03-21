@@ -19,4 +19,5 @@ namespace CollisionProfileNames
 namespace KeyboardKeysNames
 {
 	extern const FName LeftMouseButton;
+	extern const FName RightMouseButton;
 }

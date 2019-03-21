@@ -5,6 +5,7 @@
 #include "DynamicSkillTreeWidget.h"
 #include "EODGlobalNames.h"
 #include "EODItemDragDropOperation.h"
+#include "EODPreprocessors.h"
 
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -120,35 +121,31 @@ void UContainerWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 
 FReply UContainerWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
+	bool bLMBDown = InMouseEvent.IsMouseButtonDown(FKey(KeyboardKeysNames::LeftMouseButton));
+	bool bRMBDown = InMouseEvent.IsMouseButtonDown(FKey(KeyboardKeysNames::RightMouseButton));
+
 	FReply Reply = FReply::Handled();
-	if (bCanBeClicked)
+	if (bLMBDown && bCanBeClicked && EmptyBorderMID)
 	{
-		if (EmptyBorderMID)
-		{
-			EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, PressedBorderColor);
-		}
-
-		if (bCanBeDragged)
-		{
-			FKey DragKey(KeyboardKeysNames::LeftMouseButton);
-			if (InMouseEvent.GetEffectingButton() == DragKey)
-			{
-				TSharedPtr<SWidget> SlateWidgetDetectingDrag = this->GetCachedWidget();
-				if (SlateWidgetDetectingDrag.IsValid())
-				{
-					Reply = Reply.DetectDrag(SlateWidgetDetectingDrag.ToSharedRef(), DragKey);
-				}
-			}
-		}
-
+		EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, PressedBorderColor);
 		OnClicked.Broadcast(this, ContainerParentWidget);
 	}
+	else if (bRMBDown && bCanBeDragged && ContainerData.Icon != nullptr)
+	{
+		TSharedPtr<SWidget> SlateWidgetDetectingDrag = this->GetCachedWidget();
+		if (SlateWidgetDetectingDrag.IsValid())
+		{
+			Reply = Reply.DetectDrag(SlateWidgetDetectingDrag.ToSharedRef(), InMouseEvent.GetEffectingButton());
+		}
+	}
+	
 	return Reply;
 }
 
 FReply UContainerWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if ((bCanBeClicked || bCanBeDragged) && EmptyBorderMID)
+	// if ((bCanBeClicked || bCanBeDragged) && EmptyBorderMID)
+	if (bCanBeClicked && EmptyBorderMID)
 	{
 		EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, HoveredBorderColor);
 	}
@@ -168,6 +165,11 @@ void UContainerWidget::SetIsEnabled(bool bInIsEnabled)
 void UContainerWidget::SetCanBeClicked(bool bValue)
 {
 	bCanBeClicked = bValue;
+
+	if (!bCanBeClicked && EmptyBorderMID)
+	{
+		EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, NormalBorderColor);
+	}
 	//~ @todo Update container's border material
 }
 
@@ -288,6 +290,5 @@ void UContainerWidget::Internal_InitializeContainer()
 
 	SetCanBeClicked(true);
 	SetCanBeDragged(true);
-
-	SetIsEnabled(false);
+	SetIsEnabled(true);
 }

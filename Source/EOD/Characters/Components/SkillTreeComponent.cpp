@@ -53,6 +53,8 @@ void USkillTreeComponent::InitializeSkillTreeWidget()
 	{
 		SkillTreeWidget->InitializeSkillTreeLayout(this, SkillTreeLayoutTable, SkillTreeSlotsSaveData);
 	}
+
+	SkillTreeWidget->UpdateSkillSlots();
 }
 
 bool USkillTreeComponent::AttemptPointAllocationToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo)
