@@ -176,6 +176,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Container Behaviour")
 	bool bDisplaySubTextAsRatio;
 
+	/** Determines whether the SubText should be displayed to player at all */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Container Behaviour")
+	bool bSubTextVisible;
+
 	/** Parent widget of this container */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Behaviour")
 	UUserWidget* ContainerParentWidget;
@@ -247,6 +251,9 @@ public:
 
 	UFUNCTION()
 	void SetMaxValue(int32 NewValue);
+
+	UFUNCTION()
+	void SetContainerData(const FContainerData& NewData);
 	
 
 

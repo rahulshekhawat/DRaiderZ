@@ -8,7 +8,7 @@
 
 class UTextBlock;
 class UCanvasPanel;
-class USkillBarWidget;
+class UDynamicSkillBarWidget;
 class UInventoryWidget;
 class UPlayerStatsWidget;
 class UStatusIndicatorWidget;
@@ -64,8 +64,8 @@ protected:
 	UDynamicSkillTreeWidget* SkillTreeWidget;
 
 	/** Widget containing skills that can be used by player */
-	UPROPERTY(Transient, BlueprintReadOnly)
-	USkillBarWidget* SkillBarWidget;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UDynamicSkillBarWidget* SkillBarWidget;
 
 public:
 
@@ -73,7 +73,7 @@ public:
 
 	FORCEINLINE UStatusIndicatorWidget* GetStatusIndicatorWidget() const { return StatusIndicatorWidget; }
 
-	FORCEINLINE USkillBarWidget* GetSkillBarWidget() const { return SkillBarWidget; }
+	FORCEINLINE UDynamicSkillBarWidget* GetSkillBarWidget() const { return SkillBarWidget; }
 
 	FORCEINLINE UInventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
 
@@ -82,7 +82,7 @@ public:
 	FORCEINLINE UPlayerStatsWidget* GetPlayerStatsWidget() const { return PlayerStatsWidget; }
 
 	/** Add skill bar widget as a child to HUD widget */
-	void AddSkillBarWidget(USkillBarWidget* NewWidget);
+	void AddSkillBarWidget(UDynamicSkillBarWidget* NewWidget);
 
 	/** Add dialogue widget as a child to HUD widget */
 	void AddDialogueWidget(UDialogueWindowWidget* NewWidget);

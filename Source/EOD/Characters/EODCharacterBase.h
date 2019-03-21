@@ -304,9 +304,19 @@ private:
 	inline float CalculateRotationYawFromAxisInput() const;
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// UI
+public:
+
+	// --------------------------------------
+	//	User Interface
+	// --------------------------------------
+
+protected:
+
+	// UPROPERTY(EditDefaultsOnly, Category = "UI")
+		// TSubclassOf<USkillBa>
+
 private:
+
 	void BindUIDelegates();
 
 	void UnbindUIDelegates();

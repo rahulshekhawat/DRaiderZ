@@ -4,8 +4,10 @@
 #include "ContainerWidget.h"
 #include "DynamicSkillTreeWidget.h"
 #include "EODGlobalNames.h"
-#include "EODItemDragDropOperation.h"
+#include "ContainerDragDropOperation.h"
 #include "EODPreprocessors.h"
+#include "DynamicSkillBarWidget.h"
+#include "InventoryWidget.h"
 
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -15,6 +17,7 @@ UContainerWidget::UContainerWidget(const FObjectInitializer& ObjectInitializer) 
 {
 	ContainerType = EContainerType::None;
 	bDisplaySubTextAsRatio = false;
+	bSubTextVisible = true;
 }
 
 bool UContainerWidget::Initialize()
@@ -50,6 +53,10 @@ void UContainerWidget::InitializeWithParent(UUserWidget* ParentWidget)
 		ContainerType = EContainerType::SkillTree;
 		bDisplaySubTextAsRatio = true;
 	}
+	else if (ParentWidget->IsA(UDynamicSkillBarWidget::StaticClass()))
+	{
+		ContainerType = EContainerType::SkillBar;
+	}
 }
 
 void UContainerWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
@@ -60,46 +67,46 @@ void UContainerWidget::NativeOnDragDetected(const FGeometry& InGeometry, const F
 bool UContainerWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	// Cannot drop anything on skill tree
-	if (ContainerType == EContainerType::SkillTree)
+	if (this->ContainerType == EContainerType::SkillTree)
 	{
 		return false;
 	}
 
-	bool bResult = false;
-
-	/*
-	UEODItemDragDropOperation* Operation = Cast<UEODItemDragDropOperation>(InOperation);
-	if (!IsValid(Operation) || !IsValid(Operation->DraggedEODItemWidget))
+	UContainerDragDropOperation* ContOperation = Cast<UContainerDragDropOperation>(InOperation);
+	if (!ContOperation || !ContOperation->DraggedContainerWidget)
 	{
 		return false;
 	}
-
 
 	bool bResult = false;
 	// Cannot drop anything from skill tree to inventory
-	// Cannot drop anything from inventory to skill bar
+	// Cannot drop anything from inventory to skill bar (It could be implemented in future)
 	// Cannot drop anything from skill bar to inventory
-	if (Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillTree &&
-		ContainerType == EEODContainerType::SkillBar)
+	if (ContOperation->DraggedContainerWidget->ContainerType == EContainerType::SkillTree &&
+		this->ContainerType == EContainerType::SkillBar)
 	{
-		USkillBarWidget* SkillBarWidget = Cast<USkillBarWidget>(ParentWidget);
-		if (IsValid(SkillBarWidget))
+		UDynamicSkillBarWidget* SkillBarWidget = Cast<UDynamicSkillBarWidget>(ContainerParentWidget);
+		if (SkillBarWidget)
 		{
-			bResult = SkillBarWidget->OnNewSkillDropped(Operation->DraggedEODItemWidget, this);
+			bResult = SkillBarWidget->OnContainerDropped(ContOperation->DraggedContainerWidget, this);
 		}
 	}
-	else if ((Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::Inventory &&
-		ContainerType == EEODContainerType::Inventory) ||
-		(Operation->DraggedEODItemWidget->ContainerType == EEODContainerType::SkillBar &&
-			ContainerType == EEODContainerType::SkillBar))
+	else if (ContOperation->DraggedContainerWidget->ContainerType == EContainerType::SkillBar &&
+		this->ContainerType == EContainerType::SkillBar)
 	{
-		USkillBarWidget* SkillBarWidget = Cast<USkillBarWidget>(ParentWidget);
-		if (IsValid(SkillBarWidget))
+		UDynamicSkillBarWidget* SkillBarWidget = Cast<UDynamicSkillBarWidget>(ContainerParentWidget);
+		if (SkillBarWidget)
 		{
-			bResult = SkillBarWidget->OnSkillsSwapped(Operation->DraggedEODItemWidget, this);
+			bResult = SkillBarWidget->OnContainersSwapped(ContOperation->DraggedContainerWidget, this);
 		}
 	}
-	*/
+	else if (ContOperation->DraggedContainerWidget->ContainerType == EContainerType::Inventory &&
+		this->ContainerType == EContainerType::Inventory)
+	{
+		UInventoryWidget* InventoryWidget = Cast<UInventoryWidget>(ContainerParentWidget);
+		//~ @todo inventory container drop event
+	}
+
 	return bResult;
 }
 
@@ -144,7 +151,6 @@ FReply UContainerWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 
 FReply UContainerWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	// if ((bCanBeClicked || bCanBeDragged) && EmptyBorderMID)
 	if (bCanBeClicked && EmptyBorderMID)
 	{
 		EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, HoveredBorderColor);
@@ -223,21 +229,20 @@ void UContainerWidget::SetItemType(EEODItemType EODItemType)
 
 void UContainerWidget::SetCurrentValue(int32 NewValue)
 {
-	if (bDisplaySubTextAsRatio && SubText)
+	ContainerData.CurrentValue = NewValue;
+	check(ContainerData.CurrentValue <= ContainerData.MaxValue);
+	if (bSubTextVisible)
 	{
-		ContainerData.CurrentValue = NewValue;
-		check(ContainerData.CurrentValue <= ContainerData.MaxValue);
-		SubText->SetVisibility(ESlateVisibility::Visible);
-		FString NewSubTextString = FString::FromInt(NewValue) + FString("/") + FString::FromInt(ContainerData.MaxValue);
-		FText NewText = FText::FromString(NewSubTextString);
-		SubText->SetText(NewText);
-	}
-	else if (!bDisplaySubTextAsRatio && SubText)
-	{
-		ContainerData.CurrentValue = NewValue;
-		check(ContainerData.CurrentValue <= ContainerData.MaxValue);
-		SubText->SetVisibility(ESlateVisibility::Visible);
-		FString NewSubTextString = FString::FromInt(NewValue);
+		FString NewSubTextString;
+		if (bDisplaySubTextAsRatio)
+		{
+			NewSubTextString = FString::FromInt(NewValue) + FString("/") + FString::FromInt(ContainerData.MaxValue);
+		}
+		else
+		{
+			NewSubTextString = FString::FromInt(NewValue);
+		}
+
 		FText NewText = FText::FromString(NewSubTextString);
 		SubText->SetText(NewText);
 	}
@@ -253,6 +258,18 @@ void UContainerWidget::SetMaxValue(int32 NewValue)
 		FText NewText = FText::FromString(NewSubTextString);
 		SubText->SetText(NewText);
 	}
+}
+
+void UContainerWidget::SetContainerData(const FContainerData& NewData)
+{
+	SetItemID(NewData.ItemID);
+	SetItemGroup(NewData.ItemGroup);
+	SetIcon(NewData.Icon);
+	SetInGameName(NewData.InGameName);
+	SetDescription(NewData.Description);
+	SetItemType(NewData.EODItemType);
+	SetCurrentValue(NewData.CurrentValue);
+	SetMaxValue(NewData.MaxValue);
 }
 
 void UContainerWidget::SetItemID(FName NewID)
@@ -280,15 +297,22 @@ void UContainerWidget::Internal_InitializeContainer()
 		}
 	}
 
-	SetItemID(ContainerData.ItemID);
-	SetItemGroup(ContainerData.ItemGroup);
-	SetIcon(ContainerData.Icon);
-	SetInGameName(ContainerData.InGameName);
-	SetDescription(ContainerData.Description);
-	SetCurrentValue(ContainerData.CurrentValue);
-	SetMaxValue(ContainerData.MaxValue);
+	// Re-initiate container data with existing container data
+	SetContainerData(ContainerData);
 
 	SetCanBeClicked(true);
 	SetCanBeDragged(true);
 	SetIsEnabled(true);
+
+	if (SubText)
+	{
+		if (bSubTextVisible)
+		{
+			SubText->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			SubText->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}	
 }

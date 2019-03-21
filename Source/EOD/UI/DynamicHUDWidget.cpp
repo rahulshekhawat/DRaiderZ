@@ -2,7 +2,7 @@
 
 
 #include "DynamicHUDWidget.h"
-#include "SkillBarWidget.h"
+#include "DynamicSkillBarWidget.h"
 #include "InventoryWidget.h"
 #include "PlayerStatsWidget.h"
 #include "DynamicSkillTreeWidget.h"
@@ -13,6 +13,11 @@
 
 UDynamicHUDWidget::UDynamicHUDWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	SkillBarWidgetSize = FVector2D(480.f, 96.f);
+	SkillBarWidgetPosition = FVector2D(-240.f, -96.f);
+	SkillBarWidgetAnchor = FAnchors(0.5f, 1.f, 0.5f, 1.f);
+	DialogueWidgetSize = FVector2D(720.f, 360.f);
+	DialogueWidgetPosition = FVector2D(600.f, 630.f);
 }
 
 bool UDynamicHUDWidget::Initialize()
@@ -22,8 +27,10 @@ bool UDynamicHUDWidget::Initialize()
 		StatusIndicatorWidget &&
 		InventoryWidget &&
 		PlayerStatsWidget &&
-		SkillTreeWidget)
+		SkillTreeWidget &&
+		SkillBarWidget)
 	{
+		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
 		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 		PlayerStatsWidget->SetVisibility(ESlateVisibility::Hidden);
 
@@ -43,7 +50,7 @@ void UDynamicHUDWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UDynamicHUDWidget::AddSkillBarWidget(USkillBarWidget* NewWidget)
+void UDynamicHUDWidget::AddSkillBarWidget(UDynamicSkillBarWidget* NewWidget)
 {
 	if (SkillBarWidget == NewWidget || NewWidget == nullptr)
 	{

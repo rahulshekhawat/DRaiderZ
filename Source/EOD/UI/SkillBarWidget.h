@@ -25,7 +25,7 @@ class EOD_API USkillBarWidget : public UUserWidget
 public:
 	USkillBarWidget(const FObjectInitializer& ObjectInitializer);
 
-	bool Initialize() override;
+	virtual bool Initialize() override;
 
 	virtual void NativeConstruct() override;
 
