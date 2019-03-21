@@ -29,41 +29,30 @@ void USkillTreeComponent::InitializeSkillTreeWidget()
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetOuter());
 	UDynamicHUDWidget* HUDWidget = PC ? PC->GetHUDWidget() : nullptr;
 	SkillTreeWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
+	SkillPointsInfoWidget = SkillTreeWidget ? SkillTreeWidget->GetSkillPointsInfoWidget() : nullptr;
 
 	UEODGameInstance* GI = Cast<UEODGameInstance>(PC->GetGameInstance());
 	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
 
-	if (!SkillTreeWidget || !SaveGame)
-	{
-		return;
-	}
-
-	SkillPointsInfoWidget = SkillTreeWidget->GetSkillPointsInfoWidget();
 	if (SaveGame)
 	{
-		SkillTreeWidget->InitializeSkillTreeLayout(this, SkillTreeLayoutTable, SaveGame->SkillTreeSlotsSaveData);
+		SetSkillPointsAllocationInfo(SaveGame->SkillPointsAllocationInfo);
+		SkillTreeSlotsSaveData = SaveGame->SkillTreeSlotsSaveData;
 	}
 	else
 	{
-		SkillTreeWidget->InitializeSkillTreeLayout(this, SkillTreeLayoutTable);
+		SetSkillPointsAllocationInfo(SkillPointsAllocationInfo);
 	}
 
-	SkillTreeWidget->UpdateSkillSlots();
-
-	SkillPointsInfoWidget = SkillTreeWidget->GetSkillPointsInfoWidget();
-	if (!SkillPointsInfoWidget)
-	{
-		return;
-	}
-
-	SkillPointsAllocationInfo = SaveGame->SkillPointsAllocationInfo;
 	if (SkillPointsAllocationInfo.AvailableSkillPoints + SkillPointsAllocationInfo.UsedSkillPoints < SkillPointsUnlockedByDefault)
 	{
-		SkillPointsAllocationInfo.AvailableSkillPoints = SkillPointsUnlockedByDefault - SkillPointsAllocationInfo.UsedSkillPoints;
+		SetAvailableSkillPoints(SkillPointsUnlockedByDefault - SkillPointsAllocationInfo.UsedSkillPoints);
 	}
 
-	SkillPointsInfoWidget->UpdateSkillPointAllocationText(SkillPointsAllocationInfo);
-
+	if (SkillTreeWidget)
+	{
+		SkillTreeWidget->InitializeSkillTreeLayout(this, SkillTreeLayoutTable, SkillTreeSlotsSaveData);
+	}
 }
 
 bool USkillTreeComponent::AttemptPointAllocationToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo)

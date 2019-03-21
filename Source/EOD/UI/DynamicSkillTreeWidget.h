@@ -163,10 +163,6 @@ private:
 
 	void SetupArrowPosition(UImage* ArrowImage, EVocations Vocation, int32 ParentColumn, int32 ParentRow);
 
-	void UpdateSkillSlots_NoSkillPointAvailable();
-
-	void UpdateSkillSlots_SkillPointsAvailable();
-
 	// --------------------------------------
 	//	Tab Switching
 	// --------------------------------------

@@ -104,7 +104,7 @@ bool UContainerWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 
 void UContainerWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if ((bCanBeClicked || bCanBeDragged) && EmptyBorderMID)
+	if (bCanBeClicked && EmptyBorderMID)
 	{
 		EmptyBorderMID->SetVectorParameterValue(MaterialParameterNames::BaseColor, HoveredBorderColor);
 	}

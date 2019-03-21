@@ -96,13 +96,45 @@ void UDynamicSkillTreeWidget::UpdateSkillSlots()
 	TArray<FName> Keys;
 	SkillContainersMap.GetKeys(Keys);
 
-	if (SkillTreeComp->IsAnySkillPointAvailable())
+	bool bAnySkillPointAvailable = SkillTreeComp->IsAnySkillPointAvailable();
+	for (FName SkillGroup : Keys)
 	{
-		UpdateSkillSlots_SkillPointsAvailable();
-	}
-	else
-	{
-		UpdateSkillSlots_NoSkillPointAvailable();
+		UContainerWidget* ContWidget = SkillContainersMap[SkillGroup];
+
+		bool bSkillPointAllocatedToSlot = SkillTreeComp->IsAnySkillPointAllocatedToSlot(SkillGroup);
+		bool bSkillAvailable = SkillTreeComp->IsSkillAvailable(SkillGroup);
+
+		if (bSkillPointAllocatedToSlot)
+		{
+			ContWidget->SetIsEnabled(true);
+			ContWidget->SetCanBeDragged(true);
+		}
+		else if (!bSkillPointAllocatedToSlot && bSkillAvailable)
+		{
+			ContWidget->SetIsEnabled(true);
+			ContWidget->SetCanBeDragged(false);
+		}
+		else
+		{
+			ContWidget->SetIsEnabled(false);
+			ContWidget->SetCanBeDragged(false);
+		}
+
+		if (bAnySkillPointAvailable)
+		{
+			if (bSkillAvailable)
+			{
+				ContWidget->SetCanBeClicked(true);
+			}
+			else
+			{
+				ContWidget->SetCanBeClicked(false);
+			}
+		}
+		else
+		{
+			ContWidget->SetCanBeClicked(false);
+		}
 	}
 }
 
@@ -273,33 +305,6 @@ void UDynamicSkillTreeWidget::SetupArrowPosition(UImage* ArrowImage, EVocations 
 	{
 		CPSlot->SetPosition(FVector2D(XPosition, YPosition));
 		CPSlot->SetSize(Size);
-	}
-}
-
-void UDynamicSkillTreeWidget::UpdateSkillSlots_NoSkillPointAvailable()
-{
-	
-}
-
-void UDynamicSkillTreeWidget::UpdateSkillSlots_SkillPointsAvailable()
-{
-	for (FName SkillGroup : Keys)
-	{
-		UContainerWidget* Wiget = SkillContainersMap[SkillGroup];
-		// if (SkillTreeComp->Is)
-
-
-		// If no skill point is allocated to this widget
-		if (!SkillTreeComp->IsAnySkillPointAllocatedToSlot(SkillGroup))
-		{
-			// if ()
-		}
-
-		if (SkillTreeComp->IsAnySkillPointAllocatedToSlot(SkillGroup))
-		{
-
-		}
-		// SkillTreeComp->Is
 	}
 }
 

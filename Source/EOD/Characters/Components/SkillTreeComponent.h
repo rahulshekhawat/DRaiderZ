@@ -121,6 +121,8 @@ private:
 
 	void ModifySkillSlotUpgrade(FName SkillGroup, int32 Value);
 	void SetSkillSlotUpgrade(FName SkillGroup, int32 Value);
+
+	inline void SetSkillPointsAllocationInfo(const FSkillPointsAllocationInfo& NewInfo);
 };
 
 void USkillTreeComponent::ModifyAllocatedPointsAssassin(int32 Value)
@@ -156,4 +158,16 @@ inline void USkillTreeComponent::ModifyAvailableSkillPoints(int32 Value)
 inline void USkillTreeComponent::ModifyUsedSkillPoints(int32 Value)
 {
 	SetUsedSkillPoints(SkillPointsAllocationInfo.UsedSkillPoints + Value);
+}
+
+inline void USkillTreeComponent::SetSkillPointsAllocationInfo(const FSkillPointsAllocationInfo& NewInfo)
+{
+	SkillPointsAllocationInfo = NewInfo;
+	SetAvailableSkillPoints(NewInfo.AvailableSkillPoints);
+	SetUsedSkillPoints(NewInfo.UsedSkillPoints);
+	SetAllocatedPointsAssassin(NewInfo.AssassinPoints);
+	SetAllocatedPointsBerserker(NewInfo.BerserkerPoints);
+	SetAllocatedPointsCleric(NewInfo.ClericPoints);
+	SetAllocatedPointsDefender(NewInfo.DefenderPoints);
+	SetAllocatedPointsSorcerer(NewInfo.SorcererPoints);
 }
