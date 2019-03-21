@@ -87,6 +87,10 @@ public:
 	/** Add dialogue widget as a child to HUD widget */
 	void AddDialogueWidget(UDialogueWindowWidget* NewWidget);
 
+protected:
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
 private:
 
 	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

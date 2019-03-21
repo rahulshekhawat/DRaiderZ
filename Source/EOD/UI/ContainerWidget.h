@@ -153,9 +153,15 @@ protected:
 
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
+public:
+
 	// --------------------------------------
 	//	Constants : Variables that aren't meant to be changed once initialized
 	// --------------------------------------
+
+	FORCEINLINE EContainerType GetContainerType() const { return ContainerType; }
+
+protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Constants")
 	UMaterialInstanceDynamic* EmptyBorderMID;

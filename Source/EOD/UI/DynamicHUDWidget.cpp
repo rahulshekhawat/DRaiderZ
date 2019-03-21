@@ -7,6 +7,8 @@
 #include "PlayerStatsWidget.h"
 #include "DynamicSkillTreeWidget.h"
 #include "DialogueWindowWidget.h"
+#include "ContainerDragDropOperation.h"
+#include "ContainerWidget.h"
 
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -78,4 +80,22 @@ void UDynamicHUDWidget::AddDialogueWidget(UDialogueWindowWidget* NewWidget)
 		CPSlot->SetSize(DialogueWidgetSize);
 		CPSlot->SetPosition(DialogueWidgetPosition);
 	}
+}
+
+bool UDynamicHUDWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	UContainerDragDropOperation* Operation = Cast<UContainerDragDropOperation>(InOperation);
+	if (!Operation || !Operation->DraggedContainerWidget)
+	{
+		return false;
+	}
+
+	if (Operation->DraggedContainerWidget->GetContainerType() == EContainerType::SkillBar)
+	{
+		FContainerData NewData;
+		Operation->DraggedContainerWidget->SetContainerData(NewData);
+		//~ @todo call OnContainerRemoved from SkillBar
+	}
+
+	return true;
 }
