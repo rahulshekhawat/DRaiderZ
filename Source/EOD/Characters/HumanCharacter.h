@@ -23,6 +23,11 @@ class EOD_API AHumanCharacter : public AEODCharacterBase
 	GENERATED_BODY()
 
 public:
+
+	// --------------------------------------
+	//	UE4 Method Overrides
+	// --------------------------------------
+
 	/** Create and initialize skeletal armor mesh, camera, and inventory components. */
 	AHumanCharacter(const FObjectInitializer& ObjectInitializer);
 
@@ -41,17 +46,17 @@ public:
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
 
+	// --------------------------------------
+	//	Save/Load System
+	// --------------------------------------
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Save/load system
-public:
 	/** Saves current player state */
 	virtual void SaveCharacterState() override;
 
+	// --------------------------------------
+	//	Components
+	// --------------------------------------
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Components
-public:
 	static FName HairComponentName;
 
 	static FName HatItemComponentName;
@@ -66,7 +71,22 @@ public:
 
 	static FName FeetComponentName;
 
+	FORCEINLINE USkeletalMeshComponent* GetHair() const { return Hair; }
+
+	FORCEINLINE USkeletalMeshComponent* GetHatItem() const { return HatItem; }
+
+	FORCEINLINE USkeletalMeshComponent* GetFaceItem() const { return FaceItem; }
+
+	FORCEINLINE USkeletalMeshComponent* GetChest() const { return Chest; }
+	
+	FORCEINLINE USkeletalMeshComponent* GetHands() const { return Hands; }
+
+	FORCEINLINE USkeletalMeshComponent* GetLegs() const { return Legs; }
+	
+	FORCEINLINE USkeletalMeshComponent* GetFeet() const { return Feet; }
+
 private:
+
 	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player face
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -93,37 +113,45 @@ private:
 	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
 
-	FORCEINLINE void SetMasterPoseComponentForMeshes();
-	//~ End Components
+	inline void SetMasterPoseComponentForMeshes();
 
-
-	//~ Begin Animation Handling
 public:
+
+	// --------------------------------------
+	//	Animations
+	// --------------------------------------
+
 	inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
 
 private:
+
 	/** Animations for this player when it has a weapon equipped */
 	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
 
 	/** Animations for this player when it does not have a weapon equipped */
 	FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
-	//~ End Animation Handling
 
-
-	//~ Begin Weapon System
 public:
+
+	// --------------------------------------
+	//	Weapon System
+	// --------------------------------------
+
 	/** Returns the weapon type of primary weapon */
 	FORCEINLINE EWeaponType GetEquippedWeaponType() const;
 
-private:
+protected:
+
 	/** An actor for primary weapon equipped by the player */
 	UPROPERTY(Transient)
 	APrimaryWeapon* PrimaryWeapon;
-	//~ End Weapon System
 
-
-	//~ Begin Character Action Handling
 public:
+
+	// --------------------------------------
+	//	Character States
+	// --------------------------------------
+
 	/** Returns true if character can dodge */
 	virtual bool CanDodge() const;
 
@@ -134,10 +162,13 @@ public:
 	virtual void EnableCharacterGuard() override;
 
 	virtual void DisableCharacterGuard() override;
-	//~ End Character Action Handling
 
-	//~ Begin Input Handling
 private:
+
+	// --------------------------------------
+	//	Input Handling
+	// --------------------------------------
+
 	void OnPressedForward();
 
 	void OnPressedBackward();
@@ -158,41 +189,37 @@ private:
 
 	UFUNCTION()
 	void DisableBackwardPressed();
-	//~ End Input Handling
 
-
-	//~ Begin Materials
 public:
+
+	// --------------------------------------
+	//	Materials
+	// --------------------------------------
+
 	virtual void TurnOnTargetSwitch() override;
 
 	virtual void TurnOffTargetSwitch() override;
-	//~ End Materials
 
-
-	//~ Begin Network Code
 private:
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_StartDodge();
 
-	UFUNCTION(NetMultiCast, Reliable)
-	void Multicast_StartDodge();
-	//~ End Network Code
+	// --------------------------------------
+	//	Network
+	// --------------------------------------
+
 	
-
-
 };
 
-FORCEINLINE void AHumanCharacter::SetMasterPoseComponentForMeshes()
+inline void AHumanCharacter::SetMasterPoseComponentForMeshes()
 {
-	if (IsValid(GetMesh()))
+	if (GetMesh())
 	{
-		if (IsValid(Hair))		{ Hair->SetMasterPoseComponent(GetMesh()); }
-		if (IsValid(HatItem))	{ HatItem->SetMasterPoseComponent(GetMesh()); }
-		if (IsValid(FaceItem))	{ FaceItem->SetMasterPoseComponent(GetMesh()); }
-		if (IsValid(Chest))		{ Chest->SetMasterPoseComponent(GetMesh()); }
-		if (IsValid(Hands))		{ Hands->SetMasterPoseComponent(GetMesh()); }
-		if (IsValid(Legs))		{ Legs->SetMasterPoseComponent(GetMesh()); }
-		if (IsValid(Feet))		{ Feet->SetMasterPoseComponent(GetMesh()); }
+		if (Hair)		{ Hair->SetMasterPoseComponent(GetMesh()); }
+		if (HatItem)	{ HatItem->SetMasterPoseComponent(GetMesh()); }
+		if (FaceItem)	{ FaceItem->SetMasterPoseComponent(GetMesh()); }
+		if (Chest)		{ Chest->SetMasterPoseComponent(GetMesh()); }
+		if (Hands)		{ Hands->SetMasterPoseComponent(GetMesh()); }
+		if (Legs)		{ Legs->SetMasterPoseComponent(GetMesh()); }
+		if (Feet)		{ Feet->SetMasterPoseComponent(GetMesh()); }
 	}
 }
 

@@ -43,18 +43,21 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 	// The player should be free to look around with mouse without actually rotating the posessed character
 	bUseControllerRotationYaw = false;
 
+	/*
 	// @note Defaul skeletal mesh component inherited from ACharacter class will contain face mesh
 	if (GetMesh())
 	{
 		GetMesh()->AddLocalOffset(FVector(0.f, 0.f, -90.f));
 		GetMesh()->bUseAttachParentBound = true;
 	}
+	*/
 
 
 	// SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
 
 	// @note : SetMasterPoseComponent() from constructor doesn't work in packaged game (for some weird reason?!)
-
+	
+	/*
 	Hair			= CreateNewArmorComponent(FName("Hair"), ObjectInitializer);
 	HatItem			= CreateNewArmorComponent(FName("Hat Item"), ObjectInitializer);
 	FaceItem		= CreateNewArmorComponent(FName("Face Item"), ObjectInitializer);
@@ -62,6 +65,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 	Hands			= CreateNewArmorComponent(FName("Hands"), ObjectInitializer);
 	Legs			= CreateNewArmorComponent(FName("Legs"), ObjectInitializer);
 	Feet			= CreateNewArmorComponent(FName("Feet"), ObjectInitializer);
+	*/
 
 	// InventoryComponent = ObjectInitializer.CreateDefaultSubobject<UInventoryComponent>(this, FName("Player Inventory"));
 	// SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
@@ -204,8 +208,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Since setting master pose component from constructor doesn't work in packaged game
-	SetMasterPoseComponentForMeshes();
+	// SetMasterPoseComponentForMeshes();
 
 	/*
 	if (Controller && Controller->IsLocalPlayerController() && HUDWidgetClass.Get())
@@ -871,92 +874,6 @@ void APlayerCharacter::StartDodge()
 	}
 	PlayAnimationMontage(DodgeMontage, SectionToPlay, ECharacterState::Dodging);
 	TriggeriFrames(DodgeImmunityDuration, DodgeImmunityTriggerDelay);
-
-
-
-	/*
-	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->Dodge.Get())
-	{
-		// return false;
-	}
-
-	if (!CanDodge())
-	{
-		// return false;
-	}
-
-	if (IsGuardActive())
-	{
-		DeactivateGuard();
-
-		// Because desired rotation yaw from axis input wouldn't have updated if guard was active
-		InitiateRotationToYawFromAxisInput();
-	}
-	else if (IsCastingSpell())
-	{
-		// @todo stop casting spell
-	}
-	else if (IsNormalAttacking())
-	{
-		StopNormalAttack();
-	}
-
-	UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
-	// Disable movement during dodge
-	if (bCharacterStateAllowsMovement)
-	{
-		SetCharacterStateAllowsMovement(false);
-	}
-
-	// Rotate character
-	float DesiredYaw = GetControllerRotationYaw();
-	if (ForwardAxisValue != 0)
-	{
-		DesiredYaw = DesiredRotationYawFromAxisInput;
-	}
-
-	FRotator DesiredRotation = FRotator(0.f, DesiredYaw, 0.f);
-
-	// Instantly rotate character
-	SetCharacterRotation(DesiredRotation);
-	// Update desired rotation yaw in movement component so it doesn't try to rotate back to original rotation yaw
-	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-	if (MoveComp)
-	{
-		MoveComp->SetDesiredCustomRotation(DesiredRotation);
-	}
-
-	FName SectionToPlay;
-	if (ForwardAxisValue == 0)
-	{
-		if (RightAxisValue > 0)
-		{
-			SectionToPlay = UCharacterLibrary::SectionName_RightDodge;
-		}
-		else if (RightAxisValue < 0)
-		{
-			SectionToPlay = UCharacterLibrary::SectionName_LeftDodge;
-		}
-		else
-		{
-			SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
-		}
-	}
-	else
-	{
-		if (ForwardAxisValue > 0)
-		{
-			SectionToPlay = UCharacterLibrary::SectionName_ForwardDodge;
-		}
-		else if (ForwardAxisValue < 0)
-		{
-			SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
-		}
-	}
-	PlayAnimationMontage(DodgeMontage, SectionToPlay, ECharacterState::Dodging);
-	TriggeriFrames(DodgeImmunityDuration, DodgeImmunityTriggerDelay);
-	// return true;
-	*/
 }
 
 void APlayerCharacter::OnDodge()

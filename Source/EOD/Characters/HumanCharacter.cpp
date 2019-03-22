@@ -56,6 +56,7 @@ void AHumanCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Since setting master pose component from constructor doesn't work in packaged game
 	SetMasterPoseComponentForMeshes();
 }
 
@@ -178,17 +179,4 @@ void AHumanCharacter::TurnOffTargetSwitch()
 	if (!PC)
 	{
 	}
-}
-
-void AHumanCharacter::Server_StartDodge_Implementation()
-{
-}
-
-bool AHumanCharacter::Server_StartDodge_Validate()
-{
-	return true;
-}
-
-void AHumanCharacter::Multicast_StartDodge_Implementation()
-{
 }

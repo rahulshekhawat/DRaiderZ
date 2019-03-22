@@ -7,7 +7,7 @@
 // #include "EOD/Weapons/WeaponSlot.h"
 #include "EOD/Weapons/PrimaryWeapon.h"
 #include "EOD/Weapons/SecondaryWeapon.h"
-#include "EOD/Characters/EODCharacterBase.h"
+#include "EOD/Characters/HumanCharacter.h"
 
 #include "Engine/DataTable.h"
 #include "Engine/StreamableManager.h"
@@ -33,58 +33,11 @@ class APlayerCharacter;
 /** Delegate for when a player changes it's weapon */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, WeaponID, UWeaponDataAsset*, WeaponDataAsset);
 
-
-USTRUCT(BlueprintType)
-struct EOD_API FWeaponSlot
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
-	FName PrimaryWeaponID;
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
-	FName SecondaryWeaponID;
-
-};
-
-
-/*
-USTRUCT(BlueprintType)
-struct EOD_API FWeaponSlotX
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
-	AWeaponBase* PrimaryWeapon;
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
-	AWeaponBase* SecondaryWeapon;
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
-	UWeaponDataAsset* PrimaryWeaponDataAsset;
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
-	UWeaponDataAsset* SecondaryWeaponDataAsset;
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
-	FName PrimaryWeaponID;
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Weapon Slot")
-	FName SecondaryWeaponID;
-
-	bool IsPrimaryWeaponAttached()
-	{
-		return PrimaryWeapon && PrimaryWeaponDataAsset && (PrimaryWeaponID != NAME_None) ? true : false;
-	}
-};
-*/
-
-
 /**
  * PlayerCharacter is the base class for playable characters
  */
 UCLASS()
-class EOD_API APlayerCharacter : public AEODCharacterBase
+class EOD_API APlayerCharacter : public AHumanCharacter
 {
 	GENERATED_BODY()
 	
@@ -130,6 +83,7 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillsComponent* SkillsComponent;
 
+	/*
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Hair;
 	
@@ -150,6 +104,7 @@ private:
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Feet;
+	*/
 
 	//~ Audio component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -158,7 +113,7 @@ private:
 	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
 
-	FORCEINLINE void SetMasterPoseComponentForMeshes();
+	// FORCEINLINE void SetMasterPoseComponentForMeshes();
 
 public:
 	/** Determines if this character should be rotated toward DesiredSmoothRotationYaw */
@@ -567,8 +522,8 @@ private:
 	////////////////////////////////////////////////////////////////////////////////
 private:
 	/** An actor for primary weapon equipped by the player */
-	UPROPERTY(Transient)
-	APrimaryWeapon* PrimaryWeapon;
+	// UPROPERTY(Transient)
+	// APrimaryWeapon* PrimaryWeapon;
 
 	/** An actor for secondary weapon equipped by the player */
 	UPROPERTY(Transient)
@@ -1007,6 +962,7 @@ FORCEINLINE bool APlayerCharacter::IsFastRunning() const
 	return GetCharacterState() == ECharacterState::SpecialMovement;
 }
 
+/*
 FORCEINLINE void APlayerCharacter::SetMasterPoseComponentForMeshes()
 {
 	if (GetMesh())
@@ -1020,3 +976,4 @@ FORCEINLINE void APlayerCharacter::SetMasterPoseComponentForMeshes()
 		Feet->SetMasterPoseComponent(GetMesh());
 	}
 }
+*/
