@@ -22,6 +22,7 @@ public class EOD : ModuleRules
                 "EOD/Core",
                 "EOD/Events",
                 "EOD/Gameplay",
+                "EOD/Gameplay/Skills",
                 "EOD/Interactives",
                 "EOD/Notifies",
                 "EOD/Player",
@@ -31,7 +32,6 @@ public class EOD : ModuleRules
                 "EOD/UI",
                 "EOD/UI/Menu",
                 "EOD/Weapons",
-                "EOD/Gameplay/Skills",
             }
         );
 

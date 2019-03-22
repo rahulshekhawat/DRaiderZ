@@ -261,6 +261,12 @@ public:
 	UFUNCTION()
 	void SetContainerData(const FContainerData& NewData);
 	
-
+	inline void ResetContainer();
 
 };
+
+inline void UContainerWidget::ResetContainer()
+{
+	FContainerData NewData;
+	SetContainerData(NewData);
+}

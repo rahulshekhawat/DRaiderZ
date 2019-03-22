@@ -123,6 +123,9 @@ public:
 	/** Returns container at given skill bar index */
 	inline UContainerWidget* GetContainerAtIndex(const int32 Index) const;
 
+	/** Removes all skills from skill bar */
+	void ResetSkillBar();
+
 public:
 
 	/** Returns true if skill at given skill index is in cooldown */

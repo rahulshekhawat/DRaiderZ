@@ -123,7 +123,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat System", meta = (DisplayName = "Trigger iFrames"))
 	void TriggeriFrames(float Duration = 0.4f, float Delay = 0.f);
 
-	/** Returns the weapon type of weapon currently equipped by this character */
+	/** Returns the type of weapon currently equipped by this character */
 	virtual EWeaponType GetEquippedWeaponType() const { return EWeaponType::None; }
 
 protected:

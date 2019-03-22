@@ -266,12 +266,12 @@ void AEODCharacterBase::TriggeriFrames(float Duration, float Delay)
 	}
 	else
 	{
-		if (GetWorld())
+		UWorld* World = GetWorld();
+		if (World)
 		{
 			FTimerDelegate TimerDelegate;
-			// TimerDelegate.BindUFunction(this, FName("EnableiFrames"), Duration);
 			TimerDelegate.BindUObject(this, &AEODCharacterBase::EnableiFrames, Duration);
-			GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
+			World->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
 		}
 	}
 }
@@ -426,10 +426,11 @@ void AEODCharacterBase::BlockAttack()
 
 void AEODCharacterBase::EnableiFrames(float Duration)
 {
-	bActiveiFrames = true;
-	if (Duration > 0.f && GetWorld())
+	UWorld* World = GetWorld();
+	if (Duration > 0.f && World)
 	{
-		GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, this, &AEODCharacterBase::DisableiFrames, Duration, false);
+		bActiveiFrames = true;
+		World->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, this, &AEODCharacterBase::DisableiFrames, Duration, false);
 	}
 }
 

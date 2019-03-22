@@ -93,3 +93,15 @@ void UDynamicSkillBarWidget::InitializeContainersParent()
 		}
 	}
 }
+
+void UDynamicSkillBarWidget::ResetSkillBar()
+{
+	for (int i = 1; i <= 20; i++)
+	{
+		UContainerWidget* TempWidget = GetContainerAtIndex(i);
+		if (TempWidget)
+		{
+			TempWidget->ResetContainer();
+		}
+	}
+}

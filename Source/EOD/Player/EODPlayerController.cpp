@@ -247,18 +247,14 @@ void AEODPlayerController::InitializeWidgets()
 	check(SkillTreeComponent);
 	SkillTreeComponent->InitializeSkillTreeWidget();
 
-	
-	/*
-	// CreateHUDWidget();
 	// If HUD widget created successfully
-	if (IsValid(HUDWidget))
+	if (HUDWidget)
 	{
 		InitStatusIndicatorWidget();
-		InitInventoryWidget();
-		InitSkillTreeWidget();
-		InitSkillBarWidget();
+		// InitInventoryWidget();
+		// InitSkillTreeWidget();
+		// InitSkillBarWidget();
 	}
-	*/
 }
 
 void AEODPlayerController::InitializeHUDWidget()
