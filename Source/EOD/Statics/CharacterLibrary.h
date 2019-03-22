@@ -324,6 +324,21 @@ struct EOD_API FSkillPointsAllocationInfo
 	}
 };
 
+USTRUCT(BlueprintType)
+struct EOD_API FGameplaySkillTableRow : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** Player skill associated with this slot */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplaySkillBase> PlayerSkill;
+
+	FGameplaySkillTableRow()
+	{
+		PlayerSkill = NULL;
+	}
+};
+
 /** Struct containing skill tree slot information */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillTreeSlot : public FTableRowBase
