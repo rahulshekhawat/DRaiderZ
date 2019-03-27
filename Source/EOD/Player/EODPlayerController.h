@@ -296,12 +296,11 @@ public:
 private:
 
 	// --------------------------------------
-	//  Constants
+	//  Pseudo Constants
 	// --------------------------------------
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player Constants")
 	int32 DodgeStaminaCost;
-
 
 private:
 

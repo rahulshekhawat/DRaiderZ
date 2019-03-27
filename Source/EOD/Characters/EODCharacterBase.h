@@ -69,6 +69,67 @@ DECLARE_MULTICAST_DELEGATE_FourParams(FOnWeaponChangedDelegate,
 									  FWeaponTableRow*);
 
 
+USTRUCT(BlueprintType)
+struct EOD_API FCharacterStateInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	ECharacterState CharacterState;
+
+	UPROPERTY(BlueprintReadOnly)
+	uint8 SubStateIndex;
+
+	/**
+	 * This needs to be updated every time character changes state.
+	 * This is done to force the replication of character state info even if the character immediately reverts back to original state.
+	 */
+	UPROPERTY(BlueprintReadOnly)
+	uint8 NewReplicationIndex;
+
+	FCharacterStateInfo()
+	{
+		CharacterState = ECharacterState::IdleWalkRun;
+		SubStateIndex = 0;
+		NewReplicationIndex = 0;
+	}
+
+	FCharacterStateInfo(ECharacterState State) : CharacterState(State)
+	{
+		SubStateIndex = 0;
+	}
+
+	FCharacterStateInfo(ECharacterState State, uint8 SSIndex) : CharacterState(State), SubStateIndex(SSIndex)
+	{
+	}
+
+	bool operator==(const FCharacterStateInfo& OtherStateInfo)
+	{
+		return this->CharacterState == OtherStateInfo.CharacterState &&
+			this->SubStateIndex == OtherStateInfo.SubStateIndex;
+	}
+
+	bool operator!=(const FCharacterStateInfo& OtherStateInfo)
+	{
+		return this->CharacterState != OtherStateInfo.CharacterState ||
+			this->SubStateIndex != OtherStateInfo.SubStateIndex;
+	}
+
+	void operator=(const FCharacterStateInfo& OtherStateInfo)
+	{
+		this->CharacterState = OtherStateInfo.CharacterState;
+		this->SubStateIndex = OtherStateInfo.SubStateIndex;
+		this->NewReplicationIndex = OtherStateInfo.NewReplicationIndex;
+	}
+
+	FString ToString() const
+	{
+		FString String = FString("Character State: ") + EnumToString<ECharacterState>(FString("ECharacterState"), CharacterState, FString("Invalid Class")) +
+			FString(", SubStateIndex: ") + FString::FromInt(SubStateIndex);
+		return String;
+	}
+};
+
 /**
  * An abstract base class to handle the behavior of in-game characters.
  * All in-game characters must inherit from this class.
@@ -111,6 +172,28 @@ public:
 	virtual void Restart() override;
 
 public:
+
+	// --------------------------------------
+	//  Character States
+	// --------------------------------------
+
+	UPROPERTY(ReplicatedUsing = OnRep_CharacterStateInfo)
+	FCharacterStateInfo CharacterStateInfo;
+
+	/** Returns true if character can dodge */
+	virtual bool CanDodge() const;
+
+	/** Start dodging */
+	virtual void StartDodge();
+
+	/** Cancel dodging */
+	virtual void CancelDodge();
+
+	/** Finish dodging */
+	virtual void FinishDodge();
+
+	FTimerHandle FinishDodgeTimerHandle;
+
 
 	// --------------------------------------
 	//	Combat
@@ -466,18 +549,6 @@ public:
 	/** Character state determines the current action character is doing */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
 	ECharacterState CharacterState;
-
-	/** Returns true if character can dodge */
-	virtual bool CanDodge() const;
-
-	/** Start dodging */
-	virtual void StartDodge();
-
-	/** Cancel dodging */
-	virtual void CancelDodge();
-
-	/** Finish dodging */
-	virtual void FinishDodge();
 
 	// --------------------------------------
 	//	Pseudo Constants : Variables that aren't supposed to be modified post creation
@@ -1167,15 +1238,20 @@ protected:
 	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CombatEvents)
 	virtual void TurnOffTargetSwitch();
 
+protected:
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Network
-private:
+	// --------------------------------------
+	//  Network
+	// --------------------------------------
+
 	UFUNCTION()
 	void OnRep_WeaponSheathed();
 
 	UFUNCTION()
 	void OnRep_GuardActive();
+
+	UFUNCTION()
+	void OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo);
 
 	// DEPRECATED
 	UFUNCTION()
@@ -1184,8 +1260,17 @@ private:
 	UFUNCTION()
 	void OnRep_ServerCharacterState(FName LastState);
 
-	// UFUNCTION()
-	// void OnRep_CurrentRide(ARideBase* OldRide);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_Dodge(uint8 DodgeIndex, float RotationYaw);
+
+	virtual void Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
+
+	virtual bool Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw);
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void Multicast_Dodge(uint8 DodgeIndex, float RotationYaw);
+
+	virtual void Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SpawnAndMountRideableCharacter(TSubclassOf<ARideBase> RideCharacterClass);
@@ -1684,7 +1769,7 @@ inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay,
 	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }
 
-inline FString APlayerCharacter::GetGenderPrefix() const
+inline FString AEODCharacterBase::GetGenderPrefix() const
 {
 	return (Gender == ECharacterGender::Male) ? FString("M_") : FString("F_");
 }

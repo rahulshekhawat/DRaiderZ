@@ -18,6 +18,11 @@ class EOD_API UEODCharacterMovementComponent : public UCharacterMovementComponen
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	UEODCharacterMovementComponent(const FObjectInitializer& ObjectInitializer);
 
 	/** Sets up property replication */
@@ -41,16 +46,22 @@ public:
 		FName ClientBaseBoneName,
 		uint8 ClientMovementMode) override;
 
+	// --------------------------------------
+	//  Rotation
+	// --------------------------------------
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Rotation
-public:
 	FORCEINLINE FRotator GetDesiredCustomRotation() const
 	{
 		return DesiredCustomRotation;
 	}
 
 	inline void SetDesiredCustomRotation(const FRotator& NewRotation);
+
+	inline void SetDesiredCustomRotation_LocalOnly(const FRotator& NewRotation);
+
+	inline void SetDesiredCustomRotationYaw(float RotationYaw);
+
+	inline void SetDesiredCustomRotationYaw_LocalOnly(float RotationYaw);
 
 protected:
 	/**
@@ -60,12 +71,21 @@ protected:
 	UPROPERTY(Replicated)
 	FRotator DesiredCustomRotation;
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Network
 private:
+
+	// --------------------------------------
+	//  Network
+	// --------------------------------------
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetDesiredCustomRotation(const FRotator& NewRotation);
+	virtual void Server_SetDesiredCustomRotation_Implementation(const FRotator& NewRotation);
+	virtual bool Server_SetDesiredCustomRotation_Validate(const FRotator& NewRotation);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetDesiredCustomRotationYaw(float RotationYaw);
+	virtual void Server_SetDesiredCustomRotationYaw_Implementation(float RotationYaw);
+	virtual bool Server_SetDesiredCustomRotationYaw_Validate(float RotationYaw);
 
 };
 
@@ -80,4 +100,19 @@ inline void UEODCharacterMovementComponent::SetDesiredCustomRotation(const FRota
 			Server_SetDesiredCustomRotation(NewRotation);
 		}
 	}
+}
+
+inline void UEODCharacterMovementComponent::SetDesiredCustomRotation_LocalOnly(const FRotator& NewRotation)
+{
+	DesiredCustomRotation = NewRotation;
+}
+
+inline void UEODCharacterMovementComponent::SetDesiredCustomRotationYaw(float RotationYaw)
+{
+	SetDesiredCustomRotation(FRotator(0.f, RotationYaw, 0.f));
+}
+
+inline void UEODCharacterMovementComponent::SetDesiredCustomRotationYaw_LocalOnly(float RotationYaw)
+{
+	SetDesiredCustomRotation_LocalOnly(FRotator(0.f, RotationYaw, 0.f));
 }

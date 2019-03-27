@@ -12,7 +12,6 @@
 UEODCharacterMovementComponent::UEODCharacterMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	RotationRate = FRotator(300.f, 600.f, 300.f);
-	// bCanRotate = true;
 }
 
 void UEODCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -92,8 +91,8 @@ void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 void UEODCharacterMovementComponent::ServerMoveDual_Implementation(float TimeStamp0, FVector_NetQuantize10 InAccel0, uint8 PendingFlags, uint32 View0, float TimeStamp, FVector_NetQuantize10 InAccel, FVector_NetQuantize100 ClientLoc, uint8 NewFlags, uint8 ClientRoll, uint32 View, UPrimitiveComponent * ClientMovementBase, FName ClientBaseBoneName, uint8 ClientMovementMode)
 {
 	ServerMove_Implementation(TimeStamp0, InAccel0, FVector(1.f, 2.f, 3.f), PendingFlags, ClientRoll, View0, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
-	// Prevents anim notifies from being dropped from server
-	if (CharacterOwner)
+	// Prevents anim notifies from being skipped on server
+	if (CharacterOwner && CharacterOwner->GetMesh())
 	{
 		CharacterOwner->GetMesh()->ConditionallyDispatchQueuedAnimEvents();
 	}
@@ -106,6 +105,16 @@ void UEODCharacterMovementComponent::Server_SetDesiredCustomRotation_Implementat
 }
 
 bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotation_Validate(const FRotator& NewRotation)
+{
+	return true;
+}
+
+void UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Implementation(float RotationYaw)
+{
+	SetDesiredCustomRotation(FRotator(0.f, RotationYaw, 0.f));
+}
+
+bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Validate(float RotationYaw)
 {
 	return true;
 }

@@ -100,6 +100,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 
 	Faction = EFaction::Player;
 
+	CharacterStateInfo = FCharacterStateInfo();
 
 }
 
@@ -190,6 +191,8 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AEODCharacterBase, CurrentRide);
+
+	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterStateInfo, COND_SkipOwner);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bIsRunning, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bGuardActive, COND_SkipOwner);
@@ -670,6 +673,14 @@ void AEODCharacterBase::OnRep_GuardActive()
 	}
 }
 
+void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo)
+{
+	if (CharacterStateInfo.CharacterState == ECharacterState::Dodging)
+	{
+		StartDodge();
+	}
+}
+
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
 	//~ @todo : Cleanup old state
@@ -678,6 +689,19 @@ void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 void AEODCharacterBase::OnRep_ServerCharacterState(FName LastState)
 {
 	
+}
+
+void AEODCharacterBase::Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
+{
+}
+
+bool AEODCharacterBase::Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw)
+{
+	return false;
+}
+
+void AEODCharacterBase::Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
+{
 }
 
 void AEODCharacterBase::Server_SpawnAndMountRideableCharacter_Implementation(TSubclassOf<ARideBase> RideCharacterClass)

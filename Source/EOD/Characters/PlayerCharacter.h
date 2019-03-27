@@ -102,6 +102,28 @@ private:
 	UAudioComponent* AudioComponent;
 
 public:
+
+	// --------------------------------------
+	//  Character States
+	// --------------------------------------
+
+	/** Start dodging */
+	virtual void StartDodge() override;
+
+	/** Cancel dodging */
+	virtual void CancelDodge() override;
+
+	/** Finish dodging */
+	virtual void FinishDodge() override;
+
+
+
+
+
+
+
+
+public:
 	/** Determines if this character should be rotated toward DesiredSmoothRotationYaw */
 	UPROPERTY(Transient)
 	bool bRotateSmoothly;
@@ -464,7 +486,6 @@ public:
 
 	void SetActiveWeaponSlotIndex(int32 NewSlotIndex);
 
-	virtual void StartDodge() override;
 
 private:
 
@@ -656,16 +677,23 @@ private:
 	/** Plays normal attack animation over network */
 	void PlayNormalAttackAnimation(FName OldSection, FName NewSection);
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// NETWORK
-	////////////////////////////////////////////////////////////////////////////////
 private:
+
+	// --------------------------------------
+	//  Network
+	// --------------------------------------
+
 	UFUNCTION()
 	void OnRep_PrimaryWeaponID();
 
 	UFUNCTION()
 	void OnRep_SecondaryWeaponID();
+
+	virtual void Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
+
+	virtual bool Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw);
+
+	virtual void Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_PlayNormalAttackAnimation(FName OldSection, FName NewSection);

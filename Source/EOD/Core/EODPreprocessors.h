@@ -63,3 +63,14 @@ inline void PrintEverywhere(UObject* WorldContextObject, const FString& Message,
 	UKismetSystemLibrary::PrintString(WorldContextObject, Message, bLogScreen, bLogConsole, FLinearColor((0.0), (0.66), (1.0)), Duration);
 #endif // EOD_MESSAGE_LOGGING_ENABLED
 }
+
+template <typename T>
+inline FString EnumToString(const FString& EnumName, const T Value, const FString DefaultString)
+{
+	UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, *EnumName, true);
+	if (Enum)
+	{
+		return Enum->GetNameStringByValue((int64)Value);
+	}
+	return DefaultString;
+}
