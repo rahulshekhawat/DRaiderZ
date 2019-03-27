@@ -156,22 +156,6 @@ void AEODPlayerController::BeginPlay()
 
 	LoadPlayerState();
 	InitializeWidgets();
-
-	if (IsLocalController())
-	{
-		/*
-		UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
-		if (EODGI)
-		{
-			LocalSkillTreeManager = EODGI->SkillTreeManager;
-			SkillTreeWidget = LocalSkillTreeManager ? LocalSkillTreeManager->GetSkillTreeWidget() : nullptr;
-			if (SkillTreeWidget)
-			{
-				// SkillTreeWidget->AddToViewport();
-			}
-		}
-		*/
-	}
 }
 
 void AEODPlayerController::Tick(float DeltaTime)
@@ -183,18 +167,6 @@ void AEODPlayerController::Tick(float DeltaTime)
 		EODCharacter->MoveForward(1.f);
 	}
 }
-
-/*
-void AEODPlayerController::UnPossess()
-{
-	// Intentionally called before Super::UnPossess()
-	if (GetPawn())
-	{
-		Client_SetupLocalPlayerOnUnpossess(GetPawn());
-	}
-	Super::UnPossess();	
-}
-*/
 
 void AEODPlayerController::SetPawn(APawn* InPawn)
 {
@@ -612,14 +584,6 @@ void AEODPlayerController::Server_OnSuccessfulDodge_Implementation()
 	check(StatsComponent);
 	int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
 	StatsComponent->ModifyCurrentStamina(-DodgeCost);
-
-	/*
-	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetCharacterStatsComponent()))
-	{
-		int32 DodgeCost = DodgeStaminaCost * EODCharacter->GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
-		EODCharacter->GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
-	}
-	*/
 }
 
 bool AEODPlayerController::Server_OnSuccessfulDodge_Validate()

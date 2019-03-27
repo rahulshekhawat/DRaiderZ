@@ -42,6 +42,11 @@ class EOD_API APlayerCharacter : public AHumanCharacter
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//	UE4 Method Overrides
+	// --------------------------------------
+
 	/** Create and initialize skeletal armor mesh, camera, and inventory components. */
 	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
 	
@@ -50,17 +55,6 @@ public:
 	
 	/** Spawn default weapon(s) */
 	virtual void PostInitializeComponents() override;
-
-	virtual void PostInitProperties() override;
-
-#if WITH_EDITOR
-	/**
-	 * Detects changes to EditorArmorID and EditorWeaponID properties.
-	 * If the ID changes, it looks up for respective weapon or armor in
-	 * data tables and adds them to character.
-	 */
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
 
 	/** Updates player states */
 	virtual void Tick(float DeltaTime) override;
@@ -71,8 +65,28 @@ public:
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
 
+	// --------------------------------------
+	//	Load/Save System
+	// --------------------------------------
+
 	/** Saves current player state */
 	virtual void SaveCharacterState() override;
+
+	// --------------------------------------
+	//	Strings
+	// --------------------------------------
+
+	/** Get the prefix string for equipped weapon type */
+	inline FString GetEquippedWeaponPrefix() const;
+
+	inline FString GetWeaponPrefix() const;
+
+	/** Get the suffix string from the normal attack section */
+	inline FString GetNormalAttackSuffix(FName NormalAttackSection) const;
+
+	// --------------------------------------
+	//	Components
+	// --------------------------------------
 
 	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
 
@@ -83,37 +97,9 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkillsComponent* SkillsComponent;
 
-	/*
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Hair;
-	
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* HatItem;
-	
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* FaceItem;
-
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Chest;
-
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Hands;
-
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Legs;
-
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Feet;
-	*/
-
 	//~ Audio component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* AudioComponent;
-
-	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
-	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
-
-	// FORCEINLINE void SetMasterPoseComponentForMeshes();
 
 public:
 	/** Determines if this character should be rotated toward DesiredSmoothRotationYaw */
@@ -423,78 +409,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<USkillBarWidget> SkillBarWidgetClass;
 
-	FORCEINLINE FString GetGenderPrefix() const
-	{
-		return (Gender == ECharacterGender::Male) ? FString("M_") : FString("F_");
-	}
-
-	FORCEINLINE FString GetWeaponPrefix() const
-	{
-		FString ReturnString = FString("");
-		switch (GetEquippedWeaponType())
-		{
-		case EWeaponType::GreatSword:
-			ReturnString += FString("GS_");
-			break;
-		case EWeaponType::WarHammer:
-			ReturnString += FString("WH_");
-			break;
-		case EWeaponType::LongSword:
-			ReturnString += FString("LS_");
-			break;
-		case EWeaponType::Mace:
-			ReturnString += FString("MC_");
-			break;
-		case EWeaponType::Dagger:
-			ReturnString += FString("DG_");
-			break;
-		case EWeaponType::Staff:
-			ReturnString += FString("ST_");
-			break;
-		case EWeaponType::Shield:
-		case EWeaponType::None:
-		default:
-			break;
-		}
-		return ReturnString;
-	}
-
-	FORCEINLINE FString GetNormalAttackSuffix(FName NormalAttackSection) const
-	{
-		if (NormalAttackSection == UCharacterLibrary::SectionName_FirstSwing)
-		{
-			return FString("1");
-		}
-		else if (NormalAttackSection == UCharacterLibrary::SectionName_SecondSwing)
-		{
-			return FString("2");
-		}
-		else if (NormalAttackSection == UCharacterLibrary::SectionName_ThirdSwing)
-		{
-			return FString("3");
-		}
-		else if (NormalAttackSection == UCharacterLibrary::SectionName_FourthSwing)
-		{
-			return FString("4");
-		}
-		else if (NormalAttackSection == UCharacterLibrary::SectionName_FifthSwing)
-		{
-			return FString("5");
-		}
-		else if (NormalAttackSection == UCharacterLibrary::SectionName_BackwardSPSwing)
-		{
-			return FString("BSP");
-		}
-		else if (NormalAttackSection == UCharacterLibrary::SectionName_ForwardSPSwing)
-		{
-			return FString("FSP");
-		}
-		else
-		{
-			return FString("");
-		}
-	}
-
 private:
 
 	TArray<UStatusEffectBase*> ManagedStatusEffectsList;
@@ -769,6 +683,103 @@ private:
 	void Multicast_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, AWeaponBase* PrimaryWep);
 
 };
+
+inline FString APlayerCharacter::GetEquippedWeaponPrefix() const
+{
+	switch (GetEquippedWeaponType())
+	{
+	case EWeaponType::GreatSword:
+		return FString("GS_");
+		break;
+	case EWeaponType::WarHammer:
+		return FString("WH_");
+		break;
+	case EWeaponType::LongSword:
+		return FString("LS_");
+		break;
+	case EWeaponType::Mace:
+		return FString("MC_");
+		break;
+	case EWeaponType::Dagger:
+		return FString("DG_");
+		break;
+	case EWeaponType::Staff:
+		return FString("ST_");
+		break;
+	case EWeaponType::Shield:
+	case EWeaponType::None:
+	default:
+		return FString("");
+		break;
+	}
+}
+
+inline FString APlayerCharacter::GetWeaponPrefix() const
+{
+	FString ReturnString = FString("");
+	switch (GetEquippedWeaponType())
+	{
+	case EWeaponType::GreatSword:
+		ReturnString += FString("GS_");
+		break;
+	case EWeaponType::WarHammer:
+		ReturnString += FString("WH_");
+		break;
+	case EWeaponType::LongSword:
+		ReturnString += FString("LS_");
+		break;
+	case EWeaponType::Mace:
+		ReturnString += FString("MC_");
+		break;
+	case EWeaponType::Dagger:
+		ReturnString += FString("DG_");
+		break;
+	case EWeaponType::Staff:
+		ReturnString += FString("ST_");
+		break;
+	case EWeaponType::Shield:
+	case EWeaponType::None:
+	default:
+		break;
+	}
+	return ReturnString;
+}
+
+inline FString APlayerCharacter::GetNormalAttackSuffix(FName NormalAttackSection) const
+{
+	if (NormalAttackSection == UCharacterLibrary::SectionName_FirstSwing)
+	{
+		return FString("1");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_SecondSwing)
+	{
+		return FString("2");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_ThirdSwing)
+	{
+		return FString("3");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_FourthSwing)
+	{
+		return FString("4");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_FifthSwing)
+	{
+		return FString("5");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_BackwardSPSwing)
+	{
+		return FString("BSP");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_ForwardSPSwing)
+	{
+		return FString("FSP");
+	}
+	else
+	{
+		return FString("");
+	}
+}
 
 FORCEINLINE void APlayerCharacter::SetPrimaryWeaponID(FName NewWeaponID)
 {

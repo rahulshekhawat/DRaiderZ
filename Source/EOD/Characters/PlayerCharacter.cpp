@@ -36,39 +36,11 @@
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(AEODCharacterBase::CharacterStatsComponentName))
-	// Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(FName("Character Stats Component")))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	// The player should be free to look around with mouse without actually rotating the posessed character
 	bUseControllerRotationYaw = false;
-
-	/*
-	// @note Defaul skeletal mesh component inherited from ACharacter class will contain face mesh
-	if (GetMesh())
-	{
-		GetMesh()->AddLocalOffset(FVector(0.f, 0.f, -90.f));
-		GetMesh()->bUseAttachParentBound = true;
-	}
-	*/
-
-
-	// SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
-
-	// @note : SetMasterPoseComponent() from constructor doesn't work in packaged game (for some weird reason?!)
-	
-	/*
-	Hair			= CreateNewArmorComponent(FName("Hair"), ObjectInitializer);
-	HatItem			= CreateNewArmorComponent(FName("Hat Item"), ObjectInitializer);
-	FaceItem		= CreateNewArmorComponent(FName("Face Item"), ObjectInitializer);
-	Chest			= CreateNewArmorComponent(FName("Chest"), ObjectInitializer);
-	Hands			= CreateNewArmorComponent(FName("Hands"), ObjectInitializer);
-	Legs			= CreateNewArmorComponent(FName("Legs"), ObjectInitializer);
-	Feet			= CreateNewArmorComponent(FName("Feet"), ObjectInitializer);
-	*/
-
-	// InventoryComponent = ObjectInitializer.CreateDefaultSubobject<UInventoryComponent>(this, FName("Player Inventory"));
-	// SkillsComponent = ObjectInitializer.CreateDefaultSubobject<USkillsComponent>(this, FName("Skills Component"));
 
 	AudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("Audio Component"));
 	AudioComponent->SetupAttachment(RootComponent);
@@ -120,18 +92,6 @@ void APlayerCharacter::PostInitializeComponents()
 	SetCurrentPrimaryWeapon(PrimaryWeaponID);
 
 }
-
-void APlayerCharacter::PostInitProperties()
-{
-	Super::PostInitProperties();
-}
-
-#if WITH_EDITOR
-void APlayerCharacter::PostEditChangeProperty(FPropertyChangedEvent & PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-}
-#endif
 
 void APlayerCharacter::Tick(float DeltaTime)
 {
@@ -223,18 +183,6 @@ void APlayerCharacter::BeginPlay()
 		}
 	}
 	*/
-}
-
-USkeletalMeshComponent* APlayerCharacter::CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer)
-{
-	USkeletalMeshComponent* Sk = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, Name);
-	if (Sk)
-	{
-		Sk->SetupAttachment(GetMesh());
-		Sk->SetMasterPoseComponent(GetMesh());
-		Sk->bUseAttachParentBound = true;
-	}
-	return Sk;
 }
 
 bool APlayerCharacter::CanMove() const

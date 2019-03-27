@@ -480,12 +480,15 @@ public:
 	virtual void FinishDodge();
 
 	// --------------------------------------
-	//	Character Constants
+	//	Pseudo Constants : Variables that aren't supposed to be modified post creation
 	// --------------------------------------
 
 	/** Player gender : determines the animations and armor meshes to use. */
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	ECharacterGender Gender;
+
+	/** Get the prefix string for player gender */
+	inline FString GetGenderPrefix() const;
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -1679,4 +1682,9 @@ inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay,
 		CharacterState = NewState;
 	}
 	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
+}
+
+inline FString APlayerCharacter::GetGenderPrefix() const
+{
+	return (Gender == ECharacterGender::Male) ? FString("M_") : FString("F_");
 }
