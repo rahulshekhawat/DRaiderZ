@@ -198,6 +198,10 @@ public:
 
 	virtual void StopBlockingAttacks();
 
+	virtual void OnJumpAnimationStart();
+
+	virtual void OnJumpAnimationFinish();
+
 	// --------------------------------------
 	//	Combat
 	// --------------------------------------
@@ -371,7 +375,7 @@ public:
 	/** Updates the DesiredCustomRotationYaw in pawn's movement component to the DesiredRotationYawFromAxisInput */
 	void InitiateRotationToYawFromAxisInput();
 
-	virtual void Jump() override;
+	// virtual void Jump() override;
 
 	/** Zoom in player camera */
 	inline void ZoomInCamera();

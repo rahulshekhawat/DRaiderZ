@@ -14,6 +14,9 @@ UPlayerAnimInstance::UPlayerAnimInstance(const FObjectInitializer& ObjectInitial
 	MasterStateMachine_AnimationsBlendTime = 0.f;
 	IdleWalkRun_AnimationsBlendTime = 0.2f;
 	CurrentWeaponType = EWeaponType::None;
+
+	bJumpAnimationPlayingLocally = false;
+	bJumpLandAnimationPlayingLocally = false;
 }
 
 void UPlayerAnimInstance::NativeInitializeAnimation()
@@ -55,7 +58,59 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 
+	//~ @todo return if player is dead.
+
+	bool bIsFalling = EODPlayerOwner->GetCharacterMovement() && EODPlayerOwner->GetCharacterMovement()->IsFalling();
+	if (bIsFalling && !bJumpAnimationPlayingLocally)
+	{
+		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
+		if (JumpMontage)
+		{
+			Montage_Play(JumpMontage);
+			EODPlayerOwner->OnJumpAnimationStart();
+			bJumpAnimationPlayingLocally = true;
+		}
+		/*
+		// If character is falling but the jump montage is not playing
+		if (JumpMontage && !Montage_IsPlaying(JumpMontage))
+		{
+			Montage_Play(JumpMontage);
+			EODPlayerOwner->OnJumpAnimationStart();
+		}
+		*/
+	}
+	else if (!bIsFalling && bJumpAnimationPlayingLocally)
+	{
+		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
+		if (!bJumpLandAnimationPlayingLocally)
+		{
+			Montage_JumpToSection(UCharacterLibrary::SectionName_JumpEnd, JumpMontage);
+			bJumpLandAnimationPlayingLocally = true;
+		}
+	}
+	{
+		/*
+		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
+		if (IsValid(JumpMontage) && Montage_IsPlaying(JumpMontage))
+		{
+			FName CurrentSection = Montage_GetCurrentSection(JumpMontage);
+			if (CurrentSection != UCharacterLibrary::SectionName_JumpEnd)
+			{
+				Montage_JumpToSection(UCharacterLibrary::SectionName_JumpEnd, JumpMontage);
+			}
+			return;
+		}
+		else
+		{
+			// do nothing
+		}
+		*/
+	}
+
+
+
 #if EOD_TEST_CODE_ENABLED
+	/*
 	if (IsValid(EODPlayerOwner->GetCharacterMovement()) && EODPlayerOwner->GetMovementComponent()->IsFalling())
 	{
 		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
@@ -86,6 +141,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			// do nothing
 		}
 	}
+	*/
 
 	if (EODPlayerOwner->IsSwitchingWeapon())
 	{
@@ -278,6 +334,19 @@ EWeaponType UPlayerAnimInstance::GetWeaponAnimationType() const
 
 void UPlayerAnimInstance::HandleMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
+	if (EODPlayerOwner)
+	{
+		FPlayerAnimationReferencesTableRow* AnimationReferences = EODPlayerOwner->GetActiveAnimationReferences();
+		UAnimMontage* JumpMontage = AnimationReferences ? AnimationReferences->Jump.Get() : nullptr;
+		if (JumpMontage && JumpMontage == AnimMontage)
+		{
+			bJumpAnimationPlayingLocally = false;
+			bJumpLandAnimationPlayingLocally = false;
+			EODPlayerOwner->OnJumpAnimationFinish();
+		}
+	}
+
+
 	if (IsValid(EODPlayerOwner))
 	{
 		EODPlayerOwner->OnMontageBlendingOut(AnimMontage, bInterrupted);

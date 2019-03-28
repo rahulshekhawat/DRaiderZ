@@ -944,6 +944,31 @@ void AEODCharacterBase::StopBlockingAttacks()
 	ResetState();
 }
 
+void AEODCharacterBase::OnJumpAnimationStart()
+{
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (MoveComp)
+	{
+		MoveComp->bUseControllerDesiredRotation = false;
+		MoveComp->SetDesiredCustomRotationYaw_LocalOnly(GetActorRotation().Yaw);
+	}
+	bCharacterStateAllowsMovement = false;
+	bCharacterStateAllowsRotation = false;
+
+	// If the controller exists for this character, then either we are server or owner client
+	if (Controller)
+	{
+		FCharacterStateInfo StateInfo(ECharacterState::Jumping);
+		StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+		CharacterStateInfo = StateInfo;
+	}
+}
+
+void AEODCharacterBase::OnJumpAnimationFinish()
+{
+	ResetState();
+}
+
 void AEODCharacterBase::EnableCharacterGuard()
 {
 	// @todo wait for normal attack section to finish before blocking?
@@ -1183,16 +1208,20 @@ void AEODCharacterBase::InitiateRotationToYawFromAxisInput()
 	}
 }
 
+/*
 void AEODCharacterBase::Jump()
 {
-	if (IsGuardActive())
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (MoveComp)
 	{
-		DeactivateGuard();
+		MoveComp->bUseControllerDesiredRotation = false;
 	}
+	bCharacterStateAllowsMovement = false;
+	bCharacterStateAllowsRotation = false;
 
-	SetCharacterStateAllowsRotation(false);
 	Super::Jump();
 }
+*/
 
 void AEODCharacterBase::OnPressedForward()
 {

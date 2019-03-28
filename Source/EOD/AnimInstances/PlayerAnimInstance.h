@@ -172,4 +172,8 @@ private:
 		const FName BaseSection,
 		bool bZeroBlendOut = false);
 
+
+	bool bJumpAnimationPlayingLocally;
+	bool bJumpLandAnimationPlayingLocally;
+
 };

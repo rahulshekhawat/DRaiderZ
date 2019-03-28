@@ -194,7 +194,8 @@ bool APlayerCharacter::CanMove() const
 
 bool APlayerCharacter::CanJump() const
 {
-	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning();
+	return IsIdleOrMoving() || IsBlocking();
+	// return IsIdleOrMoving() || IsBlocking() || IsAutoRunning();
 }
 
 bool APlayerCharacter::CanDodge() const
