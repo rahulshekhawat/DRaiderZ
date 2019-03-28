@@ -101,6 +101,8 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	Faction = EFaction::Player;
 
 	CharacterStateInfo = FCharacterStateInfo();
+	bCharacterStateAllowsMovement = true;
+	bCharacterStateAllowsRotation = true;
 
 }
 
@@ -888,6 +890,17 @@ void AEODCharacterBase::MoveRight(const float Value)
 
 void AEODCharacterBase::UpdateRotation(float DeltaTime)
 {
+	if (bCharacterStateAllowsRotation)
+	{
+		FRotator DesiredRotation = FRotator(0.f, GetRotationYawFromAxisInput(), 0.f);
+		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+		if (MoveComp)
+		{
+			MoveComp->SetDesiredCustomRotation(DesiredRotation);
+		}
+	}
+
+	/*
 	if (IsGuardActive())
 	{
 		SetUseControllerRotationYaw(true);
@@ -909,6 +922,7 @@ void AEODCharacterBase::UpdateRotation(float DeltaTime)
 			MoveComp->SetDesiredCustomRotation(DesiredRotation);
 		}
 	}
+	*/
 }
 
 void AEODCharacterBase::UpdateMovement(float DeltaTime)
@@ -1061,6 +1075,20 @@ void AEODCharacterBase::UpdateMovementState(float DeltaTime)
 		DeltaRotateCharacterToDesiredYaw(DesiredRotationYaw, DeltaTime);
 	}
 	*/
+}
+
+void AEODCharacterBase::ResetState()
+{
+	FCharacterStateInfo StateInfo(ECharacterState::IdleWalkRun);
+	StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+	CharacterStateInfo = StateInfo;
+	bCharacterStateAllowsMovement = true;
+	bCharacterStateAllowsRotation = true;
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (MoveComp)
+	{
+		MoveComp->bUseControllerDesiredRotation = false;
+	}
 }
 
 void AEODCharacterBase::SpawnAndMountRideableCharacter(TSubclassOf<ARideBase> RideCharacterClass)

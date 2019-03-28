@@ -827,12 +827,11 @@ void APlayerCharacter::StartDodge()
 			MoveComp->bUseControllerDesiredRotation = false;
 			MoveComp->SetDesiredCustomRotationYaw_LocalOnly(DesiredYaw);
 		}
-
-		bCharacterStateAllowsMovement = false;
-		bCharacterStateAllowsRotation = false;
-
-		CharacterState = ECharacterState::Dodging;
 	}
+
+	// Following variables are only relevant to owner
+	bCharacterStateAllowsMovement = false;
+	bCharacterStateAllowsRotation = false;
 
 	FName SectionToPlay = NAME_None;
 	if (CharacterStateInfo.SubStateIndex == 0)
@@ -874,13 +873,17 @@ void APlayerCharacter::CancelDodge()
 	UWorld* World = GetWorld();
 	check(World);
 	World->GetTimerManager().ClearTimer(FinishDodgeTimerHandle);
+
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* DodgeMontage = AnimRef ? AnimRef->Dodge.Get() : nullptr;
+	check(DodgeMontage);
+
+	StopAnimMontage(DodgeMontage);
 }
 
 void APlayerCharacter::FinishDodge()
 {
-	FCharacterStateInfo StateInfo(ECharacterState::IdleWalkRun);
-	StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
-	CharacterStateInfo = StateInfo;
+	ResetState();
 }
 
 void APlayerCharacter::OnDodge()

@@ -460,6 +460,7 @@ protected:
 	/** Updates character movement every frame */
 	virtual void UpdateMovementState(float DeltaTime);
 
+	void ResetState();
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Ride System
@@ -1596,12 +1597,14 @@ FORCEINLINE bool AEODCharacterBase::IsMoving() const
 
 FORCEINLINE bool AEODCharacterBase::IsIdleOrMoving() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun;
+	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun;
+	// return CharacterState == ECharacterState::IdleWalkRun;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsJumping() const
 {
-	return CharacterState == ECharacterState::Jumping;
+	return CharacterStateInfo.CharacterState == ECharacterState::Jumping;
+	// return CharacterState == ECharacterState::Jumping;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsDodging() const
@@ -1632,7 +1635,8 @@ FORCEINLINE bool AEODCharacterBase::IsCastingSpell() const
 FORCEINLINE bool AEODCharacterBase::IsNormalAttacking() const
 {
 	// return CharacterState == ECharacterState::Attacking && GetCurrentActiveSkillID() != NAME_None;
-	return CharacterState == ECharacterState::Attacking;
+	// return CharacterState == ECharacterState::Attacking;
+	return CharacterStateInfo.CharacterState == ECharacterState::Attacking;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsUsingAnySkill() const
