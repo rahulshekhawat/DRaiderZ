@@ -41,7 +41,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	MovementSpeed				= EODPlayerOwner->GetVelocity().Size();
 	CharacterMovementDirection	= EODPlayerOwner->GetCharacterMovementDirection();
-	bIsBlocking					= EODPlayerOwner->IsGuardActive();
+	// bIsBlocking					= EODPlayerOwner->IsGuardActive();
+	bIsBlocking					= EODPlayerOwner->IsBlocking();
 	bIsRunning					= EODPlayerOwner->IsRunning();
 	BlockMovementDirectionYaw	= EODPlayerOwner->GetBlockMovementDirectionYaw();
 	bPCTryingToMove				= EODPlayerOwner->IsPCTryingToMove();

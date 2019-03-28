@@ -104,6 +104,8 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	bCharacterStateAllowsMovement = true;
 	bCharacterStateAllowsRotation = true;
 
+	MovementSpeedModifier = 1.f;
+
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
@@ -116,6 +118,20 @@ void AEODCharacterBase::Tick(float DeltaTime)
 
 	if (Controller && Controller->IsLocalPlayerController())
 	{
+		bool bCanGuardAgainstAttacks = CanGuardAgainstAttacks();
+		// If character wants to guard but it's guard is not yet active
+		if (bWantsToGuard && !IsBlocking() && bCanGuardAgainstAttacks)
+		{
+			StartBlockingAttacks();
+		}
+		// If the character guard is active but it doesn't want to guard anymore
+		else if (!bWantsToGuard && IsBlocking())
+		{
+			StopBlockingAttacks();
+		}
+
+
+		/*
 		// Update guard state only if either the character wants to guard or if character guard is active
 		if (bWantsToGuard || IsGuardActive())
 		{
@@ -139,6 +155,7 @@ void AEODCharacterBase::Tick(float DeltaTime)
 		{
 			UpdateFallState(DeltaTime);
 		}
+		*/
 
 		UpdateMovement(DeltaTime);
 		UpdateRotation(DeltaTime);
@@ -193,6 +210,7 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AEODCharacterBase, CurrentRide);
+	DOREPLIFETIME(AEODCharacterBase, MovementSpeedModifier);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterStateInfo, COND_SkipOwner);
 
@@ -677,9 +695,18 @@ void AEODCharacterBase::OnRep_GuardActive()
 
 void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo)
 {
-	if (CharacterStateInfo.CharacterState == ECharacterState::Dodging)
+	// If the new character state is IdleWalkRun but the old character state wasn't idle walk run
+	if (CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun && OldStateInfo.CharacterState != ECharacterState::IdleWalkRun)
+	{
+		ResetState();
+	}
+	else if (CharacterStateInfo.CharacterState == ECharacterState::Dodging)
 	{
 		StartDodge();
+	}
+	else if (CharacterStateInfo.CharacterState == ECharacterState::Blocking)
+	{
+		StartBlockingAttacks();
 	}
 }
 
@@ -699,11 +726,40 @@ void AEODCharacterBase::Server_Dodge_Implementation(uint8 DodgeIndex, float Rota
 
 bool AEODCharacterBase::Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw)
 {
-	return false;
+	return true;
 }
 
 void AEODCharacterBase::Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
 {
+}
+
+void AEODCharacterBase::Server_StartBlockingAttacks_Implementation()
+{
+	FCharacterStateInfo StateInfo(ECharacterState::Blocking);
+	CharacterStateInfo = StateInfo;
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (MoveComp)
+	{
+		MoveComp->bUseControllerDesiredRotation = true;
+	}
+	
+	StartBlockingDamage(DamageBlockTriggerDelay);
+	StartBlockingAttacks();
+}
+
+bool AEODCharacterBase::Server_StartBlockingAttacks_Validate()
+{
+	return true;
+}
+
+void AEODCharacterBase::Server_StopBlockingAttacks_Implementation()
+{
+	ResetState();
+}
+
+bool AEODCharacterBase::Server_StopBlockingAttacks_Validate()
+{
+	return true;
 }
 
 void AEODCharacterBase::Server_SpawnAndMountRideableCharacter_Implementation(TSubclassOf<ARideBase> RideCharacterClass)
@@ -848,6 +904,46 @@ void AEODCharacterBase::FinishDodge()
 {
 }
 
+void AEODCharacterBase::StartBlockingAttacks()
+{
+	//~ @todo handle previous state cleanup
+
+	bool bIsLocalPlayerController = Controller && Controller->IsLocalPlayerController();
+	if (bIsLocalPlayerController)
+	{
+		FCharacterStateInfo StateInfo(ECharacterState::Blocking);
+		StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+		CharacterStateInfo = StateInfo;
+		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+		if (MoveComp)
+		{
+			MoveComp->bUseControllerDesiredRotation = true;
+		}
+
+		if (Role < ROLE_Authority)
+		{
+			Server_StartBlockingAttacks();
+		}
+		else
+		{
+			StartBlockingDamage(DamageBlockTriggerDelay);
+		}
+	}
+
+	bCharacterStateAllowsMovement = true;
+	bCharacterStateAllowsRotation = false;
+}
+
+void AEODCharacterBase::StopBlockingAttacks()
+{
+	if (Role < ROLE_Authority)
+	{
+		Server_StopBlockingAttacks();
+	}
+	
+	ResetState();
+}
+
 void AEODCharacterBase::EnableCharacterGuard()
 {
 	// @todo wait for normal attack section to finish before blocking?
@@ -927,6 +1023,73 @@ void AEODCharacterBase::UpdateRotation(float DeltaTime)
 
 void AEODCharacterBase::UpdateMovement(float DeltaTime)
 {
+	if (!bCharacterStateAllowsMovement)
+	{
+		return;
+	}
+
+	// The movement speed calculations are done each frame because the movement speed modifier may change because of buffs.
+	// But no server RPC is called unless the new movement speed is different from the last speed.
+	if (IsBlocking())
+	{
+		float NewSpeed = DefaultWalkSpeedWhileBlocking * MovementSpeedModifier;
+		SetWalkSpeed(NewSpeed);
+
+		if (ForwardAxisValue == 0)
+		{
+			if (RightAxisValue > 0)
+			{
+				SetBlockMovementDirectionYaw(90.f);
+			}
+			else if (RightAxisValue < 0)
+			{
+				SetBlockMovementDirectionYaw(-90.f);
+			}
+			else
+			{
+				SetBlockMovementDirectionYaw(0.f);
+			}
+		}
+		else
+		{
+			float NewYaw = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
+			SetBlockMovementDirectionYaw(NewYaw);
+		}
+	}
+	else if (IsIdleOrMoving())
+	{
+		UpdateCharacterMovementDirection();
+		if (ForwardAxisValue < 0)
+		{
+			float NewSpeed = (DefaultWalkSpeed * MovementSpeedModifier) * (5.f / 16.f);
+			SetWalkSpeed(NewSpeed);
+		}
+		else
+		{
+			float NewSpeed = DefaultWalkSpeed * MovementSpeedModifier;
+			SetWalkSpeed(NewSpeed);
+		}
+	}
+	else
+	{
+		// Almost same as IsIdleOrMoving() except the PCTryingToMove update
+		UpdatePCTryingToMove();
+		UpdateCharacterMovementDirection();
+		if (ForwardAxisValue < 0)
+		{
+			float NewSpeed = (DefaultWalkSpeed * MovementSpeedModifier) * (5.f / 16.f);
+			SetWalkSpeed(NewSpeed);
+		}
+		else
+		{
+			float NewSpeed = DefaultWalkSpeed * MovementSpeedModifier;
+			SetWalkSpeed(NewSpeed);
+		}
+	}
+
+	/*
+	return;
+
 	UStatsComponentBase* StatsComp = GetCharacterStatsComponent();
 	if (!StatsComp)
 	{
@@ -935,7 +1098,8 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 
 	if (IsGuardActive())
 	{
-		float NewSpeed = DefaultWalkSpeedWhileBlocking * StatsComp->GetMovementSpeedModifier();
+		// float NewSpeed = DefaultWalkSpeedWhileBlocking * StatsComp->GetMovementSpeedModifier();
+		float NewSpeed = DefaultWalkSpeedWhileBlocking * MovementSpeedModifier;
 		SetWalkSpeed(NewSpeed);
 	}
 	else if (CharacterState == ECharacterState::IdleWalkRun || bCharacterStateAllowsMovement)
@@ -954,6 +1118,7 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 			SetWalkSpeed(NewSpeed);
 		}
 	}
+	*/
 }
 
 void AEODCharacterBase::UpdateFallState(float DeltaTime)

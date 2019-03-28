@@ -194,6 +194,9 @@ public:
 
 	FTimerHandle FinishDodgeTimerHandle;
 
+	virtual void StartBlockingAttacks();
+
+	virtual void StopBlockingAttacks();
 
 	// --------------------------------------
 	//	Combat
@@ -278,7 +281,7 @@ protected:
 public:
 
 	// --------------------------------------
-	//	Movement
+	//  Movement
 	// --------------------------------------
 
 	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const { return CharacterMovementDirection; }
@@ -304,11 +307,15 @@ public:
 	inline void SetCharacterStateAllowsRotation(bool bValue);
 
 protected:
+
 	/** [server + local] Sets the current character movement direction */
 	inline void SetCharacterMovementDirection(ECharMovementDirection NewDirection);
 
 	/** [server + local] Set the yaw for player's movement direction relative to player's forward direction */
 	inline void SetBlockMovementDirectionYaw(float NewYaw);
+
+	/** [server + local] Sets whether a player controller is currently trying to move this character or not */
+	inline void SetPCTryingToMove(bool bNewValue);
 
 	//~ @todo see if it's possible to use bCharacterStateAllowsMovement without needing replication
 	/** This boolean is used to determine if the character can move even if it's not in 'IdleWalkRun' state. e.g., moving while casting spell. */
@@ -317,6 +324,9 @@ protected:
 
 	UPROPERTY(Transient)
 	uint32 bCharacterStateAllowsRotation : 1;
+
+	UPROPERTY(Replicated)
+	float MovementSpeedModifier;
 
 	/** Max speed of character when it's walking */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Constants")
@@ -629,16 +639,6 @@ protected:
 		if (Role < ROLE_Authority)
 		{
 			Server_SetIsRunning(bNewValue);
-		}
-	}
-
-	/** [server + local] Sets whether a player controller is currently trying to move this character or not */
-	FORCEINLINE void SetPCTryingToMove(bool bNewValue)
-	{
-		bPCTryingToMove = bNewValue;
-		if (Role < ROLE_Authority)
-		{
-			Server_SetPCTryingToMove(bNewValue);
 		}
 	}
 
@@ -1252,7 +1252,7 @@ protected:
 	void OnRep_GuardActive();
 
 	UFUNCTION()
-	void OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo);
+	virtual void OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo);
 
 	// DEPRECATED
 	UFUNCTION()
@@ -1272,6 +1272,20 @@ protected:
 	void Multicast_Dodge(uint8 DodgeIndex, float RotationYaw);
 
 	virtual void Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_StartBlockingAttacks();
+
+	virtual void Server_StartBlockingAttacks_Implementation();
+
+	virtual bool Server_StartBlockingAttacks_Validate();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_StopBlockingAttacks();
+
+	virtual void Server_StopBlockingAttacks_Implementation();
+
+	virtual bool Server_StopBlockingAttacks_Validate();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SpawnAndMountRideableCharacter(TSubclassOf<ARideBase> RideCharacterClass);
@@ -1433,10 +1447,25 @@ inline void AEODCharacterBase::SetCharacterMovementDirection(ECharMovementDirect
 
 inline void AEODCharacterBase::SetBlockMovementDirectionYaw(float NewYaw)
 {
-	BlockMovementDirectionYaw = NewYaw;
-	if (Role < ROLE_Authority)
+	if (!FMath::IsNearlyEqual(NewYaw, BlockMovementDirectionYaw, 0.1f))
 	{
-		Server_SetBlockMovementDirectionYaw(NewYaw);
+		BlockMovementDirectionYaw = NewYaw;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetBlockMovementDirectionYaw(NewYaw);
+		}
+	}
+}
+
+inline void AEODCharacterBase::SetPCTryingToMove(bool bNewValue)
+{
+	if (bPCTryingToMove != bNewValue)
+	{
+		bPCTryingToMove = bNewValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetPCTryingToMove(bNewValue);
+		}
 	}
 }
 
@@ -1449,17 +1478,11 @@ inline void AEODCharacterBase::UpdatePCTryingToMove()
 {
 	if (ForwardAxisValue == 0 && RightAxisValue == 0)
 	{
-		if (bPCTryingToMove)
-		{
-			SetPCTryingToMove(false);
-		}
+		SetPCTryingToMove(false);
 	}
 	else
 	{
-		if (!bPCTryingToMove)
-		{
-			SetPCTryingToMove(true);
-		}
+		SetPCTryingToMove(true);
 	}
 }
 
@@ -1619,7 +1642,8 @@ FORCEINLINE bool AEODCharacterBase::IsDodgingDamage() const
 
 FORCEINLINE bool AEODCharacterBase::IsBlocking() const
 {
-	return CharacterState == ECharacterState::Blocking;
+	return CharacterStateInfo.CharacterState == ECharacterState::Blocking;
+	// return CharacterState == ECharacterState::Blocking;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsBlockingDamage() const

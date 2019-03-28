@@ -2194,6 +2194,7 @@ void APlayerCharacter::OnRep_SecondaryWeaponID()
 void APlayerCharacter::Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
 {
 	FCharacterStateInfo StateInfo(ECharacterState::Dodging, DodgeIndex);
+	StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
 	CharacterStateInfo = StateInfo;
 	SetActorRotation(FRotator(0.f, RotationYaw, 0.f));
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
