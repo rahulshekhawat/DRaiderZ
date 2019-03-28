@@ -273,6 +273,9 @@ private:
 	UPROPERTY(Transient)
 	uint32 bWantsToGuard : 1;
 
+	UPROPERTY(Transient)
+	uint32 bWantsToNormalAttack : 1;
+
 protected:
 
 	// --------------------------------------
@@ -364,6 +367,8 @@ public:
 
 	/** Sets whether character wants to guard or not */
 	FORCEINLINE void SetWantsToGuard(bool bNewValue) { bWantsToGuard = bNewValue; }
+
+	FORCEINLINE	void SetWantsToNormalAttack(bool bNewValue) { bWantsToNormalAttack = bNewValue; }
 
 	/** Returns the yaw that this pawn wants to rotate to based on the movement input from player */
 	UFUNCTION(BlueprintCallable, Category = "Input|Rotation", meta = (DisplayName = "Get Rotation Yaw From Axis Input"))
@@ -600,6 +605,10 @@ public:
 	virtual void StartNormalAttack();
 
 	virtual void StopNormalAttack();
+
+	virtual void CancelNormalAttack();
+
+	virtual void FinishNormalAttack();
 
 	virtual void PlayToggleSheatheAnimation();
 
@@ -1290,6 +1299,13 @@ protected:
 	virtual void Server_StopBlockingAttacks_Implementation();
 
 	virtual bool Server_StopBlockingAttacks_Validate();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_NormalAttack(uint8 AttackIndex);
+
+	virtual void Server_NormalAttack_Implementation(uint8 AttackIndex);
+
+	virtual bool Server_NormalAttack_Validate(uint8 AttackIndex);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SpawnAndMountRideableCharacter(TSubclassOf<ARideBase> RideCharacterClass);

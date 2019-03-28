@@ -1393,6 +1393,71 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 
 void APlayerCharacter::StartNormalAttack()
 {
+	if (Controller && Controller->IsLocalPlayerController())
+	{
+		uint8 AttackIndex;
+		if (bForwardPressed)
+		{
+			AttackIndex = 11;
+		}
+		else if (bBackwardPressed)
+		{
+			AttackIndex = 12;
+		}
+		else
+		{
+			AttackIndex = 1;
+		}
+
+		FCharacterStateInfo NewStateInfo(ECharacterState::Attacking, AttackIndex);
+		NewStateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+		CharacterStateInfo = NewStateInfo;
+
+		// float DesiredRotationYaw = GetControllerRotationYaw();
+
+		if (Role < ROLE_Authority)
+		{
+			Server_NormalAttack(AttackIndex);
+			// Server_NormalAttack(AttackIndex, DesiredRotationYaw);
+		}
+
+		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+		if (MoveComp)
+		{
+			MoveComp->bUseControllerDesiredRotation = false;
+			// MoveComp->SetDesiredCustomRotationYaw_LocalOnly(DesiredRotationYaw);
+		}
+	}
+
+	bCharacterStateAllowsMovement = false;
+	bCharacterStateAllowsRotation = false;
+
+	// Determine what normal attack section should we start with
+	FName SectionToPlay = NAME_None;
+	if (CharacterStateInfo.SubStateIndex == 11)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_ForwardSPSwing;
+	}
+	else if (CharacterStateInfo.SubStateIndex == 12)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_BackwardSPSwing;
+	}
+	else if (CharacterStateInfo.SubStateIndex == 1)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_FirstSwing;
+	}
+
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* AttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+
+	if (AttackMontage)
+	{
+		PlayAnimMontage(AttackMontage, 1.0, SectionToPlay);
+	}
+
+
+
+	/*
 	if (bCharacterStateAllowsMovement)
 	{
 		SetCharacterStateAllowsMovement(false);
@@ -1415,15 +1480,64 @@ void APlayerCharacter::StartNormalAttack()
 
 	PlayNormalAttackAnimation(NAME_None, SectionToPlay);
 	// @note The rotation is handled through the AnimNotify_NormalAttack that gets called when a normal attack starts.
+	*/
 }
 
 void APlayerCharacter::StopNormalAttack()
 {
-	GetMesh()->GetAnimInstance()->Montage_Stop(0.2f, GetActiveAnimationReferences()->NormalAttacks.Get());
+	// GetMesh()->GetAnimInstance()->Montage_Stop(0.2f, GetActiveAnimationReferences()->NormalAttacks.Get());
+}
+
+void APlayerCharacter::CancelNormalAttack()
+{
+}
+
+void APlayerCharacter::FinishNormalAttack()
+{
 }
 
 void APlayerCharacter::UpdateNormalAttackState(float DeltaTime)
 {
+	if (!bNormalAttackSectionChangeAllowed)
+	{
+		return;
+	}
+
+	// This update function must be called only on owner client
+	if (!Controller || !Controller->IsLocalPlayerController())
+	{
+		return;
+	}
+
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+
+	if (!NormalAttackMontage || !AnimInstance)
+	{
+		return;
+	}
+
+	FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
+	FName ExpectedNextSection = GetNextNormalAttackSectionName(CurrentSection);
+	if (ExpectedNextSection != NAME_None)
+	{
+		uint8 AttackIndex = GetNormalAttackIndex(ExpectedNextSection);
+		FCharacterStateInfo StateInfo(ECharacterState::Attacking, AttackIndex);
+		StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+		CharacterStateInfo = StateInfo;
+
+		if (Role < ROLE_Authority)
+		{
+			Server_NormalAttack(AttackIndex);
+		}
+
+		ChangeNormalAttackSection(CurrentSection, ExpectedNextSection);
+	}
+
+	bNormalAttackSectionChangeAllowed = false;
+
+	/*
 	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
 	{
 		return;
@@ -1441,6 +1555,7 @@ void APlayerCharacter::UpdateNormalAttackState(float DeltaTime)
 
 		bNormalAttackSectionChangeAllowed = false;
 	}
+	*/
 }
 
 void APlayerCharacter::Destroyed()
@@ -1589,6 +1704,82 @@ void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSect
 	}
 
 	Server_PlayNormalAttackAnimation(OldSection, NewSection);
+}
+
+void APlayerCharacter::ChangeNormalAttackSection(FName OldSection, FName NewSection)
+{
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+
+	if (!NormalAttackMontage || !AnimInstance)
+	{
+		return;
+	}
+
+	if (OldSection == NAME_None)
+	{
+		AnimInstance->Montage_Play(NormalAttackMontage);
+		AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+	}
+	else
+	{
+		FString OldSectionString = OldSection.ToString();
+		if (OldSectionString.EndsWith("End"))
+		{
+			AnimInstance->Montage_Play(NormalAttackMontage);
+			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+		}
+		else
+		{
+			AnimInstance->Montage_SetNextSection(OldSection, NewSection, NormalAttackMontage);
+		}
+	}
+
+
+	/*
+	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
+	{
+		return;
+	}
+
+	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
+	if (GetMesh()->GetAnimInstance())
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (OldSection == NAME_None)
+		{
+			AnimInstance->Montage_Play(NormalAttackMontage);
+			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+		}
+		else
+		{
+			FString OldSectionString = OldSection.ToString();
+			if (OldSectionString.EndsWith("End"))
+			{
+				AnimInstance->Montage_Play(NormalAttackMontage);
+				AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+			}
+			else
+			{
+				FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
+				if (CurrentSection == OldSection)
+				{
+					AnimInstance->Montage_SetNextSection(CurrentSection, NewSection, NormalAttackMontage);
+				}
+				else
+				{
+					AnimInstance->Montage_Play(NormalAttackMontage);
+					AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+				}
+			}
+		}
+
+		SetCharacterState(ECharacterState::Attacking);
+	}
+
+	Server_PlayNormalAttackAnimation(OldSection, NewSection);
+	*/
 }
 
 FName APlayerCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender)
@@ -2042,6 +2233,21 @@ void APlayerCharacter::ExitDialogue_Implementation(UDialogueWindowWidget* Widget
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
+	if (IsNormalAttacking())
+	{
+		// If the montage blending out wasn't interrupted
+		if (!bInterrupted)
+		{
+			FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+			UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+			if (NormalAttackMontage == AnimMontage)
+			{
+				ResetState();
+			}
+		}
+	}
+
+
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		// @todo
@@ -2192,6 +2398,33 @@ void APlayerCharacter::OnRep_SecondaryWeaponID()
 {
 }
 
+void APlayerCharacter::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo)
+{
+	Super::OnRep_CharacterStateInfo(OldStateInfo);
+
+	if (CharacterStateInfo.CharacterState == ECharacterState::Attacking)
+	{
+		if (CharacterStateInfo.SubStateIndex == 1 ||
+			CharacterStateInfo.SubStateIndex == 11 ||
+			CharacterStateInfo.SubStateIndex == 12)
+		{
+		}
+		else
+		{
+			FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+			UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+			UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+
+			if (NormalAttackMontage && AnimInstance)
+			{
+				FName OldSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
+				FName NewSection = GetNormalAttackSectionName(CharacterStateInfo.SubStateIndex);
+				ChangeNormalAttackSection(OldSection, NewSection);
+			}
+		}
+	}
+}
+
 void APlayerCharacter::Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
 {
 	FCharacterStateInfo StateInfo(ECharacterState::Dodging, DodgeIndex);
@@ -2216,6 +2449,42 @@ bool APlayerCharacter::Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw
 
 void APlayerCharacter::Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
 {
+}
+
+void APlayerCharacter::Server_NormalAttack_Implementation(uint8 AttackIndex)
+{
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	if (MoveComp)
+	{
+		MoveComp->bUseControllerDesiredRotation = false;
+	}
+
+	FCharacterStateInfo NewStateInfo(ECharacterState::Attacking, AttackIndex);
+	NewStateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+	CharacterStateInfo = NewStateInfo;
+
+	if (AttackIndex == 1 || AttackIndex == 11 || AttackIndex == 12)
+	{
+		StartNormalAttack();
+	}
+	else
+	{
+		FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+		UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+		UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+
+		if (NormalAttackMontage && AnimInstance)
+		{
+			FName OldSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
+			FName NewSection = GetNormalAttackSectionName(AttackIndex);
+			ChangeNormalAttackSection(OldSection, NewSection);
+		}
+	}
+}
+
+bool APlayerCharacter::Server_NormalAttack_Validate(uint8 AttackIndex)
+{
+	return true;
 }
 
 void APlayerCharacter::Server_PlayNormalAttackAnimation_Implementation(FName OldSection, FName NewSection)

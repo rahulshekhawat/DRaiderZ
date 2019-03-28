@@ -81,6 +81,10 @@ public:
 
 	inline FString GetWeaponPrefix() const;
 
+	inline FName GetNormalAttackSectionName(uint8 AttackIndex);
+
+	inline uint8 GetNormalAttackIndex(FName SectionName);
+
 	/** Get the suffix string from the normal attack section */
 	inline FString GetNormalAttackSuffix(FName NormalAttackSection) const;
 
@@ -116,6 +120,15 @@ public:
 	/** Finish dodging */
 	virtual void FinishDodge() override;
 
+	virtual void StartNormalAttack() override;
+
+	virtual void StopNormalAttack() override;
+
+	virtual void CancelNormalAttack() override;
+
+	virtual void FinishNormalAttack() override;
+
+	virtual void UpdateNormalAttackState(float DeltaTime) override;
 
 
 
@@ -640,12 +653,6 @@ private:
 	void UpdateFastMovementState(float DeltaTime);
 
 	void UpdateAutoRun(float DeltaTime);
-	
-	virtual void StartNormalAttack() override;
-
-	virtual void StopNormalAttack() override;
-
-	virtual void UpdateNormalAttackState(float DeltaTime) override;
 
 	/** Enable or disable auto run */
 	void OnToggleAutoRun();
@@ -677,6 +684,8 @@ private:
 	/** Plays normal attack animation over network */
 	void PlayNormalAttackAnimation(FName OldSection, FName NewSection);
 
+	void ChangeNormalAttackSection(FName OldSection, FName NewSection);
+
 private:
 
 	// --------------------------------------
@@ -689,11 +698,17 @@ private:
 	UFUNCTION()
 	void OnRep_SecondaryWeaponID();
 
+	virtual void OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo) override;
+
 	virtual void Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
 
 	virtual bool Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw);
 
 	virtual void Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
+
+	virtual void Server_NormalAttack_Implementation(uint8 AttackIndex);
+
+	virtual bool Server_NormalAttack_Validate(uint8 AttackIndex);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_PlayNormalAttackAnimation(FName OldSection, FName NewSection);
@@ -771,6 +786,82 @@ inline FString APlayerCharacter::GetWeaponPrefix() const
 		break;
 	}
 	return ReturnString;
+}
+
+inline FName APlayerCharacter::GetNormalAttackSectionName(uint8 AttackIndex)
+{
+	if (AttackIndex == 1)
+	{
+		return UCharacterLibrary::SectionName_FirstSwing;
+	}
+	else if (AttackIndex == 2)
+	{
+		return UCharacterLibrary::SectionName_SecondSwing;
+	}
+	else if (AttackIndex == 3)
+	{
+		return UCharacterLibrary::SectionName_ThirdSwing;
+	}
+	else if (AttackIndex == 4)
+	{
+		return UCharacterLibrary::SectionName_FourthSwing;
+	}
+	else if (AttackIndex == 5)
+	{
+		return UCharacterLibrary::SectionName_FifthSwing;
+	}
+	else if (AttackIndex == 11)
+	{
+		return UCharacterLibrary::SectionName_ForwardSPSwing;
+	}
+	else if (AttackIndex == 12)
+	{
+		return UCharacterLibrary::SectionName_BackwardSPSwing;
+	}
+	else
+	{
+		return NAME_None;
+	}
+}
+
+inline uint8 APlayerCharacter::GetNormalAttackIndex(FName SectionName)
+{
+	if (SectionName == NAME_None)
+	{
+		return 0;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_FirstSwing)
+	{
+		return 1;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_SecondSwing)
+	{
+		return 2;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_ThirdSwing)
+	{
+		return 3;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_FourthSwing)
+	{
+		return 4;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_FifthSwing)
+	{
+		return 5;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_ForwardSPSwing)
+	{
+		return 11;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_BackwardSPSwing)
+	{
+		return 12;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 inline FString APlayerCharacter::GetNormalAttackSuffix(FName NormalAttackSection) const

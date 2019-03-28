@@ -130,6 +130,21 @@ void AEODCharacterBase::Tick(float DeltaTime)
 			StopBlockingAttacks();
 		}
 
+		bool bCanNormalAttack = CanNormalAttack();
+		if (bWantsToNormalAttack && !IsNormalAttacking() && bCanNormalAttack)
+		{
+			StartNormalAttack();
+		}
+		else if (bWantsToNormalAttack && IsNormalAttacking())
+		{
+			UpdateNormalAttackState(DeltaTime);
+		}
+		else if (!bWantsToNormalAttack && IsNormalAttacking())
+		{
+			StopNormalAttack();
+		}
+
+
 
 		/*
 		// Update guard state only if either the character wants to guard or if character guard is active
@@ -708,6 +723,21 @@ void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldS
 	{
 		StartBlockingAttacks();
 	}
+	else if (CharacterStateInfo.CharacterState == ECharacterState::Attacking)
+	{
+		StartNormalAttack();
+		/*
+		if (CharacterStateInfo.SubStateIndex == 1 ||
+			CharacterStateInfo.SubStateIndex == 11 ||
+			CharacterStateInfo.SubStateIndex == 12)
+		{
+		}
+		else
+		{
+
+		}
+		*/
+	}
 }
 
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
@@ -758,6 +788,15 @@ void AEODCharacterBase::Server_StopBlockingAttacks_Implementation()
 }
 
 bool AEODCharacterBase::Server_StopBlockingAttacks_Validate()
+{
+	return true;
+}
+
+void AEODCharacterBase::Server_NormalAttack_Implementation(uint8 AttackIndex)
+{
+}
+
+bool AEODCharacterBase::Server_NormalAttack_Validate(uint8 AttackIndex)
 {
 	return true;
 }
@@ -1186,6 +1225,14 @@ void AEODCharacterBase::StartNormalAttack()
 }
 
 void AEODCharacterBase::StopNormalAttack()
+{
+}
+
+void AEODCharacterBase::CancelNormalAttack()
+{
+}
+
+void AEODCharacterBase::FinishNormalAttack()
 {
 }
 

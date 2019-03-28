@@ -427,7 +427,8 @@ void AEODPlayerController::OnPressingNormalAttackKey()
 
 	if (IsValid(EODCharacter))
 	{
-		EODCharacter->SetNormalAttackKeyPressed(true);
+		EODCharacter->SetWantsToNormalAttack(true);
+		// EODCharacter->SetNormalAttackKeyPressed(true);
 	}
 }
 
@@ -435,7 +436,8 @@ void AEODPlayerController::OnReleasingNormalAttackKey()
 {
 	if (IsValid(EODCharacter))
 	{
-		EODCharacter->SetNormalAttackKeyPressed(false);
+		EODCharacter->SetWantsToNormalAttack(false);
+		// EODCharacter->SetNormalAttackKeyPressed(false);
 	}
 }
 
