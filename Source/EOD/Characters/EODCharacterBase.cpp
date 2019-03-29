@@ -721,22 +721,16 @@ void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldS
 	}
 	else if (CharacterStateInfo.CharacterState == ECharacterState::Blocking)
 	{
+		if (OldStateInfo.CharacterState == ECharacterState::Attacking)
+		{
+			CancelNormalAttack();
+		}
+
 		StartBlockingAttacks();
 	}
 	else if (CharacterStateInfo.CharacterState == ECharacterState::Attacking)
 	{
 		StartNormalAttack();
-		/*
-		if (CharacterStateInfo.SubStateIndex == 1 ||
-			CharacterStateInfo.SubStateIndex == 11 ||
-			CharacterStateInfo.SubStateIndex == 12)
-		{
-		}
-		else
-		{
-
-		}
-		*/
 	}
 }
 
@@ -765,6 +759,11 @@ void AEODCharacterBase::Multicast_Dodge_Implementation(uint8 DodgeIndex, float R
 
 void AEODCharacterBase::Server_StartBlockingAttacks_Implementation()
 {
+	if (IsNormalAttacking())
+	{
+		CancelNormalAttack();
+	}
+
 	FCharacterStateInfo StateInfo(ECharacterState::Blocking);
 	CharacterStateInfo = StateInfo;
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
@@ -950,6 +949,11 @@ void AEODCharacterBase::StartBlockingAttacks()
 	bool bIsLocalPlayerController = Controller && Controller->IsLocalPlayerController();
 	if (bIsLocalPlayerController)
 	{
+		if (IsNormalAttacking())
+		{
+			CancelNormalAttack();
+		}
+
 		FCharacterStateInfo StateInfo(ECharacterState::Blocking);
 		StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
 		CharacterStateInfo = StateInfo;

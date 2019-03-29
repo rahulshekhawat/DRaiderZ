@@ -223,8 +223,9 @@ bool APlayerCharacter::CanBlock() const
 
 bool APlayerCharacter::CanNormalAttack() const
 {
-	// return IsIdleOrMoving() || IsNormalAttacking();
-	return IsIdleOrMoving();
+	return IsIdleOrMoving() &&
+		// The player must have a weapon equipped to normal attack and it shouldn't be sheathed
+		(GetEquippedWeaponType() != EWeaponType::None && !IsWeaponSheathed());
 }
 
 bool APlayerCharacter::CanUseAnySkill() const
@@ -1490,10 +1491,14 @@ void APlayerCharacter::StopNormalAttack()
 
 void APlayerCharacter::CancelNormalAttack()
 {
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+	StopAnimMontage(NormalAttackMontage);
 }
 
 void APlayerCharacter::FinishNormalAttack()
 {
+	ResetState();
 }
 
 void APlayerCharacter::UpdateNormalAttackState(float DeltaTime)
@@ -2242,7 +2247,7 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 			UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
 			if (NormalAttackMontage == AnimMontage)
 			{
-				ResetState();
+				FinishNormalAttack();
 			}
 		}
 	}
