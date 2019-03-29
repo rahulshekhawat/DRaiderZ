@@ -8,6 +8,7 @@
 #include "EOD/Characters/Components/GameplaySkillsComponent.h"
 #include "EOD/Player/Components/InventoryComponent.h"
 #include "EOD/Player/Components/PlayerStatsComponent.h"
+#include "Components/PlayerSkillsComponent.h"
 
 #include "DynamicHUDWidget.h"
 #include "EODGameModeBase.h"
@@ -537,17 +538,19 @@ void AEODPlayerController::OnPressingEscapeKey()
 
 void AEODPlayerController::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
-	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetGameplaySkillsComponent()))
+	UPlayerSkillsComponent* SkillComp = EODCharacter ? Cast<UPlayerSkillsComponent>(EODCharacter->GetGameplaySkillsComponent()) : nullptr;
+	if (SkillComp)
 	{
-		EODCharacter->GetGameplaySkillsComponent()->OnPressingSkillKey(SkillKeyIndex);
+		SkillComp->OnPressingSkillKey(SkillKeyIndex);
 	}
 }
 
 void AEODPlayerController::OnReleasingSkillKey(const int32 SkillKeyIndex)
 {
-	if (IsValid(EODCharacter) && IsValid(EODCharacter->GetGameplaySkillsComponent()))
+	UPlayerSkillsComponent* SkillComp = EODCharacter ? Cast<UPlayerSkillsComponent>(EODCharacter->GetGameplaySkillsComponent()) : nullptr;
+	if (SkillComp)
 	{
-		EODCharacter->GetGameplaySkillsComponent()->OnReleasingSkillKey(SkillKeyIndex);
+		SkillComp->OnReleasingSkillKey(SkillKeyIndex);
 	}
 }
 

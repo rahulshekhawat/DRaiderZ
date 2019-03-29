@@ -23,3 +23,11 @@ void UPlayerSkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
+
+void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
+{
+}
+
+void UPlayerSkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
+{
+}

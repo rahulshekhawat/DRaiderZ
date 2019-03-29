@@ -15,9 +15,9 @@
 #include "EOD/UI/DialogueWindowWidget.h"
 #include "EOD/Statics/DialogueLibrary.h"
 #include "EOD/Weapons/WeaponDataAsset.h"
-// #include "EOD/Weapons/WeaponSlot.h"
 #include "EOD/Characters/Components/GameplaySkillsComponent.h"
 #include "EOD/Characters/Components/EODCharacterMovementComponent.h"
+#include "Components/PlayerSkillsComponent.h"
 
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -35,7 +35,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(AEODCharacterBase::CharacterStatsComponentName))
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(AEODCharacterBase::CharacterStatsComponentName).
+		SetDefaultSubobjectClass<UPlayerSkillsComponent>(AEODCharacterBase::GameplaySkillsComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 

@@ -86,6 +86,7 @@ void UGameplaySkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 }
 
+/*
 void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
 	if (TS)
@@ -123,12 +124,13 @@ void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 	}
 
 	TriggerSkill(SkillID, Skill);
-	*/
+	/////
 }
 
 void UGameplaySkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
 {
 }
+*/
 
 void UGameplaySkillsComponent::TriggerSkill(FName SkillID, FSkillTableRow* Skill)
 {

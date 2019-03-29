@@ -17,7 +17,7 @@ class EOD_API UPlayerSkillsComponent : public UGameplaySkillsComponent
 public:
 
 	// --------------------------------------
-	//	UE4 Method Overrides
+	//  UE4 Method Overrides
 	// --------------------------------------
 
 	UPlayerSkillsComponent(const FObjectInitializer& ObjectInitializer);
@@ -29,5 +29,12 @@ public:
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	// --------------------------------------
+	//  Input Handling
+	// --------------------------------------
+
+	void OnPressingSkillKey(const int32 SkillKeyIndex);
+
+	void OnReleasingSkillKey(const int32 SkillKeyIndex);
 
 };

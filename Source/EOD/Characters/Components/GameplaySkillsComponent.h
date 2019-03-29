@@ -63,9 +63,9 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 	// Input handling
 public:
-	void OnPressingSkillKey(const int32 SkillKeyIndex);
+	// void OnPressingSkillKey(const int32 SkillKeyIndex);
 
-	void OnReleasingSkillKey(const int32 SkillKeyIndex);
+	// void OnReleasingSkillKey(const int32 SkillKeyIndex);
 
 
 	////////////////////////////////////////////////////////////////////////////////
