@@ -6,6 +6,8 @@
 #include "Characters/Components/GameplaySkillsComponent.h"
 #include "PlayerSkillsComponent.generated.h"
 
+class UGameplaySkillBase;
+
 /**
  * 
  */
@@ -36,5 +38,25 @@ public:
 	void OnPressingSkillKey(const int32 SkillKeyIndex);
 
 	void OnReleasingSkillKey(const int32 SkillKeyIndex);
+
+	// --------------------------------------
+	//  Skill System
+	// --------------------------------------
+
+	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr) override;
+
+	void OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
+
+protected:
+
+	/** Skill index to skil map. Skill index will be used during replication */
+	UPROPERTY(Transient)
+	TMap<uint8, UGameplaySkillBase*> SkillsMap;
+
+	/** A map of all the skills placed on skill bar to their Skill Index */
+	UPROPERTY(Transient)
+	TMap<uint8, uint8> SkillBarMap;
+
+
 
 };

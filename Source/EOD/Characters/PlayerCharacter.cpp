@@ -92,6 +92,11 @@ void APlayerCharacter::PostInitializeComponents()
 	SetCurrentSecondaryWeapon(SecondaryWeaponID);
 	SetCurrentPrimaryWeapon(PrimaryWeaponID);
 
+
+	if (GetGameplaySkillsComponent())
+	{
+		GetGameplaySkillsComponent()->InitializeSkills(this);
+	}
 }
 
 void APlayerCharacter::Tick(float DeltaTime)

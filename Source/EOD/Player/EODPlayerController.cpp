@@ -16,6 +16,7 @@
 #include "InventoryWidget.h"
 #include "PlayerStatsWidget.h"
 #include "SkillBarWidget.h"
+#include "DynamicSkillBarWidget.h"
 #include "DynamicSkillTreeWidget.h"
 
 #include "EOD/Statics/EODLibrary.h"
@@ -224,9 +225,9 @@ void AEODPlayerController::InitializeWidgets()
 	if (HUDWidget)
 	{
 		InitStatusIndicatorWidget();
+		InitSkillBarWidget();
 		// InitInventoryWidget();
 		// InitSkillTreeWidget();
-		// InitSkillBarWidget();
 	}
 }
 
@@ -284,6 +285,15 @@ void AEODPlayerController::InitSkillTreeWidget()
 
 void AEODPlayerController::InitSkillBarWidget()
 {
+	UPlayerSkillsComponent* SkillsComp = EODCharacter ? Cast<UPlayerSkillsComponent>(EODCharacter->GetGameplaySkillsComponent()) : nullptr;
+	if (HUDWidget && SkillsComp)
+	{
+		UDynamicSkillBarWidget* SkillBarWidget = HUDWidget->GetSkillBarWidget();
+		if (SkillBarWidget)
+		{
+			SkillBarWidget->SetSkillOwnerComponent(SkillsComp);
+		}
+	}	
 }
 
 void AEODPlayerController::TogglePlayerHUD()

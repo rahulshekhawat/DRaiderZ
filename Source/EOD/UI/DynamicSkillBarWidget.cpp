@@ -3,6 +3,7 @@
 
 #include "DynamicSkillBarWidget.h"
 #include "ContainerWidget.h"
+#include "Components/PlayerSkillsComponent.h"
 
 UDynamicSkillBarWidget::UDynamicSkillBarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -56,10 +57,15 @@ bool UDynamicSkillBarWidget::OnContainerDropped(UContainerWidget* FromContainer,
 	{
 		return false;
 	}
-
-	//~ @todo update skill bar component
-
+	
 	ToChildContainer->SetContainerData(FromContainer->GetContainerData());
+	if (OwnerSkillsComponent.IsValid())
+	{
+		UPlayerSkillsComponent* SkillsComp = OwnerSkillsComponent.Get();
+		uint8 SkillBarIndex = GetIndexOfSkillContainer(ToChildContainer);
+		SkillsComp->OnSkillAddedToSkillBar(SkillBarIndex, FromContainer->GetContainerData().ItemGroup);
+	}
+
 	return true;
 }
 
@@ -104,4 +110,9 @@ void UDynamicSkillBarWidget::ResetSkillBar()
 			TempWidget->ResetContainer();
 		}
 	}
+}
+
+void UDynamicSkillBarWidget::SetSkillOwnerComponent(UPlayerSkillsComponent* SkillsComponent)
+{
+	OwnerSkillsComponent = SkillsComponent;
 }

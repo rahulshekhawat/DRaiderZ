@@ -211,6 +211,10 @@ FString UGameplaySkillsComponent::GetSkillGroupFromSkillKeyIndex(const int32 Ski
 	return SBIndexToSGMap[SkillKeyIndex];
 }
 
+void UGameplaySkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
+{
+}
+
 void UGameplaySkillsComponent::UseSkill(FName SkillID)
 {
 }

@@ -7,6 +7,7 @@
 #include "DynamicSkillBarWidget.generated.h"
 
 class UContainerWidget;
+class UPlayerSkillsComponent;
 
 /**
  * 
@@ -123,8 +124,18 @@ public:
 	/** Returns container at given skill bar index */
 	inline UContainerWidget* GetContainerAtIndex(const int32 Index) const;
 
+	/** Returns the skill index of given container. Returns -1 if the container couldn't be found. */
+	inline uint8 GetIndexOfSkillContainer(UContainerWidget* Container) const;
+
 	/** Removes all skills from skill bar */
 	void ResetSkillBar();
+
+	void SetSkillOwnerComponent(UPlayerSkillsComponent* SkillsComponent);
+
+protected:
+
+	UPROPERTY(Transient)
+	TSoftObjectPtr<UPlayerSkillsComponent> OwnerSkillsComponent;
 
 public:
 
@@ -154,10 +165,6 @@ public:
 private:
 	inline void InitializeSkillContainer(UContainerWidget* Container, const int32 ContainerIndex);
 	*/
-
-
-	/** Returns the skill index of given container. Returns -1 if the container couldn't be found. */
-	// inline int32 GetIndexOfSkillContainer(UContainerWidget* Container) const;
 
 	/** Get the owning EOD player of this widget */
 	// FORCEINLINE APlayerCharacter* GetOwningEODPlayer() const;
@@ -218,4 +225,18 @@ inline UContainerWidget* UDynamicSkillBarWidget::GetContainerAtIndex(const int32
 	}
 
 	return nullptr;
+}
+
+inline uint8 UDynamicSkillBarWidget::GetIndexOfSkillContainer(UContainerWidget* Container) const
+{
+	for (uint8 i = 1; i <= 20; i++)
+	{
+		UContainerWidget* Cont = GetContainerAtIndex(i);
+		if (Cont == Container)
+		{
+			return i;
+		}
+	}
+
+	return 0;
 }

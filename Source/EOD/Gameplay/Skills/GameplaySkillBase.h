@@ -59,6 +59,10 @@ public:
 
 	FORCEINLINE FString	GetInGameDescription() const { return Description; }
 
+	FORCEINLINE FName GetSkillGroup() const { return SkillGroup; }
+
+	FORCEINLINE void SetSkillGroup(FName NewGroup) { SkillGroup = NewGroup; }
+
 	/** Event called when skill owner changes it's weapon */
 	virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
 

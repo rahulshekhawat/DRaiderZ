@@ -61,14 +61,6 @@ public:
 
 
 	////////////////////////////////////////////////////////////////////////////////
-	// Input handling
-public:
-	// void OnPressingSkillKey(const int32 SkillKeyIndex);
-
-	// void OnReleasingSkillKey(const int32 SkillKeyIndex);
-
-
-	////////////////////////////////////////////////////////////////////////////////
 	// Skill System	
 public:
 	/**
@@ -91,6 +83,8 @@ public:
 
 	//~ @todo
 	// void EndSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
+
+	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr);
 
 private:
 	/** Returns true if skill key index is invalid */
