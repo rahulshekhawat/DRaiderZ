@@ -21,19 +21,10 @@ public:
 	//	Gameplay Skill Interface
 	// --------------------------------------
 
-	/** Activate this skill */
-	virtual void ActivateSkill() override;
-
 	/** Cancel this skill */
 	virtual void CancelSkill() override;
 
-	/** Deactivate this skill */
-	virtual void EndSkill() override;
-
 protected:
-
-	/** Returns true if this activity can be activated */
-	virtual bool CanActivateSkill() const override;
 
 	/** Returns true if this skill can be cancelled */
 	virtual bool CanCancelSkill() const override;

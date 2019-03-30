@@ -33,20 +33,23 @@ public:
 	/** Reinitialize this skill. Intended to be called when the skill owner changes weapons */
 	virtual void Reinitialize();
 
-	/** Activate this skill */
-	virtual void ActivateSkill();
+	virtual bool CanTriggerSkill() const;
+
+	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
+	virtual void TriggerSkill();
+
+	virtual bool CanReleaseSkill() const;
+
+	/** Release this skill, i.e., if this skill is chargeable then activate this skill, otherwise it does nothing */
+	virtual void ReleaseSkill(float ChargeDuration);
+
+	/** Returns true if this skill can be cancelled */
+	virtual bool CanCancelSkill() const;
 
 	/** Cancel this skill */
 	virtual void CancelSkill();
 
-	/** Deactivate this skill */
-	virtual void EndSkill();
-
-	/** Returns true if this activity can be activated */
-	virtual bool CanActivateSkill() const;
-
-	/** Returns true if this skill can be cancelled */
-	virtual bool CanCancelSkill() const;
+	virtual void FinishSkill();
 
 	/** Returns true if this skill is valid, i.e, skill belongs to a valid skill group */
 	FORCEINLINE bool IsValid() const { return SkillGroup != NAME_None; }

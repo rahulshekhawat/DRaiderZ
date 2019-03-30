@@ -196,15 +196,21 @@ public:
 	UPROPERTY(Transient)
 	UGameplaySkillBase* TS;
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Network
 private:
-	// UFUNCTION()
-	// void OnRep_ActiveSkillID();
+
+	// --------------------------------------
+	//  Network
+	// --------------------------------------
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_TriggerSkill(FName SkillID);
+	void Server_TriggerSkill(uint8 SkillIndex);
+	virtual void Server_TriggerSkill_Implementation(uint8 SkillIndex);
+	virtual bool Server_TriggerSkill_Validate(uint8 SkillIndex);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_ReleaseSkill(uint8 SkillIndex, float ChargeDuration);
+	virtual void Server_ReleaseSkill_Implementation(uint8 SkillIndex, float ChargeDuration);
+	virtual bool Server_ReleaseSkill_Validate(uint8 SkillIndex, float ChargeDuration);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCurrentActiveSkill(const FName SkillID);

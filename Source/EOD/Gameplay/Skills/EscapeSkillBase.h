@@ -25,17 +25,21 @@ public:
 	/** Initialize this skill. Intended to be called immediately after the skill object is created */
 	virtual void InitSkill(AEODCharacterBase* Instigator, AController* Owner) override;
 
-	/** Activate this skill */
-	virtual void ActivateSkill() override;
+	virtual bool CanTriggerSkill() const;
+
+	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
+	virtual void TriggerSkill() override;
+
+	virtual bool CanReleaseSkill() const;
+
+	/** Release this skill, i.e., if this skill is chargeable then activate this skill, otherwise it does nothing */
+	virtual void ReleaseSkill(float ChargeDuration) override;
+
+	/** Returns true if this skill can be cancelled */
+	virtual bool CanCancelSkill() const;
 
 	/** Cancel this skill */
 	virtual void CancelSkill() override;
-
-	/** Deactivate this skill */
-	virtual void EndSkill() override;
-
-	/** Returns true if this activity can be activated */
-	virtual bool CanActivateSkill() const override;
 
 
 };

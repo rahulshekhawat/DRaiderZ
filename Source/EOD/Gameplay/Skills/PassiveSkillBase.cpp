@@ -6,21 +6,8 @@ UPassiveSkillBase::UPassiveSkillBase(const FObjectInitializer& ObjectInitializer
 {
 }
 
-void UPassiveSkillBase::ActivateSkill()
-{
-}
-
 void UPassiveSkillBase::CancelSkill()
 {
-}
-
-void UPassiveSkillBase::EndSkill()
-{
-}
-
-bool UPassiveSkillBase::CanActivateSkill() const
-{
-	return false;
 }
 
 bool UPassiveSkillBase::CanCancelSkill() const

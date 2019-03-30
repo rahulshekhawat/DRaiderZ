@@ -294,18 +294,20 @@ void UGameplaySkillsComponent::AddNewSkill(int32 SkillIndex, FString SkillGroup)
 	//~ @todo load animations for the skill
 }
 
-/*
-void UGameplaySkillsComponent::OnRep_ActiveSkillID()
+void UGameplaySkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)
 {
 }
-*/
 
-void UGameplaySkillsComponent::Server_TriggerSkill_Implementation(FName SkillID)
+bool UGameplaySkillsComponent::Server_TriggerSkill_Validate(uint8 SkillIndex)
 {
-	// TriggerSkill(SkillID);
+	return true;
 }
 
-bool UGameplaySkillsComponent::Server_TriggerSkill_Validate(FName SkillID)
+void UGameplaySkillsComponent::Server_ReleaseSkill_Implementation(uint8 SkillIndex, float ChargeDuration)
+{
+}
+
+bool UGameplaySkillsComponent::Server_ReleaseSkill_Validate(uint8 SkillIndex, float ChargeDuration)
 {
 	return true;
 }

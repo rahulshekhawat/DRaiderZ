@@ -732,6 +732,20 @@ void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldS
 	{
 		StartNormalAttack();
 	}
+	else if (CharacterStateInfo.CharacterState == ECharacterState::UsingActiveSkill)
+	{
+		if (SkillManager)
+		{
+			if (CharacterStateInfo.SubStateIndex > 100)
+			{
+				SkillManager->ReleaseSkill(CharacterStateInfo.SubStateIndex);
+			}
+			else
+			{
+				SkillManager->TriggerSkill(CharacterStateInfo.SubStateIndex);
+			}
+		}
+	}
 }
 
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)

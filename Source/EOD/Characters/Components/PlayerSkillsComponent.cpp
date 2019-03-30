@@ -121,9 +121,9 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 		return;
 	}
 
-	if (Skill->CanActivateSkill())
+	if (Skill->CanTriggerSkill())
 	{
-		Skill->ActivateSkill();
+		Skill->TriggerSkill();
 	}
 }
 

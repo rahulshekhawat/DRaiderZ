@@ -12,32 +12,7 @@ void UEscapeSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Own
 	Super::InitSkill(Instigator, Owner);
 }
 
-void UEscapeSkillBase::ActivateSkill()
-{
-
-
-
-	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	if (Instigator)
-	{
-		EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
-		UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
-		if (Montage)
-		{
-			Instigator->PlayAnimationMontage(Montage, AnimationStartSectionName, ECharacterState::UsingActiveSkill);
-		}
-	}
-}
-
-void UEscapeSkillBase::CancelSkill()
-{
-}
-
-void UEscapeSkillBase::EndSkill()
-{
-}
-
-bool UEscapeSkillBase::CanActivateSkill() const
+bool UEscapeSkillBase::CanTriggerSkill() const
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	EWeaponType EquippedWeaponType = Instigator ? Instigator->GetEquippedWeaponType() : EWeaponType::None;
@@ -49,4 +24,49 @@ bool UEscapeSkillBase::CanActivateSkill() const
 	bool bInstigatorCanUseSkill = Instigator ? Instigator->IsIdleOrMoving() || Instigator->IsBlocking() || Instigator->IsNormalAttacking() || Instigator->HasBeenHit() : false;
 
 	return bHasValidWeapon && !bInCooldown && bInstigatorCanUseSkill;
+}
+
+void UEscapeSkillBase::TriggerSkill()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+
+	bool bHasValidObjReferences = Instigator && SkillsComp; // We do not need a valid controller to trigger this skill on a character
+
+	if (!bHasValidObjReferences)
+	{
+		return;
+	}
+
+	AController* Controller = SkillOwner.Get();
+	bool bIsLocalPlayerController = Controller && Controller->IsLocalPlayerController();
+
+	if (bIsLocalPlayerController)
+	{
+	}
+
+	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
+	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
+	if (Montage)
+	{
+		Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
+	}
+}
+
+bool UEscapeSkillBase::CanReleaseSkill() const
+{
+	return false;
+}
+
+void UEscapeSkillBase::ReleaseSkill(float ChargeDuration)
+{
+}
+
+bool UEscapeSkillBase::CanCancelSkill() const
+{
+	return false;
+}
+
+void UEscapeSkillBase::CancelSkill()
+{
 }

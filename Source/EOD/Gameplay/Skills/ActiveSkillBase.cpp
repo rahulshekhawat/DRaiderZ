@@ -30,22 +30,8 @@ void UActiveSkillBase::Reinitialize()
 {
 }
 
-void UActiveSkillBase::ActivateSkill()
-{
-
-}
-
 void UActiveSkillBase::CancelSkill()
 {
-}
-
-void UActiveSkillBase::EndSkill()
-{
-}
-
-bool UActiveSkillBase::CanActivateSkill() const
-{
-	return false;
 }
 
 bool UActiveSkillBase::CanCancelSkill() const

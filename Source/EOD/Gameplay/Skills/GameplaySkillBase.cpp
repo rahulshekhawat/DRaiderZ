@@ -24,7 +24,21 @@ void UGameplaySkillBase::Reinitialize()
 {
 }
 
-void UGameplaySkillBase::ActivateSkill()
+bool UGameplaySkillBase::CanTriggerSkill() const
+{
+	return false;
+}
+
+void UGameplaySkillBase::TriggerSkill()
+{
+}
+
+bool UGameplaySkillBase::CanReleaseSkill() const
+{
+	return false;
+}
+
+void UGameplaySkillBase::ReleaseSkill(float ChargeDuration)
 {
 }
 
@@ -32,13 +46,8 @@ void UGameplaySkillBase::CancelSkill()
 {
 }
 
-void UGameplaySkillBase::EndSkill()
+void UGameplaySkillBase::FinishSkill()
 {
-}
-
-bool UGameplaySkillBase::CanActivateSkill() const
-{
-	return false;
 }
 
 bool UGameplaySkillBase::CanCancelSkill() const
