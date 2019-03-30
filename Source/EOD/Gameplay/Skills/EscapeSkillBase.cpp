@@ -2,6 +2,7 @@
 
 #include "EscapeSkillBase.h"
 #include "EODCharacterBase.h"
+#include "Components/EODCharacterMovementComponent.h"
 
 UEscapeSkillBase::UEscapeSkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -29,39 +30,42 @@ bool UEscapeSkillBase::CanTriggerSkill() const
 void UEscapeSkillBase::TriggerSkill()
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
-
-	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
-	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
-	if (Montage)
-	{
-		Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
-	}
-
-	/*
-	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
-
-	bool bHasValidObjReferences = Instigator && SkillsComp; // We do not need a valid controller to trigger this skill on a character
-
-	if (!bHasValidObjReferences)
+	if (!Instigator)
 	{
 		return;
 	}
 
-	AController* Controller = SkillOwner.Get();
-	bool bIsLocalPlayerController = Controller && Controller->IsLocalPlayerController();
-
+	bool bIsLocalPlayerController = Instigator->Controller && Instigator->Controller->IsLocalPlayerController();
 	if (bIsLocalPlayerController)
 	{
+		float DesiredRotationYaw = Instigator->GetControllerRotationYaw();
+		Instigator->SetCharacterRotationYaw(DesiredRotationYaw);
+		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(Instigator->GetCharacterMovement());
+		if (MoveComp)
+		{
+			MoveComp->SetDesiredCustomRotationYaw(DesiredRotationYaw);
+		}
+
+		Instigator->SetCharacterStateAllowsMovement(false);
+		Instigator->SetCharacterStateAllowsRotation(false);
 	}
 
 	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
 	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
 	if (Montage)
 	{
-		Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
+		float SkillDuration = Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
+		SkillDuration = SkillDuration - Montage->GetDefaultBlendOutTime();
+		UWorld* World = Instigator->GetWorld();
+		check(World);
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUObject(this, &UEscapeSkillBase::FinishSkill);
+		World->GetTimerManager().SetTimer(SkillTimerHandle, TimerDelegate, SkillDuration, false);
 	}
-	*/
+	else
+	{
+		Instigator->ResetState();
+	}
 }
 
 bool UEscapeSkillBase::CanReleaseSkill() const
@@ -80,4 +84,20 @@ bool UEscapeSkillBase::CanCancelSkill() const
 
 void UEscapeSkillBase::CancelSkill()
 {
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (Instigator)
+	{
+		UWorld* World = Instigator->GetWorld();
+		check(World);
+		World->GetTimerManager().ClearTimer(SkillTimerHandle);
+	}
+}
+
+void UEscapeSkillBase::FinishSkill()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (Instigator)
+	{
+		Instigator->ResetState();
+	}
 }

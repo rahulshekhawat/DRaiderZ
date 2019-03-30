@@ -16,6 +16,7 @@ class EOD_API UEscapeSkillBase : public UActiveSkillBase
 	GENERATED_BODY()
 	
 public:
+
 	UEscapeSkillBase(const FObjectInitializer& ObjectInitializer);
 
 	// --------------------------------------
@@ -40,6 +41,12 @@ public:
 
 	/** Cancel this skill */
 	virtual void CancelSkill() override;
+
+	virtual void FinishSkill();
+
+protected:
+
+	FTimerHandle SkillTimerHandle;
 
 
 };

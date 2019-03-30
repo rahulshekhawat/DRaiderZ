@@ -451,6 +451,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	virtual void SaveCharacterState() { ; }
 
+	void ResetState();
+
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Update character state
@@ -479,7 +481,6 @@ protected:
 	/** Updates character movement every frame */
 	virtual void UpdateMovementState(float DeltaTime);
 
-	void ResetState();
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Ride System
