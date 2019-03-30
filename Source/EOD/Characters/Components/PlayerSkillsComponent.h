@@ -47,6 +47,10 @@ public:
 
 	void OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 
+	virtual void TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr) override;
+
+	virtual void ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr, float ReleaseDelay = 0.f) override;
+
 protected:
 
 	/** Skill index to skil map. Skill index will be used during replication */

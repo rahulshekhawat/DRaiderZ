@@ -75,6 +75,10 @@ public:
 	 */
 	void ReleaseSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
 
+	virtual void TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr);
+
+	virtual void ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr, float ReleaseDelay = 0.f);
+
 	/** Cancels the skill that the character is currently using */
 	void CancelCurrentSkill();
 

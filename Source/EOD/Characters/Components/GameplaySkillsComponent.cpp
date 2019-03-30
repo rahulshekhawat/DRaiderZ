@@ -162,6 +162,14 @@ void UGameplaySkillsComponent::ReleaseSkill(FName SkillID, FSkillTableRow* Skill
 {
 }
 
+void UGameplaySkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
+{
+}
+
+void UGameplaySkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill, float ReleaseDelay)
+{
+}
+
 void UGameplaySkillsComponent::CancelCurrentSkill()
 {
 }

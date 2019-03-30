@@ -189,4 +189,11 @@ protected:
 
 	void OnMaleAnimationsLoaded();
 
+	/** Returns true if this skill can be used with the given weapon type */
+	bool IsWeaponTypeSupported(EWeaponType WeaponType) const;
+
+	//~ @todo
+	/** Returns true if this skill is currently in cooldown */
+	bool IsSkillInCooldown() const;
+
 };

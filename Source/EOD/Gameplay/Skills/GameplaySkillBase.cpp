@@ -2,6 +2,7 @@
 
 #include "GameplaySkillBase.h"
 #include "EODCharacterBase.h"
+#include "Components/GameplaySkillsComponent.h"
 
 UGameplaySkillBase::UGameplaySkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -13,6 +14,10 @@ void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* O
 {
 	SkillInstigator = Instigator;
 	SkillOwner = Owner;
+	if (Instigator)
+	{
+		InstigatorSkillComponent = Instigator->GetGameplaySkillsComponent();
+	}
 }
 
 void UGameplaySkillBase::Reinitialize()
@@ -43,4 +48,5 @@ bool UGameplaySkillBase::CanCancelSkill() const
 
 void UGameplaySkillBase::OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData)
 {
+
 }

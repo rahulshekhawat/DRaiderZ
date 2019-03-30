@@ -44,7 +44,7 @@ void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 
 	if (Skill)
 	{
-		PrintToScreen(this, FString("Skill is valid"));
+		TriggerSkill(SkillIndex, Skill);
 	}
 }
 
@@ -107,4 +107,26 @@ void UPlayerSkillsComponent::OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName S
 			break;
 		}
 	}
+}
+
+void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
+{
+	if (!Skill)
+	{
+		Skill = SkillsMap[SkillIndex];
+	}
+
+	if (!Skill)
+	{
+		return;
+	}
+
+	if (Skill->CanActivateSkill())
+	{
+		Skill->ActivateSkill();
+	}
+}
+
+void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill, float ReleaseDelay)
+{
 }

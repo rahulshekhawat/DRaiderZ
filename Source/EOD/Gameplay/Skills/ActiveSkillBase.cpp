@@ -134,3 +134,14 @@ void UActiveSkillBase::OnMaleAnimationsLoaded()
 		}
 	}
 }
+
+bool UActiveSkillBase::IsWeaponTypeSupported(EWeaponType WeaponType) const
+{
+	return (SupportedWeapons & (1 << (uint8)WeaponType));
+}
+
+bool UActiveSkillBase::IsSkillInCooldown() const
+{
+	//~ @todo
+	return false;
+}

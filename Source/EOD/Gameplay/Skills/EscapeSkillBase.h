@@ -34,6 +34,8 @@ public:
 	/** Deactivate this skill */
 	virtual void EndSkill() override;
 
+	/** Returns true if this activity can be activated */
+	virtual bool CanActivateSkill() const override;
 
 
 };
