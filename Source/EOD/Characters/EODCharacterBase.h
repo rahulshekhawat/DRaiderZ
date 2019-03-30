@@ -1003,19 +1003,16 @@ public:
 	void BP_SetWalkSpeed(const float WalkSpeed);
 
 	/**
-	 * [server + local] Change character rotation.
-	 * Note : Do not use this for consecutive rotation change 
+	 * [server + local] Set character rotation yaw over network
+	 * @note Do not use this for consecutive rotation change
 	 */
-	FORCEINLINE void SetCharacterRotation(const FRotator NewRotation)
-	{
-		// Following line of code has been commented out intentionally and this function can no longer be used for consecutive rotation change.
-		// GetCharacterMovement()->FlushServerMoves();
-		SetActorRotation(NewRotation);
-		if (Role < ROLE_Authority)
-		{
-			Server_SetCharacterRotation(NewRotation);
-		}
-	}
+	inline void SetCharacterRotationYaw(const float NewRotationYaw);
+
+	/**
+	 * [server + local] Set character rotation over network
+	 * @note Do not use this for consecutive rotation change
+	 */
+	inline void SetCharacterRotation(const FRotator NewRotation);
 
 	/** [server + client] Change character rotation. Do not use this for consecutive rotation change */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character Rotation"))
@@ -1352,6 +1349,13 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterRotation(FRotator NewRotation);
+	virtual void Server_SetCharacterRotation_Implementation(FRotator NewRotation);
+	virtual bool Server_SetCharacterRotation_Validate(FRotator NewRotation);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetCharacterRotationYaw(float NewRotationYaw);
+	virtual void Server_SetCharacterRotationYaw_Implementation(float NewRotationYaw);
+	virtual bool Server_SetCharacterRotationYaw_Validate(float NewRotationYaw);
 
 	UFUNCTION(NetMultiCast, Reliable)
 	void Multicast_SetCharacterRotation(FRotator NewRotation);
@@ -1820,4 +1824,35 @@ inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay,
 inline FString AEODCharacterBase::GetGenderPrefix() const
 {
 	return (Gender == ECharacterGender::Male) ? FString("M_") : FString("F_");
+}
+
+inline void AEODCharacterBase::SetCharacterRotationYaw(const float NewRotationYaw)
+{
+	const FRotator CurrentRotation = GetActorRotation();
+	const float ErrorTolerance = 1e-3f;
+	if (!FMath::IsNearlyEqual(CurrentRotation.Yaw, NewRotationYaw, ErrorTolerance))
+	{
+		SetActorRotation(FRotator(CurrentRotation.Pitch, NewRotationYaw, CurrentRotation.Roll));
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharacterRotationYaw(NewRotationYaw);
+		}
+	}
+}
+
+inline void AEODCharacterBase::SetCharacterRotation(const FRotator NewRotation)
+{
+	// @note Following line of code has been commented out intentionally and this function can no longer be used for consecutive rotation change.
+	// GetCharacterMovement()->FlushServerMoves();
+
+	const FRotator CurrentRotation = GetActorRotation();
+	const float ErrorTolerance = 1e-3f;
+	if (!CurrentRotation.Equals(NewRotation, ErrorTolerance))
+	{
+		SetActorRotation(NewRotation);
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharacterRotation(NewRotation);
+		}
+	}
 }

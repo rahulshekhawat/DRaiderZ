@@ -895,10 +895,22 @@ bool AEODCharacterBase::Server_SetUseControllerRotationYaw_Validate(bool bNewBoo
 
 void AEODCharacterBase::Server_SetCharacterRotation_Implementation(FRotator NewRotation)
 {
-	Multicast_SetCharacterRotation(NewRotation);
+	SetActorRotation(NewRotation);
+	// Multicast_SetCharacterRotation(NewRotation);
 }
 
 bool AEODCharacterBase::Server_SetCharacterRotation_Validate(FRotator NewRotation)
+{
+	return true;
+}
+
+void AEODCharacterBase::Server_SetCharacterRotationYaw_Implementation(float NewRotationYaw)
+{
+	const FRotator CurrentRotation = GetActorRotation();
+	SetActorRotation(FRotator(CurrentRotation.Pitch, NewRotationYaw, CurrentRotation.Roll));
+}
+
+bool AEODCharacterBase::Server_SetCharacterRotationYaw_Validate(float NewRotationYaw)
 {
 	return true;
 }
