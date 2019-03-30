@@ -11,6 +11,8 @@
 #include "SkillPointsInfoWidget.h"
 #include "ContainerWidget.h"
 
+#include "Kismet/GameplayStatics.h"
+
 USkillTreeComponent::USkillTreeComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -272,6 +274,15 @@ void USkillTreeComponent::ModifySkillSlotUpgrade(FName SkillGroup, int32 Value)
 		SaveData.CurrentUpgrade += Value;
 		SkillTreeSlotsSaveData.Add(SkillGroup, SaveData);
 		SetSkillSlotUpgrade(SkillGroup, SaveData.CurrentUpgrade);
+	}
+
+	AEODPlayerController* PC = Cast<AEODPlayerController>(GetOuter());
+	UEODGameInstance* GI = PC ? Cast<UEODGameInstance>(PC->GetGameInstance()) : nullptr;
+	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
+	if (SaveGame)
+	{
+		SaveGame->SkillTreeSlotsSaveData = this->SkillTreeSlotsSaveData;
+		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
 	}
 }
 

@@ -49,6 +49,13 @@ void UEODGameInstance::Init()
 			CurrentProfileSaveGame = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(MetaSaveGame->LastUsedSlotName, UEODGameInstance::PlayerIndex));
 			CurrentProfileName = MetaSaveGame->LastUsedSlotName;
 		}
+#if WITH_EDITOR
+		else
+		{
+			CreateNewProfile(FString("Editor_SaveGame"));
+			LoadProfileAsCurrent(FString("Editor_SaveGame"));
+		}
+#endif
 	}
 
 	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UEODGameInstance::OnPreLoadMap);

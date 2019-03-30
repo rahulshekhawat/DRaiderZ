@@ -83,6 +83,8 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 
 		SkillIndex++;
 	}
+
+
 }
 
 void UPlayerSkillsComponent::OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup)

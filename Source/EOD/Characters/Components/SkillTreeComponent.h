@@ -74,12 +74,6 @@ public:
 	/** Returns the status of this skill slot */
 	ESkillSlotStatus GetSkillSlotStatus(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
 
-	/** Returns true if the skill is completely blocked, i.e., no point has been allocated to it so far nor any point can be allocated to it   */
-	// bool IsSkillBlocked(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
-
-	/** Returns true if skill is not blocked but no skill point can be allocated to it as of now */
-	// bool IsSkillLocked(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
-
 protected:
 
 	UPROPERTY(Transient)
