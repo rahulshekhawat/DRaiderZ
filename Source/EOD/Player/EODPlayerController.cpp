@@ -292,6 +292,7 @@ void AEODPlayerController::InitSkillBarWidget()
 		if (SkillBarWidget)
 		{
 			SkillBarWidget->SetSkillOwnerComponent(SkillsComp);
+			SkillBarWidget->InitializeSkillBarLayout(SkillsComp->GetSkillBarMap(), SkillsComp->GetSkillsMap());
 		}
 	}	
 }

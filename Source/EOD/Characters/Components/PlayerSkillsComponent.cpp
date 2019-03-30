@@ -4,8 +4,11 @@
 #include "PlayerSkillsComponent.h"
 #include "Skills/GameplaySkillBase.h"
 #include "PlayerCharacter.h"
+#include "EODGameInstance.h"
+#include "PlayerSaveGame.h"
 
 #include "UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
 
 UPlayerSkillsComponent::UPlayerSkillsComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -84,7 +87,12 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 		SkillIndex++;
 	}
 
-
+	UEODGameInstance* GI = Cast<UEODGameInstance>(CompOwner->GetGameInstance());
+	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
+	if (SaveGame)
+	{
+		this->SkillBarMap = SaveGame->SkillBarMap;
+	}
 }
 
 void UPlayerSkillsComponent::OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup)
@@ -108,6 +116,15 @@ void UPlayerSkillsComponent::OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName S
 
 			break;
 		}
+	}
+
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	UEODGameInstance* GI = CharOwner ? Cast<UEODGameInstance>(CharOwner->GetGameInstance()) : nullptr;
+	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
+	if (SaveGame)
+	{
+		SaveGame->SkillBarMap = this->SkillBarMap;
+		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
 	}
 }
 

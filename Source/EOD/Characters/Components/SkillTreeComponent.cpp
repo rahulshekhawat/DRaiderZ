@@ -282,6 +282,7 @@ void USkillTreeComponent::ModifySkillSlotUpgrade(FName SkillGroup, int32 Value)
 	if (SaveGame)
 	{
 		SaveGame->SkillTreeSlotsSaveData = this->SkillTreeSlotsSaveData;
+		SaveGame->SkillPointsAllocationInfo = this->SkillPointsAllocationInfo;
 		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
 	}
 }

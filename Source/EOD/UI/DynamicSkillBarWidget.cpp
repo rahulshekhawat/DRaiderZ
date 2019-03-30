@@ -4,6 +4,7 @@
 #include "DynamicSkillBarWidget.h"
 #include "ContainerWidget.h"
 #include "Components/PlayerSkillsComponent.h"
+#include "Skills/GameplaySkillBase.h"
 
 UDynamicSkillBarWidget::UDynamicSkillBarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -115,4 +116,28 @@ void UDynamicSkillBarWidget::ResetSkillBar()
 void UDynamicSkillBarWidget::SetSkillOwnerComponent(UPlayerSkillsComponent* SkillsComponent)
 {
 	OwnerSkillsComponent = SkillsComponent;
+}
+
+void UDynamicSkillBarWidget::InitializeSkillBarLayout(const TMap<uint8, uint8>& SkillBarMap, const TMap<uint8, UGameplaySkillBase*>& SkillsMap)
+{
+	TArray<uint8> Keys;
+	SkillBarMap.GetKeys(Keys);
+
+	for (uint8 Key : Keys)
+	{
+		if (SkillsMap.Contains(Key))
+		{
+			UGameplaySkillBase* Skill = SkillsMap[Key];
+			UContainerWidget* Cont = GetContainerAtIndex(Key);
+			if (Skill && Cont)
+			{
+				Cont->SetIcon(Skill->GetSkillIcon());
+				Cont->SetInGameName(Skill->GetInGameSkillName());
+				Cont->SetDescription(Skill->GetInGameDescription());
+				Cont->SetMaxValue(Skill->GetMaxUpgradeLevel());
+				Cont->SetItemID(Skill->GetSkillGroup());
+				Cont->SetItemGroup(Skill->GetSkillGroup());
+			}
+		}
+	}
 }

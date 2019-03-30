@@ -45,4 +45,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
 	FSkillPointsAllocationInfo SkillPointsAllocationInfo;
 
+	/** A map of all the skills placed on skill bar to their Skill Index */
+	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
+	TMap<uint8, uint8> SkillBarMap;
+
 };

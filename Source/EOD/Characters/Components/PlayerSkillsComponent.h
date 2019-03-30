@@ -51,6 +51,10 @@ public:
 
 	virtual void ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr, float ReleaseDelay = 0.f) override;
 
+	TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillsMap; }
+
+	TMap<uint8, uint8> GetSkillBarMap() const { return SkillBarMap; }
+
 protected:
 
 	/** Skill index to skil map. Skill index will be used during replication */

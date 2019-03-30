@@ -7,6 +7,7 @@
 #include "DynamicSkillBarWidget.generated.h"
 
 class UContainerWidget;
+class UGameplaySkillBase;
 class UPlayerSkillsComponent;
 
 /**
@@ -131,6 +132,8 @@ public:
 	void ResetSkillBar();
 
 	void SetSkillOwnerComponent(UPlayerSkillsComponent* SkillsComponent);
+
+	void InitializeSkillBarLayout(const TMap<uint8, uint8>& SkillBarMap, const TMap<uint8, UGameplaySkillBase*>& SkillsMap);
 
 protected:
 
