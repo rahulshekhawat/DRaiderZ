@@ -111,17 +111,36 @@ void UPlayerSkillsComponent::OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName S
 
 void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
 {
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+
 	if (!Skill)
 	{
 		Skill = SkillsMap[SkillIndex];
 	}
 
-	if (!Skill)
+	if (!Skill || !CharOwner)
 	{
 		return;
 	}
 
-	if (Skill->CanTriggerSkill())
+	bool bIsLocalPlayerController = CharOwner->Controller && CharOwner->Controller->IsLocalPlayerController();
+	if (bIsLocalPlayerController)
+	{
+		if (Skill->CanTriggerSkill())
+		{
+			FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
+			StateInfo.NewReplicationIndex = CharOwner->CharacterStateInfo.NewReplicationIndex + 1;
+			CharOwner->CharacterStateInfo = StateInfo;
+
+			Skill->TriggerSkill();
+
+			if (CharOwner->Role < ROLE_Authority)
+			{
+				Server_TriggerSkill(SkillIndex);
+			}
+		}
+	}
+	else
 	{
 		Skill->TriggerSkill();
 	}
@@ -129,4 +148,16 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 
 void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill, float ReleaseDelay)
 {
+}
+
+void UPlayerSkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)
+{
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	check(CharOwner);
+
+	FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
+	StateInfo.NewReplicationIndex = CharOwner->CharacterStateInfo.NewReplicationIndex + 1;
+	CharOwner->CharacterStateInfo = StateInfo;
+
+	TriggerSkill(SkillIndex);
 }

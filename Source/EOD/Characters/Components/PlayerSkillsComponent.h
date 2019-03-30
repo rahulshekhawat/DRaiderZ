@@ -61,6 +61,12 @@ protected:
 	UPROPERTY(Transient)
 	TMap<uint8, uint8> SkillBarMap;
 
+	// --------------------------------------
+	//  Network
+	// --------------------------------------
+
+	virtual void Server_TriggerSkill_Implementation(uint8 SkillIndex) override;
+
 
 
 };

@@ -21,6 +21,7 @@ class EOD_API UGameplaySkillBase : public UObject
 	GENERATED_BODY()
 
 public:
+
 	UGameplaySkillBase(const FObjectInitializer& ObjectInitializer);
 
 	// --------------------------------------
@@ -69,11 +70,15 @@ public:
 	/** Event called when skill owner changes it's weapon */
 	virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
 
-protected:
-
 	// --------------------------------------
 	//	Constants : Default values that are not supposed to be modified
 	// --------------------------------------
+
+	/** Set this to true if this skill can be charged */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
+	bool bSkillCanBeCharged;
+
+protected:
 
 	/** Name of this skill that will be displayed to player inside the game */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")

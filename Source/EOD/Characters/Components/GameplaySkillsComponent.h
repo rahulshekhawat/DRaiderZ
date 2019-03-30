@@ -196,7 +196,7 @@ public:
 	UPROPERTY(Transient)
 	UGameplaySkillBase* TS;
 
-private:
+protected:
 
 	// --------------------------------------
 	//  Network

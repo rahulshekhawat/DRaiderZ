@@ -29,6 +29,16 @@ bool UEscapeSkillBase::CanTriggerSkill() const
 void UEscapeSkillBase::TriggerSkill()
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
+
+	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
+	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
+	if (Montage)
+	{
+		Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
+	}
+
+	/*
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
 
 	bool bHasValidObjReferences = Instigator && SkillsComp; // We do not need a valid controller to trigger this skill on a character
@@ -51,6 +61,7 @@ void UEscapeSkillBase::TriggerSkill()
 	{
 		Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
 	}
+	*/
 }
 
 bool UEscapeSkillBase::CanReleaseSkill() const

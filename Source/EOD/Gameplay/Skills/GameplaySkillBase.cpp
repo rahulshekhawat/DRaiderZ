@@ -8,6 +8,7 @@ UGameplaySkillBase::UGameplaySkillBase(const FObjectInitializer& ObjectInitializ
 {
 	SkillGroup = NAME_None;
 	CurrentUpgrade = 0;
+	bSkillCanBeCharged = false;
 }
 
 void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
