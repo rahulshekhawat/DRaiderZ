@@ -28,7 +28,7 @@ void UGameplaySkillBase::Reinitialize()
 
 bool UGameplaySkillBase::CanTriggerSkill() const
 {
-	return false;
+	return true;
 }
 
 void UGameplaySkillBase::TriggerSkill()
@@ -37,7 +37,7 @@ void UGameplaySkillBase::TriggerSkill()
 
 bool UGameplaySkillBase::CanReleaseSkill() const
 {
-	return false;
+	return true;
 }
 
 void UGameplaySkillBase::ReleaseSkill(float ChargeDuration)
@@ -54,7 +54,7 @@ void UGameplaySkillBase::FinishSkill()
 
 bool UGameplaySkillBase::CanCancelSkill() const
 {
-	return false;
+	return true;
 }
 
 void UGameplaySkillBase::OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData)
