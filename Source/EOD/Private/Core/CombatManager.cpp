@@ -79,6 +79,7 @@ void ACombatManager::NativeDisplayDamage(
 	}
 }
 
+/*
 float ACombatManager::GetActualDamage(const AEODCharacterBase* HitInstigator,
 									  const AEODCharacterBase* HitCharacter,
 									  const FSkillDamageInfo& SkillDamageInfo,
@@ -116,9 +117,9 @@ float ACombatManager::GetActualDamage(const AEODCharacterBase* HitInstigator,
 	{
 		ActualDamage = ActualDamage * (1 - DamageReductionOnBlock);
 	}
-
 	return ActualDamage;
 }
+*/
 
 float ACombatManager::GetActualDamage(
 	const AEODCharacterBase* HitInstigator,
@@ -428,6 +429,7 @@ void ACombatManager::CharacterToActorAttack(AEODCharacterBase* HitInstigator, AA
 }
 */
 
+/*
 bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 											  AEODCharacterBase* HitCharacter,
 											  const FSkillDamageInfo& SkillDamageInfo,
@@ -466,6 +468,7 @@ bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 
 	return bCCEApplied;
 }
+*/
 
 bool ACombatManager::AreEnemies(AEODCharacterBase* CharOne, AEODCharacterBase* CharTwo)
 {

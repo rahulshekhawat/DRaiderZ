@@ -63,12 +63,14 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = CombatEvent)
 	void PlayHitSound(const AEODCharacterBase* HitInstigator, const FVector& HitLocation, const bool bCriticalHit);
 
+	/*
 	UFUNCTION(BlueprintImplementableEvent, Category = CombatEvent, meta = (DisplayName = "Character To Character Attack"))
 	void BP_CharacterToCharacterAttack(AEODCharacterBase* HitInstigator,
 									   AEODCharacterBase* HitCharacter,
 									   const FSkillDamageInfo& SkillDamageInfo,
 									   const FHitResult& AttackHitResult,
 									   const FHitResult& LineHitResult);
+	*/
 
 protected:
 
@@ -120,12 +122,14 @@ private:
 
 	FORCEINLINE float GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult);
 
+	/*
 	float GetActualDamage(
 		const AEODCharacterBase* HitInstigator,
 		const AEODCharacterBase* HitCharacter,
 		const FSkillDamageInfo& SkillDamageInfo,
 		const bool bCriticalHit,
 		const bool bAttackBlocked);
+	*/
 
 	/**
 	 * Calculates and returns the actual damage that should be inflicted by HitInstigator on HitCharacter
@@ -217,14 +221,16 @@ private:
 		const FHitResult& HitResult);
 	*/
 
+	/*
 	bool ApplyCrowdControlEffects(
 		AEODCharacterBase* HitInstigator,
 		AEODCharacterBase* HitCharacter,
 		const FSkillDamageInfo& SkillDamageInfo,
 		const FHitResult& LineHitResult,
 		const float BCAngle);
+	*/
 
-	FORCEINLINE FSkillDamageInfo GetSkillDamageInfoFromSkill(FSkillTableRow* Skill);
+	// FORCEINLINE FSkillDamageInfo GetSkillDamageInfoFromSkill(FSkillTableRow* Skill);
 
 	bool AreEnemies(AEODCharacterBase* CharOne, AEODCharacterBase* CharTwo);
 
@@ -267,6 +273,7 @@ FORCEINLINE float ACombatManager::GetBCAngle(AEODCharacterBase* HitCharacter, co
 	return CalculateAngleBetweenVectors(HitCharacter->GetActorForwardVector(), LineHitResult.ImpactNormal);
 }
 
+/*
 FORCEINLINE FSkillDamageInfo ACombatManager::GetSkillDamageInfoFromSkill(FSkillTableRow* Skill)
 {
 	check(Skill);
@@ -280,3 +287,4 @@ FORCEINLINE FSkillDamageInfo ACombatManager::GetSkillDamageInfoFromSkill(FSkillT
 	SkillDamageInfo.DamageType = Skill->DamageType;
 	return SkillDamageInfo;
 }
+*/
