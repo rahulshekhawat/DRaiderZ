@@ -32,11 +32,11 @@
  */
 DECLARE_CYCLE_STAT(TEXT("EOD ChararaterTick"), STAT_EODCharacterTick, STATGROUP_EOD);
 
-FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
-FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
-FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
-FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Skill Manager"));
-FName AEODCharacterBase::InteractionSphereComponentName(TEXT("Interaction Sphere"));
+const FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
+const FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
+const FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
+const FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Skill Manager"));
+const FName AEODCharacterBase::InteractionSphereComponentName(TEXT("Interaction Sphere"));
 
 AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UEODCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -92,8 +92,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	// By default the weapon should be sheathed
 	bWeaponSheathed = true;
 
-	// MaxNumberOfSkills = 30;
-	DodgeStaminaCost = 30;
 	DodgeImmunityTriggerDelay = 0.1f;
 	DodgeImmunityDuration = 0.4;
 	DamageBlockTriggerDelay = 0.2f;
@@ -144,80 +142,9 @@ void AEODCharacterBase::Tick(float DeltaTime)
 			StopNormalAttack();
 		}
 
-
-
-		/*
-		// Update guard state only if either the character wants to guard or if character guard is active
-		if (bWantsToGuard || IsGuardActive())
-		{
-			UpdateGuardState(DeltaTime);
-		}
-
-		// Update normal attack state only if either the character wants to normal attack or if character is actively normal attacking
-		if (bNormalAttackKeyPressed || IsNormalAttacking())
-		{
-			UpdateNormalAttackState(DeltaTime);
-		}
-
-		if (IsDodging())
-		{
-
-		}
-
-		// Update fall state only if either the character is failling or jumping
-		UCharacterMovementComponent* MoveComp = GetCharacterMovement();
-		if ((MoveComp && MoveComp->IsFalling()) || IsJumping())
-		{
-			UpdateFallState(DeltaTime);
-		}
-		*/
-
 		UpdateMovement(DeltaTime);
 		UpdateRotation(DeltaTime);
 	}
-
-	/*
-	if (GetController() && GetController()->IsLocalPlayerController())
-	{
-		// If block key is pressed but the character is not blocking
-		if (bGuardKeyPressed && !IsGuardActive() && CanGuardAgainstAttacks())
-		{
-			ActivateGuard();
-		}
-		// If block is not pressed but character is blocking
-		else if (!bGuardKeyPressed && IsGuardActive())
-		{
-			DeactivateGuard();
-		}
-
-		if (bNormalAttackKeyPressed && !IsNormalAttacking() && CanNormalAttack())
-		{
-			StartNormalAttack();
-		}
-		else if (bNormalAttackKeyPressed && IsNormalAttacking())
-		{
-			UpdateNormalAttackState(DeltaTime);
-		}
-
-		if (GetCharacterMovement()->IsFalling() && bCharacterStateAllowsMovement)
-		{
-			SetCharacterStateAllowsMovement(false);
-		}
-
-		// If the character is either idle or moving, or is in a state that allows movement except guard
-		if (IsIdleOrMoving() || (bCharacterStateAllowsMovement && !IsGuardActive()))
-		{
-			UpdatePCTryingToMove();
-			UpdateCharacterMovementDirection();
-			InitiateRotationToYawFromAxisInput();
-			UpdateMovementState(DeltaTime);
-		}
-		else if (IsGuardActive())
-		{
-			UpdateGuardState(DeltaTime);
-		}
-	}
-	*/
 }
 
 void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -230,7 +157,6 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterStateInfo, COND_SkipOwner);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bIsRunning, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(AEODCharacterBase, bGuardActive, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bWeaponSheathed, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bPCTryingToMove, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, BlockMovementDirectionYaw, COND_SkipOwner);
@@ -305,12 +231,10 @@ void AEODCharacterBase::TriggeriFrames(float Duration, float Delay)
 	else
 	{
 		UWorld* World = GetWorld();
-		if (World)
-		{
-			FTimerDelegate TimerDelegate;
-			TimerDelegate.BindUObject(this, &AEODCharacterBase::EnableiFrames, Duration);
-			World->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
-		}
+		check(World);
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUObject(this, &AEODCharacterBase::EnableiFrames, Duration);
+		World->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
 	}
 }
 
@@ -343,11 +267,6 @@ bool AEODCharacterBase::CanDodge() const
 bool AEODCharacterBase::CanGuardAgainstAttacks() const
 {
 	return (IsIdleOrMoving() || IsNormalAttacking()) && !(IsWeaponSheathed());
-}
-
-bool AEODCharacterBase::CanBlock() const
-{
-	return IsIdleOrMoving();
 }
 
 bool AEODCharacterBase::CanRespawn() const
@@ -698,6 +617,7 @@ void AEODCharacterBase::OnRep_WeaponSheathed()
 
 void AEODCharacterBase::OnRep_GuardActive()
 {
+	/*
 	if (bGuardActive)
 	{
 		EnableCharacterGuard();
@@ -706,6 +626,7 @@ void AEODCharacterBase::OnRep_GuardActive()
 	{
 		DisableCharacterGuard();
 	}
+	*/
 }
 
 void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo)
@@ -1038,23 +959,6 @@ void AEODCharacterBase::OnJumpAnimationFinish()
 	ResetState();
 }
 
-void AEODCharacterBase::EnableCharacterGuard()
-{
-	// @todo wait for normal attack section to finish before blocking?
-	if (IsNormalAttacking())
-	{
-		StopNormalAttack();
-	}
-	SetCharacterState(ECharacterState::Blocking);
-	// GetCharacterMovement()->bUseControllerDesiredRotation = true;
-}
-
-void AEODCharacterBase::DisableCharacterGuard()
-{
-	SetCharacterState(ECharacterState::IdleWalkRun);
-	// GetCharacterMovement()->bUseControllerDesiredRotation = false;
-}
-
 void AEODCharacterBase::MoveForward(const float Value)
 {
 	ForwardAxisValue = Value;
@@ -1180,45 +1084,6 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 			SetWalkSpeed(NewSpeed);
 		}
 	}
-
-	/*
-	return;
-
-	UStatsComponentBase* StatsComp = GetCharacterStatsComponent();
-	if (!StatsComp)
-	{
-		return;
-	}	
-
-	if (IsGuardActive())
-	{
-		// float NewSpeed = DefaultWalkSpeedWhileBlocking * StatsComp->GetMovementSpeedModifier();
-		float NewSpeed = DefaultWalkSpeedWhileBlocking * MovementSpeedModifier;
-		SetWalkSpeed(NewSpeed);
-	}
-	else if (CharacterState == ECharacterState::IdleWalkRun || bCharacterStateAllowsMovement)
-	{
-		UpdatePCTryingToMove();
-		UpdateCharacterMovementDirection();
-
-		if (ForwardAxisValue < 0)
-		{
-			float NewSpeed = (DefaultWalkSpeed * StatsComp->GetMovementSpeedModifier()) * (5.f / 16.f);
-			SetWalkSpeed(NewSpeed);
-		}
-		else
-		{
-			float NewSpeed = DefaultWalkSpeed * StatsComp->GetMovementSpeedModifier();
-			SetWalkSpeed(NewSpeed);
-		}
-	}
-	*/
-}
-
-void AEODCharacterBase::UpdateFallState(float DeltaTime)
-{
-	SetCharacterStateAllowsMovement(false);
-	SetCharacterStateAllowsRotation(false);
 }
 
 void AEODCharacterBase::TriggerInteraction()
@@ -1277,28 +1142,12 @@ void AEODCharacterBase::PlayToggleSheatheAnimation()
 void AEODCharacterBase::InitiateRotationToYawFromAxisInput()
 {
 	float UpdatedYaw = GetRotationYawFromAxisInput();
-	FRotator DesiredRotation = FRotator(0.f, GetRotationYawFromAxisInput(), 0.f);
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
 	{
-		MoveComp->SetDesiredCustomRotation(DesiredRotation);
+		MoveComp->SetDesiredCustomRotationYaw(UpdatedYaw);
 	}
 }
-
-/*
-void AEODCharacterBase::Jump()
-{
-	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-	if (MoveComp)
-	{
-		MoveComp->bUseControllerDesiredRotation = false;
-	}
-	bCharacterStateAllowsMovement = false;
-	bCharacterStateAllowsRotation = false;
-
-	Super::Jump();
-}
-*/
 
 void AEODCharacterBase::OnPressedForward()
 {
@@ -1314,38 +1163,6 @@ void AEODCharacterBase::OnReleasedForward()
 
 void AEODCharacterBase::OnReleasedBackward()
 {
-}
-
-void AEODCharacterBase::UpdateMovementState(float DeltaTime)
-{
-	if (ForwardAxisValue < 0)
-	{
-		float Speed = IsValid(GetCharacterStatsComponent()) ? (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier()) * 5 / 16 : DefaultWalkSpeed * 5 / 16;
-
-		// float Speed = (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
-		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
-		{
-			SetWalkSpeed(Speed);
-		}
-	}
-	else
-	{
-		float Speed = IsValid(GetCharacterStatsComponent()) ? DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() : DefaultWalkSpeed;
-		// float Speed = DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
-		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
-		{
-			SetWalkSpeed(Speed);
-		}
-	}
-
-	//~ @old_code
-	/*
-	float DesiredRotationYaw = GetRotationYawFromAxisInput();
-	if (!FMath::IsNearlyEqual(DesiredRotationYaw, GetActorRotation().Yaw, 1e-3f))
-	{
-		DeltaRotateCharacterToDesiredYaw(DesiredRotationYaw, DeltaTime);
-	}
-	*/
 }
 
 void AEODCharacterBase::ResetState()
@@ -1412,49 +1229,6 @@ void AEODCharacterBase::OnMountingRide(ARideBase* RideCharacter)
 	}
 }
 
-void AEODCharacterBase::UpdateGuardState(float DeltaTime)
-{
-	// If character wants to guard but the guard is not yet active 
-	if (bWantsToGuard && !IsGuardActive() && CanGuardAgainstAttacks())
-	{
-		ActivateGuard();
-	}
-	else if (!bWantsToGuard && IsGuardActive())
-	{
-		DeactivateGuard();
-	}
-
-	if (IsGuardActive())
-	{
-		if (ForwardAxisValue == 0)
-		{
-			if (RightAxisValue > 0)
-			{
-				if (BlockMovementDirectionYaw != 90.f)
-					SetBlockMovementDirectionYaw(90.f);
-			}
-			else if (RightAxisValue < 0)
-			{
-				if (BlockMovementDirectionYaw != -90.f)
-					SetBlockMovementDirectionYaw(-90.f);
-			}
-			else
-			{
-				if (BlockMovementDirectionYaw != 0.f)
-					SetBlockMovementDirectionYaw(0.f);
-			}
-		}
-		else
-		{
-			float NewYaw = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
-			if (BlockMovementDirectionYaw != NewYaw)
-			{
-				SetBlockMovementDirectionYaw(NewYaw);
-			}
-		}
-	}
-}
-
 void AEODCharacterBase::Server_SetIsRunning_Implementation(bool bValue)
 {
 	SetIsRunning(bValue);
@@ -1507,7 +1281,7 @@ bool AEODCharacterBase::Server_SetWeaponSheathed_Validate(bool bNewValue)
 
 void AEODCharacterBase::Server_SetGuardActive_Implementation(bool bValue)
 {
-	SetGuardActive(bValue);
+	// SetGuardActive(bValue);
 }
 
 bool AEODCharacterBase::Server_SetGuardActive_Validate(bool bValue)

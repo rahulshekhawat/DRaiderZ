@@ -157,9 +157,6 @@ public:
 	/** Returns true if character can guard against incoming attacks */
 	virtual bool CanGuardAgainstAttacks() const override;
 
-	/** Returns true if character can block */
-	virtual bool CanBlock() const override;
-
 	/** Returns true if character can use normal attack */
 	virtual bool CanNormalAttack() const override;
 

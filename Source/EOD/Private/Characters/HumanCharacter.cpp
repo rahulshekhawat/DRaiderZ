@@ -93,14 +93,6 @@ void AHumanCharacter::FinishDodge()
 {
 }
 
-void AHumanCharacter::EnableCharacterGuard()
-{
-}
-
-void AHumanCharacter::DisableCharacterGuard()
-{
-}
-
 void AHumanCharacter::OnPressedForward()
 {
 	UWorld* World = GetWorld();

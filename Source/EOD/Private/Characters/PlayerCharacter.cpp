@@ -210,21 +210,18 @@ bool APlayerCharacter::CanDodge() const
 	UAnimMontage* Animation = AnimationRef ? AnimationRef->Dodge.Get() : nullptr;
 
 	// @todo add UsingSkill, Looting, Interacting, etc. to this too
-	bool bStateAllowsDodge = IsIdleOrMoving() || IsGuardActive() || IsCastingSpell() || IsNormalAttacking();
+	// bool bStateAllowsDodge = IsIdleOrMoving() || IsGuardActive() || IsCastingSpell() || IsNormalAttacking();
 
 	// If we have a valid animation for dodge and the character state allows dodging
-	return Animation && bStateAllowsDodge;
+	// return Animation && bStateAllowsDodge;
+
+	//~ @todo
+	return true;
 }
 
 bool APlayerCharacter::CanGuardAgainstAttacks() const
 {
 	return (IsIdleOrMoving() || IsNormalAttacking()) && !(IsWeaponSheathed() || GetEquippedWeaponType() == EWeaponType::None);
-}
-
-bool APlayerCharacter::CanBlock() const
-{
-	return (IsIdleOrMoving() || IsAutoRunning() || IsNormalAttacking()) &&
-		!(GetEquippedWeaponType() == EWeaponType::None || IsWeaponSheathed());
 }
 
 bool APlayerCharacter::CanNormalAttack() const
@@ -904,6 +901,7 @@ void APlayerCharacter::OnDodge()
 
 	if (CanDodge() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Dodge.Get())
 	{
+		int DodgeStaminaCost = 30;
 		int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
 		GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 

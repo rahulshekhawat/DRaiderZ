@@ -159,10 +159,6 @@ public:
 
 	virtual void FinishDodge() override;
 
-	virtual void EnableCharacterGuard() override;
-
-	virtual void DisableCharacterGuard() override;
-
 private:
 
 	// --------------------------------------

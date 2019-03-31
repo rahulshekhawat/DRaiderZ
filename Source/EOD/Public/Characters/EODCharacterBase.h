@@ -28,8 +28,6 @@ class USkillsComponent;
 class UInputComponent;
 class UCameraComponent;
 class UCharacterStateBase;
-// class AEODPlayerController;
-// class AEODAIControllerBase;
 class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
@@ -142,7 +140,7 @@ class EOD_API AEODCharacterBase : public ACharacter
 public:
 
 	// --------------------------------------
-	//	UE4 Method Overrides
+	//  UE4 Method Overrides
 	// --------------------------------------
 
 	/** Sets default values for this character's properties */
@@ -192,18 +190,70 @@ public:
 	/** Finish dodging */
 	virtual void FinishDodge();
 
-	FTimerHandle FinishDodgeTimerHandle;
+	/** Returns true if character can guard against incoming attacks */
+	virtual bool CanGuardAgainstAttacks() const;
 
+	/** Enter guard state */
 	virtual void StartBlockingAttacks();
 
+	/** Leave guard state */
 	virtual void StopBlockingAttacks();
 
+	/** Returns true if character can jump */
+	virtual bool CanJump() const;
+
+	/** Event called when the jump animation starts playing */
 	virtual void OnJumpAnimationStart();
 
+	/** Event called when the jump animation finishes playing */
 	virtual void OnJumpAnimationFinish();
 
+	/** Returns true if character can move */
+	UFUNCTION(BlueprintCallable, Category = CharacterState)
+	virtual bool CanMove() const;
+
+	/** Reset character state to Idle-Walk-Run */
+	virtual void ResetState();
+
+	/** Returns true if character can use normal attack */
+	virtual bool CanNormalAttack() const;
+
+	/** Start normal attacks */
+	virtual void StartNormalAttack();
+
+	/** Stop normal attacks */
+	virtual void StopNormalAttack();
+
+	/** Cancel normal attacks */
+	virtual void CancelNormalAttack();
+
+	/** Finish normal attacks and reset back to Idle-Walk-Run */
+	virtual void FinishNormalAttack();
+
+protected:
+
+	/** Timer handle to call FinishDodge() */
+	FTimerHandle FinishDodgeTimerHandle;
+
+	/** Updates whether player controller is currently trying to move or not */
+	inline void UpdatePCTryingToMove();
+
+	/** Resets tick dependent data. Intended to be called at the beginning of tick function */
+	virtual void ResetTickDependentData();
+
+	/** Updates character rotation every frame */
+	virtual void UpdateRotation(float DeltaTime);
+
+	/** Updates character movement every frame */
+	virtual void UpdateMovement(float DeltaTime);
+
+	/** Updates character normal attck state every frame if the character wants to normal attack */
+	virtual void UpdateNormalAttackState(float DeltaTime);
+
+public:
+
 	// --------------------------------------
-	//	Combat
+	//  Combat
 	// --------------------------------------
 
 	/**
@@ -226,34 +276,27 @@ protected:
 	UFUNCTION()
 	void DisableiFrames();
 
-	inline void ActivateGuard();
-
-	inline void DeactivateGuard();
-
-	/** [local] Transition to character guard animation */
-	UFUNCTION()
-	virtual void EnableCharacterGuard();
-
-	/** [local] Transition out of character guard animation */
-	UFUNCTION()
-	virtual void DisableCharacterGuard();
-
+	/** Enable damage blocking */
 	inline void StartBlockingDamage(float Delay = 0.2f);
 
+	/** Disable damage blocking */
 	inline void StopBlockingDamage();
+
+	/** Time in seconds after which iFrames are triggered after initiating dodge */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
+	float DodgeImmunityTriggerDelay;
+
+	/** Time in seconds for which iFrames stay active during dodge */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
+	float DodgeImmunityDuration;
+
+	/** Time in seconds by which the damage blocking is delayed after character enters block state */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
+	float DamageBlockTriggerDelay;
 
 	/** Determines whether character is currently engaged in combat or not */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Combat System")
 	bool bInCombat;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
-	float DodgeImmunityTriggerDelay;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
-	float DodgeImmunityDuration;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
-	float DamageBlockTriggerDelay;
 
 private:
 
@@ -264,26 +307,6 @@ private:
 	/** Determines if character is blocking any incoming damage */
 	UPROPERTY(Transient)
 	uint32 bBlockingDamage : 1;
-
-	/** Determines whether the character has it's guard up */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_GuardActive)
-	uint32 bGuardActive : 1;
-
-	/** Determines whether the character wants to guard right now */
-	UPROPERTY(Transient)
-	uint32 bWantsToGuard : 1;
-
-	UPROPERTY(Transient)
-	uint32 bWantsToNormalAttack : 1;
-
-protected:
-
-	// --------------------------------------
-	//	Character Stats
-	// --------------------------------------
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Stats|Constants")
-	int DodgeStaminaCost;
 
 public:
 
@@ -309,6 +332,9 @@ public:
 
 	/** [server + local] Sets whether current character state allows movement */
 	inline void SetCharacterStateAllowsMovement(bool bNewValue);
+
+	/** [local] Sets whether current character state allows movement */
+	inline void SetCharacterStateAllowsMovement_Local(bool bNewValue);
 
 	/** [local] Sets whether current character allows rotation */
 	inline void SetCharacterStateAllowsRotation(bool bValue);
@@ -348,6 +374,7 @@ protected:
 	float DefaultWalkSpeedWhileBlocking;
 
 private:
+
 	/**
 	 * The direction character is trying to move relative to it's controller rotation
 	 * If the character is controlled by player, it is determined by the movement keys pressed by player
@@ -362,7 +389,7 @@ private:
 public:
 
 	// --------------------------------------
-	//	Input Handling
+	//  Input Handling
 	// --------------------------------------
 
 	/** Sets whether character wants to guard or not */
@@ -380,15 +407,26 @@ public:
 	/** Updates the DesiredCustomRotationYaw in pawn's movement component to the DesiredRotationYawFromAxisInput */
 	void InitiateRotationToYawFromAxisInput();
 
-	// virtual void Jump() override;
-
 	/** Zoom in player camera */
 	inline void ZoomInCamera();
 
 	/** Zooms out player camera */
 	inline void ZoomOutCamera();
 
+	/** Event called when forward key is pressed */
+	virtual void OnPressedForward();
+
+	/** Event called when backward key is pressed */
+	virtual void OnPressedBackward();
+
+	/** Event called when forward key is released */
+	virtual void OnReleasedForward();
+
+	/** Event called when backward key is relased */
+	virtual void OnReleasedBackward();
+
 protected:
+
 	/** Determines whether the cached value of DesiredRotationYawFromAxisInput was updated this frame */
 	uint32 bDesiredRotationYawFromAxisInputUpdated : 1;
 
@@ -396,37 +434,33 @@ protected:
 	UPROPERTY(Transient)
 	float DesiredRotationYawFromAxisInput;
 
-	//~ @todo DEPRECATED remove
-	/** Determines whether guard key is pressed or not */
-	// UPROPERTY(Transient)
-	// uint32 bGuardKeyPressed : 1;
+	/** Determines whether the character wants to guard */
+	UPROPERTY(Transient)
+	uint32 bWantsToGuard : 1;
 
-private:
+	/** Determines whether the character wants to normal attack */
+	UPROPERTY(Transient)
+	uint32 bWantsToNormalAttack : 1;
+
 	/** Calculates and returns rotation yaw from axis input */
 	inline float CalculateRotationYawFromAxisInput() const;
 
-
-public:
-
-	// --------------------------------------
-	//	User Interface
-	// --------------------------------------
-
-protected:
-
-	// UPROPERTY(EditDefaultsOnly, Category = "UI")
-		// TSubclassOf<USkillBa>
-
 private:
+
+	// --------------------------------------
+	//  User Interface
+	// --------------------------------------
 
 	void BindUIDelegates();
 
 	void UnbindUIDelegates();
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Utility
 public:
+
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
 	/**
 	 * Returns controller rotation yaw in -180/180 range.
 	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
@@ -443,50 +477,19 @@ public:
 	/** [server + local] Plays an animation montage and changes character state over network */
 	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
+	// --------------------------------------
+	//  Save/Load System
+	// --------------------------------------
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Save/load
-public:
 	/** Saves current character state */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
+	UFUNCTION(BlueprintCallable, Category = "Save/Load System")
 	virtual void SaveCharacterState() { ; }
 
-	void ResetState();
+	// --------------------------------------
+	//  Ride System
+	// --------------------------------------
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Update character state
-protected:
-	/** Resets tick dependent data. Intended to be called at the beginning of tick function */
-	virtual void ResetTickDependentData();
-
-	/** Updates whether player controller is currently trying to move or not */
-	inline void UpdatePCTryingToMove();
-
-	/** Updates character rotation every frame */
-	virtual void UpdateRotation(float DeltaTime);
-
-	/** Updates character movement every frame */
-	virtual void UpdateMovement(float DeltaTime);
-
-	/** Updates character fall state every frame if the character is falling */
-	virtual void UpdateFallState(float DeltaTime);
-
-	/** Updates character normal attck state every frame if the character wants to normal attack */
-	virtual void UpdateNormalAttackState(float DeltaTime);
-
-	/** Updates character guard state every frame if the character wants to guard */
-	virtual void UpdateGuardState(float DeltaTime);
-
-	/** Updates character movement every frame */
-	virtual void UpdateMovementState(float DeltaTime);
-
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Ride System
-public:
 	/** Reference to the rideable character that this character may be currently riding */
-	// UPROPERTY(ReplicatedUsing = OnRep_CurrentRide)
 	UPROPERTY(Replicated)
 	ARideBase* CurrentRide;
 
@@ -497,10 +500,10 @@ public:
 	/** Called when this character successfully mounts a rideable character */
 	void OnMountingRide(ARideBase* RideCharacter);
 
+	// --------------------------------------
+	//  Components
+	// --------------------------------------
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Components
-public:
 	FORCEINLINE USpringArmComponent* GetCameraBoomComponent() const { return CameraBoomComponent; }
 
 	FORCEINLINE UCameraComponent* GetCameraComponent() const { return CameraComponent; }
@@ -511,21 +514,18 @@ public:
 
 	FORCEINLINE USphereComponent* GetInteractionSphereComponent() const { return InteractionSphereComponent; }
 
-	inline void EnableInteractionSphere();
+	static const FName CameraComponentName;
 
-	inline void DisableInteractionSphere();
+	static const FName SpringArmComponentName;
 
-	static FName CameraComponentName;
+	static const FName GameplaySkillsComponentName;
 
-	static FName SpringArmComponentName;
+	static const FName CharacterStatsComponentName;
 
-	static FName GameplaySkillsComponentName;
-
-	static FName CharacterStatsComponentName;
-
-	static FName InteractionSphereComponentName;
+	static const FName InteractionSphereComponentName;
 
 protected:
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera|Constants")
 	int32 CameraZoomRate;
 
@@ -536,6 +536,7 @@ protected:
 	int CameraArmMaximumLength;
 
 private:
+
 	/** Spring arm for camera */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoomComponent;
@@ -560,8 +561,11 @@ private:
 	UPROPERTY(Transient)
 	UAudioComponent* HitAudioComponent;
 
-
 public:
+
+	inline void EnableInteractionSphere();
+
+	inline void DisableInteractionSphere();
 
 	// --------------------------------------
 	//	Character States
@@ -602,14 +606,6 @@ public:
 	/** Put or remove weapon inside sheath */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void ToggleSheathe();
-	
-	virtual void StartNormalAttack();
-
-	virtual void StopNormalAttack();
-
-	virtual void CancelNormalAttack();
-
-	virtual void FinishNormalAttack();
 
 	virtual void PlayToggleSheatheAnimation();
 
@@ -657,6 +653,7 @@ protected:
 	}
 
 	/** [server + local] Sets whether this character has it's guard up against incoming attacks or not */
+	/*
 	FORCEINLINE void SetGuardActive(bool bNewValue)
 	{
 		bGuardActive = bNewValue;
@@ -673,6 +670,7 @@ protected:
 			Server_SetGuardActive(bNewValue);
 		}
 	}
+	*/
 
 	inline void UpdateCharacterMovementDirection();
 
@@ -683,7 +681,7 @@ public:
 
 	FORCEINLINE bool IsPCTryingToMove() const { return bPCTryingToMove; }
 
-	FORCEINLINE bool IsGuardActive() const { return bGuardActive; }
+	// FORCEINLINE bool IsGuardActive() const { return bGuardActive; }
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -708,14 +706,6 @@ public:
 	}
 
 	FORCEINLINE bool IsNormalAttackKeyPressed()const { return bNormalAttackKeyPressed; }
-
-	virtual void OnPressedForward();
-
-	virtual void OnPressedBackward();
-
-	virtual void OnReleasedForward();
-
-	virtual void OnReleasedBackward();
 
 public:
 	/** Returns true if character is alive */
@@ -777,24 +767,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Has Been Hit"))
 	bool BP_HasBeenHit() const;
 
-	/** Returns true if character can move */
-	UFUNCTION(BlueprintCallable, Category = CharacterState)
-	virtual bool CanMove() const;
-	
-	/** Returns true if character can jump */
-	virtual bool CanJump() const;
-
-	/** Returns true if character can guard against incoming attacks */
-	virtual bool CanGuardAgainstAttacks() const;
-
-	/** Returns true if character can block */
-	virtual bool CanBlock() const;
-
 	/** Returns true if character can respawn */
 	virtual bool CanRespawn() const;
-
-	/** Returns true if character can use normal attack */
-	virtual bool CanNormalAttack() const;
 	
 	/** Returns true if character can use any skill at all */
 	UFUNCTION(BlueprintCallable, Category = CharacterState)
@@ -1313,6 +1287,8 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
+	virtual void Server_SetBlockMovementDirectionYaw_Implementation(float NewYaw);
+	virtual bool Server_SetBlockMovementDirectionYaw_Validate(float NewYaw);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_StartBlockingDamage(float Delay);
@@ -1322,6 +1298,8 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_TriggeriFrames(float Duration, float Delay);
+	virtual void Server_TriggeriFrames_Implementation(float Duration, float Delay);
+	virtual bool Server_TriggeriFrames_Validate(float Duration, float Delay);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetGuardActive(bool bValue);
@@ -1334,19 +1312,27 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterStateAllowsMovement(bool bNewValue);
+	virtual void Server_SetCharacterStateAllowsMovement_Implementation(bool bNewValue);
+	virtual bool Server_SetCharacterStateAllowsMovement_Validate(bool bNewValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetPCTryingToMove(bool bNewValue);
+	virtual void Server_SetPCTryingToMove_Implementation(bool bNewValue);
+	virtual bool Server_SetPCTryingToMove_Validate(bool bNewValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharMovementDir(ECharMovementDirection NewDirection);
+	virtual void Server_SetCharMovementDir_Implementation(ECharMovementDirection NewDirection);
+	virtual bool Server_SetCharMovementDir_Validate(ECharMovementDirection NewDirection);
 
-	// DEPRECATED
+	//~ DEPRECATED
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterState(ECharacterState NewState);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetWalkSpeed(float WalkSpeed);
+	virtual void Server_SetWalkSpeed_Implementation(float WalkSpeed);
+	virtual bool Server_SetWalkSpeed_Validate(float WalkSpeed);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterRotation(FRotator NewRotation);
@@ -1363,6 +1349,8 @@ protected:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetUseControllerRotationYaw(bool bNewBool);
+	virtual void Server_SetUseControllerRotationYaw_Implementation(bool bNewBool);
+	virtual bool Server_SetUseControllerRotationYaw_Validate(bool bNewBool);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetNextMontageSection(FName CurrentSection, FName NextSection);
@@ -1382,6 +1370,7 @@ protected:
 	
 };
 
+/*
 inline void AEODCharacterBase::ActivateGuard()
 {
 	SetGuardActive(true);
@@ -1393,6 +1382,7 @@ inline void AEODCharacterBase::DeactivateGuard()
 	SetGuardActive(false);
 	StopBlockingDamage();
 }
+*/
 
 inline void AEODCharacterBase::StartBlockingDamage(float Delay)
 {
@@ -1424,7 +1414,8 @@ inline void AEODCharacterBase::StopBlockingDamage()
 inline void AEODCharacterBase::SetWalkSpeed(const float WalkSpeed)
 {
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
-	if (MoveComp && MoveComp->MaxWalkSpeed != WalkSpeed)
+	const float ErrorTolerance = 0.1f;
+	if (MoveComp && !FMath::IsNearlyEqual(MoveComp->MaxWalkSpeed, WalkSpeed, ErrorTolerance))
 	{
 		MoveComp->MaxWalkSpeed = WalkSpeed;
 		if (Role < ROLE_Authority)
@@ -1449,11 +1440,19 @@ inline void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)
 
 inline void AEODCharacterBase::SetCharacterStateAllowsMovement(bool bNewValue)
 {
-	bCharacterStateAllowsMovement = bNewValue;
-	if (Role < ROLE_Authority)
+	if (bCharacterStateAllowsMovement != bNewValue)
 	{
-		Server_SetCharacterStateAllowsMovement(bNewValue);
+		bCharacterStateAllowsMovement = bNewValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharacterStateAllowsMovement(bNewValue);
+		}
 	}
+}
+
+inline void AEODCharacterBase::SetCharacterStateAllowsMovement_Local(bool bNewValue)
+{
+	bCharacterStateAllowsMovement = bNewValue;
 }
 
 inline void AEODCharacterBase::SetCharacterStateAllowsRotation(bool bValue)
@@ -1463,16 +1462,20 @@ inline void AEODCharacterBase::SetCharacterStateAllowsRotation(bool bValue)
 
 inline void AEODCharacterBase::SetCharacterMovementDirection(ECharMovementDirection NewDirection)
 {
-	CharacterMovementDirection = NewDirection;
-	if (Role < ROLE_Authority)
+	if (CharacterMovementDirection != NewDirection)
 	{
-		Server_SetCharMovementDir(NewDirection);
+		CharacterMovementDirection = NewDirection;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetCharMovementDir(NewDirection);
+		}
 	}
 }
 
 inline void AEODCharacterBase::SetBlockMovementDirectionYaw(float NewYaw)
 {
-	if (!FMath::IsNearlyEqual(NewYaw, BlockMovementDirectionYaw, 0.1f))
+	const float AngleTolerance = 1e-3f;
+	if (!FMath::IsNearlyEqual(NewYaw, BlockMovementDirectionYaw, AngleTolerance))
 	{
 		BlockMovementDirectionYaw = NewYaw;
 		if (Role < ROLE_Authority)

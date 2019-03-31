@@ -64,6 +64,7 @@ public:
 	inline void SetDesiredCustomRotationYaw_LocalOnly(float RotationYaw);
 
 protected:
+
 	/**
 	 * Desired rotation of pawn owner. The character owner will always try to rotate smoothly to this DesiredCustomRotationYaw unless the 
 	 * rotation behavior is overriden by setting 'bOrientRotationToMovement' or 'bUseControllerDesiredRotation' to true.
