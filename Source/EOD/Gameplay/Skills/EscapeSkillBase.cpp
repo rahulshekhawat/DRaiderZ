@@ -39,12 +39,12 @@ void UEscapeSkillBase::TriggerSkill()
 	if (bIsLocalPlayerController)
 	{
 		float DesiredRotationYaw = Instigator->GetControllerRotationYaw();
+		Instigator->SetCharacterRotationYaw(DesiredRotationYaw);
 		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(Instigator->GetCharacterMovement());
 		if (MoveComp)
 		{
 			MoveComp->SetDesiredCustomRotationYaw(DesiredRotationYaw);
 		}
-		Instigator->SetCharacterRotationYaw(DesiredRotationYaw);
 
 		Instigator->SetCharacterStateAllowsMovement(false);
 		Instigator->SetCharacterStateAllowsRotation(false);

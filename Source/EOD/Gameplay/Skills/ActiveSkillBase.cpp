@@ -7,6 +7,7 @@
 UActiveSkillBase::UActiveSkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	SupersedingSkillGroup = NAME_None;
+	AnimationStartSectionName = FName("Default");
 }
 
 void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)

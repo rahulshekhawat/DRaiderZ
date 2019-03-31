@@ -8,6 +8,7 @@ UGameplaySkillBase::UGameplaySkillBase(const FObjectInitializer& ObjectInitializ
 {
 	SkillGroup = NAME_None;
 	CurrentUpgrade = 0;
+	MaxUpgrades = 1;
 	bSkillCanBeCharged = false;
 }
 

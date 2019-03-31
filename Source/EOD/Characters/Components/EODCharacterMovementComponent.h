@@ -109,10 +109,18 @@ inline void UEODCharacterMovementComponent::SetDesiredCustomRotation_LocalOnly(c
 
 inline void UEODCharacterMovementComponent::SetDesiredCustomRotationYaw(float RotationYaw)
 {
-	SetDesiredCustomRotation(FRotator(0.f, RotationYaw, 0.f));
+	const float AngleTolerance = 1e-3f;
+	if (!FMath::IsNearlyEqual(DesiredCustomRotation.Yaw, RotationYaw, AngleTolerance))
+	{
+		DesiredCustomRotation = FRotator(DesiredCustomRotation.Pitch, RotationYaw, DesiredCustomRotation.Roll);
+		if (CharacterOwner && CharacterOwner->Role < ROLE_Authority)
+		{
+			Server_SetDesiredCustomRotationYaw(RotationYaw);
+		}
+	}
 }
 
 inline void UEODCharacterMovementComponent::SetDesiredCustomRotationYaw_LocalOnly(float RotationYaw)
 {
-	SetDesiredCustomRotation_LocalOnly(FRotator(0.f, RotationYaw, 0.f));
+	SetDesiredCustomRotation_LocalOnly(FRotator(DesiredCustomRotation.Pitch, RotationYaw, DesiredCustomRotation.Roll));
 }

@@ -111,7 +111,7 @@ bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotation_Validate(co
 
 void UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Implementation(float RotationYaw)
 {
-	SetDesiredCustomRotation(FRotator(0.f, RotationYaw, 0.f));
+	SetDesiredCustomRotation(FRotator(DesiredCustomRotation.Pitch, RotationYaw, DesiredCustomRotation.Roll));
 }
 
 bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Validate(float RotationYaw)
