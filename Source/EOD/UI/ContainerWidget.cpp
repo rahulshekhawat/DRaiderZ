@@ -268,8 +268,8 @@ void UContainerWidget::SetContainerData(const FContainerData& NewData)
 	SetInGameName(NewData.InGameName);
 	SetDescription(NewData.Description);
 	SetItemType(NewData.EODItemType);
-	SetCurrentValue(NewData.CurrentValue);
 	SetMaxValue(NewData.MaxValue);
+	SetCurrentValue(NewData.CurrentValue);
 }
 
 void UContainerWidget::SetItemID(FName NewID)

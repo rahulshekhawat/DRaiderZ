@@ -18,7 +18,7 @@ bool UEscapeSkillBase::CanTriggerSkill() const
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	EWeaponType EquippedWeaponType = Instigator ? Instigator->GetEquippedWeaponType() : EWeaponType::None;
 
-	bool bHasValidWeapon = EquippedWeaponType != EWeaponType::None && IsWeaponTypeSupported(EquippedWeaponType);
+	bool bHasValidWeapon = EquippedWeaponType != EWeaponType::None && IsWeaponTypeSupported(EquippedWeaponType) && !Instigator->IsWeaponSheathed();
 	bool bInCooldown = IsSkillInCooldown();
 
 	//~ @note Escape skills can be used even if the instigator has been hit
@@ -39,12 +39,12 @@ void UEscapeSkillBase::TriggerSkill()
 	if (bIsLocalPlayerController)
 	{
 		float DesiredRotationYaw = Instigator->GetControllerRotationYaw();
-		Instigator->SetCharacterRotationYaw(DesiredRotationYaw);
 		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(Instigator->GetCharacterMovement());
 		if (MoveComp)
 		{
 			MoveComp->SetDesiredCustomRotationYaw(DesiredRotationYaw);
 		}
+		Instigator->SetCharacterRotationYaw(DesiredRotationYaw);
 
 		Instigator->SetCharacterStateAllowsMovement(false);
 		Instigator->SetCharacterStateAllowsRotation(false);
@@ -70,7 +70,7 @@ void UEscapeSkillBase::TriggerSkill()
 
 bool UEscapeSkillBase::CanReleaseSkill() const
 {
-	return false;
+	return true;
 }
 
 void UEscapeSkillBase::ReleaseSkill(float ChargeDuration)
@@ -79,7 +79,7 @@ void UEscapeSkillBase::ReleaseSkill(float ChargeDuration)
 
 bool UEscapeSkillBase::CanCancelSkill() const
 {
-	return false;
+	return true;
 }
 
 void UEscapeSkillBase::CancelSkill()
