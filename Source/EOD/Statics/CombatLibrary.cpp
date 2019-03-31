@@ -4,7 +4,7 @@
 #include "EOD/Statics/CharacterLibrary.h"
 #include "EOD/Characters/EODCharacterBase.h"
 
-UCombatLibrary::UCombatLibrary(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+UCombatLibrary::UCombatLibrary(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
