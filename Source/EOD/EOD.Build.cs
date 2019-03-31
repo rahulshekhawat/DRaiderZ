@@ -10,28 +10,33 @@ public class EOD : ModuleRules
 
         PublicIncludePaths.AddRange(
             new string[] {
-
+                "EOD/Public/AI",
+                "EOD/Public/AI/Components",
+                "EOD/Public/AnimInstances",
+                "EOD/Public/Characters",
+                "EOD/Public/Characters/Components",
+                "EOD/Public/Characters/States",
+                "EOD/Public/Core",
+                "EOD/Public/Events",
+                "EOD/Public/Gameplay",
+                "EOD/Public/Gameplay/Skills",
+                "EOD/Public/Interactives",
+                "EOD/Public/Notifies",
+                "EOD/Public/Player",
+                "EOD/Public/Player/Components",
+                "EOD/Public/SaveSystem",
+                "EOD/Public/Statics",
+                "EOD/Public/StatusEffects",
+                "EOD/Public/UI",
+                "EOD/Public/UI/Menu",
+                "EOD/Public/Weapons",
+                "EOD/Public/Weapons/Components",
             }
         );
 
         PrivateIncludePaths.AddRange(
             new string[] {
-                "EOD/AI",
-                "EOD/AnimInstances",
-                "EOD/Characters",
-                "EOD/Core",
-                "EOD/Events",
-                "EOD/Gameplay",
-                "EOD/Gameplay/Skills",
-                "EOD/Interactives",
-                "EOD/Notifies",
-                "EOD/Player",
-                "EOD/SaveSystem",
-                "EOD/Statics",
-                "EOD/StatusEffects",
-                "EOD/UI",
-                "EOD/UI/Menu",
-                "EOD/Weapons",
+
             }
         );
 
