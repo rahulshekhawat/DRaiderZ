@@ -978,7 +978,7 @@ inline void APlayerCharacter::EnableBlock()
 
 	SetCharacterState(ECharacterState::Blocking);
 	SetUseControllerRotationYaw(true);
-	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * GetCharacterStatsComponent()->GetMovementSpeedModifier());
+	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * MovementSpeedModifier);
 
 	// FTimerHandle TimerDelegate;
 	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);

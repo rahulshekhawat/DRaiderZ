@@ -72,6 +72,8 @@ void APlayerCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	LoadUnequippedWeaponAnimationReferences();
+	//~ @todo
+	/*
 	if (IsValid(GetCharacterStatsComponent()))
 	{
 		SetWalkSpeed(DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier());
@@ -80,6 +82,7 @@ void APlayerCharacter::PostInitializeComponents()
 	{
 		SetWalkSpeed(DefaultWalkSpeed);
 	}
+	*/
 
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Instigator = this;
@@ -238,6 +241,8 @@ bool APlayerCharacter::CanUseAnySkill() const
 
 bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
 {
+	//~ @todo
+	/*
 	if (Skill)
 	{
 		if ((Skill->SupportedWeapons & (1 << (uint8)GetEquippedWeaponType())) &&
@@ -247,6 +252,7 @@ bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
 			return true;
 		}
 	}
+	*/
 
 	return false;
 }
@@ -344,7 +350,8 @@ bool APlayerCharacter::CCEFreeze_Implementation(const float Duration)
 
 void APlayerCharacter::CCEUnfreeze_Implementation()
 {
-	CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
+	//~ @todo
+	// CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
 }
 
 bool APlayerCharacter::CCEKnockdown_Implementation(const float Duration)
@@ -420,7 +427,8 @@ bool APlayerCharacter::Freeze(const float Duration)
 
 void APlayerCharacter::EndFreeze()
 {
-	CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
+	//~ @todo
+	// CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
 }
 
 bool APlayerCharacter::Knockdown(const float Duration)
@@ -902,8 +910,10 @@ void APlayerCharacter::OnDodge()
 	if (CanDodge() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Dodge.Get())
 	{
 		int DodgeStaminaCost = 30;
-		int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
-		GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
+		//~ @todo
+		// int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
+		// int32 DodgeCost = DodgeStaminaCost;
+		// GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
 
 		// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
 		// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
@@ -1335,7 +1345,7 @@ void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 
 	if (ForwardAxisValue < 0)
 	{
-		float Speed = (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
+		float Speed = (DefaultWalkSpeed * MovementSpeedModifier * 5) / 16;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1343,7 +1353,7 @@ void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 	}
 	else
 	{
-		float Speed = DefaultRunSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
+		float Speed = DefaultRunSpeed * MovementSpeedModifier;
 		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 		{
 			SetWalkSpeed(Speed);
@@ -1389,7 +1399,7 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 		SetCharacterMovementDirection(ECharMovementDirection::F);
 	}
 	
-	float Speed = DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
+	float Speed = DefaultWalkSpeed * MovementSpeedModifier;
 	if (GetCharacterMovement()->MaxWalkSpeed != Speed)
 	{
 		SetWalkSpeed(Speed);
@@ -1974,8 +1984,9 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		DisableBlock();
 	}
 
-	GetCharacterStatsComponent()->ModifyCurrentMana(-SkillPair.Value->ManaRequired);
-	GetCharacterStatsComponent()->ModifyCurrentStamina(-SkillPair.Value->StaminaRequired);
+	//~ @todo
+	// GetCharacterStatsComponent()->ModifyCurrentMana(-SkillPair.Value->ManaRequired);
+	// GetCharacterStatsComponent()->ModifyCurrentStamina(-SkillPair.Value->StaminaRequired);
 
 	SetCurrentActiveSkillID(SkillPair.Key);
 	SetCurrentActiveSkill(SkillPair.Value);
@@ -1992,7 +2003,8 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 		EndFreeze();
 	}
 
-	GetCharacterStatsComponent()->AddCrowdControlImmunitiesFromSkill(SkillPair.Value->CrowdControlImmunities);
+	//~ @todo
+	// GetCharacterStatsComponent()->AddCrowdControlImmunitiesFromSkill(SkillPair.Value->CrowdControlImmunities);
 
 	if (bSkillAllowsMovement)
 	{
@@ -2272,10 +2284,14 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	{
 		GetSkillsComponent()->SetOffChainSkillReset();
 
+
+		//~ @todo
+		/*
 		if (GetCurrentActiveSkill()->CrowdControlImmunities == GetCharacterStatsComponent()->GetCrowdControlImmunitiesFromSkill())
 		{
 			GetCharacterStatsComponent()->RemoveCrowdControlImmunitiesFromSkil();
 		}
+		*/
 	}
 
 	if (GetActiveAnimationReferences()->NormalAttacks.Get() == AnimMontage)

@@ -12,7 +12,8 @@ bool UDodgeState::CanEnterState()
 {
 	if (IsValid(StateOwner))
 	{
-		UStatsComponentBase* StatsComp = StateOwner->GetCharacterStatsComponent();
+		//~ @todo
+		// UStatsComponentBase* StatsComp = StateOwner->GetCharacterStatsComponent();
 		// if (StatsComp->)
 
 	}

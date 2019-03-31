@@ -510,9 +510,9 @@ public:
 
 	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const { return SkillManager; }
 
-	FORCEINLINE UStatsComponentBase* GetCharacterStatsComponent() const { return CharacterStatsComponent; }
+	// FORCEINLINE UStatsComponentBase* GetCharacterStatsComponent() const { return CharacterStatsComponent; }
 
-	FORCEINLINE USphereComponent* GetInteractionSphereComponent() const { return InteractionSphereComponent; }
+	// FORCEINLINE USphereComponent* GetInteractionSphereComponent() const { return InteractionSphereComponent; }
 
 	static const FName CameraComponentName;
 
@@ -546,16 +546,16 @@ private:
 	UCameraComponent* CameraComponent;
 
 	/** StatsComp contains and manages the stats info of this character */
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStatsComponentBase* CharacterStatsComponent;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UStatsComponentBase* CharacterStatsComponent;
 
 	//~ Skill bar component - manages skill bar (for player controlled character) and skills of character
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGameplaySkillsComponent* SkillManager;
 
 	/** Sphere component used to detect interactives objects */
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USphereComponent* InteractionSphereComponent;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// USphereComponent* InteractionSphereComponent;
 
 	/** Audio component for playing hit effect sounds */
 	UPROPERTY(Transient)
@@ -563,9 +563,9 @@ private:
 
 public:
 
-	inline void EnableInteractionSphere();
+	// inline void EnableInteractionSphere();
 
-	inline void DisableInteractionSphere();
+	// inline void DisableInteractionSphere();
 
 	// --------------------------------------
 	//	Character States
@@ -1592,6 +1592,7 @@ inline float AEODCharacterBase::CalculateRotationYawFromAxisInput() const
 	return FMath::UnwindDegrees(ResultingRotation);
 }
 
+/*
 inline void AEODCharacterBase::EnableInteractionSphere()
 {
 	if (IsValid(InteractionSphereComponent))
@@ -1609,6 +1610,7 @@ inline void AEODCharacterBase::DisableInteractionSphere()
 		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::NoCollision);
 	}
 }
+*/
 
 inline void AEODCharacterBase::ZoomInCamera()
 {
@@ -1628,22 +1630,26 @@ inline void AEODCharacterBase::ZoomOutCamera()
 
 FORCEINLINE bool AEODCharacterBase::IsAlive() const
 {
-	return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->GetCurrentHealth() > 0 : true;
+	return true;
+	// return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->GetCurrentHealth() > 0 : true;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsDead() const
 {
-	return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->GetCurrentHealth() <= 0 : false;
+	return false;
+	// return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->GetCurrentHealth() <= 0 : false;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsIdle() const
 {
-	return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0);
+	return (CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0);
+	// return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0);
 }
 
 FORCEINLINE bool AEODCharacterBase::IsMoving() const
 {
-	return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() != 0);
+	return (CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() != 0);
+	// return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() != 0);
 }
 
 FORCEINLINE bool AEODCharacterBase::IsIdleOrMoving() const
@@ -1708,61 +1714,81 @@ FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 
 FORCEINLINE bool AEODCharacterBase::CanFlinch() const
 {
+	//~ @todo
+	/*
 	if (IsValid(CharacterStatsComponent))
 	{
 		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
 	}
+	*/
 	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanStun() const
 {
+	//~ @todo
+	/*
 	if (IsValid(CharacterStatsComponent))
 	{
 		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
 	}
+	*/
 	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
 {
+	//~ @todo
+	/*
 	if (IsValid(CharacterStatsComponent))
 	{
 		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
 	}
+	*/
 	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanKnockback() const
 {
+	//~ @todo
+	/*
 	if (IsValid(CharacterStatsComponent))
 	{
 		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
 	}
+	*/
 	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanFreeze() const
 {
+	//~ @todo
+	/*
 	if (IsValid(CharacterStatsComponent))
 	{
 		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
 	}
+	*/
 	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
 {
+	//~ @todo
+	/*
 	if (IsValid(CharacterStatsComponent))
 	{
 		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
 	}
+	*/
 	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::NeedsHealing() const
 {
-	return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->IsLowOnHealth() : false;
+	//~ @todo
+	return false;
+	// return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->IsLowOnHealth() : false;
 }
 
 FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()

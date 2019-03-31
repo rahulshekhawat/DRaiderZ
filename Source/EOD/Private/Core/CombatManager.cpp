@@ -135,6 +135,8 @@ float ACombatManager::GetActualDamage(
 	float CritBonus = 0.f;
 	float DamageReductionOnBlock = 0.f;
 
+	//~ @todo
+	/*
 	if (SkillUsed->DamageType == EDamageType::Physical)
 	{
 		ActualDamage = HitInstigator->GetCharacterStatsComponent()->GetPhysicalAttack();
@@ -149,6 +151,7 @@ float ACombatManager::GetActualDamage(
 		DamageReductionOnBlock = HitInstigator->GetCharacterStatsComponent()->GetMagickDamageReductionOnBlock();
 		CritMultiplier = MagickalCritMultiplier;
 	}
+	*/
 
 	ActualDamage = ActualDamage * SkillUsed->DamagePercent / 100.f;
 
@@ -312,9 +315,12 @@ void ACombatManager::CharacterToCharacterAttack(
 		}		
 	}
 
+	//~ @todo
+	/*
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillUsed, bCritHit, bAttackBlocked);
 	HitCharacter->GetCharacterStatsComponent()->ModifyCurrentHealth(-ActualDamage);
 	int32 ResultingHitCharacterHP = HitCharacter->GetCharacterStatsComponent()->GetCurrentHealth();
+	*/
 
 
 	/*

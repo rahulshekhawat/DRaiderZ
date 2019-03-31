@@ -43,7 +43,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	CharacterStatsComponent = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, AEODCharacterBase::CharacterStatsComponentName);
+	// CharacterStatsComponent = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, AEODCharacterBase::CharacterStatsComponentName);
 	SkillManager = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, AEODCharacterBase::GameplaySkillsComponentName);
 
 	CameraBoomComponent = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, AEODCharacterBase::SpringArmComponentName);
@@ -60,6 +60,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 		CameraComponent->SetupAttachment(CameraBoomComponent, USpringArmComponent::SocketName);
 	}
 
+	/*
 	InteractionSphereComponent = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, AEODCharacterBase::InteractionSphereComponentName);
 	if (InteractionSphereComponent)
 	{
@@ -69,6 +70,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 		InteractionSphereComponent->Deactivate();
 		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::NoCollision);
 	}
+	*/
 
 	SetReplicates(true);
 	SetReplicateMovement(true);
@@ -191,11 +193,11 @@ void AEODCharacterBase::PossessedBy(AController* NewController)
 	// @todo - Enable interaction sphere on client.
 	if (NewController && NewController->IsLocalPlayerController())
 	{
-		EnableInteractionSphere();
+		// EnableInteractionSphere();
 	}
 	else
 	{
-		DisableInteractionSphere();
+		// DisableInteractionSphere();
 	}
 }
 
@@ -398,6 +400,8 @@ void AEODCharacterBase::DisableiFrames()
 
 void AEODCharacterBase::BindUIDelegates()
 {
+	//~ @todo
+	/*
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
@@ -431,6 +435,7 @@ void AEODCharacterBase::BindUIDelegates()
 			}
 		}
 	}
+	*/
 }
 
 void AEODCharacterBase::UnbindUIDelegates()
@@ -585,7 +590,8 @@ void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* Insti
 	else
 	{
 		// Set current hp to 0
-		GetCharacterStatsComponent()->ModifyBaseHealth(-GetCharacterStatsComponent()->GetMaxHealth());
+		//~ @todo
+		// GetCharacterStatsComponent()->ModifyBaseHealth(-GetCharacterStatsComponent()->GetMaxHealth());
 		SetCharacterState(ECharacterState::Dead);
 
 		// @todo play death animation and death sound
