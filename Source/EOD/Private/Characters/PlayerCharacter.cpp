@@ -1111,7 +1111,7 @@ void APlayerCharacter::OnToggleMouseCursor()
 
 void APlayerCharacter::OnPressedNormalAttack()
 {
-	SetNormalAttackKeyPressed(true);
+	// SetNormalAttackKeyPressed(true);
 
 	/*
 	if (!CanNormalAttack() || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
@@ -1165,7 +1165,7 @@ void APlayerCharacter::OnPressedNormalAttack()
 
 void APlayerCharacter::OnReleasedNormalAttack()
 {
-	SetNormalAttackKeyPressed(false);
+	// SetNormalAttackKeyPressed(false);
 }
 
 void APlayerCharacter::DoNormalAttack()

@@ -178,6 +178,21 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_CharacterStateInfo)
 	FCharacterStateInfo CharacterStateInfo;
 
+	/** Returns true if character is idling */
+	FORCEINLINE bool IsIdle() const;
+
+	/** Returns true if character is moving around */
+	FORCEINLINE bool IsMoving() const;
+
+	/** Returns true if character is in idle-walk-run state */
+	FORCEINLINE bool IsIdleOrMoving() const;
+
+	/** Determines if the character is in dodge state. Used to trigger dodge animation */
+	FORCEINLINE bool IsDodging() const;
+
+	/** Determines if the character is dodging incoming damage */
+	FORCEINLINE bool IsDodgingDamage() const;
+
 	/** Returns true if character can dodge */
 	virtual bool CanDodge() const;
 
@@ -190,6 +205,18 @@ public:
 	/** Finish dodging */
 	virtual void FinishDodge();
 
+	/**
+	 * Detemines if the character is in block state. Used to trigger block animation.
+	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
+	 */
+	FORCEINLINE bool IsBlocking() const;
+	
+	/** 
+	 * Determines if the character is actively blocking any incoming damage
+	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
+	 */
+	FORCEINLINE bool IsBlockingDamage() const;
+
 	/** Returns true if character can guard against incoming attacks */
 	virtual bool CanGuardAgainstAttacks() const;
 
@@ -199,6 +226,9 @@ public:
 	/** Leave guard state */
 	virtual void StopBlockingAttacks();
 
+	/** Returns true if character is jumping */
+	FORCEINLINE bool IsJumping() const;
+	
 	/** Returns true if character can jump */
 	virtual bool CanJump() const;
 
@@ -214,6 +244,9 @@ public:
 
 	/** Reset character state to Idle-Walk-Run */
 	virtual void ResetState();
+
+	/** Returns true if character is using a normal attack */
+	FORCEINLINE bool IsNormalAttacking() const;
 
 	/** Returns true if character can use normal attack */
 	virtual bool CanNormalAttack() const;
@@ -353,6 +386,9 @@ protected:
 	/** [server + local] Sets whether a player controller is currently trying to move this character or not */
 	inline void SetPCTryingToMove(bool bNewValue);
 
+	/** [server + local] Sets whether this character is running or not */
+	inline void SetIsRunning(bool bNewValue);
+	
 	//~ @todo see if it's possible to use bCharacterStateAllowsMovement without needing replication
 	/** This boolean is used to determine if the character can move even if it's not in 'IdleWalkRun' state. e.g., moving while casting spell. */
 	UPROPERTY(Transient, Replicated)
@@ -389,11 +425,29 @@ private:
 	UPROPERTY(Replicated)
 	float BlockMovementDirectionYaw;
 
+	UPROPERTY(Replicated)
+	uint32 bIsRunning : 1;
+
+	/**
+	 * This boolean determines whether player is trying to move or not
+	 * i.e., if this character is possessed by a player controller, is player pressing the movement keys
+	 */
+	UPROPERTY(Replicated)
+	uint32 bPCTryingToMove : 1;
+
 public:
 
 	// --------------------------------------
 	//  Input Handling
 	// --------------------------------------
+
+	/** Cached value of player's forward axis input */
+	UPROPERTY()
+	float ForwardAxisValue;
+
+	/** Cached value of player's right axis input */
+	UPROPERTY()
+	float RightAxisValue;
 
 	/** Sets whether character wants to guard or not */
 	FORCEINLINE void SetWantsToGuard(bool bNewValue) { bWantsToGuard = bNewValue; }
@@ -551,14 +605,6 @@ private:
 public:
 
 	// --------------------------------------
-	//	Character States
-	// --------------------------------------
-
-	/** Character state determines the current action character is doing */
-	// UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
-	// ECharacterState CharacterState;
-
-	// --------------------------------------
 	//	Pseudo Constants : Variables that aren't supposed to be modified post creation
 	// --------------------------------------
 
@@ -569,11 +615,10 @@ public:
 	/** Get the prefix string for player gender */
 	inline FString GetGenderPrefix() const;
 
+	// --------------------------------------
+	//  Interaction Interface
+	// --------------------------------------
 
-	////////////////////////////////////////////////////////////////////////////////
-	// ACTIONS
-	////////////////////////////////////////////////////////////////////////////////
-public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void TriggerInteraction();
 
@@ -595,15 +640,6 @@ public:
 	// CHARACTER STATE
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	UPROPERTY(Replicated)
-	bool bIsRunning;
-
-	/**
-	 * This boolean determines whether player is trying to move or not
-	 * i.e., if this character is possessed by a player controller, is player pressing the movement keys
-	 */
-	UPROPERTY(Replicated)
-	bool bPCTryingToMove;
 	
 	/** Determines whether weapon is currently sheathed or not */
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
@@ -621,36 +657,6 @@ protected:
 		}
 	}
 
-	/** [server + local] Sets whether this character is running or not */
-	FORCEINLINE void SetIsRunning(bool bNewValue)
-	{
-		bIsRunning = bNewValue;
-		if (Role < ROLE_Authority)
-		{
-			Server_SetIsRunning(bNewValue);
-		}
-	}
-
-	/** [server + local] Sets whether this character has it's guard up against incoming attacks or not */
-	/*
-	FORCEINLINE void SetGuardActive(bool bNewValue)
-	{
-		bGuardActive = bNewValue;
-		if (bGuardActive)
-		{
-			EnableCharacterGuard();
-		}
-		else
-		{
-			DisableCharacterGuard();
-		}
-		if (Role < ROLE_Authority)
-		{
-			Server_SetGuardActive(bNewValue);
-		}
-	}
-	*/
-
 	inline void UpdateCharacterMovementDirection();
 
 public:
@@ -666,26 +672,6 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 	// INPUT
 	////////////////////////////////////////////////////////////////////////////////
-private:
-	UPROPERTY(Transient)
-	bool bNormalAttackKeyPressed;
-
-public:
-	/** Cached value of player's forward axis input */
-	UPROPERTY()
-	float ForwardAxisValue;
-
-	/** Cached value of player's right axis input */
-	UPROPERTY()
-	float RightAxisValue;
-
-	FORCEINLINE void SetNormalAttackKeyPressed(bool bNewValue)
-	{
-		bNormalAttackKeyPressed = bNewValue;
-	}
-
-	FORCEINLINE bool IsNormalAttackKeyPressed()const { return bNormalAttackKeyPressed; }
-
 public:
 	/** Returns true if character is alive */
 	FORCEINLINE bool IsAlive() const;
@@ -696,42 +682,9 @@ public:
 	/** Returns true if character is dead */
 	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Is Dead"))
 	bool BP_IsDead() const;
-	
-	/** Returns true if character is idling */
-	FORCEINLINE bool IsIdle() const;
-
-	/** Returns true if character is moving around */
-	FORCEINLINE bool IsMoving() const;
-
-	/** Returns true if character is in idle-walk-run state */
-	FORCEINLINE bool IsIdleOrMoving() const;
-
-	/** Returns true if character is jumping */
-	FORCEINLINE bool IsJumping() const;
-
-	/** Determines if the character is in dodge state. Used to trigger dodge animation */
-	FORCEINLINE bool IsDodging() const;
-	
-	/** Determines if the character is dodging incoming damage */
-	FORCEINLINE bool IsDodgingDamage() const;
-
-	/**
-	 * Detemines if the character is in block state. Used to trigger block animation.
-	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
-	 */
-	FORCEINLINE bool IsBlocking() const;
-
-	/** 
-	 * Determines if the character is actively blocking any incoming damage
-	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
-	 */
-	FORCEINLINE bool IsBlockingDamage() const;
 
 	/** Returns true if character is currently casting a spell */
 	FORCEINLINE bool IsCastingSpell() const;
-	
-	/** Returns true if character is using a normal attack */
-	FORCEINLINE bool IsNormalAttacking() const;
 
 	/** Returns true if character is using any skill */
 	FORCEINLINE bool IsUsingAnySkill() const;
@@ -1213,56 +1166,39 @@ protected:
 	void OnRep_WeaponSheathed();
 
 	UFUNCTION()
-	void OnRep_GuardActive();
+	void OnRep_CharacterState(ECharacterState OldState);
 
 	UFUNCTION()
 	virtual void OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo);
 
-	// DEPRECATED
-	UFUNCTION()
-	void OnRep_CharacterState(ECharacterState OldState);
-
-	UFUNCTION()
-	void OnRep_ServerCharacterState(FName LastState);
-
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Dodge(uint8 DodgeIndex, float RotationYaw);
-
 	virtual void Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
-
 	virtual bool Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw);
-
-	UFUNCTION(NetMultiCast, Reliable)
-	void Multicast_Dodge(uint8 DodgeIndex, float RotationYaw);
-
-	virtual void Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_StartBlockingAttacks();
-
 	virtual void Server_StartBlockingAttacks_Implementation();
-
 	virtual bool Server_StartBlockingAttacks_Validate();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_StopBlockingAttacks();
-
 	virtual void Server_StopBlockingAttacks_Implementation();
-
 	virtual bool Server_StopBlockingAttacks_Validate();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_NormalAttack(uint8 AttackIndex);
-
 	virtual void Server_NormalAttack_Implementation(uint8 AttackIndex);
-
 	virtual bool Server_NormalAttack_Validate(uint8 AttackIndex);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SpawnAndMountRideableCharacter(TSubclassOf<ARideBase> RideCharacterClass);
+	virtual void Server_SpawnAndMountRideableCharacter_Implementation(TSubclassOf<ARideBase> RideCharacterClass);
+	virtual bool Server_SpawnAndMountRideableCharacter_Validate(TSubclassOf<ARideBase> RideCharacterClass);
 
 	UFUNCTION(Client, Unreliable)
 	void Client_DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
+	virtual void Client_DisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
@@ -1271,9 +1207,13 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_StartBlockingDamage(float Delay);
+	virtual void Server_StartBlockingDamage_Implementation(float Delay);
+	virtual bool Server_StartBlockingDamage_Validate(float Delay);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_StopBlockingDamage();
+	virtual void Server_StopBlockingDamage_Implementation();
+	virtual bool Server_StopBlockingDamage_Validate();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_TriggeriFrames(float Duration, float Delay);
@@ -1281,13 +1221,14 @@ protected:
 	virtual bool Server_TriggeriFrames_Validate(float Duration, float Delay);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetGuardActive(bool bValue);
-
-	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetWeaponSheathed(bool bNewValue);
+	virtual void Server_SetWeaponSheathed_Implementation(bool bNewValue);
+	virtual bool Server_SetWeaponSheathed_Validate(bool bNewValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetIsRunning(bool bValue);
+	virtual void Server_SetIsRunning_Implementation(bool bValue);
+	virtual bool Server_SetIsRunning_Validate(bool bValue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetCharacterStateAllowsMovement(bool bNewValue);
@@ -1304,10 +1245,6 @@ protected:
 	virtual void Server_SetCharMovementDir_Implementation(ECharMovementDirection NewDirection);
 	virtual bool Server_SetCharMovementDir_Validate(ECharMovementDirection NewDirection);
 
-	//~ DEPRECATED
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetCharacterState(ECharacterState NewState);
-
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetWalkSpeed(float WalkSpeed);
 	virtual void Server_SetWalkSpeed_Implementation(float WalkSpeed);
@@ -1322,9 +1259,6 @@ protected:
 	void Server_SetCharacterRotationYaw(float NewRotationYaw);
 	virtual void Server_SetCharacterRotationYaw_Implementation(float NewRotationYaw);
 	virtual bool Server_SetCharacterRotationYaw_Validate(float NewRotationYaw);
-
-	UFUNCTION(NetMultiCast, Reliable)
-	void Multicast_SetCharacterRotation(FRotator NewRotation);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetUseControllerRotationYaw(bool bNewBool);
@@ -1348,20 +1282,6 @@ protected:
 	friend class UCharacterStateBase;
 	
 };
-
-/*
-inline void AEODCharacterBase::ActivateGuard()
-{
-	SetGuardActive(true);
-	StartBlockingDamage(DamageBlockTriggerDelay);
-}
-
-inline void AEODCharacterBase::DeactivateGuard()
-{
-	SetGuardActive(false);
-	StopBlockingDamage();
-}
-*/
 
 inline void AEODCharacterBase::StartBlockingDamage(float Delay)
 {
@@ -1472,6 +1392,18 @@ inline void AEODCharacterBase::SetPCTryingToMove(bool bNewValue)
 		if (Role < ROLE_Authority)
 		{
 			Server_SetPCTryingToMove(bNewValue);
+		}
+	}
+}
+
+inline void AEODCharacterBase::SetIsRunning(bool bNewValue)
+{
+	if (bIsRunning != bNewValue)
+	{
+		bIsRunning = bNewValue;
+		if (Role < ROLE_Authority)
+		{
+			Server_SetIsRunning(bNewValue);
 		}
 	}
 }

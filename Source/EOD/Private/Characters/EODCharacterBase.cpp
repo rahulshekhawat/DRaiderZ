@@ -606,18 +606,9 @@ void AEODCharacterBase::OnRep_WeaponSheathed()
 	PlayToggleSheatheAnimation();
 }
 
-void AEODCharacterBase::OnRep_GuardActive()
+void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
-	/*
-	if (bGuardActive)
-	{
-		EnableCharacterGuard();
-	}
-	else
-	{
-		DisableCharacterGuard();
-	}
-	*/
+	//~ @todo : Cleanup old state
 }
 
 void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo)
@@ -660,16 +651,6 @@ void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldS
 	}
 }
 
-void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
-{
-	//~ @todo : Cleanup old state
-}
-
-void AEODCharacterBase::OnRep_ServerCharacterState(FName LastState)
-{
-	
-}
-
 void AEODCharacterBase::Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
 {
 }
@@ -677,10 +658,6 @@ void AEODCharacterBase::Server_Dodge_Implementation(uint8 DodgeIndex, float Rota
 bool AEODCharacterBase::Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw)
 {
 	return true;
-}
-
-void AEODCharacterBase::Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
-{
 }
 
 void AEODCharacterBase::Server_StartBlockingAttacks_Implementation()
@@ -770,16 +747,6 @@ void AEODCharacterBase::Server_TriggeriFrames_Implementation(float Duration, flo
 }
 
 bool AEODCharacterBase::Server_TriggeriFrames_Validate(float Duration, float Delay)
-{
-	return true;
-}
-
-void AEODCharacterBase::Server_SetCharacterState_Implementation(ECharacterState NewState)
-{
-	SetCharacterState(NewState);
-}
-
-bool AEODCharacterBase::Server_SetCharacterState_Validate(ECharacterState NewState)
 {
 	return true;
 }
@@ -1273,16 +1240,6 @@ bool AEODCharacterBase::Server_SetWeaponSheathed_Validate(bool bNewValue)
 	return true;
 }
 
-void AEODCharacterBase::Server_SetGuardActive_Implementation(bool bValue)
-{
-	// SetGuardActive(bValue);
-}
-
-bool AEODCharacterBase::Server_SetGuardActive_Validate(bool bValue)
-{
-	return true;
-}
-
 void AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Implementation(float NewYaw)
 {
 	SetBlockMovementDirectionYaw(NewYaw);
@@ -1291,12 +1248,4 @@ void AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Implementation(float
 bool AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw)
 {
 	return true;
-}
-
-void AEODCharacterBase::Multicast_SetCharacterRotation_Implementation(FRotator NewRotation)
-{
-	if (!IsLocallyControlled())
-	{
-		SetCharacterRotation(NewRotation);
-	}
 }
