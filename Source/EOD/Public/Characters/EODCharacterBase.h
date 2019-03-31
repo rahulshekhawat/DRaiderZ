@@ -510,19 +510,11 @@ public:
 
 	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const { return SkillManager; }
 
-	// FORCEINLINE UStatsComponentBase* GetCharacterStatsComponent() const { return CharacterStatsComponent; }
-
-	// FORCEINLINE USphereComponent* GetInteractionSphereComponent() const { return InteractionSphereComponent; }
-
 	static const FName CameraComponentName;
 
 	static const FName SpringArmComponentName;
 
 	static const FName GameplaySkillsComponentName;
-
-	static const FName CharacterStatsComponentName;
-
-	static const FName InteractionSphereComponentName;
 
 protected:
 
@@ -545,27 +537,15 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComponent;
 
-	/** StatsComp contains and manages the stats info of this character */
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// UStatsComponentBase* CharacterStatsComponent;
-
 	//~ Skill bar component - manages skill bar (for player controlled character) and skills of character
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGameplaySkillsComponent* SkillManager;
-
-	/** Sphere component used to detect interactives objects */
-	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// USphereComponent* InteractionSphereComponent;
 
 	/** Audio component for playing hit effect sounds */
 	UPROPERTY(Transient)
 	UAudioComponent* HitAudioComponent;
 
 public:
-
-	// inline void EnableInteractionSphere();
-
-	// inline void DisableInteractionSphere();
 
 	// --------------------------------------
 	//	Character States
@@ -1591,26 +1571,6 @@ inline float AEODCharacterBase::CalculateRotationYawFromAxisInput() const
 	}
 	return FMath::UnwindDegrees(ResultingRotation);
 }
-
-/*
-inline void AEODCharacterBase::EnableInteractionSphere()
-{
-	if (IsValid(InteractionSphereComponent))
-	{
-		InteractionSphereComponent->Activate();
-		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::OverlapAllDynamic);
-	}
-}
-
-inline void AEODCharacterBase::DisableInteractionSphere()
-{
-	if (IsValid(InteractionSphereComponent))
-	{
-		InteractionSphereComponent->Deactivate();
-		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::NoCollision);
-	}
-}
-*/
 
 inline void AEODCharacterBase::ZoomInCamera()
 {

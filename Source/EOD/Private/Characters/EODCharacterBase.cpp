@@ -34,18 +34,14 @@ DECLARE_CYCLE_STAT(TEXT("EOD ChararaterTick"), STAT_EODCharacterTick, STATGROUP_
 
 const FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
 const FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
-const FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
 const FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Skill Manager"));
-const FName AEODCharacterBase::InteractionSphereComponentName(TEXT("Interaction Sphere"));
 
 AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UEODCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// CharacterStatsComponent = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, AEODCharacterBase::CharacterStatsComponentName);
 	SkillManager = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, AEODCharacterBase::GameplaySkillsComponentName);
-
 	CameraBoomComponent = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, AEODCharacterBase::SpringArmComponentName);
 	if (CameraBoomComponent)
 	{
@@ -59,18 +55,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	{
 		CameraComponent->SetupAttachment(CameraBoomComponent, USpringArmComponent::SocketName);
 	}
-
-	/*
-	InteractionSphereComponent = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, AEODCharacterBase::InteractionSphereComponentName);
-	if (InteractionSphereComponent)
-	{
-		InteractionSphereComponent->SetupAttachment(RootComponent);
-		InteractionSphereComponent->SetSphereRadius(150.f);
-		// No need to enable interaction sphere unless the character is possessed by player controller
-		InteractionSphereComponent->Deactivate();
-		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::NoCollision);
-	}
-	*/
 
 	SetReplicates(true);
 	SetReplicateMovement(true);

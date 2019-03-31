@@ -35,8 +35,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerStatsComponent>(AEODCharacterBase::CharacterStatsComponentName).
-		SetDefaultSubobjectClass<UPlayerSkillsComponent>(AEODCharacterBase::GameplaySkillsComponentName))
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerSkillsComponent>(AEODCharacterBase::GameplaySkillsComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
