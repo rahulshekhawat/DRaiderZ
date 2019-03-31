@@ -176,7 +176,7 @@ public:
 	FORCEINLINE bool IsSwitchingWeapon() const;
 
 	/** Returns true if player is on auto run */
-	FORCEINLINE bool IsAutoRunning() const;
+	// FORCEINLINE bool IsAutoRunning() const;
 
 	/** Returns true if primary weapon is equipped */
 	FORCEINLINE bool IsPrimaryWeaponEquippped() const;
@@ -1066,13 +1066,15 @@ FORCEINLINE bool APlayerCharacter::CanSwitchWeapon() const
 
 FORCEINLINE bool APlayerCharacter::IsSwitchingWeapon() const
 {
-	return GetCharacterState() == ECharacterState::SwitchingWeapon;
+	return CharacterStateInfo.CharacterState == ECharacterState::SwitchingWeapon;
 }
 
+/*
 FORCEINLINE bool APlayerCharacter::IsAutoRunning() const
 {
-	return GetCharacterState() == ECharacterState::AutoRun;
+	return CharacterStateInfo.CharacterState == ECharacterState::AutoRun;
 }
+*/
 
 FORCEINLINE bool APlayerCharacter::IsPrimaryWeaponEquippped() const
 {
@@ -1086,7 +1088,9 @@ FORCEINLINE bool APlayerCharacter::IsSecondaryWeaponEquipped() const
 
 FORCEINLINE bool APlayerCharacter::IsFastRunning() const
 {
-	return GetCharacterState() == ECharacterState::SpecialMovement;
+	//~ @todo
+	// return IsRunning();
+	return CharacterStateInfo.CharacterState == ECharacterState::SpecialMovement;
 }
 
 /*

@@ -230,6 +230,9 @@ public:
 	/** Finish normal attacks and reset back to Idle-Walk-Run */
 	virtual void FinishNormalAttack();
 
+	/** Put or remove weapon inside sheath */
+	virtual void ToggleSheathe();
+
 protected:
 
 	/** Timer handle to call FinishDodge() */
@@ -552,8 +555,8 @@ public:
 	// --------------------------------------
 
 	/** Character state determines the current action character is doing */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
-	ECharacterState CharacterState;
+	// UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterState)
+	// ECharacterState CharacterState;
 
 	// --------------------------------------
 	//	Pseudo Constants : Variables that aren't supposed to be modified post creation
@@ -582,10 +585,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
 	virtual void StopInteraction();
-
-	/** Put or remove weapon inside sheath */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
-	virtual void ToggleSheathe();
 
 	virtual void PlayToggleSheatheAnimation();
 
@@ -933,7 +932,7 @@ public:
 	/** Sets current state of character */
 	FORCEINLINE void SetCharacterState(const ECharacterState NewState)
 	{
-		CharacterState = NewState;
+		// CharacterState = NewState;
 		// Character state is no longer replicated
 		/*
 		if (Role < ROLE_Authority)
@@ -948,7 +947,7 @@ public:
 	void BP_SetCharacterState(const ECharacterState NewState);
 
 	/** Get current state of character */
-	FORCEINLINE ECharacterState GetCharacterState() const;
+	// FORCEINLINE ECharacterState GetCharacterState() const;
 
 	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get Character State"))
 	ECharacterState BP_GetCharacterState() const;
@@ -1603,30 +1602,26 @@ FORCEINLINE bool AEODCharacterBase::IsDead() const
 FORCEINLINE bool AEODCharacterBase::IsIdle() const
 {
 	return (CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0);
-	// return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0);
 }
 
 FORCEINLINE bool AEODCharacterBase::IsMoving() const
 {
 	return (CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() != 0);
-	// return (CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() != 0);
 }
 
 FORCEINLINE bool AEODCharacterBase::IsIdleOrMoving() const
 {
 	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun;
-	// return CharacterState == ECharacterState::IdleWalkRun;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsJumping() const
 {
 	return CharacterStateInfo.CharacterState == ECharacterState::Jumping;
-	// return CharacterState == ECharacterState::Jumping;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsDodging() const
 {
-	return CharacterState == ECharacterState::Dodging;
+	return CharacterStateInfo.CharacterState == ECharacterState::Dodging;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsDodgingDamage() const
@@ -1637,7 +1632,6 @@ FORCEINLINE bool AEODCharacterBase::IsDodgingDamage() const
 FORCEINLINE bool AEODCharacterBase::IsBlocking() const
 {
 	return CharacterStateInfo.CharacterState == ECharacterState::Blocking;
-	// return CharacterState == ECharacterState::Blocking;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsBlockingDamage() const
@@ -1647,29 +1641,27 @@ FORCEINLINE bool AEODCharacterBase::IsBlockingDamage() const
 
 FORCEINLINE bool AEODCharacterBase::IsCastingSpell() const
 {
-	return CharacterState == ECharacterState::CastingSpell;
+	return CharacterStateInfo.CharacterState == ECharacterState::CastingSpell;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsNormalAttacking() const
 {
-	// return CharacterState == ECharacterState::Attacking && GetCurrentActiveSkillID() != NAME_None;
-	// return CharacterState == ECharacterState::Attacking;
 	return CharacterStateInfo.CharacterState == ECharacterState::Attacking;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsUsingAnySkill() const
 {
-	return CharacterState == ECharacterState::UsingActiveSkill && GetCurrentActiveSkillID() != NAME_None;
+	return CharacterStateInfo.CharacterState == ECharacterState::UsingActiveSkill;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsUsingSkill(FName SkillID) const
 {
-	return CharacterState == ECharacterState::UsingActiveSkill && GetCurrentActiveSkillID() == SkillID;
+	return CharacterStateInfo.CharacterState == ECharacterState::UsingActiveSkill;
 }
 
 FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 {
-	return CharacterState == ECharacterState::GotHit;
+	return CharacterStateInfo.CharacterState == ECharacterState::GotHit;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanFlinch() const
@@ -1756,10 +1748,12 @@ FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
 	TurnOnTargetSwitch();
 }
 
+/*
 FORCEINLINE ECharacterState AEODCharacterBase::GetCharacterState() const
 {
 	return CharacterState;
 }
+*/
 
 FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 {
@@ -1806,7 +1800,7 @@ inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay,
 	{
 		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
-		CharacterState = NewState;
+		// CharacterState = NewState; // CharacterState removed
 	}
 	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }

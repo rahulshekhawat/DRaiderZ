@@ -71,7 +71,7 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	DefaultRunSpeed = 600.f;
 	DefaultWalkSpeedWhileBlocking = 150.f;
 
-	CharacterState = ECharacterState::IdleWalkRun;
+	// CharacterState = ECharacterState::IdleWalkRun;
 	bGodMode = false;
 	TargetSwitchDuration = 0.1f;
 
@@ -237,17 +237,17 @@ bool AEODCharacterBase::BP_HasBeenHit() const
 bool AEODCharacterBase::CanMove() const
 {
 	// Mobs can only move in IdleWalkRun state
-	return CharacterState == ECharacterState::IdleWalkRun || (IsUsingAnySkill() && bSkillAllowsMovement);
+	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun || (IsUsingAnySkill() && bSkillAllowsMovement);
 }
 
 bool AEODCharacterBase::CanJump() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun;
+	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun;
 }
 
 bool AEODCharacterBase::CanDodge() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun;
+	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun;
 }
 
 bool AEODCharacterBase::CanGuardAgainstAttacks() const
@@ -455,7 +455,8 @@ void AEODCharacterBase::BP_SetCharacterState(const ECharacterState NewState)
 
 ECharacterState AEODCharacterBase::BP_GetCharacterState() const
 {
-	return GetCharacterState();
+	return ECharacterState::IdleWalkRun;
+	// return GetCharacterState();
 }
 
 void AEODCharacterBase::BP_SetWalkSpeed(const float WalkSpeed)
@@ -863,7 +864,7 @@ void AEODCharacterBase::MultiCast_PlayAnimationMontage_Implementation(UAnimMonta
 	{
 		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
-		CharacterState = NewState;
+		// CharacterState = NewState;
 	}
 }
 
@@ -1078,6 +1079,8 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 
 void AEODCharacterBase::TriggerInteraction()
 {
+	//~ @todo
+	/*
 	// If Character is already interacting
 	if (GetCharacterState() == ECharacterState::Interacting)
 	{
@@ -1087,6 +1090,7 @@ void AEODCharacterBase::TriggerInteraction()
 	{
 		StartInteraction();
 	}
+	*/
 }
 
 void AEODCharacterBase::StartInteraction()

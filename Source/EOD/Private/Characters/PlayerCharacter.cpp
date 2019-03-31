@@ -197,7 +197,8 @@ bool APlayerCharacter::CanMove() const
 {
 	// @todo, uncomment and replace return code with following comment:
 	// return IsIdleOrMoving() || IsRunning() || bCharacterStateAllowsMovement;
-	return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
+	// return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
+	return IsIdleOrMoving() || IsBlocking() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
 }
 
 bool APlayerCharacter::CanJump() const
@@ -1022,10 +1023,12 @@ void APlayerCharacter::OnJump()
 			SetUseControllerRotationYaw(false);
 		}
 
+		/*
 		if (IsAutoRunning())
 		{
 			DisableAutoRun();
 		}
+		*/
 
 		Jump();
 		SetCharacterState(ECharacterState::Jumping);
@@ -1034,6 +1037,8 @@ void APlayerCharacter::OnJump()
 
 void APlayerCharacter::OnInteract()
 {
+	//~ @todo
+	/*
 	// If player is already interacting
 	if (GetCharacterState() == ECharacterState::Interacting)
 	{
@@ -1044,6 +1049,7 @@ void APlayerCharacter::OnInteract()
 	{
 		StartInteraction();
 	}
+	*/
 }
 
 void APlayerCharacter::ToggleSheathe()
@@ -1194,6 +1200,8 @@ void APlayerCharacter::DoNormalAttack()
 
 void APlayerCharacter::OnToggleAutoRun()
 {
+	//~ @todo
+	/*
 	if (GetCharacterState() == ECharacterState::AutoRun)
 	{
 		DisableAutoRun();
@@ -1202,6 +1210,7 @@ void APlayerCharacter::OnToggleAutoRun()
 	{
 		EnableAutoRun();
 	}
+	*/
 }
 
 void APlayerCharacter::DisableForwardPressed()
@@ -2273,10 +2282,13 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 		// @todo
 	}
 
+	//~ @todo
+	/*
 	if (!bInterrupted  && GetCharacterState() != ECharacterState::Interacting)
 	{
 		SetCharacterState(ECharacterState::IdleWalkRun);
 	}
+	*/
 
 	// @todo handle skill montage blending out better because montages might be blending out in between transition of standstill and moving animations
 	if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)

@@ -230,10 +230,13 @@ void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 		SetCurrentActiveSkill(nullptr);
 	}
 
+	//~ @todo
+	/*
 	if (!bInterrupted && GetCharacterState() != ECharacterState::Dead)
 	{
 		SetCharacterState(ECharacterState::IdleWalkRun);
 	}
+	*/
 }
 
 void AAICharacterBase::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted)
