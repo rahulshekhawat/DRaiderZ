@@ -105,7 +105,7 @@ void UPlayerSkillsComponent::OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName S
 		UGameplaySkillBase* Skill = SkillsMap[Key];
 		if (Skill && Skill->GetSkillGroup() == SkillGroup)
 		{
-			if (SkillBarMap.Contains(Key))
+			if (SkillBarMap.Contains(SkillBarIndex))
 			{
 				SkillBarMap[SkillBarIndex] = Key;
 			}

@@ -125,9 +125,10 @@ void UDynamicSkillBarWidget::InitializeSkillBarLayout(const TMap<uint8, uint8>& 
 
 	for (uint8 Key : Keys)
 	{
-		if (SkillsMap.Contains(Key))
+		uint8 SkillKey = SkillBarMap[Key];
+		if (SkillsMap.Contains(SkillKey))
 		{
-			UGameplaySkillBase* Skill = SkillsMap[Key];
+			UGameplaySkillBase* Skill = SkillsMap[SkillKey];
 			UContainerWidget* Cont = GetContainerAtIndex(Key);
 			if (Skill && Cont)
 			{

@@ -156,7 +156,7 @@ void AEODPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LoadPlayerState();
+	// LoadPlayerState();
 	InitializeWidgets();
 }
 
