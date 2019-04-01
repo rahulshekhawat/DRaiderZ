@@ -175,9 +175,6 @@ public:
 	//  Character States
 	// --------------------------------------
 
-	UPROPERTY(ReplicatedUsing = OnRep_CharacterStateInfo)
-	FCharacterStateInfo CharacterStateInfo;
-
 	/** Returns true if character is idling */
 	FORCEINLINE bool IsIdle() const;
 
@@ -193,6 +190,43 @@ public:
 	/** Determines if the character is dodging incoming damage */
 	FORCEINLINE bool IsDodgingDamage() const;
 
+	/** Returns true if character is currently casting a spell */
+	FORCEINLINE bool IsCastingSpell() const;
+
+	/** Returns true if character is using any skill */
+	FORCEINLINE bool IsUsingAnySkill() const;
+
+	/** Returns true if character has just been hit */
+	FORCEINLINE bool HasBeenHit() const;
+
+	FORCEINLINE bool IsWeaponSheathed() const;
+
+	/**
+	 * Detemines if the character is in block state. Used to trigger block animation.
+	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
+	 */
+	FORCEINLINE bool IsBlocking() const;
+
+	/**
+	 * Determines if the character is actively blocking any incoming damage
+	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
+	 */
+	FORCEINLINE bool IsBlockingDamage() const;
+
+	/** Returns true if character is jumping */
+	FORCEINLINE bool IsJumping() const;
+
+	/** Returns true if character is using a normal attack */
+	FORCEINLINE bool IsNormalAttacking() const;
+
+	//~ @todo
+	/** Returns true if character is using skill at SkillIndex */
+	FORCEINLINE bool IsUsingSkill(FName SkillID) const;
+
+	/** Returns true if character has just been hit */
+	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Has Been Hit"))
+	bool BP_HasBeenHit() const;
+
 	/** Returns true if character can dodge */
 	virtual bool CanDodge() const;
 
@@ -205,18 +239,6 @@ public:
 	/** Finish dodging */
 	virtual void FinishDodge();
 
-	/**
-	 * Detemines if the character is in block state. Used to trigger block animation.
-	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
-	 */
-	FORCEINLINE bool IsBlocking() const;
-	
-	/** 
-	 * Determines if the character is actively blocking any incoming damage
-	 * @note there is a slight delay between when the block animation is triggered and when the character actually starts blocking damage
-	 */
-	FORCEINLINE bool IsBlockingDamage() const;
-
 	/** Returns true if character can guard against incoming attacks */
 	virtual bool CanGuardAgainstAttacks() const;
 
@@ -225,9 +247,6 @@ public:
 
 	/** Leave guard state */
 	virtual void StopBlockingAttacks();
-
-	/** Returns true if character is jumping */
-	FORCEINLINE bool IsJumping() const;
 	
 	/** Returns true if character can jump */
 	virtual bool CanJump() const;
@@ -239,14 +258,10 @@ public:
 	virtual void OnJumpAnimationFinish();
 
 	/** Returns true if character can move */
-	UFUNCTION(BlueprintCallable, Category = CharacterState)
 	virtual bool CanMove() const;
 
 	/** Reset character state to Idle-Walk-Run */
 	virtual void ResetState();
-
-	/** Returns true if character is using a normal attack */
-	FORCEINLINE bool IsNormalAttacking() const;
 
 	/** Returns true if character can use normal attack */
 	virtual bool CanNormalAttack() const;
@@ -278,7 +293,8 @@ public:
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe();
 
-	FORCEINLINE bool IsWeaponSheathed() const { return bWeaponSheathed; }
+	UPROPERTY(ReplicatedUsing = OnRep_CharacterStateInfo)
+	FCharacterStateInfo CharacterStateInfo;
 
 protected:
 
@@ -319,6 +335,14 @@ public:
 	/** Returns the type of weapon currently equipped by this character */
 	virtual EWeaponType GetEquippedWeaponType() const { return EWeaponType::None; }
 
+	/** Enables blocking of incoming attacks */
+	UFUNCTION()
+	void EnableDamageBlocking();
+
+	/** Disables blocking of incoming attacks */
+	UFUNCTION()
+	void DisableDamageBlocking();
+
 protected:
 
 	/** Enables immunity frames for a given duration */
@@ -340,6 +364,20 @@ protected:
 
 	virtual void PlayToggleSheatheAnimation();
 
+	FTimerHandle DodgeImmunityTimerHandle;
+
+	FTimerHandle DamageBlockingTimerHandle;
+
+	FTimerHandle CrowdControlTimerHandle;
+
+	/** Determines whether character is currently engaged in combat or not */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Combat System")
+	uint32 bInCombat : 1;
+
+	/** Set this to true to enable God Mode */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System")
+	uint32 bGodMode : 1;
+
 	/** Time in seconds after which iFrames are triggered after initiating dodge */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
 	float DodgeImmunityTriggerDelay;
@@ -351,10 +389,6 @@ protected:
 	/** Time in seconds by which the damage blocking is delayed after character enters block state */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
 	float DamageBlockTriggerDelay;
-
-	/** Determines whether character is currently engaged in combat or not */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Combat System")
-	bool bInCombat;
 
 private:
 
@@ -562,6 +596,9 @@ public:
 	inline float GetControllerRotationYaw() const;
 
 	/** [server + local] Plays an animation montage and changes character state over network */
+	inline void NetPlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
+
+	/** [server + local] Plays an animation montage and changes character state over network */
 	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
 	// --------------------------------------
@@ -653,36 +690,19 @@ public:
 	FGameplayTagContainer GameplayTagContainer;
 
 	/** Returns true if character is alive */
-	FORCEINLINE bool IsAlive() const;
+	UFUNCTION(BlueprintPure, Category = "Gameplay")
+	virtual bool IsAlive() const;
 
 	/** Returns true if character is dead */
-	FORCEINLINE bool IsDead() const;
-
-	/** Returns true if character is dead */
-	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Is Dead"))
-	bool BP_IsDead() const;
-
-	/** Returns true if character is currently casting a spell */
-	FORCEINLINE bool IsCastingSpell() const;
-
-	/** Returns true if character is using any skill */
-	FORCEINLINE bool IsUsingAnySkill() const;
-
-	/** Returns true if character is using skill at SkillIndex */
-	FORCEINLINE bool IsUsingSkill(FName SkillID) const;
-
-	/** Returns true if character has just been hit */
-	FORCEINLINE bool HasBeenHit() const;
-
-	/** Returns true if character has just been hit */
-	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Has Been Hit"))
-	bool BP_HasBeenHit() const;
+	UFUNCTION(BlueprintPure, Category = "Gameplay")
+	virtual bool IsDead() const;
 
 	/** Returns true if character can respawn */
+	UFUNCTION(BlueprintPure, Category = "Gameplay")
 	virtual bool CanRespawn() const;
 	
 	/** Returns true if character can use any skill at all */
-	UFUNCTION(BlueprintCallable, Category = CharacterState)
+	UFUNCTION(BlueprintPure, Category = "Gameplay")
 	virtual bool CanUseAnySkill() const;
 
 	/** Returns true if character can use a particular skill */
@@ -820,17 +840,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Motion|CrowdControlEffect")
 	void PushBack(const FVector& ImpulseDirection); // @todo const parameter?
 
-	/** Enables blocking of incoming attacks */
-	UFUNCTION()
-	void EnableDamageBlocking();
-
-	/** Disables blocking of incoming attacks */
-	UFUNCTION()
-	void DisableDamageBlocking();
-
-	/** Temporarily trigger 'Target_Switch' material parameter to make the character glow */
-	FORCEINLINE void SetOffTargetSwitch();
-
 	/** Set whether character is engaged in combat or not */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character")
 	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; };
@@ -844,9 +853,6 @@ public:
 	/** Sets current state of character */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
 	void BP_SetCharacterState(const ECharacterState NewState);
-
-	/** Get current state of character */
-	// FORCEINLINE ECharacterState GetCharacterState() const;
 
 	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get Character State"))
 	ECharacterState BP_GetCharacterState() const;
@@ -1005,46 +1011,24 @@ private:
 	UPROPERTY(Transient)
 	FLastUsedSkillInfo LastUsedSkillInfo;
 
-protected:
+public:
 
-	UPROPERTY(Transient, BlueprintReadWrite)
-	bool bSkillAllowsMovement;
+	/** [Local] Display status effect message on player screen */
+	FORCEINLINE void DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
+	{
+		Client_DisplayTextOnPlayerScreen(Message, TextColor, TextPosition);
+	}
 
-	UPROPERTY(Transient, BlueprintReadWrite)
-	bool bUsingUniqueSkill;
-
-	UPROPERTY()
-	FCharacterStateData CharacterStateData;
-
-	/** Data table for character skills */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills)
-	UDataTable* SkillsDataTable;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Rotation)
-	float CharacterRotationPrecision;
-
-	/** True if character is in God Mode */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EOD Character")
-	bool bGodMode;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EOD Character")
-	float TargetSwitchDuration;
+	/** Displays status effect text on player screen */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "EOD Character")
+	void CreateAndDisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 
 public:
 
-	/** Called on dodging an enemy attack */
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Event")
-	FOnGameplayEventMCDelegate OnDodgingAttack;
+	// --------------------------------------
+	//  Gameplay Events
+	// --------------------------------------
 
-	/** Called on blocking an enemy attack */
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Event")
-	FOnGameplayEventMCDelegate OnBlockingAttack;
-
-	/** Called on deflecting an enemy attack */
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Event")
-	FOnGameplayEventMCDelegate OnDeflectingAttack;
-
-	//~
 	FOnGameplayEventMCDelegate OnReceivingHit;
 
 	FOnGameplayEventMCDelegate OnSuccessfulHit;
@@ -1065,44 +1049,41 @@ public:
 
 	FOnGameplayEventMCDelegate OnLowHealth;
 
-	// FOnGameplayEventMCDelegate OnEnteringCombat;
-
-	// FOnGameplayEventMCDelegate OnLeavingCombat;
-	//~ 
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Events")
 	FOnCombatStateChangedMCDelegate OnInitiatingCombat;
 
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Combat)
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Events")
 	FOnCombatStateChangedMCDelegate OnLeavingCombat;
 
-	/** [Local] Display status effect message on player screen */
-	FORCEINLINE void DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
-	{
-		Client_DisplayTextOnPlayerScreen(Message, TextColor, TextPosition);
-	}
+	/** Called on dodging an enemy attack */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Event")
+	FOnGameplayEventMCDelegate OnDodgingAttack;
 
-	/** Displays status effect text on player screen */
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "EOD Character")
-	void CreateAndDisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
+	/** Called on blocking an enemy attack */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Event")
+	FOnGameplayEventMCDelegate OnBlockingAttack;
+
+	/** Called on deflecting an enemy attack */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Event")
+	FOnGameplayEventMCDelegate OnDeflectingAttack;
+
+	// --------------------------------------
+	//  Materials
+	// --------------------------------------
+
+	/** Temporarily trigger 'Target_Switch' material parameter to make the character glow */
+	inline void SetOffTargetSwitch(float Duration = 0.1f);
 
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+	float TargetSwitchDuration;
 
 	FTimerHandle TargetSwitchTimerHandle;
 
-	FTimerHandle DodgeImmunityTimerHandle;
-
-	FTimerHandle BlockTimerHandle;
-
-	FTimerHandle CrowdControlTimerHandle;
-
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CombatEvents)
 	virtual void TurnOnTargetSwitch();
 
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CombatEvents)
 	virtual void TurnOffTargetSwitch();
-
-protected:
 
 	// --------------------------------------
 	//  Network
@@ -1216,15 +1197,24 @@ protected:
 	virtual void Server_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection, UAnimMontage* Montage = nullptr);
 	virtual bool Server_SetNextMontageSection_Validate(FName CurrentSection, FName NextSection, UAnimMontage* Montage = nullptr);
 	
-	UFUNCTION(NetMultiCast, Reliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SetNextMontageSection(FName CurrentSection, FName NextSection, UAnimMontage* Montage = nullptr);
 	virtual void Multicast_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection, UAnimMontage* Montage = nullptr);
-	
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_PlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
+	virtual void Server_PlayAnimMontage_Implementation(UAnimMontage* MontageToPlay, FName SectionToPlay);
+	virtual bool Server_PlayAnimMontage_Validate(UAnimMontage* MontageToPlay, FName SectionToPlay);
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void Multicast_PlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
+	virtual void Multicast_PlayAnimMontage_Implementation(UAnimMontage* MontageToPlay, FName SectionToPlay);
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 	
-	UFUNCTION(NetMultiCast, Reliable)
-	void MultiCast_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
 
 
 	friend class AEODPlayerController;
@@ -1240,10 +1230,9 @@ inline void AEODCharacterBase::StartBlockingDamage(float Delay)
 	}
 	else
 	{
-		if (GetWorld())
-		{
-			GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &AEODCharacterBase::EnableDamageBlocking, Delay, false);
-		}
+		UWorld* World = GetWorld();
+		check(World);
+		World->GetTimerManager().SetTimer(DamageBlockingTimerHandle, this, &AEODCharacterBase::EnableDamageBlocking, Delay, false);
 	}
 }
 
@@ -1372,6 +1361,17 @@ inline float AEODCharacterBase::GetControllerRotationYaw() const
 	return (Controller ? FMath::UnwindDegrees(Controller->GetControlRotation().Yaw) : 0.0f);
 }
 
+inline void AEODCharacterBase::NetPlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay)
+{
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(MontageToPlay);
+		AnimInstance->Montage_JumpToSection(SectionToPlay, MontageToPlay);
+	}
+	Server_PlayAnimMontage(MontageToPlay, SectionToPlay);
+}
+
 inline void AEODCharacterBase::UpdatePCTryingToMove()
 {
 	if (ForwardAxisValue == 0 && RightAxisValue == 0)
@@ -1478,18 +1478,6 @@ inline void AEODCharacterBase::ZoomOutCamera()
 	}
 }
 
-FORCEINLINE bool AEODCharacterBase::IsAlive() const
-{
-	return true;
-	// return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->GetCurrentHealth() > 0 : true;
-}
-
-FORCEINLINE bool AEODCharacterBase::IsDead() const
-{
-	return false;
-	// return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->GetCurrentHealth() <= 0 : false;
-}
-
 FORCEINLINE bool AEODCharacterBase::IsIdle() const
 {
 	return (CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun && GetVelocity().Size() == 0);
@@ -1553,6 +1541,11 @@ FORCEINLINE bool AEODCharacterBase::IsUsingSkill(FName SkillID) const
 FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 {
 	return CharacterStateInfo.CharacterState == ECharacterState::GotHit;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsWeaponSheathed() const
+{
+	return bWeaponSheathed;
 }
 
 FORCEINLINE bool AEODCharacterBase::CanFlinch() const
@@ -1634,17 +1627,15 @@ FORCEINLINE bool AEODCharacterBase::NeedsHealing() const
 	// return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->IsLowOnHealth() : false;
 }
 
-FORCEINLINE void AEODCharacterBase::SetOffTargetSwitch()
+inline void AEODCharacterBase::SetOffTargetSwitch(float Duration)
 {
 	TurnOnTargetSwitch();
+	UWorld* World = GetWorld();
+	if (Duration > 0.f && World)
+	{
+		World->GetTimerManager().SetTimer(TargetSwitchTimerHandle, this, &AEODCharacterBase::TurnOffTargetSwitch, Duration, false);
+	}
 }
-
-/*
-FORCEINLINE ECharacterState AEODCharacterBase::GetCharacterState() const
-{
-	return CharacterState;
-}
-*/
 
 FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 {
@@ -1654,10 +1645,13 @@ FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 inline FSkillTableRow* AEODCharacterBase::GetSkill(FName SkillID, const FString& ContextString) const
 {
 	FSkillTableRow* Skill = nullptr;
+	//~ @todo
+	/*
 	if (IsValid(SkillsDataTable))
 	{
 		Skill = SkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString);
 	}
+	*/
 	return Skill;
 }
 

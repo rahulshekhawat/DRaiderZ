@@ -218,15 +218,11 @@ void AEODCharacterBase::TriggeriFrames(float Duration, float Delay)
 	{
 		UWorld* World = GetWorld();
 		check(World);
+		// Using a delegate because I need to pass an argument to EnableiFrames function
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindUObject(this, &AEODCharacterBase::EnableiFrames, Duration);
 		World->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
 	}
-}
-
-bool AEODCharacterBase::BP_IsDead() const
-{
-	return IsDead();
 }
 
 bool AEODCharacterBase::BP_HasBeenHit() const
@@ -237,7 +233,8 @@ bool AEODCharacterBase::BP_HasBeenHit() const
 bool AEODCharacterBase::CanMove() const
 {
 	// Mobs can only move in IdleWalkRun state
-	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun || (IsUsingAnySkill() && bSkillAllowsMovement);
+	// return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun || (IsUsingAnySkill() && bSkillAllowsMovement);
+	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun;
 }
 
 bool AEODCharacterBase::CanJump() const
@@ -253,6 +250,18 @@ bool AEODCharacterBase::CanDodge() const
 bool AEODCharacterBase::CanGuardAgainstAttacks() const
 {
 	return (IsIdleOrMoving() || IsNormalAttacking()) && !(IsWeaponSheathed());
+}
+
+bool AEODCharacterBase::IsAlive() const
+{
+	//~ @todo
+	return true;
+}
+
+bool AEODCharacterBase::IsDead() const
+{
+	//~ @todo
+	return false;
 }
 
 bool AEODCharacterBase::CanRespawn() const
@@ -438,9 +447,11 @@ void AEODCharacterBase::EnableDamageBlocking()
 
 void AEODCharacterBase::DisableDamageBlocking()
 {
+	/*
 	bBlockingDamage = false;
 	// Clear block damage timer just in case it is still active
 	GetWorld()->GetTimerManager().ClearTimer(BlockTimerHandle); 
+	*/
 }
 
 bool AEODCharacterBase::BP_IsInCombat() const
@@ -592,13 +603,18 @@ float AEODCharacterBase::GetOrientationYawToActor(AActor* TargetActor)
 
 void AEODCharacterBase::TurnOnTargetSwitch()
 {
-	GetMesh()->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
-	GetWorld()->GetTimerManager().SetTimer(TargetSwitchTimerHandle, this, &AEODCharacterBase::TurnOffTargetSwitch, TargetSwitchDuration, false);
+	if (GetMesh())
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 1.f);
+	}
 }
 
 void AEODCharacterBase::TurnOffTargetSwitch()
 {
-	GetMesh()->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
+	if (GetMesh())
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
+	}
 }
 
 void AEODCharacterBase::OnRep_WeaponSheathed()
@@ -812,9 +828,29 @@ void AEODCharacterBase::Multicast_SetNextMontageSection_Implementation(FName Cur
 	}
 }
 
+void AEODCharacterBase::Server_PlayAnimMontage_Implementation(UAnimMontage* MontageToPlay, FName SectionToPlay)
+{
+	Multicast_PlayAnimMontage(MontageToPlay, SectionToPlay);
+}
+
+bool AEODCharacterBase::Server_PlayAnimMontage_Validate(UAnimMontage* MontageToPlay, FName SectionToPlay)
+{
+	return true;
+}
+
+void AEODCharacterBase::Multicast_PlayAnimMontage_Implementation(UAnimMontage* MontageToPlay, FName SectionToPlay)
+{
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (!IsLocallyControlled() && AnimInstance)
+	{
+		AnimInstance->Montage_Play(MontageToPlay);
+		AnimInstance->Montage_JumpToSection(SectionToPlay);
+	}
+}
+
 void AEODCharacterBase::Server_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
-	MultiCast_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
+	Multicast_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }
 
 bool AEODCharacterBase::Server_PlayAnimationMontage_Validate(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
@@ -822,7 +858,7 @@ bool AEODCharacterBase::Server_PlayAnimationMontage_Validate(UAnimMontage * Mont
 	return true;
 }
 
-void AEODCharacterBase::MultiCast_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
+void AEODCharacterBase::Multicast_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
 {
 	if (!IsLocallyControlled() && GetMesh()->GetAnimInstance())
 	{

@@ -343,7 +343,7 @@ public:
 
 	inline FPlayerAnimationReferencesTableRow* GetEquippedWeaponAnimationReferences() const;
 
-	FORCEINLINE bool SkillAllowsMovement() const;
+	// FORCEINLINE bool SkillAllowsMovement() const;
 
 	FORCEINLINE bool SkillHasDirectionalAnimations() const;
 
@@ -971,6 +971,7 @@ inline void APlayerCharacter::EnableBlock()
 	}
 	*/
 
+	/*
 	if (IsNormalAttacking())
 	{
 		StopNormalAttack();
@@ -982,6 +983,7 @@ inline void APlayerCharacter::EnableBlock()
 
 	// FTimerHandle TimerDelegate;
 	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);
+	*/
 }
 
 inline void APlayerCharacter::DisableBlock()
@@ -1034,10 +1036,12 @@ inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetEquippedWeaponAn
 	return EquippedWeaponAnimationReferences;
 }
 
+/*
 FORCEINLINE bool APlayerCharacter::SkillAllowsMovement() const
 {
 	return bSkillAllowsMovement;
 }
+*/
 
 FORCEINLINE bool APlayerCharacter::SkillHasDirectionalAnimations() const
 {

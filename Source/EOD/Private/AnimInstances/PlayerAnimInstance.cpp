@@ -226,6 +226,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 	*/
 	
+	//~ @todo
+	/*
 	if (EODPlayerOwner->IsUsingAnySkill() && EODPlayerOwner->SkillAllowsMovement())
 	{
 		FSkillTableRow* ActiveSkill = EODPlayerOwner->GetCurrentActiveSkill();
@@ -252,6 +254,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			}
 		}
 	}
+	*/
 }
 
 void UPlayerAnimInstance::NativePostEvaluateAnimation()

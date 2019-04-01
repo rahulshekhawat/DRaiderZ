@@ -216,7 +216,8 @@ void AAICharacterBase::SetInCombat(bool bValue)
 
 void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	if (AnimMontage == FlinchAnimMontage || bUsingUniqueSkill)
+	// if (AnimMontage == FlinchAnimMontage || bUsingUniqueSkill)
+	if (AnimMontage == FlinchAnimMontage)
 	{
 		return;
 	}
@@ -265,8 +266,9 @@ bool AAICharacterBase::UseSkill_Implementation(FName SkillID)
 		}
 		SetCurrentActiveSkillID(SkillID);
 		SetCurrentActiveSkill(SkillToUse);
+		//~ @todo
 		// SkillIDToWeightMap[SkillID] = SkillIDToWeightMap[SkillID] - 1;
-		bSkillAllowsMovement = SkillToUse->bAllowsMovement;
+		// bSkillAllowsMovement = SkillToUse->bAllowsMovement;
 		return true;
 	}
 
@@ -373,6 +375,8 @@ void AAICharacterBase::UpdateMaxWalkSpeed()
 
 void AAICharacterBase::InitializeSkills()
 {
+	//~ @todo
+	/*
 	if (!SkillsDataTable)
 	{
 		return;
@@ -485,4 +489,5 @@ void AAICharacterBase::InitializeSkills()
 			SkillAnimationsStreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AnimationsToLoad);
 		}
 	}
+	*/
 }

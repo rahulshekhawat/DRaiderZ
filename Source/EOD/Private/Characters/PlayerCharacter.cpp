@@ -198,7 +198,8 @@ bool APlayerCharacter::CanMove() const
 	// @todo, uncomment and replace return code with following comment:
 	// return IsIdleOrMoving() || IsRunning() || bCharacterStateAllowsMovement;
 	// return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
-	return IsIdleOrMoving() || IsBlocking() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
+	// return IsIdleOrMoving() || IsBlocking() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
+	return IsIdleOrMoving() || IsBlocking() || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
 }
 
 bool APlayerCharacter::CanJump() const
@@ -2000,7 +2001,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	SetCurrentActiveSkill(SkillPair.Value);
 	GetSkillsComponent()->OnSkillUsed(SkillButtonIndex, SkillPair.Key, SkillPair.Value);
 
-	bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
+	// bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
 	bSkillHasDirectionalAnimations = SkillPair.Value->bHasDirectionalAnimations;
 
 	// @todo cleaning of crowd control effect timer needs to be handled better
@@ -2014,6 +2015,8 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	//~ @todo
 	// GetCharacterStatsComponent()->AddCrowdControlImmunitiesFromSkill(SkillPair.Value->CrowdControlImmunities);
 
+	//~ @todo
+	/*
 	if (bSkillAllowsMovement)
 	{
 		if (IsIdle())
@@ -2069,6 +2072,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 			PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 		}
 	}
+	*/
 }
 
 void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
