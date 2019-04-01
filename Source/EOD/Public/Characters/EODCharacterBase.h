@@ -293,6 +293,9 @@ public:
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe();
 
+	/** Plays BlockAttack animation on blocking an incoming attack */
+	virtual void PlayAttackBlockedAnimation();
+
 	UPROPERTY(ReplicatedUsing = OnRep_CharacterStateInfo)
 	FCharacterStateInfo CharacterStateInfo;
 
@@ -418,7 +421,7 @@ private:
 public:
 
 	// --------------------------------------
-	//  Movement
+	//  Movement and Rotation
 	// --------------------------------------
 
 	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const { return CharacterMovementDirection; }
@@ -449,6 +452,26 @@ public:
 
 	/** [local] Sets whether current character allows rotation */
 	inline void SetCharacterStateAllowsRotation(bool bValue);
+
+	/**
+	 * [server + local] Set character rotation yaw over network
+	 * @note Do not use this for consecutive rotation change
+	 */
+	inline void SetCharacterRotationYaw(const float NewRotationYaw);
+
+	/**
+	 * [server + local] Set character rotation over network
+	 * @note Do not use this for consecutive rotation change
+	 */
+	inline void SetCharacterRotation(const FRotator NewRotation);
+
+	/** [server + client] Change character rotation. Do not use this for consecutive rotation change */
+	UFUNCTION(BlueprintCallable, Category = "Rotation", meta = (DisplayName = "Set Character Rotation"))
+	void BP_SetCharacterRotation(const FRotator NewRotation);
+
+	/** [server + client] Set whether character should use controller rotation yaw or not */
+	UFUNCTION(BlueprintCallable, Category = "Rotation", meta = (DisplayName = "Set Use Controller Rotation Yaw"))
+	void BP_SetUseControllerRotationYaw(const bool bNewBool);
 
 	/** [server + local] Change character max walk speed */
 	UFUNCTION(BlueprintCallable, Category = "Movement", meta = (DisplayName = "Set Walk Speed"))
@@ -718,6 +741,9 @@ public:
 	//	Pseudo Constants : Variables that aren't supposed to be modified post creation
 	// --------------------------------------
 
+	/** Returns character faction */
+	FORCEINLINE EFaction GetFaction() const;
+
 	/** In game faction of your character */
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	EFaction Faction;
@@ -747,7 +773,30 @@ public:
 	/** Returns true if character can respawn */
 	UFUNCTION(BlueprintPure, Category = "Gameplay")
 	virtual bool CanRespawn() const;
-	
+
+	/** Returns true if this character requires healing (low on HP) */
+	UFUNCTION(BlueprintPure, Category = "Gameplay")
+	virtual bool NeedsHealing() const;
+
+	/** Returns true if this character is healing anyone */
+	UFUNCTION(BlueprintPure, Category = "Gameplay")
+	virtual bool IsHealing() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gameplay")
+	void InitiateDeathSequence();
+	virtual void InitiateDeathSequence_Implementation();
+
+	/**
+	 * Kills this character
+	 * @param CauseOfDeath - The reason for death of this character
+	 * @param Instigator - The character that instigated the death of this character (if any)
+	 */
+	virtual void Die(ECauseOfDeath CauseOfDeath, AActor* Instigator = nullptr, AController* Owner = nullptr);
+
+
+
+
+
 	/** Returns true if character can use any skill at all */
 	UFUNCTION(BlueprintPure, Category = "Gameplay")
 	virtual bool CanUseAnySkill() const;
@@ -755,53 +804,8 @@ public:
 	/** Returns true if character can use a particular skill */
 	virtual bool CanUseSkill(FSkillTableRow* Skill);
 
-	/** Returns true if this character requires healing (low on HP) */
-	FORCEINLINE bool NeedsHealing() const;
 
-	/** Returns true if this character requires healing (low on HP) */
-	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Needs Healing"))
-	bool BP_NeedsHealing() const;
 
-	/** Returns true if this character is healing anyone */
-	virtual bool IsHealing() const;
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerStatus)
-	void InitiateDeathSequence();
-
-	virtual void InitiateDeathSequence_Implementation();
-
-	/** Plays BlockAttack animation on blocking an incoming attack */
-	virtual void BlockAttack();
-
-	/** Sets current state of character */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
-	void BP_SetCharacterState(const ECharacterState NewState);
-
-	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get Character State"))
-	ECharacterState BP_GetCharacterState() const;
-
-	/**
-	 * [server + local] Set character rotation yaw over network
-	 * @note Do not use this for consecutive rotation change
-	 */
-	inline void SetCharacterRotationYaw(const float NewRotationYaw);
-
-	/**
-	 * [server + local] Set character rotation over network
-	 * @note Do not use this for consecutive rotation change
-	 */
-	inline void SetCharacterRotation(const FRotator NewRotation);
-
-	/** [server + client] Change character rotation. Do not use this for consecutive rotation change */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character Rotation"))
-	void BP_SetCharacterRotation(const FRotator NewRotation);
-
-	/** [server + client] Set whether character should use controller rotation yaw or not */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Use Controller Rotation Yaw"))
-	void BP_SetUseControllerRotationYaw(const bool bNewBool);
-
-	/** Returns character faction */
-	FORCEINLINE EFaction GetFaction() const;
 
 	inline FSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
 
@@ -863,13 +867,13 @@ public:
 	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Last Used Skill"))
 	FLastUsedSkillInfo& BP_GetLastUsedSkill();
 
-	/**
-	 * Kills this character 
-	 * @param CauseOfDeath - The reason for death of this character
-	 * @param Instigator - The character that instigated the death of this character (if any)
-	 */
-	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* InstigatingChar = nullptr);
 
+
+public:
+
+	// --------------------------------------
+	//  Skill System
+	// --------------------------------------
 
 private:
 
@@ -883,12 +887,6 @@ private:
 	/** Information of last used skill */
 	UPROPERTY(Transient)
 	FLastUsedSkillInfo LastUsedSkillInfo;
-
-public:
-
-	// --------------------------------------
-	//  Skill System
-	// --------------------------------------
 
 public:
 
@@ -1519,13 +1517,6 @@ FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 FORCEINLINE bool AEODCharacterBase::IsWeaponSheathed() const
 {
 	return bWeaponSheathed;
-}
-
-FORCEINLINE bool AEODCharacterBase::NeedsHealing() const
-{
-	//~ @todo
-	return false;
-	// return IsValid(CharacterStatsComponent) ? CharacterStatsComponent->IsLowOnHealth() : false;
 }
 
 inline void AEODCharacterBase::SetOffTargetSwitch(float Duration)

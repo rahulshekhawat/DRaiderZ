@@ -393,7 +393,7 @@ bool APlayerCharacter::CCEKnockback_Implementation(const float Duration, const F
 	return false;
 }
 
-void APlayerCharacter::BlockAttack()
+void APlayerCharacter::PlayAttackBlockedAnimation()
 {
 	if (GetActiveAnimationReferences() && GetActiveAnimationReferences()->BlockAttack.Get())
 	{

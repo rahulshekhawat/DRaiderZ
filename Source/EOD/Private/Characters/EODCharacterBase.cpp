@@ -273,6 +273,11 @@ bool AEODCharacterBase::CanRespawn() const
 	return false;
 }
 
+bool AEODCharacterBase::NeedsHealing() const
+{
+	return false;
+}
+
 bool AEODCharacterBase::CanNormalAttack() const
 {
 	return IsIdleOrMoving();
@@ -286,11 +291,6 @@ bool AEODCharacterBase::CanUseAnySkill() const
 bool AEODCharacterBase::CanUseSkill(FSkillTableRow * Skill)
 {
 	return false;
-}
-
-bool AEODCharacterBase::BP_NeedsHealing() const
-{
-	return NeedsHealing();
 }
 
 bool AEODCharacterBase::IsHealing() const
@@ -356,7 +356,7 @@ void AEODCharacterBase::InitiateDeathSequence_Implementation()
 {
 }
 
-void AEODCharacterBase::BlockAttack()
+void AEODCharacterBase::PlayAttackBlockedAnimation()
 {
 }
 
@@ -441,17 +441,6 @@ void AEODCharacterBase::DisableDamageBlocking()
 bool AEODCharacterBase::BP_IsInCombat() const
 {
 	return IsInCombat();
-}
-
-void AEODCharacterBase::BP_SetCharacterState(const ECharacterState NewState)
-{
-	// SetCharacterState(NewState);
-}
-
-ECharacterState AEODCharacterBase::BP_GetCharacterState() const
-{
-	return ECharacterState::IdleWalkRun;
-	// return GetCharacterState();
 }
 
 void AEODCharacterBase::BP_SetWalkSpeed(const float WalkSpeed)
@@ -540,7 +529,7 @@ bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float
 	}
 }
 
-void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* InstigatingChar)
+void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AActor* Instigator, AController* Owner)
 {
 	if (bGodMode || IsDead())
 	{

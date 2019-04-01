@@ -231,7 +231,7 @@ public:
 	/** Knockback this character */
 	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection) override;
 
-	virtual void BlockAttack() override;
+	virtual void PlayAttackBlockedAnimation() override;
 
 	UFUNCTION()
 	void ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
