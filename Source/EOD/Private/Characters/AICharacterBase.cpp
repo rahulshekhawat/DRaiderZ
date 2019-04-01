@@ -70,13 +70,15 @@ bool AAICharacterBase::CCEFlinch_Implementation(const float BCAngle)
 	{
 		if (BCAngle <= 90)
 		{
-			PlayAnimationMontage(FlinchAnimMontage,
-				UCharacterLibrary::SectionName_ForwardFlinch);
+			PlayAnimMontage(FlinchAnimMontage, 1.f, UCharacterLibrary::SectionName_ForwardFlinch);
+			// PlayAnimationMontage(FlinchAnimMontage,
+				// UCharacterLibrary::SectionName_ForwardFlinch);
 		}
 		else
 		{
-			PlayAnimationMontage(FlinchAnimMontage,
-				UCharacterLibrary::SectionName_BackwardFlinch);
+			PlayAnimMontage(FlinchAnimMontage, 1.f, UCharacterLibrary::SectionName_BackwardFlinch);
+			// PlayAnimationMontage(FlinchAnimMontage,
+				// UCharacterLibrary::SectionName_BackwardFlinch);
 		}
 
 		return true;
@@ -91,15 +93,17 @@ bool AAICharacterBase::CCEInterrupt_Implementation(const float BCAngle)
 	{
 		if (BCAngle <= 90)
 		{
-			PlayAnimationMontage(HitEffectsAnimMontage,
-				UCharacterLibrary::SectionName_ForwardInterrupt,
-				ECharacterState::GotHit);
+			NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_ForwardInterrupt);
+			// PlayAnimationMontage(HitEffectsAnimMontage,
+				// UCharacterLibrary::SectionName_ForwardInterrupt,
+				// ECharacterState::GotHit);
 		}
 		else
 		{
-			PlayAnimationMontage(HitEffectsAnimMontage,
-				UCharacterLibrary::SectionName_BackwardInterrupt,
-				ECharacterState::GotHit);
+			NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_BackwardInterrupt);
+			// PlayAnimationMontage(HitEffectsAnimMontage,
+				// UCharacterLibrary::SectionName_BackwardInterrupt,
+				// ECharacterState::GotHit);
 		}
 
 		return true;
@@ -152,9 +156,10 @@ bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 {
 	if (CanKnockdown() && HitEffectsAnimMontage)
 	{
-		PlayAnimationMontage(HitEffectsAnimMontage,
-			UCharacterLibrary::SectionName_KnockdownStart,
-			ECharacterState::GotHit);
+		NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_KnockdownStart);
+		// PlayAnimationMontage(HitEffectsAnimMontage,
+			// UCharacterLibrary::SectionName_KnockdownStart,
+			// ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 
 		return true;
@@ -165,18 +170,20 @@ bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 
 void AAICharacterBase::CCEEndKnockdown_Implementation()
 {
-	PlayAnimationMontage(HitEffectsAnimMontage,
-		UCharacterLibrary::SectionName_KnockdownEnd,
-		ECharacterState::GotHit);
+	NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_KnockdownEnd);
+	// PlayAnimationMontage(HitEffectsAnimMontage,
+		// UCharacterLibrary::SectionName_KnockdownEnd,
+		// ECharacterState::GotHit);
 }
 
 bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
 {
 	if (CanKnockdown() && HitEffectsAnimMontage)
 	{
-		PlayAnimationMontage(HitEffectsAnimMontage,
-			UCharacterLibrary::SectionName_KnockdownStart,
-			ECharacterState::GotHit);
+		//~ @todo
+		// PlayAnimationMontage(HitEffectsAnimMontage,
+			// UCharacterLibrary::SectionName_KnockdownStart,
+			// ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 		PushBack(ImpulseDirection);
 		return true;
@@ -262,7 +269,8 @@ bool AAICharacterBase::UseSkill_Implementation(FName SkillID)
 
 		if (SkillToUse->AnimMontage.Get())
 		{
-			PlayAnimationMontage(SkillToUse->AnimMontage.Get(), SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+			//~ @todo
+			// PlayAnimationMontage(SkillToUse->AnimMontage.Get(), SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 		}
 		SetCurrentActiveSkillID(SkillID);
 		SetCurrentActiveSkill(SkillToUse);

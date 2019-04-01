@@ -598,8 +598,14 @@ public:
 	/** [server + local] Plays an animation montage and changes character state over network */
 	inline void NetPlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
 
-	/** [server + local] Plays an animation montage and changes character state over network */
-	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
+	/** [server + client] Set the next montage section to play for a given animation montage */
+	inline void SetNextMontageSection(FName CurrentSection, FName NextSection, UAnimMontage* Montage = nullptr);
+
+	/** Called when an animation montage is blending out out to clean up, reset, or change any state variables */
+	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
+
+	/** Called when an animation montage is ending to clean up, reset, or change any state variables */
+	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
 	// --------------------------------------
 	//  Save/Load System
@@ -956,24 +962,6 @@ public:
 	 */
 	virtual void RemoveStatusEffect(const UStatusEffectBase* StatusEffect);
 
-	/** Called when an animation montage is blending out out to clean up, reset, or change any state variables */
-	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
-
-	/** Called when an animation montage is ending to clean up, reset, or change any state variables */
-	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
-
-	// Play an animation montage locally
-	inline void PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
-
-	//~ @note UFUNCTIONs don't allow function overloading
-	/** [server + client] Plays an animation montage and changes character state over network */
-	UFUNCTION(BlueprintCallable, Category = Animations, meta = (DisplayName = "Play Animation Montage Over Network"))
-	void BP_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
-
-	/** [server + client] Set the next montage section to play for a given animation montage */
-	void SetNextMontageSection(FName CurrentSection, FName NextSection);
-	// void SetNextMontageSection(UAnimMontage* Montage, FName CurrentSection, FName NextSection);
-
 	/**
 	 * Rotate a character toward desired yaw based on the rotation rate in a given delta time (Precision based)
 	 * @param DesiredYaw 	The desired yaw of character in degrees
@@ -1210,13 +1198,6 @@ protected:
 	void Multicast_PlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
 	virtual void Multicast_PlayAnimMontage_Implementation(UAnimMontage* MontageToPlay, FName SectionToPlay);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
-	
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
-
-
 	friend class AEODPlayerController;
 	friend class UCharacterStateBase;
 	
@@ -1370,6 +1351,16 @@ inline void AEODCharacterBase::NetPlayAnimMontage(UAnimMontage* MontageToPlay, F
 		AnimInstance->Montage_JumpToSection(SectionToPlay, MontageToPlay);
 	}
 	Server_PlayAnimMontage(MontageToPlay, SectionToPlay);
+}
+
+inline void AEODCharacterBase::SetNextMontageSection(FName CurrentSection, FName NextSection, UAnimMontage* Montage)
+{
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_SetNextSection(CurrentSection, NextSection, Montage);
+	}
+	Server_SetNextMontageSection(CurrentSection, NextSection, Montage);
 }
 
 inline void AEODCharacterBase::UpdatePCTryingToMove()
@@ -1668,26 +1659,6 @@ FORCEINLINE FSkillTableRow* AEODCharacterBase::GetCurrentActiveSkill() const
 FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
 {
 	return LastUsedSkillInfo;
-}
-
-inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay)
-{
-	if (IsValid(GetMesh()) && IsValid(GetMesh()->GetAnimInstance()))
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
-	}
-}
-
-inline void AEODCharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState)
-{
-	if (IsValid(GetMesh()) && IsValid(GetMesh()->GetAnimInstance()))
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay, MontageToPlay);
-		// CharacterState = NewState; // CharacterState removed
-	}
-	Server_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
 }
 
 inline FString AEODCharacterBase::GetGenderPrefix() const

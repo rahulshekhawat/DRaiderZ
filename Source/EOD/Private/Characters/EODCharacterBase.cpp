@@ -533,21 +533,6 @@ void AEODCharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterru
 {
 }
 
-void AEODCharacterBase::BP_PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
-{
-	PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
-}
-
-void AEODCharacterBase::SetNextMontageSection(FName CurrentSection, FName NextSection)
-{
-	if (GetMesh()->GetAnimInstance())
-	{
-		GetMesh()->GetAnimInstance()->Montage_SetNextSection(CurrentSection, NextSection);
-	}
-
-	Server_SetNextMontageSection(CurrentSection, NextSection);
-}
-
 bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision, float RotationRate)
 {
 	PrintToScreen(this, FString("Rotating"));
@@ -845,26 +830,6 @@ void AEODCharacterBase::Multicast_PlayAnimMontage_Implementation(UAnimMontage* M
 	{
 		AnimInstance->Montage_Play(MontageToPlay);
 		AnimInstance->Montage_JumpToSection(SectionToPlay);
-	}
-}
-
-void AEODCharacterBase::Server_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
-{
-	Multicast_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
-}
-
-bool AEODCharacterBase::Server_PlayAnimationMontage_Validate(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
-{
-	return true;
-}
-
-void AEODCharacterBase::Multicast_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
-{
-	if (!IsLocallyControlled() && GetMesh()->GetAnimInstance())
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
-		// CharacterState = NewState;
 	}
 }
 

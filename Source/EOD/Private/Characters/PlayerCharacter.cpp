@@ -276,13 +276,13 @@ bool APlayerCharacter::CCEFlinch_Implementation(const float BCAngle)
 
 		if (BCAngle <= 90)
 		{
-			PlayAnimationMontage(FlinchMontage,
-				UCharacterLibrary::SectionName_ForwardFlinch);
+			// PlayAnimationMontage(FlinchMontage,
+				// UCharacterLibrary::SectionName_ForwardFlinch);
 		}
 		else
 		{
-			PlayAnimationMontage(FlinchMontage,
-				UCharacterLibrary::SectionName_BackwardFlinch);
+			// PlayAnimationMontage(FlinchMontage,
+				// UCharacterLibrary::SectionName_BackwardFlinch);
 		}
 
 		return true;
@@ -299,15 +299,15 @@ bool APlayerCharacter::CCEInterrupt_Implementation(const float BCAngle)
 
 		if (BCAngle <= 90)
 		{
-			PlayAnimationMontage(HitMontage,
-				UCharacterLibrary::SectionName_ForwardInterrupt,
-				ECharacterState::GotHit);
+			// PlayAnimationMontage(HitMontage,
+				// UCharacterLibrary::SectionName_ForwardInterrupt,
+				// ECharacterState::GotHit);
 		}
 		else
 		{
-			PlayAnimationMontage(HitMontage,
-				UCharacterLibrary::SectionName_BackwardInterrupt,
-				ECharacterState::GotHit);
+			// PlayAnimationMontage(HitMontage,
+				// UCharacterLibrary::SectionName_BackwardInterrupt,
+				// ECharacterState::GotHit);
 		}
 
 		return true;
@@ -359,9 +359,9 @@ bool APlayerCharacter::CCEKnockdown_Implementation(const float Duration)
 {
 	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-			UCharacterLibrary::SectionName_KnockdownStart,
-			ECharacterState::GotHit);
+		// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
+			// UCharacterLibrary::SectionName_KnockdownStart,
+			// ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 
 		return true;
@@ -372,18 +372,18 @@ bool APlayerCharacter::CCEKnockdown_Implementation(const float Duration)
 
 void APlayerCharacter::CCEEndKnockdown_Implementation()
 {
-	PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-		UCharacterLibrary::SectionName_KnockdownEnd,
-		ECharacterState::GotHit);
+	// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
+		// UCharacterLibrary::SectionName_KnockdownEnd,
+		// ECharacterState::GotHit);
 }
 
 bool APlayerCharacter::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
 {
 	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-			UCharacterLibrary::SectionName_KnockdownStart,
-			ECharacterState::GotHit);
+		// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
+			// UCharacterLibrary::SectionName_KnockdownStart,
+			// ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 		PushBack(ImpulseDirection);
 
@@ -436,9 +436,9 @@ bool APlayerCharacter::Knockdown(const float Duration)
 {
 	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-			UCharacterLibrary::SectionName_KnockdownStart,
-			ECharacterState::GotHit);
+		// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
+			// UCharacterLibrary::SectionName_KnockdownStart,
+			// ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
 
 		return true;
@@ -449,18 +449,18 @@ bool APlayerCharacter::Knockdown(const float Duration)
 
 void APlayerCharacter::EndKnockdown()
 {
-	PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-		UCharacterLibrary::SectionName_KnockdownEnd,
-		ECharacterState::GotHit);
+	// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
+		// UCharacterLibrary::SectionName_KnockdownEnd,
+		// ECharacterState::GotHit);
 }
 
 bool APlayerCharacter::Knockback(const float Duration, const FVector& ImpulseDirection)
 {
 	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-			UCharacterLibrary::SectionName_KnockdownStart,
-			ECharacterState::GotHit);
+		// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
+			// UCharacterLibrary::SectionName_KnockdownStart,
+			// ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
 		PushBack(ImpulseDirection);
 
@@ -474,8 +474,8 @@ void APlayerCharacter::BlockAttack()
 {
 	if (GetActiveAnimationReferences() && GetActiveAnimationReferences()->BlockAttack.Get())
 	{
-		PlayAnimationMontage(GetActiveAnimationReferences()->BlockAttack.Get(),
-			UCharacterLibrary::SectionName_BlockAttack);
+		// PlayAnimationMontage(GetActiveAnimationReferences()->BlockAttack.Get(),
+			// UCharacterLibrary::SectionName_BlockAttack);
 	}
 }
 
@@ -927,6 +927,8 @@ void APlayerCharacter::OnDodge()
 
 		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
 		UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
+		//~ @todo
+		/*
 		if (ForwardAxisValue == 0)
 		{
 			if (RightAxisValue > 0)
@@ -963,6 +965,7 @@ void APlayerCharacter::OnDodge()
 					ECharacterState::Dodging);
 			}
 		}
+		*/
 
 		// @note Why would DodgeImmunityTimerHandle be active here?. Uncommented for now
 		/*
@@ -1176,6 +1179,8 @@ void APlayerCharacter::DoNormalAttack()
 		return;
 	}
 
+	//~ @todo
+	/*
 	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
 	if (bForwardPressed)
 	{
@@ -1197,6 +1202,7 @@ void APlayerCharacter::DoNormalAttack()
 			UCharacterLibrary::SectionName_FirstSwing,
 			ECharacterState::Attacking);
 	}
+	*/
 }
 
 void APlayerCharacter::OnToggleAutoRun()
