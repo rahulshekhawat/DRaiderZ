@@ -604,11 +604,33 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Utility", meta = (DisplayName = "Get Controller Rotation Yaw"))
 	float BP_GetControllerRotationYaw() const;
 
+	UFUNCTION(BlueprintCallable, category = Rotation)
+	float GetOrientationYawToActor(AActor* TargetActor);
+
+	/**
+	 * Rotate a character toward desired yaw based on the rotation rate in a given delta time (Precision based)
+	 * @param DesiredYaw 	The desired yaw of character in degrees
+	 * @param DeltaTime 	The time between last and current tick
+	 * @param Precision		Yaw difference in degrees that will be used to determine success condition
+	 * @param RotationRate 	Rotation rate to use for yaw rotation in degrees
+	 * @return 				True if character successfully rotates to DesiredYaw (CurrentYaw == DesiredYaw)
+	 */
+	UFUNCTION(BlueprintCallable, category = Rotation, meta = (DeprecatedFunction))
+	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision = 1e-3f, float RotationRate = 600.f);
+
+	/** Displays status effect text on player screen */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Utility")
+	void CreateAndDisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
+	virtual void CreateAndDisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
+
 	/**
 	 * Returns controller rotation yaw in -180/180 range.
 	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
 	 */
 	inline float GetControllerRotationYaw() const;
+
+	/** [server] Display status effect message on player screen */
+	inline void DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 
 	/** [server + local] Plays an animation montage and changes character state over network */
 	inline void NetPlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
@@ -695,6 +717,10 @@ public:
 	// --------------------------------------
 	//	Pseudo Constants : Variables that aren't supposed to be modified post creation
 	// --------------------------------------
+
+	/** In game faction of your character */
+	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
+	EFaction Faction;
 
 	/** Player gender : determines the animations and armor meshes to use. */
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
@@ -838,30 +864,14 @@ public:
 	FLastUsedSkillInfo& BP_GetLastUsedSkill();
 
 	/**
-	 * Rotate a character toward desired yaw based on the rotation rate in a given delta time (Precision based)
-	 * @param DesiredYaw 	The desired yaw of character in degrees
-	 * @param DeltaTime 	The time between last and current tick
-	 * @param Precision		Yaw difference in degrees that will be used to determine success condition
-	 * @param RotationRate 	Rotation rate to use for yaw rotation in degrees
-	 * @return 				True if character successfully rotates to DesiredYaw (CurrentYaw == DesiredYaw)
-	 */
-	UFUNCTION(BlueprintCallable, category = Rotation, meta = (DeprecatedFunction))
-	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision = 1e-3f, float RotationRate = 600.f);
-
-	/**
 	 * Kills this character 
 	 * @param CauseOfDeath - The reason for death of this character
 	 * @param Instigator - The character that instigated the death of this character (if any)
 	 */
 	virtual void Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* InstigatingChar = nullptr);
 
-	UFUNCTION(BlueprintCallable, category = Rotation)
-	float GetOrientationYawToActor(AActor* TargetActor);
 
 private:
-	/** In game faction of your character */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character", meta = (AllowPrivateAccess = "true"))
-	EFaction Faction;
 
 	/** SkillID of skill that this character is currently using */
 	UPROPERTY(Transient)
@@ -876,15 +886,9 @@ private:
 
 public:
 
-	/** [Local] Display status effect message on player screen */
-	FORCEINLINE void DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
-	{
-		Client_DisplayTextOnPlayerScreen(Message, TextColor, TextPosition);
-	}
-
-	/** Displays status effect text on player screen */
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "EOD Character")
-	void CreateAndDisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
+	// --------------------------------------
+	//  Skill System
+	// --------------------------------------
 
 public:
 
@@ -1313,6 +1317,11 @@ inline void AEODCharacterBase::SetIsRunning(bool bNewValue)
 inline float AEODCharacterBase::GetControllerRotationYaw() const
 {
 	return (Controller ? FMath::UnwindDegrees(Controller->GetControlRotation().Yaw) : 0.0f);
+}
+
+inline void AEODCharacterBase::DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
+{
+	Client_DisplayTextOnPlayerScreen(Message, TextColor, TextPosition);
 }
 
 inline void AEODCharacterBase::NetPlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay)

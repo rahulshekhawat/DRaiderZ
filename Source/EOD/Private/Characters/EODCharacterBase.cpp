@@ -208,6 +208,10 @@ float AEODCharacterBase::BP_GetControllerRotationYaw() const
 	return (Controller ? FMath::UnwindDegrees(Controller->GetControlRotation().Yaw) : 0.0f);
 }
 
+void AEODCharacterBase::CreateAndDisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
+{
+}
+
 void AEODCharacterBase::TriggeriFrames(float Duration, float Delay)
 {
 	if (Role < ROLE_Authority)
@@ -341,6 +345,10 @@ void AEODCharacterBase::PlayStunAnimation_Implementation()
 }
 
 void AEODCharacterBase::StopStunAnimation_Implementation()
+{
+}
+
+void AEODCharacterBase::PushBack_Implementation(const FVector& ImpulseDirection)
 {
 }
 
