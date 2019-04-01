@@ -751,13 +751,12 @@ bool AEODCharacterBase::Server_TriggeriFrames_Validate(float Duration, float Del
 	return true;
 }
 
-void AEODCharacterBase::Server_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection)
+void AEODCharacterBase::Server_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection, UAnimMontage* Montage)
 {
-
-	Multicast_SetNextMontageSection(CurrentSection, NextSection);
+	Multicast_SetNextMontageSection(CurrentSection, NextSection, Montage);
 }
 
-bool AEODCharacterBase::Server_SetNextMontageSection_Validate(FName CurrentSection, FName NextSection)
+bool AEODCharacterBase::Server_SetNextMontageSection_Validate(FName CurrentSection, FName NextSection, UAnimMontage* Montage)
 {
 	return true;
 }
@@ -804,14 +803,12 @@ bool AEODCharacterBase::Server_SetWalkSpeed_Validate(float WalkSpeed)
 	return true;
 }
 
-void AEODCharacterBase::Multicast_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection)
+void AEODCharacterBase::Multicast_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection, UAnimMontage* Montage)
 {
-	FString Message = FString("Multi cast called");
-	UKismetSystemLibrary::PrintString(this, Message, true, false);
-
-	if (!IsLocallyControlled() && GetMesh()->GetAnimInstance())
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (!IsLocallyControlled() && AnimInstance)
 	{
-		GetMesh()->GetAnimInstance()->Montage_SetNextSection(CurrentSection, NextSection);
+		AnimInstance->Montage_SetNextSection(CurrentSection, NextSection, Montage);
 	}
 }
 

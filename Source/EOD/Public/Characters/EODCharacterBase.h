@@ -263,8 +263,22 @@ public:
 	/** Finish normal attacks and reset back to Idle-Walk-Run */
 	virtual void FinishNormalAttack();
 
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	virtual void TriggerInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	virtual void StartInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	virtual void UpdateInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	virtual void StopInteraction();
+
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe();
+
+	FORCEINLINE bool IsWeaponSheathed() const { return bWeaponSheathed; }
 
 protected:
 
@@ -273,6 +287,9 @@ protected:
 
 	/** Updates whether player controller is currently trying to move or not */
 	inline void UpdatePCTryingToMove();
+
+	/** Updates the direction character is walking in */
+	inline void UpdateCharacterMovementDirection();
 
 	/** Resets tick dependent data. Intended to be called at the beginning of tick function */
 	virtual void ResetTickDependentData();
@@ -318,6 +335,11 @@ protected:
 	/** Disable damage blocking */
 	inline void StopBlockingDamage();
 
+	/** [server + local] Sets whether this character's weapon is sheathed or not */
+	inline void SetWeaponSheathed(bool bNewValue);
+
+	virtual void PlayToggleSheatheAnimation();
+
 	/** Time in seconds after which iFrames are triggered after initiating dodge */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
 	float DodgeImmunityTriggerDelay;
@@ -344,6 +366,10 @@ private:
 	UPROPERTY(Transient)
 	uint32 bBlockingDamage : 1;
 
+	/** Determines whether weapon is currently sheathed or not */
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
+	bool bWeaponSheathed;
+
 public:
 
 	// --------------------------------------
@@ -353,6 +379,10 @@ public:
 	FORCEINLINE ECharMovementDirection GetCharacterMovementDirection() const { return CharacterMovementDirection; }
 
 	FORCEINLINE float GetBlockMovementDirectionYaw() const { return BlockMovementDirectionYaw; }
+
+	FORCEINLINE bool IsRunning() const { return bIsRunning; }
+
+	FORCEINLINE bool IsPCTryingToMove() const { return bPCTryingToMove; }
 
 	/** [server + local] Change character max walk speed */
 	inline void SetWalkSpeed(const float WalkSpeed);
@@ -616,63 +646,12 @@ public:
 	inline FString GetGenderPrefix() const;
 
 	// --------------------------------------
-	//  Interaction Interface
+	//  Gameplay
 	// --------------------------------------
-
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
-	virtual void TriggerInteraction();
-
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
-	virtual void StartInteraction();
-
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
-	virtual void UpdateInteraction();
-
-	UFUNCTION(BlueprintCallable, Category = "EOD Character Actions")
-	virtual void StopInteraction();
-
-	virtual void PlayToggleSheatheAnimation();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gameplay")
 	FGameplayTagContainer GameplayTagContainer;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// CHARACTER STATE
-	////////////////////////////////////////////////////////////////////////////////
-private:
-	
-	/** Determines whether weapon is currently sheathed or not */
-	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
-	bool bWeaponSheathed;
-
-protected:
-	/** [server + local] Sets whether this character's weapon is sheathed or not */
-	FORCEINLINE void SetWeaponSheathed(bool bNewValue)
-	{
-		bWeaponSheathed = bNewValue;
-		PlayToggleSheatheAnimation();
-		if (Role < ROLE_Authority)
-		{
-			Server_SetWeaponSheathed(bNewValue);
-		}
-	}
-
-	inline void UpdateCharacterMovementDirection();
-
-public:
-	FORCEINLINE bool IsWeaponSheathed() const { return bWeaponSheathed; }
-
-	FORCEINLINE bool IsRunning() const { return bIsRunning; }
-
-	FORCEINLINE bool IsPCTryingToMove() const { return bPCTryingToMove; }
-
-	// FORCEINLINE bool IsGuardActive() const { return bGuardActive; }
-
-
-	////////////////////////////////////////////////////////////////////////////////
-	// INPUT
-	////////////////////////////////////////////////////////////////////////////////
-public:
 	/** Returns true if character is alive */
 	FORCEINLINE bool IsAlive() const;
 
@@ -848,26 +827,6 @@ public:
 	/** Disables blocking of incoming attacks */
 	UFUNCTION()
 	void DisableDamageBlocking();
-
-	/**
-	 * Called on dodging an enemy attack
-	 * @param AttackInstigator Enemy character whose incoming damage this character dodged
-	 */
-	// void OnSuccessfulDodge(AEODCharacterBase* AttackInstigator);
-	// void SuccessfulDodge(AEODCharacterBase* AttackInstigator);
-	// void DodgedAttack(AEODCharacterBase* AttackInstigator);
-
-	/**
-	 * Called on successfully blocking an enemy attack
-	 * @param AttackInstigator Enemy character whose incoming damage this character blocked
-	 */
-	// void OnSuccessfulBlock(AEODCharacterBase* AttackInstigator);
-
-	/**
-	 * Called on getting an attack of this character blocked by an enemy
-	 * @param AttackBlocker Enemy character that blocked this character's attack
-	 */
-	// void OnAttackDeflected(AEODCharacterBase* AttackBlocker, bool bSkillIgnoresBlock);
 
 	/** Temporarily trigger 'Target_Switch' material parameter to make the character glow */
 	FORCEINLINE void SetOffTargetSwitch();
@@ -1266,10 +1225,13 @@ protected:
 	virtual bool Server_SetUseControllerRotationYaw_Validate(bool bNewBool);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetNextMontageSection(FName CurrentSection, FName NextSection);
+	void Server_SetNextMontageSection(FName CurrentSection, FName NextSection, UAnimMontage* Montage = nullptr);
+	virtual void Server_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection, UAnimMontage* Montage = nullptr);
+	virtual bool Server_SetNextMontageSection_Validate(FName CurrentSection, FName NextSection, UAnimMontage* Montage = nullptr);
 	
 	UFUNCTION(NetMultiCast, Reliable)
-	void Multicast_SetNextMontageSection(FName CurrentSection, FName NextSection);
+	void Multicast_SetNextMontageSection(FName CurrentSection, FName NextSection, UAnimMontage* Montage = nullptr);
+	virtual void Multicast_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection, UAnimMontage* Montage = nullptr);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_PlayAnimationMontage(UAnimMontage* MontageToPlay, FName SectionToPlay, ECharacterState NewState);
@@ -1307,6 +1269,16 @@ inline void AEODCharacterBase::StopBlockingDamage()
 	else
 	{
 		DisableDamageBlocking();
+	}
+}
+
+inline void AEODCharacterBase::SetWeaponSheathed(bool bNewValue)
+{
+	bWeaponSheathed = bNewValue;
+	PlayToggleSheatheAnimation();
+	if (Role < ROLE_Authority)
+	{
+		Server_SetWeaponSheathed(bNewValue);
 	}
 }
 
