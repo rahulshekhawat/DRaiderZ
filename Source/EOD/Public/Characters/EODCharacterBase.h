@@ -791,35 +791,51 @@ public:
 	 * @param CauseOfDeath - The reason for death of this character
 	 * @param Instigator - The character that instigated the death of this character (if any)
 	 */
-	virtual void Die(ECauseOfDeath CauseOfDeath, AActor* Instigator = nullptr, AController* Owner = nullptr);
+	virtual void Die(ECauseOfDeath CauseOfDeath, AActor* EventInstigator = nullptr, AController* EventOwner = nullptr);
 
+	// --------------------------------------
+	//  Skill System
+	// --------------------------------------
 
+	/** Returns the ID of skill that character is currently using. Returns NAME_None if character is not using any skill */
+	FORCEINLINE FName GetCurrentActiveSkillID() const;
 
+	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
+	UFUNCTION(BlueprintPure, Category = "Skill System", meta = (DisplayName = "Get Current Active Skill ID"))
+	FName BP_GetCurrentActiveSkillID() const;
 
+	//  Set the ID of the skill that is currently being used
+	FORCEINLINE void SetCurrentActiveSkillID(FName SkillID);
+
+	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
+	UFUNCTION(BlueprintCallable, Category = "Skill System", meta = (DisplayName = "Set Current Active Skill ID"))
+	void BP_SetCurrentActiveSkillID(FName SkillID);
+
+	/** Returns the skill that character is currently using. Returns nullptr if character is not using any skill */
+	FORCEINLINE UGameplaySkillBase* GetCurrentActiveSkill() const;
+
+	FORCEINLINE void SetCurrentActiveSkill(UGameplaySkillBase* Skill);
 
 	/** Returns true if character can use any skill at all */
-	UFUNCTION(BlueprintPure, Category = "Gameplay")
+	UFUNCTION(BlueprintPure, Category = "Skill System")
 	virtual bool CanUseAnySkill() const;
 
-	/** Returns true if character can use a particular skill */
-	virtual bool CanUseSkill(FSkillTableRow* Skill);
+	UFUNCTION(BlueprintPure, Category = "Skill System")
+	virtual bool CanUseSkill(FName SkillID, UGameplaySkillBase* Skill = nullptr);
 
+	/** Returns the last used skill */
+	FORCEINLINE FLastUsedSkillInfo GetLastUsedSkill();
 
+	/** Returns the last used skill */
+	UFUNCTION(BlueprintPure, Category = "Skill System", meta = (DisplayName = "Get Last Used Skill"))
+	FLastUsedSkillInfo BP_GetLastUsedSkill();
 
+	UFUNCTION(BlueprintPure, Category = "Skill System")
+	UGameplaySkillBase* GetSkill(FName SkillID) const;
 
-	inline FSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
-
-	/**
-	 * Use a skill and play it's animation
-	 * This method is primarily intended to be used by AI characters
-	 */
-	// UFUNCTION(BlueprintCallable, Category = Skills)
-	// virtual bool UseSkill(FName SkillID);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect)
-	bool UseSkill(FName SkillID);
-
-	virtual bool UseSkill_Implementation(FName SkillID);
+	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
+	UFUNCTION(BlueprintPure, Category = "Skill System")
+	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const;
 
 	/**
 	 * Determines and returns the status of a skill
@@ -828,64 +844,29 @@ public:
 	 * Returns EEODTaskStatus::Aborted if the skill was aborted before completion
 	 * Returns EEODTaskStatus::Inactive if the character is using or have used a different skill
 	 */
-	UFUNCTION(BlueprintCallable, Category = Skills)
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual EEODTaskStatus CheckSkillStatus(FName SkillID);
 
-	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
-	UFUNCTION(BlueprintCallable, Category = Skills)
-	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const;
-
-	/** Returns the ID of skill that character is currently using. Returns NAME_None if character is not using any skill */
-	FORCEINLINE FName GetCurrentActiveSkillID() const;
-
-	/** Returns the skill that character is currently using. Returns nullptr if character is not using any skill */
-	FORCEINLINE FSkillTableRow* GetCurrentActiveSkill() const;
-
-	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
-	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Current Active Skill ID"))
-	FName BP_GetCurrentActiveSkillID() const;
-
-	//  Set the ID of the skill that is currently being used
-	FORCEINLINE void SetCurrentActiveSkillID(FName SkillID)
-	{
-		CurrentActiveSkillID = SkillID;
-	}
-
-	FORCEINLINE void SetCurrentActiveSkill(FSkillTableRow* Skill)
-	{
-		CurrentActiveSkill = Skill;
-	}
-
-	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
-	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Current Active Skill ID"))
-	void BP_SetCurrentActiveSkillID(FName SkillID);
-
-	/** Returns the last used skill */
-	FORCEINLINE FLastUsedSkillInfo& GetLastUsedSkill();
-
-	/** Returns the last used skill */
-	UFUNCTION(BlueprintPure, Category = Skills, meta = (DisplayName = "Get Last Used Skill"))
-	FLastUsedSkillInfo& BP_GetLastUsedSkill();
-
-
-
-public:
-
-	// --------------------------------------
-	//  Skill System
-	// --------------------------------------
+	/**
+	 * Use a skill and play it's animation
+	 * This method is primarily intended to be used by AI characters
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Skill System")
+	bool UseSkill(FName SkillID, UGameplaySkillBase* Skill = nullptr);
+	virtual bool UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill = nullptr);
 
 private:
 
 	/** SkillID of skill that this character is currently using */
-	UPROPERTY(Transient)
+	UPROPERTY()
 	FName CurrentActiveSkillID;
 
 	/** The skill that this character is currently using */
-	FSkillTableRow* CurrentActiveSkill;
+	UPROPERTY(Transient)
+	UGameplaySkillBase* CurrentActiveSkill;
 
 	/** Information of last used skill */
-	UPROPERTY(Transient)
+	UPROPERTY()
 	FLastUsedSkillInfo LastUsedSkillInfo;
 
 public:
@@ -1534,6 +1515,7 @@ FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 	return Faction;
 }
 
+/*
 inline FSkillTableRow* AEODCharacterBase::GetSkill(FName SkillID, const FString& ContextString) const
 {
 	FSkillTableRow* Skill = nullptr;
@@ -1543,21 +1525,32 @@ inline FSkillTableRow* AEODCharacterBase::GetSkill(FName SkillID, const FString&
 	{
 		Skill = SkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString);
 	}
-	*/
+	//////
 	return Skill;
 }
+*/
 
 FORCEINLINE FName AEODCharacterBase::GetCurrentActiveSkillID() const
 {
 	return CurrentActiveSkillID;
 }
 
-FORCEINLINE FSkillTableRow* AEODCharacterBase::GetCurrentActiveSkill() const
+FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkillID(FName SkillID)
+{
+	CurrentActiveSkillID = SkillID;
+}
+
+FORCEINLINE UGameplaySkillBase* AEODCharacterBase::GetCurrentActiveSkill() const
 {
 	return CurrentActiveSkill;
 }
 
-FORCEINLINE FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill()
+FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkill(UGameplaySkillBase* Skill)
+{
+	CurrentActiveSkill = Skill;
+}
+
+FORCEINLINE FLastUsedSkillInfo AEODCharacterBase::GetLastUsedSkill()
 {
 	return LastUsedSkillInfo;
 }

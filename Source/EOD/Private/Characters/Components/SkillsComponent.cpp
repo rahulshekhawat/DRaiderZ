@@ -346,7 +346,8 @@ void USkillsComponent::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
 #endif // TEST_CODE_ENABLED
 
 		FString SkillIDString = GetGenderPrefix() + SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
-		FSkillTableRow* Skill = PlayerPawn->GetSkill(FName(*SkillIDString));
+		// FSkillTableRow* Skill = PlayerPawn->GetSkill(FName(*SkillIDString));
+		FSkillTableRow* Skill = nullptr;
 
 		if (!Skill)
 		{

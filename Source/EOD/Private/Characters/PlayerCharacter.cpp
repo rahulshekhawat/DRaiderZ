@@ -240,10 +240,10 @@ bool APlayerCharacter::CanUseAnySkill() const
 	return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsFastRunning() || IsNormalAttacking());
 }
 
+/*
 bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
 {
 	//~ @todo
-	/*
 	if (Skill)
 	{
 		if ((Skill->SupportedWeapons & (1 << (uint8)GetEquippedWeaponType())) &&
@@ -253,10 +253,9 @@ bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
 			return true;
 		}
 	}
-	*/
-
 	return false;
 }
+*/
 
 EWeaponType APlayerCharacter::GetEquippedWeaponType() const
 {
@@ -1927,7 +1926,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	// GetCharacterStatsComponent()->ModifyCurrentStamina(-SkillPair.Value->StaminaRequired);
 
 	SetCurrentActiveSkillID(SkillPair.Key);
-	SetCurrentActiveSkill(SkillPair.Value);
+	// SetCurrentActiveSkill(SkillPair.Value); // @todo
 	GetSkillsComponent()->OnSkillUsed(SkillButtonIndex, SkillPair.Key, SkillPair.Value);
 
 	// bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
@@ -2225,7 +2224,8 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	*/
 
 	// @todo handle skill montage blending out better because montages might be blending out in between transition of standstill and moving animations
-	if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
+	//~ @todo
+	// if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
 	{
 		GetSkillsComponent()->SetOffChainSkillReset();
 

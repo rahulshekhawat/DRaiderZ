@@ -90,6 +90,9 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 
 	MovementSpeedModifier = 1.f;
 
+	CurrentActiveSkillID = NAME_None;
+	CurrentActiveSkill = nullptr;
+
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
@@ -288,7 +291,7 @@ bool AEODCharacterBase::CanUseAnySkill() const
 	return IsIdleOrMoving();
 }
 
-bool AEODCharacterBase::CanUseSkill(FSkillTableRow * Skill)
+bool AEODCharacterBase::CanUseSkill(FName SkillID, UGameplaySkillBase* Skill)
 {
 	return false;
 }
@@ -458,11 +461,6 @@ void AEODCharacterBase::BP_SetUseControllerRotationYaw(const bool bNewBool)
 	SetUseControllerRotationYaw(bNewBool);
 }
 
-bool AEODCharacterBase::UseSkill_Implementation(FName SkillID)
-{
-	return false;
-}
-
 EEODTaskStatus AEODCharacterBase::CheckSkillStatus(FName SkillID)
 {
 	return EEODTaskStatus();
@@ -483,9 +481,19 @@ void AEODCharacterBase::BP_SetCurrentActiveSkillID(FName SkillID)
 	SetCurrentActiveSkillID(SkillID);
 }
 
-FLastUsedSkillInfo& AEODCharacterBase::BP_GetLastUsedSkill()
+FLastUsedSkillInfo AEODCharacterBase::BP_GetLastUsedSkill()
 {
 	return GetLastUsedSkill();
+}
+
+UGameplaySkillBase* AEODCharacterBase::GetSkill(FName SkillID) const
+{
+	return nullptr;
+}
+
+bool AEODCharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill)
+{
+	return false;
 }
 
 void AEODCharacterBase::ApplyStatusEffect(const UStatusEffectBase * StatusEffect)
@@ -529,7 +537,7 @@ bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float
 	}
 }
 
-void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AActor* Instigator, AController* Owner)
+void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AActor* EventInstigator, AController* EventOwner)
 {
 	if (bGodMode || IsDead())
 	{

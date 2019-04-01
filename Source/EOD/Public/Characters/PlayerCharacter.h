@@ -164,7 +164,7 @@ public:
 	virtual bool CanUseAnySkill() const;
 
 	/** Returns true if character can use a particular skill */
-	virtual bool CanUseSkill(FSkillTableRow* Skill);
+	// virtual bool CanUseSkill(FSkillTableRow* Skill);
 
 	/** Returns true if character can auto run */
 	FORCEINLINE bool CanAutoRun() const;

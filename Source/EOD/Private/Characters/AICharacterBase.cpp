@@ -230,6 +230,8 @@ void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 		return;
 	}
 
+	//~ @todo
+	/*
 	if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
 	{
 		GetLastUsedSkill().LastUsedSkillID = GetCurrentActiveSkillID();
@@ -238,6 +240,7 @@ void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 		SetCurrentActiveSkillID(NAME_None);
 		SetCurrentActiveSkill(nullptr);
 	}
+	*/
 
 	//~ @todo
 	/*
@@ -253,11 +256,13 @@ void AAICharacterBase::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupt
 	// @todo
 }
 
-bool AAICharacterBase::UseSkill_Implementation(FName SkillID)
+bool AAICharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill)
 {
 	if (CanUseAnySkill())
 	{
-		FSkillTableRow* SkillToUse = GetSkill(SkillID, FString("AAICharacterBase::UseSkill, looking up AI skills for use"));
+		//~ @todo
+		// FSkillTableRow* SkillToUse = GetSkill(SkillID, FString("AAICharacterBase::UseSkill, looking up AI skills for use"));
+		FSkillTableRow* SkillToUse = nullptr;
 
 		if (!SkillToUse)
 		{
@@ -274,7 +279,7 @@ bool AAICharacterBase::UseSkill_Implementation(FName SkillID)
 			// PlayAnimationMontage(SkillToUse->AnimMontage.Get(), SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 		}
 		SetCurrentActiveSkillID(SkillID);
-		SetCurrentActiveSkill(SkillToUse);
+		// SetCurrentActiveSkill(SkillToUse);
 		//~ @todo
 		// SkillIDToWeightMap[SkillID] = SkillIDToWeightMap[SkillID] - 1;
 		// bSkillAllowsMovement = SkillToUse->bAllowsMovement;
