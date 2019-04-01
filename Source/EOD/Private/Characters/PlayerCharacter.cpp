@@ -393,83 +393,6 @@ bool APlayerCharacter::CCEKnockback_Implementation(const float Duration, const F
 	return false;
 }
 
-bool APlayerCharacter::Stun(const float Duration)
-{
-	if (CanStun())
-	{
-		PlayStunAnimation();
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndStun, Duration, false);
-
-		return true;
-	}
-
-	return false;
-}
-
-void APlayerCharacter::EndStun()
-{
-	StopStunAnimation();
-	// @todo Restore character state to IdleWalkRun if necessary (if OnMontageBlendingOut event doesn't restore character state to IdleWalkRun)
-}
-
-bool APlayerCharacter::Freeze(const float Duration)
-{
-	// @todo maybe just freeze animation instead of freezing entire character since it might freeze additional effects like glow
-	if (CanFreeze())
-	{
-		CustomTimeDilation = 0;
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndFreeze, Duration, false);
-
-		return true;
-	}
-
-	return false;
-}
-
-void APlayerCharacter::EndFreeze()
-{
-	//~ @todo
-	// CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
-}
-
-bool APlayerCharacter::Knockdown(const float Duration)
-{
-	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
-	{
-		// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-			// UCharacterLibrary::SectionName_KnockdownStart,
-			// ECharacterState::GotHit);
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
-
-		return true;
-	}
-
-	return false;
-}
-
-void APlayerCharacter::EndKnockdown()
-{
-	// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-		// UCharacterLibrary::SectionName_KnockdownEnd,
-		// ECharacterState::GotHit);
-}
-
-bool APlayerCharacter::Knockback(const float Duration, const FVector& ImpulseDirection)
-{
-	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
-	{
-		// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-			// UCharacterLibrary::SectionName_KnockdownStart,
-			// ECharacterState::GotHit);
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::EndKnockdown, Duration, false);
-		PushBack(ImpulseDirection);
-
-		return true;
-	}
-
-	return false;
-}
-
 void APlayerCharacter::BlockAttack()
 {
 	if (GetActiveAnimationReferences() && GetActiveAnimationReferences()->BlockAttack.Get())
@@ -2015,7 +1938,8 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	// If frozen
 	if (CustomTimeDilation == 0.f)
 	{
-		EndFreeze();
+		//~ @todo
+		// EndFreeze();
 	}
 
 	//~ @todo

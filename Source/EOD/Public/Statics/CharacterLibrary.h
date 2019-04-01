@@ -37,6 +37,8 @@ UENUM(BlueprintType)
 enum class ECauseOfDeath : uint8
 {
 	ZeroHP,
+	KilledByEnemy,
+	KilledByEnvironment,
 	Suicide,
 	FellOutOfWorld,
 };

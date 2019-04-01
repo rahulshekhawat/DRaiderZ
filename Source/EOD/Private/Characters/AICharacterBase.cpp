@@ -138,7 +138,8 @@ bool AAICharacterBase::CCEFreeze_Implementation(const float Duration)
 	if (CanFreeze())
 	{
 		CustomTimeDilation = 0;
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::EndFreeze, Duration, false);
+		//~ @todo
+		// GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::EndFreeze, Duration, false);
 
 		return true;
 	}

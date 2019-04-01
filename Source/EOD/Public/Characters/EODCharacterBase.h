@@ -343,6 +343,17 @@ public:
 	UFUNCTION()
 	void DisableDamageBlocking();
 
+	/** Set whether character is engaged in combat or not */
+	UFUNCTION(BlueprintCallable, Category = "Combat System")
+	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; };
+
+	/** Returns true if character is engaged in combat */
+	FORCEINLINE bool IsInCombat() const { return bInCombat; }
+
+	/** Returns true if character is engaged in combat */
+	UFUNCTION(BlueprintPure, Category = "Combat System", meta = (DisplayName = "Is In Combat"))
+	bool BP_IsInCombat() const;
+
 protected:
 
 	/** Enables immunity frames for a given duration */
@@ -438,6 +449,10 @@ public:
 
 	/** [local] Sets whether current character allows rotation */
 	inline void SetCharacterStateAllowsRotation(bool bValue);
+
+	/** [server + local] Change character max walk speed */
+	UFUNCTION(BlueprintCallable, Category = "Movement", meta = (DisplayName = "Set Walk Speed"))
+	void BP_SetWalkSpeed(const float WalkSpeed);
 
 protected:
 
@@ -713,24 +728,6 @@ public:
 
 	/** Returns true if character can use a particular skill */
 	virtual bool CanUseSkill(FSkillTableRow* Skill);
-	
-	/** Returns true if character can flinch */
-	FORCEINLINE bool CanFlinch() const;
-
-	/** Returns true if character can stun */
-	FORCEINLINE bool CanStun() const;
-
-	/** Returns true if character can get knocked down */
-	FORCEINLINE bool CanKnockdown() const;
-
-	/** Returns true if character can get knocked back */
-	FORCEINLINE bool CanKnockback() const;
-
-	/** Returns true if character can be frozed/crystalized */
-	FORCEINLINE bool CanFreeze() const;
-
-	/** Returns true if character can be interrupted */
-	FORCEINLINE bool CanInterrupt() const;
 
 	/** Returns true if this character requires healing (low on HP) */
 	FORCEINLINE bool NeedsHealing() const;
@@ -742,119 +739,13 @@ public:
 	/** Returns true if this character is healing anyone */
 	virtual bool IsHealing() const;
 
-	/** Flinch this character (visual feedback) */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Flinch"))
-	bool CCEFlinch(const float BCAngle);
-
-	/** Flinch this character (visual feedback) */
-	virtual bool CCEFlinch_Implementation(const float BCAngle);
-
-	/** Interrupt this character's current action */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Interrupt"))
-	bool CCEInterrupt(const float BCAngle);
-
-	/** Interrupt this character's current action */
-	virtual bool CCEInterrupt_Implementation(const float BCAngle);
-
-	/** Applies stun to this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Stun"))
-	bool CCEStun(const float Duration);
-
-	/** Applies stun to this character */
-	virtual bool CCEStun_Implementation(const float Duration);
-
-	/** Removes 'stun' crowd control effect from this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Remove Stun"))
-	void CCERemoveStun();
-
-	/** Removes 'stun' crowd control effect from this character */
-	virtual void CCERemoveStun_Implementation();
-
-	/** Freeze this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Freeze"))
-	bool CCEFreeze(const float Duration);
-
-	/** Freeze this character */
-	virtual bool CCEFreeze_Implementation(const float Duration);
-
-	/** Removes 'freeze' crowd control effect from this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Unfreeze"))
-	void CCEUnfreeze();
-
-	/** Removes 'freeze' crowd control effect from this character */
-	virtual void CCEUnfreeze_Implementation();
-
-	/** Knockdown this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockdown"))
-	bool CCEKnockdown(const float Duration);
-
-	/** Knockdown this character */
-	virtual bool CCEKnockdown_Implementation(const float Duration);
-
-	/** Removes 'knock-down' crowd control effect from this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE End Knockdown"))
-	void CCEEndKnockdown();
-
-	/** Removes 'knock-down' crowd control effect from this character */
-	virtual void CCEEndKnockdown_Implementation();
-
-	/** Knockback this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockback"))
-	bool CCEKnockback(const float Duration, const FVector& ImpulseDirection);
-
-	/** Knockback this character */
-	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection);
-
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerStatus)
 	void InitiateDeathSequence();
 
 	virtual void InitiateDeathSequence_Implementation();
 
-	/** Applies stun to this character */
-	virtual bool Stun(const float Duration);
-
-	/** Removes 'stun' crowd control effect from this character */
-	virtual void EndStun();
-
-	/** Freeze this character */
-	virtual bool Freeze(const float Duration);
-
-	/** Removes 'freeze' crowd control effect from this character */
-	virtual void EndFreeze();
-
-	/** Knockdown this character */
-	virtual bool Knockdown(const float Duration);
-
-	/** Removes 'knock-down' crowd control effect from this character */
-	virtual void EndKnockdown();
-
-	/** Knockback this character */
-	virtual bool Knockback(const float Duration, const FVector& ImpulseDirection);
-
 	/** Plays BlockAttack animation on blocking an incoming attack */
 	virtual void BlockAttack();
-
-	/** Plays stun animation */
-	UFUNCTION(BlueprintImplementableEvent, Category = "Animations|CrowdControlEffect")
-	void PlayStunAnimation();
-
-	/** Stops stun animation */
-	UFUNCTION(BlueprintImplementableEvent, Category = "Animations|CrowdControlEffect")
-	void StopStunAnimation();
-
-	/** Simulates the knock back effect */
-	UFUNCTION(BlueprintImplementableEvent, Category = "Motion|CrowdControlEffect")
-	void PushBack(const FVector& ImpulseDirection); // @todo const parameter?
-
-	/** Set whether character is engaged in combat or not */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character")
-	virtual void SetInCombat(const bool bValue) { bInCombat = bValue; };
-	
-	/** Returns true if character is engaged in combat */
-	FORCEINLINE bool IsInCombat() const { return bInCombat; }
-
-	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Is In Combat"))
-	bool BP_IsInCombat() const;
 
 	/** Sets current state of character */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
@@ -862,10 +753,6 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "EOD Character", meta = (DisplayName = "Get Character State"))
 	ECharacterState BP_GetCharacterState() const;
-
-	/** [server + local] Change character max walk speed */
-	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Walk Speed"))
-	void BP_SetWalkSpeed(const float WalkSpeed);
 
 	/**
 	 * [server + local] Set character rotation yaw over network
@@ -951,18 +838,6 @@ public:
 	FLastUsedSkillInfo& BP_GetLastUsedSkill();
 
 	/**
-	 * Applies status effect on the character
-	 * Handles activation of particle effects and sounds of the status effect (e.g. burning)
-	 */
-	virtual void ApplyStatusEffect(const UStatusEffectBase* StatusEffect);
-
-	/**
-	 * Removes status effect from the character
-	 * Handles deactivation of particle effects and sounds of the status effect (e.g. burning)
-	 */
-	virtual void RemoveStatusEffect(const UStatusEffectBase* StatusEffect);
-
-	/**
 	 * Rotate a character toward desired yaw based on the rotation rate in a given delta time (Precision based)
 	 * @param DesiredYaw 	The desired yaw of character in degrees
 	 * @param DeltaTime 	The time between last and current tick
@@ -1012,6 +887,104 @@ public:
 	void CreateAndDisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 
 public:
+
+	// --------------------------------------
+	//  Status Effects
+	// --------------------------------------
+
+	/**
+	 * Applies status effect on the character
+	 * Handles activation of particle effects and sounds of the status effect (e.g. burning)
+	 */
+	virtual void ApplyStatusEffect(const UStatusEffectBase* StatusEffect);
+
+	/**
+	 * Removes status effect from the character
+	 * Handles deactivation of particle effects and sounds of the status effect (e.g. burning)
+	 */
+	virtual void RemoveStatusEffect(const UStatusEffectBase* StatusEffect);
+
+	// --------------------------------------
+	//  Crowd Control Effects
+	// --------------------------------------
+
+	/** Returns true if character can flinch */
+	virtual bool CanFlinch() const;
+
+	/** Returns true if character can stun */
+	virtual bool CanStun() const;
+
+	/** Returns true if character can get knocked down */
+	virtual bool CanKnockdown() const;
+
+	/** Returns true if character can get knocked back */
+	virtual bool CanKnockback() const;
+
+	/** Returns true if character can be frozed/crystalized */
+	virtual bool CanFreeze() const;
+
+	/** Returns true if character can be interrupted */
+	virtual bool CanInterrupt() const;
+
+	/** Flinch this character (visual feedback) */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Flinch"))
+	bool CCEFlinch(const float BCAngle);
+	virtual bool CCEFlinch_Implementation(const float BCAngle);
+
+	/** Interrupt this character's current action */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Interrupt"))
+	bool CCEInterrupt(const float BCAngle);
+	virtual bool CCEInterrupt_Implementation(const float BCAngle);
+
+	/** Applies stun to this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Stun"))
+	bool CCEStun(const float Duration);
+	virtual bool CCEStun_Implementation(const float Duration);
+
+	/** Removes 'stun' crowd control effect from this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Remove Stun"))
+	void CCERemoveStun();
+	virtual void CCERemoveStun_Implementation();
+
+	/** Freeze this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Freeze"))
+	bool CCEFreeze(const float Duration);
+	virtual bool CCEFreeze_Implementation(const float Duration);
+
+	/** Removes 'freeze' crowd control effect from this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Unfreeze"))
+	void CCEUnfreeze();
+	virtual void CCEUnfreeze_Implementation();
+
+	/** Knockdown this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockdown"))
+	bool CCEKnockdown(const float Duration);
+	virtual bool CCEKnockdown_Implementation(const float Duration);
+
+	/** Removes 'knock-down' crowd control effect from this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE End Knockdown"))
+	void CCEEndKnockdown();
+	virtual void CCEEndKnockdown_Implementation();
+
+	/** Knockback this character */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockback"))
+	bool CCEKnockback(const float Duration, const FVector & ImpulseDirection);
+	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection);
+
+	/** Plays stun animation */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CrowdControlEffect|Animations")
+	void PlayStunAnimation();
+	virtual void PlayStunAnimation_Implementation();
+
+	/** Stops stun animation */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CrowdControlEffect|Animations")
+	void StopStunAnimation();
+	virtual void StopStunAnimation_Implementation();
+
+	/** Simulates the knock back effect */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CrowdControlEffect|Movement")
+	void PushBack(const FVector& ImpulseDirection);
+	virtual void PushBack_Implementation(const FVector& ImpulseDirection);
 
 	// --------------------------------------
 	//  Gameplay Events
@@ -1537,78 +1510,6 @@ FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 FORCEINLINE bool AEODCharacterBase::IsWeaponSheathed() const
 {
 	return bWeaponSheathed;
-}
-
-FORCEINLINE bool AEODCharacterBase::CanFlinch() const
-{
-	//~ @todo
-	/*
-	if (IsValid(CharacterStatsComponent))
-	{
-		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Flinch);
-	}
-	*/
-	return true;
-}
-
-FORCEINLINE bool AEODCharacterBase::CanStun() const
-{
-	//~ @todo
-	/*
-	if (IsValid(CharacterStatsComponent))
-	{
-		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Stunned);
-	}
-	*/
-	return true;
-}
-
-FORCEINLINE bool AEODCharacterBase::CanKnockdown() const
-{
-	//~ @todo
-	/*
-	if (IsValid(CharacterStatsComponent))
-	{
-		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::KnockedDown);
-	}
-	*/
-	return true;
-}
-
-FORCEINLINE bool AEODCharacterBase::CanKnockback() const
-{
-	//~ @todo
-	/*
-	if (IsValid(CharacterStatsComponent))
-	{
-		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::KnockedBack);
-	}
-	*/
-	return true;
-}
-
-FORCEINLINE bool AEODCharacterBase::CanFreeze() const
-{
-	//~ @todo
-	/*
-	if (IsValid(CharacterStatsComponent))
-	{
-		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Crystalized);
-	}
-	*/
-	return true;
-}
-
-FORCEINLINE bool AEODCharacterBase::CanInterrupt() const
-{
-	//~ @todo
-	/*
-	if (IsValid(CharacterStatsComponent))
-	{
-		return IsAlive() && !CharacterStatsComponent->HasCrowdControlImmunity(ECrowdControlEffect::Interrupt);
-	}
-	*/
-	return true;
 }
 
 FORCEINLINE bool AEODCharacterBase::NeedsHealing() const

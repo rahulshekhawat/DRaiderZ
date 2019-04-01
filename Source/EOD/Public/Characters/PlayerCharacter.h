@@ -231,27 +231,6 @@ public:
 	/** Knockback this character */
 	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection) override;
 
-	/** [server + local] Applies stun to this character */
-	virtual bool Stun(const float Duration) override;
-
-	/** Removes 'stun' crowd control effect from this character */
-	virtual void EndStun() override;
-
-	/** [server + local] Freeze this character */
-	virtual bool Freeze(const float Duration) override;
-
-	/** Removes 'freeze' crowd control effect from this character */
-	virtual void EndFreeze() override;
-
-	/** [server + local] Knockdown this character */
-	virtual bool Knockdown(const float Duration) override;
-
-	/** Removes 'knock-down' crowd control effect from this character */
-	virtual void EndKnockdown() override;
-
-	/** [server + local] Knockback this character */
-	virtual bool Knockback(const float Duration, const FVector& ImpulseDirection) override;
-
 	virtual void BlockAttack() override;
 
 	UFUNCTION()

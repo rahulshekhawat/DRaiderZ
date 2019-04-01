@@ -336,40 +336,16 @@ bool AEODCharacterBase::CCEKnockback_Implementation(const float Duration, const 
 	return false;
 }
 
+void AEODCharacterBase::PlayStunAnimation_Implementation()
+{
+}
+
+void AEODCharacterBase::StopStunAnimation_Implementation()
+{
+}
+
 void AEODCharacterBase::InitiateDeathSequence_Implementation()
 {
-}
-
-bool AEODCharacterBase::Stun(const float Duration)
-{
-	return false;
-}
-
-void AEODCharacterBase::EndStun()
-{
-}
-
-bool AEODCharacterBase::Freeze(const float Duration)
-{
-	return false;
-}
-
-void AEODCharacterBase::EndFreeze()
-{
-}
-
-bool AEODCharacterBase::Knockdown(const float Duration)
-{
-	return false;
-}
-
-void AEODCharacterBase::EndKnockdown()
-{
-}
-
-bool AEODCharacterBase::Knockback(const float Duration, const FVector & ImpulseDirection)
-{
-	return false;
 }
 
 void AEODCharacterBase::BlockAttack()
@@ -1244,6 +1220,36 @@ void AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Implementation(float
 }
 
 bool AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Validate(float NewYaw)
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanFlinch() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanStun() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanKnockdown() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanKnockback() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanFreeze() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanInterrupt() const
 {
 	return true;
 }
