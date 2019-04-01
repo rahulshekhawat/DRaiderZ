@@ -842,19 +842,6 @@ public:
 	bool BP_IsInCombat() const;
 
 	/** Sets current state of character */
-	FORCEINLINE void SetCharacterState(const ECharacterState NewState)
-	{
-		// CharacterState = NewState;
-		// Character state is no longer replicated
-		/*
-		if (Role < ROLE_Authority)
-		{
-			Server_SetCharacterState(NewState);
-		}
-		*/
-	}
-
-	/** Sets current state of character */
 	UFUNCTION(BlueprintCallable, Category = "EOD Character", meta = (DisplayName = "Set Character State"))
 	void BP_SetCharacterState(const ECharacterState NewState);
 

@@ -450,7 +450,7 @@ bool AEODCharacterBase::BP_IsInCombat() const
 
 void AEODCharacterBase::BP_SetCharacterState(const ECharacterState NewState)
 {
-	SetCharacterState(NewState);
+	// SetCharacterState(NewState);
 }
 
 ECharacterState AEODCharacterBase::BP_GetCharacterState() const
@@ -577,7 +577,7 @@ void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* Insti
 		// Set current hp to 0
 		//~ @todo
 		// GetCharacterStatsComponent()->ModifyBaseHealth(-GetCharacterStatsComponent()->GetMaxHealth());
-		SetCharacterState(ECharacterState::Dead);
+		// SetCharacterState(ECharacterState::Dead);
 
 		// @todo play death animation and death sound
 	}

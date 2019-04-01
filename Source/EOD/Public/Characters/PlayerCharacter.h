@@ -924,7 +924,7 @@ inline void APlayerCharacter::ReleasedSkillKey()
 
 inline void APlayerCharacter::EnableAutoRun()
 {
-	SetCharacterState(ECharacterState::AutoRun);
+	// SetCharacterState(ECharacterState::AutoRun);
 	SetUseControllerRotationYaw(true);
 }
 
@@ -932,7 +932,7 @@ inline void APlayerCharacter::DisableAutoRun()
 {
 	// @todo put a test to check if the player is really auto running
 
-	SetCharacterState(ECharacterState::IdleWalkRun);
+	// SetCharacterState(ECharacterState::IdleWalkRun);
 	SetUseControllerRotationYaw(false);
 }
 
@@ -976,7 +976,7 @@ inline void APlayerCharacter::EnableBlock()
 		StopNormalAttack();
 	}
 
-	SetCharacterState(ECharacterState::Blocking);
+	// SetCharacterState(ECharacterState::Blocking);
 	SetUseControllerRotationYaw(true);
 	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * MovementSpeedModifier);
 
@@ -987,7 +987,7 @@ inline void APlayerCharacter::EnableBlock()
 inline void APlayerCharacter::DisableBlock()
 {
 	SetUseControllerRotationYaw(false);
-	SetCharacterState(ECharacterState::IdleWalkRun);
+	// SetCharacterState(ECharacterState::IdleWalkRun);
 	DisableDamageBlocking();
 }
 
@@ -995,7 +995,7 @@ inline void APlayerCharacter::EnableFastRun()
 {
 	if (IsIdleOrMoving())
 	{
-		SetCharacterState(ECharacterState::SpecialMovement);
+		// SetCharacterState(ECharacterState::SpecialMovement);
 	}
 }
 
@@ -1003,7 +1003,7 @@ inline void APlayerCharacter::DisableFastRun()
 {
 	if (IsFastRunning())
 	{
-		SetCharacterState(ECharacterState::IdleWalkRun);
+		// SetCharacterState(ECharacterState::IdleWalkRun);
 	}
 }
 

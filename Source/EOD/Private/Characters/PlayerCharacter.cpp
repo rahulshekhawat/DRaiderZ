@@ -1031,7 +1031,7 @@ void APlayerCharacter::OnJump()
 		*/
 
 		Jump();
-		SetCharacterState(ECharacterState::Jumping);
+		// SetCharacterState(ECharacterState::Jumping);
 	}
 }
 
@@ -1081,7 +1081,7 @@ void APlayerCharacter::PlayToggleSheatheAnimation()
 		PlayerAnimInstance->Montage_Play(MontageToPlay);
 		PlayerAnimInstance->Montage_JumpToSection(SectionToPlay);
 		PlayerAnimInstance->OnTransitionableMontageTriggered(false);
-		SetCharacterState(ECharacterState::SwitchingWeapon);
+		// SetCharacterState(ECharacterState::SwitchingWeapon);
 	}
 }
 
@@ -1727,7 +1727,7 @@ void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSect
 			}
 		}
 
-		SetCharacterState(ECharacterState::Attacking);
+		// SetCharacterState(ECharacterState::Attacking);
 	}
 
 	Server_PlayNormalAttackAnimation(OldSection, NewSection);
@@ -2204,7 +2204,7 @@ void APlayerCharacter::RequestDialogue_Implementation(AActor* Requestor, FName D
 {
 	FocusCameraOnActor(Requestor);
 	DisplayDialogueWidget(DialogueWindowID);
-	SetCharacterState(ECharacterState::Interacting);
+	// SetCharacterState(ECharacterState::Interacting);
 }
 
 void APlayerCharacter::FocusCameraOnActor(AActor* TargetActor)
@@ -2242,7 +2242,7 @@ void APlayerCharacter::EndInteraction()
 	if (PC)
 	{
 		PC->SetViewTargetWithBlend(this, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
-		SetCharacterState(ECharacterState::IdleWalkRun);
+		// SetCharacterState(ECharacterState::IdleWalkRun);
 
 		RemoveDialogueWidget();
 
@@ -2571,7 +2571,7 @@ void APlayerCharacter::Multicast_PlayNormalAttackAnimation_Implementation(FName 
 			}
 		}
 
-		SetCharacterState(ECharacterState::Attacking);
+		// SetCharacterState(ECharacterState::Attacking);
 	}
 }
 
