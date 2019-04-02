@@ -26,26 +26,24 @@ class EOD_API IInteractionInterface
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//  Interaction Interface
+	// --------------------------------------
+
 	/** This event is called when a (player) character interacts with the underlying actor */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
 	void OnInteract(AEODCharacterBase* Character);
-
-	/** This event is called when a (player) character interacts with the underlying actor */
 	virtual void OnInteract_Implementation(AEODCharacterBase* Character);
 
 	/** This event is called to highlight interactive actor's meshes */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
 	void EnableCustomDepth();
-
-	/** This event is called to highlight interactive actor's meshes */
 	virtual void EnableCustomDepth_Implementation();
 
 	/** This event is called to disable highlight on interactive actor's meshes */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
 	void DisableCustomDepth();
-
-	/** This event is called to disable highlight on interactive actor's meshes */
 	virtual void DisableCustomDepth_Implementation();
-
 
 };

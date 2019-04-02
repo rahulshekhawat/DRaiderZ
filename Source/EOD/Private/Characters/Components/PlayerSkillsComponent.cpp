@@ -65,11 +65,15 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 
 	if (!CompOwner)
 	{
+		// If CompOwner is invalid, try to initalize it from locally cached component owner
 		CompOwner = GetCharacterOwner();
 	}
 
-	check(CompOwner);
-	check(SkillsDataTable);
+	check(CompOwner)
+	if (!SkillsDataTable)
+	{
+		return;
+	}
 
 	FString ContextString = FString("UPlayerSkillsComponent::InitializeSkills()");
 	TArray<FName> Keys = SkillsDataTable->GetRowNames();

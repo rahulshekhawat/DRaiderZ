@@ -70,7 +70,8 @@ void USkillsComponent::ToggleSkillTreeUI()
 void USkillsComponent::InitializeComponentWidgets()
 {
 	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
-	if (!(OwningPlayer && OwningPlayer->Controller && OwningPlayer->Controller->IsLocalPlayerController() && OwningPlayer->GetHUDWidget()))
+	//~ @todo
+	//if (!(OwningPlayer && OwningPlayer->Controller && OwningPlayer->Controller->IsLocalPlayerController() && OwningPlayer->GetHUDWidget()))
 	{
 		return;
 	}
@@ -78,14 +79,16 @@ void USkillsComponent::InitializeComponentWidgets()
 	if (SkillTreeWidgetClass.Get())
 	{
 		SkillTreeWidget = CreateWidget<USkillTreeWidget>(OwningPlayer->GetGameInstance(), SkillTreeWidgetClass);
-		OwningPlayer->GetHUDWidget()->AddSkillTreeWidget(SkillTreeWidget);
+		//~ @todo
+		// OwningPlayer->GetHUDWidget()->AddSkillTreeWidget(SkillTreeWidget);
 		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 	if (SkillBarWidgetClass.Get())
 	{
 		SkillBarWidget = CreateWidget<USkillBarWidget>(OwningPlayer->GetGameInstance(), SkillBarWidgetClass);
-		OwningPlayer->GetHUDWidget()->AddSkillBarWidget(SkillBarWidget);
+		//~ @todo
+		// OwningPlayer->GetHUDWidget()->AddSkillBarWidget(SkillBarWidget);
 	}
 }
 
@@ -346,7 +349,8 @@ void USkillsComponent::OnSkillGroupAddedToSkillBar(const FString& SkillGroup)
 #endif // TEST_CODE_ENABLED
 
 		FString SkillIDString = GetGenderPrefix() + SkillGroup + FString("_") + FString::FromInt(SkillState.CurrentUpgradeLevel);
-		FSkillTableRow* Skill = PlayerPawn->GetSkill(FName(*SkillIDString));
+		// FSkillTableRow* Skill = PlayerPawn->GetSkill(FName(*SkillIDString));
+		FSkillTableRow* Skill = nullptr;
 
 		if (!Skill)
 		{

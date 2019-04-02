@@ -79,6 +79,7 @@ void ACombatManager::NativeDisplayDamage(
 	}
 }
 
+/*
 float ACombatManager::GetActualDamage(const AEODCharacterBase* HitInstigator,
 									  const AEODCharacterBase* HitCharacter,
 									  const FSkillDamageInfo& SkillDamageInfo,
@@ -116,9 +117,9 @@ float ACombatManager::GetActualDamage(const AEODCharacterBase* HitInstigator,
 	{
 		ActualDamage = ActualDamage * (1 - DamageReductionOnBlock);
 	}
-
 	return ActualDamage;
 }
+*/
 
 float ACombatManager::GetActualDamage(
 	const AEODCharacterBase* HitInstigator,
@@ -134,6 +135,8 @@ float ACombatManager::GetActualDamage(
 	float CritBonus = 0.f;
 	float DamageReductionOnBlock = 0.f;
 
+	//~ @todo
+	/*
 	if (SkillUsed->DamageType == EDamageType::Physical)
 	{
 		ActualDamage = HitInstigator->GetCharacterStatsComponent()->GetPhysicalAttack();
@@ -148,6 +151,7 @@ float ACombatManager::GetActualDamage(
 		DamageReductionOnBlock = HitInstigator->GetCharacterStatsComponent()->GetMagickDamageReductionOnBlock();
 		CritMultiplier = MagickalCritMultiplier;
 	}
+	*/
 
 	ActualDamage = ActualDamage * SkillUsed->DamagePercent / 100.f;
 
@@ -311,9 +315,12 @@ void ACombatManager::CharacterToCharacterAttack(
 		}		
 	}
 
+	//~ @todo
+	/*
 	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillUsed, bCritHit, bAttackBlocked);
 	HitCharacter->GetCharacterStatsComponent()->ModifyCurrentHealth(-ActualDamage);
 	int32 ResultingHitCharacterHP = HitCharacter->GetCharacterStatsComponent()->GetCurrentHealth();
+	*/
 
 
 	/*
@@ -428,6 +435,7 @@ void ACombatManager::CharacterToActorAttack(AEODCharacterBase* HitInstigator, AA
 }
 */
 
+/*
 bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 											  AEODCharacterBase* HitCharacter,
 											  const FSkillDamageInfo& SkillDamageInfo,
@@ -466,6 +474,7 @@ bool ACombatManager::ApplyCrowdControlEffects(AEODCharacterBase* HitInstigator,
 
 	return bCCEApplied;
 }
+*/
 
 bool ACombatManager::AreEnemies(AEODCharacterBase* CharOne, AEODCharacterBase* CharTwo)
 {

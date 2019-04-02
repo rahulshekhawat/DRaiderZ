@@ -10,6 +10,7 @@
 #include "AICharacterBase.generated.h"
 
 class UEODWidgetComponent;
+class UGameplaySkillBase;
 
 /**
  * AICharacterBase is the base class for AI controlled characters
@@ -81,7 +82,7 @@ public:
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
 	/** Use a skill and play it's animation */
-	virtual bool UseSkill_Implementation(FName SkillID) override;
+	virtual bool UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill = nullptr) override;
 
 	/**
 	 * Determines and returns the status of a skill

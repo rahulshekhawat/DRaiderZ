@@ -608,6 +608,7 @@ bool AEODPlayerController::Server_OnSuccessfulDodge_Validate()
 
 void AEODPlayerController::Client_SetupLocalPlayerOnUnpossess_Implementation(APawn* InPawn)
 {
+	/*
 	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
 	if (IsValid(EODChar) && IsValid(HUDWidget))
 	{
@@ -620,4 +621,5 @@ void AEODPlayerController::Client_SetupLocalPlayerOnUnpossess_Implementation(APa
 			StatsComp->OnStaminaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
 		}
 	}
+	*/
 }

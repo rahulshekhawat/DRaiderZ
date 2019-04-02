@@ -32,20 +32,16 @@
  */
 DECLARE_CYCLE_STAT(TEXT("EOD ChararaterTick"), STAT_EODCharacterTick, STATGROUP_EOD);
 
-FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
-FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
-FName AEODCharacterBase::CharacterStatsComponentName(TEXT("Character Stats"));
-FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Skill Manager"));
-FName AEODCharacterBase::InteractionSphereComponentName(TEXT("Interaction Sphere"));
+const FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
+const FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
+const FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Skill Manager"));
 
 AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UEODCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	CharacterStatsComponent = ObjectInitializer.CreateDefaultSubobject<UStatsComponentBase>(this, AEODCharacterBase::CharacterStatsComponentName);
 	SkillManager = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, AEODCharacterBase::GameplaySkillsComponentName);
-
 	CameraBoomComponent = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, AEODCharacterBase::SpringArmComponentName);
 	if (CameraBoomComponent)
 	{
@@ -58,16 +54,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	if (CameraComponent)
 	{
 		CameraComponent->SetupAttachment(CameraBoomComponent, USpringArmComponent::SocketName);
-	}
-
-	InteractionSphereComponent = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, AEODCharacterBase::InteractionSphereComponentName);
-	if (InteractionSphereComponent)
-	{
-		InteractionSphereComponent->SetupAttachment(RootComponent);
-		InteractionSphereComponent->SetSphereRadius(150.f);
-		// No need to enable interaction sphere unless the character is possessed by player controller
-		InteractionSphereComponent->Deactivate();
-		InteractionSphereComponent->SetCollisionProfileName(CollisionProfileNames::NoCollision);
 	}
 
 	SetReplicates(true);
@@ -85,15 +71,13 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	DefaultRunSpeed = 600.f;
 	DefaultWalkSpeedWhileBlocking = 150.f;
 
-	CharacterState = ECharacterState::IdleWalkRun;
+	// CharacterState = ECharacterState::IdleWalkRun;
 	bGodMode = false;
 	TargetSwitchDuration = 0.1f;
 
 	// By default the weapon should be sheathed
 	bWeaponSheathed = true;
 
-	// MaxNumberOfSkills = 30;
-	DodgeStaminaCost = 30;
 	DodgeImmunityTriggerDelay = 0.1f;
 	DodgeImmunityDuration = 0.4;
 	DamageBlockTriggerDelay = 0.2f;
@@ -105,6 +89,9 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	bCharacterStateAllowsRotation = true;
 
 	MovementSpeedModifier = 1.f;
+
+	CurrentActiveSkillID = NAME_None;
+	CurrentActiveSkill = nullptr;
 
 }
 
@@ -144,80 +131,9 @@ void AEODCharacterBase::Tick(float DeltaTime)
 			StopNormalAttack();
 		}
 
-
-
-		/*
-		// Update guard state only if either the character wants to guard or if character guard is active
-		if (bWantsToGuard || IsGuardActive())
-		{
-			UpdateGuardState(DeltaTime);
-		}
-
-		// Update normal attack state only if either the character wants to normal attack or if character is actively normal attacking
-		if (bNormalAttackKeyPressed || IsNormalAttacking())
-		{
-			UpdateNormalAttackState(DeltaTime);
-		}
-
-		if (IsDodging())
-		{
-
-		}
-
-		// Update fall state only if either the character is failling or jumping
-		UCharacterMovementComponent* MoveComp = GetCharacterMovement();
-		if ((MoveComp && MoveComp->IsFalling()) || IsJumping())
-		{
-			UpdateFallState(DeltaTime);
-		}
-		*/
-
 		UpdateMovement(DeltaTime);
 		UpdateRotation(DeltaTime);
 	}
-
-	/*
-	if (GetController() && GetController()->IsLocalPlayerController())
-	{
-		// If block key is pressed but the character is not blocking
-		if (bGuardKeyPressed && !IsGuardActive() && CanGuardAgainstAttacks())
-		{
-			ActivateGuard();
-		}
-		// If block is not pressed but character is blocking
-		else if (!bGuardKeyPressed && IsGuardActive())
-		{
-			DeactivateGuard();
-		}
-
-		if (bNormalAttackKeyPressed && !IsNormalAttacking() && CanNormalAttack())
-		{
-			StartNormalAttack();
-		}
-		else if (bNormalAttackKeyPressed && IsNormalAttacking())
-		{
-			UpdateNormalAttackState(DeltaTime);
-		}
-
-		if (GetCharacterMovement()->IsFalling() && bCharacterStateAllowsMovement)
-		{
-			SetCharacterStateAllowsMovement(false);
-		}
-
-		// If the character is either idle or moving, or is in a state that allows movement except guard
-		if (IsIdleOrMoving() || (bCharacterStateAllowsMovement && !IsGuardActive()))
-		{
-			UpdatePCTryingToMove();
-			UpdateCharacterMovementDirection();
-			InitiateRotationToYawFromAxisInput();
-			UpdateMovementState(DeltaTime);
-		}
-		else if (IsGuardActive())
-		{
-			UpdateGuardState(DeltaTime);
-		}
-	}
-	*/
 }
 
 void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -230,7 +146,6 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterStateInfo, COND_SkipOwner);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bIsRunning, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(AEODCharacterBase, bGuardActive, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bWeaponSheathed, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, bPCTryingToMove, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, BlockMovementDirectionYaw, COND_SkipOwner);
@@ -265,11 +180,11 @@ void AEODCharacterBase::PossessedBy(AController* NewController)
 	// @todo - Enable interaction sphere on client.
 	if (NewController && NewController->IsLocalPlayerController())
 	{
-		EnableInteractionSphere();
+		// EnableInteractionSphere();
 	}
 	else
 	{
-		DisableInteractionSphere();
+		// DisableInteractionSphere();
 	}
 }
 
@@ -296,6 +211,10 @@ float AEODCharacterBase::BP_GetControllerRotationYaw() const
 	return (Controller ? FMath::UnwindDegrees(Controller->GetControlRotation().Yaw) : 0.0f);
 }
 
+void AEODCharacterBase::CreateAndDisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
+{
+}
+
 void AEODCharacterBase::TriggeriFrames(float Duration, float Delay)
 {
 	if (Role < ROLE_Authority)
@@ -305,18 +224,12 @@ void AEODCharacterBase::TriggeriFrames(float Duration, float Delay)
 	else
 	{
 		UWorld* World = GetWorld();
-		if (World)
-		{
-			FTimerDelegate TimerDelegate;
-			TimerDelegate.BindUObject(this, &AEODCharacterBase::EnableiFrames, Duration);
-			World->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
-		}
+		check(World);
+		// Using a delegate because I need to pass an argument to EnableiFrames function
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUObject(this, &AEODCharacterBase::EnableiFrames, Duration);
+		World->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, Delay, false);
 	}
-}
-
-bool AEODCharacterBase::BP_IsDead() const
-{
-	return IsDead();
 }
 
 bool AEODCharacterBase::BP_HasBeenHit() const
@@ -327,17 +240,18 @@ bool AEODCharacterBase::BP_HasBeenHit() const
 bool AEODCharacterBase::CanMove() const
 {
 	// Mobs can only move in IdleWalkRun state
-	return CharacterState == ECharacterState::IdleWalkRun || (IsUsingAnySkill() && bSkillAllowsMovement);
+	// return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun || (IsUsingAnySkill() && bSkillAllowsMovement);
+	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun;
 }
 
 bool AEODCharacterBase::CanJump() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun;
+	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun;
 }
 
 bool AEODCharacterBase::CanDodge() const
 {
-	return CharacterState == ECharacterState::IdleWalkRun;
+	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun;
 }
 
 bool AEODCharacterBase::CanGuardAgainstAttacks() const
@@ -345,12 +259,24 @@ bool AEODCharacterBase::CanGuardAgainstAttacks() const
 	return (IsIdleOrMoving() || IsNormalAttacking()) && !(IsWeaponSheathed());
 }
 
-bool AEODCharacterBase::CanBlock() const
+bool AEODCharacterBase::IsAlive() const
 {
-	return IsIdleOrMoving();
+	//~ @todo
+	return true;
+}
+
+bool AEODCharacterBase::IsDead() const
+{
+	//~ @todo
+	return false;
 }
 
 bool AEODCharacterBase::CanRespawn() const
+{
+	return false;
+}
+
+bool AEODCharacterBase::NeedsHealing() const
 {
 	return false;
 }
@@ -365,14 +291,9 @@ bool AEODCharacterBase::CanUseAnySkill() const
 	return IsIdleOrMoving();
 }
 
-bool AEODCharacterBase::CanUseSkill(FSkillTableRow * Skill)
+bool AEODCharacterBase::CanUseSkill(FName SkillID, UGameplaySkillBase* Skill)
 {
 	return false;
-}
-
-bool AEODCharacterBase::BP_NeedsHealing() const
-{
-	return NeedsHealing();
 }
 
 bool AEODCharacterBase::IsHealing() const
@@ -422,43 +343,23 @@ bool AEODCharacterBase::CCEKnockback_Implementation(const float Duration, const 
 	return false;
 }
 
+void AEODCharacterBase::PlayStunAnimation_Implementation()
+{
+}
+
+void AEODCharacterBase::StopStunAnimation_Implementation()
+{
+}
+
+void AEODCharacterBase::PushBack_Implementation(const FVector& ImpulseDirection)
+{
+}
+
 void AEODCharacterBase::InitiateDeathSequence_Implementation()
 {
 }
 
-bool AEODCharacterBase::Stun(const float Duration)
-{
-	return false;
-}
-
-void AEODCharacterBase::EndStun()
-{
-}
-
-bool AEODCharacterBase::Freeze(const float Duration)
-{
-	return false;
-}
-
-void AEODCharacterBase::EndFreeze()
-{
-}
-
-bool AEODCharacterBase::Knockdown(const float Duration)
-{
-	return false;
-}
-
-void AEODCharacterBase::EndKnockdown()
-{
-}
-
-bool AEODCharacterBase::Knockback(const float Duration, const FVector & ImpulseDirection)
-{
-	return false;
-}
-
-void AEODCharacterBase::BlockAttack()
+void AEODCharacterBase::PlayAttackBlockedAnimation()
 {
 }
 
@@ -479,6 +380,8 @@ void AEODCharacterBase::DisableiFrames()
 
 void AEODCharacterBase::BindUIDelegates()
 {
+	//~ @todo
+	/*
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
 		AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
@@ -512,6 +415,7 @@ void AEODCharacterBase::BindUIDelegates()
 			}
 		}
 	}
+	*/
 }
 
 void AEODCharacterBase::UnbindUIDelegates()
@@ -530,24 +434,16 @@ void AEODCharacterBase::EnableDamageBlocking()
 
 void AEODCharacterBase::DisableDamageBlocking()
 {
+	/*
 	bBlockingDamage = false;
 	// Clear block damage timer just in case it is still active
 	GetWorld()->GetTimerManager().ClearTimer(BlockTimerHandle); 
+	*/
 }
 
 bool AEODCharacterBase::BP_IsInCombat() const
 {
 	return IsInCombat();
-}
-
-void AEODCharacterBase::BP_SetCharacterState(const ECharacterState NewState)
-{
-	SetCharacterState(NewState);
-}
-
-ECharacterState AEODCharacterBase::BP_GetCharacterState() const
-{
-	return GetCharacterState();
 }
 
 void AEODCharacterBase::BP_SetWalkSpeed(const float WalkSpeed)
@@ -563,11 +459,6 @@ void AEODCharacterBase::BP_SetCharacterRotation(const FRotator NewRotation)
 void AEODCharacterBase::BP_SetUseControllerRotationYaw(const bool bNewBool)
 {
 	SetUseControllerRotationYaw(bNewBool);
-}
-
-bool AEODCharacterBase::UseSkill_Implementation(FName SkillID)
-{
-	return false;
 }
 
 EEODTaskStatus AEODCharacterBase::CheckSkillStatus(FName SkillID)
@@ -590,9 +481,19 @@ void AEODCharacterBase::BP_SetCurrentActiveSkillID(FName SkillID)
 	SetCurrentActiveSkillID(SkillID);
 }
 
-FLastUsedSkillInfo& AEODCharacterBase::BP_GetLastUsedSkill()
+FLastUsedSkillInfo AEODCharacterBase::BP_GetLastUsedSkill()
 {
 	return GetLastUsedSkill();
+}
+
+UGameplaySkillBase* AEODCharacterBase::GetSkill(FName SkillID) const
+{
+	return nullptr;
+}
+
+bool AEODCharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill)
+{
+	return false;
 }
 
 void AEODCharacterBase::ApplyStatusEffect(const UStatusEffectBase * StatusEffect)
@@ -611,21 +512,6 @@ void AEODCharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bI
 
 void AEODCharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterrupted)
 {
-}
-
-void AEODCharacterBase::BP_PlayAnimationMontage(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
-{
-	PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
-}
-
-void AEODCharacterBase::SetNextMontageSection(FName CurrentSection, FName NextSection)
-{
-	if (GetMesh()->GetAnimInstance())
-	{
-		GetMesh()->GetAnimInstance()->Montage_SetNextSection(CurrentSection, NextSection);
-	}
-
-	Server_SetNextMontageSection(CurrentSection, NextSection);
 }
 
 bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision, float RotationRate)
@@ -651,7 +537,7 @@ bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float
 	}
 }
 
-void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* InstigatingChar)
+void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AActor* EventInstigator, AController* EventOwner)
 {
 	if (bGodMode || IsDead())
 	{
@@ -666,8 +552,9 @@ void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AEODCharacterBase* Insti
 	else
 	{
 		// Set current hp to 0
-		GetCharacterStatsComponent()->ModifyBaseHealth(-GetCharacterStatsComponent()->GetMaxHealth());
-		SetCharacterState(ECharacterState::Dead);
+		//~ @todo
+		// GetCharacterStatsComponent()->ModifyBaseHealth(-GetCharacterStatsComponent()->GetMaxHealth());
+		// SetCharacterState(ECharacterState::Dead);
 
 		// @todo play death animation and death sound
 	}
@@ -682,13 +569,18 @@ float AEODCharacterBase::GetOrientationYawToActor(AActor* TargetActor)
 
 void AEODCharacterBase::TurnOnTargetSwitch()
 {
-	GetMesh()->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 1.f);
-	GetWorld()->GetTimerManager().SetTimer(TargetSwitchTimerHandle, this, &AEODCharacterBase::TurnOffTargetSwitch, TargetSwitchDuration, false);
+	if (GetMesh())
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 1.f);
+	}
 }
 
 void AEODCharacterBase::TurnOffTargetSwitch()
 {
-	GetMesh()->SetScalarParameterValueOnMaterials(FName("Target_Switch_On"), 0.f);
+	if (GetMesh())
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials(MaterialParameterNames::TargetSwitchOn, 0.f);
+	}
 }
 
 void AEODCharacterBase::OnRep_WeaponSheathed()
@@ -696,16 +588,9 @@ void AEODCharacterBase::OnRep_WeaponSheathed()
 	PlayToggleSheatheAnimation();
 }
 
-void AEODCharacterBase::OnRep_GuardActive()
+void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
 {
-	if (bGuardActive)
-	{
-		EnableCharacterGuard();
-	}
-	else
-	{
-		DisableCharacterGuard();
-	}
+	//~ @todo : Cleanup old state
 }
 
 void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo)
@@ -748,16 +633,6 @@ void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldS
 	}
 }
 
-void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
-{
-	//~ @todo : Cleanup old state
-}
-
-void AEODCharacterBase::OnRep_ServerCharacterState(FName LastState)
-{
-	
-}
-
 void AEODCharacterBase::Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
 {
 }
@@ -765,10 +640,6 @@ void AEODCharacterBase::Server_Dodge_Implementation(uint8 DodgeIndex, float Rota
 bool AEODCharacterBase::Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw)
 {
 	return true;
-}
-
-void AEODCharacterBase::Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
-{
 }
 
 void AEODCharacterBase::Server_StartBlockingAttacks_Implementation()
@@ -862,23 +733,12 @@ bool AEODCharacterBase::Server_TriggeriFrames_Validate(float Duration, float Del
 	return true;
 }
 
-void AEODCharacterBase::Server_SetCharacterState_Implementation(ECharacterState NewState)
+void AEODCharacterBase::Server_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection, UAnimMontage* Montage)
 {
-	SetCharacterState(NewState);
+	Multicast_SetNextMontageSection(CurrentSection, NextSection, Montage);
 }
 
-bool AEODCharacterBase::Server_SetCharacterState_Validate(ECharacterState NewState)
-{
-	return true;
-}
-
-void AEODCharacterBase::Server_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection)
-{
-
-	Multicast_SetNextMontageSection(CurrentSection, NextSection);
-}
-
-bool AEODCharacterBase::Server_SetNextMontageSection_Validate(FName CurrentSection, FName NextSection)
+bool AEODCharacterBase::Server_SetNextMontageSection_Validate(FName CurrentSection, FName NextSection, UAnimMontage* Montage)
 {
 	return true;
 }
@@ -925,34 +785,32 @@ bool AEODCharacterBase::Server_SetWalkSpeed_Validate(float WalkSpeed)
 	return true;
 }
 
-void AEODCharacterBase::Multicast_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection)
+void AEODCharacterBase::Multicast_SetNextMontageSection_Implementation(FName CurrentSection, FName NextSection, UAnimMontage* Montage)
 {
-	FString Message = FString("Multi cast called");
-	UKismetSystemLibrary::PrintString(this, Message, true, false);
-
-	if (!IsLocallyControlled() && GetMesh()->GetAnimInstance())
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (!IsLocallyControlled() && AnimInstance)
 	{
-		GetMesh()->GetAnimInstance()->Montage_SetNextSection(CurrentSection, NextSection);
+		AnimInstance->Montage_SetNextSection(CurrentSection, NextSection, Montage);
 	}
 }
 
-void AEODCharacterBase::Server_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
+void AEODCharacterBase::Server_PlayAnimMontage_Implementation(UAnimMontage* MontageToPlay, FName SectionToPlay)
 {
-	MultiCast_PlayAnimationMontage(MontageToPlay, SectionToPlay, NewState);
+	Multicast_PlayAnimMontage(MontageToPlay, SectionToPlay);
 }
 
-bool AEODCharacterBase::Server_PlayAnimationMontage_Validate(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
+bool AEODCharacterBase::Server_PlayAnimMontage_Validate(UAnimMontage* MontageToPlay, FName SectionToPlay)
 {
 	return true;
 }
 
-void AEODCharacterBase::MultiCast_PlayAnimationMontage_Implementation(UAnimMontage * MontageToPlay, FName SectionToPlay, ECharacterState NewState)
+void AEODCharacterBase::Multicast_PlayAnimMontage_Implementation(UAnimMontage* MontageToPlay, FName SectionToPlay)
 {
-	if (!IsLocallyControlled() && GetMesh()->GetAnimInstance())
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (!IsLocallyControlled() && AnimInstance)
 	{
-		GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionToPlay);
-		CharacterState = NewState;
+		AnimInstance->Montage_Play(MontageToPlay);
+		AnimInstance->Montage_JumpToSection(SectionToPlay);
 	}
 }
 
@@ -1036,23 +894,6 @@ void AEODCharacterBase::OnJumpAnimationStart()
 void AEODCharacterBase::OnJumpAnimationFinish()
 {
 	ResetState();
-}
-
-void AEODCharacterBase::EnableCharacterGuard()
-{
-	// @todo wait for normal attack section to finish before blocking?
-	if (IsNormalAttacking())
-	{
-		StopNormalAttack();
-	}
-	SetCharacterState(ECharacterState::Blocking);
-	// GetCharacterMovement()->bUseControllerDesiredRotation = true;
-}
-
-void AEODCharacterBase::DisableCharacterGuard()
-{
-	SetCharacterState(ECharacterState::IdleWalkRun);
-	// GetCharacterMovement()->bUseControllerDesiredRotation = false;
 }
 
 void AEODCharacterBase::MoveForward(const float Value)
@@ -1180,49 +1021,12 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 			SetWalkSpeed(NewSpeed);
 		}
 	}
-
-	/*
-	return;
-
-	UStatsComponentBase* StatsComp = GetCharacterStatsComponent();
-	if (!StatsComp)
-	{
-		return;
-	}	
-
-	if (IsGuardActive())
-	{
-		// float NewSpeed = DefaultWalkSpeedWhileBlocking * StatsComp->GetMovementSpeedModifier();
-		float NewSpeed = DefaultWalkSpeedWhileBlocking * MovementSpeedModifier;
-		SetWalkSpeed(NewSpeed);
-	}
-	else if (CharacterState == ECharacterState::IdleWalkRun || bCharacterStateAllowsMovement)
-	{
-		UpdatePCTryingToMove();
-		UpdateCharacterMovementDirection();
-
-		if (ForwardAxisValue < 0)
-		{
-			float NewSpeed = (DefaultWalkSpeed * StatsComp->GetMovementSpeedModifier()) * (5.f / 16.f);
-			SetWalkSpeed(NewSpeed);
-		}
-		else
-		{
-			float NewSpeed = DefaultWalkSpeed * StatsComp->GetMovementSpeedModifier();
-			SetWalkSpeed(NewSpeed);
-		}
-	}
-	*/
-}
-
-void AEODCharacterBase::UpdateFallState(float DeltaTime)
-{
-	SetCharacterStateAllowsMovement(false);
-	SetCharacterStateAllowsRotation(false);
 }
 
 void AEODCharacterBase::TriggerInteraction()
 {
+	//~ @todo
+	/*
 	// If Character is already interacting
 	if (GetCharacterState() == ECharacterState::Interacting)
 	{
@@ -1232,6 +1036,7 @@ void AEODCharacterBase::TriggerInteraction()
 	{
 		StartInteraction();
 	}
+	*/
 }
 
 void AEODCharacterBase::StartInteraction()
@@ -1277,28 +1082,12 @@ void AEODCharacterBase::PlayToggleSheatheAnimation()
 void AEODCharacterBase::InitiateRotationToYawFromAxisInput()
 {
 	float UpdatedYaw = GetRotationYawFromAxisInput();
-	FRotator DesiredRotation = FRotator(0.f, GetRotationYawFromAxisInput(), 0.f);
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
 	{
-		MoveComp->SetDesiredCustomRotation(DesiredRotation);
+		MoveComp->SetDesiredCustomRotationYaw(UpdatedYaw);
 	}
 }
-
-/*
-void AEODCharacterBase::Jump()
-{
-	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-	if (MoveComp)
-	{
-		MoveComp->bUseControllerDesiredRotation = false;
-	}
-	bCharacterStateAllowsMovement = false;
-	bCharacterStateAllowsRotation = false;
-
-	Super::Jump();
-}
-*/
 
 void AEODCharacterBase::OnPressedForward()
 {
@@ -1314,38 +1103,6 @@ void AEODCharacterBase::OnReleasedForward()
 
 void AEODCharacterBase::OnReleasedBackward()
 {
-}
-
-void AEODCharacterBase::UpdateMovementState(float DeltaTime)
-{
-	if (ForwardAxisValue < 0)
-	{
-		float Speed = IsValid(GetCharacterStatsComponent()) ? (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier()) * 5 / 16 : DefaultWalkSpeed * 5 / 16;
-
-		// float Speed = (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
-		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
-		{
-			SetWalkSpeed(Speed);
-		}
-	}
-	else
-	{
-		float Speed = IsValid(GetCharacterStatsComponent()) ? DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() : DefaultWalkSpeed;
-		// float Speed = DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
-		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
-		{
-			SetWalkSpeed(Speed);
-		}
-	}
-
-	//~ @old_code
-	/*
-	float DesiredRotationYaw = GetRotationYawFromAxisInput();
-	if (!FMath::IsNearlyEqual(DesiredRotationYaw, GetActorRotation().Yaw, 1e-3f))
-	{
-		DeltaRotateCharacterToDesiredYaw(DesiredRotationYaw, DeltaTime);
-	}
-	*/
 }
 
 void AEODCharacterBase::ResetState()
@@ -1412,49 +1169,6 @@ void AEODCharacterBase::OnMountingRide(ARideBase* RideCharacter)
 	}
 }
 
-void AEODCharacterBase::UpdateGuardState(float DeltaTime)
-{
-	// If character wants to guard but the guard is not yet active 
-	if (bWantsToGuard && !IsGuardActive() && CanGuardAgainstAttacks())
-	{
-		ActivateGuard();
-	}
-	else if (!bWantsToGuard && IsGuardActive())
-	{
-		DeactivateGuard();
-	}
-
-	if (IsGuardActive())
-	{
-		if (ForwardAxisValue == 0)
-		{
-			if (RightAxisValue > 0)
-			{
-				if (BlockMovementDirectionYaw != 90.f)
-					SetBlockMovementDirectionYaw(90.f);
-			}
-			else if (RightAxisValue < 0)
-			{
-				if (BlockMovementDirectionYaw != -90.f)
-					SetBlockMovementDirectionYaw(-90.f);
-			}
-			else
-			{
-				if (BlockMovementDirectionYaw != 0.f)
-					SetBlockMovementDirectionYaw(0.f);
-			}
-		}
-		else
-		{
-			float NewYaw = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
-			if (BlockMovementDirectionYaw != NewYaw)
-			{
-				SetBlockMovementDirectionYaw(NewYaw);
-			}
-		}
-	}
-}
-
 void AEODCharacterBase::Server_SetIsRunning_Implementation(bool bValue)
 {
 	SetIsRunning(bValue);
@@ -1505,16 +1219,6 @@ bool AEODCharacterBase::Server_SetWeaponSheathed_Validate(bool bNewValue)
 	return true;
 }
 
-void AEODCharacterBase::Server_SetGuardActive_Implementation(bool bValue)
-{
-	SetGuardActive(bValue);
-}
-
-bool AEODCharacterBase::Server_SetGuardActive_Validate(bool bValue)
-{
-	return true;
-}
-
 void AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Implementation(float NewYaw)
 {
 	SetBlockMovementDirectionYaw(NewYaw);
@@ -1525,10 +1229,32 @@ bool AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Validate(float NewYa
 	return true;
 }
 
-void AEODCharacterBase::Multicast_SetCharacterRotation_Implementation(FRotator NewRotation)
+bool AEODCharacterBase::CanFlinch() const
 {
-	if (!IsLocallyControlled())
-	{
-		SetCharacterRotation(NewRotation);
-	}
+	return true;
+}
+
+bool AEODCharacterBase::CanStun() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanKnockdown() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanKnockback() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanFreeze() const
+{
+	return true;
+}
+
+bool AEODCharacterBase::CanInterrupt() const
+{
+	return true;
 }

@@ -716,7 +716,7 @@ void UPlayerStatsComponent::InitializeComponentWidget()
 {
 	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
 
-	if (!(OwningPlayer && OwningPlayer->GetHUDWidget()))
+	// if (!(OwningPlayer && OwningPlayer->GetHUDWidget()))
 	{
 		return;
 	}
@@ -724,7 +724,8 @@ void UPlayerStatsComponent::InitializeComponentWidget()
 	if (StatusIndicatorWidgetClass.Get())
 	{
 		StatusIndicatorWidget = CreateWidget<UStatusIndicatorWidget>(OwningPlayer->GetGameInstance(), StatusIndicatorWidgetClass);
-		OwningPlayer->GetHUDWidget()->AddStatusIndicatorWidget(StatusIndicatorWidget);
+		//~ @todo
+		// OwningPlayer->GetHUDWidget()->AddStatusIndicatorWidget(StatusIndicatorWidget);
 	}
 }
 

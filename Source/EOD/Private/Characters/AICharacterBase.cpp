@@ -42,7 +42,7 @@ void AAICharacterBase::BeginPlay()
 	SetInCombat(false);
 
 	// Following line is used to update the floating health bar widget (floating health bar widget is NULL when CurrentHealth is initially initialized)
-	GetCharacterStatsComponent()->ModifyCurrentHealth(0);
+	// GetCharacterStatsComponent()->ModifyCurrentHealth(0);
 }
 
 void AAICharacterBase::Destroyed()
@@ -70,13 +70,15 @@ bool AAICharacterBase::CCEFlinch_Implementation(const float BCAngle)
 	{
 		if (BCAngle <= 90)
 		{
-			PlayAnimationMontage(FlinchAnimMontage,
-				UCharacterLibrary::SectionName_ForwardFlinch);
+			PlayAnimMontage(FlinchAnimMontage, 1.f, UCharacterLibrary::SectionName_ForwardFlinch);
+			// PlayAnimationMontage(FlinchAnimMontage,
+				// UCharacterLibrary::SectionName_ForwardFlinch);
 		}
 		else
 		{
-			PlayAnimationMontage(FlinchAnimMontage,
-				UCharacterLibrary::SectionName_BackwardFlinch);
+			PlayAnimMontage(FlinchAnimMontage, 1.f, UCharacterLibrary::SectionName_BackwardFlinch);
+			// PlayAnimationMontage(FlinchAnimMontage,
+				// UCharacterLibrary::SectionName_BackwardFlinch);
 		}
 
 		return true;
@@ -91,15 +93,17 @@ bool AAICharacterBase::CCEInterrupt_Implementation(const float BCAngle)
 	{
 		if (BCAngle <= 90)
 		{
-			PlayAnimationMontage(HitEffectsAnimMontage,
-				UCharacterLibrary::SectionName_ForwardInterrupt,
-				ECharacterState::GotHit);
+			NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_ForwardInterrupt);
+			// PlayAnimationMontage(HitEffectsAnimMontage,
+				// UCharacterLibrary::SectionName_ForwardInterrupt,
+				// ECharacterState::GotHit);
 		}
 		else
 		{
-			PlayAnimationMontage(HitEffectsAnimMontage,
-				UCharacterLibrary::SectionName_BackwardInterrupt,
-				ECharacterState::GotHit);
+			NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_BackwardInterrupt);
+			// PlayAnimationMontage(HitEffectsAnimMontage,
+				// UCharacterLibrary::SectionName_BackwardInterrupt,
+				// ECharacterState::GotHit);
 		}
 
 		return true;
@@ -134,7 +138,8 @@ bool AAICharacterBase::CCEFreeze_Implementation(const float Duration)
 	if (CanFreeze())
 	{
 		CustomTimeDilation = 0;
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::EndFreeze, Duration, false);
+		//~ @todo
+		// GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::EndFreeze, Duration, false);
 
 		return true;
 	}
@@ -144,16 +149,18 @@ bool AAICharacterBase::CCEFreeze_Implementation(const float Duration)
 
 void AAICharacterBase::CCEUnfreeze_Implementation()
 {
-	CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
+	//~ @todo
+	// CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
 }
 
 bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 {
 	if (CanKnockdown() && HitEffectsAnimMontage)
 	{
-		PlayAnimationMontage(HitEffectsAnimMontage,
-			UCharacterLibrary::SectionName_KnockdownStart,
-			ECharacterState::GotHit);
+		NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_KnockdownStart);
+		// PlayAnimationMontage(HitEffectsAnimMontage,
+			// UCharacterLibrary::SectionName_KnockdownStart,
+			// ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 
 		return true;
@@ -164,18 +171,20 @@ bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 
 void AAICharacterBase::CCEEndKnockdown_Implementation()
 {
-	PlayAnimationMontage(HitEffectsAnimMontage,
-		UCharacterLibrary::SectionName_KnockdownEnd,
-		ECharacterState::GotHit);
+	NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_KnockdownEnd);
+	// PlayAnimationMontage(HitEffectsAnimMontage,
+		// UCharacterLibrary::SectionName_KnockdownEnd,
+		// ECharacterState::GotHit);
 }
 
 bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
 {
 	if (CanKnockdown() && HitEffectsAnimMontage)
 	{
-		PlayAnimationMontage(HitEffectsAnimMontage,
-			UCharacterLibrary::SectionName_KnockdownStart,
-			ECharacterState::GotHit);
+		//~ @todo
+		// PlayAnimationMontage(HitEffectsAnimMontage,
+			// UCharacterLibrary::SectionName_KnockdownStart,
+			// ECharacterState::GotHit);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 		PushBack(ImpulseDirection);
 		return true;
@@ -215,11 +224,14 @@ void AAICharacterBase::SetInCombat(bool bValue)
 
 void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
-	if (AnimMontage == FlinchAnimMontage || bUsingUniqueSkill)
+	// if (AnimMontage == FlinchAnimMontage || bUsingUniqueSkill)
+	if (AnimMontage == FlinchAnimMontage)
 	{
 		return;
 	}
 
+	//~ @todo
+	/*
 	if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
 	{
 		GetLastUsedSkill().LastUsedSkillID = GetCurrentActiveSkillID();
@@ -228,11 +240,15 @@ void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 		SetCurrentActiveSkillID(NAME_None);
 		SetCurrentActiveSkill(nullptr);
 	}
+	*/
 
+	//~ @todo
+	/*
 	if (!bInterrupted && GetCharacterState() != ECharacterState::Dead)
 	{
 		SetCharacterState(ECharacterState::IdleWalkRun);
 	}
+	*/
 }
 
 void AAICharacterBase::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted)
@@ -240,11 +256,13 @@ void AAICharacterBase::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupt
 	// @todo
 }
 
-bool AAICharacterBase::UseSkill_Implementation(FName SkillID)
+bool AAICharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill)
 {
 	if (CanUseAnySkill())
 	{
-		FSkillTableRow* SkillToUse = GetSkill(SkillID, FString("AAICharacterBase::UseSkill, looking up AI skills for use"));
+		//~ @todo
+		// FSkillTableRow* SkillToUse = GetSkill(SkillID, FString("AAICharacterBase::UseSkill, looking up AI skills for use"));
+		FSkillTableRow* SkillToUse = nullptr;
 
 		if (!SkillToUse)
 		{
@@ -257,12 +275,14 @@ bool AAICharacterBase::UseSkill_Implementation(FName SkillID)
 
 		if (SkillToUse->AnimMontage.Get())
 		{
-			PlayAnimationMontage(SkillToUse->AnimMontage.Get(), SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
+			//~ @todo
+			// PlayAnimationMontage(SkillToUse->AnimMontage.Get(), SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
 		}
 		SetCurrentActiveSkillID(SkillID);
-		SetCurrentActiveSkill(SkillToUse);
+		// SetCurrentActiveSkill(SkillToUse);
+		//~ @todo
 		// SkillIDToWeightMap[SkillID] = SkillIDToWeightMap[SkillID] - 1;
-		bSkillAllowsMovement = SkillToUse->bAllowsMovement;
+		// bSkillAllowsMovement = SkillToUse->bAllowsMovement;
 		return true;
 	}
 
@@ -369,6 +389,8 @@ void AAICharacterBase::UpdateMaxWalkSpeed()
 
 void AAICharacterBase::InitializeSkills()
 {
+	//~ @todo
+	/*
 	if (!SkillsDataTable)
 	{
 		return;
@@ -481,4 +503,5 @@ void AAICharacterBase::InitializeSkills()
 			SkillAnimationsStreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AnimationsToLoad);
 		}
 	}
+	*/
 }
