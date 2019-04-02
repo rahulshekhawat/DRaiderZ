@@ -1,9 +1,11 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "HumanCharacter.h"
-#include "EODCharacterMovementComponent.h"
+#include "GameSingleton.h"
 #include "EODGlobalNames.h"
+#include "EODCharacterMovementComponent.h"
 
+#include "Engine/Engine.h"
 #include "GameFramework/PlayerController.h"
 
 FName AHumanCharacter::HairComponentName(TEXT("Hair"));
@@ -78,6 +80,155 @@ USkeletalMeshComponent* AHumanCharacter::CreateNewArmorComponent(const FName Nam
 		Sk->bUseAttachParentBound = true;
 	}
 	return Sk;
+}
+
+void AHumanCharacter::UnloadUnequippedWeaponAnimationReferences()
+{
+	if (UnequippedWeaponAnimationsStreamableHandle.IsValid())
+	{
+		UnequippedWeaponAnimationsStreamableHandle.Get()->ReleaseHandle();
+		UnequippedWeaponAnimationsStreamableHandle.Reset();
+	}
+}
+
+void AHumanCharacter::LoadUnequippedWeaponAnimationReferences()
+{
+	UnloadUnequippedWeaponAnimationReferences();
+
+	if (!PlayerAnimationReferencesDataTable)
+	{
+		return;
+	}
+
+	FName RowID = GetAnimationReferencesRowID(EWeaponType::None, Gender);
+	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
+		FString("APlayerCharacter::LoadUnequippedWeaponAnimationReferences(), loading unequipped weapon animation references"));
+
+	if (!PlayerAnimationReferences)
+	{
+		return;
+	}
+
+	UnequippedWeaponAnimationReferences = PlayerAnimationReferences;
+	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
+}
+
+void AHumanCharacter::UnloadEquippedWeaponAnimationReferences()
+{
+	if (EquippedWeaponAnimationsStreamableHandle.IsValid())
+	{
+		EquippedWeaponAnimationsStreamableHandle.Get()->ReleaseHandle();
+		EquippedWeaponAnimationsStreamableHandle.Reset();
+	}
+}
+
+void AHumanCharacter::LoadEquippedWeaponAnimationReferences()
+{
+	UnloadEquippedWeaponAnimationReferences();
+
+	if (!PlayerAnimationReferencesDataTable)
+	{
+		return;
+	}
+
+	FName RowID = GetAnimationReferencesRowID(GetEquippedWeaponType(), Gender);
+	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
+		FString("APlayerCharacter::LoadEquippedWeaponAnimationReferences(), loading equipped weapon animation references"));
+
+	if (!PlayerAnimationReferences)
+	{
+		return;
+	}
+
+	EquippedWeaponAnimationReferences = PlayerAnimationReferences;
+	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
+}
+
+FName AHumanCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender)
+{
+	FString Prefix;
+	if (CharGender == ECharacterGender::Female)
+	{
+		Prefix = FString("Female_");
+	}
+	else
+	{
+		Prefix = FString("Male_");
+	}
+
+	FString Postfix;
+	switch (WeaponType)
+	{
+	case EWeaponType::GreatSword:
+		Postfix = FString("GreatSword");
+		break;
+	case EWeaponType::WarHammer:
+		Postfix = FString("WarHammer");
+		break;
+	case EWeaponType::LongSword:
+		Postfix = FString("LongSword");
+		break;
+	case EWeaponType::Mace:
+		Postfix = FString("Mace");
+		break;
+	case EWeaponType::Dagger:
+		Postfix = FString("Dagger");
+		break;
+	case EWeaponType::Staff:
+		Postfix = FString("Staff");
+		break;
+	case EWeaponType::Shield:
+	case EWeaponType::None:
+	default:
+		Postfix = FString("NoWeapon");
+		break;
+	}
+
+	FString RowIDString = Prefix + Postfix;
+	FName RowID = FName(*RowIDString);
+
+	return RowID;
+}
+
+TSharedPtr<FStreamableHandle> AHumanCharacter::LoadAnimationReferences(FPlayerAnimationReferencesTableRow* AnimationReferences)
+{
+	TSharedPtr<FStreamableHandle> StreamableHandle;
+
+	UGameSingleton* GameSingleton = nullptr;
+	if (GEngine)
+	{
+		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+	}
+
+	if (!GameSingleton)
+	{
+		return StreamableHandle;
+	}
+
+	TArray<FSoftObjectPath> AssetsToLoad;
+	if (AnimationReferences)
+	{
+		AssetsToLoad.Add(AnimationReferences->Flinch.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->HitEffects.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->NormalAttacks.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Jump.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Dodge.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->SpecialActions.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Skills.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Spells.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->BlockAttack.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->WeaponSwitchFullBody.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->WeaponSwitchUpperBody.ToSoftObjectPath());
+		AssetsToLoad.Add(AnimationReferences->Die.ToSoftObjectPath());
+	}
+
+	StreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AssetsToLoad);
+	return StreamableHandle;
+}
+
+EWeaponType AHumanCharacter::GetEquippedWeaponType() const
+{
+	return PrimaryWeapon ? PrimaryWeapon->GetWeaponType() : EWeaponType::None;
 }
 
 bool AHumanCharacter::CanDodge() const
@@ -171,4 +322,12 @@ void AHumanCharacter::TurnOffTargetSwitch()
 	if (!PC)
 	{
 	}
+}
+
+void AHumanCharacter::OnRep_PrimaryWeaponID()
+{
+}
+
+void AHumanCharacter::OnRep_SecondaryWeaponID()
+{
 }

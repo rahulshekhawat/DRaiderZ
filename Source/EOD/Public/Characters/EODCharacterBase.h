@@ -149,10 +149,10 @@ public:
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void PostInitializeComponents() override;
+
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
-
-	virtual void PostInitializeComponents() override;
 
 	/** Updates character state every frame */
 	virtual void Tick(float DeltaTime) override;
@@ -278,6 +278,7 @@ public:
 	/** Finish normal attacks and reset back to Idle-Walk-Run */
 	virtual void FinishNormalAttack();
 
+	/** Trigger interaction with an NPC or an in-game interactive object */
 	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
 	virtual void TriggerInteraction();
 
@@ -646,6 +647,9 @@ public:
 	void CreateAndDisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 	virtual void CreateAndDisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 
+	/** Get the prefix string for player gender */
+	inline FString GetGenderPrefix() const;
+
 	/**
 	 * Returns controller rotation yaw in -180/180 range.
 	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
@@ -717,6 +721,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera|Constants")
 	int CameraArmMaximumLength;
 
+	/** Audio component for playing hit effect sounds */
+	UPROPERTY(Transient)
+	UAudioComponent* HitAudioComponent;
+
 private:
 
 	/** Spring arm for camera */
@@ -730,10 +738,6 @@ private:
 	//~ Skill bar component - manages skill bar (for player controlled character) and skills of character
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGameplaySkillsComponent* SkillManager;
-
-	/** Audio component for playing hit effect sounds */
-	UPROPERTY(Transient)
-	UAudioComponent* HitAudioComponent;
 
 public:
 
@@ -751,9 +755,6 @@ public:
 	/** Player gender : determines the animations and armor meshes to use. */
 	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
 	ECharacterGender Gender;
-
-	/** Get the prefix string for player gender */
-	inline FString GetGenderPrefix() const;
 
 	// --------------------------------------
 	//  Gameplay
@@ -1514,21 +1515,6 @@ FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 {
 	return Faction;
 }
-
-/*
-inline FSkillTableRow* AEODCharacterBase::GetSkill(FName SkillID, const FString& ContextString) const
-{
-	FSkillTableRow* Skill = nullptr;
-	//~ @todo
-	/*
-	if (IsValid(SkillsDataTable))
-	{
-		Skill = SkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString);
-	}
-	//////
-	return Skill;
-}
-*/
 
 FORCEINLINE FName AEODCharacterBase::GetCurrentActiveSkillID() const
 {

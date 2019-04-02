@@ -4,17 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "WeaponBase.h"
-
-#include "PrimaryWeapon.h"
-#include "SecondaryWeapon.h"
 #include "HumanCharacter.h"
 
-#include "Engine/DataTable.h"
-#include "Engine/StreamableManager.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "PlayerCharacter.generated.h"
 
-class UHUDWidget;
+
 class USkillBarWidget;
 class UAudioComponent;
 class UAnimMontage;
@@ -56,11 +51,11 @@ public:
 	/** Spawn default weapon(s) */
 	virtual void PostInitializeComponents() override;
 
-	/** Updates player states */
-	virtual void Tick(float DeltaTime) override;
-
 	/** Initializes player animation references. Creates player HUD widget and adds it to the viewport. */
 	virtual void BeginPlay() override;
+
+	/** Updates player states */
+	virtual void Tick(float DeltaTime) override;
 
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
@@ -72,34 +67,11 @@ public:
 	/** Saves current player state */
 	virtual void SaveCharacterState() override;
 
-	// --------------------------------------
-	//	Strings
-	// --------------------------------------
-
-	/** Get the prefix string for equipped weapon type */
-	inline FString GetEquippedWeaponPrefix() const;
-
-	inline FString GetWeaponPrefix() const;
-
-	inline FName GetNormalAttackSectionName(uint8 AttackIndex);
-
-	inline uint8 GetNormalAttackIndex(FName SectionName);
-
-	/** Get the suffix string from the normal attack section */
-	inline FString GetNormalAttackSuffix(FName NormalAttackSection) const;
+protected:
 
 	// --------------------------------------
 	//	Components
 	// --------------------------------------
-
-	FORCEINLINE USkillsComponent* GetSkillsComponent() const { return SkillsComponent; }
-
-private:
-	//~ @note The default skeletal mesh component inherited from ACharacter class will reference the skeletal mesh for player face
-
-	//~ Skills component - manages skills of character // DEPRECATED
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkillsComponent* SkillsComponent;
 
 	//~ Audio component
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -120,30 +92,26 @@ public:
 	/** Finish dodging */
 	virtual void FinishDodge() override;
 
+	/** Start normal attacks */
 	virtual void StartNormalAttack() override;
 
+	/** Stop normal attacks */
 	virtual void StopNormalAttack() override;
 
+	/** Cancel normal attacks */
 	virtual void CancelNormalAttack() override;
 
+	/** Finish normal attacks and reset back to Idle-Walk-Run */
 	virtual void FinishNormalAttack() override;
 
+	/** Updates character normal attck state every frame if the character wants to normal attack */
 	virtual void UpdateNormalAttackState(float DeltaTime) override;
 
+	/** Put or remove weapon inside sheath */
+	virtual void ToggleSheathe() override;
 
-
-
-
-
-
-public:
-	/** Determines if this character should be rotated toward DesiredSmoothRotationYaw */
-	UPROPERTY(Transient)
-	bool bRotateSmoothly;
-
-	/** The yaw to which the character needs to be rotated smoothly */
-	UPROPERTY(Transient)
-	float DesiredSmoothRotationYaw;
+	/** Plays BlockAttack animation on blocking an incoming attack */
+	virtual void PlayAttackBlockedAnimation() override;
 
 	/** Returns true if character can move */
 	virtual bool CanMove() const override;
@@ -163,75 +131,25 @@ public:
 	/** Returns true if character can use any skill at all */
 	virtual bool CanUseAnySkill() const;
 
-	/** Returns true if character can use a particular skill */
-	// virtual bool CanUseSkill(FSkillTableRow* Skill);
+	// --------------------------------------
+	//  Rotation
+	// --------------------------------------
 
-	/** Returns true if character can auto run */
-	FORCEINLINE bool CanAutoRun() const;
+	/** Determines if this character should be rotated toward DesiredSmoothRotationYaw */
+	UPROPERTY(Transient)
+	bool bRotateSmoothly;
 
-	FORCEINLINE bool CanSwitchWeapon() const;
+	/** The yaw to which the character needs to be rotated smoothly */
+	UPROPERTY(Transient)
+	float DesiredSmoothRotationYaw;
 
-	FORCEINLINE bool CanToggleSheathe() const { return IsIdleOrMoving() && IsPrimaryWeaponEquippped(); }
 
-	FORCEINLINE bool IsSwitchingWeapon() const;
 
-	/** Returns true if player is on auto run */
-	// FORCEINLINE bool IsAutoRunning() const;
 
-	/** Returns true if primary weapon is equipped */
-	FORCEINLINE bool IsPrimaryWeaponEquippped() const;
 
-	/** Returns true if secondary weapon is equipped */
-	FORCEINLINE bool IsSecondaryWeaponEquipped() const;
 
-	FORCEINLINE bool IsFastRunning() const;
 
-	/** Returns primary weapon actor */
-	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
 
-	/** Returns secondary weapon actor */
-	FORCEINLINE ASecondaryWeapon* GetSecondaryWeapon() const;
-
-	/** Returns the weapon type of primary weapon */
-	virtual EWeaponType GetEquippedWeaponType() const override;
-
-	/** Returns HUD widget */
-	FORCEINLINE UHUDWidget* GetHUDWidget() const;
-
-	FORCEINLINE ECharacterGender GetCharacterGender() const;
-
-	/** Returns HUD widget */
-	UFUNCTION(BlueprintPure, Category = UI, meta = (DisplayName = "Get HUD Widget"))
-	UHUDWidget* BP_GetHUDWidget() const;
-
-	/** Flinch this character (visual feedback) */
-	virtual bool CCEFlinch_Implementation(const float BCAngle) override;
-
-	/** Interrupt this character's current action */
-	virtual bool CCEInterrupt_Implementation(const float BCAngle) override;
-
-	/** Applies stun to this character */
-	virtual bool CCEStun_Implementation(const float Duration) override;
-
-	/** Removes 'stun' crowd control effect from this character */
-	virtual void CCERemoveStun_Implementation() override;
-
-	/** Freeze this character */
-	virtual bool CCEFreeze_Implementation(const float Duration) override;
-
-	/** Removes 'freeze' crowd control effect from this character */
-	virtual void CCEUnfreeze_Implementation() override;
-
-	/** Knockdown this character */
-	virtual bool CCEKnockdown_Implementation(const float Duration) override;
-
-	/** Removes 'knock-down' crowd control effect from this character */
-	virtual void CCEEndKnockdown_Implementation() override;
-
-	/** Knockback this character */
-	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection) override;
-
-	virtual void PlayAttackBlockedAnimation() override;
 
 	UFUNCTION()
 	void ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
@@ -313,10 +231,6 @@ public:
 	void OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup);
 
 	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
-
-	inline void EnableFastRun();
-
-	inline void DisableFastRun();
 
 	inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
 
@@ -450,20 +364,10 @@ private:
 	// UPROPERTY(Transient)
 	// APrimaryWeapon* PrimaryWeapon;
 
-	/** An actor for secondary weapon equipped by the player */
-	UPROPERTY(Transient)
-	ASecondaryWeapon* SecondaryWeapon;
 
 	FORCEINLINE void SetPrimaryWeaponID(FName NewWeaponID);
 
 protected:
-	/** ID of the current primary weapon equipped. It will be NAME_None if no primary weapon is equipped */
-	UPROPERTY(ReplicatedUsing = OnRep_PrimaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
-	FName PrimaryWeaponID;
-	
-	/** ID of current secondary weapon equipped. It will be NAME_None if no secondary weapon is equipped */
-	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
-	FName SecondaryWeaponID;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 	void EquipPrimaryWeapon(FName WeaponID);
@@ -485,14 +389,6 @@ private:
 	UPROPERTY()
 	UWeaponDataAsset* SecondaryWeaponDataAsset;
 
-	UPROPERTY(Transient)
-	bool bForwardPressed;
-
-	UPROPERTY(Transient)
-	bool bBackwardPressed;
-
-	UPROPERTY(Transient)
-	bool bBlockPressed;
 
 	UPROPERTY(Transient)
 	bool bCanUseChainSkill;
@@ -503,28 +399,13 @@ private:
 	UPROPERTY(Transient)
 	bool bNormalAttackSectionChangeAllowed;
 
-	/** Player HUD class reference */
-	UPROPERTY(Transient)
-	UHUDWidget* HUDWidget;
-
-	/** The blueprint widget class to use for player HUD */
-	UPROPERTY(EditDefaultsOnly, Category = RequiredInfo)
-	TSubclassOf<UHUDWidget> HUDWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills, meta = (AllowPrivateAccess = "true"))
 	uint8 MaxNumberOfSkills;
 
 
 private:
-	/** Data table containing player animation references */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable, meta = (AllowPrivateAccess = "true"))
-	UDataTable* PlayerAnimationReferencesDataTable;
 
-	/** Animation references by weapon type */
-	TMap<EWeaponType, FPlayerAnimationReferencesTableRow*> AnimationReferencesMap;
-
-	/** Streamable handle for animation references by weapon type */
-	TMap<EWeaponType, TSharedPtr<FStreamableHandle>> AnimationReferencesStreamableHandles;
 
 	inline FPlayerAnimationReferencesTableRow* GetAnimationReferences() const;
 
@@ -534,77 +415,33 @@ private:
 	UFUNCTION()
 	void UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
+	/** Animation references by weapon type */
+	TMap<EWeaponType, FPlayerAnimationReferencesTableRow*> AnimationReferencesMap;
+
+	/** Streamable handle for animation references by weapon type */
+	TMap<EWeaponType, TSharedPtr<FStreamableHandle>> AnimationReferencesStreamableHandles;
 
 	/** Animations for this player when it has a weapon equipped */
-	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
+	// FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
 
 	/** Animations for this player when it does not have a weapon equipped */
-	FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
-
-	TSharedPtr<FStreamableHandle> EquippedWeaponAnimationsStreamableHandle;
-
-	TSharedPtr<FStreamableHandle> UnequippedWeaponAnimationsStreamableHandle;
+	// FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
 
 
-	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender);
 
-	TSharedPtr<FStreamableHandle> LoadAnimationReferences(FPlayerAnimationReferencesTableRow* AnimationReferences);
 
-	void UnloadUnequippedWeaponAnimationReferences();
-
-	void LoadUnequippedWeaponAnimationReferences();
-
-	void UnloadEquippedWeaponAnimationReferences();
-
-	void LoadEquippedWeaponAnimationReferences();
 
 
 	//~ @note Pressing and releasing skill keys are separate events to support charge events (e.g. charge rage)
 
-	/** Handles player pressing a skill key */
-	void OnPressingSkillKey(const uint32 SkillButtonIndex);
-
-	/** Handles player releasing a skill key */
-	void OnReleasingSkillKey(const uint32 SkillButtonIndex);
 	
-	void ZoomInCamera();
 
-	void ZoomOutCamera();
 
-	void OnDodge();
-
-public:
-	virtual void OnPressedForward() override;
-
-	virtual void OnPressedBackward() override;
-
-private:
-	/** Sets the boolean used to enable block to true */
-	void OnPressedBlock();
-	
-	/** Sets the boolean used to enable block to false */
-	void OnReleasedBlock();
-
-	void OnPressedEscape();
-
-	/** Enable damage blocking */
-	inline void EnableBlock();
-
-	/** Disable damage blocking */
-	inline void DisableBlock();
-
-	/** Event triggered when player presses the jump key */
-	void OnJump();
-
-	/** Interacts with NPC or an in-game interactable object */
-	void OnInteract();
 
 	////////////////////////////////////////////////////////////////////////////////
 	// ACTIONS
 	////////////////////////////////////////////////////////////////////////////////
 private:
-	/** Put or remove weapon inside sheath */
-	virtual void ToggleSheathe() override;
 
 	virtual void PlayToggleSheatheAnimation() override;
 
@@ -614,34 +451,98 @@ private:
 	/** Display or hide mouse cursor */
 	void OnToggleMouseCursor();
 
-	void OnPressedNormalAttack();
-
-	void OnReleasedNormalAttack();
-
-	void DoNormalAttack();
-
 	void UpdateIdleState(float DeltaTime);
-
-	// void UpdateMovement(float DeltaTime);
-
-	// virtual void UpdateGuardState(float DeltaTime) override;
 
 	void UpdateFastMovementState(float DeltaTime);
 
 	void UpdateAutoRun(float DeltaTime);
 
-	/** Enable or disable auto run */
-	void OnToggleAutoRun();
-
-	inline void EnableAutoRun();
-
-	inline void DisableAutoRun();
-
-	void DisableForwardPressed();
-
-	void DisableBackwardPressed();
-
 	FName GetNextNormalAttackSectionName(const FName& CurrentSection) const;
+
+
+	/** Plays normal attack animation over network */
+	void PlayNormalAttackAnimation(FName OldSection, FName NewSection);
+
+	void ChangeNormalAttackSection(FName OldSection, FName NewSection);
+
+public:
+
+	// --------------------------------------
+	//  Animations
+	// --------------------------------------
+
+	// --------------------------------------
+	//  Weapon System
+	// --------------------------------------
+
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
+	FORCEINLINE ECharacterGender GetCharacterGender() const;
+
+	/** Get the prefix string for equipped weapon type */
+	inline FString GetEquippedWeaponPrefix() const;
+
+	inline FString GetWeaponPrefix() const;
+
+	inline FName GetNormalAttackSectionName(uint8 AttackIndex);
+
+	inline uint8 GetNormalAttackIndex(FName SectionName);
+
+	/** Get the suffix string from the normal attack section */
+	inline FString GetNormalAttackSuffix(FName NormalAttackSection) const;
+
+	// --------------------------------------
+	//  Dialgoue System
+	// --------------------------------------
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	void DisplayDialogueWidget(FName DialogueWindowID);
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	void RemoveDialogueWidget();
+
+	// --------------------------------------
+	//  Crowd Control Effect
+	// --------------------------------------
+
+	/** Flinch this character (visual feedback) */
+	virtual bool CCEFlinch_Implementation(const float BCAngle) override;
+
+	/** Interrupt this character's current action */
+	virtual bool CCEInterrupt_Implementation(const float BCAngle) override;
+
+	/** Applies stun to this character */
+	virtual bool CCEStun_Implementation(const float Duration) override;
+
+	/** Removes 'stun' crowd control effect from this character */
+	virtual void CCERemoveStun_Implementation() override;
+
+	/** Freeze this character */
+	virtual bool CCEFreeze_Implementation(const float Duration) override;
+
+	/** Removes 'freeze' crowd control effect from this character */
+	virtual void CCEUnfreeze_Implementation() override;
+
+	/** Knockdown this character */
+	virtual bool CCEKnockdown_Implementation(const float Duration) override;
+
+	/** Removes 'knock-down' crowd control effect from this character */
+	virtual void CCEEndKnockdown_Implementation() override;
+
+	/** Knockback this character */
+	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection) override;
+
+	// --------------------------------------
+	//  Input Handling
+	// --------------------------------------
+
+	/** Handles player pressing a skill key */
+	void OnPressingSkillKey(const uint32 SkillButtonIndex);
+
+	/** Handles player releasing a skill key */
+	void OnReleasingSkillKey(const uint32 SkillButtonIndex);
 
 	/** Called when player presses a skill key */
 	template<uint32 SkillButtonIndex>
@@ -651,55 +552,26 @@ private:
 	template<uint32 SkillButtonIndex>
 	void ReleasedSkillKey();
 
-	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
-	void DisplayDialogueWidget(FName DialogueWindowID);
-
-	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
-	void RemoveDialogueWidget();
-
-	/** Plays normal attack animation over network */
-	void PlayNormalAttackAnimation(FName OldSection, FName NewSection);
-
-	void ChangeNormalAttackSection(FName OldSection, FName NewSection);
-
-private:
+protected:
 
 	// --------------------------------------
 	//  Network
 	// --------------------------------------
 
-	UFUNCTION()
-	void OnRep_PrimaryWeaponID();
+	virtual void OnRep_PrimaryWeaponID() override;
+	virtual	void OnRep_SecondaryWeaponID() override;
 
-	UFUNCTION()
-	void OnRep_SecondaryWeaponID();
-
+	//~ Begin AEODCharacterBase RPC overrides
 	virtual void OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo) override;
-
 	virtual void Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
-
-	virtual bool Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw);
-
 	virtual void Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
-
 	virtual void Server_NormalAttack_Implementation(uint8 AttackIndex);
-
-	virtual bool Server_NormalAttack_Validate(uint8 AttackIndex);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_PlayNormalAttackAnimation(FName OldSection, FName NewSection);
-
-	UFUNCTION(NetMultiCast, Reliable)
-	void Multicast_PlayNormalAttackAnimation(FName OldSection, FName NewSection);
+	//~ End AEODCharacterBase RPC overrides
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetPrimaryWeaponID(FName NewWeaponID);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
-
-	UFUNCTION(NetMultiCast, Reliable)
-	void Multicast_AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, AWeaponBase* PrimaryWep);
+	virtual void Server_SetPrimaryWeaponID_Implementation(FName NewWeaponID);
+	virtual bool Server_SetPrimaryWeaponID_Validate(FName NewWeaponID);
 
 };
 
@@ -901,35 +773,6 @@ inline void APlayerCharacter::ReleasedSkillKey()
 	OnReleasingSkillKey(SkillButtonIndex);
 }
 
-inline void APlayerCharacter::EnableAutoRun()
-{
-	// SetCharacterState(ECharacterState::AutoRun);
-	SetUseControllerRotationYaw(true);
-}
-
-inline void APlayerCharacter::DisableAutoRun()
-{
-	// @todo put a test to check if the player is really auto running
-
-	// SetCharacterState(ECharacterState::IdleWalkRun);
-	SetUseControllerRotationYaw(false);
-}
-
-FORCEINLINE APrimaryWeapon* APlayerCharacter::GetPrimaryWeapon() const
-{
-	return PrimaryWeapon;
-}
-
-FORCEINLINE ASecondaryWeapon* APlayerCharacter::GetSecondaryWeapon() const
-{
-	return SecondaryWeapon;
-}
-
-FORCEINLINE UHUDWidget* APlayerCharacter::GetHUDWidget() const
-{
-	return HUDWidget;
-}
-
 FORCEINLINE ECharacterGender APlayerCharacter::GetCharacterGender() const
 {
 	return Gender;
@@ -939,53 +782,6 @@ FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
 {
 	bRotateSmoothly = true;
 	DesiredSmoothRotationYaw = DesiredYaw;
-}
-
-inline void APlayerCharacter::EnableBlock()
-{
-	/*
-	if (IsAutoRunning())
-	{
-		DisableAutoRun();
-	}
-	*/
-
-	/*
-	if (IsNormalAttacking())
-	{
-		StopNormalAttack();
-	}
-
-	// SetCharacterState(ECharacterState::Blocking);
-	SetUseControllerRotationYaw(true);
-	SetWalkSpeed(DefaultWalkSpeedWhileBlocking * MovementSpeedModifier);
-
-	// FTimerHandle TimerDelegate;
-	GetWorld()->GetTimerManager().SetTimer(BlockTimerHandle, this, &APlayerCharacter::EnableDamageBlocking, DamageBlockTriggerDelay, false);
-	*/
-}
-
-inline void APlayerCharacter::DisableBlock()
-{
-	SetUseControllerRotationYaw(false);
-	// SetCharacterState(ECharacterState::IdleWalkRun);
-	DisableDamageBlocking();
-}
-
-inline void APlayerCharacter::EnableFastRun()
-{
-	if (IsIdleOrMoving())
-	{
-		// SetCharacterState(ECharacterState::SpecialMovement);
-	}
-}
-
-inline void APlayerCharacter::DisableFastRun()
-{
-	if (IsFastRunning())
-	{
-		// SetCharacterState(ECharacterState::IdleWalkRun);
-	}
 }
 
 inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetAnimationReferences() const
@@ -1015,13 +811,6 @@ inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetEquippedWeaponAn
 	return EquippedWeaponAnimationReferences;
 }
 
-/*
-FORCEINLINE bool APlayerCharacter::SkillAllowsMovement() const
-{
-	return bSkillAllowsMovement;
-}
-*/
-
 FORCEINLINE bool APlayerCharacter::SkillHasDirectionalAnimations() const
 {
 	return bSkillHasDirectionalAnimations;
@@ -1036,58 +825,3 @@ FORCEINLINE void APlayerCharacter::SetNormalAttackSectionChangeAllowed(bool bNew
 {
 	bNormalAttackSectionChangeAllowed = bNewValue;
 }
-
-FORCEINLINE bool APlayerCharacter::CanAutoRun() const
-{
-	return IsIdleOrMoving();
-}
-
-FORCEINLINE bool APlayerCharacter::CanSwitchWeapon() const
-{
-	return IsIdleOrMoving();
-}
-
-FORCEINLINE bool APlayerCharacter::IsSwitchingWeapon() const
-{
-	return CharacterStateInfo.CharacterState == ECharacterState::SwitchingWeapon;
-}
-
-/*
-FORCEINLINE bool APlayerCharacter::IsAutoRunning() const
-{
-	return CharacterStateInfo.CharacterState == ECharacterState::AutoRun;
-}
-*/
-
-FORCEINLINE bool APlayerCharacter::IsPrimaryWeaponEquippped() const
-{
-	return PrimaryWeaponID != NAME_None && PrimaryWeapon->IsAttachedToCharacterOwner();
-}
-
-FORCEINLINE bool APlayerCharacter::IsSecondaryWeaponEquipped() const
-{
-	return SecondaryWeaponID != NAME_None && SecondaryWeapon->IsAttachedToCharacterOwner();
-}
-
-FORCEINLINE bool APlayerCharacter::IsFastRunning() const
-{
-	//~ @todo
-	// return IsRunning();
-	return CharacterStateInfo.CharacterState == ECharacterState::SpecialMovement;
-}
-
-/*
-FORCEINLINE void APlayerCharacter::SetMasterPoseComponentForMeshes()
-{
-	if (GetMesh())
-	{
-		Hair->SetMasterPoseComponent(GetMesh());
-		HatItem->SetMasterPoseComponent(GetMesh());
-		FaceItem->SetMasterPoseComponent(GetMesh());
-		Chest->SetMasterPoseComponent(GetMesh());
-		Hands->SetMasterPoseComponent(GetMesh());
-		Legs->SetMasterPoseComponent(GetMesh());
-		Feet->SetMasterPoseComponent(GetMesh());
-	}
-}
-*/

@@ -279,7 +279,7 @@ bool UPlayerAnimInstance::IsFastRunning() const
 {
 	if (EODPlayerOwner)
 	{
-		return EODPlayerOwner->IsFastRunning();
+		// return EODPlayerOwner->IsFastRunning();
 	}
 
 	return false;

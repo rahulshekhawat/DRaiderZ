@@ -37,8 +37,6 @@
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerSkillsComponent>(AEODCharacterBase::GameplaySkillsComponentName))
 {
-	PrimaryActorTick.bCanEverTick = true;
-
 	// The player should be free to look around with mouse without actually rotating the posessed character
 	bUseControllerRotationYaw = false;
 
@@ -71,17 +69,7 @@ void APlayerCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	LoadUnequippedWeaponAnimationReferences();
-	//~ @todo
-	/*
-	if (IsValid(GetCharacterStatsComponent()))
-	{
-		SetWalkSpeed(DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier());
-	}
-	else
-	{
-		SetWalkSpeed(DefaultWalkSpeed);
-	}
-	*/
+	SetWalkSpeed(DefaultWalkSpeed * MovementSpeedModifier);
 
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Instigator = this;
@@ -176,21 +164,6 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// SetMasterPoseComponentForMeshes();
-
-	/*
-	if (Controller && Controller->IsLocalPlayerController() && HUDWidgetClass.Get())
-	{
-		if (HUDWidgetClass.Get())
-		{
-			HUDWidget = CreateWidget<UHUDWidget>(GetGameInstance(), HUDWidgetClass);
-			if (HUDWidget)
-			{
-				HUDWidget->AddToViewport();
-			}
-		}
-	}
-	*/
 }
 
 bool APlayerCharacter::CanMove() const
@@ -199,7 +172,8 @@ bool APlayerCharacter::CanMove() const
 	// return IsIdleOrMoving() || IsRunning() || bCharacterStateAllowsMovement;
 	// return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
 	// return IsIdleOrMoving() || IsBlocking() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
-	return IsIdleOrMoving() || IsBlocking() || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
+	// return IsIdleOrMoving() || IsBlocking() || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
+	return IsIdleOrMoving() || IsBlocking() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
 }
 
 bool APlayerCharacter::CanJump() const
@@ -237,7 +211,8 @@ bool APlayerCharacter::CanNormalAttack() const
 
 bool APlayerCharacter::CanUseAnySkill() const
 {
-	return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsFastRunning() || IsNormalAttacking());
+	// return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsFastRunning() || IsNormalAttacking());
+	return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsNormalAttacking());
 }
 
 /*
@@ -257,15 +232,6 @@ bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
 }
 */
 
-EWeaponType APlayerCharacter::GetEquippedWeaponType() const
-{
-	return PrimaryWeapon ? PrimaryWeapon->GetWeaponType() : EWeaponType::None;
-}
-
-UHUDWidget* APlayerCharacter::BP_GetHUDWidget() const
-{
-	return GetHUDWidget();
-}
 
 bool APlayerCharacter::CCEFlinch_Implementation(const float BCAngle)
 {
@@ -529,7 +495,8 @@ void APlayerCharacter::AddPrimaryWeaponToCurrentSlot(FName WeaponID)
 	UWeaponDataAsset* WeaponDataAsset = UWeaponLibrary::GetWeaponDataAsset(WeaponID);
 	if (WeaponDataAsset)
 	{
-		Server_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset);
+		//~ @todo
+		// Server_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset);
 	}
 
 	/*
@@ -666,18 +633,6 @@ void APlayerCharacter::RemoveSecondaryWeapon()
 	SecondaryWeapon->OnUnEquip();
 	*/
 	// @todo remove weapon stats
-}
-
-void APlayerCharacter::ZoomInCamera()
-{
-	if (GetCameraBoomComponent()->TargetArmLength >= CameraArmMinimumLength)
-		GetCameraBoomComponent()->TargetArmLength -= CameraZoomRate;
-}
-
-void APlayerCharacter::ZoomOutCamera()
-{
-	if (GetCameraBoomComponent()->TargetArmLength <= CameraArmMaximumLength)
-		GetCameraBoomComponent()->TargetArmLength += CameraZoomRate;
 }
 
 /*
@@ -822,162 +777,6 @@ void APlayerCharacter::FinishDodge()
 	ResetState();
 }
 
-void APlayerCharacter::OnDodge()
-{
-	// Alternative to disable auto run
-	if (bUseControllerRotationYaw)
-	{
-		SetUseControllerRotationYaw(false);
-	}
-
-	if (CanDodge() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Dodge.Get())
-	{
-		int DodgeStaminaCost = 30;
-		//~ @todo
-		// int32 DodgeCost = DodgeStaminaCost * GetCharacterStatsComponent()->GetStaminaConsumptionModifier();
-		// int32 DodgeCost = DodgeStaminaCost;
-		// GetCharacterStatsComponent()->ModifyCurrentStamina(-DodgeCost);
-
-		// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-		// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
-		float DesiredYaw = GetControllerRotationYaw();
-
-		if (ForwardAxisValue != 0)
-		{
-			DesiredYaw = GetRotationYawFromAxisInput();
-		}
-
-		SetCharacterRotation(FRotator(0.f, DesiredYaw, 0.f));
-		UAnimMontage* DodgeMontage = GetActiveAnimationReferences()->Dodge.Get();
-		//~ @todo
-		/*
-		if (ForwardAxisValue == 0)
-		{
-			if (RightAxisValue > 0)
-			{
-				PlayAnimationMontage(DodgeMontage,
-					UCharacterLibrary::SectionName_RightDodge,
-					ECharacterState::Dodging);
-			}
-			else if (RightAxisValue < 0)
-			{
-				PlayAnimationMontage(DodgeMontage,
-					UCharacterLibrary::SectionName_LeftDodge,
-					ECharacterState::Dodging);
-			}
-			else
-			{
-				PlayAnimationMontage(DodgeMontage,
-					UCharacterLibrary::SectionName_BackwardDodge,
-					ECharacterState::Dodging);
-			}
-		}
-		else
-		{
-			if (ForwardAxisValue > 0)
-			{
-				PlayAnimationMontage(DodgeMontage,
-					UCharacterLibrary::SectionName_ForwardDodge,
-					ECharacterState::Dodging);
-			}
-			else if (ForwardAxisValue < 0)
-			{
-				PlayAnimationMontage(DodgeMontage,
-					UCharacterLibrary::SectionName_BackwardDodge,
-					ECharacterState::Dodging);
-			}
-		}
-		*/
-
-		// @note Why would DodgeImmunityTimerHandle be active here?. Uncommented for now
-		/*
-		if (GetWorld()->GetTimerManager().IsTimerActive(DodgeImmunityTimerHandle))
-		{
-			DisableiFrames();
-		}
-		*/
-
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindUFunction(this, FName("EnableiFrames"), DodgeImmunityDuration);
-		GetWorld()->GetTimerManager().SetTimer(DodgeImmunityTimerHandle, TimerDelegate, DodgeImmunityTriggerDelay, false);
-	}
-}
-
-void APlayerCharacter::OnPressedForward()
-{
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		bBackwardPressed = false;
-		bForwardPressed = true;
-		World->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableForwardPressed, 0.1f, false);
-	}
-}
-
-void APlayerCharacter::OnPressedBackward()
-{
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		bForwardPressed = false;
-		bBackwardPressed = true;
-		World->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &APlayerCharacter::DisableBackwardPressed, 0.1f, false);
-	}
-}
-
-void APlayerCharacter::OnPressedBlock()
-{
-	bBlockPressed = true;
-}
-
-void APlayerCharacter::OnReleasedBlock()
-{
-	bBlockPressed = false;
-}
-
-void APlayerCharacter::OnPressedEscape()
-{
-	// @todo pause game, show cursor and display pause menu
-}
-
-void APlayerCharacter::OnJump()
-{
-	if (CanJump())
-	{
-		if (bUseControllerRotationYaw)
-		{
-			SetUseControllerRotationYaw(false);
-		}
-
-		/*
-		if (IsAutoRunning())
-		{
-			DisableAutoRun();
-		}
-		*/
-
-		Jump();
-		// SetCharacterState(ECharacterState::Jumping);
-	}
-}
-
-void APlayerCharacter::OnInteract()
-{
-	//~ @todo
-	/*
-	// If player is already interacting
-	if (GetCharacterState() == ECharacterState::Interacting)
-	{
-		UpdateInteraction();
-		// EndInteraction();
-	}
-	else
-	{
-		StartInteraction();
-	}
-	*/
-}
-
 void APlayerCharacter::ToggleSheathe()
 {
 	if (CanToggleSheathe())
@@ -1035,123 +834,6 @@ void APlayerCharacter::OnToggleMouseCursor()
 	}
 }
 
-void APlayerCharacter::OnPressedNormalAttack()
-{
-	// SetNormalAttackKeyPressed(true);
-
-	/*
-	if (!CanNormalAttack() || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
-	{
-		return;
-	}
-
-	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
-
-	// @todo maybe change character state to using skill when using SP attacks?s
-	if (!IsNormalAttacking() && bForwardPressed)
-	{
-		PlayAnimationMontage(NormalAttackMontage,
-			UCharacterLibrary::SectionName_ForwardSPSwing,
-			ECharacterState::Attacking);
-		SetCharacterRotation(FRotator(0.f, GetControllerRotationYaw(), 0.f));
-	}
-	else if (!IsNormalAttacking() && bBackwardPressed)
-	{
-		PlayAnimationMontage(NormalAttackMontage,
-			UCharacterLibrary::SectionName_BackwardSPSwing,
-			ECharacterState::Attacking);
-		SetCharacterRotation(FRotator(0.f, GetControllerRotationYaw(), 0.f));
-	}
-	else if (!IsNormalAttacking())
-	{
-		PlayAnimationMontage(NormalAttackMontage,
-			UCharacterLibrary::SectionName_FirstSwing,
-			ECharacterState::Attacking);
-	}
-	else if (IsNormalAttacking())
-	{
-		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(NormalAttackMontage);
-		FName NextSection = GetNextNormalAttackSectionName(CurrentSection);
-
-		if (NextSection != NAME_None)
-		{
-			FString CurrentSectionString = CurrentSection.ToString();
-			if (CurrentSectionString.EndsWith("End"))
-			{
-				PlayAnimationMontage(NormalAttackMontage, NextSection, ECharacterState::Attacking);
-			}
-			else
-			{
-				SetNextMontageSection(CurrentSection, NextSection);
-			}
-		}
-	}
-	*/
-}
-
-void APlayerCharacter::OnReleasedNormalAttack()
-{
-	// SetNormalAttackKeyPressed(false);
-}
-
-void APlayerCharacter::DoNormalAttack()
-{
-	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
-	{
-		return;
-	}
-
-	//~ @todo
-	/*
-	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
-	if (bForwardPressed)
-	{
-		PlayAnimationMontage(NormalAttackMontage,
-			UCharacterLibrary::SectionName_ForwardSPSwing,
-			ECharacterState::Attacking);
-		SetCharacterRotation(FRotator(0.f, GetControllerRotationYaw(), 0.f));
-	}
-	else if (bBackwardPressed)
-	{
-		PlayAnimationMontage(NormalAttackMontage,
-			UCharacterLibrary::SectionName_BackwardSPSwing,
-			ECharacterState::Attacking);
-		SetCharacterRotation(FRotator(0.f, GetControllerRotationYaw(), 0.f));
-	}
-	else
-	{
-		PlayAnimationMontage(NormalAttackMontage,
-			UCharacterLibrary::SectionName_FirstSwing,
-			ECharacterState::Attacking);
-	}
-	*/
-}
-
-void APlayerCharacter::OnToggleAutoRun()
-{
-	//~ @todo
-	/*
-	if (GetCharacterState() == ECharacterState::AutoRun)
-	{
-		DisableAutoRun();
-	}
-	else if (CanAutoRun())
-	{
-		EnableAutoRun();
-	}
-	*/
-}
-
-void APlayerCharacter::DisableForwardPressed()
-{
-	bForwardPressed = false;
-}
-
-void APlayerCharacter::DisableBackwardPressed()
-{
-	bBackwardPressed = false;
-}
-
 void APlayerCharacter::UpdateIdleState(float DeltaTime)
 {
 	if (GetCharacterMovementDirection() != ECharMovementDirection::None)
@@ -1159,107 +841,6 @@ void APlayerCharacter::UpdateIdleState(float DeltaTime)
 		SetCharacterMovementDirection(ECharMovementDirection::None);
 	}
 }
-
-/*
-void APlayerCharacter::UpdateMovement(float DeltaTime)
-{
-	float ActorRotationYaw = GetActorRotation().Yaw;
-	float DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
-			
-	bool bRotatePlayer = DesiredPlayerRotationYaw == ActorRotationYaw ? false : true;
-
-	float ForwardAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveForward"));
-	float RightAxisValue = GetController()->InputComponent->GetAxisValue(FName("MoveRight"));
-
-	// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-	// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
-	if (ForwardAxisValue == 0 && RightAxisValue == 0)
-	{
-		bRotatePlayer = false;
-	}
-
-	if (bRotatePlayer)
-	{
-		DeltaRotateCharacterToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
-	}
-	
-	if (ForwardAxisValue < 0)
-	{
-		float Speed = (DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier() * 5) / 16;
-		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
-		{
-			SetWalkSpeed(Speed);
-		}
-	}
-	else
-	{
-		float Speed = DefaultWalkSpeed * GetCharacterStatsComponent()->GetMovementSpeedModifier();
-		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
-		{
-			SetWalkSpeed(Speed);
-		}
-	}
-
-	if (ForwardAxisValue == 0)
-	{
-		if (RightAxisValue > 0 && GetCharacterMovementDirection() != ECharMovementDirection::R)
-		{
-			SetCharacterMovementDirection(ECharMovementDirection::R);
-		}
-		else if (RightAxisValue < 0 && GetCharacterMovementDirection() != ECharMovementDirection::L)
-		{
-			SetCharacterMovementDirection(ECharMovementDirection::L);
-		}
-	}
-	else
-	{
-		if (ForwardAxisValue > 0 && GetCharacterMovementDirection() != ECharMovementDirection::F)
-		{
-			SetCharacterMovementDirection(ECharMovementDirection::F);
-		}
-		else if (ForwardAxisValue < 0 && GetCharacterMovementDirection() != ECharMovementDirection::B)
-		{
-			SetCharacterMovementDirection(ECharMovementDirection::B);
-		}
-	}
-}
-*/
-
-/*
-void APlayerCharacter::UpdateGuardState(float DeltaTime)
-{
-	// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-	// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
-	
-	if (ForwardAxisValue == 0)
-	{
-		if (RightAxisValue > 0)
-		{
-			if (BlockMovementDirectionYaw != 90.f)
-				SetBlockMovementDirectionYaw(90.f);
-		}
-		else if (RightAxisValue < 0)
-		{
-			if (BlockMovementDirectionYaw != -90.f)
-				SetBlockMovementDirectionYaw(-90.f);
-		}
-		else
-		{
-			if (BlockMovementDirectionYaw != 0.f)
-				SetBlockMovementDirectionYaw(0.f);
-		}
-	}
-	else
-	{
-		float NewYaw = FMath::RadiansToDegrees(FMath::Atan2(RightAxisValue, ForwardAxisValue));
-		
-		if (BlockMovementDirectionYaw != NewYaw)
-		{
-			SetBlockMovementDirectionYaw(NewYaw);
-		}
-	}
-}
-*/
 
 void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
 {
@@ -1584,6 +1165,8 @@ FName APlayerCharacter::GetNextNormalAttackSectionName(const FName& CurrentSecti
 
 void APlayerCharacter::DisplayDialogueWidget(FName DialogueWindowID)
 {
+	//~ @todo
+	/*
 	if (DialogueWidgetClass.Get())
 	{
 		DialogueWidget = CreateWidget<UDialogueWindowWidget>(GetGameInstance(), DialogueWidgetClass);
@@ -1600,6 +1183,7 @@ void APlayerCharacter::DisplayDialogueWidget(FName DialogueWindowID)
 			AudioComponent->Play();
 		}
 	}
+	*/
 }
 
 void APlayerCharacter::RemoveDialogueWidget()
@@ -1611,10 +1195,12 @@ void APlayerCharacter::RemoveDialogueWidget()
 		DialogueWidget = nullptr;
 	}
 
+	/*
 	if (HUDWidget)
 	{
 		HUDWidget->GetSkillBarWidget()->SetVisibility(ESlateVisibility::Visible);
 	}
+	*/
 }
 
 void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSection)
@@ -1659,7 +1245,8 @@ void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSect
 		// SetCharacterState(ECharacterState::Attacking);
 	}
 
-	Server_PlayNormalAttackAnimation(OldSection, NewSection);
+	//~ @todo
+	// Server_PlayNormalAttackAnimation(OldSection, NewSection);
 }
 
 void APlayerCharacter::ChangeNormalAttackSection(FName OldSection, FName NewSection)
@@ -1738,154 +1325,13 @@ void APlayerCharacter::ChangeNormalAttackSection(FName OldSection, FName NewSect
 	*/
 }
 
-FName APlayerCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender)
-{
-	FString Prefix;
-	if (CharGender == ECharacterGender::Female)
-	{
-		Prefix = FString("Female_");
-	}
-	else
-	{
-		Prefix = FString("Male_");
-	}
-
-	FString Postfix;
-	switch (WeaponType)
-	{
-	case EWeaponType::GreatSword:
-		Postfix = FString("GreatSword");
-		break;
-	case EWeaponType::WarHammer:
-		Postfix = FString("WarHammer");
-		break;
-	case EWeaponType::LongSword:
-		Postfix = FString("LongSword");
-		break;
-	case EWeaponType::Mace:
-		Postfix = FString("Mace");
-		break;
-	case EWeaponType::Dagger:
-		Postfix = FString("Dagger");
-		break;
-	case EWeaponType::Staff:
-		Postfix = FString("Staff");
-		break;
-	case EWeaponType::Shield:
-	case EWeaponType::None:
-	default:
-		Postfix = FString("NoWeapon");
-		break;
-	}
-
-	FString RowIDString = Prefix + Postfix;
-	FName RowID = FName(*RowIDString);
-
-	return RowID;
-}
-
-TSharedPtr<FStreamableHandle> APlayerCharacter::LoadAnimationReferences(FPlayerAnimationReferencesTableRow* AnimationReferences)
-{
-	TSharedPtr<FStreamableHandle> StreamableHandle;
-
-	UGameSingleton* GameSingleton = nullptr;
-	if (GEngine)
-	{
-		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-	}
-
-	if (!GameSingleton)
-	{
-		return StreamableHandle;
-	}
-
-	TArray<FSoftObjectPath> AssetsToLoad;
-	if (AnimationReferences)
-	{
-		AssetsToLoad.Add(AnimationReferences->Flinch.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->HitEffects.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->NormalAttacks.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Jump.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Dodge.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->SpecialActions.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Skills.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Spells.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->BlockAttack.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->WeaponSwitchFullBody.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->WeaponSwitchUpperBody.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Die.ToSoftObjectPath());
-	}
-
-	StreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AssetsToLoad);
-	return StreamableHandle;
-}
-
-void APlayerCharacter::UnloadUnequippedWeaponAnimationReferences()
-{
-	if (UnequippedWeaponAnimationsStreamableHandle.IsValid())
-	{
-		UnequippedWeaponAnimationsStreamableHandle.Get()->ReleaseHandle();
-		UnequippedWeaponAnimationsStreamableHandle.Reset();
-	}
-}
-
-void APlayerCharacter::LoadUnequippedWeaponAnimationReferences()
-{
-	UnloadUnequippedWeaponAnimationReferences();
-
-	if (!PlayerAnimationReferencesDataTable)
-	{
-		return;
-	}
-
-	FName RowID = GetAnimationReferencesRowID(EWeaponType::None, Gender);
-	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
-		FString("APlayerCharacter::LoadUnequippedWeaponAnimationReferences(), loading unequipped weapon animation references"));
-
-	if (!PlayerAnimationReferences)
-	{
-		return;
-	}
-
-	UnequippedWeaponAnimationReferences = PlayerAnimationReferences;
-	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
-}
-
-void APlayerCharacter::UnloadEquippedWeaponAnimationReferences()
-{
-	if (EquippedWeaponAnimationsStreamableHandle.IsValid())
-	{
-		EquippedWeaponAnimationsStreamableHandle.Get()->ReleaseHandle();
-		EquippedWeaponAnimationsStreamableHandle.Reset();
-	}
-}
-
-void APlayerCharacter::LoadEquippedWeaponAnimationReferences()
-{
-	UnloadEquippedWeaponAnimationReferences();
-
-	if (!PlayerAnimationReferencesDataTable)
-	{
-		return;
-	}
-
-	FName RowID = GetAnimationReferencesRowID(GetEquippedWeaponType(), Gender);
-	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
-		FString("APlayerCharacter::LoadEquippedWeaponAnimationReferences(), loading equipped weapon animation references"));
-
-	if (!PlayerAnimationReferences)
-	{
-		return;
-	}
-	
-	EquippedWeaponAnimationReferences = PlayerAnimationReferences;
-	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
-}
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
 	// bool bSkillBeingUsedWhileHit;
 	TPair<FName, FSkillTableRow*> SkillPair(NAME_None, nullptr);
+	//~ @todo
+	/*
 	if (CanUseAnySkill())
 	{
 		SkillPair = GetSkillsComponent()->GetSkillFromSkillSlot(SkillButtonIndex);
@@ -1898,6 +1344,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 	{
 		SkillPair = GetSkillsComponent()->GetHitImmuneSkillFromSkillSlot(SkillButtonIndex);
 	}
+	*/
 
 	/*
 	if (!CanUseAnySkill())
@@ -1918,7 +1365,7 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 	if (IsBlocking())
 	{
-		DisableBlock();
+		// DisableBlock();
 	}
 
 	//~ @todo
@@ -1927,7 +1374,8 @@ void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 
 	SetCurrentActiveSkillID(SkillPair.Key);
 	// SetCurrentActiveSkill(SkillPair.Value); // @todo
-	GetSkillsComponent()->OnSkillUsed(SkillButtonIndex, SkillPair.Key, SkillPair.Value);
+	//~ @todo
+	// GetSkillsComponent()->OnSkillUsed(SkillButtonIndex, SkillPair.Key, SkillPair.Value);
 
 	// bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
 	bSkillHasDirectionalAnimations = SkillPair.Value->bHasDirectionalAnimations;
@@ -2227,7 +1675,8 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 	//~ @todo
 	// if (GetCurrentActiveSkill() && GetCurrentActiveSkill()->AnimMontage.Get() == AnimMontage)
 	{
-		GetSkillsComponent()->SetOffChainSkillReset();
+		//~ @todo
+		// GetSkillsComponent()->SetOffChainSkillReset();
 
 
 		//~ @todo
@@ -2336,12 +1785,12 @@ void APlayerCharacter::TurnOffTargetSwitch()
 
 void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)
 {
-	GetSkillsComponent()->OnSkillGroupAddedToSkillBar(SkillGroup);
+	// GetSkillsComponent()->OnSkillGroupAddedToSkillBar(SkillGroup);
 }
 
 void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString & SkillGroup)
 {
-	GetSkillsComponent()->OnSkillGroupRemovedFromSkillBar(SkillGroup);
+	// GetSkillsComponent()->OnSkillGroupRemovedFromSkillBar(SkillGroup);
 }
 
 void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
@@ -2412,11 +1861,6 @@ void APlayerCharacter::Server_Dodge_Implementation(uint8 DodgeIndex, float Rotat
 	StartDodge();
 }
 
-bool APlayerCharacter::Server_Dodge_Validate(uint8 DodgeIndex, float RotationYaw)
-{
-	return true;
-}
-
 void APlayerCharacter::Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
 {
 }
@@ -2452,89 +1896,6 @@ void APlayerCharacter::Server_NormalAttack_Implementation(uint8 AttackIndex)
 	}
 }
 
-bool APlayerCharacter::Server_NormalAttack_Validate(uint8 AttackIndex)
-{
-	return true;
-}
-
-void APlayerCharacter::Server_PlayNormalAttackAnimation_Implementation(FName OldSection, FName NewSection)
-{
-	Multicast_PlayNormalAttackAnimation(OldSection, NewSection);
-}
-
-bool APlayerCharacter::Server_PlayNormalAttackAnimation_Validate(FName OldSection, FName NewSection)
-{
-	return true;
-}
-
-void APlayerCharacter::Multicast_PlayNormalAttackAnimation_Implementation(FName OldSection, FName NewSection)
-{
-	if (IsLocallyControlled() || !GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
-	{
-		return;
-	}
-	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
-	if (GetMesh()->GetAnimInstance())
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (OldSection == NAME_None)
-		{
-			AnimInstance->Montage_Play(NormalAttackMontage);
-			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-		}
-		else
-		{
-			FString OldSectionString = OldSection.ToString();
-			if (OldSectionString.EndsWith("End"))
-			{
-				AnimInstance->Montage_Play(NormalAttackMontage);
-				AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-			}
-			else
-			{
-				FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
-				if (CurrentSection == OldSection)
-				{
-					AnimInstance->Montage_SetNextSection(CurrentSection, NewSection, NormalAttackMontage);
-				}
-				else
-				{
-					AnimInstance->Montage_Play(NormalAttackMontage);
-					AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-				}
-			}
-		}
-
-		// SetCharacterState(ECharacterState::Attacking);
-	}
-}
-
-/*
-void APlayerCharacter::OnRep_WeaponSlots(TArray<UWeaponSlot*> OldWeaponSlots)
-{
-	UKismetSystemLibrary::PrintString(this, FString("Weapon slots got replicated"));
-
-	FString Message = FString::FromInt(WeaponSlots.Num());
-	UKismetSystemLibrary::PrintString(this, Message);
-
-	ActiveWeaponSlotIndex = 0;
-	UWeaponSlot* WeaponSlot = WeaponSlots[ActiveWeaponSlotIndex];
-
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.Instigator = this;
-	SpawnInfo.Owner = this;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	APrimaryWeapon* Wep = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
-
-	// UKismetSystemLibrary::PrintString(this, WeaponSlot->PrimaryWeaponID.ToString());
-
-	if (WeaponSlot)
-	{
-		WeaponSlot->AttachPrimaryWeapon(Wep);
-	}
-}
-*/
-
 void APlayerCharacter::Server_SetPrimaryWeaponID_Implementation(FName NewWeaponID)
 {
 	SetPrimaryWeaponID(NewWeaponID);
@@ -2543,47 +1904,4 @@ void APlayerCharacter::Server_SetPrimaryWeaponID_Implementation(FName NewWeaponI
 bool APlayerCharacter::Server_SetPrimaryWeaponID_Validate(FName NewWeaponID)
 {
 	return true;
-}
-
-void APlayerCharacter::Server_AddPrimaryWeaponToCurrentSlot_Implementation(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
-{
-	UKismetSystemLibrary::PrintString(this, FString("Server RPC called"));
-
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.Instigator = this;
-	SpawnInfo.Owner = this;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	APrimaryWeapon* Wep = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
-
-	Multicast_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset, Wep);
-}
-
-bool APlayerCharacter::Server_AddPrimaryWeaponToCurrentSlot_Validate(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
-{
-	return true;
-}
-
-void APlayerCharacter::Multicast_AddPrimaryWeaponToCurrentSlot_Implementation(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, AWeaponBase* PrimaryWep)
-{
-	UKismetSystemLibrary::PrintString(this, FString("Multicast called"));
-
-	/*
-	PrimaryWeaponID = WeaponID;
-	UWeaponSlot* WeaponSlot = GetCurrentWeaponSlot();
-	if (!WeaponSlot)
-	{
-		// WeaponSlot = NewObject<UWeaponSlot>((UObject*)GetTransientPackage(), UWeaponSlot::StaticClass());
-		WeaponSlot = NewObject<UWeaponSlot>(this, UWeaponSlot::StaticClass(), FName("SlotObj"), RF_Transient);
-	}
-
-	if (WeaponSlot)
-	{
-		WeaponSlot->AttachPrimaryWeapon(WeaponID, WeaponDataAsset, PrimaryWep);
-	}
-
-	if (WeaponSlot)
-	{
-		ActiveWeaponSlotIndex = WeaponSlots.Add(WeaponSlot);
-	}
-	*/
 }

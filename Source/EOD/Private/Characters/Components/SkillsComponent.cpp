@@ -70,7 +70,8 @@ void USkillsComponent::ToggleSkillTreeUI()
 void USkillsComponent::InitializeComponentWidgets()
 {
 	APlayerCharacter* OwningPlayer = Cast<APlayerCharacter>(GetOwner());
-	if (!(OwningPlayer && OwningPlayer->Controller && OwningPlayer->Controller->IsLocalPlayerController() && OwningPlayer->GetHUDWidget()))
+	//~ @todo
+	//if (!(OwningPlayer && OwningPlayer->Controller && OwningPlayer->Controller->IsLocalPlayerController() && OwningPlayer->GetHUDWidget()))
 	{
 		return;
 	}
@@ -78,14 +79,16 @@ void USkillsComponent::InitializeComponentWidgets()
 	if (SkillTreeWidgetClass.Get())
 	{
 		SkillTreeWidget = CreateWidget<USkillTreeWidget>(OwningPlayer->GetGameInstance(), SkillTreeWidgetClass);
-		OwningPlayer->GetHUDWidget()->AddSkillTreeWidget(SkillTreeWidget);
+		//~ @todo
+		// OwningPlayer->GetHUDWidget()->AddSkillTreeWidget(SkillTreeWidget);
 		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 	if (SkillBarWidgetClass.Get())
 	{
 		SkillBarWidget = CreateWidget<USkillBarWidget>(OwningPlayer->GetGameInstance(), SkillBarWidgetClass);
-		OwningPlayer->GetHUDWidget()->AddSkillBarWidget(SkillBarWidget);
+		//~ @todo
+		// OwningPlayer->GetHUDWidget()->AddSkillBarWidget(SkillBarWidget);
 	}
 }
 

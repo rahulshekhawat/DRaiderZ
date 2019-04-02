@@ -29,11 +29,13 @@ void UFuriousDashBase::OnStatusEffectTick_Implementation(AEODCharacterBase* Targ
 		FStatusInfo& StatusInfo = CharacterToStatusInfoMap[TargetCharacter];
 		if (StatusInfo.TotalElapsedTime == 0)
 		{
-			PlayerChar->EnableFastRun();
+			// ~ @todo
+			// PlayerChar->EnableFastRun();
 		}
 		else if (StatusInfo.TotalElapsedTime >= StatusEffectDuration)
 		{
-			PlayerChar->DisableFastRun();
+			//~ @todo
+			// PlayerChar->DisableFastRun();
 			DeactivateStatusEffect(TargetCharacter);
 			return;
 		}

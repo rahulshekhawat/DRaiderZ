@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "PrimaryWeapon.h"
+#include "SecondaryWeapon.h"
 #include "CharacterLibrary.h"
 #include "EODCharacterBase.h"
 
+#include "Engine/DataTable.h"
+#include "Engine/StreamableManager.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "HumanCharacter.generated.h"
 
@@ -25,7 +28,7 @@ class EOD_API AHumanCharacter : public AEODCharacterBase
 public:
 
 	// --------------------------------------
-	//	UE4 Method Overrides
+	//  UE4 Method Overrides
 	// --------------------------------------
 
 	/** Create and initialize skeletal armor mesh, camera, and inventory components. */
@@ -47,14 +50,14 @@ public:
 	virtual void Destroyed() override;
 
 	// --------------------------------------
-	//	Save/Load System
+	//  Save/Load System
 	// --------------------------------------
 
 	/** Saves current player state */
 	virtual void SaveCharacterState() override;
 
 	// --------------------------------------
-	//	Components
+	//  Components
 	// --------------------------------------
 
 	static FName HairComponentName;
@@ -118,12 +121,32 @@ private:
 public:
 
 	// --------------------------------------
-	//	Animations
+	//  Animations
 	// --------------------------------------
 
 	inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
 
-private:
+protected:
+
+	virtual void UnloadUnequippedWeaponAnimationReferences();
+
+	virtual void LoadUnequippedWeaponAnimationReferences();
+
+	virtual void UnloadEquippedWeaponAnimationReferences();
+
+	virtual void LoadEquippedWeaponAnimationReferences();
+
+	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender);
+
+	TSharedPtr<FStreamableHandle> LoadAnimationReferences(FPlayerAnimationReferencesTableRow* AnimationReferences);
+
+	/** Data table containing player animation references */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable, meta = (AllowPrivateAccess = "true"))
+	UDataTable * PlayerAnimationReferencesDataTable;
+
+	TSharedPtr<FStreamableHandle> EquippedWeaponAnimationsStreamableHandle;
+
+	TSharedPtr<FStreamableHandle> UnequippedWeaponAnimationsStreamableHandle;
 
 	/** Animations for this player when it has a weapon equipped */
 	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
@@ -134,11 +157,29 @@ private:
 public:
 
 	// --------------------------------------
-	//	Weapon System
+	//  Weapon System
 	// --------------------------------------
 
+	/** Returns true if primary weapon is equipped */
+	FORCEINLINE bool IsPrimaryWeaponEquippped() const;
+
+	/** Returns true if secondary weapon is equipped */
+	FORCEINLINE bool IsSecondaryWeaponEquipped() const;
+
+	/** Returns primary weapon actor */
+	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
+
+	/** Returns secondary weapon actor */
+	FORCEINLINE ASecondaryWeapon* GetSecondaryWeapon() const;
+
+	FORCEINLINE bool CanSwitchWeapon() const;
+
+	FORCEINLINE bool CanToggleSheathe() const;
+
+	FORCEINLINE bool IsSwitchingWeapon() const;
+
 	/** Returns the weapon type of primary weapon */
-	FORCEINLINE EWeaponType GetEquippedWeaponType() const;
+	virtual EWeaponType GetEquippedWeaponType() const override;
 
 protected:
 
@@ -146,36 +187,54 @@ protected:
 	UPROPERTY(Transient)
 	APrimaryWeapon* PrimaryWeapon;
 
+	/** An actor for secondary weapon equipped by the player */
+	UPROPERTY(Transient)
+	ASecondaryWeapon* SecondaryWeapon;
+
+	/** ID of the current primary weapon equipped. It will be NAME_None if no primary weapon is equipped */
+	UPROPERTY(ReplicatedUsing = OnRep_PrimaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
+	FName PrimaryWeaponID;
+
+	/** ID of current secondary weapon equipped. It will be NAME_None if no secondary weapon is equipped */
+	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
+	FName SecondaryWeaponID;
+
 public:
 
 	// --------------------------------------
-	//	Character States
+	//  Character States
 	// --------------------------------------
 
 	/** Returns true if character can dodge */
 	virtual bool CanDodge() const;
 
+	/** Start dodging */
 	virtual void StartDodge() override;
 
+	/** Finish dodging */
 	virtual void FinishDodge() override;
 
-private:
-
 	// --------------------------------------
-	//	Input Handling
+	//  Input Handling
 	// --------------------------------------
 
+	/** Event called when forward key is pressed */
 	void OnPressedForward();
 
+	/** Event called when backward key is pressed */
 	void OnPressedBackward();
 
+	/** Event called when forward key is released */
 	void OnReleasedForward();
 
+	/** Event called when backward key is relased */
 	void OnReleasedBackward();
 
-	bool bForwardPressed;
+	UPROPERTY(Transient)
+	uint32 bForwardPressed : 1;
 
-	bool bBackwardPressed;
+	UPROPERTY(Transient)
+	uint32 bBackwardPressed : 1;
 
 	/** Timer handle needed for executing SP normal attacks */
 	FTimerHandle SPAttackTimerHandle;
@@ -186,22 +245,25 @@ private:
 	UFUNCTION()
 	void DisableBackwardPressed();
 
-public:
-
 	// --------------------------------------
-	//	Materials
+	//  Materials
 	// --------------------------------------
 
 	virtual void TurnOnTargetSwitch() override;
 
 	virtual void TurnOffTargetSwitch() override;
 
-private:
+protected:
 
 	// --------------------------------------
-	//	Network
+	//  Network
 	// --------------------------------------
 
+	UFUNCTION()
+	virtual void OnRep_PrimaryWeaponID();
+
+	UFUNCTION()
+	virtual	void OnRep_SecondaryWeaponID();
 	
 };
 
@@ -228,7 +290,37 @@ inline FPlayerAnimationReferencesTableRow* AHumanCharacter::GetActiveAnimationRe
 	return EquippedWeaponAnimationReferences;
 }
 
-EWeaponType AHumanCharacter::GetEquippedWeaponType() const
+FORCEINLINE bool AHumanCharacter::IsPrimaryWeaponEquippped() const
 {
-	return PrimaryWeapon ? PrimaryWeapon->GetWeaponType() : EWeaponType::None;
+	return PrimaryWeaponID != NAME_None && PrimaryWeapon->IsAttachedToCharacterOwner();
+}
+
+FORCEINLINE bool AHumanCharacter::IsSecondaryWeaponEquipped() const
+{
+	return SecondaryWeaponID != NAME_None && SecondaryWeapon->IsAttachedToCharacterOwner();
+}
+
+FORCEINLINE APrimaryWeapon* AHumanCharacter::GetPrimaryWeapon() const
+{
+	return PrimaryWeapon;
+}
+
+FORCEINLINE ASecondaryWeapon* AHumanCharacter::GetSecondaryWeapon() const
+{
+	return SecondaryWeapon;
+}
+
+FORCEINLINE bool AHumanCharacter::CanSwitchWeapon() const
+{
+	return IsIdleOrMoving();
+}
+
+FORCEINLINE bool AHumanCharacter::CanToggleSheathe() const
+{
+	return IsIdleOrMoving() && IsPrimaryWeaponEquippped();
+}
+
+FORCEINLINE bool AHumanCharacter::IsSwitchingWeapon() const
+{
+	return CharacterStateInfo.CharacterState == ECharacterState::SwitchingWeapon;
 }
