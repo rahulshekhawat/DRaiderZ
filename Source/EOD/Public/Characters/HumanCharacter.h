@@ -126,33 +126,31 @@ public:
 
 	inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
 
+	inline FPlayerAnimationReferencesTableRow* GetEquippedWeaponAnimationReferences() const;
+
 protected:
 
-	virtual void UnloadUnequippedWeaponAnimationReferences();
+	inline void AddAnimationSoftObjectPathToArray(const TSoftObjectPtr<UAnimMontage>& MontageSoftPtr, TArray<FSoftObjectPath>& PathArray);
 
-	virtual void LoadUnequippedWeaponAnimationReferences();
+	/** Load animation references for the given weapon type */
+	virtual void LoadAnimationReferencesForWeapon(EWeaponType WeaponType);
 
-	virtual void UnloadEquippedWeaponAnimationReferences();
-
-	virtual void LoadEquippedWeaponAnimationReferences();
-
-	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender);
+	/** Unload animation references for the given weapon type */
+	virtual void UnloadAnimationReferencesForWeapon(EWeaponType WeaponType);
 
 	TSharedPtr<FStreamableHandle> LoadAnimationReferences(FPlayerAnimationReferencesTableRow* AnimationReferences);
 
+	/** Animation references by weapon type */
+	TMap<EWeaponType, FPlayerAnimationReferencesTableRow*> AnimationReferencesMap;
+
+	/** Streamable handle for animation references by weapon type */
+	TMap<EWeaponType, TSharedPtr<FStreamableHandle>> AnimationReferencesStreamableHandles;
+
+	FName GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender);
+
 	/** Data table containing player animation references */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable, meta = (AllowPrivateAccess = "true"))
-	UDataTable * PlayerAnimationReferencesDataTable;
-
-	TSharedPtr<FStreamableHandle> EquippedWeaponAnimationsStreamableHandle;
-
-	TSharedPtr<FStreamableHandle> UnequippedWeaponAnimationsStreamableHandle;
-
-	/** Animations for this player when it has a weapon equipped */
-	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
-
-	/** Animations for this player when it does not have a weapon equipped */
-	FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data Table")
+	UDataTable* PlayerAnimationReferencesDataTable;
 
 public:
 
@@ -180,6 +178,18 @@ public:
 
 	/** Returns the weapon type of primary weapon */
 	virtual EWeaponType GetEquippedWeaponType() const override;
+
+	/** Replace primary weapon with a new weapon */
+	virtual void SetCurrentPrimaryWeapon(const FName WeaponID);
+
+	/** Replace secondary weapon with a new weapon */
+	virtual void SetCurrentSecondaryWeapon(const FName WeaponID);
+
+	/** Removes primary weapon if it is currently equipped */
+	virtual void RemovePrimaryWeapon();
+
+	/** Removes secondary weapon if it is currently equipped */
+	virtual void RemoveSecondaryWeapon();
 
 protected:
 
@@ -283,11 +293,32 @@ inline void AHumanCharacter::SetMasterPoseComponentForMeshes()
 
 inline FPlayerAnimationReferencesTableRow* AHumanCharacter::GetActiveAnimationReferences() const
 {
-	if (IsWeaponSheathed() || GetEquippedWeaponType() == EWeaponType::None)
+	EWeaponType WeaponType = IsWeaponSheathed() ? EWeaponType::None : GetEquippedWeaponType();
+	if (AnimationReferencesMap.Contains(WeaponType))
 	{
-		return UnequippedWeaponAnimationReferences;
+		return AnimationReferencesMap[WeaponType];
 	}
-	return EquippedWeaponAnimationReferences;
+
+	return nullptr;
+}
+
+inline FPlayerAnimationReferencesTableRow* AHumanCharacter::GetEquippedWeaponAnimationReferences() const
+{
+	EWeaponType WeaponType = GetEquippedWeaponType();
+	if (AnimationReferencesMap.Contains(WeaponType))
+	{
+		return AnimationReferencesMap[WeaponType];
+	}
+
+	return nullptr;
+}
+
+inline void AHumanCharacter::AddAnimationSoftObjectPathToArray(const TSoftObjectPtr<UAnimMontage>& MontageSoftPtr, TArray<FSoftObjectPath>& PathArray)
+{
+	if (MontageSoftPtr.IsPending())
+	{
+		PathArray.Add(MontageSoftPtr.ToSoftObjectPath());
+	}
 }
 
 FORCEINLINE bool AHumanCharacter::IsPrimaryWeaponEquippped() const

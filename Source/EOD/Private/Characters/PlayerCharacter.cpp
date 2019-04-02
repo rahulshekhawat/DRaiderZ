@@ -68,6 +68,7 @@ void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	/*
 	LoadUnequippedWeaponAnimationReferences();
 	SetWalkSpeed(DefaultWalkSpeed * MovementSpeedModifier);
 
@@ -81,7 +82,7 @@ void APlayerCharacter::PostInitializeComponents()
 	// @note Set secondary weapon first and primary weapon later during initialization
 	SetCurrentSecondaryWeapon(SecondaryWeaponID);
 	SetCurrentPrimaryWeapon(PrimaryWeaponID);
-
+	*/
 
 	if (GetGameplaySkillsComponent())
 	{
@@ -95,7 +96,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (!GetActiveAnimationReferences())
 	{
-		PrintToScreen(this, FString("Animation references are NULL"));
+		// PrintToScreen(this, FString("Animation references are NULL"));
 		return;
 	}
 
@@ -607,33 +608,6 @@ void APlayerCharacter::ToggleWeaponSlot()
 {
 }
 
-void APlayerCharacter::RemovePrimaryWeapon()
-{
-	OnPrimaryWeaponUnequipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
-	PrimaryWeaponID = NAME_None;
-	PrimaryWeaponDataAsset = nullptr;	
-
-	/*
-	PrimaryWeapon->OnUnEquip();
-	PrimaryWeaponID = NAME_None;
-	UnloadEquippedWeaponAnimationReferences();
-	*/
-
-	// @todo remove weapon stats
-}
-
-void APlayerCharacter::RemoveSecondaryWeapon()
-{
-	OnSecondaryWeaponUnequipped.Broadcast(SecondaryWeaponID, SecondaryWeaponDataAsset);
-	SecondaryWeaponID = NAME_None;
-	SecondaryWeaponDataAsset = nullptr;
-
-	/*
-	SecondaryWeaponID = NAME_None;
-	SecondaryWeapon->OnUnEquip();
-	*/
-	// @todo remove weapon stats
-}
 
 /*
 UWeaponSlot* APlayerCharacter::CreateNewWeaponSlot()
@@ -790,6 +764,7 @@ void APlayerCharacter::ToggleSheathe()
 
 void APlayerCharacter::PlayToggleSheatheAnimation()
 {
+	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences = GetEquippedWeaponAnimationReferences();
 	if (!EquippedWeaponAnimationReferences)
 	{
 		return;
@@ -1110,8 +1085,15 @@ void APlayerCharacter::Destroyed()
 		SecondaryWeapon->Destroy();
 	}
 
-	UnloadUnequippedWeaponAnimationReferences();
-	UnloadEquippedWeaponAnimationReferences();
+	/*
+	//~ Unload animation references for weapons
+	TArray<EWeaponType> Weapons;
+	AnimationReferencesStreamableHandles.GetKeys(Weapons);
+	for (EWeaponType Weapon : Weapons)
+	{
+		UnloadAnimationReferencesForWeapon(Weapon);
+	}
+	*/
 }
 
 void APlayerCharacter::SaveCharacterState()
@@ -1712,65 +1694,6 @@ void APlayerCharacter::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupt
 void APlayerCharacter::EquipPrimaryWeapon(FName WeaponID)
 {
 	SetPrimaryWeaponID(WeaponID);
-}
-
-void APlayerCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
-{
-	//  You would call SetCurrentPrimaryWeapon(NAME_None) when you want to remove equipped primary weapon
-	if (WeaponID == NAME_None)
-	{
-		RemovePrimaryWeapon();
-		return;
-	}
-
-	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
-	// If it's an invalid weapon
-	if (!WeaponData || WeaponData->WeaponMesh.IsNull())
-	{
-		return;
-	}
-
-	RemovePrimaryWeapon();
-	if (UWeaponLibrary::IsWeaponDualHanded(WeaponData->WeaponType))
-	{
-		RemoveSecondaryWeapon();
-	}
-	PrimaryWeapon->OnEquip(WeaponID, WeaponData);
-	PrimaryWeaponID = WeaponID;
-
-	LoadEquippedWeaponAnimationReferences();
-	// UpdateCurrentWeaponAnimationType();
-
-	// @todo add weapon stats
-}
-
-void APlayerCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
-{
-	//  You would call SetCurrentSecondaryWeapon(NAME_None) when you want to remove equipped secondary weapon
-	if (WeaponID == NAME_None)
-	{
-		RemoveSecondaryWeapon();
-		return;
-	}
-
-	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
-	// If it's an invalid weapon
-	if (!WeaponData || WeaponData->WeaponMesh.IsNull())
-	{
-		return;
-	}
-
-	// Since secondary weapon is guaranteed to be single handed
-	RemoveSecondaryWeapon();
-	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->GetWeaponType()))
-	{
-		RemovePrimaryWeapon();
-	}
-	SecondaryWeaponID = WeaponID;
-	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
-
-	
-	// @todo add weapon stats
 }
 
 void APlayerCharacter::TurnOnTargetSwitch()

@@ -192,17 +192,9 @@ public:
 
 	void ToggleWeaponSlot();
 
-	/** Removes primary weapon if it is currently equipped */
-	void RemovePrimaryWeapon();
 
-	/** Removes secondary weapon if it is currently equipped */
-	void RemoveSecondaryWeapon();
 
-	/** Replace primary weapon with a new weapon */
-	void SetCurrentPrimaryWeapon(const FName WeaponID);
 
-	/** Replace secondary weapon with a new weapon */
-	void SetCurrentSecondaryWeapon(const FName WeaponID);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = SpecialEffects)
 	void CreateGhostTrail();
@@ -232,9 +224,9 @@ public:
 
 	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
 
-	inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
+	// inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
 
-	inline FPlayerAnimationReferencesTableRow* GetEquippedWeaponAnimationReferences() const;
+	// inline FPlayerAnimationReferencesTableRow* GetEquippedWeaponAnimationReferences() const;
 
 	// FORCEINLINE bool SkillAllowsMovement() const;
 
@@ -415,11 +407,6 @@ private:
 	UFUNCTION()
 	void UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
-	/** Animation references by weapon type */
-	TMap<EWeaponType, FPlayerAnimationReferencesTableRow*> AnimationReferencesMap;
-
-	/** Streamable handle for animation references by weapon type */
-	TMap<EWeaponType, TSharedPtr<FStreamableHandle>> AnimationReferencesStreamableHandles;
 
 	/** Animations for this player when it has a weapon equipped */
 	// FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
@@ -796,6 +783,7 @@ inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetAnimationReferen
 	return AnimationsPtr ? *AnimationsPtr : nullptr;
 }
 
+/*
 inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationReferences() const
 {
 	if (IsWeaponSheathed() || GetEquippedWeaponType() == EWeaponType::None)
@@ -810,6 +798,7 @@ inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetEquippedWeaponAn
 {
 	return EquippedWeaponAnimationReferences;
 }
+*/
 
 FORCEINLINE bool APlayerCharacter::SkillHasDirectionalAnimations() const
 {

@@ -3,6 +3,8 @@
 #include "HumanCharacter.h"
 #include "GameSingleton.h"
 #include "EODGlobalNames.h"
+#include "PrimaryWeapon.h"
+#include "SecondaryWeapon.h"
 #include "EODCharacterMovementComponent.h"
 
 #include "Engine/Engine.h"
@@ -47,6 +49,20 @@ void AHumanCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 void AHumanCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	// Load animation references for no-weapon
+	LoadAnimationReferencesForWeapon(EWeaponType::None);
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Instigator = this;
+	SpawnInfo.Owner = this;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
+	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
+
+	// @note Set secondary weapon first and primary weapon later during initialization
+	SetCurrentSecondaryWeapon(SecondaryWeaponID);
+	SetCurrentPrimaryWeapon(PrimaryWeaponID);
 }
 
 void AHumanCharacter::Tick(float DeltaTime)
@@ -82,66 +98,63 @@ USkeletalMeshComponent* AHumanCharacter::CreateNewArmorComponent(const FName Nam
 	return Sk;
 }
 
-void AHumanCharacter::UnloadUnequippedWeaponAnimationReferences()
+void AHumanCharacter::LoadAnimationReferencesForWeapon(EWeaponType WeaponType)
 {
-	if (UnequippedWeaponAnimationsStreamableHandle.IsValid())
-	{
-		UnequippedWeaponAnimationsStreamableHandle.Get()->ReleaseHandle();
-		UnequippedWeaponAnimationsStreamableHandle.Reset();
-	}
-}
-
-void AHumanCharacter::LoadUnequippedWeaponAnimationReferences()
-{
-	UnloadUnequippedWeaponAnimationReferences();
-
+	// If there is no data table containing animation references then we simply can't load animations
 	if (!PlayerAnimationReferencesDataTable)
 	{
 		return;
 	}
 
-	FName RowID = GetAnimationReferencesRowID(EWeaponType::None, Gender);
+	// If the animation references are already loaded
+	if (AnimationReferencesMap.Contains(WeaponType) && AnimationReferencesStreamableHandles.Contains(WeaponType))
+	{
+		return;
+	}
+
+	FName RowID = GetAnimationReferencesRowID(WeaponType, Gender);
 	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
-		FString("APlayerCharacter::LoadUnequippedWeaponAnimationReferences(), loading unequipped weapon animation references"));
+		FString("AHumanCharacter::LoadAnimationReferencesForWeapon()"));
 
 	if (!PlayerAnimationReferences)
 	{
 		return;
 	}
 
-	UnequippedWeaponAnimationReferences = PlayerAnimationReferences;
-	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
-}
+	TSharedPtr<FStreamableHandle> AnimationHandle = LoadAnimationReferences(PlayerAnimationReferences);;
 
-void AHumanCharacter::UnloadEquippedWeaponAnimationReferences()
-{
-	if (EquippedWeaponAnimationsStreamableHandle.IsValid())
+	if (AnimationReferencesMap.Contains(WeaponType))
 	{
-		EquippedWeaponAnimationsStreamableHandle.Get()->ReleaseHandle();
-		EquippedWeaponAnimationsStreamableHandle.Reset();
+		AnimationReferencesMap[WeaponType] = PlayerAnimationReferences;
+	}
+	else
+	{
+		AnimationReferencesMap.Add(WeaponType, PlayerAnimationReferences);
+	}
+	
+	if (AnimationReferencesStreamableHandles.Contains(WeaponType))
+	{
+		AnimationReferencesStreamableHandles[WeaponType] = AnimationHandle;
+	}
+	else
+	{
+		AnimationReferencesStreamableHandles.Add(WeaponType, AnimationHandle);
 	}
 }
 
-void AHumanCharacter::LoadEquippedWeaponAnimationReferences()
+void AHumanCharacter::UnloadAnimationReferencesForWeapon(EWeaponType WeaponType)
 {
-	UnloadEquippedWeaponAnimationReferences();
-
-	if (!PlayerAnimationReferencesDataTable)
+	if (AnimationReferencesStreamableHandles.Contains(WeaponType))
 	{
-		return;
+		TSharedPtr<FStreamableHandle> AnimationHandle = AnimationReferencesStreamableHandles[WeaponType];
+		if (AnimationHandle.IsValid())
+		{
+			AnimationHandle.Get()->ReleaseHandle();
+			AnimationHandle.Reset();
+		}
 	}
-
-	FName RowID = GetAnimationReferencesRowID(GetEquippedWeaponType(), Gender);
-	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
-		FString("APlayerCharacter::LoadEquippedWeaponAnimationReferences(), loading equipped weapon animation references"));
-
-	if (!PlayerAnimationReferences)
-	{
-		return;
-	}
-
-	EquippedWeaponAnimationReferences = PlayerAnimationReferences;
-	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
+	AnimationReferencesStreamableHandles.Remove(WeaponType);
+	AnimationReferencesMap.Remove(WeaponType);
 }
 
 FName AHumanCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, ECharacterGender CharGender)
@@ -194,11 +207,7 @@ TSharedPtr<FStreamableHandle> AHumanCharacter::LoadAnimationReferences(FPlayerAn
 {
 	TSharedPtr<FStreamableHandle> StreamableHandle;
 
-	UGameSingleton* GameSingleton = nullptr;
-	if (GEngine)
-	{
-		GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-	}
+	UGameSingleton* GameSingleton = GEngine ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
 
 	if (!GameSingleton)
 	{
@@ -220,8 +229,24 @@ TSharedPtr<FStreamableHandle> AHumanCharacter::LoadAnimationReferences(FPlayerAn
 		AssetsToLoad.Add(AnimationReferences->WeaponSwitchFullBody.ToSoftObjectPath());
 		AssetsToLoad.Add(AnimationReferences->WeaponSwitchUpperBody.ToSoftObjectPath());
 		AssetsToLoad.Add(AnimationReferences->Die.ToSoftObjectPath());
+		
+		/*
+		AddAnimationSoftObjectPathToArray(AnimationReferences->Flinch, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->HitEffects, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->NormalAttacks, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->Jump, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->Dodge, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->SpecialActions, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->Skills, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->Spells, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->BlockAttack, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->WeaponSwitchFullBody, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->WeaponSwitchUpperBody, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->Die, AssetsToLoad);
+		*/
 	}
 
+	// StreamableHandle = GameSingleton->StreamableManager.RequestAsyncLoad(AssetsToLoad);
 	StreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AssetsToLoad);
 	return StreamableHandle;
 }
@@ -229,6 +254,93 @@ TSharedPtr<FStreamableHandle> AHumanCharacter::LoadAnimationReferences(FPlayerAn
 EWeaponType AHumanCharacter::GetEquippedWeaponType() const
 {
 	return PrimaryWeapon ? PrimaryWeapon->GetWeaponType() : EWeaponType::None;
+}
+
+void AHumanCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
+{
+	//  You would call SetCurrentPrimaryWeapon(NAME_None) when you want to remove equipped primary weapon
+	if (WeaponID == NAME_None)
+	{
+		RemovePrimaryWeapon();
+		return;
+	}
+
+	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
+	// If it's an invalid weapon
+	if (!WeaponData || WeaponData->WeaponMesh.IsNull())
+	{
+		return;
+	}
+
+	RemovePrimaryWeapon();
+	if (UWeaponLibrary::IsWeaponDualHanded(WeaponData->WeaponType))
+	{
+		RemoveSecondaryWeapon();
+	}
+	PrimaryWeapon->OnEquip(WeaponID, WeaponData);
+	PrimaryWeaponID = WeaponID;
+
+	LoadAnimationReferencesForWeapon(WeaponData->WeaponType);
+	// UpdateCurrentWeaponAnimationType();
+
+	// @todo add weapon stats
+}
+
+void AHumanCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
+{
+	//  You would call SetCurrentSecondaryWeapon(NAME_None) when you want to remove equipped secondary weapon
+	if (WeaponID == NAME_None)
+	{
+		RemoveSecondaryWeapon();
+		return;
+	}
+
+	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
+	// If it's an invalid weapon
+	if (!WeaponData || WeaponData->WeaponMesh.IsNull())
+	{
+		return;
+	}
+
+	// Since secondary weapon is guaranteed to be single handed
+	RemoveSecondaryWeapon();
+	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->GetWeaponType()))
+	{
+		RemovePrimaryWeapon();
+	}
+	SecondaryWeaponID = WeaponID;
+	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
+
+
+	// @todo add weapon stats
+}
+
+void AHumanCharacter::RemovePrimaryWeapon()
+{
+	// OnPrimaryWeaponUnequipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
+	PrimaryWeaponID = NAME_None;
+	// PrimaryWeaponDataAsset = nullptr;
+
+	/*
+	PrimaryWeapon->OnUnEquip();
+	PrimaryWeaponID = NAME_None;
+	UnloadEquippedWeaponAnimationReferences();
+	*/
+
+	// @todo remove weapon stats
+}
+
+void AHumanCharacter::RemoveSecondaryWeapon()
+{
+	// OnSecondaryWeaponUnequipped.Broadcast(SecondaryWeaponID, SecondaryWeaponDataAsset);
+	SecondaryWeaponID = NAME_None;
+	// SecondaryWeaponDataAsset = nullptr;
+
+	/*
+	SecondaryWeaponID = NAME_None;
+	SecondaryWeapon->OnUnEquip();
+	*/
+	// @todo remove weapon stats
 }
 
 bool AHumanCharacter::CanDodge() const
