@@ -189,13 +189,10 @@ bool APlayerCharacter::CanDodge() const
 	UAnimMontage* Animation = AnimationRef ? AnimationRef->Dodge.Get() : nullptr;
 
 	// @todo add UsingSkill, Looting, Interacting, etc. to this too
-	// bool bStateAllowsDodge = IsIdleOrMoving() || IsGuardActive() || IsCastingSpell() || IsNormalAttacking();
+	bool bStateAllowsDodge = IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking();
 
 	// If we have a valid animation for dodge and the character state allows dodging
-	// return Animation && bStateAllowsDodge;
-
-	//~ @todo
-	return true;
+	return Animation && bStateAllowsDodge;
 }
 
 bool APlayerCharacter::CanGuardAgainstAttacks() const
@@ -1695,16 +1692,16 @@ void APlayerCharacter::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldSt
 	}
 	else if (CharacterStateInfo.CharacterState == ECharacterState::UsingActiveSkill)
 	{
-		UGameplaySkillsComponent* SkillManager = GetGameplaySkillsComponent();
-		if (SkillManager)
+		UGameplaySkillsComponent* SkillsComp = GetGameplaySkillsComponent();
+		if (SkillsComp)
 		{
 			if (CharacterStateInfo.SubStateIndex > 100)
 			{
-				SkillManager->ReleaseSkill(CharacterStateInfo.SubStateIndex);
+				SkillsComp->ReleaseSkill(CharacterStateInfo.SubStateIndex);
 			}
 			else
 			{
-				SkillManager->TriggerSkill(CharacterStateInfo.SubStateIndex);
+				SkillsComp->TriggerSkill(CharacterStateInfo.SubStateIndex);
 			}
 		}
 	}
