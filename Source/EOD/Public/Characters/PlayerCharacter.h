@@ -95,9 +95,6 @@ public:
 	/** Start normal attacks */
 	virtual void StartNormalAttack() override;
 
-	/** Stop normal attacks */
-	virtual void StopNormalAttack() override;
-
 	/** Cancel normal attacks */
 	virtual void CancelNormalAttack() override;
 
@@ -112,6 +109,8 @@ public:
 
 	/** Plays BlockAttack animation on blocking an incoming attack */
 	virtual void PlayAttackBlockedAnimation() override;
+
+	virtual void PlayToggleSheatheAnimation() override;
 
 	/** Returns true if character can move */
 	virtual bool CanMove() const override;
@@ -135,21 +134,26 @@ public:
 	//  Rotation
 	// --------------------------------------
 
+	//~ DEPRECATED
 	/** Determines if this character should be rotated toward DesiredSmoothRotationYaw */
 	UPROPERTY(Transient)
 	bool bRotateSmoothly;
 
+	//~ DEPRECATED
 	/** The yaw to which the character needs to be rotated smoothly */
 	UPROPERTY(Transient)
 	float DesiredSmoothRotationYaw;
 
+	//~ DEPRECATED
+	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
 
 
 
 
 
-
-
+	// --------------------------------------
+	//  Weapon System
+	// --------------------------------------
 
 	UFUNCTION()
 	void ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
@@ -195,10 +199,6 @@ public:
 
 
 
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = SpecialEffects)
-	void CreateGhostTrail();
-
 	/** [server + local] Change idle-walk-run direction of character */
 	// inline void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
 
@@ -222,7 +222,6 @@ public:
 
 	void OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup);
 
-	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
 
 	// inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
 
@@ -332,12 +331,6 @@ private:
 
 	TArray<UStatusEffectBase*> InflictedStatusEffectsList;
 
-	const int CameraZoomRate = 15;
-
-	const int CameraArmMinimumLength = 50;
-
-	const int CameraArmMaximumLength = 500;
-
 	// TArray<FCombatEvent> EventsOnUsingSkill;
 	TArray<FOnGameplayEventMCDelegate> EventsOnUsingSkill;
 
@@ -399,23 +392,6 @@ private:
 private:
 
 
-	inline FPlayerAnimationReferencesTableRow* GetAnimationReferences() const;
-
-	UFUNCTION()
-	void LoadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
-
-	UFUNCTION()
-	void UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
-
-
-	/** Animations for this player when it has a weapon equipped */
-	// FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences;
-
-	/** Animations for this player when it does not have a weapon equipped */
-	// FPlayerAnimationReferencesTableRow* UnequippedWeaponAnimationReferences;
-
-
-
 
 
 
@@ -430,13 +406,9 @@ private:
 	////////////////////////////////////////////////////////////////////////////////
 private:
 
-	virtual void PlayToggleSheatheAnimation() override;
 
 	/** Display or hide character stats UI */
 	void OnToggleCharacterStatsUI();
-
-	/** Display or hide mouse cursor */
-	void OnToggleMouseCursor();
 
 	void UpdateIdleState(float DeltaTime);
 
@@ -455,12 +427,10 @@ private:
 public:
 
 	// --------------------------------------
-	//  Animations
+	//  Effects
 	// --------------------------------------
 
-	// --------------------------------------
-	//  Weapon System
-	// --------------------------------------
+	virtual void CreateGhostTrail_Implementation() override;
 
 	// --------------------------------------
 	//  Utility
@@ -519,6 +489,9 @@ public:
 	// --------------------------------------
 	//  Input Handling
 	// --------------------------------------
+
+	/** Display or hide mouse cursor */
+	void OnToggleMouseCursor();
 
 	/** Handles player pressing a skill key */
 	void OnPressingSkillKey(const uint32 SkillButtonIndex);
@@ -703,18 +676,6 @@ FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
 {
 	bRotateSmoothly = true;
 	DesiredSmoothRotationYaw = DesiredYaw;
-}
-
-inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetAnimationReferences() const
-{
-	EWeaponType WeaponType = EWeaponType::None;
-	if (!IsWeaponSheathed())
-	{
-		WeaponType = GetEquippedWeaponType();
-	}
-
-	FPlayerAnimationReferencesTableRow* const* AnimationsPtr = AnimationReferencesMap.Find(WeaponType);
-	return AnimationsPtr ? *AnimationsPtr : nullptr;
 }
 
 FORCEINLINE bool APlayerCharacter::SkillHasDirectionalAnimations() const

@@ -126,10 +126,6 @@ void AEODCharacterBase::Tick(float DeltaTime)
 		{
 			UpdateNormalAttackState(DeltaTime);
 		}
-		else if (!bWantsToNormalAttack && IsNormalAttacking())
-		{
-			StopNormalAttack();
-		}
 
 		UpdateMovement(DeltaTime);
 		UpdateRotation(DeltaTime);
@@ -356,6 +352,10 @@ void AEODCharacterBase::PushBack_Implementation(const FVector& ImpulseDirection)
 }
 
 void AEODCharacterBase::InitiateDeathSequence_Implementation()
+{
+}
+
+void AEODCharacterBase::CreateGhostTrail_Implementation()
 {
 }
 
@@ -1056,10 +1056,6 @@ void AEODCharacterBase::ToggleSheathe()
 }
 
 void AEODCharacterBase::StartNormalAttack()
-{
-}
-
-void AEODCharacterBase::StopNormalAttack()
 {
 }
 

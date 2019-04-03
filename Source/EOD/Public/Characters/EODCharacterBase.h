@@ -269,9 +269,6 @@ public:
 	/** Start normal attacks */
 	virtual void StartNormalAttack();
 
-	/** Stop normal attacks */
-	virtual void StopNormalAttack();
-
 	/** Cancel normal attacks */
 	virtual void CancelNormalAttack();
 
@@ -296,6 +293,8 @@ public:
 
 	/** Plays BlockAttack animation on blocking an incoming attack */
 	virtual void PlayAttackBlockedAnimation();
+
+	virtual void PlayToggleSheatheAnimation();
 
 	UPROPERTY(ReplicatedUsing = OnRep_CharacterStateInfo)
 	FCharacterStateInfo CharacterStateInfo;
@@ -376,8 +375,6 @@ protected:
 
 	/** [server + local] Sets whether this character's weapon is sheathed or not */
 	inline void SetWeaponSheathed(bool bNewValue);
-
-	virtual void PlayToggleSheatheAnimation();
 
 	FTimerHandle DodgeImmunityTimerHandle;
 
@@ -616,6 +613,14 @@ private:
 	void UnbindUIDelegates();
 
 public:
+
+	// --------------------------------------
+	//  Effects
+	// --------------------------------------
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Effects")
+	void CreateGhostTrail();
+	virtual void CreateGhostTrail_Implementation();
 
 	// --------------------------------------
 	//  Utility

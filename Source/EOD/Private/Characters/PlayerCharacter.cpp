@@ -46,7 +46,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 	MaxWeaponSlots = 2;
 	
 	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
-	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::LoadWeaponAnimationReferences);
+	// OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::LoadWeaponAnimationReferences);
 	OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
 	// Perhaps unloading weapon animation references is not necessary until the equipped weapon type actually changes
 	// OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::UnloadWeaponAnimationReferences);
@@ -373,49 +373,6 @@ void APlayerCharacter::ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDat
 }
 
 void APlayerCharacter::DeactivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
-{
-}
-
-void APlayerCharacter::LoadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
-{
-	EWeaponType WeaponType = EWeaponType::None;
-	if (WeaponDataAsset)
-	{
-		WeaponType = WeaponDataAsset->WeaponType;
-	}
-
-	// No need to load references if they are already loaded
-	if (AnimationReferencesMap.Contains(WeaponDataAsset->WeaponType))
-	{
-		return;
-	}
-
-
-
-
-	/*
-	UnloadEquippedWeaponAnimationReferences();
-
-	if (!PlayerAnimationReferencesDataTable)
-	{
-		return;
-	}
-
-	FName RowID = GetAnimationReferencesRowID(GetEquippedWeaponType(), Gender);
-	FPlayerAnimationReferencesTableRow* PlayerAnimationReferences = PlayerAnimationReferencesDataTable->FindRow<FPlayerAnimationReferencesTableRow>(RowID,
-		FString("APlayerCharacter::LoadEquippedWeaponAnimationReferences(), loading equipped weapon animation references"));
-
-	if (!PlayerAnimationReferences)
-	{
-		return;
-	}
-
-	EquippedWeaponAnimationReferences = PlayerAnimationReferences;
-	UnequippedWeaponAnimationsStreamableHandle = LoadAnimationReferences(PlayerAnimationReferences);
-	*/
-}
-
-void APlayerCharacter::UnloadWeaponAnimationReferences(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
 {
 }
 
@@ -962,38 +919,7 @@ void APlayerCharacter::StartNormalAttack()
 	{
 		PlayAnimMontage(AttackMontage, 1.0, SectionToPlay);
 	}
-
-
-
-	/*
-	if (bCharacterStateAllowsMovement)
-	{
-		SetCharacterStateAllowsMovement(false);
-	}
-
-	// Determine what normal attack section should we start with
-	FName SectionToPlay;
-	if (bForwardPressed)
-	{
-		SectionToPlay = UCharacterLibrary::SectionName_ForwardSPSwing;
-	}
-	else if (bBackwardPressed)
-	{
-		SectionToPlay = UCharacterLibrary::SectionName_BackwardSPSwing;
-	}
-	else
-	{
-		SectionToPlay = UCharacterLibrary::SectionName_FirstSwing;
-	}
-
-	PlayNormalAttackAnimation(NAME_None, SectionToPlay);
 	// @note The rotation is handled through the AnimNotify_NormalAttack that gets called when a normal attack starts.
-	*/
-}
-
-void APlayerCharacter::StopNormalAttack()
-{
-	// GetMesh()->GetAnimInstance()->Montage_Stop(0.2f, GetActiveAnimationReferences()->NormalAttacks.Get());
 }
 
 void APlayerCharacter::CancelNormalAttack()
@@ -1307,6 +1233,9 @@ void APlayerCharacter::ChangeNormalAttackSection(FName OldSection, FName NewSect
 	*/
 }
 
+void APlayerCharacter::CreateGhostTrail_Implementation()
+{
+}
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
