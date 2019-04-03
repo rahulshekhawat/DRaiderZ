@@ -974,26 +974,6 @@ void APlayerCharacter::UpdateNormalAttackState(float DeltaTime)
 	}
 
 	bNormalAttackSectionChangeAllowed = false;
-
-	/*
-	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
-	{
-		return;
-	}
-
-	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
-	if (bNormalAttackSectionChangeAllowed)
-	{
-		FName CurrentSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(NormalAttackMontage);
-		FName ExpectedNextSection = GetNextNormalAttackSectionName(CurrentSection);
-		if (ExpectedNextSection != NAME_None)
-		{
-			PlayNormalAttackAnimation(CurrentSection, ExpectedNextSection);
-		}
-
-		bNormalAttackSectionChangeAllowed = false;
-	}
-	*/
 }
 
 void APlayerCharacter::Destroyed()
@@ -1111,6 +1091,7 @@ void APlayerCharacter::RemoveDialogueWidget()
 	*/
 }
 
+/*
 void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSection)
 {
 	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
@@ -1156,6 +1137,7 @@ void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSect
 	//~ @todo
 	// Server_PlayNormalAttackAnimation(OldSection, NewSection);
 }
+*/
 
 void APlayerCharacter::ChangeNormalAttackSection(FName OldSection, FName NewSection)
 {
@@ -1671,14 +1653,31 @@ void APlayerCharacter::OnRep_SecondaryWeaponID()
 
 void APlayerCharacter::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo)
 {
-	Super::OnRep_CharacterStateInfo(OldStateInfo);
+	// If the new character state is IdleWalkRun but the old character state wasn't idle walk run
+	if (CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun && OldStateInfo.CharacterState != ECharacterState::IdleWalkRun)
+	{
+		ResetState();
+	}
+	else if (CharacterStateInfo.CharacterState == ECharacterState::Dodging)
+	{
+		StartDodge();
+	}
+	else if (CharacterStateInfo.CharacterState == ECharacterState::Blocking)
+	{
+		if (OldStateInfo.CharacterState == ECharacterState::Attacking)
+		{
+			CancelNormalAttack();
+		}
 
-	if (CharacterStateInfo.CharacterState == ECharacterState::Attacking)
+		StartBlockingAttacks();
+	}
+	else if (CharacterStateInfo.CharacterState == ECharacterState::Attacking)
 	{
 		if (CharacterStateInfo.SubStateIndex == 1 ||
 			CharacterStateInfo.SubStateIndex == 11 ||
 			CharacterStateInfo.SubStateIndex == 12)
 		{
+			StartNormalAttack();
 		}
 		else
 		{
@@ -1691,6 +1690,21 @@ void APlayerCharacter::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldSt
 				FName OldSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
 				FName NewSection = GetNormalAttackSectionName(CharacterStateInfo.SubStateIndex);
 				ChangeNormalAttackSection(OldSection, NewSection);
+			}
+		}
+	}
+	else if (CharacterStateInfo.CharacterState == ECharacterState::UsingActiveSkill)
+	{
+		UGameplaySkillsComponent* SkillManager = GetGameplaySkillsComponent();
+		if (SkillManager)
+		{
+			if (CharacterStateInfo.SubStateIndex > 100)
+			{
+				SkillManager->ReleaseSkill(CharacterStateInfo.SubStateIndex);
+			}
+			else
+			{
+				SkillManager->TriggerSkill(CharacterStateInfo.SubStateIndex);
 			}
 		}
 	}

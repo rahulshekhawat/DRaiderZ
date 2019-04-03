@@ -217,20 +217,6 @@ TSharedPtr<FStreamableHandle> AHumanCharacter::LoadAnimationReferences(FPlayerAn
 	TArray<FSoftObjectPath> AssetsToLoad;
 	if (AnimationReferences)
 	{
-		AssetsToLoad.Add(AnimationReferences->Flinch.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->HitEffects.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->NormalAttacks.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Jump.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Dodge.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->SpecialActions.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Skills.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Spells.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->BlockAttack.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->WeaponSwitchFullBody.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->WeaponSwitchUpperBody.ToSoftObjectPath());
-		AssetsToLoad.Add(AnimationReferences->Die.ToSoftObjectPath());
-		
-		/*
 		AddAnimationSoftObjectPathToArray(AnimationReferences->Flinch, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->HitEffects, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->NormalAttacks, AssetsToLoad);
@@ -243,11 +229,9 @@ TSharedPtr<FStreamableHandle> AHumanCharacter::LoadAnimationReferences(FPlayerAn
 		AddAnimationSoftObjectPathToArray(AnimationReferences->WeaponSwitchFullBody, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->WeaponSwitchUpperBody, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->Die, AssetsToLoad);
-		*/
 	}
 
-	// StreamableHandle = GameSingleton->StreamableManager.RequestAsyncLoad(AssetsToLoad);
-	StreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AssetsToLoad);
+	StreamableHandle = GameSingleton->StreamableManager.RequestAsyncLoad(AssetsToLoad);
 	return StreamableHandle;
 }
 

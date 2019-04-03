@@ -104,6 +104,10 @@ public:
 	/** Updates character normal attck state every frame if the character wants to normal attack */
 	virtual void UpdateNormalAttackState(float DeltaTime) override;
 
+	FName GetNextNormalAttackSectionName(const FName& CurrentSection) const;
+
+	void ChangeNormalAttackSection(FName OldSection, FName NewSection);
+
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe() override;
 
@@ -146,10 +150,6 @@ public:
 
 	//~ DEPRECATED
 	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
-
-
-
-
 
 	// --------------------------------------
 	//  Weapon System
@@ -337,9 +337,6 @@ private:
 	TArray<FOnGameplayEventMCDelegate> EventsOnSuccessfulSkillAttack;
 	// TArray<FCombatEvent> EventsOnSuccessfulSkillAttack;
 
-	/** Timer handle needed for executing SP normal attacks */
-	FTimerHandle SPAttackTimerHandle;
-
 
 	////////////////////////////////////////////////////////////////////////////////
 	// WEAPONS
@@ -416,13 +413,6 @@ private:
 
 	void UpdateAutoRun(float DeltaTime);
 
-	FName GetNextNormalAttackSectionName(const FName& CurrentSection) const;
-
-
-	/** Plays normal attack animation over network */
-	void PlayNormalAttackAnimation(FName OldSection, FName NewSection);
-
-	void ChangeNormalAttackSection(FName OldSection, FName NewSection);
 
 public:
 
