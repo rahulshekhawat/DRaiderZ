@@ -24,6 +24,11 @@ void UPlayerSkillsComponent::BeginPlay()
 void UPlayerSkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (bSkillCharging)
+	{
+		SkillChargeDuration += DeltaTime;
+	}
 }
 
 void UPlayerSkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -53,6 +58,23 @@ void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 
 void UPlayerSkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
 {
+	uint8 SkillIndex = 0;
+	UGameplaySkillBase* Skill = nullptr;
+	if (SkillBarMap.Contains(SkillKeyIndex))
+	{
+		SkillIndex = SkillBarMap[SkillKeyIndex];
+	}
+
+	if (SkillsMap.Contains(SkillIndex))
+	{
+		Skill = SkillsMap[SkillIndex];
+	}
+
+	if (Skill)
+	{
+		SkillIndex += 100; // Skill Index while releasing skill is offset by 100 for replication purposes
+		ReleaseSkill(SkillIndex, Skill);
+	}
 }
 
 void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
@@ -161,6 +183,12 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			{
 				Server_TriggerSkill(SkillIndex);
 			}
+
+			if (Skill->bSkillCanBeCharged)
+			{
+				bSkillCharging = true;
+				SkillChargeDuration = 0.f;
+			}
 		}
 	}
 	else
@@ -171,6 +199,46 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 
 void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill, float ReleaseDelay)
 {
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	uint8 ActualSkillIndex = SkillIndex % 100;
+
+	if (!Skill)
+	{
+		Skill = SkillsMap[ActualSkillIndex];
+	}
+
+	if (!Skill || !CharOwner)
+	{
+		return;
+	}
+
+	bool bIsLocalPlayerController = CharOwner->Controller && CharOwner->Controller->IsLocalPlayerController();
+	if (bIsLocalPlayerController)
+	{
+		if (Skill->CanReleaseSkill())
+		{
+			FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
+			StateInfo.NewReplicationIndex = CharOwner->CharacterStateInfo.NewReplicationIndex + 1;
+			CharOwner->CharacterStateInfo = StateInfo;
+
+			//~ @note Release delay is only relevant to server and client owner
+			Skill->ReleaseSkill(ReleaseDelay);
+
+			if (CharOwner->Role < ROLE_Authority)
+			{
+				//~ @note Release delay is only relevant to server and client owner
+				Server_ReleaseSkill(SkillIndex, ReleaseDelay);
+			}
+
+			bSkillCharging = false;
+			SkillChargeDuration = 0.f;
+		}
+	}
+	else
+	{
+		//~ @note Release delay is only relevant to server and client owner
+		Skill->ReleaseSkill(ReleaseDelay);
+	}
 }
 
 void UPlayerSkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)
@@ -183,4 +251,17 @@ void UPlayerSkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex
 	CharOwner->CharacterStateInfo = StateInfo;
 
 	TriggerSkill(SkillIndex);
+}
+
+void UPlayerSkillsComponent::Server_ReleaseSkill_Implementation(uint8 SkillIndex, float ChargeDuration)
+{
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	check(CharOwner);
+
+	FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
+	StateInfo.NewReplicationIndex = CharOwner->CharacterStateInfo.NewReplicationIndex + 1;
+	CharOwner->CharacterStateInfo = StateInfo;
+
+	SkillChargeDuration = SkillIndex;
+	ReleaseSkill(SkillIndex);
 }

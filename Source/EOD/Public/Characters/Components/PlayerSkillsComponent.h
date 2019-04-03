@@ -65,11 +65,16 @@ protected:
 	UPROPERTY(Transient)
 	TMap<uint8, uint8> SkillBarMap;
 
+	bool bSkillCharging;
+
+	float SkillChargeDuration;
+
 	// --------------------------------------
 	//  Network
 	// --------------------------------------
 
 	virtual void Server_TriggerSkill_Implementation(uint8 SkillIndex) override;
+	virtual void Server_ReleaseSkill_Implementation(uint8 SkillIndex, float ChargeDuration) override;
 
 
 
