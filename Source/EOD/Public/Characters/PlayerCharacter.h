@@ -468,11 +468,6 @@ public:
 
 	FORCEINLINE ECharacterGender GetCharacterGender() const;
 
-	/** Get the prefix string for equipped weapon type */
-	inline FString GetEquippedWeaponPrefix() const;
-
-	inline FString GetWeaponPrefix() const;
-
 	inline FName GetNormalAttackSectionName(uint8 AttackIndex);
 
 	inline uint8 GetNormalAttackIndex(FName SectionName);
@@ -561,67 +556,6 @@ protected:
 	virtual bool Server_SetPrimaryWeaponID_Validate(FName NewWeaponID);
 
 };
-
-inline FString APlayerCharacter::GetEquippedWeaponPrefix() const
-{
-	switch (GetEquippedWeaponType())
-	{
-	case EWeaponType::GreatSword:
-		return FString("GS_");
-		break;
-	case EWeaponType::WarHammer:
-		return FString("WH_");
-		break;
-	case EWeaponType::LongSword:
-		return FString("LS_");
-		break;
-	case EWeaponType::Mace:
-		return FString("MC_");
-		break;
-	case EWeaponType::Dagger:
-		return FString("DG_");
-		break;
-	case EWeaponType::Staff:
-		return FString("ST_");
-		break;
-	case EWeaponType::Shield:
-	case EWeaponType::None:
-	default:
-		return FString("");
-		break;
-	}
-}
-
-inline FString APlayerCharacter::GetWeaponPrefix() const
-{
-	FString ReturnString = FString("");
-	switch (GetEquippedWeaponType())
-	{
-	case EWeaponType::GreatSword:
-		ReturnString += FString("GS_");
-		break;
-	case EWeaponType::WarHammer:
-		ReturnString += FString("WH_");
-		break;
-	case EWeaponType::LongSword:
-		ReturnString += FString("LS_");
-		break;
-	case EWeaponType::Mace:
-		ReturnString += FString("MC_");
-		break;
-	case EWeaponType::Dagger:
-		ReturnString += FString("DG_");
-		break;
-	case EWeaponType::Staff:
-		ReturnString += FString("ST_");
-		break;
-	case EWeaponType::Shield:
-	case EWeaponType::None:
-	default:
-		break;
-	}
-	return ReturnString;
-}
 
 inline FName APlayerCharacter::GetNormalAttackSectionName(uint8 AttackIndex)
 {
@@ -782,23 +716,6 @@ inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetAnimationReferen
 	FPlayerAnimationReferencesTableRow* const* AnimationsPtr = AnimationReferencesMap.Find(WeaponType);
 	return AnimationsPtr ? *AnimationsPtr : nullptr;
 }
-
-/*
-inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetActiveAnimationReferences() const
-{
-	if (IsWeaponSheathed() || GetEquippedWeaponType() == EWeaponType::None)
-	{
-		return UnequippedWeaponAnimationReferences;
-	}
-
-	return EquippedWeaponAnimationReferences;
-}
-
-inline FPlayerAnimationReferencesTableRow* APlayerCharacter::GetEquippedWeaponAnimationReferences() const
-{
-	return EquippedWeaponAnimationReferences;
-}
-*/
 
 FORCEINLINE bool APlayerCharacter::SkillHasDirectionalAnimations() const
 {

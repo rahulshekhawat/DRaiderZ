@@ -650,6 +650,11 @@ public:
 	/** Get the prefix string for player gender */
 	inline FString GetGenderPrefix() const;
 
+	/** Get the prefix string for equipped weapon type */
+	inline FString GetEquippedWeaponPrefix() const;
+
+	inline FString GetWeaponPrefix(EWeaponType WeaponType) const;
+
 	/**
 	 * Returns controller rotation yaw in -180/180 range.
 	 * @note the yaw obtained from Controller->GetControlRotation().Yaw is in 0/360 range, which may not be desirable
@@ -1544,6 +1549,42 @@ FORCEINLINE FLastUsedSkillInfo AEODCharacterBase::GetLastUsedSkill()
 inline FString AEODCharacterBase::GetGenderPrefix() const
 {
 	return (Gender == ECharacterGender::Male) ? FString("M_") : FString("F_");
+}
+
+inline FString AEODCharacterBase::GetEquippedWeaponPrefix() const
+{
+	EWeaponType WepType = GetEquippedWeaponType();
+	return GetWeaponPrefix(WepType);
+}
+
+inline FString AEODCharacterBase::GetWeaponPrefix(EWeaponType WeaponType) const
+{
+	switch (WeaponType)
+	{
+	case EWeaponType::GreatSword:
+		return FString("GS_");
+		break;
+	case EWeaponType::WarHammer:
+		return FString("WH_");
+		break;
+	case EWeaponType::LongSword:
+		return FString("LS_");
+		break;
+	case EWeaponType::Mace:
+		return FString("MC_");
+		break;
+	case EWeaponType::Dagger:
+		return FString("DG_");
+		break;
+	case EWeaponType::Staff:
+		return FString("ST_");
+		break;
+	case EWeaponType::Shield:
+	case EWeaponType::None:
+	default:
+		return FString("");
+		break;
+	}
 }
 
 inline void AEODCharacterBase::SetCharacterRotationYaw(const float NewRotationYaw)

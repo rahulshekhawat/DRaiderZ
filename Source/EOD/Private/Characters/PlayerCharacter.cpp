@@ -1720,7 +1720,7 @@ void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
 	FString SkillIDString = FString("");
 	SkillIDString += GetGenderPrefix();
-	SkillIDString += GetWeaponPrefix();
+	SkillIDString += GetEquippedWeaponPrefix();
 	SkillIDString += GetNormalAttackSuffix(SectionName);
 
 	if (IsValid(GetGameplaySkillsComponent()) && IsValid(GetController()) && GetController()->IsLocalPlayerController())
