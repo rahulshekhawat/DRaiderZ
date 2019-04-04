@@ -7,12 +7,14 @@
 #include "CombatManager.h"
 #include "EODCharacterBase.h"
 
+#include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
 
 void UAnimNotify_SphereCollision::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	if (IsValid(MeshComp))
+	UWorld* World = MeshComp ? MeshComp->GetWorld() : nullptr;
+	if (World)
 	{
 		FTransform WorldTransform = MeshComp->GetComponentTransform();
 		FVector TransformedCenter = WorldTransform.TransformPosition(Center);
@@ -21,23 +23,25 @@ void UAnimNotify_SphereCollision::Notify(USkeletalMeshComponent* MeshComp, UAnim
 		UKismetSystemLibrary::DrawDebugSphere(MeshComp, TransformedCenter, Radius, 12, FLinearColor::White, 5.f, 1.f);
 #endif
 
-		if (!IsValid(MeshComp->GetOwner()) || MeshComp->GetOwner()->GetNetMode() == NM_Client)
+		AActor* Owner = MeshComp->GetOwner();
+		if (!IsValid(Owner) || Owner->GetNetMode() == NM_Client)
 		{
 			return;
 		}
 
 		// Only process this notify if the current game mode is ACombatZoneModeBase
-		ACombatZoneModeBase* CombatZoneGameMode = Cast<ACombatZoneModeBase>(MeshComp->GetWorld()->GetAuthGameMode());
-		if (!CombatZoneGameMode)
+		ACombatZoneModeBase* CombatZoneGameMode = Cast<ACombatZoneModeBase>(World->GetAuthGameMode());
+		ACombatManager* CombatManager = CombatZoneGameMode ? CombatZoneGameMode->GetCombatManager() : nullptr;
+		if (!CombatManager)
 		{
 			return;
 		}
 
 		FCollisionShape CollisionShape = FCollisionShape::MakeSphere(Radius);
-		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(MeshComp->GetOwner());
+		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(Owner);
 		TArray<FHitResult> HitResults;
 
-		bool bHit = MeshComp->GetWorld()->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, FQuat::Identity, COLLISION_COMBAT, CollisionShape, Params);
-		CombatZoneGameMode->GetCombatManager()->OnMeleeAttack(MeshComp->GetOwner(), bHit, HitResults);
+		bool bHit = World->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, FQuat::Identity, COLLISION_COMBAT, CollisionShape, Params);
+		CombatManager->OnMeleeAttack(Owner, bHit, HitResults);
 	}
 }

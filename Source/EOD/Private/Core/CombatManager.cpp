@@ -31,7 +31,7 @@ void ACombatManager::Tick(float DeltaTime)
 
 void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
-	if (!IsValid(HitInstigator) || HitResults.Num() == 0)
+	if (!HitInstigator || HitResults.Num() == 0)
 	{
 		return;
 	}
@@ -227,6 +227,10 @@ void ACombatManager::ProcessActorAttack(AActor* HitInstigator, const bool bHit, 
 
 void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
+
+
+
+	/*
 	FSkillTableRow* HitSkill = nullptr;
 	if (IsValid(HitInstigator) && IsValid(HitInstigator->GetGameplaySkillsComponent()))
 	{
@@ -260,6 +264,7 @@ void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, co
 			CharacterToActorAttack(HitInstigator, HitActor, HitSkill, HitResult, bHitActorWasDamaged, ActualDamageToHitActor);
 		}
 	}
+	*/
 }
 
 void ACombatManager::CharacterToCharacterAttack(

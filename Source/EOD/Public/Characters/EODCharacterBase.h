@@ -402,6 +402,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
 	float DamageBlockTriggerDelay;
 
+	FAttackInfo CurrentAttackInfo;
+
 private:
 
 	/** Determines if invincibility frames are active */

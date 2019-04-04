@@ -73,7 +73,7 @@ struct FDamageResponse
 	}
 };
 
-/** This struct contains information of how the character received damage */
+/** This struct contains information of current attack */
 USTRUCT(BlueprintType)
 struct FAttackInfo
 {
