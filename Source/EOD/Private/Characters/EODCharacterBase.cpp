@@ -8,7 +8,6 @@
 #include "EODPlayerController.h"
 #include "EODAIControllerBase.h"
 #include "HUDWidget.h"
-#include "SkillsComponent.h"
 #include "StatsComponentBase.h"
 #include "GameplaySkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
