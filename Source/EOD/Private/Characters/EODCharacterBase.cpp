@@ -11,7 +11,8 @@
 #include "StatsComponentBase.h"
 #include "GameplaySkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
-
+#include "StatsComponentBase.h"
+#include "PlayerStatsComponent.h"
 #include "ActiveSkillBase.h"
 
 #include "DynamicHUDWidget.h"
@@ -445,6 +446,66 @@ void AEODCharacterBase::DisableDamageBlocking()
 bool AEODCharacterBase::BP_IsInCombat() const
 {
 	return IsInCombat();
+}
+
+TSharedPtr<FAttackInfo> AEODCharacterBase::GetAttackInfoPtr() const
+{
+	return AttackInfoPtr;
+}
+
+void AEODCharacterBase::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill)
+{
+	UStatsComponentBase* StatsComponent = nullptr;
+	AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
+	if (PC)
+	{
+		StatsComponent = PC->GetStatsComponent();
+	}
+	else
+	{
+		AEODAIControllerBase* AC = Cast<AEODAIControllerBase>(Controller);
+		if (AC)
+		{
+			// StatsComponent = AC->GetStatsComponent();
+		}
+	}
+
+	if (!ActiveSkill || !StatsComponent)
+	{
+		return;
+	}
+
+	if (AttackInfoPtr.IsValid())
+	{
+		AttackInfoPtr.Reset();
+	}
+
+	AttackInfoPtr = MakeShareable(new FAttackInfo);
+	FAttackInfo* CurrentAttackInfo = AttackInfoPtr.Get();
+
+	FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
+	CurrentAttackInfo->bUnblockable = SkillInfo.bUnblockable;
+	CurrentAttackInfo->bUndodgable = SkillInfo.bUndodgable;
+	CurrentAttackInfo->CrowdControlEffect = SkillInfo.CrowdControlEffect;
+	CurrentAttackInfo->CrowdControlEffectDuration = SkillInfo.CrowdControlEffectDuration;
+	CurrentAttackInfo->DamageType = ActiveSkill->GetDamageType();
+	if (CurrentAttackInfo->DamageType == EDamageType::Magickal)
+	{
+		CurrentAttackInfo->CritRate = StatsComponent->GetMagickCritRate();
+		CurrentAttackInfo->NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetMagickAttack();
+		CurrentAttackInfo->CritDamage = CurrentAttackInfo->NormalDamage * UCombatLibrary::MagickalCritMultiplier;
+	}
+	else
+	{
+		CurrentAttackInfo->CritRate = StatsComponent->GetPhysicalCritRate();
+		CurrentAttackInfo->NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetPhysicalAttack();
+		CurrentAttackInfo->CritDamage = CurrentAttackInfo->NormalDamage * UCombatLibrary::PhysicalCritMultiplier;
+	}
+}
+
+void AEODCharacterBase::ResetAttackInfo()
+{
+	AttackInfoPtr.Reset();
 }
 
 void AEODCharacterBase::BP_SetWalkSpeed(const float WalkSpeed)

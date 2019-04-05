@@ -236,6 +236,7 @@ void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, co
 	// If hit instigator is player controlled
 	if (PC)
 	{
+		/*
 		TSharedPtr<FAttackInfo> AttackInfoPtr = PC->GetAttackInfoPtr();
 		if (!AttackInfoPtr.IsValid())
 		{
@@ -259,7 +260,6 @@ void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, co
 
 			}
 
-			/*
 			bool bHitActorWasDamaged;
 			float ActualDamageToHitActor;
 			if (HitCharacter && HitCharacter->IsAlive())
@@ -270,8 +270,8 @@ void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, co
 			{
 				CharacterToActorAttack(HitInstigator, HitActor, HitSkill, HitResult, bHitActorWasDamaged, ActualDamageToHitActor);
 			}
-			*/
 		}
+		*/
 	}
 	// If hit instigator is AI controlled
 	else if (AC)

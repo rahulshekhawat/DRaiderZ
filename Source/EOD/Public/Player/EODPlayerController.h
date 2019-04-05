@@ -53,22 +53,6 @@ public:
 	virtual void SetPawn(APawn* InPawn) override;
 
 	// --------------------------------------
-	//  Combat
-	// --------------------------------------
-
-	FORCEINLINE TSharedPtr<FAttackInfo> GetAttackInfoPtr() const { return AttackInfoPtr; }
-
-	void SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill);
-
-	void ResetAttackInfo();
-
-protected:
-
-	TSharedPtr<FAttackInfo> AttackInfoPtr;
-
-public:
-
-	// --------------------------------------
 	//  Pawn
 	// --------------------------------------
 

@@ -9,6 +9,7 @@
 #include "CharacterLibrary.h"
 #include "StatusEffectBase.h"
 #include "StatsComponentBase.h"
+#include "CombatInterface.h"
 
 #include "GameplayTagContainer.h"
 #include "Animation/AnimInstance.h"
@@ -134,7 +135,7 @@ struct EOD_API FCharacterStateInfo
  * All in-game characters must inherit from this class.
  */
 UCLASS(Abstract)
-class EOD_API AEODCharacterBase : public ACharacter
+class EOD_API AEODCharacterBase : public ACharacter, public ICombatInterface
 {
 	GENERATED_BODY()
 
@@ -416,6 +417,22 @@ private:
 	/** Determines whether weapon is currently sheathed or not */
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponSheathed)
 	bool bWeaponSheathed;
+
+public:
+
+	// --------------------------------------
+	//  Combat Interface
+	// --------------------------------------
+
+	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() const override;
+
+	virtual void SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill) override;
+
+	virtual void ResetAttackInfo() override;
+
+protected:
+
+	TSharedPtr<FAttackInfo> AttackInfoPtr;
 
 public:
 

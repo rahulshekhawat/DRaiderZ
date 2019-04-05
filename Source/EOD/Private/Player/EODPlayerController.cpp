@@ -178,46 +178,6 @@ void AEODPlayerController::SetPawn(APawn* InPawn)
 	EODCharacter = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
 }
 
-void AEODPlayerController::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill)
-{
-	if (!ActiveSkill || !StatsComponent)
-	{
-		return;
-	}
-
-	if (AttackInfoPtr.IsValid())
-	{
-		AttackInfoPtr.Reset();
-	}
-
-	AttackInfoPtr = MakeShareable(new FAttackInfo);
-	FAttackInfo* CurrentAttackInfo = AttackInfoPtr.Get();
-
-	FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
-	CurrentAttackInfo->bUnblockable = SkillInfo.bUnblockable;
-	CurrentAttackInfo->bUndodgable = SkillInfo.bUndodgable;
-	CurrentAttackInfo->CrowdControlEffect = SkillInfo.CrowdControlEffect;
-	CurrentAttackInfo->CrowdControlEffectDuration = SkillInfo.CrowdControlEffectDuration;
-	CurrentAttackInfo->DamageType = ActiveSkill->GetDamageType();
-	if (CurrentAttackInfo->DamageType == EDamageType::Magickal)
-	{
-		CurrentAttackInfo->CritRate = StatsComponent->GetMagickCritRate();
-		CurrentAttackInfo->NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetMagickAttack();
-		CurrentAttackInfo->CritDamage = CurrentAttackInfo->NormalDamage * UCombatLibrary::MagickalCritMultiplier;
-	}
-	else
-	{
-		CurrentAttackInfo->CritRate = StatsComponent->GetPhysicalCritRate();
-		CurrentAttackInfo->NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetPhysicalAttack();
-		CurrentAttackInfo->CritDamage = CurrentAttackInfo->NormalDamage * UCombatLibrary::PhysicalCritMultiplier;
-	}
-}
-
-void AEODPlayerController::ResetAttackInfo()
-{
-	AttackInfoPtr.Reset();
-}
-
 void AEODPlayerController::LoadPlayerState()
 {
 	if (IsLocalController())
