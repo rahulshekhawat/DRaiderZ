@@ -185,30 +185,37 @@ void AEODPlayerController::SetAttackInfoFromActiveSkill(UActiveSkillBase* Active
 		return;
 	}
 
-	FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
-	CurrentAttackInfo.bUnblockable = SkillInfo.bUnblockable;
-	CurrentAttackInfo.bUndodgable = SkillInfo.bUndodgable;
-	CurrentAttackInfo.CrowdControlEffect = SkillInfo.CrowdControlEffect;
-	CurrentAttackInfo.CrowdControlEffectDuration = SkillInfo.CrowdControlEffectDuration;
-	CurrentAttackInfo.DamageType = ActiveSkill->GetDamageType();
-	if (CurrentAttackInfo.DamageType == EDamageType::Magickal)
+	if (AttackInfoPtr.IsValid())
 	{
-		CurrentAttackInfo.CritRate = StatsComponent->GetMagickCritRate();
-		CurrentAttackInfo.NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetMagickAttack();
-		CurrentAttackInfo.CritDamage = CurrentAttackInfo.NormalDamage * UCombatLibrary::MagickalCritMultiplier;
+		AttackInfoPtr.Reset();
+	}
+
+	AttackInfoPtr = MakeShareable(new FAttackInfo);
+	FAttackInfo* CurrentAttackInfo = AttackInfoPtr.Get();
+
+	FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
+	CurrentAttackInfo->bUnblockable = SkillInfo.bUnblockable;
+	CurrentAttackInfo->bUndodgable = SkillInfo.bUndodgable;
+	CurrentAttackInfo->CrowdControlEffect = SkillInfo.CrowdControlEffect;
+	CurrentAttackInfo->CrowdControlEffectDuration = SkillInfo.CrowdControlEffectDuration;
+	CurrentAttackInfo->DamageType = ActiveSkill->GetDamageType();
+	if (CurrentAttackInfo->DamageType == EDamageType::Magickal)
+	{
+		CurrentAttackInfo->CritRate = StatsComponent->GetMagickCritRate();
+		CurrentAttackInfo->NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetMagickAttack();
+		CurrentAttackInfo->CritDamage = CurrentAttackInfo->NormalDamage * UCombatLibrary::MagickalCritMultiplier;
 	}
 	else
 	{
-		CurrentAttackInfo.CritRate = StatsComponent->GetPhysicalCritRate();
-		CurrentAttackInfo.NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetPhysicalAttack();
-		CurrentAttackInfo.CritDamage = CurrentAttackInfo.NormalDamage * UCombatLibrary::PhysicalCritMultiplier;
+		CurrentAttackInfo->CritRate = StatsComponent->GetPhysicalCritRate();
+		CurrentAttackInfo->NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetPhysicalAttack();
+		CurrentAttackInfo->CritDamage = CurrentAttackInfo->NormalDamage * UCombatLibrary::PhysicalCritMultiplier;
 	}
-	CurrentAttackInfo.bIsValid = true;
 }
 
 void AEODPlayerController::ResetAttackInfo()
 {
-	CurrentAttackInfo = FAttackInfo();
+	AttackInfoPtr.Reset();
 }
 
 void AEODPlayerController::LoadPlayerState()

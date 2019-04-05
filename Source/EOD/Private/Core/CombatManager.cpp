@@ -14,6 +14,8 @@
 
 ACombatManager::ACombatManager(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
+	SetReplicates(false);
+	SetReplicateMovement(false);
 	BlockDetectionAngle = 60.f;
 	PhysicalCritMultiplier = 1.6f;
 	MagickalCritMultiplier = 1.4f;
@@ -229,52 +231,53 @@ void ACombatManager::ProcessActorAttack(AActor* HitInstigator, const bool bHit, 
 
 void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
-	/*
 	AEODPlayerController* PC = Cast<AEODPlayerController>(HitInstigator->Controller);
 	AEODAIControllerBase* AC = Cast<AEODAIControllerBase>(HitInstigator->Controller);
+	// If hit instigator is player controlled
 	if (PC)
 	{
-		FAttackInfo AttackInfo = PC->GetCurrentAttackInfo();
-		if (AttackInfo.bIsValid)
+		TSharedPtr<FAttackInfo> AttackInfoPtr = PC->GetAttackInfoPtr();
+		if (!AttackInfoPtr.IsValid())
 		{
-			for (const FHitResult& HitResult : HitResults)
+			return;
+		}
+
+		FAttackInfo* AttackInfo = AttackInfoPtr.Get();
+		for (const FHitResult& HitResult : HitResults)
+		{
+			AActor* HitActor = HitResult.GetActor();
+			// Do not process if hit actor is not valid
+			if (!IsValid(HitActor))
 			{
-				AActor* HitActor = HitResult.GetActor();
-				// Do not process if hit actor is not valid
-				if (!IsValid(HitActor))
-				{
-					continue;
-				}
-
-				FDamageResponse DamageResponse;
-
-
-
-
-				bool bHitActorWasDamaged;
-				float ActualDamageToHitActor;
-				AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitActor);
-				if (HitCharacter && HitCharacter->IsAlive())
-				{
-					CharacterToCharacterAttack(HitInstigator, HitCharacter, HitSkill, HitResult, bHitActorWasDamaged, ActualDamageToHitActor);
-				}
-				else
-				{
-					CharacterToActorAttack(HitInstigator, HitActor, HitSkill, HitResult, bHitActorWasDamaged, ActualDamageToHitActor);
-				}
+				continue;
 			}
 
+			TSharedPtr<FDamageResponse> DamageResponsePtr;
+			AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitActor);
+			if (HitCharacter && HitCharacter->IsAlive())
+			{
 
+			}
 
-
-
+			/*
+			bool bHitActorWasDamaged;
+			float ActualDamageToHitActor;
+			if (HitCharacter && HitCharacter->IsAlive())
+			{
+				CharacterToCharacterAttack(HitInstigator, HitCharacter, HitSkill, HitResult, bHitActorWasDamaged, ActualDamageToHitActor);
+			}
+			else
+			{
+				CharacterToActorAttack(HitInstigator, HitActor, HitSkill, HitResult, bHitActorWasDamaged, ActualDamageToHitActor);
+			}
+			*/
 		}
 	}
+	// If hit instigator is AI controlled
 	else if (AC)
 	{
 		//~ @todo
 	}
-	*/
 
 	/*
 	FSkillTableRow* HitSkill = nullptr;

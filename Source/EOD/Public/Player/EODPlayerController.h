@@ -56,7 +56,7 @@ public:
 	//  Combat
 	// --------------------------------------
 
-	FORCEINLINE FAttackInfo GetCurrentAttackInfo() const { return CurrentAttackInfo; }
+	FORCEINLINE TSharedPtr<FAttackInfo> GetAttackInfoPtr() const { return AttackInfoPtr; }
 
 	void SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill);
 
@@ -64,7 +64,7 @@ public:
 
 protected:
 
-	FAttackInfo CurrentAttackInfo;
+	TSharedPtr<FAttackInfo> AttackInfoPtr;
 
 public:
 

@@ -105,12 +105,8 @@ struct FAttackInfo
 	UPROPERTY(BlueprintReadWrite)
 	float CrowdControlEffectDuration;
 
-	UPROPERTY(BlueprintReadWrite)
-	bool bIsValid;
-
 	FAttackInfo()
 	{
-		bIsValid = false;
 		bUndodgable = false;
 		bUnblockable = false;
 		CritRate = 0.f;
@@ -121,6 +117,36 @@ struct FAttackInfo
 		CrowdControlEffectDuration = 0.f;
 	}
 };
+
+USTRUCT()
+struct EOD_API FMeleeDamageEvent : public FDamageEvent
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	float Damage;
+
+	/** True if this attack cannot be dodged */
+	UPROPERTY()
+	bool bUndodgable;
+
+	/** True if this attack cannot be blocked */
+	UPROPERTY()
+	bool bUnblockable;
+
+	UPROPERTY()
+	ECrowdControlEffect CrowdControlEffect;
+
+	UPROPERTY()
+	float CrowdControlEffectDuration;
+
+	static const int32 ClassID = 11;
+
+	virtual int32 GetTypeID() const override { return FMeleeDamageEvent::ClassID; }
+	virtual bool IsOfType(int32 InID) const override { return FMeleeDamageEvent::ClassID == InID; }
+
+};
+
 
 /**
  * CombatLibrary contains static helper functions for handling in-game combat.
