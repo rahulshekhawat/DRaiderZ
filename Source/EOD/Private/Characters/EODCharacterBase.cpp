@@ -13,6 +13,8 @@
 #include "GameplaySkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
 
+#include "ActiveSkillBase.h"
+
 #include "DynamicHUDWidget.h"
 
 #include "IdleWalkRunState.h"

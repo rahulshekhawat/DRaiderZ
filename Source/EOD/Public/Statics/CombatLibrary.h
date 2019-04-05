@@ -105,8 +105,12 @@ struct FAttackInfo
 	UPROPERTY(BlueprintReadWrite)
 	float CrowdControlEffectDuration;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsValid;
+
 	FAttackInfo()
 	{
+		bIsValid = false;
 		bUndodgable = false;
 		bUnblockable = false;
 		CritRate = 0.f;
@@ -134,5 +138,8 @@ public:
 	static FCollisionQueryParams GenerateCombatCollisionQueryParams(const AActor* ActorToIgnore, EQueryMobilityType MobilityType = EQueryMobilityType::Dynamic, bool bReturnPhysicalMaterial = false, FName TraceTag = FName("CollisionQueryForCombat"));
 
 	static float CalculateDamage(float Attack, float Defense);
+
+	static const float PhysicalCritMultiplier;
+	static const float MagickalCritMultiplier;
 
 };

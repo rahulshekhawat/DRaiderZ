@@ -4,6 +4,9 @@
 #include "CharacterLibrary.h"
 #include "EODCharacterBase.h"
 
+const float UCombatLibrary::PhysicalCritMultiplier = 1.6f;
+const float UCombatLibrary::MagickalCritMultiplier = 1.4f;
+
 UCombatLibrary::UCombatLibrary(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }

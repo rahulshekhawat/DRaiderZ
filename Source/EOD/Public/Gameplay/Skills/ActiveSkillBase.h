@@ -106,6 +106,10 @@ public:
 	/** Returns true if this skill can be cancelled */
 	virtual bool CanCancelSkill() const override;
 
+	inline FActiveSkillLevelUpInfo GetCurrentSkillLevelupInfo() const;
+
+	FORCEINLINE EDamageType GetDamageType() const { return DamageType; }
+
 protected:
 
 	// --------------------------------------
@@ -188,3 +192,19 @@ protected:
 	bool IsSkillInCooldown() const;
 
 };
+
+inline FActiveSkillLevelUpInfo UActiveSkillBase::GetCurrentSkillLevelupInfo() const
+{
+	if (SkillLevelUpsInfo.Num() > CurrentUpgrade)
+	{
+		return SkillLevelUpsInfo[CurrentUpgrade];
+	}
+	else if (SkillLevelUpsInfo.Num() > 0)
+	{
+		return SkillLevelUpsInfo[0];
+	}
+	else
+	{
+		return FActiveSkillLevelUpInfo();
+	}
+}

@@ -19,6 +19,8 @@
 #include "DynamicSkillBarWidget.h"
 #include "DynamicSkillTreeWidget.h"
 
+#include "ActiveSkillBase.h"
+
 #include "EODLibrary.h"
 #include "PlayerSaveGame.h"
 
@@ -174,6 +176,39 @@ void AEODPlayerController::SetPawn(APawn* InPawn)
 {
 	Super::SetPawn(InPawn);
 	EODCharacter = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
+}
+
+void AEODPlayerController::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill)
+{
+	if (!ActiveSkill || !StatsComponent)
+	{
+		return;
+	}
+
+	FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
+	CurrentAttackInfo.bUnblockable = SkillInfo.bUnblockable;
+	CurrentAttackInfo.bUndodgable = SkillInfo.bUndodgable;
+	CurrentAttackInfo.CrowdControlEffect = SkillInfo.CrowdControlEffect;
+	CurrentAttackInfo.CrowdControlEffectDuration = SkillInfo.CrowdControlEffectDuration;
+	CurrentAttackInfo.DamageType = ActiveSkill->GetDamageType();
+	if (CurrentAttackInfo.DamageType == EDamageType::Magickal)
+	{
+		CurrentAttackInfo.CritRate = StatsComponent->GetMagickCritRate();
+		CurrentAttackInfo.NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetMagickAttack();
+		CurrentAttackInfo.CritDamage = CurrentAttackInfo.NormalDamage * UCombatLibrary::MagickalCritMultiplier;
+	}
+	else
+	{
+		CurrentAttackInfo.CritRate = StatsComponent->GetPhysicalCritRate();
+		CurrentAttackInfo.NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetPhysicalAttack();
+		CurrentAttackInfo.CritDamage = CurrentAttackInfo.NormalDamage * UCombatLibrary::PhysicalCritMultiplier;
+	}
+	CurrentAttackInfo.bIsValid = true;
+}
+
+void AEODPlayerController::ResetAttackInfo()
+{
+	CurrentAttackInfo = FAttackInfo();
 }
 
 void AEODPlayerController::LoadPlayerState()
@@ -469,7 +504,7 @@ void AEODPlayerController::AttemptDodge()
 		if (bCanDodge)
 		{
 			EODCharacter->StartDodge();
-			Server_OnSuccessfulDodge();
+			Server_OnInitiateDodge();
 		}
 	}
 }
@@ -594,14 +629,14 @@ bool AEODPlayerController::Server_SetGender_Validate(ECharacterGender NewGender)
 	return true;
 }
 
-void AEODPlayerController::Server_OnSuccessfulDodge_Implementation()
+void AEODPlayerController::Server_OnInitiateDodge_Implementation()
 {
 	check(StatsComponent);
 	int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
 	StatsComponent->ModifyCurrentStamina(-DodgeCost);
 }
 
-bool AEODPlayerController::Server_OnSuccessfulDodge_Validate()
+bool AEODPlayerController::Server_OnInitiateDodge_Validate()
 {
 	return true;
 }

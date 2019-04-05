@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "EODCharacterBase.h"
+#include "CombatLibrary.h"
 
 #include "GameFramework/PlayerController.h"
 #include "EODPlayerController.generated.h"
 
+class UGameplaySkillBase;
+class UActiveSkillBase;
 class UHUDWidget;
 class UDynamicHUDWidget;
 class UInGameMenuWidget;
@@ -49,18 +52,30 @@ public:
 
 	virtual void SetPawn(APawn* InPawn) override;
 
+	// --------------------------------------
+	//  Combat
+	// --------------------------------------
+
+	FORCEINLINE FAttackInfo GetCurrentAttackInfo() const { return CurrentAttackInfo; }
+
+	void SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill);
+
+	void ResetAttackInfo();
+
+protected:
+
+	FAttackInfo CurrentAttackInfo;
+
 public:
 
 	// --------------------------------------
-	//  
+	//  Pawn
 	// --------------------------------------
-
-	FORCEINLINE AEODCharacterBase* GetEODCharacter() const { return EODCharacter; }
 
 	/** Returns the gender of the pawn that the player selected during player creation */
 	FORCEINLINE ECharacterGender GetGender() const { return Gender; }
 
-	void LoadPlayerState();
+	FORCEINLINE AEODCharacterBase* GetEODCharacter() const { return EODCharacter; }
 
 protected:
 
@@ -293,6 +308,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Save/Load System")
 	void SavePlayerState();
 
+	void LoadPlayerState();
+
 private:
 
 	// --------------------------------------
@@ -311,12 +328,18 @@ private:
 	/** Call this to set gender of player pawn on server */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetGender(ECharacterGender NewGender);
+	virtual void Server_SetGender_Implementation(ECharacterGender NewGender);
+	virtual bool Server_SetGender_Validate(ECharacterGender NewGender);
+
+	/** Event called when the controlled pawn initiates dodge */
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_OnInitiateDodge();
+	virtual void Server_OnInitiateDodge_Implementation();
+	virtual bool Server_OnInitiateDodge_Validate();
 
 	UFUNCTION(Client, Reliable)
 	void Client_SetupLocalPlayerOnUnpossess(APawn* InPawn);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_OnSuccessfulDodge();
+	virtual void Client_SetupLocalPlayerOnUnpossess_Implementation(APawn* InPawn);
 
 	friend class AEODCharacterBase;
 

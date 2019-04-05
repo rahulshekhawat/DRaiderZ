@@ -27,6 +27,7 @@ class UAnimMontage;
 class USkillsComponent;
 class UInputComponent;
 class UCameraComponent;
+class UActiveSkillBase;
 class UCharacterStateBase;
 class UStatusEffectBase;
 class UGameplayEventBase;
@@ -401,8 +402,6 @@ protected:
 	/** Time in seconds by which the damage blocking is delayed after character enters block state */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat System|Constants")
 	float DamageBlockTriggerDelay;
-
-	FAttackInfo CurrentAttackInfo;
 
 private:
 

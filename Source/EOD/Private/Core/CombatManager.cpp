@@ -6,6 +6,8 @@
 #include "AttackDodgedEvent.h"
 #include "StatsComponentBase.h"
 #include "GameplaySkillsComponent.h"
+#include "EODAIControllerBase.h"
+#include "EODPlayerController.h"
 
 #include "Engine/World.h"
 #include "Components/PrimitiveComponent.h"
@@ -35,7 +37,7 @@ void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const
 	{
 		return;
 	}
-	
+
 	AEODCharacterBase* InstigatingCharacter = Cast<AEODCharacterBase>(HitInstigator);
 	if (InstigatingCharacter)
 	{
@@ -227,8 +229,20 @@ void ACombatManager::ProcessActorAttack(AActor* HitInstigator, const bool bHit, 
 
 void ACombatManager::ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
+	AEODPlayerController* PC = Cast<AEODPlayerController>(HitInstigator->Controller);
+	AEODAIControllerBase* AC = Cast<AEODAIControllerBase>(HitInstigator->Controller);
+	if (PC)
+	{
+		FAttackInfo AttackInfo = PC->GetCurrentAttackInfo();
+		if (AttackInfo.bIsValid)
+		{
 
+		}
+	}
+	else if (AC)
+	{
 
+	}
 
 	/*
 	FSkillTableRow* HitSkill = nullptr;
