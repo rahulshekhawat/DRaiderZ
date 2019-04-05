@@ -430,9 +430,11 @@ public:
 
 	virtual void ResetAttackInfo() override;
 
+	virtual TSharedPtr<FAttackResponse> ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr) override;
+
 protected:
 
-	TSharedPtr<FAttackInfo> AttackInfoPtr;
+	TSharedPtr<FAttackInfo> CurrentAttackInfoPtr;
 
 public:
 

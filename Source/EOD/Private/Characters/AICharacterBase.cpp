@@ -54,6 +54,13 @@ void AAICharacterBase::Destroyed()
 	}
 }
 
+TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr)
+{
+	PrintToScreen(this, FString("Rrceived attack"), 10.f);
+
+	return TSharedPtr<FAttackResponse>();
+}
+
 UEODWidgetComponent* AAICharacterBase::BP_GetAggroWidgetComp() const
 {
 	return GetAggroWidgetComp();

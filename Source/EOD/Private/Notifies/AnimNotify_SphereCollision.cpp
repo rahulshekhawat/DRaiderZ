@@ -41,7 +41,9 @@ void UAnimNotify_SphereCollision::Notify(USkeletalMeshComponent* MeshComp, UAnim
 		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(Owner);
 		TArray<FHitResult> HitResults;
 
-		bool bHit = World->SweepMultiByChannel(HitResults, TransformedCenter, TransformedCenter, FQuat::Identity, COLLISION_COMBAT, CollisionShape, Params);
+		// If trace start and end position is same, the trace doesn't hit anything.
+		FVector End = TransformedCenter + FVector(0.f, 0.f, 1.f);
+		bool bHit = World->SweepMultiByChannel(HitResults, TransformedCenter, End, FQuat::Identity, COLLISION_COMBAT, CollisionShape, Params);
 		CombatManager->OnMeleeAttack(Owner, bHit, HitResults);
 	}
 }

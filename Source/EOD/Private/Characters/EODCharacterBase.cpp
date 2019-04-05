@@ -450,7 +450,7 @@ bool AEODCharacterBase::BP_IsInCombat() const
 
 TSharedPtr<FAttackInfo> AEODCharacterBase::GetAttackInfoPtr() const
 {
-	return AttackInfoPtr;
+	return CurrentAttackInfoPtr;
 }
 
 void AEODCharacterBase::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill)
@@ -475,13 +475,13 @@ void AEODCharacterBase::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSki
 		return;
 	}
 
-	if (AttackInfoPtr.IsValid())
+	if (CurrentAttackInfoPtr.IsValid())
 	{
-		AttackInfoPtr.Reset();
+		CurrentAttackInfoPtr.Reset();
 	}
 
-	AttackInfoPtr = MakeShareable(new FAttackInfo);
-	FAttackInfo* CurrentAttackInfo = AttackInfoPtr.Get();
+	CurrentAttackInfoPtr = MakeShareable(new FAttackInfo);
+	FAttackInfo* CurrentAttackInfo = CurrentAttackInfoPtr.Get();
 
 	FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
 	CurrentAttackInfo->bUnblockable = SkillInfo.bUnblockable;
@@ -505,7 +505,12 @@ void AEODCharacterBase::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSki
 
 void AEODCharacterBase::ResetAttackInfo()
 {
-	AttackInfoPtr.Reset();
+	CurrentAttackInfoPtr.Reset();
+}
+
+TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr)
+{
+	return TSharedPtr<FAttackResponse>();
 }
 
 void AEODCharacterBase::BP_SetWalkSpeed(const float WalkSpeed)

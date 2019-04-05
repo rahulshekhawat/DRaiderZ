@@ -22,6 +22,10 @@ class EOD_API AAICharacterBase : public AEODCharacterBase
 	
 public:
 
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	AAICharacterBase(const FObjectInitializer& ObjectInitializer);
 
 	/** Initialize TArray<FSkill*> */
@@ -32,6 +36,16 @@ public:
 
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
+
+	// --------------------------------------
+	//  Combat Interface
+	// --------------------------------------
+
+	virtual TSharedPtr<FAttackResponse> ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr) override;
+
+	// --------------------------------------
+	//  
+	// --------------------------------------
 
 	/** Get aggro widget component */
 	FORCEINLINE UEODWidgetComponent* GetAggroWidgetComp() const { return AggroWidgetComp; }

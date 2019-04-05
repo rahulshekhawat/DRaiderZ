@@ -35,20 +35,117 @@ void ACombatManager::Tick(float DeltaTime)
 
 void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
-	if (!HitInstigator || HitResults.Num() == 0)
+	ICombatInterface* InstigatorCI = Cast<ICombatInterface>(HitInstigator);
+	if (!HitInstigator || HitResults.Num() == 0 || !InstigatorCI)
 	{
 		return;
 	}
 
-	AEODCharacterBase* InstigatingCharacter = Cast<AEODCharacterBase>(HitInstigator);
-	if (InstigatingCharacter)
+	TSharedPtr<FAttackInfo> AttackInfoPtr = InstigatorCI->GetAttackInfoPtr();
+	TArray<TSharedPtr<FAttackResponse>> DamageResponses;
+	for (const FHitResult& HitResult : HitResults)
 	{
-		ProcessCharacterAttack(InstigatingCharacter, bHit, HitResults);
+		AActor* HitActor = HitResult.GetActor();
+		ICombatInterface* TargetCI = Cast<ICombatInterface>(HitActor);
+
+		// Do not process if the hit actor does not implement a combat interface
+		if (!TargetCI)
+		{
+			continue;
+		}
+
+		TSharedPtr<FAttackResponse> DamageResponsePtr = ProcessAttack(InstigatorCI, AttackInfoPtr, TargetCI, HitResult);
+		if (DamageResponsePtr.IsValid())
+		{
+			DamageResponses.Add(DamageResponsePtr);
+		}
 	}
-	else
+}
+
+TSharedPtr<FAttackResponse> ACombatManager::ProcessAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, ICombatInterface* TargetCI, const FHitResult& HitResult)
+{
+	check(InstigatorCI && TargetCI);
+
+	TSharedPtr<FAttackResponse> DamageResponsePtr(nullptr);
+	if (!AttackInfoPtr.IsValid() || !InstigatorCI->IsEnemyOf(TargetCI))
 	{
-		ProcessActorAttack(HitInstigator, bHit, HitResults);
+		return DamageResponsePtr;
 	}
+
+	DamageResponsePtr = TargetCI->ReceiveAttack(InstigatorCI, AttackInfoPtr);
+
+
+
+
+	/*
+
+	if (!SkillUsed->bUndodgable && HitCharacter->IsDodgingDamage())
+	{
+		HitCharacter->DisplayTextOnPlayerScreen(FString("Dodge"), DodgeTextColor, HitResult.ImpactPoint);
+		HitInstigator->DisplayTextOnPlayerScreen(FString("Dodge"), DodgeTextColor, HitResult.ImpactPoint);
+		UAttackDodgedEvent* DodgeEvent = NewObject<UAttackDodgedEvent>();
+		DodgeEvent->AddToRoot();
+		HitCharacter->OnDodgingAttack.Broadcast(HitCharacter, HitInstigator, HitCharacter, DodgeEvent);
+		DodgeEvent->RemoveFromRoot();
+		DodgeEvent->MarkPendingKill();
+		return;
+	}
+
+	FHitResult LineHitResult;
+	bool bLineHitResultFound;
+	GetLineHitResult(HitInstigator, HitResult.GetComponent(), LineHitResult, bLineHitResultFound);
+
+	// Cause a crash if no line hit result was found
+	check(bLineHitResultFound);
+
+	bool bCritHit = GetCritChanceBoolean(HitInstigator, HitCharacter, SkillUsed->DamageType);
+	float BCAngle = GetBCAngle(HitCharacter, LineHitResult);
+
+	bool bAttackBlocked = false;
+	if (!SkillUsed->bUnblockable && HitCharacter->IsBlockingDamage())
+	{
+		bAttackBlocked = BCAngle < BlockDetectionAngle ? true : false;
+		if (bAttackBlocked)
+		{
+			// HitCharacter->OnBlockingAttack.Broadcast()
+			// HitInstigator->OnDeflectingAttack.Broadcast()
+			// @fix
+			// HitCharacter->OnSuccessfulBlock(HitInstigator);
+			// HitInstigator->OnAttackDeflected(HitCharacter, SkillDamageInfo.bIgnoresBlock);
+		}
+	}
+	*/
+
+	//~ @todo
+	/*
+	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillUsed, bCritHit, bAttackBlocked);
+	HitCharacter->GetCharacterStatsComponent()->ModifyCurrentHealth(-ActualDamage);
+	int32 ResultingHitCharacterHP = HitCharacter->GetCharacterStatsComponent()->GetCurrentHealth();
+	*/
+
+
+	/*
+	bool bCCEApplied = ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillUsed, LineHitResult, BCAngle);
+	if (ResultingHitCharacterHP <= 0)
+	{
+		HitCharacter->InitiateDeathSequence();
+	}
+	NativeDisplayDamage(HitInstigator, HitCharacter, LineHitResult, ActualDamage, bCritHit);
+
+	// @todo make camera shake interesting
+	PlayCameraShake(ECameraShakeType::Medium, LineHitResult.ImpactPoint);
+	SpawnHitSFX(LineHitResult.ImpactPoint, LineHitResult.ImpactNormal);
+	PlayHitSound(HitInstigator, LineHitResult.ImpactPoint, bCritHit);
+
+	if (bAttackBlocked)
+	{
+		return;
+	}
+
+	HitCharacter->SetOffTargetSwitch();
+	*/
+
+	return DamageResponsePtr;
 }
 
 void ACombatManager::NativeDisplayDamage(

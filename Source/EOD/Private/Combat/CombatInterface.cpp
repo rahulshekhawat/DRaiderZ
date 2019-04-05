@@ -19,3 +19,13 @@ void ICombatInterface::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkil
 void ICombatInterface::ResetAttackInfo()
 {
 }
+
+bool ICombatInterface::IsEnemyOf(ICombatInterface* TargetCI) const
+{
+	return true;
+}
+
+TSharedPtr<FAttackResponse> ICombatInterface::ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr)
+{
+	return TSharedPtr<FAttackResponse>();
+}

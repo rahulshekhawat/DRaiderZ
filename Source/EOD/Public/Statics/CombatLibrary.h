@@ -44,7 +44,7 @@ enum class EDamageType : uint8
 
 /** This struct contains information of how the character received damage */
 USTRUCT(BlueprintType)
-struct FDamageResponse
+struct FAttackResponse
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -64,7 +64,7 @@ struct FDamageResponse
 	UPROPERTY(BlueprintReadWrite)
 	bool bCritHit;
 
-	FDamageResponse()
+	FAttackResponse()
 	{
 		DamageResult = EDamageResult::Damaged;
 		CrowdControlEffect = ECrowdControlEffect::Flinch;

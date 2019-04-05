@@ -37,4 +37,9 @@ public:
 
 	virtual void ResetAttackInfo();
 
+	virtual bool IsEnemyOf(ICombatInterface* TargetCI) const;
+
+	virtual TSharedPtr<FAttackResponse> ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr);
+
+
 };
