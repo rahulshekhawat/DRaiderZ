@@ -42,6 +42,65 @@ enum class EDamageType : uint8
 	Magickal
 };
 
+USTRUCT(BlueprintType)
+struct EOD_API FReceivedHitInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	AActor* HitInstigator;
+
+	UPROPERTY()
+	EDamageResult DamageResult;
+
+	UPROPERTY()
+	ECrowdControlEffect CrowdControlEffect;
+
+	UPROPERTY()
+	float CrowdControlEffectDuration;
+
+	UPROPERTY()
+	float BCAngle;
+
+	/** Amount of actual damage that the character received */
+	UPROPERTY()
+	int32 ActualDamage;
+
+	/** True if the character received a critical hit */
+	UPROPERTY()
+	bool bCritHit;
+
+	UPROPERTY()
+	FVector_NetQuantize HitLocation;
+
+	UPROPERTY()
+	uint8 ReplicationIndex;
+
+	FReceivedHitInfo()
+	{
+		HitInstigator = nullptr;
+		DamageResult = EDamageResult::Nullified;
+		CrowdControlEffect = ECrowdControlEffect::Flinch;
+		CrowdControlEffectDuration = 0.f;
+		BCAngle = 0.f;
+		ActualDamage = 0.f;
+		bCritHit = false;
+	}
+
+	void operator=(const FReceivedHitInfo& OtherHitInfo)
+	{
+		this->HitInstigator = OtherHitInfo.HitInstigator;
+		this->DamageResult = OtherHitInfo.DamageResult;
+		this->CrowdControlEffect = OtherHitInfo.CrowdControlEffect;
+		this->CrowdControlEffectDuration = OtherHitInfo.CrowdControlEffectDuration;
+		this->BCAngle = OtherHitInfo.BCAngle;
+		this->ActualDamage = OtherHitInfo.ActualDamage;
+		this->bCritHit = OtherHitInfo.bCritHit;
+		this->HitLocation = OtherHitInfo.HitLocation;
+		this->ReplicationIndex = OtherHitInfo.ReplicationIndex;
+	}
+};
+
 /** This struct contains information of how the character received damage */
 USTRUCT(BlueprintType)
 struct FAttackResponse

@@ -244,4 +244,12 @@ private:
 
 	void InitializeSkills();
 
+protected:
+
+	// --------------------------------------
+	//  Network
+	// --------------------------------------
+
+	virtual void OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo) override;	
+
 };

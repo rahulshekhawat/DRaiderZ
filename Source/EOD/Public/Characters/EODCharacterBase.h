@@ -449,6 +449,9 @@ public:
 
 protected:
 
+	UPROPERTY(ReplicatedUsing = OnRep_LastReceivedHit)
+	FReceivedHitInfo LastReceivedHit;
+
 	TSharedPtr<FAttackInfo> CurrentAttackInfoPtr;
 
 public:
@@ -1087,6 +1090,9 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo);
+
+	UFUNCTION()
+	virtual void OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Dodge(uint8 DodgeIndex, float RotationYaw);

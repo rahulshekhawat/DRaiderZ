@@ -140,6 +140,7 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(AEODCharacterBase, CurrentRide);
 	DOREPLIFETIME(AEODCharacterBase, MovementSpeedModifier);
+	DOREPLIFETIME(AEODCharacterBase, LastReceivedHit);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterStateInfo, COND_SkipOwner);
 
@@ -704,6 +705,11 @@ void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldS
 			}
 		}
 	}
+}
+
+void AEODCharacterBase::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)
+{
+
 }
 
 void AEODCharacterBase::Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)

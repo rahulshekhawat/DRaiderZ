@@ -8,6 +8,7 @@
 #include "EODWidgetComponent.h"
 #include "AttackDodgedEvent.h"
 #include "EODBlueprintFunctionLibrary.h"
+#include "EODPlayerController.h"
 
 #include "Engine/Engine.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -93,6 +94,14 @@ TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(AActor* HitInstigato
 			AttackResponsePtr->CrowdControlEffect = ECrowdControlEffect::Flinch;
 			AttackResponsePtr->DamageResult = EDamageResult::Dodged;
 		}
+
+		// Replicate Hit Info
+		FReceivedHitInfo ReceivedHitInfo;
+		ReceivedHitInfo.DamageResult = EDamageResult::Dodged;
+		ReceivedHitInfo.HitInstigator = HitInstigator;
+		ReceivedHitInfo.ReplicationIndex = LastReceivedHit.ReplicationIndex + 1;
+		LastReceivedHit = ReceivedHitInfo;
+
 		return AttackResponsePtr;
 	}
 
@@ -169,9 +178,28 @@ TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(AActor* HitInstigato
 
 	if (!bAttackBlocked)
 	{
-		SetOffTargetSwitch(2.f);
+		SetOffTargetSwitch(TargetSwitchDuration);
 	}
 
+	// Replicate Hit Info
+	FReceivedHitInfo ReceivedHitInfo;
+	ReceivedHitInfo.ActualDamage = AttackResponsePtr->ActualDamage;
+	ReceivedHitInfo.DamageResult = AttackResponsePtr->DamageResult;
+	ReceivedHitInfo.CrowdControlEffect = AttackResponsePtr->CrowdControlEffect;
+	ReceivedHitInfo.CrowdControlEffectDuration = AttackInfoPtr->CrowdControlEffectDuration;
+	ReceivedHitInfo.BCAngle = BCAngle;
+	ReceivedHitInfo.bCritHit = AttackResponsePtr->bCritHit;
+	ReceivedHitInfo.HitInstigator = HitInstigator;
+	if (bLineHitResultFound)
+	{
+		ReceivedHitInfo.HitLocation = LineHitResult.ImpactPoint;
+	}
+	else
+	{
+		ReceivedHitInfo.HitLocation = DirectHitResult.ImpactPoint;
+	}
+	ReceivedHitInfo.ReplicationIndex = LastReceivedHit.ReplicationIndex + 1;
+	LastReceivedHit = ReceivedHitInfo;
 
 
 	/*
@@ -261,14 +289,10 @@ bool AAICharacterBase::CCEFlinch_Implementation(const float BCAngle)
 		if (BCAngle <= 90)
 		{
 			PlayAnimMontage(FlinchAnimMontage, 1.f, UCharacterLibrary::SectionName_ForwardFlinch);
-			// PlayAnimationMontage(FlinchAnimMontage,
-				// UCharacterLibrary::SectionName_ForwardFlinch);
 		}
 		else
 		{
 			PlayAnimMontage(FlinchAnimMontage, 1.f, UCharacterLibrary::SectionName_BackwardFlinch);
-			// PlayAnimationMontage(FlinchAnimMontage,
-				// UCharacterLibrary::SectionName_BackwardFlinch);
 		}
 
 		return true;
@@ -283,17 +307,13 @@ bool AAICharacterBase::CCEInterrupt_Implementation(const float BCAngle)
 	{
 		if (BCAngle <= 90)
 		{
-			NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_ForwardInterrupt);
-			// PlayAnimationMontage(HitEffectsAnimMontage,
-				// UCharacterLibrary::SectionName_ForwardInterrupt,
-				// ECharacterState::GotHit);
+			// NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_ForwardInterrupt);
+			PlayAnimMontage(HitEffectsAnimMontage, 1.f, UCharacterLibrary::SectionName_ForwardInterrupt);
 		}
 		else
 		{
-			NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_BackwardInterrupt);
-			// PlayAnimationMontage(HitEffectsAnimMontage,
-				// UCharacterLibrary::SectionName_BackwardInterrupt,
-				// ECharacterState::GotHit);
+			// NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_BackwardInterrupt);
+			PlayAnimMontage(HitEffectsAnimMontage, 1.f, UCharacterLibrary::SectionName_BackwardInterrupt);
 		}
 
 		return true;
@@ -347,10 +367,8 @@ bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 {
 	if (CanKnockdown() && HitEffectsAnimMontage)
 	{
-		NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_KnockdownStart);
-		// PlayAnimationMontage(HitEffectsAnimMontage,
-			// UCharacterLibrary::SectionName_KnockdownStart,
-			// ECharacterState::GotHit);
+		// NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_KnockdownStart);
+		PlayAnimMontage(HitEffectsAnimMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 
 		return true;
@@ -361,10 +379,8 @@ bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 
 void AAICharacterBase::CCEEndKnockdown_Implementation()
 {
-	NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_KnockdownEnd);
-	// PlayAnimationMontage(HitEffectsAnimMontage,
-		// UCharacterLibrary::SectionName_KnockdownEnd,
-		// ECharacterState::GotHit);
+	// NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_KnockdownEnd);
+	PlayAnimMontage(HitEffectsAnimMontage, 1.f, UCharacterLibrary::SectionName_KnockdownEnd);
 }
 
 bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
@@ -694,4 +710,76 @@ void AAICharacterBase::InitializeSkills()
 		}
 	}
 	*/
+}
+
+void AAICharacterBase::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)
+{
+	if (LastReceivedHit.DamageResult == EDamageResult::Dodged)
+	{
+		//~ @todo Display dodge message
+		//~ @todo Play dodge sound
+	}
+	else if (LastReceivedHit.DamageResult == EDamageResult::Blocked)
+	{
+		//~ @todo Play attack blocked animation
+		//~ @todo Play attack blocked sound
+	}
+	else if (LastReceivedHit.DamageResult == EDamageResult::Immune)
+	{
+		//~ @todo Display immune message
+	}
+	else if (LastReceivedHit.DamageResult == EDamageResult::Nullified)
+	{
+		SetOffTargetSwitch(TargetSwitchDuration);
+		
+	}
+	else if (LastReceivedHit.DamageResult == EDamageResult::Damaged)
+	{
+		SetOffTargetSwitch(TargetSwitchDuration);
+	}
+
+	UWorld* World = GetWorld();
+	AEODPlayerController* FirstPC = nullptr;
+	if (World)
+	{
+		for (FConstPlayerControllerIterator Iterator = World->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			FirstPC = Cast<AEODPlayerController>(Iterator->Get());
+			break;
+		}
+	}
+
+	AEODCharacterBase* FirstPlayerChar = FirstPC ? Cast<AEODCharacterBase>(FirstPC->GetPawn()) : nullptr;
+	if (FirstPlayerChar)
+	{
+		FString Message = FString::FromInt(LastReceivedHit.ActualDamage);
+		FirstPlayerChar->CreateAndDisplayTextOnPlayerScreen(Message, FLinearColor::Gray, LastReceivedHit.HitLocation);
+	}
+
+	switch (LastReceivedHit.CrowdControlEffect)
+	{
+	case ECrowdControlEffect::Flinch:
+		CCEFlinch(LastReceivedHit.BCAngle);
+		break;
+	case ECrowdControlEffect::Interrupt:
+		CCEInterrupt(LastReceivedHit.BCAngle);
+		break;
+	case ECrowdControlEffect::KnockedDown:
+		CCEKnockdown(LastReceivedHit.CrowdControlEffectDuration);
+		break;
+	case ECrowdControlEffect::KnockedBack:
+		if (LastReceivedHit.HitInstigator)
+		{
+			CCEKnockback(LastReceivedHit.CrowdControlEffectDuration, LastReceivedHit.HitInstigator->GetActorForwardVector());
+		}
+		break;
+	case ECrowdControlEffect::Stunned:
+		CCEStun(LastReceivedHit.CrowdControlEffectDuration);
+		break;
+	case ECrowdControlEffect::Crystalized:
+		CCEFreeze(LastReceivedHit.CrowdControlEffectDuration);
+		break;
+	default:
+		break;
+	}
 }
