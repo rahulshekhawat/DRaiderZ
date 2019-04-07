@@ -5,7 +5,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 
-AMobController::AMobController(const FObjectInitializer& ObjectInitializer)
+AMobController::AMobController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	AggroActivationRadius = 500;
 	AggroAreaRadius = 5000;

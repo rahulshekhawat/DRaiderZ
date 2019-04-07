@@ -168,4 +168,6 @@ public:
 	static const float PhysicalCritMultiplier;
 	static const float MagickalCritMultiplier;
 
+	static const float BlockDetectionAngle;
+
 };

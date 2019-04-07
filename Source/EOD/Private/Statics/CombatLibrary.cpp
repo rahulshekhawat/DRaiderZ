@@ -6,6 +6,7 @@
 
 const float UCombatLibrary::PhysicalCritMultiplier = 1.6f;
 const float UCombatLibrary::MagickalCritMultiplier = 1.4f;
+const float UCombatLibrary::BlockDetectionAngle = 60.f;
 
 UCombatLibrary::UCombatLibrary(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

@@ -481,25 +481,26 @@ void AEODCharacterBase::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSki
 	}
 
 	CurrentAttackInfoPtr = MakeShareable(new FAttackInfo);
-	FAttackInfo* CurrentAttackInfo = CurrentAttackInfoPtr.Get();
-
-	FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
-	CurrentAttackInfo->bUnblockable = SkillInfo.bUnblockable;
-	CurrentAttackInfo->bUndodgable = SkillInfo.bUndodgable;
-	CurrentAttackInfo->CrowdControlEffect = SkillInfo.CrowdControlEffect;
-	CurrentAttackInfo->CrowdControlEffectDuration = SkillInfo.CrowdControlEffectDuration;
-	CurrentAttackInfo->DamageType = ActiveSkill->GetDamageType();
-	if (CurrentAttackInfo->DamageType == EDamageType::Magickal)
+	if (CurrentAttackInfoPtr.IsValid())
 	{
-		CurrentAttackInfo->CritRate = StatsComponent->GetMagickCritRate();
-		CurrentAttackInfo->NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetMagickAttack();
-		CurrentAttackInfo->CritDamage = CurrentAttackInfo->NormalDamage * UCombatLibrary::MagickalCritMultiplier;
-	}
-	else
-	{
-		CurrentAttackInfo->CritRate = StatsComponent->GetPhysicalCritRate();
-		CurrentAttackInfo->NormalDamage = SkillInfo.DamagePercent * StatsComponent->GetPhysicalAttack();
-		CurrentAttackInfo->CritDamage = CurrentAttackInfo->NormalDamage * UCombatLibrary::PhysicalCritMultiplier;
+		FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
+		CurrentAttackInfoPtr->bUnblockable = SkillInfo.bUnblockable;
+		CurrentAttackInfoPtr->bUndodgable = SkillInfo.bUndodgable;
+		CurrentAttackInfoPtr->CrowdControlEffect = SkillInfo.CrowdControlEffect;
+		CurrentAttackInfoPtr->CrowdControlEffectDuration = SkillInfo.CrowdControlEffectDuration;
+		CurrentAttackInfoPtr->DamageType = ActiveSkill->GetDamageType();
+		if (CurrentAttackInfoPtr->DamageType == EDamageType::Magickal)
+		{
+			CurrentAttackInfoPtr->CritRate = StatsComponent->GetMagickCritRate();
+			CurrentAttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->GetMagickAttack();
+			CurrentAttackInfoPtr->CritDamage = CurrentAttackInfoPtr->NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComponent->GetMagickCritBonus();
+		}
+		else
+		{
+			CurrentAttackInfoPtr->CritRate = StatsComponent->GetPhysicalCritRate();
+			CurrentAttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->GetPhysicalAttack();
+			CurrentAttackInfoPtr->CritDamage = CurrentAttackInfoPtr->NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComponent->GetPhysicalCritBonus();
+		}
 	}
 }
 
@@ -508,9 +509,14 @@ void AEODCharacterBase::ResetAttackInfo()
 	CurrentAttackInfoPtr.Reset();
 }
 
-TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr)
+TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, const FHitResult& DirectHitResult, const bool bLineHitResultFound, const FHitResult& LineHitResult)
 {
-	return TSharedPtr<FAttackResponse>();
+	return TSharedPtr<FAttackResponse>(nullptr);
+}
+
+float AEODCharacterBase::GetActualDamage(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, const bool bCritHit, const bool bAttackBlocked)
+{
+	return 0.0f;
 }
 
 void AEODCharacterBase::BP_SetWalkSpeed(const float WalkSpeed)

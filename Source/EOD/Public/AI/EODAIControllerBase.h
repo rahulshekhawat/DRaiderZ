@@ -36,7 +36,9 @@ public:
 	//  Components
 	// --------------------------------------
 
-	
+	static const FName StatsComponentName;
+
+	FORCEINLINE UAIStatsComponent* GetStatsComponent() const { return StatsComponent; }
 
 private:
 

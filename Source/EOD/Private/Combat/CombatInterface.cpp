@@ -25,7 +25,12 @@ bool ICombatInterface::IsEnemyOf(ICombatInterface* TargetCI) const
 	return true;
 }
 
-TSharedPtr<FAttackResponse> ICombatInterface::ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr)
+TSharedPtr<FAttackResponse> ICombatInterface::ReceiveAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, const FHitResult& DirectHitResult, const bool bLineHitResultFound, const FHitResult& LineHitResult)
 {
-	return TSharedPtr<FAttackResponse>();
+	return TSharedPtr<FAttackResponse>(nullptr);
+}
+
+float ICombatInterface::GetActualDamage(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, const bool bCritHit, const bool bAttackBlocked)
+{
+	return 0.0f;
 }

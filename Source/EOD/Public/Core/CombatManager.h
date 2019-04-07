@@ -32,8 +32,11 @@ public:
 	/** Called when an actor attacks another actor */
 	void OnMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
 
-	TSharedPtr<FAttackResponse> ProcessAttack(ICombatInterface* InstigatorCI,
+	TSharedPtr<FAttackResponse> ProcessAttack(
+		AActor* HitInstigator,
+		ICombatInterface* InstigatorCI,
 		const TSharedPtr<FAttackInfo>& AttackInfoPtr,
+		AActor* HitTarget,
 		ICombatInterface* TargetCI,
 		const FHitResult& HitResult);
 

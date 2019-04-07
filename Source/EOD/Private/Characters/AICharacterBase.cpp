@@ -4,7 +4,10 @@
 #include "GameSingleton.h"
 #include "EODPreprocessors.h"
 #include "AIStatsComponent.h"
+#include "EODAIControllerBase.h"
 #include "EODWidgetComponent.h"
+#include "AttackDodgedEvent.h"
+#include "EODBlueprintFunctionLibrary.h"
 
 #include "Engine/Engine.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -54,11 +57,191 @@ void AAICharacterBase::Destroyed()
 	}
 }
 
-TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr)
+TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, const FHitResult& DirectHitResult, const bool bLineHitResultFound, const FHitResult& LineHitResult)
 {
-	PrintToScreen(this, FString("Rrceived attack"), 10.f);
+	TSharedPtr<FAttackResponse> AttackResponsePtr = TSharedPtr<FAttackResponse>(nullptr);
 
-	return TSharedPtr<FAttackResponse>();
+	AEODAIControllerBase* AIController = Cast<AEODAIControllerBase>(Controller);
+	UStatsComponentBase* StatsComp = AIController ? AIController->GetStatsComponent() : nullptr;
+
+	if (!AttackInfoPtr.IsValid() || !InstigatorCI || !StatsComp)
+	{
+		return AttackResponsePtr;
+	}
+
+	AEODCharacterBase* InstigatingChar = Cast<AEODCharacterBase>(HitInstigator);
+	bool bIsInstigatorAPlayer = InstigatingChar && InstigatingChar->Controller && InstigatingChar->Controller->IsLocalPlayerController();
+	if (!AttackInfoPtr->bUndodgable && this->IsDodgingDamage())
+	{
+		if (bIsInstigatorAPlayer)
+		{
+
+			// DisplayTextOnPlayerScreen(FString("Dodge"), )
+		}
+
+		UAttackDodgedEvent* DodgeEvent = NewObject<UAttackDodgedEvent>();
+		DodgeEvent->AddToRoot();
+		this->OnDodgingAttack.Broadcast(this, HitInstigator, this, DodgeEvent);
+		DodgeEvent->RemoveFromRoot();
+		DodgeEvent->MarkPendingKill();
+
+		AttackResponsePtr = MakeShareable(new FAttackResponse);
+		if (AttackResponsePtr.IsValid())
+		{
+			AttackResponsePtr->ActualDamage = 0.f;
+			AttackResponsePtr->bCritHit = false;
+			AttackResponsePtr->CrowdControlEffect = ECrowdControlEffect::Flinch;
+			AttackResponsePtr->DamageResult = EDamageResult::Dodged;
+		}
+		return AttackResponsePtr;
+	}
+
+	bool bCritHit = AttackInfoPtr->CritRate	>= FMath::RandRange(0.f, 100.f) ? true : false;
+	bool bAttackBlocked = false;
+	float BCAngle = 0.f;
+	if (bLineHitResultFound)
+	{
+		BCAngle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(GetActorForwardVector(), LineHitResult.ImpactNormal);
+		if (!AttackInfoPtr->bUnblockable && this->IsBlockingDamage())
+		{
+			bAttackBlocked = BCAngle < UCombatLibrary::BlockDetectionAngle ? true : false;
+			if (bAttackBlocked)
+			{
+				//~ @todo block event
+				PlayAttackBlockedAnimation();
+			}
+		}
+	}
+	else
+	{
+		BCAngle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(GetActorForwardVector(), DirectHitResult.ImpactNormal);
+	}
+
+	float ActualDamage = GetActualDamage(HitInstigator, InstigatorCI, AttackInfoPtr, bCritHit, bAttackBlocked);
+	StatsComp->ModifyCurrentHealth(-ActualDamage);
+	int32 CurrentHP = StatsComp->GetCurrentHealth();
+
+	bool bCCEApplied = false;
+	if (!bAttackBlocked)
+	{
+		switch (AttackInfoPtr->CrowdControlEffect)
+		{
+		case ECrowdControlEffect::Flinch:
+			bCCEApplied = CCEFlinch(BCAngle);
+			break;
+		case ECrowdControlEffect::Interrupt:
+			bCCEApplied = CCEInterrupt(BCAngle);
+			break;
+		case ECrowdControlEffect::KnockedDown:
+			bCCEApplied = CCEKnockdown(AttackInfoPtr->CrowdControlEffectDuration);
+			break;
+		case ECrowdControlEffect::KnockedBack:
+			bCCEApplied = CCEKnockback(AttackInfoPtr->CrowdControlEffectDuration, HitInstigator->GetActorForwardVector());
+			break;
+		case ECrowdControlEffect::Stunned:
+			bCCEApplied = CCEStun(AttackInfoPtr->CrowdControlEffectDuration);
+			break;
+		case ECrowdControlEffect::Crystalized:
+			bCCEApplied = CCEFreeze(AttackInfoPtr->CrowdControlEffectDuration);
+			break;
+		default:
+			break;
+		}
+	}
+
+	AttackResponsePtr = MakeShareable(new FAttackResponse);
+	AttackResponsePtr->ActualDamage = ActualDamage;
+	AttackResponsePtr->CrowdControlEffect = bCCEApplied ? AttackInfoPtr->CrowdControlEffect : ECrowdControlEffect::Flinch;
+	if (bAttackBlocked)
+	{
+		AttackResponsePtr->DamageResult = ActualDamage > 0 ? EDamageResult::Blocked : EDamageResult::Nullified;
+	}
+	else
+	{
+		AttackResponsePtr->DamageResult = ActualDamage > 0 ? EDamageResult::Damaged : EDamageResult::Nullified;
+	}
+
+
+	if (bCCEApplied)
+	{
+		AttackResponsePtr->CrowdControlEffect = AttackInfoPtr->CrowdControlEffect;
+	}
+
+	if (!bAttackBlocked)
+	{
+		SetOffTargetSwitch(2.f);
+	}
+
+
+
+	/*
+
+	/*
+	if (ResultingHitCharacterHP <= 0)
+	{
+		HitCharacter->InitiateDeathSequence();
+	}
+	NativeDisplayDamage(HitInstigator, HitCharacter, LineHitResult, ActualDamage, bCritHit);
+
+	// @todo make camera shake interesting
+	PlayCameraShake(ECameraShakeType::Medium, LineHitResult.ImpactPoint);
+	SpawnHitSFX(LineHitResult.ImpactPoint, LineHitResult.ImpactNormal);
+	PlayHitSound(HitInstigator, LineHitResult.ImpactPoint, bCritHit);
+
+	if (bAttackBlocked)
+	{
+		return;
+	}
+
+	HitCharacter->SetOffTargetSwitch();
+	*/
+
+
+
+
+	return AttackResponsePtr;
+}
+
+float AAICharacterBase::GetActualDamage(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, const bool bCritHit, const bool bAttackBlocked)
+{
+	float ActualDamage = 0.f;
+
+	if (!AttackInfoPtr.IsValid())
+	{
+		return ActualDamage;
+	}
+
+	if (bCritHit)
+	{
+		ActualDamage = AttackInfoPtr->CritDamage;
+	}
+	else
+	{
+		ActualDamage = AttackInfoPtr->NormalDamage;
+	}
+
+	if (bAttackBlocked)
+	{
+		AEODAIControllerBase* AIController = Cast<AEODAIControllerBase>(Controller);
+		UStatsComponentBase* StatsComp = AIController ? AIController->GetStatsComponent() : nullptr;
+
+		float DamageReductionOnBlock = 0.1f;
+		if (StatsComp)
+		{
+			if (AttackInfoPtr->DamageType == EDamageType::Magickal)
+			{
+				DamageReductionOnBlock = StatsComp->GetMagickDamageReductionOnBlock();
+			}
+			else
+			{
+				DamageReductionOnBlock = StatsComp->GetPhysicalDamageReductionOnBlock();
+			}
+		}
+
+		ActualDamage = ActualDamage * (1 - DamageReductionOnBlock);
+	}
+
+	return ActualDamage;
 }
 
 UEODWidgetComponent* AAICharacterBase::BP_GetAggroWidgetComp() const

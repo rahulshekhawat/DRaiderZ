@@ -54,7 +54,7 @@ void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const
 			continue;
 		}
 
-		TSharedPtr<FAttackResponse> DamageResponsePtr = ProcessAttack(InstigatorCI, AttackInfoPtr, TargetCI, HitResult);
+		TSharedPtr<FAttackResponse> DamageResponsePtr = ProcessAttack(HitInstigator, InstigatorCI, AttackInfoPtr, HitActor, TargetCI, HitResult);
 		if (DamageResponsePtr.IsValid())
 		{
 			DamageResponses.Add(DamageResponsePtr);
@@ -62,7 +62,7 @@ void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const
 	}
 }
 
-TSharedPtr<FAttackResponse> ACombatManager::ProcessAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, ICombatInterface* TargetCI, const FHitResult& HitResult)
+TSharedPtr<FAttackResponse> ACombatManager::ProcessAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, AActor* HitTarget, ICombatInterface* TargetCI, const FHitResult& HitResult)
 {
 	check(InstigatorCI && TargetCI);
 
@@ -72,78 +72,11 @@ TSharedPtr<FAttackResponse> ACombatManager::ProcessAttack(ICombatInterface* Inst
 		return DamageResponsePtr;
 	}
 
-	DamageResponsePtr = TargetCI->ReceiveAttack(InstigatorCI, AttackInfoPtr);
-
-
-
-
-	/*
-
-	if (!SkillUsed->bUndodgable && HitCharacter->IsDodgingDamage())
-	{
-		HitCharacter->DisplayTextOnPlayerScreen(FString("Dodge"), DodgeTextColor, HitResult.ImpactPoint);
-		HitInstigator->DisplayTextOnPlayerScreen(FString("Dodge"), DodgeTextColor, HitResult.ImpactPoint);
-		UAttackDodgedEvent* DodgeEvent = NewObject<UAttackDodgedEvent>();
-		DodgeEvent->AddToRoot();
-		HitCharacter->OnDodgingAttack.Broadcast(HitCharacter, HitInstigator, HitCharacter, DodgeEvent);
-		DodgeEvent->RemoveFromRoot();
-		DodgeEvent->MarkPendingKill();
-		return;
-	}
-
 	FHitResult LineHitResult;
 	bool bLineHitResultFound;
 	GetLineHitResult(HitInstigator, HitResult.GetComponent(), LineHitResult, bLineHitResultFound);
 
-	// Cause a crash if no line hit result was found
-	check(bLineHitResultFound);
-
-	bool bCritHit = GetCritChanceBoolean(HitInstigator, HitCharacter, SkillUsed->DamageType);
-	float BCAngle = GetBCAngle(HitCharacter, LineHitResult);
-
-	bool bAttackBlocked = false;
-	if (!SkillUsed->bUnblockable && HitCharacter->IsBlockingDamage())
-	{
-		bAttackBlocked = BCAngle < BlockDetectionAngle ? true : false;
-		if (bAttackBlocked)
-		{
-			// HitCharacter->OnBlockingAttack.Broadcast()
-			// HitInstigator->OnDeflectingAttack.Broadcast()
-			// @fix
-			// HitCharacter->OnSuccessfulBlock(HitInstigator);
-			// HitInstigator->OnAttackDeflected(HitCharacter, SkillDamageInfo.bIgnoresBlock);
-		}
-	}
-	*/
-
-	//~ @todo
-	/*
-	float ActualDamage = GetActualDamage(HitInstigator, HitCharacter, SkillUsed, bCritHit, bAttackBlocked);
-	HitCharacter->GetCharacterStatsComponent()->ModifyCurrentHealth(-ActualDamage);
-	int32 ResultingHitCharacterHP = HitCharacter->GetCharacterStatsComponent()->GetCurrentHealth();
-	*/
-
-
-	/*
-	bool bCCEApplied = ApplyCrowdControlEffects(HitInstigator, HitCharacter, SkillUsed, LineHitResult, BCAngle);
-	if (ResultingHitCharacterHP <= 0)
-	{
-		HitCharacter->InitiateDeathSequence();
-	}
-	NativeDisplayDamage(HitInstigator, HitCharacter, LineHitResult, ActualDamage, bCritHit);
-
-	// @todo make camera shake interesting
-	PlayCameraShake(ECameraShakeType::Medium, LineHitResult.ImpactPoint);
-	SpawnHitSFX(LineHitResult.ImpactPoint, LineHitResult.ImpactNormal);
-	PlayHitSound(HitInstigator, LineHitResult.ImpactPoint, bCritHit);
-
-	if (bAttackBlocked)
-	{
-		return;
-	}
-
-	HitCharacter->SetOffTargetSwitch();
-	*/
+	DamageResponsePtr = TargetCI->ReceiveAttack(HitInstigator, InstigatorCI, AttackInfoPtr, HitResult, bLineHitResultFound, LineHitResult);
 
 	return DamageResponsePtr;
 }

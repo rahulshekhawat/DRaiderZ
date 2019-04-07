@@ -39,7 +39,19 @@ public:
 
 	virtual bool IsEnemyOf(ICombatInterface* TargetCI) const;
 
-	virtual TSharedPtr<FAttackResponse> ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr);
+	virtual TSharedPtr<FAttackResponse> ReceiveAttack(
+		AActor* HitInstigator,
+		ICombatInterface* InstigatorCI,
+		const TSharedPtr<FAttackInfo>& AttackInfoPtr,
+		const FHitResult& DirectHitResult,
+		const bool bLineHitResultFound,
+		const FHitResult& LineHitResult);
 
+	virtual float GetActualDamage(
+		AActor* HitInstigator,
+		ICombatInterface* InstigatorCI,
+		const TSharedPtr<FAttackInfo>& AttackInfoPtr,
+		const bool bCritHit,
+		const bool bAttackBlocked);
 
 };

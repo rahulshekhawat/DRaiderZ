@@ -41,7 +41,22 @@ public:
 	//  Combat Interface
 	// --------------------------------------
 
-	virtual TSharedPtr<FAttackResponse> ReceiveAttack(ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr) override;
+	/** [server] Receive an attack on server */
+	virtual TSharedPtr<FAttackResponse> ReceiveAttack(
+		AActor* HitInstigator,
+		ICombatInterface* InstigatorCI,
+		const TSharedPtr<FAttackInfo>& AttackInfoPtr,
+		const FHitResult& DirectHitResult,
+		const bool bLineHitResultFound,
+		const FHitResult& LineHitResult) override;
+
+	/** Returns the actual damage received by this character */
+	virtual float GetActualDamage(
+		AActor* HitInstigator,
+		ICombatInterface* InstigatorCI,
+		const TSharedPtr<FAttackInfo>& AttackInfoPtr,
+		const bool bCritHit,
+		const bool bAttackBlocked) override;
 
 	// --------------------------------------
 	//  

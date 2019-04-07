@@ -2,10 +2,11 @@
 
 
 #include "PlayerSkillsComponent.h"
-#include "GameplaySkillBase.h"
 #include "PlayerCharacter.h"
 #include "EODGameInstance.h"
 #include "PlayerSaveGame.h"
+#include "GameplaySkillBase.h"
+#include "ActiveSkillBase.h"
 
 #include "UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
@@ -238,6 +239,15 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	{
 		//~ @note Release delay is only relevant to server and client owner
 		Skill->ReleaseSkill(ReleaseDelay);
+	}
+
+	if (!(CharOwner->Role < ROLE_Authority))
+	{
+		UActiveSkillBase* _Skill = Cast<UActiveSkillBase>(Skill);
+		if (_Skill)
+		{
+			CharOwner->SetAttackInfoFromActiveSkill(_Skill);
+		}
 	}
 }
 

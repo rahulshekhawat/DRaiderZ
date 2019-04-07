@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AIController.h"
+#include "EODAIControllerBase.h"
 #include "MobController.generated.h"
 
 /**
@@ -11,7 +11,7 @@
  * All AI controller classes for EOD's in-game AI should inherit from this class
  */
 UCLASS()
-class EOD_API AMobController : public AAIController
+class EOD_API AMobController : public AEODAIControllerBase
 {
 	GENERATED_BODY()
 	
