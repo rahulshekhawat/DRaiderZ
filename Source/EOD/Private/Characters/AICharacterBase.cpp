@@ -9,6 +9,8 @@
 #include "AttackDodgedEvent.h"
 #include "EODBlueprintFunctionLibrary.h"
 #include "EODPlayerController.h"
+#include "GenericPlatform/GenericPlatformTime.h"
+#include "EODGameInstance.h"
 
 #include "Engine/Engine.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -738,24 +740,12 @@ void AAICharacterBase::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)
 		SetOffTargetSwitch(TargetSwitchDuration);
 	}
 
-	UWorld* World = GetWorld();
-	AEODPlayerController* FirstPC = nullptr;
-	if (World)
+	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
+	if (EODGI)
 	{
-		for (FConstPlayerControllerIterator Iterator = World->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		{
-			FirstPC = Cast<AEODPlayerController>(Iterator->Get());
-			break;
-		}
+		EODGI->DisplayDamageNumbers(LastReceivedHit.ActualDamage, LastReceivedHit.bCritHit, this, LastReceivedHit.HitLocation);
 	}
-
-	AEODCharacterBase* FirstPlayerChar = FirstPC ? Cast<AEODCharacterBase>(FirstPC->GetPawn()) : nullptr;
-	if (FirstPlayerChar)
-	{
-		FString Message = FString::FromInt(LastReceivedHit.ActualDamage);
-		FirstPlayerChar->CreateAndDisplayTextOnPlayerScreen(Message, FLinearColor::Gray, LastReceivedHit.HitLocation);
-	}
-
+	
 	switch (LastReceivedHit.CrowdControlEffect)
 	{
 	case ECrowdControlEffect::Flinch:

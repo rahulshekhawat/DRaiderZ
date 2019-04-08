@@ -634,7 +634,7 @@ void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AActor* EventInstigator,
 	}
 }
 
-float AEODCharacterBase::GetOrientationYawToActor(AActor* TargetActor)
+float AEODCharacterBase::GetOrientationYawToActor(const AActor* TargetActor)
 {
 	FVector OrientationVector = TargetActor->GetActorLocation() - GetActorLocation();
 	FRotator OrientationRotator = OrientationVector.ToOrientationRotator();

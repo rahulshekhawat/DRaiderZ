@@ -7,6 +7,7 @@
 #include "MetaSaveGame.h"
 #include "PlayerSaveGame.h"
 #include "EODGlobalNames.h"
+#include "DamageNumberWidget.h"
 
 #include "MoviePlayer.h"
 #include "Blueprint/UserWidget.h"
@@ -173,13 +174,39 @@ void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 
 void UEODGameInstance::OnPostLoadMap(UWorld* WorldObj)
 {
-	/*
-	check(WorldObj);
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SkillTreeManager = WorldObj->SpawnActor <APlayerSkillTreeManager>(PlayerSkillTreeManagerClass.Get(), SpawnInfo);
+}
 
-	check(SkillTreeManager);
-	SkillTreeManager->CreateSkillTreeWidget(this);
-	*/
+void UEODGameInstance::DisplayDamageNumbers(const float DamageValue, const bool bCritHit, const AActor* DamagedActor, const FVector& HitLocation)
+{
+	UClass* WidgetClass = DamageWidgetClass.Get();
+	if (!WidgetClass)
+	{
+		return;
+	}
+
+	AEODPlayerController* PC = Cast<AEODPlayerController>(GetFirstLocalPlayerController());
+	check(PC);
+
+	UDamageNumberWidget* DamageWidget = CreateWidget<UDamageNumberWidget>(PC, WidgetClass);
+	if (DamageWidget)
+	{
+		FVector2D WidgetLocation;
+		bool bResult = PC->ProjectWorldLocationToScreen(HitLocation, WidgetLocation);
+		if (bResult)
+		{
+			DamageWidget->SetDamageValue(DamageValue);
+			FLinearColor FinalColor;
+			if (DamagedActor == PC->GetPawn())
+			{
+				FinalColor = PlayerDamagedTextColor;
+			}
+			else
+			{
+				FinalColor = bCritHit ? NPCCritDamagedTextColor : NPCNormalDamagedTextColor;
+			}
+			DamageWidget->SetDamageColor(FinalColor);
+			DamageWidget->SetPositionInViewport(WidgetLocation);
+			DamageWidget->AddToViewport(-10);
+		}
+	}
 }

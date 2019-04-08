@@ -672,7 +672,7 @@ public:
 	float BP_GetControllerRotationYaw() const;
 
 	UFUNCTION(BlueprintCallable, category = Rotation)
-	float GetOrientationYawToActor(AActor* TargetActor);
+	float GetOrientationYawToActor(const AActor* TargetActor);
 
 	/**
 	 * Rotate a character toward desired yaw based on the rotation rate in a given delta time (Precision based)

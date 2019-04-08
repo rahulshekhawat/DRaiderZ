@@ -10,7 +10,7 @@
 #include "EODGameInstance.generated.h"
 
 class UWorld;
-class UUserWidget;
+class UDamageNumberWidget;
 class UMetaSaveGame;
 class UPlayerSaveGame;
 class APlayerSkillTreeManager;
@@ -125,18 +125,42 @@ private:
 public:
 
 	// --------------------------------------
-	//	Player Skill Tree
+	//  Utility
 	// --------------------------------------
 
-	UPROPERTY(Transient)
-	TMap<FString, FSkillState> SGToSSMap;
+	/**
+	 * Displays damage numbers on player screen
+	 * @param DamageValue	The amount by which the character was damaged
+	 * @param bCritHit		True if the damage was critical
+	 * @param DamagedActor	The actor that was damaged
+	 * @param HitLocation	The hit position (in world space)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void DisplayDamageNumbers(
+		const float DamageValue,
+		const bool bCritHit,
+		const AActor* DamagedActor,
+		const FVector& HitLocation);
 
-	TMap<FString, TSharedRef<FSkillState>> SkillGroupToSkillStateMap;
+	UPROPERTY(EditAnywhere, Category = "Utility")
+	TSubclassOf<UDamageNumberWidget> DamageWidgetClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree")
-	TSubclassOf<APlayerSkillTreeManager> PlayerSkillTreeManagerClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Colors", BlueprintReadOnly)
+	FLinearColor BuffTextColor;
 
-	// UPROPERTY(Transient)
-	// APlayerSkillTreeManager* SkillTreeManager;
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Colors", BlueprintReadOnly)
+	FLinearColor DebuffTextColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Colors", BlueprintReadOnly)
+	FLinearColor DodgeTextColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Colors", BlueprintReadOnly)
+	FLinearColor PlayerDamagedTextColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Colors", BlueprintReadOnly, DisplayName = "NPC Damaged Text Color")
+	FLinearColor NPCNormalDamagedTextColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Colors", BlueprintReadOnly, DisplayName = "NPC Critically Damaged Text Color")
+	FLinearColor NPCCritDamagedTextColor;
 
 };
