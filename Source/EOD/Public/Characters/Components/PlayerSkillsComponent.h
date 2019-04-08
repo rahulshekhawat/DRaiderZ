@@ -7,6 +7,7 @@
 #include "PlayerSkillsComponent.generated.h"
 
 class UGameplaySkillBase;
+class UContainerWidget;
 
 /**
  * 
@@ -51,9 +52,13 @@ public:
 
 	virtual void ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr, float ReleaseDelay = 0.f) override;
 
-	TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillsMap; }
+	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillsMap; }
 
-	TMap<uint8, uint8> GetSkillBarMap() const { return SkillBarMap; }
+	FORCEINLINE TMap<uint8, uint8> GetSkillBarMap() const { return SkillBarMap; }
+
+	virtual void UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown) override;
+
+	TArray<UContainerWidget*> GetAllContainerWidgetsForSkill(FName SkillGroup) const;
 
 protected:
 

@@ -211,6 +211,16 @@ void AEODPlayerController::SetGender(ECharacterGender NewGender)
 	}
 }
 
+UDynamicSkillBarWidget* AEODPlayerController::GetSkillBarWidget() const
+{
+	if (HUDWidget)
+	{
+		return HUDWidget->GetSkillBarWidget();
+	}
+
+	return nullptr;
+}
+
 void AEODPlayerController::InitializeWidgets()
 {
 	if (!IsLocalPlayerController())

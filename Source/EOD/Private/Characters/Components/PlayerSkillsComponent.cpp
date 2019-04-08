@@ -7,6 +7,9 @@
 #include "PlayerSaveGame.h"
 #include "GameplaySkillBase.h"
 #include "ActiveSkillBase.h"
+#include "DynamicSkillBarWidget.h"
+#include "EODPlayerController.h"
+#include "ContainerWidget.h"
 
 #include "UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
@@ -249,6 +252,86 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			CharOwner->SetAttackInfoFromActiveSkill(_Skill);
 		}
 	}
+}
+
+void UPlayerSkillsComponent::UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown)
+{
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	// If this skill component doesn't belong to a local player character
+	if (!CharOwner || !CharOwner->Controller || !CharOwner->Controller->IsLocalPlayerController())
+	{
+		return;
+	}
+
+	TArray<UContainerWidget*> SkillWidgets = GetAllContainerWidgetsForSkill(SkillGroup);
+	
+	for (UContainerWidget* Widget : SkillWidgets)
+	{
+		if (Widget)
+		{
+			Widget->UpdateCooldown(RemainingCooldown);
+		}
+	}
+}
+
+TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill(FName SkillGroup) const
+{
+	AEODPlayerController* PC = GetCharacterOwner() ? Cast<AEODPlayerController>(GetCharacterOwner()->Controller) : nullptr;
+	UDynamicSkillBarWidget* SkillBarWidget = PC ? PC->GetSkillBarWidget() : nullptr;
+
+	if (!SkillBarWidget)
+	{
+		return TArray<UContainerWidget*>();
+	}
+
+	int SkillIndex = 0;
+	TArray<uint8> SkillsMapKeys;
+	SkillsMap.GetKeys(SkillsMapKeys);
+
+	for (uint8 Key : SkillsMapKeys)
+	{
+		UGameplaySkillBase* Skill = SkillsMap[Key];
+		if (Skill && Skill->GetSkillGroup() == SkillGroup)
+		{
+			SkillIndex = Key;
+			break;
+		}
+	}
+
+	if (SkillIndex == 0)
+	{
+		return TArray<UContainerWidget*>();
+	}
+
+	TArray<uint8> SkillBarMapKeys;
+	SkillBarMap.GetKeys(SkillBarMapKeys);
+
+	TArray<uint8> SkillWidgetsIndices;
+	for (uint8 Key : SkillBarMapKeys)
+	{
+		if (SkillBarMap[Key] == SkillIndex)
+		{
+			SkillWidgetsIndices.Add(Key);
+		}
+	}
+
+	if (SkillWidgetsIndices.Num() == 0)
+	{
+		return TArray<UContainerWidget*>();
+	}
+
+	TArray<UContainerWidget*> SkillWidgets;
+
+	for (uint8 Key : SkillWidgetsIndices)
+	{
+		UContainerWidget* Widget = SkillBarWidget->GetContainerAtIndex(Key);
+		if (Widget)
+		{
+			SkillWidgets.Add(Widget);
+		}
+	}
+
+	return SkillWidgets;
 }
 
 void UPlayerSkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)

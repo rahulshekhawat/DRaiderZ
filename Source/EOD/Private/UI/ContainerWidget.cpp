@@ -272,6 +272,26 @@ void UContainerWidget::SetContainerData(const FContainerData& NewData)
 	SetCurrentValue(NewData.CurrentValue);
 }
 
+void UContainerWidget::EnableCooldownText()
+{
+	if (ItemImage && CooldownText)
+	{
+		bIsInCooldown = true;
+		ItemImage->SetIsEnabled(false);
+		CooldownText->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void UContainerWidget::DisableCooldownText()
+{
+	if (ItemImage && CooldownText)
+	{
+		bIsInCooldown = false;
+		ItemImage->SetIsEnabled(true);
+		CooldownText->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
 void UContainerWidget::SetItemID(FName NewID)
 {
 	ContainerData.ItemID = NewID;
@@ -315,4 +335,28 @@ void UContainerWidget::Internal_InitializeContainer()
 			SubText->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}	
+}
+
+void UContainerWidget::UpdateCooldown(float CooldownTimeRemaining)
+{
+	if (CooldownTimeRemaining <= 0.f)
+	{
+		if (bIsInCooldown)
+		{
+			DisableCooldownText();
+		}
+	}
+	else
+	{
+		if (!bIsInCooldown)
+		{
+			EnableCooldownText();
+		}
+
+		if (CooldownText)
+		{
+			CooldownText->SetText(FText::FromString(FString::FromInt(CooldownTimeRemaining)));
+			CooldownRemaining = CooldownTimeRemaining;
+		}
+	}
 }

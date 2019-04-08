@@ -223,6 +223,10 @@ void UGameplaySkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 {
 }
 
+void UGameplaySkillsComponent::UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown)
+{
+}
+
 void UGameplaySkillsComponent::UseSkill(FName SkillID)
 {
 }

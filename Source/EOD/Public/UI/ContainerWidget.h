@@ -224,6 +224,15 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Behaviour")
 	uint32 bCanBeDragged : 1;
 
+	UPROPERTY(Transient)
+	bool bIsInCooldown;
+
+	float CooldownRemaining;
+
+	void EnableCooldownText();
+
+	void DisableCooldownText();
+
 public:
 
 	// --------------------------------------
@@ -260,7 +269,10 @@ public:
 
 	UFUNCTION()
 	void SetContainerData(const FContainerData& NewData);
-	
+
+	UFUNCTION()
+	void UpdateCooldown(float CooldownTimeRemaining);
+
 	inline void ResetContainer();
 
 };

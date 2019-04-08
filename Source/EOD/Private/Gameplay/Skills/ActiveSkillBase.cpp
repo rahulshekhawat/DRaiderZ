@@ -3,11 +3,15 @@
 #include "ActiveSkillBase.h"
 #include "EODCharacterBase.h"
 #include "EODGameInstance.h"
+#include "PlayerSkillsComponent.h"
+
+#include "TimerManager.h"
 
 UActiveSkillBase::UActiveSkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	SupersedingSkillGroup = NAME_None;
 	AnimationStartSectionName = FName("Default");
+	CooldownRemaining = 0.f;
 }
 
 void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
@@ -131,4 +135,51 @@ bool UActiveSkillBase::IsSkillInCooldown() const
 {
 	//~ @todo
 	return false;
+}
+
+void UActiveSkillBase::StartCooldown()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	check(Instigator);
+	UWorld* World = Instigator->GetWorld();
+	check(World);
+
+	const FActiveSkillLevelUpInfo CurrentLevelUpInfo = GetCurrentSkillLevelupInfo();
+	World->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UActiveSkillBase::UpdateCooldown, 1.f, true, 0.f);
+	CooldownRemaining = CurrentLevelUpInfo.Cooldown;
+
+}
+
+void UActiveSkillBase::FinishCooldown()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	check(Instigator);
+	UWorld* World = Instigator->GetWorld();
+	check(World);
+
+	World->GetTimerManager().ClearTimer(CooldownTimerHandle);
+
+	UGameplaySkillsComponent* SkillComp = InstigatorSkillComponent.Get();
+	check(SkillComp);
+	CooldownRemaining = 0.f;
+	SkillComp->UpdateSkillCooldown(SkillGroup, CooldownRemaining);
+}
+
+void UActiveSkillBase::CancelCooldown()
+{
+	FinishCooldown();
+}
+
+void UActiveSkillBase::UpdateCooldown()
+{
+	if (CooldownRemaining <= 0.f)
+	{
+		FinishCooldown();
+	}
+
+	UGameplaySkillsComponent* SkillComp = InstigatorSkillComponent.Get();
+	check(SkillComp);
+	SkillComp->UpdateSkillCooldown(SkillGroup, CooldownRemaining);
+
+	CooldownRemaining--;
 }

@@ -90,6 +90,8 @@ public:
 
 	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr);
 
+	virtual void UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown);
+
 private:
 	/** Returns true if skill key index is invalid */
 	inline bool IsSkillKeyIndexInvalid(const int32 SkillKeyIndex) const;

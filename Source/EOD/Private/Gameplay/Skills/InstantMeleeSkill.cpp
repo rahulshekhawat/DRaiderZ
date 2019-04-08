@@ -42,6 +42,10 @@ void UInstantMeleeSkill::TriggerSkill()
 
 		Instigator->SetCharacterStateAllowsMovement(false);
 		Instigator->SetCharacterStateAllowsRotation(false);
+
+		//~ @todo consume stamina and mana
+
+		StartCooldown();
 	}
 
 	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();

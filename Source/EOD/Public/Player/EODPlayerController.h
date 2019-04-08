@@ -13,6 +13,7 @@ class UGameplaySkillBase;
 class UActiveSkillBase;
 class UHUDWidget;
 class UDynamicHUDWidget;
+class UDynamicSkillBarWidget;
 class UInGameMenuWidget;
 class USkillTreeComponent;
 class APlayerSkillTreeManager;
@@ -117,6 +118,8 @@ public:
 	FORCEINLINE UDialogueWindowWidget* GetDialogueWidget() const { return DialogueWidget; }
 
 	FORCEINLINE UInGameMenuWidget* GetPauseMenuWidget() const { return InGameMenuWidget; }
+
+	UDynamicSkillBarWidget* GetSkillBarWidget() const;
 
 protected:
 

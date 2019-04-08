@@ -191,6 +191,23 @@ protected:
 	/** Returns true if this skill is currently in cooldown */
 	bool IsSkillInCooldown() const;
 
+	UPROPERTY()
+	FTimerHandle CooldownTimerHandle;
+
+	float CooldownRemaining;
+
+	UFUNCTION()
+	virtual void StartCooldown();
+
+	UFUNCTION()
+	virtual void FinishCooldown();
+
+	UFUNCTION()
+	virtual void CancelCooldown();
+
+	UFUNCTION()
+	virtual void UpdateCooldown();
+
 };
 
 inline FActiveSkillLevelUpInfo UActiveSkillBase::GetCurrentSkillLevelupInfo() const
