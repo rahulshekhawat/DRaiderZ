@@ -10,6 +10,7 @@ public class EOD : ModuleRules
 
         PublicIncludePaths.AddRange(
             new string[] {
+                "EOD/Public/Actors",
                 "EOD/Public/AI",
                 "EOD/Public/AI/Components",
                 "EOD/Public/AnimInstances",
