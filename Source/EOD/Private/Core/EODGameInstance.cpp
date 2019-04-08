@@ -176,7 +176,7 @@ void UEODGameInstance::OnPostLoadMap(UWorld* WorldObj)
 {
 }
 
-void UEODGameInstance::DisplayDamageNumbers(const float DamageValue, const bool bCritHit, const AActor* DamagedActor, const FVector& HitLocation)
+void UEODGameInstance::DisplayDamageNumbers(const float DamageValue, const bool bCritHit, const AActor* DamagedActor, const AActor* DamageInstigator, const FVector& HitLocation)
 {
 	UClass* WidgetClass = DamageWidgetClass.Get();
 	if (!WidgetClass)
@@ -185,7 +185,14 @@ void UEODGameInstance::DisplayDamageNumbers(const float DamageValue, const bool 
 	}
 
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetFirstLocalPlayerController());
-	check(PC);
+	APawn* ControlledPawn = PC->GetPawn();
+	check(ControlledPawn);
+
+	// If neither the damaged actor or damage instigator is a player controlled character, then we do not want to display damage
+	if (ControlledPawn != DamagedActor && ControlledPawn != DamageInstigator)
+	{
+		return;
+	}
 
 	UDamageNumberWidget* DamageWidget = CreateWidget<UDamageNumberWidget>(PC, WidgetClass);
 	if (DamageWidget)
@@ -196,7 +203,7 @@ void UEODGameInstance::DisplayDamageNumbers(const float DamageValue, const bool 
 		{
 			DamageWidget->SetDamageValue(DamageValue);
 			FLinearColor FinalColor;
-			if (DamagedActor == PC->GetPawn())
+			if (DamagedActor == ControlledPawn)
 			{
 				FinalColor = PlayerDamagedTextColor;
 			}

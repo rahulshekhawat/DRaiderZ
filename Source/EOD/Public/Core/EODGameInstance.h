@@ -140,6 +140,7 @@ public:
 		const float DamageValue,
 		const bool bCritHit,
 		const AActor* DamagedActor,
+		const AActor* DamageInstigator,
 		const FVector& HitLocation);
 
 	UPROPERTY(EditAnywhere, Category = "Utility")

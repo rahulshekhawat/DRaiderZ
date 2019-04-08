@@ -743,7 +743,7 @@ void AAICharacterBase::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)
 	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
 	if (EODGI)
 	{
-		EODGI->DisplayDamageNumbers(LastReceivedHit.ActualDamage, LastReceivedHit.bCritHit, this, LastReceivedHit.HitLocation);
+		EODGI->DisplayDamageNumbers(LastReceivedHit.ActualDamage, LastReceivedHit.bCritHit, this, LastReceivedHit.HitInstigator, LastReceivedHit.HitLocation);
 	}
 	
 	switch (LastReceivedHit.CrowdControlEffect)
