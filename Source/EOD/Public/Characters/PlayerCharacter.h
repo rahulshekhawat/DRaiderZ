@@ -111,10 +111,14 @@ public:
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe() override;
 
+	virtual void StartWeaponSwitch() override;
+
+	virtual void CancelWeaponSwitch() override;
+
+	virtual void FinishWeaponSwitch() override;
+
 	/** Plays BlockAttack animation on blocking an incoming attack */
 	virtual void PlayAttackBlockedAnimation() override;
-
-	virtual void PlayToggleSheatheAnimation() override;
 
 	/** Returns true if character can move */
 	virtual bool CanMove() const override;

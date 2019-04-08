@@ -659,7 +659,8 @@ void AEODCharacterBase::TurnOffTargetSwitch()
 
 void AEODCharacterBase::OnRep_WeaponSheathed()
 {
-	PlayToggleSheatheAnimation();
+	StartWeaponSwitch();
+	// PlayToggleSheatheAnimation();
 }
 
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
@@ -1134,6 +1135,18 @@ void AEODCharacterBase::ToggleSheathe()
 {
 }
 
+void AEODCharacterBase::StartWeaponSwitch()
+{
+}
+
+void AEODCharacterBase::CancelWeaponSwitch()
+{
+}
+
+void AEODCharacterBase::FinishWeaponSwitch()
+{
+}
+
 void AEODCharacterBase::StartNormalAttack()
 {
 }
@@ -1147,10 +1160,6 @@ void AEODCharacterBase::FinishNormalAttack()
 }
 
 void AEODCharacterBase::UpdateNormalAttackState(float DeltaTime)
-{
-}
-
-void AEODCharacterBase::PlayToggleSheatheAnimation()
 {
 }
 
@@ -1287,6 +1296,7 @@ bool AEODCharacterBase::Server_SetCharMovementDir_Validate(ECharMovementDirectio
 void AEODCharacterBase::Server_SetWeaponSheathed_Implementation(bool bNewValue)
 {
 	SetWeaponSheathed(bNewValue);
+	StartWeaponSwitch();
 }
 
 bool AEODCharacterBase::Server_SetWeaponSheathed_Validate(bool bNewValue)

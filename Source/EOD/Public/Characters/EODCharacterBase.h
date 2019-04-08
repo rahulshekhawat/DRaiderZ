@@ -293,10 +293,14 @@ public:
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe();
 
+	virtual void StartWeaponSwitch();
+
+	virtual void CancelWeaponSwitch();
+
+	virtual void FinishWeaponSwitch();
+
 	/** Plays BlockAttack animation on blocking an incoming attack */
 	virtual void PlayAttackBlockedAnimation();
-
-	virtual void PlayToggleSheatheAnimation();
 
 	UPROPERTY(ReplicatedUsing = OnRep_CharacterStateInfo)
 	FCharacterStateInfo CharacterStateInfo;
@@ -305,6 +309,9 @@ protected:
 
 	/** Timer handle to call FinishDodge() */
 	FTimerHandle FinishDodgeTimerHandle;
+
+	/** Timer handle to call FinishWeaponSwitch() */
+	FTimerHandle FinishWeaponSwitchTimerHandle;
 
 	/** Updates whether player controller is currently trying to move or not */
 	inline void UpdatePCTryingToMove();
@@ -1083,10 +1090,10 @@ protected:
 	// --------------------------------------
 
 	UFUNCTION()
-	void OnRep_WeaponSheathed();
+	virtual void OnRep_WeaponSheathed();
 
 	UFUNCTION()
-	void OnRep_CharacterState(ECharacterState OldState);
+	virtual void OnRep_CharacterState(ECharacterState OldState);
 
 	UFUNCTION()
 	virtual void OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo);
@@ -1240,7 +1247,6 @@ inline void AEODCharacterBase::StopBlockingDamage()
 inline void AEODCharacterBase::SetWeaponSheathed(bool bNewValue)
 {
 	bWeaponSheathed = bNewValue;
-	PlayToggleSheatheAnimation();
 	if (Role < ROLE_Authority)
 	{
 		Server_SetWeaponSheathed(bNewValue);

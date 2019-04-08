@@ -680,10 +680,7 @@ void APlayerCharacter::StartDodge()
 
 	UWorld* World = GetWorld();
 	check(World);
-	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindUObject(this, &APlayerCharacter::FinishDodge);
-	World->GetTimerManager().SetTimer(FinishDodgeTimerHandle, TimerDelegate, ActualDuration, false);
-
+	World->GetTimerManager().SetTimer(FinishDodgeTimerHandle, this, &APlayerCharacter::FinishDodge, ActualDuration, false);
 }
 
 void APlayerCharacter::CancelDodge()
@@ -710,32 +707,50 @@ void APlayerCharacter::ToggleSheathe()
 	{
 		bool bNewValue = !IsWeaponSheathed();
 		SetWeaponSheathed(bNewValue);
-		SetCharacterStateAllowsMovement(true);
-		SetCharacterStateAllowsRotation(true);
+		StartWeaponSwitch();
+		bCharacterStateAllowsMovement = true;
+		bCharacterStateAllowsRotation = true;
 	}
 }
 
-void APlayerCharacter::PlayToggleSheatheAnimation()
+void APlayerCharacter::StartWeaponSwitch()
 {
-	FPlayerAnimationReferencesTableRow* EquippedWeaponAnimationReferences = GetEquippedWeaponAnimationReferences();
-	if (!EquippedWeaponAnimationReferences)
+	FPlayerAnimationReferencesTableRow* EquippedAnimRef = GetEquippedWeaponAnimationReferences();
+	if (!EquippedAnimRef)
 	{
 		return;
 	}
-	
-	UAnimMontage* MontageToPlay = IsPCTryingToMove() ? EquippedWeaponAnimationReferences->WeaponSwitchUpperBody.Get() :
-		EquippedWeaponAnimationReferences->WeaponSwitchFullBody.Get();
-	FName SectionToPlay = IsWeaponSheathed() ? UCharacterLibrary::SectionName_SheatheWeapon :
-		UCharacterLibrary::SectionName_UnsheatheWeapon;
 
-	UPlayerAnimInstance* PlayerAnimInstance = GetMesh()->GetAnimInstance() ? Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()) : nullptr;
-	if (PlayerAnimInstance)
+	UAnimMontage* MontageToPlay = IsPCTryingToMove() ? EquippedAnimRef->WeaponSwitchUpperBody.Get() : EquippedAnimRef->WeaponSwitchFullBody.Get();
+	FName SectionToPlay = IsWeaponSheathed() ? UCharacterLibrary::SectionName_SheatheWeapon : UCharacterLibrary::SectionName_UnsheatheWeapon;
+
+	UPlayerAnimInstance* PlayerAnimInstance = nullptr;
+	if (GetMesh())
 	{
-		PlayerAnimInstance->Montage_Play(MontageToPlay);
-		PlayerAnimInstance->Montage_JumpToSection(SectionToPlay);
-		PlayerAnimInstance->OnTransitionableMontageTriggered(false);
-		// SetCharacterState(ECharacterState::SwitchingWeapon);
+		PlayerAnimInstance = GetMesh()->GetAnimInstance() ? Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()) : nullptr;
 	}
+
+	UWorld* World = GetWorld();
+	if (PlayerAnimInstance && World)
+	{
+		float MontageLength = PlayerAnimInstance->Montage_Play(MontageToPlay);
+		PlayerAnimInstance->Montage_JumpToSection(SectionToPlay);
+		PlayerAnimInstance->OnTransitionableMontageTriggered(IsPCTryingToMove());
+
+		float ActualLength = MontageLength / 2.f;
+		World->GetTimerManager().SetTimer(FinishWeaponSwitchTimerHandle, this, &APlayerCharacter::FinishWeaponSwitch, ActualLength, false);
+		
+		CharacterStateInfo.CharacterState = ECharacterState::SwitchingWeapon;
+	}
+}
+
+void APlayerCharacter::CancelWeaponSwitch()
+{
+}
+
+void APlayerCharacter::FinishWeaponSwitch()
+{
+	ResetState();
 }
 
 void APlayerCharacter::OnToggleCharacterStatsUI()

@@ -20,6 +20,11 @@ class EOD_API UPlayerAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	/** Sets default values for blend times */
 	UPlayerAnimInstance(const FObjectInitializer& ObjectInitializer);
 	
@@ -31,6 +36,10 @@ public:
 	virtual void NativePostEvaluateAnimation() override;
 
 	virtual void NativeUninitializeAnimation() override;
+
+	// --------------------------------------
+	//  Animation Blueprint Update Variables
+	// --------------------------------------
 	
 	/** Blend time for transitions between the animations coming from various state machines in main anim graph */
 	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Player Anim Instance")
@@ -61,33 +70,9 @@ public:
 	UPROPERTY(Transient, BlueprintReadonly, Category = "Player Anim Instance")
 	EWeaponType CurrentWeaponType;
 
-	// DEPRECATED
-	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
-	bool IsBlocking() const;
-
-	// DEPRECATED
-	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
-	bool IsFastRunning() const;
-
-	// DEPRECATED
-	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
-	ECharMovementDirection GetIWRCharMovementDir() const;
-	
-	// DEPRECATED
-	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
-	float GetMovementSpeed() const;
-	
-	// DEPRECATED
-	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
-	float GetBlockMovementDirectionYaw() const;
-
-	// DEPRECATED
-	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
-	bool IsPCTryingToMove() const;
-	
-	// DEPRECATED
-	UFUNCTION(BlueprintCallable, Category = "Player Anim Instance", meta = (BlueprintThreadSafe, DeprecatedFunction))
-	EWeaponType GetWeaponAnimationType() const;
+	// --------------------------------------
+	//  
+	// --------------------------------------
 
 	FORCEINLINE void OnTransitionableMontageTriggered(bool bIsCurrentMontageMovable)
 	{
