@@ -302,7 +302,7 @@ public:
 	/** Plays BlockAttack animation on blocking an incoming attack */
 	virtual void PlayAttackBlockedAnimation();
 
-	UPROPERTY(ReplicatedUsing = OnRep_CharacterStateInfo)
+	UPROPERTY(ReplicatedUsing = OnRep_CharacterStateInfo, BlueprintReadOnly, Category = "Character State")
 	FCharacterStateInfo CharacterStateInfo;
 
 protected:

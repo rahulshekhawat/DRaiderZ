@@ -48,6 +48,10 @@ void UEscapeSkillBase::TriggerSkill()
 
 		Instigator->SetCharacterStateAllowsMovement(false);
 		Instigator->SetCharacterStateAllowsRotation(false);
+
+		//~ @todo consume stamina and mana
+
+		StartCooldown();
 	}
 
 	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
@@ -66,11 +70,6 @@ void UEscapeSkillBase::TriggerSkill()
 	{
 		Instigator->ResetState();
 	}
-}
-
-bool UEscapeSkillBase::CanReleaseSkill() const
-{
-	return true;
 }
 
 void UEscapeSkillBase::ReleaseSkill(float ChargeDuration)

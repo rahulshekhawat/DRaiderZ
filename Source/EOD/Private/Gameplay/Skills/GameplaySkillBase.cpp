@@ -37,7 +37,7 @@ void UGameplaySkillBase::TriggerSkill()
 
 bool UGameplaySkillBase::CanReleaseSkill() const
 {
-	return true;
+	return bSkillCanBeCharged;
 }
 
 void UGameplaySkillBase::ReleaseSkill(float ChargeDuration)

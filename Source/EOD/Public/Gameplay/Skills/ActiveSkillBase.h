@@ -187,9 +187,8 @@ protected:
 	/** Returns true if this skill can be used with the given weapon type */
 	bool IsWeaponTypeSupported(EWeaponType WeaponType) const;
 
-	//~ @todo
 	/** Returns true if this skill is currently in cooldown */
-	bool IsSkillInCooldown() const;
+	inline bool IsSkillInCooldown() const;
 
 	UPROPERTY()
 	FTimerHandle CooldownTimerHandle;
@@ -224,4 +223,9 @@ inline FActiveSkillLevelUpInfo UActiveSkillBase::GetCurrentSkillLevelupInfo() co
 	{
 		return FActiveSkillLevelUpInfo();
 	}
+}
+
+inline bool UActiveSkillBase::IsSkillInCooldown() const
+{
+	return CooldownRemaining > 0.f;
 }

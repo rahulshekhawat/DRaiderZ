@@ -131,12 +131,6 @@ bool UActiveSkillBase::IsWeaponTypeSupported(EWeaponType WeaponType) const
 	return (SupportedWeapons & (1 << (uint8)WeaponType));
 }
 
-bool UActiveSkillBase::IsSkillInCooldown() const
-{
-	//~ @todo
-	return false;
-}
-
 void UActiveSkillBase::StartCooldown()
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();

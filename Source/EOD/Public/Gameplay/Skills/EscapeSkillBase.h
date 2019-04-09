@@ -31,8 +31,6 @@ public:
 	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
 	virtual void TriggerSkill() override;
 
-	virtual bool CanReleaseSkill() const override;
-
 	/** Release this skill, i.e., if this skill is chargeable then activate this skill, otherwise it does nothing */
 	virtual void ReleaseSkill(float ChargeDuration) override;
 

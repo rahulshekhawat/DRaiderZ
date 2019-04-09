@@ -16,8 +16,7 @@ bool UInstantMeleeSkill::CanTriggerSkill() const
 	bool bHasValidWeapon = EquippedWeaponType != EWeaponType::None && IsWeaponTypeSupported(EquippedWeaponType) && !Instigator->IsWeaponSheathed();
 	bool bInCooldown = IsSkillInCooldown();
 
-	//~ @note Escape skills can be used even if the instigator has been hit
-	bool bInstigatorCanUseSkill = Instigator ? Instigator->IsIdleOrMoving() || Instigator->IsBlocking() || Instigator->IsNormalAttacking() || Instigator->HasBeenHit() : false;
+	bool bInstigatorCanUseSkill = Instigator ? Instigator->IsIdleOrMoving() || Instigator->IsBlocking() || Instigator->IsNormalAttacking() : false;
 
 	return bHasValidWeapon && !bInCooldown && bInstigatorCanUseSkill;
 }
