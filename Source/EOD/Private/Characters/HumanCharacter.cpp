@@ -218,14 +218,15 @@ TSharedPtr<FStreamableHandle> AHumanCharacter::LoadAnimationReferences(FPlayerAn
 	if (AnimationReferences)
 	{
 		AddAnimationSoftObjectPathToArray(AnimationReferences->Flinch, AssetsToLoad);
-		AddAnimationSoftObjectPathToArray(AnimationReferences->HitEffects, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->Interrupt, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->Knockdown, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->Stun, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->AttackDeflect, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->BlockAttack, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->NormalAttacks, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->Jump, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->Dodge, AssetsToLoad);
-		AddAnimationSoftObjectPathToArray(AnimationReferences->SpecialActions, AssetsToLoad);
-		AddAnimationSoftObjectPathToArray(AnimationReferences->Skills, AssetsToLoad);
-		AddAnimationSoftObjectPathToArray(AnimationReferences->Spells, AssetsToLoad);
-		AddAnimationSoftObjectPathToArray(AnimationReferences->BlockAttack, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->Loot, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->WeaponSwitchFullBody, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->WeaponSwitchUpperBody, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->Die, AssetsToLoad);

@@ -216,9 +216,25 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
 	TSoftObjectPtr<UAnimMontage> Flinch;
 
-	/** Reference to player animation montage that contains animations for crowd control effects */
+	/** Reference to player animation montage that contains animations for getting interrupted */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
-	TSoftObjectPtr<UAnimMontage> HitEffects;
+	TSoftObjectPtr<UAnimMontage> Interrupt;
+
+	/** Reference to player animation montage that contains animations for getting knocked down */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> Knockdown;
+
+	/** Reference to player animation montage that contains animations for getting stunned */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> Stun;
+
+	/** Reference to player animation montage that contains animations for getting character attack deflected */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> AttackDeflect;
+
+	/** Reference to player animation montage that contains animations for blocking an attack */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> BlockAttack;
 
 	/** Reference to player animation montage that contains animations for normal attacks */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
@@ -232,22 +248,9 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
 	TSoftObjectPtr<UAnimMontage> Dodge;
 
-	//~ @note Add AnimationMontage_WeaponChange animations here
-	/** Reference to player animation montage that contains animations for special actions (@todo list special actions) */
+	/** Reference to player animation montage that contains animations for looting */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
-	TSoftObjectPtr<UAnimMontage> SpecialActions;
-
-	/** Reference to player animation montage that contains animations for using weapon skils */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
-	TSoftObjectPtr<UAnimMontage> Skills;
-
-	/** Reference to player animation montage that contains animations for spells */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
-	TSoftObjectPtr<UAnimMontage> Spells;
-
-	/** Reference to player animation montage that contains animations for blocking an attack */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
-	TSoftObjectPtr<UAnimMontage> BlockAttack;
+	TSoftObjectPtr<UAnimMontage> Loot;
 
 	/** Animation montage containing animation for weapon switch - Full Body Slot */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
@@ -261,15 +264,25 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
 	TSoftObjectPtr<UAnimMontage> Die;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SoundEffects)
-	TArray<TSoftObjectPtr<USoundBase>> NormalHitSounds;
+	////////////////////////////////
+	//~ @todo Remove following
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SoundEffects)
-	TArray<TSoftObjectPtr<USoundBase>> CriticalHitSounds;
+	/** Reference to player animation montage that contains animations for crowd control effects */
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	// TSoftObjectPtr<UAnimMontage> HitEffects;
 
-	/** Reference to player animation montage that contains animations for special movement (@todo more info) */
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	// TSoftObjectPtr<UAnimMontage> SpecialMovement;
+	//~ @note Add AnimationMontage_WeaponChange animations here
+	/** Reference to player animation montage that contains animations for special actions (@todo list special actions) */
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	// TSoftObjectPtr<UAnimMontage> SpecialActions;
+
+	/** Reference to player animation montage that contains animations for using weapon skils */
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	// TSoftObjectPtr<UAnimMontage> Skills;
+
+	/** Reference to player animation montage that contains animations for spells */
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	// TSoftObjectPtr<UAnimMontage> Spells;
 
 };
 

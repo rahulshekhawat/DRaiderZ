@@ -255,21 +255,22 @@ bool APlayerCharacter::CCEFlinch_Implementation(const float BCAngle)
 
 bool APlayerCharacter::CCEInterrupt_Implementation(const float BCAngle)
 {
-	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
+	if (!CanInterrupt())
 	{
-		UAnimMontage* HitMontage = GetActiveAnimationReferences()->HitEffects.Get();
+		return false;
+	}
 
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* AnimMontage = AnimRef ? AnimRef->Interrupt.Get() : nullptr;
+	if (AnimMontage)
+	{
 		if (BCAngle <= 90)
 		{
-			// PlayAnimationMontage(HitMontage,
-				// UCharacterLibrary::SectionName_ForwardInterrupt,
-				// ECharacterState::GotHit);
+			PlayAnimMontage(AnimMontage, 1.f, UCharacterLibrary::SectionName_ForwardInterrupt);
 		}
 		else
 		{
-			// PlayAnimationMontage(HitMontage,
-				// UCharacterLibrary::SectionName_BackwardInterrupt,
-				// ECharacterState::GotHit);
+			PlayAnimMontage(AnimMontage, 1.f, UCharacterLibrary::SectionName_BackwardInterrupt);
 		}
 
 		return true;
@@ -319,13 +320,19 @@ void APlayerCharacter::CCEUnfreeze_Implementation()
 
 bool APlayerCharacter::CCEKnockdown_Implementation(const float Duration)
 {
-	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
+	if (!CanKnockdown())
 	{
-		// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-			// UCharacterLibrary::SectionName_KnockdownStart,
-			// ECharacterState::GotHit);
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
+		return false;
+	}
 
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* AnimMontage = AnimRef ? AnimRef->Knockdown.Get() : nullptr;
+	UWorld* World = GetWorld();
+
+	if (AnimMontage && World)
+	{
+		PlayAnimMontage(AnimMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
+		World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::CCEEndKnockdown, Duration, false);
 		return true;
 	}
 
@@ -339,16 +346,21 @@ void APlayerCharacter::CCEEndKnockdown_Implementation()
 		// ECharacterState::GotHit);
 }
 
-bool APlayerCharacter::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
+bool APlayerCharacter::CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection)
 {
-	if (CanKnockdown() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->HitEffects.Get())
+	if (!CanKnockdown())
 	{
-		// PlayAnimationMontage(GetActiveAnimationReferences()->HitEffects.Get(),
-			// UCharacterLibrary::SectionName_KnockdownStart,
-			// ECharacterState::GotHit);
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
-		PushBack(ImpulseDirection);
+		return false;
+	}
 
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* AnimMontage = AnimRef ? AnimRef->Knockdown.Get() : nullptr;
+	UWorld* World = GetWorld();
+
+	if (AnimMontage && World)
+	{
+		PlayAnimMontage(AnimMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
+		World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &APlayerCharacter::CCEEndKnockdown, Duration, false);
 		return true;
 	}
 
