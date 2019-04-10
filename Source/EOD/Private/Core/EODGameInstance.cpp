@@ -179,12 +179,12 @@ void UEODGameInstance::OnPostLoadMap(UWorld* WorldObj)
 void UEODGameInstance::DisplayDamageNumbers(const float DamageValue, const bool bCritHit, const AActor* DamagedActor, const AActor* DamageInstigator, const FVector& HitLocation)
 {
 	UClass* WidgetClass = DamageWidgetClass.Get();
-	if (!WidgetClass)
+	AEODPlayerController* PC = Cast<AEODPlayerController>(GetFirstLocalPlayerController());
+	if (!PC || !WidgetClass)
 	{
 		return;
 	}
 
-	AEODPlayerController* PC = Cast<AEODPlayerController>(GetFirstLocalPlayerController());
 	APawn* ControlledPawn = PC->GetPawn();
 	check(ControlledPawn);
 

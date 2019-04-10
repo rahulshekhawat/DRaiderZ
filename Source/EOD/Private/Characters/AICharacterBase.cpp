@@ -204,6 +204,12 @@ TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(AActor* HitInstigato
 	LastReceivedHit = ReceivedHitInfo;
 
 
+	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
+	if (EODGI)
+	{
+		EODGI->DisplayDamageNumbers(LastReceivedHit.ActualDamage, LastReceivedHit.bCritHit, this, LastReceivedHit.HitInstigator, LastReceivedHit.HitLocation);
+	}
+
 	/*
 
 	/*
