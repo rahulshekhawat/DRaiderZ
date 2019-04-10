@@ -14,21 +14,19 @@
 void UAnimNotify_SphereCollision::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	UWorld* World = MeshComp ? MeshComp->GetWorld() : nullptr;
+
+#if EOD_DRAWING_DEBUG_SHAPES_ENABLED
 	if (World)
 	{
 		FTransform WorldTransform = MeshComp->GetComponentTransform();
 		FVector TransformedCenter = WorldTransform.TransformPosition(Center);
 
-#if EOD_DRAWING_DEBUG_SHAPES_ENABLED
 		UKismetSystemLibrary::DrawDebugSphere(MeshComp, TransformedCenter, Radius, 12, FLinearColor::White, 5.f, 1.f);
+	}
 #endif
 
-		AActor* Owner = MeshComp->GetOwner();
-		if (!IsValid(Owner) || Owner->GetNetMode() == NM_Client)
-		{
-			return;
-		}
-
+	if (World)
+	{
 		// Only process this notify if the current game mode is ACombatZoneModeBase
 		ACombatZoneModeBase* CombatZoneGameMode = Cast<ACombatZoneModeBase>(World->GetAuthGameMode());
 		ACombatManager* CombatManager = CombatZoneGameMode ? CombatZoneGameMode->GetCombatManager() : nullptr;
@@ -36,6 +34,11 @@ void UAnimNotify_SphereCollision::Notify(USkeletalMeshComponent* MeshComp, UAnim
 		{
 			return;
 		}
+
+		FTransform WorldTransform = MeshComp->GetComponentTransform();
+		FVector TransformedCenter = WorldTransform.TransformPosition(Center);
+
+		AActor* Owner = MeshComp->GetOwner();
 
 		FCollisionShape CollisionShape = FCollisionShape::MakeSphere(Radius);
 		FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(Owner);
