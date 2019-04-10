@@ -3,15 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplaySkillBase.h"
+#include "ActiveSkillBase.h"
 #include "DynamicSpellCastingSkill.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API UDynamicSpellCastingSkill : public UGameplaySkillBase
+class EOD_API UDynamicSpellCastingSkill : public UActiveSkillBase
 {
 	GENERATED_BODY()
+
+public:
+
+	UDynamicSpellCastingSkill(const FObjectInitializer& ObjectInitializer);
+
+
 	
 };

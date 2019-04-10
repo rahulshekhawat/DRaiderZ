@@ -3,3 +3,6 @@
 
 #include "DynamicSpellCastingSkill.h"
 
+UDynamicSpellCastingSkill::UDynamicSpellCastingSkill(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+}
