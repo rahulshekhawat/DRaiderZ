@@ -107,11 +107,17 @@ protected:
 	//	Gameplay Tags
 	// --------------------------------------
 
+	/** The tags used to identify this ability. (example usecase : Cancelling abilities by tags) */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tags")
 	FGameplayTagContainer AbilityTags;
 
+	/** The tags that are added to owner while this ability is active */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tags")
 	FGameplayTagContainer ActivationOwnedTags;
+
+	/** The tags that are required on owner to use this ability */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tags")
+	FGameplayTag RequiredOwnerGameplayTag;
 
 	// --------------------------------------
 	//	Cache

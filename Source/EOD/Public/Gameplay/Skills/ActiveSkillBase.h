@@ -170,10 +170,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	FName SupersedingSkillGroup;
 
-	/** The status effect required to use this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
-	FGameplayTag RequiredOwnerGameplayTag;
-
 	/** The camera to play when this skill hits an enemy */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
 	TSoftClassPtr<UCameraShake> CameraShakeOnHitSoftClass;
