@@ -5,7 +5,7 @@
 
 #include "Engine/World.h"
 
-ACombatZoneModeBase::ACombatZoneModeBase(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
+ACombatZoneModeBase::ACombatZoneModeBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	CombatManagerClass = ACombatManager::StaticClass();
 }
@@ -14,19 +14,31 @@ void ACombatZoneModeBase::InitGame(const FString& MapName, const FString& Option
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
-	if (IsValid(GetWorld()))
+	UWorld* World = GetWorld();
+	if (World)
 	{
-		// @todo Spawn combat and status effect manager only on server
-
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.Instigator = Instigator;
-		// We don't want status effects manager or combat manager to be saved into map
-		SpawnInfo.ObjectFlags |= RF_Transient;
-		CombatManager = GetWorld()->SpawnActor<ACombatManager>(CombatManagerClass, SpawnInfo);
+		if (CombatManagerClass.Get())
+		{
+			FActorSpawnParameters SpawnInfo;
+			SpawnInfo.Owner = this;
+			// We don't want status effects manager or combat manager to be saved into map
+			SpawnInfo.ObjectFlags |= RF_Transient;
+			CombatManager = World->SpawnActor<ACombatManager>(CombatManagerClass, SpawnInfo);
+		}
 	}
 }
 
-ACombatManager * ACombatZoneModeBase::BP_GetCombatManager() const
+void ACombatZoneModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void ACombatZoneModeBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+ACombatManager* ACombatZoneModeBase::BP_GetCombatManager() const
 {
 	return GetCombatManager();
 }

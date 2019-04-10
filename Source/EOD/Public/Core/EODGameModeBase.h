@@ -28,6 +28,12 @@ public:
 	/** Spawns actors of manager classes */
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
 
+	/** Called when the game starts or when spawned */
+	virtual void BeginPlay() override;
+
+	/** Updates game state every frame */
+	virtual void Tick(float DeltaTime) override;
+
 	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 
 	// --------------------------------------
@@ -39,6 +45,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = Managers, meta = (DisplayName = "Get Status Effects Manager"))
 	AStatusEffectsManager* BP_GetStatusEffectsManager() const;
 
+protected:
+
 	/** Blueprint class used for spawning female characters */
 	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
 	TSubclassOf<AEODCharacterBase> FemalePawnClass;
@@ -47,13 +55,14 @@ public:
 	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
 	TSubclassOf<AEODCharacterBase> MalePawnClass;
 
-private:
+	/** Blueprint class used for spawning status effect manager */
+	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
+	TSubclassOf<AStatusEffectsManager> StatusEffectsManagerClass;
 
 	UPROPERTY(Transient)
 	AStatusEffectsManager* StatusEffectsManager;
-		
-};
 
+};
 
 FORCEINLINE AStatusEffectsManager* AEODGameModeBase::GetStatusEffectsManager() const
 {

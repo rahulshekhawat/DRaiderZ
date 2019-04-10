@@ -20,30 +20,28 @@ void AEODGameModeBase::InitGame(const FString& MapName, const FString& Options, 
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
-	UGameSingleton* GameSingleton = IsValid(GEngine) ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
-	if (!IsValid(GameSingleton))
+	UWorld* World = GetWorld();
+	if (World)
 	{
-		return;
+		if (StatusEffectsManagerClass.Get())
+		{
+			FActorSpawnParameters SpawnInfo;
+			SpawnInfo.Owner = this;
+			// We don't want status effects manager or combat manager to be saved into map
+			SpawnInfo.ObjectFlags |= RF_Transient;
+			StatusEffectsManager = World->SpawnActor<AStatusEffectsManager>(StatusEffectsManagerClass, SpawnInfo);
+		}
 	}
+}
 
-	/*
-	UEODSaveGame* EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::LoadGameFromSlot(GameSingleton->DefaultSaveSlotName, GameSingleton->UserIndex));
-	// If the default save game profile doesn't exist then create it
-	if (!IsValid(EODSaveGame))
-	{
-		EODSaveGame = Cast<UEODSaveGame>(UGameplayStatics::CreateSaveGameObject(UEODSaveGame::StaticClass()));
-		UGameplayStatics::SaveGameToSlot(EODSaveGame, GameSingleton->DefaultSaveSlotName, GameSingleton->UserIndex);
-	}
+void AEODGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
 
-	if (IsValid(GetWorld()))
-	{
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.Instigator = Instigator;
-		// We don't want status effects manager or combat manager to be saved into map
-		SpawnInfo.ObjectFlags |= RF_Transient;
-		StatusEffectsManager = GetWorld()->SpawnActor<AStatusEffectsManager>(AStatusEffectsManager::StaticClass(), SpawnInfo);
-	}
-	*/
+void AEODGameModeBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 UClass* AEODGameModeBase::GetDefaultPawnClassForController_Implementation(AController* InController)
