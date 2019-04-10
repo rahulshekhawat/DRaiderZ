@@ -52,7 +52,17 @@ void UInstantMeleeSkill::TriggerSkill()
 	if (Montage)
 	{
 		SkillDuration = Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
-		float ActualSkillDuration = SkillDuration - Montage->GetDefaultBlendOutTime();
+		float ActualSkillDuration;
+
+		if (Montage->BlendOutTriggerTime >= 0.f)
+		{
+			ActualSkillDuration = SkillDuration;
+		}
+		else
+		{
+			ActualSkillDuration = SkillDuration - Montage->BlendOut.GetBlendTime();
+		}
+
 		UWorld* World = Instigator->GetWorld();
 		check(World);
 		FTimerDelegate TimerDelegate;
