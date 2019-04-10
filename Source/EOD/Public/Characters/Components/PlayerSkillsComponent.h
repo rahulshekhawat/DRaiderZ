@@ -60,6 +60,10 @@ public:
 
 	TArray<UContainerWidget*> GetAllContainerWidgetsForSkill(FName SkillGroup) const;
 
+	UGameplaySkillBase* GetSkillForSkillGroup(FName SkillGroup) const;
+
+	uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const;
+
 protected:
 
 	/** Skill index to skil map. Skill index will be used during replication */
@@ -73,6 +77,20 @@ protected:
 	bool bSkillCharging;
 
 	float SkillChargeDuration;
+
+	int32 LastPressedSkillKey;
+
+	int32 LastReleasedSkillKey;
+
+	FName LastUsedSkillGroup;
+
+	FName ActivePrecedingChainSkillGroup;
+
+	TPair<uint8, uint8> SupersedingChainSkillGroup;
+
+	FTimerHandle ChainSkillTimerHandle;
+
+	void ResetChainSkill();
 
 	// --------------------------------------
 	//  Network

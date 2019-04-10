@@ -70,6 +70,9 @@ public:
 	/** Event called when skill owner changes it's weapon */
 	virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
 
+	/** Returns true if this skill is currently in cooldown */
+	inline bool IsSkillInCooldown() const;
+
 	// --------------------------------------
 	//	Constants : Default values that are not supposed to be modified
 	// --------------------------------------
@@ -141,5 +144,26 @@ protected:
 
 	int32 CurrentUpgrade;
 
+	UPROPERTY()
+	FTimerHandle CooldownTimerHandle;
+
+	float CooldownRemaining;
+
+	UFUNCTION()
+	virtual void StartCooldown();
+
+	UFUNCTION()
+	virtual void FinishCooldown();
+
+	UFUNCTION()
+	virtual void CancelCooldown();
+
+	UFUNCTION()
+	virtual void UpdateCooldown();
 
 };
+
+inline bool UGameplaySkillBase::IsSkillInCooldown() const
+{
+	return CooldownRemaining > 0.f;
+}

@@ -11,6 +11,7 @@
 #include "EODPlayerController.h"
 #include "ContainerWidget.h"
 
+#include "TimerManager.h"
 #include "UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -44,7 +45,11 @@ void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
 	uint8 SkillIndex = 0;
 	UGameplaySkillBase* Skill = nullptr;
-	if (SkillBarMap.Contains(SkillKeyIndex))
+	if (SupersedingChainSkillGroup.Key == SkillKeyIndex)
+	{
+		SkillIndex = SupersedingChainSkillGroup.Key;
+	}
+	else if (SkillBarMap.Contains(SkillKeyIndex))
 	{
 		SkillIndex = SkillBarMap[SkillKeyIndex];
 	}
@@ -58,6 +63,8 @@ void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 	{
 		TriggerSkill(SkillIndex, Skill);
 	}
+
+	LastPressedSkillKey = SkillKeyIndex;
 }
 
 void UPlayerSkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
@@ -79,6 +86,8 @@ void UPlayerSkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
 		SkillIndex += 100; // Skill Index while releasing skill is offset by 100 for replication purposes
 		ReleaseSkill(SkillIndex, Skill);
 	}
+
+	LastReleasedSkillKey = SkillKeyIndex;
 }
 
 void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
@@ -175,8 +184,25 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	bool bIsLocalPlayerController = CharOwner->Controller && CharOwner->Controller->IsLocalPlayerController();
 	if (bIsLocalPlayerController)
 	{
+		UActiveSkillBase* _Skill = Cast<UActiveSkillBase>(Skill);
+		TArray<FName> _PrecedingSkillGroups = _Skill->GetPrecedingSkillGroups();
+		if (_PrecedingSkillGroups.Num() > 0)
+		{
+			if (ActivePrecedingChainSkillGroup == NAME_None)
+			{
+				return;
+			}
+
+			if (!_PrecedingSkillGroups.Contains(ActivePrecedingChainSkillGroup))
+			{
+				return;
+			}
+		}
+
 		if (Skill->CanTriggerSkill())
 		{
+			ResetChainSkill();
+
 			FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
 			StateInfo.NewReplicationIndex = CharOwner->CharacterStateInfo.NewReplicationIndex + 1;
 			CharOwner->CharacterStateInfo = StateInfo;
@@ -193,6 +219,22 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 				bSkillCharging = true;
 				SkillChargeDuration = 0.f;
 			}
+
+			UWorld* World = GetWorld();
+			if (_Skill && World)
+			{
+				FName SupersedingSkillGroup = _Skill->GetSupersedingSkillGroup();
+				uint8 SupersedingSkillIndex = GetSkillIndexForSkillGroup(SupersedingSkillGroup);
+				if (SupersedingSkillIndex != 0)
+				{
+					SupersedingChainSkillGroup = TPair<uint8, uint8>(LastPressedSkillKey, SupersedingSkillIndex);
+					float SkillDuration = _Skill->GetSkillDuration();
+					float ChainSkillActivationWindow = SkillDuration + 2.f;
+					World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
+				}
+			}
+
+			ActivePrecedingChainSkillGroup = LastUsedSkillGroup = Skill->GetSkillGroup();
 		}
 	}
 	else
@@ -332,6 +374,53 @@ TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill
 	}
 
 	return SkillWidgets;
+}
+
+UGameplaySkillBase* UPlayerSkillsComponent::GetSkillForSkillGroup(FName SkillGroup) const
+{
+	TArray<uint8> SkillsMapKeys;
+	SkillsMap.GetKeys(SkillsMapKeys);
+
+	for (uint8 Key : SkillsMapKeys)
+	{
+		UGameplaySkillBase* Skill = SkillsMap[Key];
+		if (Skill && Skill->GetSkillGroup() == SkillGroup)
+		{
+			return Skill;
+		}
+	}
+
+	return nullptr;
+}
+
+uint8 UPlayerSkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) const
+{
+	uint8 SkillIndex = 0;
+	TArray<uint8> SkillsMapKeys;
+	SkillsMap.GetKeys(SkillsMapKeys);
+
+	for (uint8 Key : SkillsMapKeys)
+	{
+		UGameplaySkillBase* Skill = SkillsMap[Key];
+		if (Skill && Skill->GetSkillGroup() == SkillGroup)
+		{
+			return Key;
+		}
+	}
+
+	return SkillIndex;
+}
+
+void UPlayerSkillsComponent::ResetChainSkill()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		World->GetTimerManager().ClearTimer(ChainSkillTimerHandle);
+	}
+
+	ActivePrecedingChainSkillGroup = NAME_None;
+	SupersedingChainSkillGroup = TPair<uint8, uint8>(0, 0);
 }
 
 void UPlayerSkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)

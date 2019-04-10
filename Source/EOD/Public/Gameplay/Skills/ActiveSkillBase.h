@@ -110,7 +110,19 @@ public:
 
 	FORCEINLINE EDamageType GetDamageType() const { return DamageType; }
 
+	FORCEINLINE TArray<FName> GetPrecedingSkillGroups() const { return PrecedingSkillGroups; }
+
+	FORCEINLINE FName GetSupersedingSkillGroup() const { return SupersedingSkillGroup; }
+
 protected:
+
+	virtual void StartCooldown() override;
+
+	virtual void FinishCooldown() override;
+
+	virtual void CancelCooldown() override;
+
+	virtual void UpdateCooldown() override;
 
 	// --------------------------------------
 	//	Constants : Default values that are not supposed to be modified
@@ -187,25 +199,15 @@ protected:
 	/** Returns true if this skill can be used with the given weapon type */
 	bool IsWeaponTypeSupported(EWeaponType WeaponType) const;
 
-	/** Returns true if this skill is currently in cooldown */
-	inline bool IsSkillInCooldown() const;
+public:
 
-	UPROPERTY()
-	FTimerHandle CooldownTimerHandle;
+	// --------------------------------------
+	//	Utility
+	// --------------------------------------
 
-	float CooldownRemaining;
+	/** Returns the skill duration  */
+	virtual float GetSkillDuration() const;
 
-	UFUNCTION()
-	virtual void StartCooldown();
-
-	UFUNCTION()
-	virtual void FinishCooldown();
-
-	UFUNCTION()
-	virtual void CancelCooldown();
-
-	UFUNCTION()
-	virtual void UpdateCooldown();
 
 };
 
@@ -223,9 +225,4 @@ inline FActiveSkillLevelUpInfo UActiveSkillBase::GetCurrentSkillLevelupInfo() co
 	{
 		return FActiveSkillLevelUpInfo();
 	}
-}
-
-inline bool UActiveSkillBase::IsSkillInCooldown() const
-{
-	return CooldownRemaining > 0.f;
 }

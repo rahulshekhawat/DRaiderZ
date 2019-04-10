@@ -131,6 +131,11 @@ bool UActiveSkillBase::IsWeaponTypeSupported(EWeaponType WeaponType) const
 	return (SupportedWeapons & (1 << (uint8)WeaponType));
 }
 
+float UActiveSkillBase::GetSkillDuration() const
+{
+	return 0.0f;
+}
+
 void UActiveSkillBase::StartCooldown()
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
@@ -139,9 +144,12 @@ void UActiveSkillBase::StartCooldown()
 	check(World);
 
 	const FActiveSkillLevelUpInfo CurrentLevelUpInfo = GetCurrentSkillLevelupInfo();
-	World->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UActiveSkillBase::UpdateCooldown, 1.f, true, 0.f);
+	World->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UActiveSkillBase::UpdateCooldown, 1.f, true);
 	CooldownRemaining = CurrentLevelUpInfo.Cooldown;
 
+	UGameplaySkillsComponent* SkillComp = InstigatorSkillComponent.Get();
+	check(SkillComp);
+	SkillComp->UpdateSkillCooldown(SkillGroup, CooldownRemaining);
 }
 
 void UActiveSkillBase::FinishCooldown()
@@ -166,6 +174,8 @@ void UActiveSkillBase::CancelCooldown()
 
 void UActiveSkillBase::UpdateCooldown()
 {
+	CooldownRemaining--;
+
 	if (CooldownRemaining <= 0.f)
 	{
 		FinishCooldown();
@@ -174,6 +184,4 @@ void UActiveSkillBase::UpdateCooldown()
 	UGameplaySkillsComponent* SkillComp = InstigatorSkillComponent.Get();
 	check(SkillComp);
 	SkillComp->UpdateSkillCooldown(SkillGroup, CooldownRemaining);
-
-	CooldownRemaining--;
 }

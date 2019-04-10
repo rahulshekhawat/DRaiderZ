@@ -61,3 +61,19 @@ void UGameplaySkillBase::OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow*
 {
 
 }
+
+void UGameplaySkillBase::StartCooldown()
+{
+}
+
+void UGameplaySkillBase::FinishCooldown()
+{
+}
+
+void UGameplaySkillBase::CancelCooldown()
+{
+}
+
+void UGameplaySkillBase::UpdateCooldown()
+{
+}

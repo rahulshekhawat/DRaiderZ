@@ -39,4 +39,13 @@ protected:
 
 	FTimerHandle SkillTimerHandle;
 
+public:
+
+	// --------------------------------------
+	//	Utility
+	// --------------------------------------
+
+	/** Returns the skill duration  */
+	virtual float GetSkillDuration() const;
+
 };

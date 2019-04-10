@@ -89,3 +89,8 @@ void UInstantMeleeSkill::FinishSkill()
 		Instigator->ResetState();
 	}
 }
+
+float UInstantMeleeSkill::GetSkillDuration() const
+{
+	return 0.0f;
+}
