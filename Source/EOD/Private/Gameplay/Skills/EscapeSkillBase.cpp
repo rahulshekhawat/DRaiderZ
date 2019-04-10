@@ -58,13 +58,13 @@ void UEscapeSkillBase::TriggerSkill()
 	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
 	if (Montage)
 	{
-		float SkillDuration = Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
-		SkillDuration = SkillDuration - Montage->GetDefaultBlendOutTime();
+		SkillDuration = Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
+		float ActualSkillDuration = SkillDuration - Montage->GetDefaultBlendOutTime();
 		UWorld* World = Instigator->GetWorld();
 		check(World);
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindUObject(this, &UEscapeSkillBase::FinishSkill);
-		World->GetTimerManager().SetTimer(SkillTimerHandle, TimerDelegate, SkillDuration, false);
+		World->GetTimerManager().SetTimer(SkillTimerHandle, TimerDelegate, ActualSkillDuration, false);
 	}
 	else
 	{

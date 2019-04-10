@@ -43,11 +43,13 @@ void UPlayerSkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 
 void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
+	LastPressedSkillKey = SkillKeyIndex;
+
 	uint8 SkillIndex = 0;
 	UGameplaySkillBase* Skill = nullptr;
 	if (SupersedingChainSkillGroup.Key == SkillKeyIndex)
 	{
-		SkillIndex = SupersedingChainSkillGroup.Key;
+		SkillIndex = SupersedingChainSkillGroup.Value;
 	}
 	else if (SkillBarMap.Contains(SkillKeyIndex))
 	{
@@ -63,8 +65,6 @@ void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 	{
 		TriggerSkill(SkillIndex, Skill);
 	}
-
-	LastPressedSkillKey = SkillKeyIndex;
 }
 
 void UPlayerSkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
@@ -186,6 +186,7 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	{
 		UActiveSkillBase* _Skill = Cast<UActiveSkillBase>(Skill);
 		TArray<FName> _PrecedingSkillGroups = _Skill->GetPrecedingSkillGroups();
+
 		if (_PrecedingSkillGroups.Num() > 0)
 		{
 			if (ActivePrecedingChainSkillGroup == NAME_None)

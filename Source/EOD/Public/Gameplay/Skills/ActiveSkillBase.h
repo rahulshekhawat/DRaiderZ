@@ -208,6 +208,9 @@ public:
 	/** Returns the skill duration  */
 	virtual float GetSkillDuration() const;
 
+protected:
+
+	float SkillDuration;
 
 };
 

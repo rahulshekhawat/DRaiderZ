@@ -51,13 +51,13 @@ void UInstantMeleeSkill::TriggerSkill()
 	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
 	if (Montage)
 	{
-		float SkillDuration = Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
-		SkillDuration = SkillDuration - Montage->GetDefaultBlendOutTime();
+		SkillDuration = Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
+		float ActualSkillDuration = SkillDuration - Montage->GetDefaultBlendOutTime();
 		UWorld* World = Instigator->GetWorld();
 		check(World);
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindUObject(this, &UInstantMeleeSkill::FinishSkill);
-		World->GetTimerManager().SetTimer(SkillTimerHandle, TimerDelegate, SkillDuration, false);
+		World->GetTimerManager().SetTimer(SkillTimerHandle, TimerDelegate, ActualSkillDuration, false);
 	}
 	else
 	{
@@ -92,5 +92,5 @@ void UInstantMeleeSkill::FinishSkill()
 
 float UInstantMeleeSkill::GetSkillDuration() const
 {
-	return 0.0f;
+	return SkillDuration;
 }
