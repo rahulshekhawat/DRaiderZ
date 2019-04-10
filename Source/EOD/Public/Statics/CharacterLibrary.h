@@ -248,9 +248,13 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
 	TSoftObjectPtr<UAnimMontage> Dodge;
 
-	/** Reference to player animation montage that contains animations for looting */
+	/** Reference to player animation montage that contains animations for starting loot */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
-	TSoftObjectPtr<UAnimMontage> Loot;
+	TSoftObjectPtr<UAnimMontage> LootStart;
+
+	/** Reference to player animation montage that contains animations for ending loot */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
+	TSoftObjectPtr<UAnimMontage> LootEnd;
 
 	/** Animation montage containing animation for weapon switch - Full Body Slot */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)

@@ -226,7 +226,8 @@ TSharedPtr<FStreamableHandle> AHumanCharacter::LoadAnimationReferences(FPlayerAn
 		AddAnimationSoftObjectPathToArray(AnimationReferences->NormalAttacks, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->Jump, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->Dodge, AssetsToLoad);
-		AddAnimationSoftObjectPathToArray(AnimationReferences->Loot, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->LootStart, AssetsToLoad);
+		AddAnimationSoftObjectPathToArray(AnimationReferences->LootEnd, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->WeaponSwitchFullBody, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->WeaponSwitchUpperBody, AssetsToLoad);
 		AddAnimationSoftObjectPathToArray(AnimationReferences->Die, AssetsToLoad);
