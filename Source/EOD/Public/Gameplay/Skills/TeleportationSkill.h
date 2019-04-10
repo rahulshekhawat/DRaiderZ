@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplaySkillBase.h"
+#include "ActiveSkillBase.h"
 #include "TeleportationSkill.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API UTeleportationSkill : public UGameplaySkillBase
+class EOD_API UTeleportationSkill : public UActiveSkillBase
 {
 	GENERATED_BODY()
 	

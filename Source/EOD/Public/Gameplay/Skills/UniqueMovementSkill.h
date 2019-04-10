@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplaySkillBase.h"
+#include "ActiveSkillBase.h"
 #include "UniqueMovementSkill.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API UUniqueMovementSkill : public UGameplaySkillBase
+class EOD_API UUniqueMovementSkill : public UActiveSkillBase
 {
 	GENERATED_BODY()
 	

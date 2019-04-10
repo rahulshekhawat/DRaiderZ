@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplaySkillBase.h"
+#include "ActiveSkillBase.h"
 #include "StaticSpellCastingSkill.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API UStaticSpellCastingSkill : public UGameplaySkillBase
+class EOD_API UStaticSpellCastingSkill : public UActiveSkillBase
 {
 	GENERATED_BODY()
 	
