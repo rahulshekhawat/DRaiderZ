@@ -41,16 +41,22 @@ void UAnimNotify_FootStepBase::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 
 void UAnimNotify_FootStepBase::GetFootstepHitResults(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, FHitResult& OutHitResults)
 {
-	FVector TraceStart = MeshComp->GetOwner()->GetActorLocation();
-	FVector TraceEnd = TraceStart + FVector(0.f, 0.f, -95.f);
+	AActor* Owner = MeshComp ? MeshComp->GetOwner() : nullptr;
+	UWorld* World = MeshComp ? MeshComp->GetWorld() : nullptr;
 
-	FCollisionQueryParams Params;
-	Params.bTraceComplex = false;
-	Params.bReturnPhysicalMaterial = true;
-	Params.bReturnFaceIndex = false;
-	// Params.bTraceAsyncScene = true;
-	Params.AddIgnoredActor(MeshComp->GetOwner());
-	MeshComp->GetWorld()->LineTraceSingleByChannel(OutHitResults, TraceStart, TraceEnd, ECC_Visibility, Params);
+	if (Owner && World)
+	{
+		FVector TraceStart = Owner->GetActorLocation();
+		FVector TraceEnd = TraceStart + FVector(0.f, 0.f, -95.f);
+
+		FCollisionQueryParams Params;
+		Params.bTraceComplex = false;
+		Params.bReturnPhysicalMaterial = true;
+		Params.bReturnFaceIndex = false;
+
+		Params.AddIgnoredActor(Owner);
+		World->LineTraceSingleByChannel(OutHitResults, TraceStart, TraceEnd, ECC_Visibility, Params);
+	}
 }
 
 void UAnimNotify_FootStepBase::PlayFootstepSound(const FHitResult& HitResult)
