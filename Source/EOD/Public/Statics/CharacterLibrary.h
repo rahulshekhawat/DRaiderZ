@@ -271,22 +271,10 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 	////////////////////////////////
 	//~ @todo Remove following
 
-	/** Reference to player animation montage that contains animations for crowd control effects */
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
-	// TSoftObjectPtr<UAnimMontage> HitEffects;
-
 	//~ @note Add AnimationMontage_WeaponChange animations here
 	/** Reference to player animation montage that contains animations for special actions (@todo list special actions) */
 	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
 	// TSoftObjectPtr<UAnimMontage> SpecialActions;
-
-	/** Reference to player animation montage that contains animations for using weapon skils */
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
-	// TSoftObjectPtr<UAnimMontage> Skills;
-
-	/** Reference to player animation montage that contains animations for spells */
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
-	// TSoftObjectPtr<UAnimMontage> Spells;
 
 };
 
@@ -683,6 +671,14 @@ public:
 	static const FName SectionName_JumpLoop;
 
 	static const FName SectionName_JumpEnd;
+
+	static const FName SectionName_ForwardJumpStart;
+	static const FName SectionName_ForwardJumpLoop;
+	static const FName SectionName_ForwardJumpEnd;
+
+	static const FName SectionName_BackwardJumpStart;
+	static const FName SectionName_BackwardJumpLoop;
+	static const FName SectionName_BackwardJumpEnd;
 
 	static const FName SectionName_FirstSwing;
 

@@ -68,6 +68,18 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			Montage_Play(JumpMontage);
 			EODPlayerOwner->OnJumpAnimationStart();
 			bJumpAnimationPlayingLocally = true;
+
+			if (CurrentWeaponType == EWeaponType::Dagger)
+			{
+				if (EODPlayerOwner->ForwardAxisValue >= 0)
+				{
+					Montage_JumpToSection(UCharacterLibrary::SectionName_ForwardJumpStart);
+				}
+				else
+				{
+					Montage_JumpToSection(UCharacterLibrary::SectionName_BackwardJumpStart);
+				}
+			}
 		}
 	}
 	else if (!bIsFalling && bJumpAnimationPlayingLocally)
@@ -75,7 +87,26 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
 		if (!bJumpLandAnimationPlayingLocally)
 		{
-			Montage_JumpToSection(UCharacterLibrary::SectionName_JumpEnd, JumpMontage);
+			if (CurrentWeaponType != EWeaponType::Dagger)
+			{
+				Montage_JumpToSection(UCharacterLibrary::SectionName_JumpEnd, JumpMontage);
+			}
+			else
+			{
+				FName CurrentSection = Montage_GetCurrentSection(JumpMontage);
+				if (CurrentSection == UCharacterLibrary::SectionName_ForwardJumpLoop)
+				{
+					Montage_JumpToSection(UCharacterLibrary::SectionName_ForwardJumpEnd, JumpMontage);
+				}
+				else if (CurrentSection == UCharacterLibrary::SectionName_BackwardJumpLoop)
+				{
+					Montage_JumpToSection(UCharacterLibrary::SectionName_BackwardJumpEnd, JumpMontage);
+				}
+				else
+				{
+					Montage_JumpToSection(UCharacterLibrary::SectionName_ForwardJumpEnd, JumpMontage);
+				}
+			}
 			bJumpLandAnimationPlayingLocally = true;
 		}
 	}

@@ -736,11 +736,7 @@ void APlayerCharacter::StartWeaponSwitch()
 	UAnimMontage* MontageToPlay = IsPCTryingToMove() ? EquippedAnimRef->WeaponSwitchUpperBody.Get() : EquippedAnimRef->WeaponSwitchFullBody.Get();
 	FName SectionToPlay = IsWeaponSheathed() ? UCharacterLibrary::SectionName_SheatheWeapon : UCharacterLibrary::SectionName_UnsheatheWeapon;
 
-	UPlayerAnimInstance* PlayerAnimInstance = nullptr;
-	if (GetMesh())
-	{
-		PlayerAnimInstance = GetMesh()->GetAnimInstance() ? Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()) : nullptr;
-	}
+	UPlayerAnimInstance* PlayerAnimInstance = GetMesh() ? Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()) : nullptr;
 
 	UWorld* World = GetWorld();
 	if (PlayerAnimInstance && World)
