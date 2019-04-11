@@ -11,16 +11,22 @@
 
 void UAnimNotify_JumpBase::GetJumpHitResults(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, FHitResult& OutHitResults)
 {
-	FVector TraceStart = MeshComp->GetOwner()->GetActorLocation();
-	FVector TraceEnd = TraceStart + FVector(0.f, 0.f, -100.f);
+	AActor* Owner = MeshComp ? MeshComp->GetOwner() : nullptr;
+	UWorld* World = MeshComp ? MeshComp->GetWorld() : nullptr;
 
-	FCollisionQueryParams Params;
-	Params.bTraceComplex = false;
-	Params.bReturnPhysicalMaterial = true;
-	Params.bReturnFaceIndex = false;
-	// Params.bTraceAsyncScene = true;
-	Params.AddIgnoredActor(MeshComp->GetOwner());
-	MeshComp->GetWorld()->LineTraceSingleByChannel(OutHitResults, TraceStart, TraceEnd, ECC_Visibility, Params);
+	if (Owner && World)
+	{
+		FVector TraceStart = Owner->GetActorLocation();
+		FVector TraceEnd = TraceStart + FVector(0.f, 0.f, -100.f);
+
+		FCollisionQueryParams Params;
+		Params.bTraceComplex = false;
+		Params.bReturnPhysicalMaterial = true;
+		Params.bReturnFaceIndex = false;
+
+		Params.AddIgnoredActor(Owner);
+		World->LineTraceSingleByChannel(OutHitResults, TraceStart, TraceEnd, ECC_Visibility, Params);
+	}
 }
 
 void UAnimNotify_JumpBase::PlayJumpSound(const FHitResult& HitResult)
