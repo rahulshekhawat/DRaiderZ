@@ -29,6 +29,14 @@ const FName UCharacterLibrary::SectionName_JumpEnd					= FName("JumpEnd");
 const FName UCharacterLibrary::SectionName_JumpLoop					= FName("JumpLoop");
 const FName UCharacterLibrary::SectionName_JumpStart				= FName("JumpStart");
 
+const FName UCharacterLibrary::SectionName_ForwardJumpStart			= FName("ForwardJumpStart");
+const FName UCharacterLibrary::SectionName_ForwardJumpLoop			= FName("ForwardJumpLoop");
+const FName UCharacterLibrary::SectionName_ForwardJumpEnd			= FName("ForwardJumpEnd");
+
+const FName UCharacterLibrary::SectionName_BackwardJumpStart		= FName("BackwardJumpStart");
+const FName UCharacterLibrary::SectionName_BackwardJumpLoop			= FName("BackwardJumpLoop");
+const FName UCharacterLibrary::SectionName_BackwardJumpEnd			= FName("BackwardJumpEnd");
+
 const FName UCharacterLibrary::SectionName_FirstSwing 				= FName("FirstSwing");
 const FName UCharacterLibrary::SectionName_FirstSwingEnd 			= FName("FirstSwingEnd");
 const FName UCharacterLibrary::SectionName_SecondSwing 				= FName("SecondSwing");
