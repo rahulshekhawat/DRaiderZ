@@ -185,7 +185,7 @@ FName AHumanCharacter::GetAnimationReferencesRowID(EWeaponType WeaponType, EChar
 		Postfix = FString("Mace");
 		break;
 	case EWeaponType::Dagger:
-		Postfix = FString("Dagger");
+		Postfix = FString("Daggers");
 		break;
 	case EWeaponType::Staff:
 		Postfix = FString("Staff");
