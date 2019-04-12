@@ -5,16 +5,13 @@
 #include "PlayerCharacter.h"
 #include "PlayerSaveGame.h"
 #include "EODGameInstance.h"
+#include "GameplaySkillBase.h"
 #include "EODCharacterMovementComponent.h"
-
-#include "Gameplay/Skills/GameplaySkillBase.h"
 
 #include "Kismet/GameplayStatics.h"
 
 
-/**
- * EOD Character stats
- */
+/** EOD Character stats */
 DECLARE_CYCLE_STAT(TEXT("EOD GameplaySkillsTick"), STAT_EODGameplaySkillsTick, STATGROUP_EOD);
 
 UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -24,19 +21,11 @@ UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& Obj
 
 	ChainSkillResetDelay = 2.f;
 	MaxNumSkills = 20;
-
-	for (int i = 1; i <= MaxNumSkills; i++)
-	{
-		SBIndexToSGMap.Add(i, FString(""));
-	}
 }
 
 void UGameplaySkillsComponent::PostLoad()
 {
 	Super::PostLoad();
-	// LoadSkillBarLayout();
-
-
 }
 
 void UGameplaySkillsComponent::BeginPlay()
@@ -50,19 +39,6 @@ void UGameplaySkillsComponent::BeginPlay()
 	EODCharacterOwner = Cast<AEODCharacterBase>(GetOwner());
 
 	//~ @note The result of IsPlayerControlled() is not correct during BeginPlay because PlayerState has not finished replicating.
-	
-	if (IsValid(EODCharacterOwner) && EODCharacterOwner->IsLocallyControlled() && EODCharacterOwner->IsPlayerControlled())
-	{
-		// LoadSkillBarLayout();
-		if (TestSkill.Get())
-		{
-			TS = NewObject<UGameplaySkillBase>(this, TestSkill, NAME_None, RF_Transient);
-			if (TS)
-			{
-				TS->InitSkill(EODCharacterOwner, EODCharacterOwner->Controller);
-			}
-		}
-	}
 
 }
 
@@ -85,52 +61,6 @@ void UGameplaySkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 }
-
-/*
-void UGameplaySkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
-{
-	if (TS)
-	{
-		TS->ActivateSkill();
-	}
-	
-	/*
-	// return if the character is incapable of using any skill right now
-	if (!CanUseAnySkill())
-	{
-		return;
-	}
-
-	FString SGToUse = GetSkillGroupFromSkillKeyIndex(SkillKeyIndex);
-	if (SGToUse == FString("") || SGToCooldownMap.Contains(SGToUse))
-	{
-		// Either no skill equipped in given slot or it's in cooldown
-		return;
-	}
-
-	FName SkillID = GetPlayerSkillIDFromSG(SGToUse);
-	FSkillTableRow* Skill = GetSkill(SkillID);
-
-	if (!Skill)
-	{
-		// Invalid Skill ID
-		return;
-	}
-
-	// If the player hasn't used the required preceding group 
-	if (Skill->PrecedingSkillGroups.Num() > 0 && !Skill->PrecedingSkillGroups.Contains(LastUsedSkillGroup))
-	{
-		return;
-	}
-
-	TriggerSkill(SkillID, Skill);
-	/////
-}
-
-void UGameplaySkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
-{
-}
-*/
 
 void UGameplaySkillsComponent::TriggerSkill(FName SkillID, FSkillTableRow* Skill)
 {
@@ -231,66 +161,6 @@ void UGameplaySkillsComponent::UseSkill(FName SkillID)
 {
 }
 
-void UGameplaySkillsComponent::SetCurrentActiveSkill(const FName SkillID)
-{
-	// Although setting ActiveSkillID and ActiveSkill on local client is un-necessary from combat perspective (all combat events fire on server only),
-	// these variables have been set up in local client as well for query purposes.
-
-	if (SkillID == NAME_None)
-	{
-		ActiveSkillID = NAME_None;
-		ActiveSkill = nullptr;
-	}
-	else
-	{
-		ActiveSkill = GetSkill(SkillID);
-		ActiveSkillID = ActiveSkill ? SkillID : NAME_None;
-	}
-
-	if (IsValid(EODCharacterOwner) && EODCharacterOwner->Role < ROLE_Authority)
-	{
-		Server_SetCurrentActiveSkill(SkillID);
-	}
-}
-
-void UGameplaySkillsComponent::LoadSkillBarLayout()
-{
-	UEODGameInstance* GameInstance = EODCharacterOwner ? Cast<UEODGameInstance>(EODCharacterOwner->GetGameInstance()) : nullptr;
-	if (!IsValid(GameInstance) || !IsValid(GameInstance->GetCurrentPlayerSaveGameObject()))
-	{
-		return;
-	}
-	
-	UPlayerSaveGame* PlayerSaveGame = GameInstance->GetCurrentPlayerSaveGameObject();
-
-	TMap<int32, FString>& SBLayout = PlayerSaveGame->SkillBarLayout;
-	TArray<int32> LayoutKeys;
-	SBLayout.GetKeys(LayoutKeys);
-	for (int32 Key : LayoutKeys)
-	{
-		if (SBLayout[Key] == FString(""))
-		{
-			continue;
-		}
-
-		if (SBIndexToSGMap.Contains(Key))
-		{
-			SBIndexToSGMap[Key] = SBLayout[Key];
-		}
-	}
-}
-
-void UGameplaySkillsComponent::SaveSkillBarLayout()
-{
-	UEODGameInstance* GameInstance = EODCharacterOwner ? Cast<UEODGameInstance>(EODCharacterOwner->GetGameInstance()) : nullptr;
-	UPlayerSaveGame* PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
-	if (IsValid(PlayerSaveGame))
-	{
-		PlayerSaveGame->SkillBarLayout = SBIndexToSGMap;
-		UGameplayStatics::SaveGameToSlot(PlayerSaveGame, GameInstance->GetCurrentPlayerSaveGameName(), GameInstance->PlayerIndex);
-	}
-}
-
 void UGameplaySkillsComponent::AddNewSkill(int32 SkillIndex, FString SkillGroup)
 {
 	SBIndexToSGMap.Add(SkillIndex, SkillGroup);
@@ -312,16 +182,6 @@ void UGameplaySkillsComponent::Server_ReleaseSkill_Implementation(uint8 SkillInd
 }
 
 bool UGameplaySkillsComponent::Server_ReleaseSkill_Validate(uint8 SkillIndex, float ChargeDuration)
-{
-	return true;
-}
-
-void UGameplaySkillsComponent::Server_SetCurrentActiveSkill_Implementation(const FName SkillID)
-{
-	SetCurrentActiveSkill(SkillID);
-}
-
-bool UGameplaySkillsComponent::Server_SetCurrentActiveSkill_Validate(const FName SkillID)
 {
 	return true;
 }

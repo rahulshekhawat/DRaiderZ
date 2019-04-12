@@ -12,42 +12,17 @@
 class AEODCharacterBase;
 class UGameplaySkillBase;
 
-/*
-USTRUCT(BlueprintType)
-struct EOD_API FSkillStatus
-{
-	GENERATED_USTRUCT_BODY()
-public:
-
-
-};
-*/
-
-/** Struct containing information regarding skill's cooldown */
-USTRUCT(BlueprintType)
-struct EOD_API FSkillCooldownStatus
-{
-	GENERATED_USTRUCT_BODY()
-
-	bool bIsInCooldown;
-
-	float CooldownRemaining;
-
-	FTimerHandle CooldownTimerHandle;
-
-	FSkillCooldownStatus()
-	{
-		bIsInCooldown = false;
-		CooldownRemaining = 0.f;
-	}
-};
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EOD_API UGameplaySkillsComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	UGameplaySkillsComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PostLoad() override;
@@ -59,10 +34,25 @@ public:
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	// --------------------------------------
+	//  Skill System
+	// --------------------------------------
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Skill System	
-public:
+	/**
+	 * Trigger a skill
+	 * @note This may result in either instantly activating a skill (e.g. Nocturne) or this may start charging the skill (for skills that can be charged by holding down the attack key)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	virtual void TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr);
+
+	/** If the character is currently charging a chargeable skill then this activates the skill. Otherwise it does nothing */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	virtual void ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr, float ReleaseDelay = 0.f);
+
+	/** If the character is currently using skill with ID same as the function argument, then cancel it. Otherwise do nothing. */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	void CancelSkill(FName SkillID);
+
 	/**
 	 * Trigger a skill
 	 * @note This may result in either instantly activating a skill (e.g. Nocturne) or this may start charging the skill (for skills that can be
@@ -75,15 +65,8 @@ public:
 	 */
 	void ReleaseSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
 
-	virtual void TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr);
-
-	virtual void ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr, float ReleaseDelay = 0.f);
-
 	/** Cancels the skill that the character is currently using */
 	void CancelCurrentSkill();
-
-	/** If the character is currently using skill with ID same as the function argument, then cancel it. Otherwise do nothing. */
-	void CancelSkill(FName SkillID);
 
 	//~ @todo
 	// void EndSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
@@ -149,7 +132,7 @@ private:
 	TMap<FString, bool> SGToCooldownMap;
 
 	/** A map of skill group to it's cooldown status info */
-	TMap<FString, FSkillCooldownStatus> SGToCooldownStatusMap;
+	// TMap<FString, FSkillCooldownStatus> SGToCooldownStatusMap;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character Skills")
@@ -170,7 +153,7 @@ protected:
 	void UseSkill(FName SkillID);
 
 public:
-	void SetCurrentActiveSkill(const FName SkillID);
+	// void SetCurrentActiveSkill(const FName SkillID);
 
 	FORCEINLINE FName GetCurrentActiveSkillID() const { return ActiveSkillID; }
 
@@ -180,23 +163,12 @@ public:
 
 	FORCEINLINE TMap<int32, FString>& GetSkillBarLayout() { return SBIndexToSGMap; }
 
-	void LoadSkillBarLayout();
-
-	void SaveSkillBarLayout();
-
 	/**
 	 * Add new skill to the skill bar.
 	 * Used to add new skills to the skill bar through UI
 	 */
 	UFUNCTION()
 	void AddNewSkill(int32 SkillIndex, FString SkillGroup);
-
-
-	UPROPERTY(EditDefaultsOnly, Category = Skills)
-	TSubclassOf<UGameplaySkillBase> TestSkill;
-
-	UPROPERTY(Transient)
-	UGameplaySkillBase* TS;
 
 protected:
 
@@ -213,10 +185,6 @@ protected:
 	void Server_ReleaseSkill(uint8 SkillIndex, float ChargeDuration);
 	virtual void Server_ReleaseSkill_Implementation(uint8 SkillIndex, float ChargeDuration);
 	virtual bool Server_ReleaseSkill_Validate(uint8 SkillIndex, float ChargeDuration);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetCurrentActiveSkill(const FName SkillID);
-
 
 };
 

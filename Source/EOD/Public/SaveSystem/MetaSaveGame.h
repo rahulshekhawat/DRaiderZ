@@ -12,16 +12,16 @@ struct EOD_API FMetaSaveGameData
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(BlueprintReadOnly, Category = "Save Game Meta Data")
+	UPROPERTY()
 	FString SaveSlotName;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Save Game Meta Data")
+	UPROPERTY()
 	FString CharacterName;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Save Game Meta Data")
+	UPROPERTY()
 	FDateTime LastSaveTime;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Save Game Meta Data")
+	UPROPERTY()
 	int32 PlayerIndex;
 };
 
@@ -35,13 +35,14 @@ class EOD_API UMetaSaveGame : public USaveGame
 	GENERATED_BODY()
 	
 public:
+
 	UMetaSaveGame(const FObjectInitializer& ObjectInitializer);
 
 	/** A list of all the save game profiles saved on the system */
-	UPROPERTY(BlueprintReadOnly, Category = "Meta Save Game")
+	UPROPERTY()
 	TArray<FMetaSaveGameData> SaveSlotMetaDataList;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Meta Save Game")
+	UPROPERTY()
 	FString LastUsedSlotName;
 
 

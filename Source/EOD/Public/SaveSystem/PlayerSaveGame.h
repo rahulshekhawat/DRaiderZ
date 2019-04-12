@@ -20,33 +20,27 @@ class EOD_API UPlayerSaveGame : public USaveGame
 	GENERATED_BODY()
 	
 public:
+
 	UPlayerSaveGame(const FObjectInitializer& ObjectInitializer);
 
 	/** Character gender that player selected during character creation */
-	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
+	UPROPERTY()
 	ECharacterGender CharacterGender;
 
-	/** Skill button index to skill group map for skill bar  */
-	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
-	TMap<int32, FString> SkillBarLayout;
-
-	/** A map of skill to it's state */
-	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
-	TMap<FString, FSkillState> SGToSSMap;
-
-	/** A map of skill group to it's skill tree slot info */
-	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
-	TMap<FName, FSkillTreeSlotSaveData> SkillTreeSlotsSaveData;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
+	/** Number of unlocked skill points currently available */
+	UPROPERTY()
 	int32 UnlockedSkillPoints;
 
+	/** A map of skill group to it's skill tree slot info */
+	UPROPERTY()
+	TMap<FName, FSkillTreeSlotSaveData> SkillTreeSlotsSaveData;
+
 	/** Information of how players has allocated his skill points */
-	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
+	UPROPERTY()
 	FSkillPointsAllocationInfo SkillPointsAllocationInfo;
 
 	/** A map of all the skills placed on skill bar to their Skill Index */
-	UPROPERTY(BlueprintReadOnly, Category = "Player Save Game")
+	UPROPERTY()
 	TMap<uint8, uint8> SkillBarMap;
 
 };

@@ -5,4 +5,5 @@
 UPlayerSaveGame::UPlayerSaveGame(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	CharacterGender = ECharacterGender::Female;
+	UnlockedSkillPoints = 0;
 }

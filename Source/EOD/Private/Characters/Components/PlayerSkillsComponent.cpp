@@ -230,7 +230,7 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 				{
 					SupersedingChainSkillGroup = TPair<uint8, uint8>(LastPressedSkillKey, SupersedingSkillIndex);
 					float SkillDuration = _Skill->GetSkillDuration();
-					float ChainSkillActivationWindow = SkillDuration + 2.f;
+					float ChainSkillActivationWindow = SkillDuration + ChainSkillResetDelay;
 					World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
 				}
 			}

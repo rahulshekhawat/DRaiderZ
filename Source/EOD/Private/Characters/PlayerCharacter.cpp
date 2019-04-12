@@ -1025,7 +1025,7 @@ void APlayerCharacter::SaveCharacterState()
 {
 	if (IsValid(GetGameplaySkillsComponent()))
 	{
-		GetGameplaySkillsComponent()->SaveSkillBarLayout();
+		// GetGameplaySkillsComponent()->SaveSkillBarLayout();
 	}
 }
 
@@ -1613,7 +1613,7 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 
 	if (IsValid(GetGameplaySkillsComponent()) && IsValid(GetController()) && GetController()->IsLocalPlayerController())
 	{
-		GetGameplaySkillsComponent()->SetCurrentActiveSkill(NAME_None);
+		// GetGameplaySkillsComponent()->SetCurrentActiveSkill(NAME_None);
 	}
 }
 
@@ -1655,7 +1655,7 @@ void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
 
 	if (IsValid(GetGameplaySkillsComponent()) && IsValid(GetController()) && GetController()->IsLocalPlayerController())
 	{
-		GetGameplaySkillsComponent()->SetCurrentActiveSkill(FName(*SkillIDString));
+		// GetGameplaySkillsComponent()->SetCurrentActiveSkill(FName(*SkillIDString));
 	}
 
 	// @todo set current active skill

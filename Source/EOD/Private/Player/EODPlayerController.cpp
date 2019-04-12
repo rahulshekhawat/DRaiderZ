@@ -584,7 +584,7 @@ void AEODPlayerController::SavePlayerState()
 		UGameplaySkillsComponent* GSComp = EODCharacter->GetGameplaySkillsComponent();
 		if (IsValid(GSComp))
 		{
-			GSComp->SaveSkillBarLayout();
+			// GSComp->SaveSkillBarLayout();
 		}
 	}
 }
