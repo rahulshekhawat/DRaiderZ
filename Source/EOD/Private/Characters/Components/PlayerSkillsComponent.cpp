@@ -412,18 +412,6 @@ uint8 UPlayerSkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) const
 	return SkillIndex;
 }
 
-void UPlayerSkillsComponent::ResetChainSkill()
-{
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		World->GetTimerManager().ClearTimer(ChainSkillTimerHandle);
-	}
-
-	ActivePrecedingChainSkillGroup = NAME_None;
-	SupersedingChainSkillGroup = TPair<uint8, uint8>(0, 0);
-}
-
 void UPlayerSkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)
 {
 	AEODCharacterBase* CharOwner = GetCharacterOwner();

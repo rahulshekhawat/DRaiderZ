@@ -49,126 +49,160 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual void ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr, float ReleaseDelay = 0.f);
 
-	/** If the character is currently using skill with ID same as the function argument, then cancel it. Otherwise do nothing. */
+	/** If the character is currently using skill corresponding to given SkillIndex then cancel it, otherwise do nothing. */
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
-	void CancelSkill(FName SkillID);
+	virtual void CancelSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr);
+
+	/** Cancels all active skills that the character is currently using */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	virtual void CancelAllActiveSkills();
+
+	/** Returns true if the character can use any skill right now */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	virtual bool CanUseAnySkill() const;
+
+	/** Returns true if the character can use skill corresponding to given SkillIndex */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	virtual bool CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr);
+
+	/** Returns the skill index of the skill with corresponding SkillGroup */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	virtual uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const;
+
+	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillsMap; }
+
+	inline FGameplaySkillTableRow* GetGameplaySkillTableRow(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
+	
+protected:
+
+	/** Skill index to skil map. Skill index will be used during replication */
+	UPROPERTY(Transient)
+	TMap<uint8, UGameplaySkillBase*> SkillsMap;
+
+	/** The skill that the character used last time */
+	UPROPERTY(Transient)
+	uint8 LastUsedSkillIndex;
+
+	/** The skill that the character used last time */
+	UPROPERTY(Transient)
+	FName LastUsedSkillGroup;
 
 	/**
-	 * Trigger a skill
-	 * @note This may result in either instantly activating a skill (e.g. Nocturne) or this may start charging the skill (for skills that can be
-	 *		 charged by holding down the attack key)
+	 * The skill that the player last used.
+	 * This is used to determine whether a skill that requires a 'ActivePrecedingChainSkillGroup' type skill to be used previously, can be used
+	 * It will auto deactivate after 'ChainSkillResetDelay' seconds.
 	 */
-	void TriggerSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
-
-	/**
-	 * If the character is currently charging a chargeable skill then this activates the skill. Otherwise it does nothing
-	 */
-	void ReleaseSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
-
-	/** Cancels the skill that the character is currently using */
-	void CancelCurrentSkill();
-
-	//~ @todo
-	// void EndSkill(FName SkillID, FSkillTableRow* Skill = nullptr);
-
-	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr);
-
-	virtual void UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown);
-
-private:
-	/** Returns true if skill key index is invalid */
-	inline bool IsSkillKeyIndexInvalid(const int32 SkillKeyIndex) const;
-
-	bool CanUseAnySkill() const;
-
-	bool CanUseSkill(FName SkillID) const;
-
-	bool CanUseSkillAtIndex(const int32 SkillKeyIndex) const;
-
-	FName GetPlayerSkillIDFromSG(FString& SkillGroup) const;
-
-	/**
-	 * Returns the skill group that should be used when pressing a skill key.
-	 * @note It won't necessarily return the skill placed at the skill key index
-	 */
-	FString GetSkillGroupFromSkillKeyIndex(const int32 SkillKeyIndex) const;
+	UPROPERTY(Transient)
+	FName ActivePrecedingChainSkillGroup;
 
 	/**
 	 * The skill group that will get triggered on pressing the skill key at index 'ActiveSupersedingChainSkillGroup.Key'
 	 * This will auto deactivate after 'ChainSkillResetDelay' seconds.
 	 */
-	TPair<int32, FString> ActiveSupersedingChainSkillGroup;
+	TPair<uint8, uint8> SupersedingChainSkillGroup;
+
+	UPROPERTY(Transient)
+	bool bSkillCharging;
+
+	UPROPERTY(Transient)
+	float SkillChargeDuration;
+
+	FTimerHandle ChainSkillTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill System")
+	float ChainSkillResetDelay;
+
+	/** Data table for character skills */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill System")
+	UDataTable* SkillsDataTable;
+
+	void ResetChainSkill();
+
+public:
+
+	// --------------------------------------
+	//  Gameplay
+	// --------------------------------------
+
+	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr);
+
+	virtual void UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown);
+
+	virtual void UpdateSkillCooldown(uint8 SkillIndex, float RemainingCooldown);
+
+	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return EODCharacterOwner; }
+
+private:
+
+	UPROPERTY(Transient)
+	AEODCharacterBase* EODCharacterOwner;
+
+
+
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// TODO
+
+
+
+
+
+	// bool CanUseAnySkill() const;
+
+	// bool CanUseSkill(FName SkillID) const;
+
+	// bool CanUseSkillAtIndex(const int32 SkillKeyIndex) const;
+
+	// FName GetPlayerSkillIDFromSG(FString& SkillGroup) const;
 
 	/**
-	 * The skill that the player last used. 
-	 * This is used to determine whether a skill that requires a 'ActivePrecedingChainSkillGroup' type skill to be used previously, can be used
-	 * It will auto deactivate after 'ChainSkillResetDelay' seconds.
+	 * Returns the skill group that should be used when pressing a skill key.
+	 * @note It won't necessarily return the skill placed at the skill key index
 	 */
-	FString ActivePrecedingChainSkillGroup;
+	// FString GetSkillGroupFromSkillKeyIndex(const int32 SkillKeyIndex) const;
 
-	/** The skill that the character used last time */
-	FString LastUsedSkillGroup;
+	// TPair<int32, FString> ActiveSupersedingChainSkillGroup;
+
+
 
 
 	////////////////////////////////////////////////////////////////////////////////
 	// EOD
 	////////////////////////////////////////////////////////////////////////////////
-private:
-	UPROPERTY(Transient)
-	AEODCharacterBase* EODCharacterOwner;
+// private:
 
 	// UPROPERTY(ReplicatedUsing = OnRep_ActiveSkillID)
-	FName ActiveSkillID;
+	// FName ActiveSkillID;
 
-	FSkillTableRow* ActiveSkill;
+	// FSkillTableRow* ActiveSkill;
 
 	/** Skill button index to skill group map (this describes which skill group is placed on which skill bar button) */
-	TMap<int32, FString> SBIndexToSGMap;
+	// TMap<int32, FString> SBIndexToSGMap;
 
 	/** Skill group to skill state map */
-	TMap<FString, FSkillState> SGToSSMap;
+	// TMap<FString, FSkillState> SGToSSMap;
 
 	/** A map of skill group to a boolean that determines whether the skill group is currently in cooldown or not */
-	TMap<FString, bool> SGToCooldownMap;
+	// TMap<FString, bool> SGToCooldownMap;
 
 	/** A map of skill group to it's cooldown status info */
 	// TMap<FString, FSkillCooldownStatus> SGToCooldownStatusMap;
 
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Character Skills")
-	int32 MaxNumSkills;
+// public:
 
-	UPROPERTY(BlueprintReadOnly, Category = "EOD Character Skills")
-	float ChainSkillResetDelay;
 
-	/** Data table for character skills */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills)
-	UDataTable* SkillsDataTable;
-
-	FORCEINLINE FSkillTableRow* GetSkill(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const
-	{
-		return SkillsDataTable ? SkillsDataTable->FindRow<FSkillTableRow>(SkillID, ContextString) : nullptr;
-	}
-
-	void UseSkill(FName SkillID);
-
-public:
 	// void SetCurrentActiveSkill(const FName SkillID);
 
-	FORCEINLINE FName GetCurrentActiveSkillID() const { return ActiveSkillID; }
+	// FORCEINLINE FName GetCurrentActiveSkillID() const { return ActiveSkillID; }
 
-	FORCEINLINE FSkillTableRow* GetCurrentActiveSkill() const { return ActiveSkill; }
+	// FORCEINLINE FSkillTableRow* GetCurrentActiveSkill() const { return ActiveSkill; }
 
-	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return EODCharacterOwner; }
 
-	FORCEINLINE TMap<int32, FString>& GetSkillBarLayout() { return SBIndexToSGMap; }
+	// FORCEINLINE TMap<int32, FString>& GetSkillBarLayout() { return SBIndexToSGMap; }
 
-	/**
-	 * Add new skill to the skill bar.
-	 * Used to add new skills to the skill bar through UI
-	 */
-	UFUNCTION()
-	void AddNewSkill(int32 SkillIndex, FString SkillGroup);
+	// UFUNCTION()
+	// void AddNewSkill(int32 SkillIndex, FString SkillGroup);
 
 protected:
 
@@ -188,7 +222,8 @@ protected:
 
 };
 
-inline bool UGameplaySkillsComponent::IsSkillKeyIndexInvalid(const int32 SkillKeyIndex) const
+inline FGameplaySkillTableRow* UGameplaySkillsComponent::GetGameplaySkillTableRow(FName SkillID, const FString& ContextString) const
 {
-	return (SkillKeyIndex <= 0) || !SBIndexToSGMap.Contains(SkillKeyIndex);
+	return SkillsDataTable ? SkillsDataTable->FindRow<FGameplaySkillTableRow>(SkillID, ContextString) : nullptr;
 }
+

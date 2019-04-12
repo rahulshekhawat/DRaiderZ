@@ -20,7 +20,6 @@ UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& Obj
 	SetIsReplicated(true);
 
 	ChainSkillResetDelay = 2.f;
-	MaxNumSkills = 20;
 }
 
 void UGameplaySkillsComponent::PostLoad()
@@ -62,6 +61,7 @@ void UGameplaySkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 }
 
+/*
 void UGameplaySkillsComponent::TriggerSkill(FName SkillID, FSkillTableRow* Skill)
 {
 	if (!IsValid(EODCharacterOwner))
@@ -71,7 +71,8 @@ void UGameplaySkillsComponent::TriggerSkill(FName SkillID, FSkillTableRow* Skill
 
 	if (!Skill)
 	{
-		Skill = GetSkill(SkillID);
+		//~ @todo
+		// Skill = GetSkill(SkillID);
 	}
 
 	if (Skill && Skill->AnimMontage.Get())
@@ -91,6 +92,7 @@ void UGameplaySkillsComponent::TriggerSkill(FName SkillID, FSkillTableRow* Skill
 void UGameplaySkillsComponent::ReleaseSkill(FName SkillID, FSkillTableRow* Skill)
 {
 }
+*/
 
 void UGameplaySkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
 {
@@ -100,6 +102,15 @@ void UGameplaySkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase
 {
 }
 
+void UGameplaySkillsComponent::CancelSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
+{
+}
+
+void UGameplaySkillsComponent::CancelAllActiveSkills()
+{
+}
+
+/*
 void UGameplaySkillsComponent::CancelCurrentSkill()
 {
 }
@@ -107,12 +118,24 @@ void UGameplaySkillsComponent::CancelCurrentSkill()
 void UGameplaySkillsComponent::CancelSkill(FName SkillID)
 {
 }
+*/
 
 bool UGameplaySkillsComponent::CanUseAnySkill() const
 {
 	return IsValid(EODCharacterOwner) && EODCharacterOwner->CanUseAnySkill();
 }
 
+bool UGameplaySkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
+{
+	return false;
+}
+
+uint8 UGameplaySkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) const
+{
+	return uint8();
+}
+
+/*
 bool UGameplaySkillsComponent::CanUseSkill(FName SkillID) const
 {
 	return false;
@@ -141,12 +164,26 @@ FString UGameplaySkillsComponent::GetSkillGroupFromSkillKeyIndex(const int32 Ski
 
 
 
-	if (ActiveSupersedingChainSkillGroup.Key == SkillKeyIndex)
+	//~ @todo
+	// if (ActiveSupersedingChainSkillGroup.Key == SkillKeyIndex)
 	{
-		return ActiveSupersedingChainSkillGroup.Value;
+		// return ActiveSupersedingChainSkillGroup.Value;
 	}
 
 	return SBIndexToSGMap[SkillKeyIndex];
+}
+*/
+
+void UGameplaySkillsComponent::ResetChainSkill()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		World->GetTimerManager().ClearTimer(ChainSkillTimerHandle);
+	}
+
+	ActivePrecedingChainSkillGroup = NAME_None;
+	SupersedingChainSkillGroup = TPair<uint8, uint8>(0, 0);
 }
 
 void UGameplaySkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
@@ -157,6 +194,11 @@ void UGameplaySkillsComponent::UpdateSkillCooldown(FName SkillGroup, float Remai
 {
 }
 
+void UGameplaySkillsComponent::UpdateSkillCooldown(uint8 SkillIndex, float RemainingCooldown)
+{
+}
+
+/*
 void UGameplaySkillsComponent::UseSkill(FName SkillID)
 {
 }
@@ -167,6 +209,7 @@ void UGameplaySkillsComponent::AddNewSkill(int32 SkillIndex, FString SkillGroup)
 
 	//~ @todo load animations for the skill
 }
+*/
 
 void UGameplaySkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)
 {

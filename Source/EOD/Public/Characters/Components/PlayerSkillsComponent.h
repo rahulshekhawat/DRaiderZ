@@ -46,13 +46,14 @@ public:
 
 	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr) override;
 
-	void OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
-
 	virtual void TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr) override;
 
 	virtual void ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr, float ReleaseDelay = 0.f) override;
 
-	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillsMap; }
+	virtual uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const override;
+
+	/** Event called when a new skill is added to skill bar */
+	void OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 
 	FORCEINLINE TMap<uint8, uint8> GetSkillBarMap() const { return SkillBarMap; }
 
@@ -62,35 +63,15 @@ public:
 
 	UGameplaySkillBase* GetSkillForSkillGroup(FName SkillGroup) const;
 
-	uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const;
-
 protected:
-
-	/** Skill index to skil map. Skill index will be used during replication */
-	UPROPERTY(Transient)
-	TMap<uint8, UGameplaySkillBase*> SkillsMap;
 
 	/** A map of all the skills placed on skill bar to their Skill Index */
 	UPROPERTY(Transient)
 	TMap<uint8, uint8> SkillBarMap;
 
-	bool bSkillCharging;
-
-	float SkillChargeDuration;
-
 	int32 LastPressedSkillKey;
 
 	int32 LastReleasedSkillKey;
-
-	FName LastUsedSkillGroup;
-
-	FName ActivePrecedingChainSkillGroup;
-
-	TPair<uint8, uint8> SupersedingChainSkillGroup;
-
-	FTimerHandle ChainSkillTimerHandle;
-
-	void ResetChainSkill();
 
 	// --------------------------------------
 	//  Network

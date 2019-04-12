@@ -73,6 +73,9 @@ public:
 	/** Returns true if this skill is currently in cooldown */
 	inline bool IsSkillInCooldown() const;
 
+	//~ @todo
+	// inline bool IsUnlocked() const { return CurrentUpgradeLevel > 0; }
+
 	// --------------------------------------
 	//	Constants : Default values that are not supposed to be modified
 	// --------------------------------------
