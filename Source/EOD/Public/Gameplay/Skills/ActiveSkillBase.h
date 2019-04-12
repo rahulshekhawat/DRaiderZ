@@ -6,7 +6,7 @@
 #include "Camera/CameraShake.h"
 
 #include "Engine/StreamableManager.h"
-#include "Gameplay/Skills/GameplaySkillBase.h"
+#include "Gameplay/Skills/PlayerSkillBase.h"
 #include "ActiveSkillBase.generated.h"
 
 class UStatusEffectBase;
@@ -83,7 +83,7 @@ struct EOD_API FActiveSkillLevelUpInfo
  * Base class for all active skills
  */
 UCLASS()
-class EOD_API UActiveSkillBase : public UGameplaySkillBase
+class EOD_API UActiveSkillBase : public UPlayerSkillBase
 {
 	GENERATED_BODY()
 

@@ -53,7 +53,7 @@ public:
 	virtual void FinishSkill();
 
 	/** Returns true if this skill is valid, i.e, skill belongs to a valid skill group */
-	FORCEINLINE bool IsValid() const { return SkillGroup != NAME_None; }
+	FORCEINLINE bool IsValid() const { return SkillGroup != NAME_None && SkillIndex != 0; }
 
 	FORCEINLINE int32 GetMaxUpgradeLevel() const { return MaxUpgrades; }
 
@@ -144,12 +144,23 @@ public:
 	//	Skill State
 	// --------------------------------------
 
-	FORCEINLINE int32 GetCurrentUpgrade()const { return CurrentUpgrade; }
+	FORCEINLINE int32 GetCurrentUpgrade() const { return CurrentUpgrade; }
+
+	FORCEINLINE uint8 GetSkillIndex() const { return SkillIndex; }
 
 	//~ @todo add check to make sure current upgrade is not more than maxupgrade
-	void SetCurrentUpgrade(int32 Value) { CurrentUpgrade = Value; }
+	inline void SetCurrentUpgrade(int32 Value) { CurrentUpgrade = Value; }
+
+	inline void SetSkillIndex(uint8 NewSkillIndex) { SkillIndex = NewSkillIndex; }
 
 protected:
+
+	/** 
+	 * This is used to identify skill during replication. SkillIndex(uint8) is cheaper to replicate than SkillID(FName)
+	 * This will be set by the gameplay skill component when an object of this class is created.
+	 */
+	UPROPERTY(Transient)
+	uint8 SkillIndex;
 
 	int32 CurrentUpgrade;
 
