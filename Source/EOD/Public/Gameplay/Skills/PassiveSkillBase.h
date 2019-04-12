@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplaySkillBase.h"
+#include "Gameplay/Skills/PlayerSkillBase.h"
 #include "PassiveSkillBase.generated.h"
 
 /**
  * Base class for all passive skills
  */
 UCLASS()
-class EOD_API UPassiveSkillBase : public UGameplaySkillBase
+class EOD_API UPassiveSkillBase : public UPlayerSkillBase
 {
 	GENERATED_BODY()
 

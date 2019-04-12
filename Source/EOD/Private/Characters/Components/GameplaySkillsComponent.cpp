@@ -48,13 +48,16 @@ void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	bool bIsLocallyControlled = EODCharacterOwner && EODCharacterOwner->Controller && EODCharacterOwner->Controller->IsLocalController();
-	bool bIsLocallyControlledByPlayer = EODCharacterOwner && EODCharacterOwner->Controller && EODCharacterOwner->Controller->IsLocalPlayerController();
-
-	if (bIsLocallyControlled)
+	if (bSkillCharging)
 	{
-
+		SkillChargeDuration += DeltaTime;
 	}
+
+	// bool bIsLocallyControlled = EODCharacterOwner && EODCharacterOwner->Controller && EODCharacterOwner->Controller->IsLocalController();
+	// bool bIsLocallyControlledByPlayer = EODCharacterOwner && EODCharacterOwner->Controller && EODCharacterOwner->Controller->IsLocalPlayerController();
+	// if (bIsLocallyControlled)
+	// {
+	// }
 }
 
 void UGameplaySkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)

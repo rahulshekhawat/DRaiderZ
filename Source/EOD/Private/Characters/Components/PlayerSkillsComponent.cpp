@@ -29,11 +29,6 @@ void UPlayerSkillsComponent::BeginPlay()
 void UPlayerSkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (bSkillCharging)
-	{
-		SkillChargeDuration += DeltaTime;
-	}
 }
 
 void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
@@ -115,7 +110,7 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->PlayerSkill, Key, RF_Transient);
 		check(GameplaySkill)
 		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
-		GameplaySkill->SetSkillGroup(Key);
+		// GameplaySkill->SetSkillGroup(Key);
 		SkillIndexToSkillMap.Add(SkillIndex, GameplaySkill);
 
 		SkillIndex++;
@@ -293,6 +288,24 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	}
 }
 
+void UPlayerSkillsComponent::CancelSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
+{
+}
+
+void UPlayerSkillsComponent::CancelAllActiveSkills()
+{
+}
+
+bool UPlayerSkillsComponent::CanUseAnySkill() const
+{
+	return false;
+}
+
+bool UPlayerSkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
+{
+	return false;
+}
+
 void UPlayerSkillsComponent::UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown)
 {
 	AEODCharacterBase* CharOwner = GetCharacterOwner();
@@ -311,6 +324,10 @@ void UPlayerSkillsComponent::UpdateSkillCooldown(FName SkillGroup, float Remaini
 			Widget->UpdateCooldown(RemainingCooldown);
 		}
 	}
+}
+
+void UPlayerSkillsComponent::UpdateSkillCooldown(uint8 SkillIndex, float RemainingCooldown)
+{
 }
 
 TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill(FName SkillGroup) const
@@ -406,6 +423,10 @@ uint8 UPlayerSkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) const
 	}
 
 	return SkillIndex;
+}
+
+void UPlayerSkillsComponent::ResetChainSkill()
+{
 }
 
 void UPlayerSkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)

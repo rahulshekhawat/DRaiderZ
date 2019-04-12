@@ -879,6 +879,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Skill System")
 	virtual bool CanUseSkill(FName SkillID, UGameplaySkillBase* Skill = nullptr);
 
+	/** Event called when this character activates a skill */
+	virtual void OnSkillActivated(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill);
+
 	/** Returns the last used skill */
 	FORCEINLINE FLastUsedSkillInfo GetLastUsedSkill();
 

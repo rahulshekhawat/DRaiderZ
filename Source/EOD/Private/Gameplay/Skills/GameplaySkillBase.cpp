@@ -7,8 +7,6 @@
 UGameplaySkillBase::UGameplaySkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	SkillGroup = NAME_None;
-	CurrentUpgrade = 0;
-	MaxUpgrades = 1;
 	bSkillCanBeCharged = false;
 }
 
@@ -20,10 +18,6 @@ void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* O
 	{
 		InstigatorSkillComponent = Instigator->GetGameplaySkillsComponent();
 	}
-}
-
-void UGameplaySkillBase::Reinitialize()
-{
 }
 
 bool UGameplaySkillBase::CanTriggerSkill() const
@@ -60,20 +54,4 @@ bool UGameplaySkillBase::CanCancelSkill() const
 void UGameplaySkillBase::OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData)
 {
 
-}
-
-void UGameplaySkillBase::StartCooldown()
-{
-}
-
-void UGameplaySkillBase::FinishCooldown()
-{
-}
-
-void UGameplaySkillBase::CancelCooldown()
-{
-}
-
-void UGameplaySkillBase::UpdateCooldown()
-{
 }

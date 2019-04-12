@@ -38,14 +38,30 @@ public:
 	void OnReleasingSkillKey(const int32 SkillKeyIndex);
 
 	// --------------------------------------
-	//  Skill System
+	//  Gameplay
 	// --------------------------------------
 
 	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr) override;
 
+	virtual void UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown) override;
+
+	virtual void UpdateSkillCooldown(uint8 SkillIndex, float RemainingCooldown) override;
+
+	// --------------------------------------
+	//  Skill System
+	// --------------------------------------
+
 	virtual void TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr) override;
 
 	virtual void ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr, float ReleaseDelay = 0.f) override;
+
+	virtual void CancelSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr) override;
+
+	virtual void CancelAllActiveSkills() override;
+
+	virtual bool CanUseAnySkill() const override;
+
+	virtual bool CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr) override;
 
 	virtual uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const override;
 
@@ -53,8 +69,6 @@ public:
 	void OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 
 	FORCEINLINE TMap<uint8, uint8> GetSkillBarMap() const { return SkillBarMap; }
-
-	virtual void UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown) override;
 
 	TArray<UContainerWidget*> GetAllContainerWidgetsForSkill(FName SkillGroup) const;
 
@@ -69,6 +83,8 @@ protected:
 	int32 LastPressedSkillKey;
 
 	int32 LastReleasedSkillKey;
+
+	virtual void ResetChainSkill() override;
 
 	// --------------------------------------
 	//  Network

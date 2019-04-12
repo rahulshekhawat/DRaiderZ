@@ -295,6 +295,10 @@ bool AEODCharacterBase::CanUseSkill(FName SkillID, UGameplaySkillBase* Skill)
 	return false;
 }
 
+void AEODCharacterBase::OnSkillActivated(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
+{
+}
+
 bool AEODCharacterBase::IsHealing() const
 {
 	return false;

@@ -3,7 +3,7 @@
 
 #include "DynamicSkillBarWidget.h"
 #include "ContainerWidget.h"
-#include "GameplaySkillBase.h"
+#include "PlayerSkillBase.h"
 #include "PlayerSkillsComponent.h"
 
 UDynamicSkillBarWidget::UDynamicSkillBarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -128,7 +128,7 @@ void UDynamicSkillBarWidget::InitializeSkillBarLayout(const TMap<uint8, uint8>& 
 		uint8 SkillKey = SkillBarMap[Key];
 		if (SkillsMap.Contains(SkillKey))
 		{
-			UGameplaySkillBase* Skill = SkillsMap[SkillKey];
+			UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(SkillsMap[SkillKey]);
 			UContainerWidget* Cont = GetContainerAtIndex(Key);
 			if (Skill && Cont)
 			{

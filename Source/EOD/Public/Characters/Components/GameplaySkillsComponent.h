@@ -119,7 +119,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill System")
 	UDataTable* SkillsDataTable;
 
-	void ResetChainSkill();
+	virtual void ResetChainSkill();
 
 public:
 

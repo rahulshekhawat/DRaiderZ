@@ -31,10 +31,6 @@ void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Own
 	}
 }
 
-void UActiveSkillBase::Reinitialize()
-{
-}
-
 void UActiveSkillBase::CancelSkill()
 {
 }
