@@ -73,15 +73,15 @@ public:
 	/** Returns true if this skill is currently in cooldown */
 	inline bool IsSkillInCooldown() const;
 
-	//~ @todo
-	// inline bool IsUnlocked() const { return CurrentUpgradeLevel > 0; }
+	/** Returns true if this skill is currently unlocked on skill tree */
+	inline bool IsUnlocked() const { return CurrentUpgrade > 0; }
 
 	// --------------------------------------
 	//	Constants : Default values that are not supposed to be modified
 	// --------------------------------------
 
 	/** Set this to true if this skill can be charged */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	bool bSkillCanBeCharged;
 
 protected:

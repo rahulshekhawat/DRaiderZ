@@ -8,6 +8,7 @@
 #include "GameplaySkillBase.h"
 #include "EODCharacterMovementComponent.h"
 
+#include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -47,55 +48,29 @@ void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (EODCharacterOwner && EODCharacterOwner->IsLocallyControlled())
+	bool bIsLocallyControlled = EODCharacterOwner && EODCharacterOwner->Controller && EODCharacterOwner->Controller->IsLocalController();
+	bool bIsLocallyControlledByPlayer = EODCharacterOwner && EODCharacterOwner->Controller && EODCharacterOwner->Controller->IsLocalPlayerController();
+
+	if (bIsLocallyControlled)
 	{
-
-
 
 	}
 }
 
-void UGameplaySkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UGameplaySkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	if (!Skill)
+	{
+		check(SkillIndexToSkillMap.Contains(SkillIndex));
+		Skill = SkillIndexToSkillMap[SkillIndex];
+	}
 
-}
-
-/*
-void UGameplaySkillsComponent::TriggerSkill(FName SkillID, FSkillTableRow* Skill)
-{
-	if (!IsValid(EODCharacterOwner))
+	if (!Skill || !EODCharacterOwner)
 	{
 		return;
 	}
 
-	if (!Skill)
-	{
-		//~ @todo
-		// Skill = GetSkill(SkillID);
-	}
-
-	if (Skill && Skill->AnimMontage.Get())
-	{
-		// EODCharacterOwner->PlayAnimationMontage(Skill->AnimMontage.Get(), Skill->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-	}
-
-	EODCharacterOwner->SetCharacterStateAllowsRotation(false);
-	float ControlRotationYaw = EODCharacterOwner->GetControllerRotationYaw();
-	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(EODCharacterOwner->GetCharacterMovement());
-	if (MoveComp)
-	{
-		MoveComp->SetDesiredCustomRotation(FRotator(0.f, ControlRotationYaw, 0.f));
-	}
-}
-
-void UGameplaySkillsComponent::ReleaseSkill(FName SkillID, FSkillTableRow* Skill)
-{
-}
-*/
-
-void UGameplaySkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
-{
+	//~ @todo
 }
 
 void UGameplaySkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill, float ReleaseDelay)
@@ -110,16 +85,6 @@ void UGameplaySkillsComponent::CancelAllActiveSkills()
 {
 }
 
-/*
-void UGameplaySkillsComponent::CancelCurrentSkill()
-{
-}
-
-void UGameplaySkillsComponent::CancelSkill(FName SkillID)
-{
-}
-*/
-
 bool UGameplaySkillsComponent::CanUseAnySkill() const
 {
 	return IsValid(EODCharacterOwner) && EODCharacterOwner->CanUseAnySkill();
@@ -132,47 +97,13 @@ bool UGameplaySkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase*
 
 uint8 UGameplaySkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) const
 {
-	return uint8();
-}
-
-/*
-bool UGameplaySkillsComponent::CanUseSkill(FName SkillID) const
-{
-	return false;
-}
-
-bool UGameplaySkillsComponent::CanUseSkillAtIndex(const int32 SkillKeyIndex) const
-{
-	return false;
-}
-
-FName UGameplaySkillsComponent::GetPlayerSkillIDFromSG(FString& SkillGroup) const
-{
-	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(EODCharacterOwner);
-	FString GenderPrefix = PlayerChar ? PlayerChar->GetGenderPrefix() : FString("");
-	FString SkillIDString = GenderPrefix + SkillGroup + FString("_") + FString::FromInt(1);
-	return FName(*SkillIDString);
-}
-
-FString UGameplaySkillsComponent::GetSkillGroupFromSkillKeyIndex(const int32 SkillKeyIndex) const
-{
-	if (IsSkillKeyIndexInvalid(SkillKeyIndex))
+	if (SkillGroupToSkillIndexMap.Contains(SkillGroup))
 	{
-		// Invalid skill key index
-		return FString("");
+		return SkillGroupToSkillIndexMap[SkillGroup];
 	}
 
-
-
-	//~ @todo
-	// if (ActiveSupersedingChainSkillGroup.Key == SkillKeyIndex)
-	{
-		// return ActiveSupersedingChainSkillGroup.Value;
-	}
-
-	return SBIndexToSGMap[SkillKeyIndex];
+	return 0;
 }
-*/
 
 void UGameplaySkillsComponent::ResetChainSkill()
 {
@@ -197,19 +128,6 @@ void UGameplaySkillsComponent::UpdateSkillCooldown(FName SkillGroup, float Remai
 void UGameplaySkillsComponent::UpdateSkillCooldown(uint8 SkillIndex, float RemainingCooldown)
 {
 }
-
-/*
-void UGameplaySkillsComponent::UseSkill(FName SkillID)
-{
-}
-
-void UGameplaySkillsComponent::AddNewSkill(int32 SkillIndex, FString SkillGroup)
-{
-	SBIndexToSGMap.Add(SkillIndex, SkillGroup);
-
-	//~ @todo load animations for the skill
-}
-*/
 
 void UGameplaySkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)
 {

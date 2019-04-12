@@ -31,9 +31,6 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	/** Sets up property replication */
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 	// --------------------------------------
 	//  Skill System
 	// --------------------------------------
@@ -69,7 +66,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const;
 
-	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillsMap; }
+	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillIndexToSkillMap; }
 
 	inline FGameplaySkillTableRow* GetGameplaySkillTableRow(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
 	
@@ -77,7 +74,13 @@ protected:
 
 	/** Skill index to skil map. Skill index will be used during replication */
 	UPROPERTY(Transient)
-	TMap<uint8, UGameplaySkillBase*> SkillsMap;
+	TMap<uint8, UGameplaySkillBase*> SkillIndexToSkillMap;
+
+	UPROPERTY(Transient)
+	TMap<FName, UGameplaySkillBase*> SkillGroupToSkillMap;
+
+	UPROPERTY(Transient)
+	TMap<FName, uint8> SkillGroupToSkillIndexMap;
 
 	/** The skill that the character used last time */
 	UPROPERTY(Transient)
@@ -136,73 +139,6 @@ private:
 
 	UPROPERTY(Transient)
 	AEODCharacterBase* EODCharacterOwner;
-
-
-
-
-
-	////////////////////////////////////////////////////////////////////////////////
-	// TODO
-
-
-
-
-
-	// bool CanUseAnySkill() const;
-
-	// bool CanUseSkill(FName SkillID) const;
-
-	// bool CanUseSkillAtIndex(const int32 SkillKeyIndex) const;
-
-	// FName GetPlayerSkillIDFromSG(FString& SkillGroup) const;
-
-	/**
-	 * Returns the skill group that should be used when pressing a skill key.
-	 * @note It won't necessarily return the skill placed at the skill key index
-	 */
-	// FString GetSkillGroupFromSkillKeyIndex(const int32 SkillKeyIndex) const;
-
-	// TPair<int32, FString> ActiveSupersedingChainSkillGroup;
-
-
-
-
-	////////////////////////////////////////////////////////////////////////////////
-	// EOD
-	////////////////////////////////////////////////////////////////////////////////
-// private:
-
-	// UPROPERTY(ReplicatedUsing = OnRep_ActiveSkillID)
-	// FName ActiveSkillID;
-
-	// FSkillTableRow* ActiveSkill;
-
-	/** Skill button index to skill group map (this describes which skill group is placed on which skill bar button) */
-	// TMap<int32, FString> SBIndexToSGMap;
-
-	/** Skill group to skill state map */
-	// TMap<FString, FSkillState> SGToSSMap;
-
-	/** A map of skill group to a boolean that determines whether the skill group is currently in cooldown or not */
-	// TMap<FString, bool> SGToCooldownMap;
-
-	/** A map of skill group to it's cooldown status info */
-	// TMap<FString, FSkillCooldownStatus> SGToCooldownStatusMap;
-
-// public:
-
-
-	// void SetCurrentActiveSkill(const FName SkillID);
-
-	// FORCEINLINE FName GetCurrentActiveSkillID() const { return ActiveSkillID; }
-
-	// FORCEINLINE FSkillTableRow* GetCurrentActiveSkill() const { return ActiveSkill; }
-
-
-	// FORCEINLINE TMap<int32, FString>& GetSkillBarLayout() { return SBIndexToSGMap; }
-
-	// UFUNCTION()
-	// void AddNewSkill(int32 SkillIndex, FString SkillGroup);
 
 protected:
 

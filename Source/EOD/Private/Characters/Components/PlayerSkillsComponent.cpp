@@ -36,11 +36,6 @@ void UPlayerSkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 }
 
-void UPlayerSkillsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-}
-
 void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 {
 	LastPressedSkillKey = SkillKeyIndex;
@@ -56,9 +51,9 @@ void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 		SkillIndex = SkillBarMap[SkillKeyIndex];
 	}
 
-	if (SkillsMap.Contains(SkillIndex))
+	if (SkillIndexToSkillMap.Contains(SkillIndex))
 	{
-		Skill = SkillsMap[SkillIndex];
+		Skill = SkillIndexToSkillMap[SkillIndex];
 	}
 
 	if (Skill)
@@ -76,9 +71,9 @@ void UPlayerSkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
 		SkillIndex = SkillBarMap[SkillKeyIndex];
 	}
 
-	if (SkillsMap.Contains(SkillIndex))
+	if (SkillIndexToSkillMap.Contains(SkillIndex))
 	{
-		Skill = SkillsMap[SkillIndex];
+		Skill = SkillIndexToSkillMap[SkillIndex];
 	}
 
 	if (Skill)
@@ -93,7 +88,7 @@ void UPlayerSkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
 void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 {
 	// If skills have already been initialized
-	if (SkillsMap.Num() > 0)
+	if (SkillIndexToSkillMap.Num() > 0)
 	{
 		return;
 	}
@@ -121,7 +116,7 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 		check(GameplaySkill)
 		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
 		GameplaySkill->SetSkillGroup(Key);
-		SkillsMap.Add(SkillIndex, GameplaySkill);
+		SkillIndexToSkillMap.Add(SkillIndex, GameplaySkill);
 
 		SkillIndex++;
 	}
@@ -137,11 +132,11 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 void UPlayerSkillsComponent::OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup)
 {
 	TArray<uint8> Keys;
-	SkillsMap.GetKeys(Keys);
+	SkillIndexToSkillMap.GetKeys(Keys);
 
 	for (uint8 Key : Keys)
 	{
-		UGameplaySkillBase* Skill = SkillsMap[Key];
+		UGameplaySkillBase* Skill = SkillIndexToSkillMap[Key];
 		if (Skill && Skill->GetSkillGroup() == SkillGroup)
 		{
 			if (SkillBarMap.Contains(SkillBarIndex))
@@ -173,7 +168,8 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 
 	if (!Skill)
 	{
-		Skill = SkillsMap[SkillIndex];
+		check(SkillIndexToSkillMap.Contains(SkillIndex));
+		Skill = SkillIndexToSkillMap[SkillIndex];
 	}
 
 	if (!Skill || !CharOwner)
@@ -260,7 +256,7 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 
 	if (!Skill)
 	{
-		Skill = SkillsMap[ActualSkillIndex];
+		Skill = SkillIndexToSkillMap[ActualSkillIndex];
 	}
 
 	if (!Skill || !CharOwner)
@@ -329,11 +325,11 @@ TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill
 
 	int SkillIndex = 0;
 	TArray<uint8> SkillsMapKeys;
-	SkillsMap.GetKeys(SkillsMapKeys);
+	SkillIndexToSkillMap.GetKeys(SkillsMapKeys);
 
 	for (uint8 Key : SkillsMapKeys)
 	{
-		UGameplaySkillBase* Skill = SkillsMap[Key];
+		UGameplaySkillBase* Skill = SkillIndexToSkillMap[Key];
 		if (Skill && Skill->GetSkillGroup() == SkillGroup)
 		{
 			SkillIndex = Key;
@@ -380,11 +376,11 @@ TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill
 UGameplaySkillBase* UPlayerSkillsComponent::GetSkillForSkillGroup(FName SkillGroup) const
 {
 	TArray<uint8> SkillsMapKeys;
-	SkillsMap.GetKeys(SkillsMapKeys);
+	SkillIndexToSkillMap.GetKeys(SkillsMapKeys);
 
 	for (uint8 Key : SkillsMapKeys)
 	{
-		UGameplaySkillBase* Skill = SkillsMap[Key];
+		UGameplaySkillBase* Skill = SkillIndexToSkillMap[Key];
 		if (Skill && Skill->GetSkillGroup() == SkillGroup)
 		{
 			return Skill;
@@ -398,11 +394,11 @@ uint8 UPlayerSkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) const
 {
 	uint8 SkillIndex = 0;
 	TArray<uint8> SkillsMapKeys;
-	SkillsMap.GetKeys(SkillsMapKeys);
+	SkillIndexToSkillMap.GetKeys(SkillsMapKeys);
 
 	for (uint8 Key : SkillsMapKeys)
 	{
-		UGameplaySkillBase* Skill = SkillsMap[Key];
+		UGameplaySkillBase* Skill = SkillIndexToSkillMap[Key];
 		if (Skill && Skill->GetSkillGroup() == SkillGroup)
 		{
 			return Key;
