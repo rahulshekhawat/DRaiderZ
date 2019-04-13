@@ -98,18 +98,20 @@ bool UGameplaySkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase*
 	return false;
 }
 
-uint8 UGameplaySkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) const
-{
-	if (SkillGroupToSkillIndexMap.Contains(SkillGroup))
-	{
-		return SkillGroupToSkillIndexMap[SkillGroup];
-	}
-
-	return 0;
-}
-
 void UGameplaySkillsComponent::ActivateChainSkill(FName SkillGroup)
 {
+}
+
+uint8 UGameplaySkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) const
+{
+	return SkillGroupToSkillIndexMap.Contains(SkillGroup) ? SkillGroupToSkillIndexMap[SkillGroup] : 0;
+}
+
+UGameplaySkillBase* UGameplaySkillsComponent::GetSkillForSkillGroup(FName SkillGroup) const
+{
+	uint8 SkillIndex = SkillGroupToSkillIndexMap.Contains(SkillGroup) ? SkillGroupToSkillIndexMap[SkillGroup] : 0;
+	UGameplaySkillBase* Skill = SkillIndexToSkillMap.Contains(SkillIndex) ? SkillIndexToSkillMap[SkillIndex] : nullptr;
+	return Skill;
 }
 
 void UGameplaySkillsComponent::ResetChainSkill()

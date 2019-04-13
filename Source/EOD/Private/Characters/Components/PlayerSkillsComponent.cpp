@@ -113,7 +113,7 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
 		GameplaySkill->SetSkillIndex(SkillIndex);
 
-		SkillIndexToSkillMap.Add(SkillIndex, GameplaySkill);
+		SkillIndexToSkillMap.Add(GameplaySkill->GetSkillIndex(), GameplaySkill);
 		SkillGroupToSkillMap.Add(GameplaySkill->GetSkillGroup(), GameplaySkill);
 		SkillGroupToSkillIndexMap.Add(GameplaySkill->GetSkillGroup(), GameplaySkill->GetSkillIndex());
 
@@ -371,41 +371,6 @@ TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill
 	}
 
 	return SkillWidgets;
-}
-
-UGameplaySkillBase* UPlayerSkillsComponent::GetSkillForSkillGroup(FName SkillGroup) const
-{
-	TArray<uint8> SkillsMapKeys;
-	SkillIndexToSkillMap.GetKeys(SkillsMapKeys);
-
-	for (uint8 Key : SkillsMapKeys)
-	{
-		UGameplaySkillBase* Skill = SkillIndexToSkillMap[Key];
-		if (Skill && Skill->GetSkillGroup() == SkillGroup)
-		{
-			return Skill;
-		}
-	}
-
-	return nullptr;
-}
-
-uint8 UPlayerSkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) const
-{
-	uint8 SkillIndex = 0;
-	TArray<uint8> SkillsMapKeys;
-	SkillIndexToSkillMap.GetKeys(SkillsMapKeys);
-
-	for (uint8 Key : SkillsMapKeys)
-	{
-		UGameplaySkillBase* Skill = SkillIndexToSkillMap[Key];
-		if (Skill && Skill->GetSkillGroup() == SkillGroup)
-		{
-			return Key;
-		}
-	}
-
-	return SkillIndex;
 }
 
 void UPlayerSkillsComponent::ActivateChainSkill(FName SkillGroup)

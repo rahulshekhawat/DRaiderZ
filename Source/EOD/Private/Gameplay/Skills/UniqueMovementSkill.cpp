@@ -23,4 +23,5 @@ bool UUniqueMovementSkill::CanTriggerSkill() const
 
 void UUniqueMovementSkill::TriggerSkill()
 {
+
 }

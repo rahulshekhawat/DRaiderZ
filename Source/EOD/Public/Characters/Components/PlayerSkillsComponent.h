@@ -63,8 +63,6 @@ public:
 
 	virtual bool CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr) override;
 
-	virtual uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const override;
-
 	virtual void ActivateChainSkill(FName SkillGroup) override;
 
 	/** Event called when a new skill is added to skill bar */
@@ -73,8 +71,6 @@ public:
 	FORCEINLINE TMap<uint8, uint8> GetSkillBarMap() const { return SkillBarMap; }
 
 	TArray<UContainerWidget*> GetAllContainerWidgetsForSkill(FName SkillGroup) const;
-
-	UGameplaySkillBase* GetSkillForSkillGroup(FName SkillGroup) const;
 
 protected:
 

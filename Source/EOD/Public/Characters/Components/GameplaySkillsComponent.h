@@ -62,15 +62,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual bool CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr);
 
-	/** Returns the skill index of the skill with corresponding SkillGroup */
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
-	virtual uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const;
-
 	virtual void ActivateChainSkill(FName SkillGroup);
 
-	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillIndexToSkillMap; }
+	/** Returns the skill index of the skill with corresponding SkillGroup */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const;
+
+	/** Returns the skill corresponding to given SkillGroup */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	UGameplaySkillBase* GetSkillForSkillGroup(FName SkillGroup) const;
 
 	inline FGameplaySkillTableRow* GetGameplaySkillTableRow(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
+
+	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillIndexToSkillMap; }
 	
 protected:
 
