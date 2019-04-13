@@ -508,6 +508,9 @@ public:
 	 */
 	inline void SetCharacterRotation(const FRotator NewRotation);
 
+	/** [server + local] Sets whether this character is running or not */
+	inline void SetIsRunning(bool bNewValue);
+
 	/** [server + client] Change character rotation. Do not use this for consecutive rotation change */
 	UFUNCTION(BlueprintCallable, Category = "Rotation", meta = (DisplayName = "Set Character Rotation"))
 	void BP_SetCharacterRotation(const FRotator NewRotation);
@@ -530,9 +533,6 @@ protected:
 
 	/** [server + local] Sets whether a player controller is currently trying to move this character or not */
 	inline void SetPCTryingToMove(bool bNewValue);
-
-	/** [server + local] Sets whether this character is running or not */
-	inline void SetIsRunning(bool bNewValue);
 	
 	//~ @todo see if it's possible to use bCharacterStateAllowsMovement without needing replication
 	/** This boolean is used to determine if the character can move even if it's not in 'IdleWalkRun' state. e.g., moving while casting spell. */

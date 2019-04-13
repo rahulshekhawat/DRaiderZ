@@ -4,8 +4,12 @@
 #include "UniqueMovementSkill.h"
 #include "EODCharacterBase.h"
 
+#include "TimerManager.h"
+#include "Engine/World.h"
+
 UUniqueMovementSkill::UUniqueMovementSkill(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	bSkillCanBeCharged = false;
 }
 
 bool UUniqueMovementSkill::CanTriggerSkill() const
@@ -23,5 +27,30 @@ bool UUniqueMovementSkill::CanTriggerSkill() const
 
 void UUniqueMovementSkill::TriggerSkill()
 {
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (Instigator && Instigator->Controller && Instigator->Controller->IsLocalPlayerController())
+	{
+		Instigator->SetIsRunning(true);
+		UWorld* World = Instigator->GetWorld();
+		check(World);
+		World->GetTimerManager().SetTimer(MovementEndTimerHandle, this, &UUniqueMovementSkill::FinishSkill, SpecialMovementDuration, false);
+	}
+}
 
+void UUniqueMovementSkill::CancelSkill()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (Instigator && Instigator->Controller)
+	{
+		Instigator->SetIsRunning(false);
+	}
+}
+
+void UUniqueMovementSkill::FinishSkill()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (Instigator && Instigator->Controller)
+	{
+		Instigator->SetIsRunning(false);
+	}
 }

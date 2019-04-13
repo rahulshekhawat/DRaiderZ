@@ -27,7 +27,19 @@ public:
 	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
 	virtual void TriggerSkill() override;
 
+	/** Cancel this skill */
+	virtual void CancelSkill() override;
 
+	virtual void FinishSkill() override;
 
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
+
+	/** The duration for which this skill will last */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	float SpecialMovementDuration;
 	
+	FTimerHandle MovementEndTimerHandle;
+
 };

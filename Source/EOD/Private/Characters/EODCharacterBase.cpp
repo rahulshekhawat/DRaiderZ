@@ -1078,14 +1078,15 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 	else if (IsIdleOrMoving())
 	{
 		UpdateCharacterMovementDirection();
+		float DesiredSpeed = IsRunning() ? DefaultRunSpeed : DefaultWalkSpeed;
 		if (ForwardAxisValue < 0)
 		{
-			float NewSpeed = (DefaultWalkSpeed * MovementSpeedModifier) * (5.f / 16.f);
+			float NewSpeed = (DesiredSpeed * MovementSpeedModifier) * (5.f / 16.f);
 			SetWalkSpeed(NewSpeed);
 		}
 		else
 		{
-			float NewSpeed = DefaultWalkSpeed * MovementSpeedModifier;
+			float NewSpeed = DesiredSpeed * MovementSpeedModifier;
 			SetWalkSpeed(NewSpeed);
 		}
 	}
@@ -1094,14 +1095,15 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 		// Almost same as IsIdleOrMoving() except the PCTryingToMove update
 		UpdatePCTryingToMove();
 		UpdateCharacterMovementDirection();
+		float DesiredSpeed = IsRunning() ? DefaultRunSpeed : DefaultWalkSpeed;
 		if (ForwardAxisValue < 0)
 		{
-			float NewSpeed = (DefaultWalkSpeed * MovementSpeedModifier) * (5.f / 16.f);
+			float NewSpeed = (DesiredSpeed * MovementSpeedModifier) * (5.f / 16.f);
 			SetWalkSpeed(NewSpeed);
 		}
 		else
 		{
-			float NewSpeed = DefaultWalkSpeed * MovementSpeedModifier;
+			float NewSpeed = DesiredSpeed * MovementSpeedModifier;
 			SetWalkSpeed(NewSpeed);
 		}
 	}
