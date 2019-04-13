@@ -47,6 +47,14 @@ void UInstantMeleeSkill::TriggerSkill()
 		StartCooldown();
 	}
 
+	bool bHasController = Instigator->Controller != nullptr;
+	if (bHasController)
+	{
+		FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
+		StateInfo.NewReplicationIndex = Instigator->CharacterStateInfo.NewReplicationIndex + 1;
+		Instigator->CharacterStateInfo = StateInfo;
+	}
+
 	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
 	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
 	if (Montage)
@@ -98,9 +106,4 @@ void UInstantMeleeSkill::FinishSkill()
 	{
 		Instigator->ResetState();
 	}
-}
-
-float UInstantMeleeSkill::GetSkillDuration() const
-{
-	return SkillDuration;
 }

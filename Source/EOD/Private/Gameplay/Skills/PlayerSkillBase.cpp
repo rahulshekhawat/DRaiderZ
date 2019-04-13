@@ -36,3 +36,8 @@ void UPlayerSkillBase::CancelCooldown()
 void UPlayerSkillBase::UpdateCooldown()
 {
 }
+
+float UPlayerSkillBase::GetSkillDuration() const
+{
+	return SkillDuration;
+}

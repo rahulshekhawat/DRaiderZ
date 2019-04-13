@@ -122,16 +122,6 @@ void UActiveSkillBase::OnMaleAnimationsLoaded()
 	}
 }
 
-bool UActiveSkillBase::IsWeaponTypeSupported(EWeaponType WeaponType) const
-{
-	return (SupportedWeapons & (1 << (uint8)WeaponType));
-}
-
-float UActiveSkillBase::GetSkillDuration() const
-{
-	return 0.0f;
-}
-
 void UActiveSkillBase::StartCooldown()
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();

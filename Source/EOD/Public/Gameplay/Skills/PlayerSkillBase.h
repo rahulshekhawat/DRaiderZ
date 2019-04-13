@@ -37,11 +37,27 @@ public:
 
 	FORCEINLINE int32 GetMaxUpgradeLevel() const { return MaxUpgrades; }
 
+	FORCEINLINE FName GetSupersedingSkillGroup() const { return SupersedingSkillGroup; }
+
+	FORCEINLINE TArray<FName> GetPrecedingSkillGroups() const { return PrecedingSkillGroups; }
+
 protected:
 
 	/** Maximum upgrades available for this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	int32 MaxUpgrades;
+
+	/** Skill that can be used after using this skill (skill chaining) */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	FName SupersedingSkillGroup;
+
+	/** Skills, any of which MUST be used before using this skill */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	TArray<FName> PrecedingSkillGroups;
+
+	/** Weapons that this skill can be used with */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information", meta = (Bitmask, BitmaskEnum = "EWeaponType"))
+	uint8 SupportedWeapons;
 
 public:
 
@@ -81,4 +97,25 @@ protected:
 	UFUNCTION()
 	virtual void UpdateCooldown();
 
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
+public:
+
+	/** Returns the skill duration  */
+	virtual float GetSkillDuration() const;
+
+	/** Returns true if this skill can be used with the given weapon type */
+	inline bool IsWeaponTypeSupported(EWeaponType WeaponType) const;
+
+protected:
+
+	float SkillDuration;
+
 };
+
+inline bool UPlayerSkillBase::IsWeaponTypeSupported(EWeaponType WeaponType) const
+{
+	return (SupportedWeapons & (1 << (uint8)WeaponType));
+}

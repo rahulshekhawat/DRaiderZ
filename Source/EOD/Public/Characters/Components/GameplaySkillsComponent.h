@@ -66,6 +66,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const;
 
+	virtual void ActivateChainSkill(FName SkillGroup);
+
 	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillIndexToSkillMap; }
 
 	inline FGameplaySkillTableRow* GetGameplaySkillTableRow(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
@@ -127,6 +129,10 @@ public:
 	//  Gameplay
 	// --------------------------------------
 
+	inline void StartChargingSkill();
+
+	inline void StopChargingSkill();
+
 	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr);
 
 	virtual void UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown);
@@ -163,3 +169,14 @@ inline FGameplaySkillTableRow* UGameplaySkillsComponent::GetGameplaySkillTableRo
 	return SkillsDataTable ? SkillsDataTable->FindRow<FGameplaySkillTableRow>(SkillID, ContextString) : nullptr;
 }
 
+inline void UGameplaySkillsComponent::StartChargingSkill()
+{
+	bSkillCharging = true;
+	SkillChargeDuration = 0.f;
+}
+
+inline void UGameplaySkillsComponent::StopChargingSkill()
+{
+	bSkillCharging = false;
+	SkillChargeDuration = 0.f;
+}

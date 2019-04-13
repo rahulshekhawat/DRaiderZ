@@ -52,6 +52,15 @@ public:
 	/** Returns true if this skill is valid, i.e, skill belongs to a valid skill group */
 	FORCEINLINE bool IsValid() const { return SkillGroup != NAME_None && SkillIndex != 0; }
 
+	/** Event called when skill owner changes it's weapon */
+	virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
+
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
+
+	FORCEINLINE EDamageType GetDamageType() const { return DamageType; }
+
 	FORCEINLINE UTexture* GetSkillIcon() const { return Icon; }
 
 	FORCEINLINE FString	GetInGameSkillName() const { return InGameName; }
@@ -59,13 +68,6 @@ public:
 	FORCEINLINE FString	GetInGameDescription() const { return Description; }
 
 	FORCEINLINE FName GetSkillGroup() const { return SkillGroup; }
-
-	/** Event called when skill owner changes it's weapon */
-	virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
-
-	// --------------------------------------
-	//  Pseudo Constants
-	// --------------------------------------
 
 	/** Set this to true if this skill can be charged */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
@@ -88,6 +90,14 @@ protected:
 	/** Skill group of this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	FName SkillGroup;
+
+	/** Describes the effect of this skill. This will be used by AI for determining most suitable skill to use */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
+	ESkillEffect SkillEffect;
+
+	/** Type of damage inflicted by this skill if this skill can inflict damage */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
+	EDamageType DamageType;
 
 	// --------------------------------------
 	//	Gameplay Tags

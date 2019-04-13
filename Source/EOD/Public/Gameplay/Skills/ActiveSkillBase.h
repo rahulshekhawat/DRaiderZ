@@ -105,12 +105,6 @@ public:
 
 	inline FActiveSkillLevelUpInfo GetCurrentSkillLevelupInfo() const;
 
-	FORCEINLINE EDamageType GetDamageType() const { return DamageType; }
-
-	FORCEINLINE TArray<FName> GetPrecedingSkillGroups() const { return PrecedingSkillGroups; }
-
-	FORCEINLINE FName GetSupersedingSkillGroup() const { return SupersedingSkillGroup; }
-
 protected:
 
 	virtual void StartCooldown() override;
@@ -143,29 +137,6 @@ protected:
 	/** Starting section of skill animation inside animation montages */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
 	FName AnimationStartSectionName;
-	
-	/**
-	 * Weapons that this skill can be used with.
-	 * @note This only applies to characters that can equip a custom weapon
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information", meta = (Bitmask, BitmaskEnum = "EWeaponType"))
-	uint8 SupportedWeapons;
-
-	/** Type of damage inflicted by this skill if this skill can inflict damage */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	EDamageType DamageType;
-
-	/** Describes the effect of this skill. This will be used by AI for determining most suitable skill to use */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	ESkillEffect SkillEffect;
-
-	/** Skills, any of which MUST be used before using this skill */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
-	TArray<FName> PrecedingSkillGroups;
-
-	/** Skill that can be used after using this skill (skill chaining) */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
-	FName SupersedingSkillGroup;
 
 	/** The camera to play when this skill hits an enemy */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
@@ -188,22 +159,6 @@ protected:
 	void OnFemaleAnimationsLoaded();
 
 	void OnMaleAnimationsLoaded();
-
-	/** Returns true if this skill can be used with the given weapon type */
-	bool IsWeaponTypeSupported(EWeaponType WeaponType) const;
-
-public:
-
-	// --------------------------------------
-	//	Utility
-	// --------------------------------------
-
-	/** Returns the skill duration  */
-	virtual float GetSkillDuration() const;
-
-protected:
-
-	float SkillDuration;
 
 };
 

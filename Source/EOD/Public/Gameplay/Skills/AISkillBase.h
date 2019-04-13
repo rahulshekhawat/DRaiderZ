@@ -17,6 +17,5 @@ class EOD_API UAISkillBase : public UGameplaySkillBase
 public:
 
 	UAISkillBase(const FObjectInitializer& ObjectInitializer);
-
 	
 };

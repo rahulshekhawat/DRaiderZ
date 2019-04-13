@@ -108,6 +108,10 @@ uint8 UGameplaySkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) con
 	return 0;
 }
 
+void UGameplaySkillsComponent::ActivateChainSkill(FName SkillGroup)
+{
+}
+
 void UGameplaySkillsComponent::ResetChainSkill()
 {
 	UWorld* World = GetWorld();

@@ -14,6 +14,7 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
+#include "GenericPlatform/GenericPlatformTime.h"
 
 UPlayerSkillsComponent::UPlayerSkillsComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -110,8 +111,11 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->PlayerSkill, Key, RF_Transient);
 		check(GameplaySkill)
 		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
-		// GameplaySkill->SetSkillGroup(Key);
+		GameplaySkill->SetSkillIndex(SkillIndex);
+
 		SkillIndexToSkillMap.Add(SkillIndex, GameplaySkill);
+		SkillGroupToSkillMap.Add(GameplaySkill->GetSkillGroup(), GameplaySkill);
+		SkillGroupToSkillIndexMap.Add(GameplaySkill->GetSkillGroup(), GameplaySkill->GetSkillIndex());
 
 		SkillIndex++;
 	}
@@ -121,6 +125,18 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 	if (SaveGame)
 	{
 		this->SkillBarMap = SaveGame->SkillBarMap;
+
+		TMap<FName, FSkillTreeSlotSaveData> SkillTreeSlotsSaveData = SaveGame->SkillTreeSlotsSaveData;
+		TArray<FName> SkillGroups;
+		for (FName SkillGroup : SkillGroups)
+		{
+			FSkillTreeSlotSaveData SlotSaveData = SkillTreeSlotsSaveData[SkillGroup];
+			UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(GetSkillForSkillGroup(SkillGroup));
+			if (PlayerSkill)
+			{
+				PlayerSkill->SetCurrentUpgrade(SlotSaveData.CurrentUpgrade);
+			}
+		}		
 	}
 }
 
@@ -161,13 +177,10 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 {
 	AEODCharacterBase* CharOwner = GetCharacterOwner();
 
-	if (!Skill)
-	{
-		check(SkillIndexToSkillMap.Contains(SkillIndex));
-		Skill = SkillIndexToSkillMap[SkillIndex];
-	}
+	check(SkillIndexToSkillMap.Contains(SkillIndex));
+	UPlayerSkillBase* PlayerSkill = Skill ? Cast<UPlayerSkillBase>(Skill) : Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SkillIndex]);
 
-	if (!Skill || !CharOwner)
+	if (!PlayerSkill || !CharOwner)
 	{
 		return;
 	}
@@ -175,55 +188,24 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	bool bIsLocalPlayerController = CharOwner->Controller && CharOwner->Controller->IsLocalPlayerController();
 	if (bIsLocalPlayerController)
 	{
-		UActiveSkillBase* _Skill = Cast<UActiveSkillBase>(Skill);
-		TArray<FName> _PrecedingSkillGroups = _Skill->GetPrecedingSkillGroups();
-
-		if (_PrecedingSkillGroups.Num() > 0)
-		{
-			if (ActivePrecedingChainSkillGroup == NAME_None)
-			{
-				return;
-			}
-
-			if (!_PrecedingSkillGroups.Contains(ActivePrecedingChainSkillGroup))
-			{
-				return;
-			}
-		}
-
-		if (Skill->CanTriggerSkill())
+		if (PlayerSkill->CanTriggerSkill())
 		{
 			ResetChainSkill();
 
-			FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
-			StateInfo.NewReplicationIndex = CharOwner->CharacterStateInfo.NewReplicationIndex + 1;
-			CharOwner->CharacterStateInfo = StateInfo;
-
-			Skill->TriggerSkill();
-
+			PlayerSkill->TriggerSkill();
 			if (CharOwner->Role < ROLE_Authority)
 			{
 				Server_TriggerSkill(SkillIndex);
 			}
 
-			if (Skill->bSkillCanBeCharged)
+			if (PlayerSkill->bSkillCanBeCharged)
 			{
-				bSkillCharging = true;
-				SkillChargeDuration = 0.f;
+				StartChargingSkill();
 			}
 
-			UWorld* World = GetWorld();
-			if (_Skill && World)
+			if (PlayerSkill->GetSupersedingSkillGroup() != NAME_None)
 			{
-				FName SupersedingSkillGroup = _Skill->GetSupersedingSkillGroup();
-				uint8 SupersedingSkillIndex = GetSkillIndexForSkillGroup(SupersedingSkillGroup);
-				if (SupersedingSkillIndex != 0)
-				{
-					SupersedingChainSkillGroup = TPair<uint8, uint8>(LastPressedSkillKey, SupersedingSkillIndex);
-					float SkillDuration = _Skill->GetSkillDuration();
-					float ChainSkillActivationWindow = SkillDuration + ChainSkillResetDelay;
-					World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
-				}
+				ActivateChainSkill(PlayerSkill->GetSupersedingSkillGroup());
 			}
 
 			ActivePrecedingChainSkillGroup = LastUsedSkillGroup = Skill->GetSkillGroup();
@@ -231,9 +213,10 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	}
 	else
 	{
-		Skill->TriggerSkill();
+		PlayerSkill->TriggerSkill();
 	}
 
+	//~ @todo Modify the way attack info is stored
 	if (!(CharOwner->Role < ROLE_Authority))
 	{
 		UActiveSkillBase* _Skill = Cast<UActiveSkillBase>(Skill);
@@ -425,6 +408,25 @@ uint8 UPlayerSkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) const
 	return SkillIndex;
 }
 
+void UPlayerSkillsComponent::ActivateChainSkill(FName SkillGroup)
+{
+	SkillGroupToSkillIndexMap[SkillGroup];
+	uint8 SupersedingSkillIndex = GetSkillIndexForSkillGroup(SkillGroup);
+
+	if (SupersedingSkillIndex != 0)
+	{
+		UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SupersedingSkillIndex]);
+		UWorld* World = GetWorld();
+		if (PlayerSkill && World)
+		{
+			SupersedingChainSkillGroup = TPair<uint8, uint8>(LastPressedSkillKey, SupersedingSkillIndex);
+			float SkillDuration = PlayerSkill->GetSkillDuration();
+			float ChainSkillActivationWindow = SkillDuration + ChainSkillResetDelay;
+			World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
+		}
+	}
+}
+
 void UPlayerSkillsComponent::ResetChainSkill()
 {
 }
@@ -434,10 +436,6 @@ void UPlayerSkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex
 	AEODCharacterBase* CharOwner = GetCharacterOwner();
 	check(CharOwner);
 
-	FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
-	StateInfo.NewReplicationIndex = CharOwner->CharacterStateInfo.NewReplicationIndex + 1;
-	CharOwner->CharacterStateInfo = StateInfo;
-
 	TriggerSkill(SkillIndex);
 }
 
@@ -446,9 +444,9 @@ void UPlayerSkillsComponent::Server_ReleaseSkill_Implementation(uint8 SkillIndex
 	AEODCharacterBase* CharOwner = GetCharacterOwner();
 	check(CharOwner);
 
-	FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
-	StateInfo.NewReplicationIndex = CharOwner->CharacterStateInfo.NewReplicationIndex + 1;
-	CharOwner->CharacterStateInfo = StateInfo;
+	// FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
+	// StateInfo.NewReplicationIndex = CharOwner->CharacterStateInfo.NewReplicationIndex + 1;
+	// CharOwner->CharacterStateInfo = StateInfo;
 
 	SkillChargeDuration = SkillIndex;
 	ReleaseSkill(SkillIndex);

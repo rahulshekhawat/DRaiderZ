@@ -65,6 +65,8 @@ public:
 
 	virtual uint8 GetSkillIndexForSkillGroup(FName SkillGroup) const override;
 
+	virtual void ActivateChainSkill(FName SkillGroup) override;
+
 	/** Event called when a new skill is added to skill bar */
 	void OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 
