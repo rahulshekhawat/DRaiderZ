@@ -208,7 +208,7 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 				ActivateChainSkill(PlayerSkill->GetSupersedingSkillGroup());
 			}
 
-			ActivePrecedingChainSkillGroup = LastUsedSkillGroup = Skill->GetSkillGroup();
+			ActivePrecedingChainSkillGroup = LastUsedSkillGroup = PlayerSkill->GetSkillGroup();
 		}
 	}
 	else
@@ -219,7 +219,7 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	//~ @todo Modify the way attack info is stored
 	if (!(CharOwner->Role < ROLE_Authority))
 	{
-		UActiveSkillBase* _Skill = Cast<UActiveSkillBase>(Skill);
+		UActiveSkillBase* _Skill = Cast<UActiveSkillBase>(PlayerSkill);
 		if (_Skill)
 		{
 			CharOwner->SetAttackInfoFromActiveSkill(_Skill);
@@ -423,12 +423,21 @@ void UPlayerSkillsComponent::ActivateChainSkill(FName SkillGroup)
 			float SkillDuration = PlayerSkill->GetSkillDuration();
 			float ChainSkillActivationWindow = SkillDuration + ChainSkillResetDelay;
 			World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
+			PlayerSkill->OnActivatedAsChainSkill();
 		}
 	}
 }
 
 void UPlayerSkillsComponent::ResetChainSkill()
 {
+	if (SupersedingChainSkillGroup.Value != 0)
+	{
+		check(SkillIndexToSkillMap.Contains(SupersedingChainSkillGroup.Value));
+		UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SupersedingChainSkillGroup.Value]);
+		PlayerSkill->OnDeactivatedAsChainSkill();
+	}
+
+	Super::ResetChainSkill();
 }
 
 void UPlayerSkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)

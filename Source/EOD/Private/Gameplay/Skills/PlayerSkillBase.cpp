@@ -15,6 +15,7 @@ void UPlayerSkillBase::OnWeaponChange(EWeaponType NewWeaponType, EWeaponType Old
 
 void UPlayerSkillBase::OnActivatedAsChainSkill()
 {
+
 }
 
 void UPlayerSkillBase::OnDeactivatedAsChainSkill()
