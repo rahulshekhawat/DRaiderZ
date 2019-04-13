@@ -31,15 +31,6 @@ void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Own
 	}
 }
 
-void UActiveSkillBase::CancelSkill()
-{
-}
-
-bool UActiveSkillBase::CanCancelSkill() const
-{
-	return false;
-}
-
 void UActiveSkillBase::LoadFemaleAnimations()
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();

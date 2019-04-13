@@ -97,12 +97,6 @@ public:
 	/** Initialize this skill. Intended to be called immediately after the skill object is created */
 	virtual void InitSkill(AEODCharacterBase* Instigator, AController* Owner) override;
 
-	/** Cancel this skill */
-	virtual void CancelSkill() override;
-
-	/** Returns true if this skill can be cancelled */
-	virtual bool CanCancelSkill() const override;
-
 	inline FActiveSkillLevelUpInfo GetCurrentSkillLevelupInfo() const;
 
 protected:
@@ -145,20 +139,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Level Up Info")
 	TArray<FActiveSkillLevelUpInfo> SkillLevelUpsInfo;
 
-protected:
-
 	UPROPERTY(Transient)
 	TMap<EWeaponType, UAnimMontage*> SkillAnimations;
 
-	TSharedPtr<FStreamableHandle> AnimationsHandle;
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
 
-	void LoadFemaleAnimations();
+	virtual void LoadFemaleAnimations();
 
-	void LoadMaleAnimations();
+	virtual void LoadMaleAnimations();
 	
-	void OnFemaleAnimationsLoaded();
+	UFUNCTION()
+	virtual void OnFemaleAnimationsLoaded();
 
-	void OnMaleAnimationsLoaded();
+	UFUNCTION()
+	virtual void OnMaleAnimationsLoaded();
 
 };
 

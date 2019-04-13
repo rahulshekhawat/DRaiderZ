@@ -719,6 +719,7 @@ void APlayerCharacter::ToggleSheathe()
 	{
 		bool bNewValue = !IsWeaponSheathed();
 		SetWeaponSheathed(bNewValue);
+		UpdatePCTryingToMove();
 		StartWeaponSwitch();
 		bCharacterStateAllowsMovement = true;
 		bCharacterStateAllowsRotation = true;

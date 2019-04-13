@@ -305,6 +305,9 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_CharacterStateInfo, BlueprintReadOnly, Category = "Character State")
 	FCharacterStateInfo CharacterStateInfo;
 
+	/** Updates whether player controller is currently trying to move or not */
+	inline void UpdatePCTryingToMove();
+
 protected:
 
 	/** Timer handle to call FinishDodge() */
@@ -312,9 +315,6 @@ protected:
 
 	/** Timer handle to call FinishWeaponSwitch() */
 	FTimerHandle FinishWeaponSwitchTimerHandle;
-
-	/** Updates whether player controller is currently trying to move or not */
-	inline void UpdatePCTryingToMove();
 
 	/** Updates the direction character is walking in */
 	inline void UpdateCharacterMovementDirection();
