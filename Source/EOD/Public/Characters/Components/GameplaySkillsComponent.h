@@ -73,11 +73,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	UGameplaySkillBase* GetSkillForSkillGroup(FName SkillGroup) const;
 
+	void OnSkillCancelled(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill);
+
+	void OnSkillFinished(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill);
+
 	inline FGameplaySkillTableRow* GetGameplaySkillTableRow(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
 
 	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillIndexToSkillMap; }
 	
 protected:
+
+	UPROPERTY(Transient)
+	TArray<UGameplaySkillBase*> ActiveSkills;
 
 	/** Skill index to skil map. Skill index will be used during replication */
 	UPROPERTY(Transient)

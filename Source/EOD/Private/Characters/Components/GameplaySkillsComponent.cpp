@@ -114,6 +114,22 @@ UGameplaySkillBase* UGameplaySkillsComponent::GetSkillForSkillGroup(FName SkillG
 	return Skill;
 }
 
+void UGameplaySkillsComponent::OnSkillCancelled(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
+{
+	if (Skill)
+	{
+		ActiveSkills.Remove(Skill);
+	}
+}
+
+void UGameplaySkillsComponent::OnSkillFinished(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
+{
+	if (Skill)
+	{
+		ActiveSkills.Remove(Skill);
+	}
+}
+
 void UGameplaySkillsComponent::ResetChainSkill()
 {
 	UWorld* World = GetWorld();

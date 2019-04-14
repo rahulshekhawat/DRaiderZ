@@ -4,9 +4,11 @@
 #include "DynamicSpellCastingSkill.h"
 #include "EODCharacterBase.h"
 #include "EODGameInstance.h"
+#include "PlayerAnimInstance.h"
 
 UDynamicSpellCastingSkill::UDynamicSpellCastingSkill(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	bMovableMontagePlaying = false;
 }
 
 void UDynamicSpellCastingSkill::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
@@ -81,6 +83,8 @@ void UDynamicSpellCastingSkill::TriggerSkill()
 			ActualSkillDuration = SkillDuration - MontageToPlay->BlendOut.GetBlendTime();
 		}
 
+		bMovableMontagePlaying = Instigator->IsPCTryingToMove();
+
 		UWorld* World = Instigator->GetWorld();
 		check(World);
 		FTimerDelegate TimerDelegate;
@@ -96,6 +100,39 @@ void UDynamicSpellCastingSkill::TriggerSkill()
 bool UDynamicSpellCastingSkill::CanCancelSkill() const
 {
 	return false;
+}
+
+void UDynamicSpellCastingSkill::UpdateSkill(float DeltaTime)
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (!Instigator)
+	{
+		return;
+	}
+
+	if (Instigator->IsPCTryingToMove() != bMovableMontagePlaying)
+	{
+		EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
+		check(SkillAnimations.Contains(CurrentWeapon) && SkillUpperSlotAnimations.Contains(CurrentWeapon));
+		UAnimMontage* FullSlotAnimation = SkillAnimations[CurrentWeapon];
+		UAnimMontage* UpperSlotAnimation = SkillUpperSlotAnimations[CurrentWeapon];
+
+		UAnimInstance* PrimaryAnimInstance = Instigator->GetMesh() ? Instigator->GetMesh()->GetAnimInstance() : nullptr;
+
+		if (PrimaryAnimInstance && FullSlotAnimation && UpperSlotAnimation)
+		{
+			if (Instigator->IsPCTryingToMove())
+			{
+				TransitionBetweenMontages(PrimaryAnimInstance, FullSlotAnimation, UpperSlotAnimation);
+				bMovableMontagePlaying = true;
+			}
+			else
+			{
+				TransitionBetweenMontages(PrimaryAnimInstance, UpperSlotAnimation, FullSlotAnimation);
+				bMovableMontagePlaying = false;
+			}
+		}
+	}
 }
 
 void UDynamicSpellCastingSkill::CancelSkill()
@@ -235,6 +272,30 @@ void UDynamicSpellCastingSkill::OnMaleAnimationsLoaded()
 		if (SoftAnimation.IsValid())
 		{
 			SkillUpperSlotAnimations.Add(Key, SoftAnimation.Get());
+		}
+	}
+}
+
+void UDynamicSpellCastingSkill::TransitionBetweenMontages(UAnimInstance* AnimInstance, UAnimMontage* TransitionFromMontage, UAnimMontage* TransitionToMontage)
+{
+	check(AnimInstance);
+	if (AnimInstance->Montage_IsPlaying(TransitionFromMontage))
+	{
+		int32 MovingMontageSectionIndex = TransitionToMontage->GetSectionIndex(AnimationStartSectionName);
+		int32 StandStillMontageSectionIndex = TransitionFromMontage->GetSectionIndex(AnimationStartSectionName);
+		if (MovingMontageSectionIndex != INDEX_NONE && StandStillMontageSectionIndex != INDEX_NONE)
+		{
+			float SectionStartTime;
+			float SectionEndtime;
+			TransitionFromMontage->GetSectionStartAndEndTime(StandStillMontageSectionIndex, SectionStartTime, SectionEndtime);
+			float CurrentPosition = AnimInstance->Montage_GetPosition(TransitionFromMontage);
+			float SectionOffset = CurrentPosition - SectionStartTime;
+			AnimInstance->Montage_Stop(TransitionFromMontage->BlendOut.GetBlendTime(), TransitionFromMontage);
+
+			TransitionToMontage->GetSectionStartAndEndTime(MovingMontageSectionIndex, SectionStartTime, SectionEndtime);
+			float MontageStartPosition = SectionStartTime + SectionOffset;
+
+			AnimInstance->Montage_Play(TransitionToMontage, 1.f, EMontagePlayReturnType::MontageLength, MontageStartPosition);
 		}
 	}
 }

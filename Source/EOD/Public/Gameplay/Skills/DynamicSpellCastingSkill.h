@@ -33,6 +33,8 @@ public:
 	/** Returns true if this skill can be cancelled */
 	virtual bool CanCancelSkill() const override;
 
+	virtual void UpdateSkill(float DeltaTime) override;
+
 	/** Cancel this skill */
 	virtual void CancelSkill() override;
 
@@ -66,6 +68,10 @@ protected:
 	//  Utility
 	// --------------------------------------
 
+	bool bMovableMontagePlaying;
+
+	FTimerHandle SkillTimerHandle;
+
 	virtual void LoadFemaleAnimations() override;
 
 	virtual void LoadMaleAnimations() override;
@@ -74,6 +80,6 @@ protected:
 
 	virtual void OnMaleAnimationsLoaded() override;
 
-	FTimerHandle SkillTimerHandle;
+	void TransitionBetweenMontages(UAnimInstance* AnimInstance, UAnimMontage* TransitionFromMontage, UAnimMontage* TransitionToMontage);
 
 };

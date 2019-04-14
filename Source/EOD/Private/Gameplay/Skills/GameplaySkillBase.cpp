@@ -38,6 +38,10 @@ void UGameplaySkillBase::ReleaseSkill(float ChargeDuration)
 {
 }
 
+void UGameplaySkillBase::UpdateSkill(float DeltaTime)
+{
+}
+
 void UGameplaySkillBase::CancelSkill()
 {
 }

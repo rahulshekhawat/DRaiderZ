@@ -41,6 +41,8 @@ public:
 	/** Release this skill, i.e., if this skill is chargeable then activate this skill, otherwise it does nothing */
 	virtual void ReleaseSkill(float ChargeDuration);
 
+	virtual void UpdateSkill(float DeltaTime);
+
 	/** Returns true if this skill can be cancelled */
 	virtual bool CanCancelSkill() const;
 

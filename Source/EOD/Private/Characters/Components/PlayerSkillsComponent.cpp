@@ -30,6 +30,11 @@ void UPlayerSkillsComponent::BeginPlay()
 void UPlayerSkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	for (UGameplaySkillBase* Skill : ActiveSkills)
+	{
+		Skill->UpdateSkill(DeltaTime);
+	}
 }
 
 void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
@@ -209,11 +214,13 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			}
 
 			ActivePrecedingChainSkillGroup = LastUsedSkillGroup = PlayerSkill->GetSkillGroup();
+			ActiveSkills.Add(PlayerSkill);
 		}
 	}
 	else
 	{
 		PlayerSkill->TriggerSkill();
+		ActiveSkills.Add(PlayerSkill);
 	}
 
 	//~ @todo Modify the way attack info is stored
