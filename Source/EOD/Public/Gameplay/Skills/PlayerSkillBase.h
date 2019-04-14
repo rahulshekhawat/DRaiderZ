@@ -22,6 +22,8 @@ public:
 	//  Gameplay Skill Interface
 	// --------------------------------------
 
+	virtual bool CanPlayerActivateThisSkill() const;
+
 	/** Event called when player changes it's equipped weapon */
 	virtual void OnWeaponChange(EWeaponType NewWeaponType, EWeaponType OldWeaponType);
 

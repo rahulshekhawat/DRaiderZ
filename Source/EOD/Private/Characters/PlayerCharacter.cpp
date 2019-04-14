@@ -723,6 +723,11 @@ void APlayerCharacter::ToggleSheathe()
 		StartWeaponSwitch();
 		bCharacterStateAllowsMovement = true;
 		bCharacterStateAllowsRotation = true;
+
+		UPlayerSkillsComponent* SkillComp = Cast<UPlayerSkillsComponent>(GetGameplaySkillsComponent());
+		check(SkillComp);
+		EWeaponType NewWeaponType = IsWeaponSheathed() ? EWeaponType::None : GetEquippedWeaponType();
+		SkillComp->OnPlayerWeaponChanged();
 	}
 }
 

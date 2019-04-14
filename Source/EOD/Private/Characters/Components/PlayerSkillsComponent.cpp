@@ -13,6 +13,7 @@
 
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
+#include "Components/Image.h"
 #include "Kismet/GameplayStatics.h"
 #include "GenericPlatform/GenericPlatformTime.h"
 
@@ -396,6 +397,43 @@ void UPlayerSkillsComponent::ActivateChainSkill(FName SkillGroup)
 			float ChainSkillActivationWindow = SkillDuration + ChainSkillResetDelay;
 			World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
 			PlayerSkill->OnActivatedAsChainSkill();
+		}
+	}
+}
+
+void UPlayerSkillsComponent::OnPlayerWeaponChanged()
+{
+	AEODPlayerController* PC = GetCharacterOwner() ? Cast<AEODPlayerController>(GetCharacterOwner()->Controller) : nullptr;
+	UDynamicSkillBarWidget* SkillBarWidget = PC ? PC->GetSkillBarWidget() : nullptr;
+
+	if (!SkillBarWidget)
+	{
+		return;
+	}
+
+	TArray<uint8> Keys;
+	SkillBarMap.GetKeys(Keys);
+
+	for (uint8 Key : Keys)
+	{
+		uint8 SkillKey = SkillBarMap[Key];
+		if (SkillIndexToSkillMap.Contains(SkillKey))
+		{
+			UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SkillKey]);
+			UContainerWidget* Cont = SkillBarWidget->GetContainerAtIndex(Key);
+			if (Skill && Cont)
+			{
+				if (Skill->CanPlayerActivateThisSkill())
+				{
+					Cont->ItemImage->SetIsEnabled(true);
+					Cont->SetCanBeClicked(true);
+				}
+				else
+				{
+					Cont->ItemImage->SetIsEnabled(false);
+					Cont->SetCanBeClicked(false);
+				}
+			}
 		}
 	}
 }

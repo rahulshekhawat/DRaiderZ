@@ -65,6 +65,10 @@ public:
 
 	virtual void ActivateChainSkill(FName SkillGroup) override;
 
+	void OnPlayerWeaponChanged();
+	// @todo
+	// void OnPlayerWeaponChanged(EWeaponType NewWeaponType, EWeaponType OldWeaponType);
+
 	/** Event called when a new skill is added to skill bar */
 	void OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 

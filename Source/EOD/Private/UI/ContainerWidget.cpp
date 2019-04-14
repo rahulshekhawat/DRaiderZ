@@ -278,6 +278,7 @@ void UContainerWidget::EnableCooldownText()
 	{
 		bIsInCooldown = true;
 		ItemImage->SetIsEnabled(false);
+		SetCanBeClicked(false);
 		CooldownText->SetVisibility(ESlateVisibility::Visible);
 	}
 }
@@ -288,6 +289,7 @@ void UContainerWidget::DisableCooldownText()
 	{
 		bIsInCooldown = false;
 		ItemImage->SetIsEnabled(true);
+		SetCanBeClicked(true);
 		CooldownText->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

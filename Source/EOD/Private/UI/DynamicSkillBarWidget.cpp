@@ -6,6 +6,8 @@
 #include "PlayerSkillBase.h"
 #include "PlayerSkillsComponent.h"
 
+#include "Components/Image.h"
+
 UDynamicSkillBarWidget::UDynamicSkillBarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 
@@ -138,6 +140,17 @@ void UDynamicSkillBarWidget::InitializeSkillBarLayout(const TMap<uint8, uint8>& 
 				Cont->SetMaxValue(Skill->GetMaxUpgradeLevel());
 				Cont->SetItemID(Skill->GetSkillGroup());
 				Cont->SetItemGroup(Skill->GetSkillGroup());
+
+				if (Skill->CanPlayerActivateThisSkill())
+				{
+					Cont->ItemImage->SetIsEnabled(true);
+					Cont->SetCanBeClicked(true);
+				}
+				else
+				{
+					Cont->ItemImage->SetIsEnabled(false);
+					Cont->SetCanBeClicked(false);
+				}
 			}
 		}
 	}
