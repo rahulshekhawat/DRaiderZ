@@ -161,6 +161,8 @@ public:
 
 	FORCEINLINE EContainerType GetContainerType() const { return ContainerType; }
 
+	FORCEINLINE UUserWidget* GetContainerParent() const { return ContainerParentWidget; }
+
 protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Constants")

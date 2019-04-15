@@ -148,25 +148,42 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 
 void UPlayerSkillsComponent::OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup)
 {
-	TArray<uint8> Keys;
-	SkillIndexToSkillMap.GetKeys(Keys);
-
-	for (uint8 Key : Keys)
+	uint8 SkillIndex = SkillGroupToSkillIndexMap.Contains(SkillGroup) ? SkillGroupToSkillIndexMap[SkillGroup] : 0;
+	if (SkillIndex == 0 || !SkillIndexToSkillMap.Contains(SkillIndex))
 	{
-		UGameplaySkillBase* Skill = SkillIndexToSkillMap[Key];
-		if (Skill && Skill->GetSkillGroup() == SkillGroup)
-		{
-			if (SkillBarMap.Contains(SkillBarIndex))
-			{
-				SkillBarMap[SkillBarIndex] = Key;
-			}
-			else
-			{
-				SkillBarMap.Add(SkillBarIndex, Key);
-			}
+		return;
+	}
 
-			break;
-		}
+	if (SkillBarMap.Contains(SkillBarIndex))
+	{
+		SkillBarMap[SkillBarIndex] = SkillIndex;
+	}
+	else
+	{
+		SkillBarMap.Add(SkillBarIndex, SkillIndex);
+	}
+
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	UEODGameInstance* GI = CharOwner ? Cast<UEODGameInstance>(CharOwner->GetGameInstance()) : nullptr;
+	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
+	if (SaveGame)
+	{
+		SaveGame->SkillBarMap = this->SkillBarMap;
+		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
+	}
+}
+
+void UPlayerSkillsComponent::OnSkillRemovedFromSkillBar(uint8 SkillBarIndex, FName SkillGroup)
+{
+	uint8 SkillIndex = SkillGroupToSkillIndexMap.Contains(SkillGroup) ? SkillGroupToSkillIndexMap[SkillGroup] : 0;
+	if (SkillIndex == 0 || !SkillIndexToSkillMap.Contains(SkillIndex))
+	{
+		return;
+	}
+
+	if (SkillBarMap.Contains(SkillBarIndex))
+	{
+		SkillBarMap.Remove(SkillBarIndex);
 	}
 
 	AEODCharacterBase* CharOwner = GetCharacterOwner();

@@ -72,6 +72,8 @@ public:
 	/** Event called when a new skill is added to skill bar */
 	void OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 
+	void OnSkillRemovedFromSkillBar(uint8 SkillBarIndex, FName SkillGroup);
+
 	FORCEINLINE TMap<uint8, uint8> GetSkillBarMap() const { return SkillBarMap; }
 
 	TArray<UContainerWidget*> GetAllContainerWidgetsForSkill(FName SkillGroup) const;

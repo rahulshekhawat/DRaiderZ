@@ -88,7 +88,22 @@ bool UDynamicSkillBarWidget::OnContainersSwapped(UContainerWidget* Container1, U
 
 bool UDynamicSkillBarWidget::OnContainerRemoved(UContainerWidget* Container)
 {
-	return false;
+	if (!Container)
+	{
+		return false;
+	}
+
+	if (OwnerSkillsComponent.IsValid())
+	{
+		FContainerData NewData;
+		Container->SetContainerData(NewData);
+
+		UPlayerSkillsComponent* SkillsComp = OwnerSkillsComponent.Get();
+		uint8 SkillBarIndex = GetIndexOfSkillContainer(Container);
+		SkillsComp->OnSkillRemovedFromSkillBar(SkillBarIndex, Container->GetContainerData().ItemGroup);
+	}
+
+	return true;
 }
 
 void UDynamicSkillBarWidget::InitializeContainersParent()
