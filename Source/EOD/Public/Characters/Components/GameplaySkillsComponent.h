@@ -73,8 +73,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	UGameplaySkillBase* GetSkillForSkillGroup(FName SkillGroup) const;
 
+	/** Event called when a skill gets cancelled */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	void OnSkillCancelled(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill);
 
+	/** Event called when a skill gets finished */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	void OnSkillFinished(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill);
 
 	inline FGameplaySkillTableRow* GetGameplaySkillTableRow(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;

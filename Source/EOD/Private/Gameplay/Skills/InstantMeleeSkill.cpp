@@ -2,6 +2,7 @@
 
 #include "InstantMeleeSkill.h"
 #include "EODCharacterBase.h"
+#include "GameplaySkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
 
 UInstantMeleeSkill::UInstantMeleeSkill(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -97,6 +98,12 @@ void UInstantMeleeSkill::CancelSkill()
 		check(World);
 		World->GetTimerManager().ClearTimer(SkillTimerHandle);
 	}
+	
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if(SkillsComp)
+	{
+		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
+	}
 }
 
 void UInstantMeleeSkill::FinishSkill()
@@ -105,5 +112,11 @@ void UInstantMeleeSkill::FinishSkill()
 	if (Instigator)
 	{
 		Instigator->ResetState();
+	}
+	
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if(SkillsComp)
+	{
+		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
 	}
 }

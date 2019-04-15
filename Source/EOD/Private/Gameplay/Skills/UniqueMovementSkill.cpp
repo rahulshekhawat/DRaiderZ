@@ -3,6 +3,7 @@
 
 #include "UniqueMovementSkill.h"
 #include "EODCharacterBase.h"
+#include "GameplaySkillsComponent.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -44,6 +45,12 @@ void UUniqueMovementSkill::CancelSkill()
 	{
 		Instigator->SetIsRunning(false);
 	}
+
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if(SkillsComp)
+	{
+		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
+	}
 }
 
 void UUniqueMovementSkill::FinishSkill()
@@ -52,5 +59,11 @@ void UUniqueMovementSkill::FinishSkill()
 	if (Instigator && Instigator->Controller)
 	{
 		Instigator->SetIsRunning(false);
+	}
+	
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if(SkillsComp)
+	{
+		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
 	}
 }

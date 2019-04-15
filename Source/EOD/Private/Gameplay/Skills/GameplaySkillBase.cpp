@@ -44,10 +44,20 @@ void UGameplaySkillBase::UpdateSkill(float DeltaTime)
 
 void UGameplaySkillBase::CancelSkill()
 {
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if(SkillsComp)
+	{
+		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
+	}
 }
 
 void UGameplaySkillBase::FinishSkill()
 {
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if(SkillsComp)
+	{
+		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
+	}
 }
 
 bool UGameplaySkillBase::CanCancelSkill() const

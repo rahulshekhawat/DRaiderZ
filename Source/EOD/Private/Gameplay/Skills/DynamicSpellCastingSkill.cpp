@@ -5,6 +5,7 @@
 #include "EODCharacterBase.h"
 #include "EODGameInstance.h"
 #include "PlayerAnimInstance.h"
+#include "GameplaySkillsComponent.h"
 
 UDynamicSpellCastingSkill::UDynamicSpellCastingSkill(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -143,6 +144,12 @@ void UDynamicSpellCastingSkill::CancelSkill()
 	{
 		Instigator->ResetState();
 	}
+	
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if(SkillsComp)
+	{
+		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
+	}
 }
 
 void UDynamicSpellCastingSkill::FinishSkill()
@@ -151,7 +158,13 @@ void UDynamicSpellCastingSkill::FinishSkill()
 	if (Instigator)
 	{
 		Instigator->ResetState();
-	}	
+	}
+	
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if(SkillsComp)
+	{
+		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
+	}
 }
 
 void UDynamicSpellCastingSkill::LoadFemaleAnimations()

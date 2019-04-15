@@ -2,6 +2,7 @@
 
 #include "EscapeSkillBase.h"
 #include "EODCharacterBase.h"
+#include "GameplaySkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
 
 UEscapeSkillBase::UEscapeSkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -90,6 +91,12 @@ void UEscapeSkillBase::CancelSkill()
 		check(World);
 		World->GetTimerManager().ClearTimer(SkillTimerHandle);
 	}
+	
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if(SkillsComp)
+	{
+		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
+	}
 }
 
 void UEscapeSkillBase::FinishSkill()
@@ -98,5 +105,11 @@ void UEscapeSkillBase::FinishSkill()
 	if (Instigator)
 	{
 		Instigator->ResetState();
+	}
+	
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if(SkillsComp)
+	{
+		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
 	}
 }
