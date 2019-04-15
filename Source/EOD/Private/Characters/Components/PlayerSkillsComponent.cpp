@@ -396,14 +396,16 @@ void UPlayerSkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill
 	}
 
 	uint8 SupersedingSkillIndex = GetSkillIndexForSkillGroup(PlayerSkill->GetSupersedingSkillGroup());
+	UPlayerSkillBase* SupersedingSkill = SkillIndexToSkillMap.Contains(SupersedingSkillIndex) ? Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SupersedingSkillIndex]) : nullptr;
 
-	if (SupersedingSkillIndex != 0)
+	if (SupersedingSkill)
 	{
 		SupersedingChainSkillGroup = TPair<uint8, uint8>(LastPressedSkillKey, SupersedingSkillIndex);
 		float SkillDuration = PlayerSkill->GetSkillDuration();
 		float ChainSkillActivationWindow = SkillDuration + ChainSkillResetDelay;
 		World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
-		PlayerSkill->OnActivatedAsChainSkill();
+
+		SupersedingSkill->OnActivatedAsChainSkill();
 	}
 }
 

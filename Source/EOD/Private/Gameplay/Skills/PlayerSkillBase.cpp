@@ -3,6 +3,10 @@
 
 #include "PlayerSkillBase.h"
 #include "EODCharacterBase.h"
+#include "ContainerWidget.h"
+#include "PlayerSkillsComponent.h"
+
+#include "Components/Image.h"
 
 UPlayerSkillBase::UPlayerSkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -17,8 +21,9 @@ bool UPlayerSkillBase::CanPlayerActivateThisSkill() const
 
 	bool bHasValidWeapon = EquippedWeaponType != EWeaponType::None && IsWeaponTypeSupported(EquippedWeaponType) && !Instigator->IsWeaponSheathed();
 	bool bInCooldown = IsSkillInCooldown();
+	bool bHasNoPrecedingSkillGroups = PrecedingSkillGroups.Num() == 0;
 
-	return bHasValidWeapon && !bInCooldown;
+	return bHasValidWeapon && !bInCooldown && bHasNoPrecedingSkillGroups;
 }
 
 void UPlayerSkillBase::OnWeaponChange(EWeaponType NewWeaponType, EWeaponType OldWeaponType)
@@ -27,11 +32,46 @@ void UPlayerSkillBase::OnWeaponChange(EWeaponType NewWeaponType, EWeaponType Old
 
 void UPlayerSkillBase::OnActivatedAsChainSkill()
 {
+	if (PrecedingSkillGroups.Num() == 0)
+	{
+		return;
+	}
 
+	UPlayerSkillsComponent* SkillComp = Cast<UPlayerSkillsComponent>(InstigatorSkillComponent.Get());
+	if (SkillComp)
+	{
+		TArray<UContainerWidget*> Containers = SkillComp->GetAllContainerWidgetsForSkill(SkillGroup);
+		for (UContainerWidget* Cont : Containers)
+		{
+			if (Cont)
+			{
+				Cont->ItemImage->SetIsEnabled(true);
+				Cont->SetCanBeClicked(true);
+			}
+		}
+	}
 }
 
 void UPlayerSkillBase::OnDeactivatedAsChainSkill()
 {
+	if (PrecedingSkillGroups.Num() == 0)
+	{
+		return;
+	}
+
+	UPlayerSkillsComponent* SkillComp = Cast<UPlayerSkillsComponent>(InstigatorSkillComponent.Get());
+	if (SkillComp)
+	{
+		TArray<UContainerWidget*> Containers = SkillComp->GetAllContainerWidgetsForSkill(SkillGroup);
+		for (UContainerWidget* Cont : Containers)
+		{
+			if (Cont)
+			{
+				Cont->ItemImage->SetIsEnabled(false);
+				Cont->SetCanBeClicked(false);
+			}
+		}
+	}
 }
 
 void UPlayerSkillBase::StartCooldown()
