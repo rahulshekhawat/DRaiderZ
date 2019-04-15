@@ -139,6 +139,16 @@ public:
 	virtual bool CanUseAnySkill() const;
 
 	// --------------------------------------
+	//  Sounds
+	// --------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+	FPlayerSystemSounds SystemSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+	FPlayerGameplaySounds GameplaySounds;
+
+	// --------------------------------------
 	//  Rotation
 	// --------------------------------------
 

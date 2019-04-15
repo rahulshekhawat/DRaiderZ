@@ -346,6 +346,176 @@ struct EOD_API FGameplaySkillTableRow : public FTableRowBase
 	}
 };
 
+USTRUCT(BlueprintType)
+struct EOD_API FPlayerSystemSounds
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	USoundBase* NotEnoughGold;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	USoundBase* NotEnoughStamina;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	USoundBase* NotEnoughEnergy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	USoundBase* NotEnoughHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	USoundBase* SkillNotAvailable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	USoundBase* CannotEquipItem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	USoundBase* CannotUseItem;
+};
+
+USTRUCT(BlueprintType)
+struct EOD_API FPlayerGameplaySounds
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	USoundBase* DialogueTriggeredSound;
+
+};
+
+USTRUCT(BlueprintType)
+struct EOD_API FWeaponHitSounds
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> BluntCritHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> BluntFleshHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> BluntMetalHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> BluntHitMissSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> BluntStoneHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> BluntUndeadHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> BluntWoodHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt2CritHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt2FleshHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt2MetalHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt2HitMissSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt2StoneHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt2UndeadHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt2WoodHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt3CritHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt3FleshHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt3MetalHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt3HitMissSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt3StoneHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt3UndeadHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Blunt3WoodHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SlashCritHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SlashFleshHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SlashMetalHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SlashHitMissSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SlashStoneHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SlashUndeadHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SlashWoodHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Slash2CritHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Slash2FleshHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Slash2MetalHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Slash2HitMissSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Slash2StoneHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Slash2UndeadHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> Slash2WoodHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SliceCritHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SliceFleshHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SliceMetalHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SliceHitMissSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SliceStoneHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SliceUndeadHitSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TArray<USoundBase*> SliceWoodHitSounds;
+
+};
+
 /** Struct containing skill tree slot information */
 USTRUCT(BlueprintType)
 struct EOD_API FSkillTreeSlot : public FTableRowBase

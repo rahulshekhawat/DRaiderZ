@@ -263,6 +263,13 @@ public:
 
 	virtual void TurnOffTargetSwitch() override;
 
+	// --------------------------------------
+	//  Sounds
+	// --------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+	FWeaponHitSounds WeaponHitSounds;
+
 protected:
 
 	// --------------------------------------
