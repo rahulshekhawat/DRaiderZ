@@ -14,6 +14,7 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 #include "Components/Image.h"
+#include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GenericPlatform/GenericPlatformTime.h"
 
@@ -233,6 +234,20 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 
 			ActivePrecedingChainSkillGroup = LastUsedSkillGroup = PlayerSkill->GetSkillGroup();
 			ActiveSkills.Add(PlayerSkill);
+		}
+		else
+		{
+			APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(CharOwner);
+			if (PlayerChar)
+			{
+				UAudioComponent* AC = PlayerChar->GetSystemAudioComponent();
+				if (AC)
+				{
+					AC->SetSound(PlayerChar->SystemSounds.SkillNotAvailable);
+					AC->Play();
+				}
+				// UGameplayStatics::SpawnSoundAtLocation(this, PlayerChar->SystemSounds.SkillNotAvailable, PlayerChar->GetActorLocation());
+			}
 		}
 	}
 	else

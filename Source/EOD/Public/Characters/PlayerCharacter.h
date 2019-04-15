@@ -67,15 +67,20 @@ public:
 	/** Saves current player state */
 	virtual void SaveCharacterState() override;
 
-protected:
 
 	// --------------------------------------
 	//	Components
 	// --------------------------------------
 
-	//~ Audio component
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UAudioComponent* AudioComponent;
+	FORCEINLINE UAudioComponent* GetSystemAudioComponent() const { return SystemAudioComponent; }
+
+	static const FName SystemAudioComponentName;
+
+protected:
+
+	/** Audio component for playing system messages */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
+	UAudioComponent* SystemAudioComponent;
 
 public:
 

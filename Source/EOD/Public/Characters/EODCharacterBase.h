@@ -759,11 +759,15 @@ public:
 
 	FORCEINLINE UGameplaySkillsComponent* GetGameplaySkillsComponent() const { return SkillManager; }
 
+	FORCEINLINE UAudioComponent* GetGameplayAudioComponent() const { return GameplayAudioComponent; }
+
 	static const FName CameraComponentName;
 
 	static const FName SpringArmComponentName;
 
 	static const FName GameplaySkillsComponentName;
+
+	static const FName GameplayAudioComponentName;
 
 protected:
 
@@ -776,9 +780,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera|Constants")
 	int CameraArmMaximumLength;
 
-	/** Audio component for playing hit effect sounds */
-	UPROPERTY(Transient)
-	UAudioComponent* HitAudioComponent;
+	/** Audio component for playing sound effects on getting hit */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Sound)
+	UAudioComponent* GameplayAudioComponent;
 
 private:
 

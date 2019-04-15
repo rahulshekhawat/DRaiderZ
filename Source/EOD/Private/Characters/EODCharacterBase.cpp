@@ -28,6 +28,7 @@
 #include "UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/AudioComponent.h"
 
 /**
  * EOD Character stats
@@ -37,6 +38,7 @@ DECLARE_CYCLE_STAT(TEXT("EOD ChararaterTick"), STAT_EODCharacterTick, STATGROUP_
 const FName AEODCharacterBase::CameraComponentName(TEXT("Camera"));
 const FName AEODCharacterBase::SpringArmComponentName(TEXT("Camera Boom"));
 const FName AEODCharacterBase::GameplaySkillsComponentName(TEXT("Skill Manager"));
+const FName AEODCharacterBase::GameplayAudioComponentName(TEXT("Gameplay Audio Component"));
 
 AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UEODCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -56,6 +58,12 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	if (CameraComponent)
 	{
 		CameraComponent->SetupAttachment(CameraBoomComponent, USpringArmComponent::SocketName);
+	}
+
+	GameplayAudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, AEODCharacterBase::GameplayAudioComponentName);
+	if (GameplayAudioComponent)
+	{
+		GameplayAudioComponent->SetupAttachment(RootComponent);
 	}
 
 	SetReplicates(true);

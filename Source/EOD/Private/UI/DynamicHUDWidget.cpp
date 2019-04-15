@@ -92,10 +92,10 @@ bool UDynamicHUDWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 
 	if (Operation->DraggedContainerWidget->GetContainerType() == EContainerType::SkillBar)
 	{
-		UDynamicSkillBarWidget* SkillBarWidget = Cast<UDynamicSkillBarWidget>(Operation->DraggedContainerWidget->GetContainerParent());
-		if (SkillBarWidget)
+		UDynamicSkillBarWidget* ParentSkillBarWidget = Cast<UDynamicSkillBarWidget>(Operation->DraggedContainerWidget->GetContainerParent());
+		if (ParentSkillBarWidget)
 		{
-			SkillBarWidget->OnContainerRemoved(Operation->DraggedContainerWidget);
+			ParentSkillBarWidget->OnContainerRemoved(Operation->DraggedContainerWidget);
 		}
 	}
 

@@ -33,14 +33,19 @@
 // #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+const FName APlayerCharacter::SystemAudioComponentName(TEXT("System Audio Component"));
+
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerSkillsComponent>(AEODCharacterBase::GameplaySkillsComponentName))
 {
 	// The player should be free to look around with mouse without actually rotating the posessed character
 	bUseControllerRotationYaw = false;
 
-	AudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("Audio Component"));
-	AudioComponent->SetupAttachment(RootComponent);
+	SystemAudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, APlayerCharacter::SystemAudioComponentName);
+	if (SystemAudioComponent)
+	{
+		SystemAudioComponent->SetupAttachment(RootComponent);
+	}
 
 	MaxWeaponSlots = 2;
 	
@@ -1403,8 +1408,8 @@ void APlayerCharacter::OnInteractionSphereBeginOverlap_Implementation(AActor* Ot
 	ActiveInteractiveActor = OtherActor;
 	OverlappingInteractiveActors.Add(OtherActor);
 
-	AudioComponent->SetSound(InteractiveActorDetectedSound);
-	AudioComponent->Play();
+	GameplayAudioComponent->SetSound(InteractiveActorDetectedSound);
+	GameplayAudioComponent->Play();
 }
 
 void APlayerCharacter::OnInteractionSphereEndOverlap_Implementation(AActor* OtherActor)
@@ -1427,8 +1432,8 @@ void APlayerCharacter::OnInteractionSphereEndOverlap_Implementation(AActor* Othe
 			IInteractionInterface* NewInteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
 			NewInteractiveObj->Execute_EnableCustomDepth(ActiveInteractiveActor);
 
-			AudioComponent->SetSound(InteractiveActorDetectedSound);
-			AudioComponent->Play();
+			GameplayAudioComponent->SetSound(InteractiveActorDetectedSound);
+			GameplayAudioComponent->Play();
 		}
 		else
 		{
@@ -1493,8 +1498,8 @@ void APlayerCharacter::UpdateInteraction()
 		{
 			DialogueWidget->UpdateDialogueWindow(DialogueWin->NextEventID);
 
-			AudioComponent->SetSound(DialogueTriggeredSound);
-			AudioComponent->Play();
+			GameplayAudioComponent->SetSound(DialogueTriggeredSound);
+			GameplayAudioComponent->Play();
 		}
 	}
 }
@@ -1545,9 +1550,9 @@ void APlayerCharacter::EndInteraction()
 
 		RemoveDialogueWidget();
 
-		AudioComponent->SetSound(DialogueEndSound);
+		GameplayAudioComponent->SetSound(DialogueEndSound);
 		// AudioComponent->SetSound(InteractionEndSound);
-		AudioComponent->Play();
+		GameplayAudioComponent->Play();
 	}
 }
 
