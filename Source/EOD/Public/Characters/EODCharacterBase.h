@@ -1081,6 +1081,10 @@ public:
 	/** Temporarily trigger 'Target_Switch' material parameter to make the character glow */
 	inline void SetOffTargetSwitch(float Duration = 0.1f);
 
+	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Materials")
+	// void DissolveCharacter();
+	// virtual void DissolveCharacter_Implementation();
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")

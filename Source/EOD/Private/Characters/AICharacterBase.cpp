@@ -399,6 +399,7 @@ bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const F
 		// PlayAnimationMontage(HitEffectsAnimMontage,
 			// UCharacterLibrary::SectionName_KnockdownStart,
 			// ECharacterState::GotHit);
+		PlayAnimMontage(HitEffectsAnimMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 		PushBack(ImpulseDirection);
 		return true;

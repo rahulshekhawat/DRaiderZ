@@ -238,7 +238,7 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 		else
 		{
 			APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(CharOwner);
-			if (PlayerChar)
+			if (PlayerChar && (PlayerChar->IsIdleOrMoving() || PlayerChar->IsNormalAttacking() || PlayerChar->IsBlocking()))
 			{
 				UAudioComponent* AC = PlayerChar->GetSystemAudioComponent();
 				if (AC)
