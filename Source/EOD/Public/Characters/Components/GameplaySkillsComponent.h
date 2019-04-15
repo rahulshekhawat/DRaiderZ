@@ -63,7 +63,7 @@ public:
 	virtual bool CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
-	virtual void ActivateChainSkill(FName SkillGroup);
+	virtual void ActivateChainSkill(UGameplaySkillBase* CurrentSkill);
 
 	/** Returns the skill index of the skill with corresponding SkillGroup */
 	UFUNCTION(BlueprintCallable, Category = "Skill System")

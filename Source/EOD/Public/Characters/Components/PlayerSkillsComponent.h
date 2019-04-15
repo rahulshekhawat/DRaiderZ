@@ -63,7 +63,7 @@ public:
 
 	virtual bool CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr) override;
 
-	virtual void ActivateChainSkill(FName SkillGroup) override;
+	virtual void ActivateChainSkill(UGameplaySkillBase* CurrentSkill) override;
 
 	void OnPlayerWeaponChanged();
 	// @todo

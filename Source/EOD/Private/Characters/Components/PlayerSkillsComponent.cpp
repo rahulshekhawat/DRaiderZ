@@ -211,7 +211,7 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 
 			if (PlayerSkill->GetSupersedingSkillGroup() != NAME_None)
 			{
-				ActivateChainSkill(PlayerSkill->GetSupersedingSkillGroup());
+				ActivateChainSkill(PlayerSkill);
 			}
 
 			ActivePrecedingChainSkillGroup = LastUsedSkillGroup = PlayerSkill->GetSkillGroup();
@@ -381,23 +381,30 @@ TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill
 	return SkillWidgets;
 }
 
-void UPlayerSkillsComponent::ActivateChainSkill(FName SkillGroup)
+void UPlayerSkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill)
 {
-	SkillGroupToSkillIndexMap[SkillGroup];
-	uint8 SupersedingSkillIndex = GetSkillIndexForSkillGroup(SkillGroup);
+	UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(CurrentSkill);
+	UWorld* World = GetWorld();
+	if (!PlayerSkill || !World)
+	{
+		return;
+	}
+
+	if (PlayerSkill->GetSupersedingSkillGroup() == NAME_None)
+	{
+		return;
+	}
+
+	uint8 SupersedingSkillIndex = GetSkillIndexForSkillGroup(PlayerSkill->GetSupersedingSkillGroup());
 
 	if (SupersedingSkillIndex != 0)
 	{
-		UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SupersedingSkillIndex]);
-		UWorld* World = GetWorld();
-		if (PlayerSkill && World)
-		{
-			SupersedingChainSkillGroup = TPair<uint8, uint8>(LastPressedSkillKey, SupersedingSkillIndex);
-			float SkillDuration = PlayerSkill->GetSkillDuration();
-			float ChainSkillActivationWindow = SkillDuration + ChainSkillResetDelay;
-			World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
-			PlayerSkill->OnActivatedAsChainSkill();
-		}
+		SupersedingChainSkillGroup = TPair<uint8, uint8>(LastPressedSkillKey, SupersedingSkillIndex);
+		float SkillDuration = PlayerSkill->GetSkillDuration();
+		float ChainSkillActivationWindow = SkillDuration + ChainSkillResetDelay;
+		PrintToScreen(this, FString::SanitizeFloat(SkillDuration), 10.f);
+		World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
+		PlayerSkill->OnActivatedAsChainSkill();
 	}
 }
 

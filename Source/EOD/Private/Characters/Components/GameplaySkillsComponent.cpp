@@ -98,7 +98,7 @@ bool UGameplaySkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase*
 	return false;
 }
 
-void UGameplaySkillsComponent::ActivateChainSkill(FName SkillGroup)
+void UGameplaySkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill)
 {
 }
 
