@@ -23,6 +23,7 @@ APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Sup
 		RightHandWeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		RightHandWeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 		RightHandWeaponMeshComp->SetCanEverAffectNavigation(false);
+		RightHandWeaponMeshComp->SetReceivesDecals(false);
 		RightHandWeaponMeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	}
 
@@ -33,6 +34,7 @@ APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Sup
 		LeftHandWeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		LeftHandWeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 		LeftHandWeaponMeshComp->SetCanEverAffectNavigation(false);
+		LeftHandWeaponMeshComp->SetReceivesDecals(false);
 		LeftHandWeaponMeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	}
 
@@ -43,6 +45,7 @@ APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Sup
 		SheathedWeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		SheathedWeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 		SheathedWeaponMeshComp->SetCanEverAffectNavigation(false);
+		SheathedWeaponMeshComp->SetReceivesDecals(false);
 		SheathedWeaponMeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	}
 
@@ -52,6 +55,7 @@ APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Sup
 		FallenWeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		FallenWeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 		FallenWeaponMeshComp->SetCanEverAffectNavigation(false);
+		FallenWeaponMeshComp->SetReceivesDecals(false);
 		FallenWeaponMeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	}
 }

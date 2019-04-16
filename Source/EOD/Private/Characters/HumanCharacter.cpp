@@ -93,6 +93,7 @@ USkeletalMeshComponent* AHumanCharacter::CreateNewArmorComponent(const FName Nam
 	if (Sk)
 	{
 		Sk->SetupAttachment(GetMesh());
+		Sk->SetReceivesDecals(false);
 		Sk->bUseAttachParentBound = true;
 	}
 	return Sk;

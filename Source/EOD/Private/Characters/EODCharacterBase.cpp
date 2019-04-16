@@ -66,6 +66,11 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 		GameplayAudioComponent->SetupAttachment(RootComponent);
 	}
 
+	if (GetMesh())
+	{
+		GetMesh()->SetReceivesDecals(false);
+	}
+
 	SetReplicates(true);
 	SetReplicateMovement(true);
 	if (GetCharacterMovement())
