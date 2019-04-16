@@ -221,6 +221,9 @@ public:
 	/** Start dodging */
 	virtual void StartDodge() override;
 
+	/** Cancel dodging */
+	virtual void CancelDodge() override;
+
 	/** Finish dodging */
 	virtual void FinishDodge() override;
 

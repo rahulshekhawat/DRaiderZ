@@ -88,15 +88,6 @@ public:
 	//  Character States
 	// --------------------------------------
 
-	/** Start dodging */
-	virtual void StartDodge() override;
-
-	/** Cancel dodging */
-	virtual void CancelDodge() override;
-
-	/** Finish dodging */
-	virtual void FinishDodge() override;
-
 	/** Start normal attacks */
 	virtual void StartNormalAttack() override;
 

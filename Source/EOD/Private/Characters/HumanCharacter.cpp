@@ -332,15 +332,135 @@ void AHumanCharacter::RemoveSecondaryWeapon()
 
 bool AHumanCharacter::CanDodge() const
 {
-	return IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking();
+	FPlayerAnimationReferencesTableRow* AnimationRef = GetActiveAnimationReferences();
+	UAnimMontage* Animation = AnimationRef ? AnimationRef->Dodge.Get() : nullptr;
+
+	// @todo add UsingSkill, Looting, Interacting, etc. to this too
+	bool bStateAllowsDodge = IsIdleOrMoving() || IsBlocking() || IsCastingSpell() || IsNormalAttacking();
+
+	// If we have a valid animation for dodge and the character state allows dodging
+	return Animation && bStateAllowsDodge;
 }
 
 void AHumanCharacter::StartDodge()
 {
+	if (Controller && Controller->IsLocalController())
+	{
+		// DodgeIndex
+		// 0 = Forward Dodge
+		// 1 = Backward Dodge
+		// 2 = Left Dodge
+		// 3 = Right Dodge
+
+		uint8 DodgeIndex = 0;
+		if (ForwardAxisValue == 0)
+		{
+			if (RightAxisValue > 0)
+			{
+				DodgeIndex = 3;
+			}
+			else if (RightAxisValue < 0)
+			{
+				DodgeIndex = 2;
+			}
+			else
+			{
+				DodgeIndex = 1;
+			}
+		}
+		else
+		{
+			if (ForwardAxisValue > 0)
+			{
+				DodgeIndex = 0;
+			}
+			else if (ForwardAxisValue < 0)
+			{
+				DodgeIndex = 1;
+			}
+		}
+
+		float DesiredYaw = GetControllerRotationYaw();
+		if (ForwardAxisValue != 0)
+		{
+			DesiredYaw = GetRotationYawFromAxisInput();
+		}
+
+		// Initiate dodge over network
+		if (Role < ROLE_Authority)
+		{
+			Server_Dodge(DodgeIndex, DesiredYaw);
+		}
+		else
+		{
+			TriggeriFrames(DodgeImmunityDuration, DodgeImmunityTriggerDelay);
+		}
+
+		FCharacterStateInfo NewStateInfo(ECharacterState::Dodging, DodgeIndex);
+		NewStateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+		CharacterStateInfo = NewStateInfo;
+
+		SetActorRotation(FRotator(0.f, DesiredYaw, 0.f));
+		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+		if (MoveComp)
+		{
+			MoveComp->bUseControllerDesiredRotation = false;
+			MoveComp->SetDesiredCustomRotationYaw_LocalOnly(DesiredYaw);
+		}
+	}
+
+	// Following variables are only relevant to owner
+	bCharacterStateAllowsMovement = false;
+	bCharacterStateAllowsRotation = false;
+
+	FName SectionToPlay = NAME_None;
+	if (CharacterStateInfo.SubStateIndex == 0)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_ForwardDodge;
+	}
+	else if (CharacterStateInfo.SubStateIndex == 1)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_BackwardDodge;
+	}
+	else if (CharacterStateInfo.SubStateIndex == 2)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_LeftDodge;
+	}
+	else if (CharacterStateInfo.SubStateIndex == 3)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_RightDodge;
+	}
+
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* DodgeMontage = AnimRef ? AnimRef->Dodge.Get() : nullptr;
+	check(DodgeMontage);
+
+	float MontageDuration = PlayAnimMontage(DodgeMontage, 1.f, SectionToPlay);
+
+	// The total duration of dodge montage is 4 times the dodge animation duration since it includes dodge animations for all 4 directions (left, right, forward, backward)
+	float ActualDuration = (MontageDuration / 4) - DodgeMontage->GetDefaultBlendOutTime();
+
+	UWorld* World = GetWorld();
+	check(World);
+	World->GetTimerManager().SetTimer(FinishDodgeTimerHandle, this, &AHumanCharacter::FinishDodge, ActualDuration, false);
+}
+
+void AHumanCharacter::CancelDodge()
+{
+	UWorld* World = GetWorld();
+	check(World);
+	World->GetTimerManager().ClearTimer(FinishDodgeTimerHandle);
+
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* DodgeMontage = AnimRef ? AnimRef->Dodge.Get() : nullptr;
+	check(DodgeMontage);
+
+	StopAnimMontage(DodgeMontage);
 }
 
 void AHumanCharacter::FinishDodge()
 {
+	ResetState();
 }
 
 void AHumanCharacter::OnPressedForward()
