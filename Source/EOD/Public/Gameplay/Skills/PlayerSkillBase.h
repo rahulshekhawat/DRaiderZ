@@ -24,6 +24,8 @@ public:
 
 	virtual bool CanPlayerActivateThisSkill() const;
 
+	virtual bool CanTriggerSkill() const override;
+
 	/** Event called when player changes it's equipped weapon */
 	virtual void OnWeaponChange(EWeaponType NewWeaponType, EWeaponType OldWeaponType);
 

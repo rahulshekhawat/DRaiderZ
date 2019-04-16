@@ -1379,9 +1379,12 @@ void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
 {
 }
 
-void APlayerCharacter::BP_SetCanUseChainSkill(bool bNewValue)
+void APlayerCharacter::SetCanUseChainSkill(bool bNewValue)
 {
-	SetCanUseChainSkill(bNewValue);
+	if (GetGameplaySkillsComponent())
+	{
+		GetGameplaySkillsComponent()->SetCanUseChainSkill(bNewValue);
+	}
 }
 
 void APlayerCharacter::BP_SetNormalAttackSectionChangeAllowed(bool bNewValue)

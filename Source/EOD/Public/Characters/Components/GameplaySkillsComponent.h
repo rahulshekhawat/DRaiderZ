@@ -84,6 +84,18 @@ public:
 	inline FGameplaySkillTableRow* GetGameplaySkillTableRow(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
 
 	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillIndexToSkillMap; }
+
+	FORCEINLINE FName GetActivePrecedingChainSkillGroup() const { return ActivePrecedingChainSkillGroup; }
+
+	FORCEINLINE bool CanUseChainSkill() const { return bCanUseChainSkill; }
+
+	inline void SetCanUseChainSkill(bool bValue) { bCanUseChainSkill = bValue; }
+
+	FORCEINLINE FName GetLastUsedSkillGroup() const { return LastUsedSkillGroup; }
+
+	FORCEINLINE uint8 GetLastUsedSkillIndex() const { return LastUsedSkillIndex; }
+
+	FORCEINLINE TPair<uint8, uint8> GetSupersedingChainSkillGroup() const { return SupersedingChainSkillGroup; };
 	
 protected:
 
@@ -99,6 +111,9 @@ protected:
 
 	UPROPERTY(Transient)
 	TMap<FName, uint8> SkillGroupToSkillIndexMap;
+
+	UPROPERTY(Transient)
+	bool bCanUseChainSkill;
 
 	/** The skill that the character used last time */
 	UPROPERTY(Transient)

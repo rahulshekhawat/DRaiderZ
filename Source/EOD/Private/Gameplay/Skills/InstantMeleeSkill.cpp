@@ -11,6 +11,9 @@ UInstantMeleeSkill::UInstantMeleeSkill(const FObjectInitializer& ObjectInitializ
 
 bool UInstantMeleeSkill::CanTriggerSkill() const
 {
+	return Super::CanTriggerSkill();
+
+	/*
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	EWeaponType EquippedWeaponType = Instigator ? Instigator->GetEquippedWeaponType() : EWeaponType::None;
 
@@ -18,8 +21,13 @@ bool UInstantMeleeSkill::CanTriggerSkill() const
 	bool bInCooldown = IsSkillInCooldown();
 
 	bool bInstigatorCanUseSkill = Instigator ? Instigator->IsIdleOrMoving() || Instigator->IsBlocking() || Instigator->IsNormalAttacking() : false;
+	if (!bInstigatorCanUseSkill)
+	{
+		// bInstigatorCanUseSkill = Instigator->()
+	}
 
 	return bHasValidWeapon && !bInCooldown && bInstigatorCanUseSkill;
+	*/
 }
 
 void UInstantMeleeSkill::TriggerSkill()

@@ -26,6 +26,27 @@ bool UPlayerSkillBase::CanPlayerActivateThisSkill() const
 	return bHasValidWeapon && !bInCooldown && bHasNoPrecedingSkillGroups;
 }
 
+bool UPlayerSkillBase::CanTriggerSkill() const
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	EWeaponType EquippedWeaponType = Instigator ? Instigator->GetEquippedWeaponType() : EWeaponType::None;
+
+	bool bHasValidWeapon = EquippedWeaponType != EWeaponType::None && IsWeaponTypeSupported(EquippedWeaponType) && !Instigator->IsWeaponSheathed();
+	bool bInCooldown = IsSkillInCooldown();
+
+	bool bInstigatorCanUseSkill = Instigator ? Instigator->IsIdleOrMoving() || Instigator->IsBlocking() || Instigator->IsNormalAttacking() : false;
+	if (!bInstigatorCanUseSkill && Instigator->IsUsingAnySkill())
+	{
+		UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+		if (SkillsComp && SkillsComp->CanUseChainSkill() && SkillsComp->GetSupersedingChainSkillGroup().Value == this->SkillIndex)
+		{
+			bInstigatorCanUseSkill = true;
+		}
+	}
+
+	return bHasValidWeapon && !bInCooldown && bInstigatorCanUseSkill;
+}
+
 void UPlayerSkillBase::OnWeaponChange(EWeaponType NewWeaponType, EWeaponType OldWeaponType)
 {
 }

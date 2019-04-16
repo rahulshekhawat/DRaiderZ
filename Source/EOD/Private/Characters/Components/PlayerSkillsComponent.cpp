@@ -214,6 +214,15 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	{
 		if (PlayerSkill->CanTriggerSkill())
 		{
+			if (ActiveSkills.Num() > 0)
+			{
+				UGameplaySkillBase* PreviousSkill = ActiveSkills[0];
+				if (PreviousSkill)
+				{
+					PreviousSkill->CancelSkill();
+				}
+			}
+
 			ResetChainSkill();
 
 			PlayerSkill->TriggerSkill();
@@ -233,7 +242,9 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			}
 
 			ActivePrecedingChainSkillGroup = LastUsedSkillGroup = PlayerSkill->GetSkillGroup();
+			LastUsedSkillIndex = SkillIndex;
 			ActiveSkills.Add(PlayerSkill);
+			SetCanUseChainSkill(false);
 		}
 		else
 		{
@@ -246,12 +257,20 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 					AC->SetSound(PlayerChar->SystemSounds.SkillNotAvailable);
 					AC->Play();
 				}
-				// UGameplayStatics::SpawnSoundAtLocation(this, PlayerChar->SystemSounds.SkillNotAvailable, PlayerChar->GetActorLocation());
 			}
 		}
 	}
 	else
 	{
+		if (ActiveSkills.Num() > 0)
+		{
+			UGameplaySkillBase* PreviousSkill = ActiveSkills[0];
+			if (PreviousSkill)
+			{
+				PreviousSkill->CancelSkill();
+			}
+		}
+
 		PlayerSkill->TriggerSkill();
 		ActiveSkills.Add(PlayerSkill);
 	}

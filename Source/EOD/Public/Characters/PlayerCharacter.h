@@ -154,6 +154,13 @@ public:
 	FPlayerGameplaySounds GameplaySounds;
 
 	// --------------------------------------
+	//  Skill System
+	// --------------------------------------
+
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	void SetCanUseChainSkill(bool bNewValue);
+
+	// --------------------------------------
 	//  Rotation
 	// --------------------------------------
 
@@ -250,12 +257,7 @@ public:
 
 	FORCEINLINE bool SkillHasDirectionalAnimations() const;
 
-	FORCEINLINE void SetCanUseChainSkill(bool bNewValue);
-
 	FORCEINLINE void SetNormalAttackSectionChangeAllowed(bool bNewValue);
-
-	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Can Use Chain Skill"))
-	void BP_SetCanUseChainSkill(bool bNewValue);
 
 	UFUNCTION(BlueprintCallable, Category = Skills, meta = (DisplayName = "Set Normal Attack Section Change Allowed"))
 	void BP_SetNormalAttackSectionChangeAllowed(bool bNewValue);
@@ -389,10 +391,6 @@ private:
 
 	UPROPERTY()
 	UWeaponDataAsset* SecondaryWeaponDataAsset;
-
-
-	UPROPERTY(Transient)
-	bool bCanUseChainSkill;
 
 	UPROPERTY(Transient)
 	bool bSkillHasDirectionalAnimations;
@@ -690,11 +688,6 @@ FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
 FORCEINLINE bool APlayerCharacter::SkillHasDirectionalAnimations() const
 {
 	return bSkillHasDirectionalAnimations;
-}
-
-FORCEINLINE void APlayerCharacter::SetCanUseChainSkill(bool bNewValue)
-{
-	bCanUseChainSkill = bNewValue;
 }
 
 FORCEINLINE void APlayerCharacter::SetNormalAttackSectionChangeAllowed(bool bNewValue)
