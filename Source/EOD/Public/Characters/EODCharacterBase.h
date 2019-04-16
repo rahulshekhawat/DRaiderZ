@@ -277,19 +277,6 @@ public:
 	/** Finish normal attacks and reset back to Idle-Walk-Run */
 	virtual void FinishNormalAttack();
 
-	/** Trigger interaction with an NPC or an in-game interactive object */
-	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
-	virtual void TriggerInteraction();
-
-	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
-	virtual void StartInteraction();
-
-	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
-	virtual void UpdateInteraction();
-
-	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
-	virtual void StopInteraction();
-
 	/** Put or remove weapon inside sheath */
 	UFUNCTION(BlueprintCallable, Category = "Character State")
 	virtual void ToggleSheathe();
@@ -333,6 +320,30 @@ protected:
 	virtual void UpdateNormalAttackState(float DeltaTime);
 
 public:
+
+	// --------------------------------------
+	//  Interaction
+	// --------------------------------------
+
+	FORCEINLINE bool IsInteracting() const;
+
+	virtual bool CanStartInteraction() const;
+
+	/** Trigger interaction with an NPC or an in-game interactive object */
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	virtual void TriggerInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	virtual void StartInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	virtual void UpdateInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	virtual void CancelInteraction();
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	virtual void FinishInteraction();
 
 	// --------------------------------------
 	//  Combat
@@ -1563,6 +1574,11 @@ FORCEINLINE bool AEODCharacterBase::IsUsingSkill(FName SkillID) const
 FORCEINLINE bool AEODCharacterBase::HasBeenHit() const
 {
 	return CharacterStateInfo.CharacterState == ECharacterState::GotHit;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsInteracting() const
+{
+	return CharacterStateInfo.CharacterState == ECharacterState::Interacting;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsWeaponSheathed() const

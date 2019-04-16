@@ -1027,30 +1027,6 @@ void AEODCharacterBase::UpdateRotation(float DeltaTime)
 			MoveComp->SetDesiredCustomRotation(DesiredRotation);
 		}
 	}
-
-	/*
-	if (IsGuardActive())
-	{
-		SetUseControllerRotationYaw(true);
-		return;
-		
-	}
-	else
-	{
-		SetUseControllerRotationYaw(false);
-	}
-	
-	if (CharacterState == ECharacterState::IdleWalkRun || bCharacterStateAllowsRotation)
-	{
-		SetUseControllerRotationYaw(false);
-		FRotator DesiredRotation = FRotator(0.f, GetRotationYawFromAxisInput(), 0.f);
-		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-		if (MoveComp)
-		{
-			MoveComp->SetDesiredCustomRotation(DesiredRotation);
-		}
-	}
-	*/
 }
 
 void AEODCharacterBase::UpdateMovement(float DeltaTime)
@@ -1122,20 +1098,13 @@ void AEODCharacterBase::UpdateMovement(float DeltaTime)
 	}
 }
 
+bool AEODCharacterBase::CanStartInteraction() const
+{
+	return false;
+}
+
 void AEODCharacterBase::TriggerInteraction()
 {
-	//~ @todo
-	/*
-	// If Character is already interacting
-	if (GetCharacterState() == ECharacterState::Interacting)
-	{
-		UpdateInteraction();
-	}
-	else
-	{
-		StartInteraction();
-	}
-	*/
 }
 
 void AEODCharacterBase::StartInteraction()
@@ -1146,7 +1115,11 @@ void AEODCharacterBase::UpdateInteraction()
 {
 }
 
-void AEODCharacterBase::StopInteraction()
+void AEODCharacterBase::CancelInteraction()
+{
+}
+
+void AEODCharacterBase::FinishInteraction()
 {
 }
 

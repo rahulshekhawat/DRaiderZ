@@ -178,11 +178,30 @@ public:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
 
+	virtual bool CanStartInteraction() const override;
+
+	/** Trigger interaction with an NPC or an in-game interactive object */
+	virtual void TriggerInteraction() override;
+
+	virtual void StartInteraction() override;
+
+	virtual void UpdateInteraction() override;
+
+	virtual void CancelInteraction() override;
+
+	virtual void FinishInteraction() override;
+
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Character Interaction")
 	TArray<AActor*> OverlappingInteractiveActors;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Character Interaction")
 	AActor* ActiveInteractiveActor;
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	void DisplayDialogueWidget(FName DialogueWindowID);
+
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	void RemoveDialogueWidget();
 
 	// --------------------------------------
 	//  Weapon System
@@ -253,30 +272,7 @@ public:
 
 	void OnSkillGroupRemovedFromSkillBar(const FString& SkillGroup);
 
-
-	// inline FPlayerAnimationReferencesTableRow* GetActiveAnimationReferences() const;
-
-	// inline FPlayerAnimationReferencesTableRow* GetEquippedWeaponAnimationReferences() const;
-
-	// FORCEINLINE bool SkillAllowsMovement() const;
-
 	FORCEINLINE bool SkillHasDirectionalAnimations() const;
-
-
-	/** On beginning overlap with an interactive actors */
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
-	// void OnInteractionSphereBeginOverlap(AActor* OtherActor);
-
-	/** On beginning overlap with an interactive actors */
-	// virtual void OnInteractionSphereBeginOverlap_Implementation(AActor* OtherActor);
-
-	/** On ending overlap with an interactive actors */
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
-	// void OnInteractionSphereEndOverlap(AActor* OtherActor);
-
-	/** On ending overlap with an interactive actors */
-	// virtual void OnInteractionSphereEndOverlap_Implementation(AActor* OtherActor);
-
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
 	UDialogueWindowWidget* DialogueWidget;
@@ -292,13 +288,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
 	USoundBase* InteractiveActorDetectedSound;
-
-	/** Attempts to start interaction with the active interactive actor */
-	// UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
-	virtual void StartInteraction() override;
-
-	// UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
-	virtual void UpdateInteraction() override;
 
 	// virtual void UpdateInteraction_Implementation();
 
@@ -413,15 +402,8 @@ private:
 	////////////////////////////////////////////////////////////////////////////////
 private:
 
-
 	/** Display or hide character stats UI */
 	void OnToggleCharacterStatsUI();
-
-	void UpdateIdleState(float DeltaTime);
-
-	void UpdateFastMovementState(float DeltaTime);
-
-	void UpdateAutoRun(float DeltaTime);
 
 
 public:
@@ -431,16 +413,6 @@ public:
 	// --------------------------------------
 
 	virtual void CreateGhostTrail_Implementation() override;
-	
-	// --------------------------------------
-	//  Dialgoue System
-	// --------------------------------------
-
-	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
-	void DisplayDialogueWidget(FName DialogueWindowID);
-
-	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
-	void RemoveDialogueWidget();
 
 	// --------------------------------------
 	//  Crowd Control Effect

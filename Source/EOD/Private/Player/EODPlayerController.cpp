@@ -549,6 +549,13 @@ void AEODPlayerController::OnReleasingGuardKey()
 
 void AEODPlayerController::OnPressingEscapeKey()
 {
+	if (IsValid(EODCharacter) && EODCharacter->IsInteracting())
+	{
+		EODCharacter->CancelInteraction();
+	}
+
+
+
 	if (IsPaused())
 	{
 		SetPause(false);

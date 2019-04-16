@@ -53,6 +53,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 	{
 		InteractionSphere->SetupAttachment(RootComponent);
 		InteractionSphere->SetSphereRadius(150);
+		InteractionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 
 	MaxWeaponSlots = 2;
@@ -80,23 +81,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	/*
-	LoadUnequippedWeaponAnimationReferences();
-	SetWalkSpeed(DefaultWalkSpeed * MovementSpeedModifier);
-
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.Instigator = this;
-	SpawnInfo.Owner = this;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
-	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
-
-	// @note Set secondary weapon first and primary weapon later during initialization
-	SetCurrentSecondaryWeapon(SecondaryWeaponID);
-	SetCurrentPrimaryWeapon(PrimaryWeaponID);
-	*/
-
+	
 	if (GetGameplaySkillsComponent())
 	{
 		GetGameplaySkillsComponent()->InitializeSkills(this);
@@ -106,72 +91,6 @@ void APlayerCharacter::PostInitializeComponents()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (!GetActiveAnimationReferences())
-	{
-		// PrintToScreen(this, FString("Animation references are NULL"));
-		return;
-	}
-
-	if (Controller && Controller->IsLocalPlayerController())
-	{
-		/*
-		if (IsSwitchingWeapon())
-		{
-			UpdatePCTryingToMove();
-		}
-		*/
-
-		/*
-		// If block key is pressed but the character is not blocking
-		if (bBlockPressed && !IsBlocking() && CanBlock())
-		{
-			EnableBlock();
-		}
-		// If block is not pressed but character is blocking
-		else if (!bBlockPressed && IsBlocking())
-		{
-			DisableBlock();
-		}
-
-		if (bNormalAttackPressed && CanNormalAttack())
-		{
-			DoNormalAttack();
-		}
-
-		if (IsIdle())
-		{
-			UpdateIdleState(DeltaTime);
-		}
-		else if (IsAutoRunning())
-		{
-			UpdateAutoRun(DeltaTime);
-		}
-		else if (IsFastRunning())
-		{
-			UpdateFastMovementState(DeltaTime);
-		}
-		else if (bNormalAttackPressed && IsNormalAttacking())
-		{
-			UpdateNormalAttack(DeltaTime);
-		}
-		else if (IsMoving() || (IsUsingAnySkill() && bSkillAllowsMovement) || (IsSwitchingWeapon()))
-		{
-			// UpdateMovement(DeltaTime);
-		}
-		else if (IsBlocking())
-		{
-			UpdateBlockState(DeltaTime);
-		}
-		*/
-
-		/*
-		if (bRotateSmoothly)
-		{
-			bRotateSmoothly = !DeltaRotateCharacterToDesiredYaw(DesiredSmoothRotationYaw, DeltaTime);
-		}
-		*/
-	}
 }
 
 void APlayerCharacter::BeginPlay()
@@ -183,10 +102,6 @@ void APlayerCharacter::BeginPlay()
 bool APlayerCharacter::CanMove() const
 {
 	// @todo, uncomment and replace return code with following comment:
-	// return IsIdleOrMoving() || IsRunning() || bCharacterStateAllowsMovement;
-	// return IsIdleOrMoving() || IsBlocking() || IsAutoRunning() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
-	// return IsIdleOrMoving() || IsBlocking() || (IsUsingAnySkill() && bSkillAllowsMovement) || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
-	// return IsIdleOrMoving() || IsBlocking() || IsFastRunning() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
 	return IsIdleOrMoving() || IsBlocking() || IsSwitchingWeapon() || bCharacterStateAllowsMovement;
 }
 
@@ -215,27 +130,8 @@ bool APlayerCharacter::CanGuardAgainstAttacks() const
 
 bool APlayerCharacter::CanUseAnySkill() const
 {
-	// return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsFastRunning() || IsNormalAttacking());
 	return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsNormalAttacking());
 }
-
-/*
-bool APlayerCharacter::CanUseSkill(FSkillTableRow* Skill)
-{
-	//~ @todo
-	if (Skill)
-	{
-		if ((Skill->SupportedWeapons & (1 << (uint8)GetEquippedWeaponType())) &&
-			GetCharacterStatsComponent()->GetCurrentMana() > Skill->ManaRequired &&
-			GetCharacterStatsComponent()->GetCurrentStamina() > Skill->StaminaRequired)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-*/
-
 
 bool APlayerCharacter::CCEFlinch_Implementation(const float BCAngle)
 {
@@ -471,54 +367,6 @@ void APlayerCharacter::AddPrimaryWeaponToCurrentSlot(FName WeaponID)
 		//~ @todo
 		// Server_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset);
 	}
-
-	/*
-	//  You would call AddPrimaryWeaponToCurrentSlot(NAME_None) when you want to remove equipped primary weapon
-	if (WeaponID == NAME_None)
-	{
-		RemovePrimaryWeaponFromCurrentSlot();
-		return;
-	}
-
-	UWeaponDataAsset* WeaponDataAsset = UWeaponLibrary::GetWeaponDataAsset(WeaponID);
-	if (!WeaponDataAsset)
-	{
-		return;
-	}
-
-	RemovePrimaryWeaponFromCurrentSlot();
-	if (UWeaponLibrary::IsWeaponDualHanded(WeaponDataAsset->WeaponType))
-	{
-		RemoveSecondaryWeaponFromCurrentSlot();
-	}
-
-	Server_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset);
-	*/
-
-	/*
-	UWeaponSlot* CurrentWeaponSlot = GetCurrentWeaponSlot() ? GetCurrentWeaponSlot() : CreateNewWeaponSlot();
-
-	UWeaponSlot* WeaponSlot = GetCurrentWeaponSlot();
-	if (WeaponSlot)
-	{
-		WeaponSlot->AttachPrimaryWeapon(WeaponID, WeaponDataAsset);
-	}
-	else
-	{
-
-	}
-
-
-
-	PrimaryWeaponID = WeaponID;
-	PrimaryWeaponDataAsset = WeaponDataAsset;
-
-	OnPrimaryWeaponEquipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
-	*/
-	/*
-	LoadEquippedWeaponAnimationReferences();
-	// @todo add weapon stats
-	*/
 }
 
 void APlayerCharacter::AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset * WeaponDataAsset)
@@ -677,96 +525,6 @@ void APlayerCharacter::OnToggleMouseCursor()
 	}
 }
 
-void APlayerCharacter::UpdateIdleState(float DeltaTime)
-{
-	if (GetCharacterMovementDirection() != ECharMovementDirection::None)
-	{
-		SetCharacterMovementDirection(ECharMovementDirection::None);
-	}
-}
-
-void APlayerCharacter::UpdateFastMovementState(float DeltaTime)
-{
-	float ActorRotationYaw = GetActorRotation().Yaw;
-	float DesiredPlayerRotationYaw = GetRotationYawFromAxisInput();
-
-	bool bRotatePlayer = DesiredPlayerRotationYaw == ActorRotationYaw ? false : true;
-
-	// float ForwardAxisValue = InputComponent->GetAxisValue(FName("MoveForward"));
-	// float RightAxisValue = InputComponent->GetAxisValue(FName("MoveRight"));
-	if (ForwardAxisValue == 0 && RightAxisValue == 0)
-	{
-		bRotatePlayer = false;
-	}
-
-	if (bRotatePlayer)
-	{
-		DeltaRotateCharacterToDesiredYaw(DesiredPlayerRotationYaw, DeltaTime);
-	}
-
-	if (ForwardAxisValue < 0)
-	{
-		float Speed = (DefaultWalkSpeed * MovementSpeedModifier * 5) / 16;
-		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
-		{
-			SetWalkSpeed(Speed);
-		}
-	}
-	else
-	{
-		float Speed = DefaultRunSpeed * MovementSpeedModifier;
-		if (GetCharacterMovement()->MaxWalkSpeed != Speed)
-		{
-			SetWalkSpeed(Speed);
-		}
-	}
-
-	if (ForwardAxisValue == 0)
-	{
-		if (RightAxisValue > 0 && GetCharacterMovementDirection() != ECharMovementDirection::R)
-		{
-			SetCharacterMovementDirection(ECharMovementDirection::R);
-		}
-		else if (RightAxisValue < 0 && GetCharacterMovementDirection() != ECharMovementDirection::L)
-		{
-			SetCharacterMovementDirection(ECharMovementDirection::L);
-		}
-	}
-	else
-	{
-		if (ForwardAxisValue > 0 && GetCharacterMovementDirection() != ECharMovementDirection::F)
-		{
-			SetCharacterMovementDirection(ECharMovementDirection::F);
-		}
-		else if (ForwardAxisValue < 0 && GetCharacterMovementDirection() != ECharMovementDirection::B)
-		{
-			SetCharacterMovementDirection(ECharMovementDirection::B);
-		}
-	}
-}
-
-void APlayerCharacter::UpdateAutoRun(float DeltaTime)
-{
-	if (Controller && Controller->IsLocalPlayerController())
-	{
-		FRotator rot = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
-		FVector Direction = FRotationMatrix(rot).GetScaledAxis(EAxis::X);
-		AddMovementInput(Direction, 1.f);
-	}
-
-	// @todo Why isn't following code inside Enable Auto Run? Un-necessarily repetitive condition checks
-	if (GetCharacterMovementDirection() != ECharMovementDirection::F)
-	{
-		SetCharacterMovementDirection(ECharMovementDirection::F);
-	}
-	
-	float Speed = DefaultWalkSpeed * MovementSpeedModifier;
-	if (GetCharacterMovement()->MaxWalkSpeed != Speed)
-	{
-		SetWalkSpeed(Speed);
-	}
-}
-
 void APlayerCharacter::Destroyed()
 {
 	Super::Destroyed();
@@ -841,182 +599,12 @@ void APlayerCharacter::RemoveDialogueWidget()
 	*/
 }
 
-/*
-void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSection)
-{
-	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
-	{
-		return;
-	}
-
-	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
-	if (GetMesh()->GetAnimInstance())
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (OldSection == NAME_None)
-		{
-			AnimInstance->Montage_Play(NormalAttackMontage);
-			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-		}
-		else
-		{
-			FString OldSectionString = OldSection.ToString();
-			if (OldSectionString.EndsWith("End"))
-			{
-				AnimInstance->Montage_Play(NormalAttackMontage);
-				AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-			}
-			else
-			{
-				FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
-				if (CurrentSection == OldSection)
-				{
-					AnimInstance->Montage_SetNextSection(CurrentSection, NewSection, NormalAttackMontage);
-				}
-				else
-				{
-					AnimInstance->Montage_Play(NormalAttackMontage);
-					AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-				}
-			}
-		}
-
-		// SetCharacterState(ECharacterState::Attacking);
-	}
-
-	//~ @todo
-	// Server_PlayNormalAttackAnimation(OldSection, NewSection);
-}
-*/
-
 void APlayerCharacter::CreateGhostTrail_Implementation()
 {
 }
 
 void APlayerCharacter::OnPressingSkillKey(const uint32 SkillButtonIndex)
 {
-	// bool bSkillBeingUsedWhileHit;
-	TPair<FName, FSkillTableRow*> SkillPair(NAME_None, nullptr);
-	//~ @todo
-	/*
-	if (CanUseAnySkill())
-	{
-		SkillPair = GetSkillsComponent()->GetSkillFromSkillSlot(SkillButtonIndex);
-	}
-	else if (IsUsingAnySkill() && bCanUseChainSkill)
-	{
-		SkillPair = GetSkillsComponent()->GetChainSkillFromSkillSlot(SkillButtonIndex);
-	}
-	else if (HasBeenHit())
-	{
-		SkillPair = GetSkillsComponent()->GetHitImmuneSkillFromSkillSlot(SkillButtonIndex);
-	}
-	*/
-
-	/*
-	if (!CanUseAnySkill())
-	{
-#if MESSAGE_LOGGING_ENABLED
-		UKismetSystemLibrary::PrintString(this, FString("Can't use any skill right now"));
-#endif // MESSAGE_LOGGING_ENABLED
-		return;
-	}
-	*/
-
-	// TPair<FName, FSkillTableRow*> SkillPair = SkillsComponent->GetSkillFromSkillSlot(SkillButtonIndex);
-	// There isn't any skill to use
-	if (SkillPair.Key == NAME_None || SkillPair.Value == nullptr)
-	{
-		return;
-	}
-
-	if (IsBlocking())
-	{
-		// DisableBlock();
-	}
-
-	//~ @todo
-	// GetCharacterStatsComponent()->ModifyCurrentMana(-SkillPair.Value->ManaRequired);
-	// GetCharacterStatsComponent()->ModifyCurrentStamina(-SkillPair.Value->StaminaRequired);
-
-	SetCurrentActiveSkillID(SkillPair.Key);
-	// SetCurrentActiveSkill(SkillPair.Value); // @todo
-	//~ @todo
-	// GetSkillsComponent()->OnSkillUsed(SkillButtonIndex, SkillPair.Key, SkillPair.Value);
-
-	// bSkillAllowsMovement = SkillPair.Value->bAllowsMovement;
-	bSkillHasDirectionalAnimations = SkillPair.Value->bHasDirectionalAnimations;
-
-	// @todo cleaning of crowd control effect timer needs to be handled better
-	GetWorld()->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
-	// If frozen
-	if (CustomTimeDilation == 0.f)
-	{
-		//~ @todo
-		// EndFreeze();
-	}
-
-	//~ @todo
-	// GetCharacterStatsComponent()->AddCrowdControlImmunitiesFromSkill(SkillPair.Value->CrowdControlImmunities);
-
-	//~ @todo
-	/*
-	if (bSkillAllowsMovement)
-	{
-		if (IsIdle())
-		{
-			if (SkillPair.Value->AnimMontage.Get())
-			{
-				PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-			}
-		}
-		else if (IsMoving() && !bSkillHasDirectionalAnimations)
-		{
-			if (SkillPair.Value->UpperBodyAnimMontage.Get())
-			{
-				PlayAnimationMontage(SkillPair.Value->UpperBodyAnimMontage.Get(), SkillPair.Value->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-			}
-		}
-		else if (IsMoving() && bSkillHasDirectionalAnimations)
-		{
-			if (SkillPair.Value->UpperBodyAnimMontage.Get())
-			{
-				FString SectionSuffixString;
-				if (GetCharacterMovementDirection() == ECharMovementDirection::F)
-				{
-					SectionSuffixString = FString("_F");
-				}
-				else if (GetCharacterMovementDirection() == ECharMovementDirection::B)
-				{
-					SectionSuffixString = FString("_B");
-				}
-				else if (GetCharacterMovementDirection() == ECharMovementDirection::L)
-				{
-					SectionSuffixString = FString("_L");
-				}
-				else if (GetCharacterMovementDirection() == ECharMovementDirection::R)
-				{
-					SectionSuffixString = FString("_R");
-				}
-				else
-				{
-					SectionSuffixString = FString("_F");
-				}
-
-				FName SectionToPlay = FName(*(SkillPair.Value->SkillStartMontageSectionName.ToString() + SectionSuffixString));
-				PlayAnimationMontage(SkillPair.Value->UpperBodyAnimMontage.Get(), SectionToPlay, ECharacterState::UsingActiveSkill);
-			}
-		}
-	}
-	else
-	{
-		if (SkillPair.Value->AnimMontage.Get())
-		{
-			SetOffSmoothRotation(GetControllerRotationYaw());
-			PlayAnimationMontage(SkillPair.Value->AnimMontage.Get(), SkillPair.Value->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-		}
-	}
-	*/
 }
 
 void APlayerCharacter::OnReleasingSkillKey(const uint32 SkillButtonIndex)
@@ -1094,6 +682,23 @@ void APlayerCharacter::OnInteractionSphereEndOverlap(
 	}
 }
 
+bool APlayerCharacter::CanStartInteraction() const
+{
+	return IsIdleOrMoving();
+}
+
+void APlayerCharacter::TriggerInteraction()
+{
+	if (IsInteracting())
+	{
+		UpdateInteraction();
+	}
+	else if (CanStartInteraction())
+	{
+		StartInteraction();
+	}
+}
+
 void APlayerCharacter::StartInteraction()
 {
 	if (ActiveInteractiveActor)
@@ -1105,7 +710,6 @@ void APlayerCharacter::StartInteraction()
 		}
 	}
 
-	/*
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
 	if (PC && ActiveInteractiveActor)
 	{
@@ -1114,21 +718,31 @@ void APlayerCharacter::StartInteraction()
 		if (InteractiveObj)
 		{
 			PC->SetViewTargetWithBlend(ActiveInteractiveActor, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
-			SetCharacterState(ECharacterState::Interacting);
 
-			DisplayDialogueWidget();
+			FCharacterStateInfo NewStateInfo;
+			NewStateInfo.CharacterState = ECharacterState::Interacting;
+			NewStateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+			CharacterStateInfo = NewStateInfo;
+			SetCharacterStateAllowsMovement_Local(false);
+			SetCharacterStateAllowsRotation(false);
 
-			AudioComponent->SetSound(InteractionStartSound);
-			AudioComponent->Play();
+			// DisplayDialogueWidget();
+
+			if (GameplayAudioComponent)
+			{
+				GameplayAudioComponent->SetSound(DialogueTriggeredSound);
+				GameplayAudioComponent->Play();
+			}
 
 			InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this);
-			// InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this, DialogueWidget);
 		}
 	}
-	*/
+	else
+	{
+		CancelInteraction();
+	}
 }
 
-// void APlayerCharacter::UpdateInteraction_Implementation()
 void APlayerCharacter::UpdateInteraction()
 {
 	UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
@@ -1154,6 +768,25 @@ void APlayerCharacter::UpdateInteraction()
 			GameplayAudioComponent->Play();
 		}
 	}
+}
+
+void APlayerCharacter::CancelInteraction()
+{
+	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
+	if (PC)
+	{
+		PC->SetViewTargetWithBlend(this, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
+		ResetState();
+
+		RemoveDialogueWidget();
+
+		GameplayAudioComponent->SetSound(DialogueEndSound);
+		GameplayAudioComponent->Play();
+	}
+}
+
+void APlayerCharacter::FinishInteraction()
+{
 }
 
 void APlayerCharacter::RequestDialogue_Implementation(AActor* Requestor, FName DialogueWindowID)
@@ -1231,7 +864,6 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 			}
 		}
 	}
-
 
 	if (GetController() && GetController()->IsLocalPlayerController())
 	{
