@@ -204,13 +204,6 @@ bool APlayerCharacter::CanGuardAgainstAttacks() const
 	return (IsIdleOrMoving() || IsNormalAttacking()) && !(IsWeaponSheathed() || GetEquippedWeaponType() == EWeaponType::None);
 }
 
-bool APlayerCharacter::CanNormalAttack() const
-{
-	return IsIdleOrMoving() &&
-		// The player must have a weapon equipped to normal attack and it shouldn't be sheathed
-		(GetEquippedWeaponType() != EWeaponType::None && !IsWeaponSheathed());
-}
-
 bool APlayerCharacter::CanUseAnySkill() const
 {
 	// return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsFastRunning() || IsNormalAttacking());
@@ -765,126 +758,6 @@ void APlayerCharacter::UpdateAutoRun(float DeltaTime)
 	}
 }
 
-void APlayerCharacter::StartNormalAttack()
-{
-	if (Controller && Controller->IsLocalPlayerController())
-	{
-		uint8 AttackIndex;
-		if (bForwardPressed)
-		{
-			AttackIndex = 11;
-		}
-		else if (bBackwardPressed)
-		{
-			AttackIndex = 12;
-		}
-		else
-		{
-			AttackIndex = 1;
-		}
-
-		FCharacterStateInfo NewStateInfo(ECharacterState::Attacking, AttackIndex);
-		NewStateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
-		CharacterStateInfo = NewStateInfo;
-
-		// float DesiredRotationYaw = GetControllerRotationYaw();
-
-		if (Role < ROLE_Authority)
-		{
-			Server_NormalAttack(AttackIndex);
-			// Server_NormalAttack(AttackIndex, DesiredRotationYaw);
-		}
-
-		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-		if (MoveComp)
-		{
-			MoveComp->bUseControllerDesiredRotation = false;
-			// MoveComp->SetDesiredCustomRotationYaw_LocalOnly(DesiredRotationYaw);
-		}
-	}
-
-	bCharacterStateAllowsMovement = false;
-	bCharacterStateAllowsRotation = false;
-
-	// Determine what normal attack section should we start with
-	FName SectionToPlay = NAME_None;
-	if (CharacterStateInfo.SubStateIndex == 11)
-	{
-		SectionToPlay = UCharacterLibrary::SectionName_ForwardSPSwing;
-	}
-	else if (CharacterStateInfo.SubStateIndex == 12)
-	{
-		SectionToPlay = UCharacterLibrary::SectionName_BackwardSPSwing;
-	}
-	else if (CharacterStateInfo.SubStateIndex == 1)
-	{
-		SectionToPlay = UCharacterLibrary::SectionName_FirstSwing;
-	}
-
-	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
-	UAnimMontage* AttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
-
-	if (AttackMontage)
-	{
-		PlayAnimMontage(AttackMontage, 1.0, SectionToPlay);
-	}
-	// @note The rotation is handled through the AnimNotify_NormalAttack that gets called when a normal attack starts.
-}
-
-void APlayerCharacter::CancelNormalAttack()
-{
-	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
-	UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
-	StopAnimMontage(NormalAttackMontage);
-}
-
-void APlayerCharacter::FinishNormalAttack()
-{
-	ResetState();
-}
-
-void APlayerCharacter::UpdateNormalAttackState(float DeltaTime)
-{
-	if (!bNormalAttackSectionChangeAllowed)
-	{
-		return;
-	}
-
-	// This update function must be called only on owner client
-	if (!Controller || !Controller->IsLocalPlayerController())
-	{
-		return;
-	}
-
-	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
-	UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
-	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
-
-	if (!NormalAttackMontage || !AnimInstance)
-	{
-		return;
-	}
-
-	FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
-	FName ExpectedNextSection = GetNextNormalAttackSectionName(CurrentSection);
-	if (ExpectedNextSection != NAME_None)
-	{
-		uint8 AttackIndex = GetNormalAttackIndex(ExpectedNextSection);
-		FCharacterStateInfo StateInfo(ECharacterState::Attacking, AttackIndex);
-		StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
-		CharacterStateInfo = StateInfo;
-
-		if (Role < ROLE_Authority)
-		{
-			Server_NormalAttack(AttackIndex);
-		}
-
-		ChangeNormalAttackSection(CurrentSection, ExpectedNextSection);
-	}
-
-	bNormalAttackSectionChangeAllowed = false;
-}
-
 void APlayerCharacter::Destroyed()
 {
 	Super::Destroyed();
@@ -917,47 +790,6 @@ void APlayerCharacter::SaveCharacterState()
 	{
 		// GetGameplaySkillsComponent()->SaveSkillBarLayout();
 	}
-}
-
-FName APlayerCharacter::GetNextNormalAttackSectionName(const FName& CurrentSection) const
-{
-	if (CurrentSection == UCharacterLibrary::SectionName_FirstSwing ||
-		CurrentSection == UCharacterLibrary::SectionName_FirstSwingEnd)
-	{
-		return UCharacterLibrary::SectionName_SecondSwing;
-	}
-	else if (CurrentSection == UCharacterLibrary::SectionName_SecondSwing ||
-			 CurrentSection == UCharacterLibrary::SectionName_SecondSwingEnd)
-	{
-		return UCharacterLibrary::SectionName_ThirdSwing;
-	}
-	else if (CurrentSection == UCharacterLibrary::SectionName_ThirdSwing ||
-	 		 CurrentSection == UCharacterLibrary::SectionName_ThirdSwingEnd)
-	{
-		if (GetEquippedWeaponType() == EWeaponType::GreatSword ||
-			GetEquippedWeaponType() == EWeaponType::WarHammer)
-		{
-			return NAME_None;
-		}
-		else
-		{
-			return UCharacterLibrary::SectionName_FourthSwing;
-		}
-	}
-	else if (CurrentSection == UCharacterLibrary::SectionName_FourthSwing ||
-			 CurrentSection == UCharacterLibrary::SectionName_FourthSwingEnd)
-	{
-		if (GetEquippedWeaponType() == EWeaponType::Staff)
-		{
-			return NAME_None;
-		}
-		else
-		{
-			return UCharacterLibrary::SectionName_FifthSwing;
-		}
-	}
-
-	return NAME_None;
 }
 
 void APlayerCharacter::DisplayDialogueWidget(FName DialogueWindowID)
@@ -1047,82 +879,6 @@ void APlayerCharacter::PlayNormalAttackAnimation(FName OldSection, FName NewSect
 	// Server_PlayNormalAttackAnimation(OldSection, NewSection);
 }
 */
-
-void APlayerCharacter::ChangeNormalAttackSection(FName OldSection, FName NewSection)
-{
-	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
-	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
-	UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
-
-	if (!NormalAttackMontage || !AnimInstance)
-	{
-		return;
-	}
-
-	if (OldSection == NAME_None)
-	{
-		AnimInstance->Montage_Play(NormalAttackMontage);
-		AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-	}
-	else
-	{
-		FString OldSectionString = OldSection.ToString();
-		if (OldSectionString.EndsWith("End"))
-		{
-			AnimInstance->Montage_Play(NormalAttackMontage);
-			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-		}
-		else
-		{
-			AnimInstance->Montage_SetNextSection(OldSection, NewSection, NormalAttackMontage);
-		}
-	}
-
-
-	/*
-	if (!GetActiveAnimationReferences() || !GetActiveAnimationReferences()->NormalAttacks.Get())
-	{
-		return;
-	}
-
-	UAnimMontage* NormalAttackMontage = GetActiveAnimationReferences()->NormalAttacks.Get();
-	if (GetMesh()->GetAnimInstance())
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (OldSection == NAME_None)
-		{
-			AnimInstance->Montage_Play(NormalAttackMontage);
-			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-		}
-		else
-		{
-			FString OldSectionString = OldSection.ToString();
-			if (OldSectionString.EndsWith("End"))
-			{
-				AnimInstance->Montage_Play(NormalAttackMontage);
-				AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-			}
-			else
-			{
-				FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
-				if (CurrentSection == OldSection)
-				{
-					AnimInstance->Montage_SetNextSection(CurrentSection, NewSection, NormalAttackMontage);
-				}
-				else
-				{
-					AnimInstance->Montage_Play(NormalAttackMontage);
-					AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
-				}
-			}
-		}
-
-		SetCharacterState(ECharacterState::Attacking);
-	}
-
-	Server_PlayNormalAttackAnimation(OldSection, NewSection);
-	*/
-}
 
 void APlayerCharacter::CreateGhostTrail_Implementation()
 {
@@ -1264,11 +1020,6 @@ void APlayerCharacter::SetCanUseChainSkill(bool bNewValue)
 	{
 		GetGameplaySkillsComponent()->SetCanUseChainSkill(bNewValue);
 	}
-}
-
-void APlayerCharacter::BP_SetNormalAttackSectionChangeAllowed(bool bNewValue)
-{
-	SetNormalAttackSectionChangeAllowed(bNewValue);
 }
 
 void APlayerCharacter::OnInteractionSphereBeginOverlap_Implementation(AActor* OtherActor)
@@ -1537,21 +1288,6 @@ void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)
 void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString & SkillGroup)
 {
 	// GetSkillsComponent()->OnSkillGroupRemovedFromSkillBar(SkillGroup);
-}
-
-void APlayerCharacter::OnNormalAttackSectionStart(FName SectionName)
-{
-	FString SkillIDString = FString("");
-	SkillIDString += GetGenderPrefix();
-	SkillIDString += GetEquippedWeaponPrefix();
-	SkillIDString += GetNormalAttackSuffix(SectionName);
-
-	if (IsValid(GetGameplaySkillsComponent()) && IsValid(GetController()) && GetController()->IsLocalPlayerController())
-	{
-		// GetGameplaySkillsComponent()->SetCurrentActiveSkill(FName(*SkillIDString));
-	}
-
-	// @todo set current active skill
 }
 
 void APlayerCharacter::OnRep_PrimaryWeaponID()

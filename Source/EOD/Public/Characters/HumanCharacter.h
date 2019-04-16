@@ -227,6 +227,55 @@ public:
 	/** Finish dodging */
 	virtual void FinishDodge() override;
 
+	/** Returns true if character can use normal attack */
+	virtual bool CanNormalAttack() const override;
+
+	/** Start normal attacks */
+	virtual void StartNormalAttack() override;
+
+	/** Cancel normal attacks */
+	virtual void CancelNormalAttack() override;
+
+	/** Finish normal attacks and reset back to Idle-Walk-Run */
+	virtual void FinishNormalAttack() override;
+
+	/** Updates character normal attck state every frame if the character wants to normal attack */
+	virtual void UpdateNormalAttackState(float DeltaTime) override;
+
+	/** Get the name of next normal attack section that comes after CurrentSection */
+	FName GetNextNormalAttackSectionName(const FName& CurrentSection) const;
+
+	/** Switch between normal attack sections */
+	void ChangeNormalAttackSection(FName OldSection, FName NewSection);
+
+	/** Event called when a new normal attack section starts playing */
+	void OnNormalAttackSectionStart(FName SectionName);
+
+	/** Set whether normal attack section can change or not  */
+	UFUNCTION(BlueprintCallable, Category = "Character State")
+	void SetNormalAttackSectionChangeAllowed(bool bNewValue);
+
+protected:
+
+	UPROPERTY(Transient)
+	uint32 bNormalAttackSectionChangeAllowed : 1;
+
+public:
+
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
+	FORCEINLINE ECharacterGender GetCharacterGender() const;
+
+	inline FName GetNormalAttackSectionName(uint8 AttackIndex);
+
+	inline uint8 GetNormalAttackIndex(FName SectionName);
+
+	/** Get the suffix string from the normal attack section */
+	inline FString GetNormalAttackSuffix(FName NormalAttackSection) const;
+
+
 	// --------------------------------------
 	//  Input Handling
 	// --------------------------------------
@@ -364,4 +413,121 @@ FORCEINLINE bool AHumanCharacter::CanToggleSheathe() const
 FORCEINLINE bool AHumanCharacter::IsSwitchingWeapon() const
 {
 	return CharacterStateInfo.CharacterState == ECharacterState::SwitchingWeapon;
+}
+
+FORCEINLINE ECharacterGender AHumanCharacter::GetCharacterGender() const
+{
+	return Gender;
+}
+
+inline FName AHumanCharacter::GetNormalAttackSectionName(uint8 AttackIndex)
+{
+	if (AttackIndex == 1)
+	{
+		return UCharacterLibrary::SectionName_FirstSwing;
+	}
+	else if (AttackIndex == 2)
+	{
+		return UCharacterLibrary::SectionName_SecondSwing;
+	}
+	else if (AttackIndex == 3)
+	{
+		return UCharacterLibrary::SectionName_ThirdSwing;
+	}
+	else if (AttackIndex == 4)
+	{
+		return UCharacterLibrary::SectionName_FourthSwing;
+	}
+	else if (AttackIndex == 5)
+	{
+		return UCharacterLibrary::SectionName_FifthSwing;
+	}
+	else if (AttackIndex == 11)
+	{
+		return UCharacterLibrary::SectionName_ForwardSPSwing;
+	}
+	else if (AttackIndex == 12)
+	{
+		return UCharacterLibrary::SectionName_BackwardSPSwing;
+	}
+	else
+	{
+		return NAME_None;
+	}
+}
+
+inline uint8 AHumanCharacter::GetNormalAttackIndex(FName SectionName)
+{
+	if (SectionName == NAME_None)
+	{
+		return 0;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_FirstSwing)
+	{
+		return 1;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_SecondSwing)
+	{
+		return 2;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_ThirdSwing)
+	{
+		return 3;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_FourthSwing)
+	{
+		return 4;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_FifthSwing)
+	{
+		return 5;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_ForwardSPSwing)
+	{
+		return 11;
+	}
+	else if (SectionName == UCharacterLibrary::SectionName_BackwardSPSwing)
+	{
+		return 12;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+inline FString AHumanCharacter::GetNormalAttackSuffix(FName NormalAttackSection) const
+{
+	if (NormalAttackSection == UCharacterLibrary::SectionName_FirstSwing)
+	{
+		return FString("1");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_SecondSwing)
+	{
+		return FString("2");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_ThirdSwing)
+	{
+		return FString("3");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_FourthSwing)
+	{
+		return FString("4");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_FifthSwing)
+	{
+		return FString("5");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_BackwardSPSwing)
+	{
+		return FString("BSP");
+	}
+	else if (NormalAttackSection == UCharacterLibrary::SectionName_ForwardSPSwing)
+	{
+		return FString("FSP");
+	}
+	else
+	{
+		return FString("");
+	}
 }

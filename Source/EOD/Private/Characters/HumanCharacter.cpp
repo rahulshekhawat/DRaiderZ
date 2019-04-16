@@ -5,6 +5,7 @@
 #include "EODGlobalNames.h"
 #include "PrimaryWeapon.h"
 #include "SecondaryWeapon.h"
+#include "GameplaySkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
 
 #include "Engine/Engine.h"
@@ -461,6 +462,221 @@ void AHumanCharacter::CancelDodge()
 void AHumanCharacter::FinishDodge()
 {
 	ResetState();
+}
+
+bool AHumanCharacter::CanNormalAttack() const
+{
+	return IsIdleOrMoving() &&
+		// The player must have a weapon equipped to normal attack and it shouldn't be sheathed
+		(GetEquippedWeaponType() != EWeaponType::None && !IsWeaponSheathed());
+}
+
+void AHumanCharacter::StartNormalAttack()
+{
+	if (Controller && Controller->IsLocalController())
+	{
+		uint8 AttackIndex;
+		if (bForwardPressed)
+		{
+			AttackIndex = 11;
+		}
+		else if (bBackwardPressed)
+		{
+			AttackIndex = 12;
+		}
+		else
+		{
+			AttackIndex = 1;
+		}
+
+		FCharacterStateInfo NewStateInfo(ECharacterState::Attacking, AttackIndex);
+		NewStateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+		CharacterStateInfo = NewStateInfo;
+
+		if (Role < ROLE_Authority)
+		{
+			Server_NormalAttack(AttackIndex);
+		}
+
+		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+		if (MoveComp)
+		{
+			MoveComp->bUseControllerDesiredRotation = false;
+		}
+	}
+
+	bCharacterStateAllowsMovement = false;
+	bCharacterStateAllowsRotation = false;
+
+	// Determine what normal attack section should we start with
+	FName SectionToPlay = NAME_None;
+	if (CharacterStateInfo.SubStateIndex == 11)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_ForwardSPSwing;
+	}
+	else if (CharacterStateInfo.SubStateIndex == 12)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_BackwardSPSwing;
+	}
+	else if (CharacterStateInfo.SubStateIndex == 1)
+	{
+		SectionToPlay = UCharacterLibrary::SectionName_FirstSwing;
+	}
+
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* AttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+
+	if (AttackMontage)
+	{
+		PlayAnimMontage(AttackMontage, 1.0, SectionToPlay);
+	}
+	// @note The rotation is handled through the AnimNotify_NormalAttack that gets called when a normal attack starts.
+}
+
+void AHumanCharacter::CancelNormalAttack()
+{
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+	StopAnimMontage(NormalAttackMontage);
+}
+
+void AHumanCharacter::FinishNormalAttack()
+{
+	ResetState();
+}
+
+void AHumanCharacter::UpdateNormalAttackState(float DeltaTime)
+{
+	if (!bNormalAttackSectionChangeAllowed)
+	{
+		return;
+	}
+
+	// This update function must be called only on owner client
+	if (!Controller || !Controller->IsLocalPlayerController())
+	{
+		return;
+	}
+
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+
+	if (!NormalAttackMontage || !AnimInstance)
+	{
+		return;
+	}
+
+	FName CurrentSection = AnimInstance->Montage_GetCurrentSection(NormalAttackMontage);
+	FName ExpectedNextSection = GetNextNormalAttackSectionName(CurrentSection);
+	if (ExpectedNextSection != NAME_None)
+	{
+		uint8 AttackIndex = GetNormalAttackIndex(ExpectedNextSection);
+		FCharacterStateInfo StateInfo(ECharacterState::Attacking, AttackIndex);
+		StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+		CharacterStateInfo = StateInfo;
+
+		if (Role < ROLE_Authority)
+		{
+			Server_NormalAttack(AttackIndex);
+		}
+
+		ChangeNormalAttackSection(CurrentSection, ExpectedNextSection);
+	}
+
+	bNormalAttackSectionChangeAllowed = false;
+}
+
+FName AHumanCharacter::GetNextNormalAttackSectionName(const FName& CurrentSection) const
+{
+	if (CurrentSection == UCharacterLibrary::SectionName_FirstSwing ||
+		CurrentSection == UCharacterLibrary::SectionName_FirstSwingEnd)
+	{
+		return UCharacterLibrary::SectionName_SecondSwing;
+	}
+	else if (CurrentSection == UCharacterLibrary::SectionName_SecondSwing ||
+		CurrentSection == UCharacterLibrary::SectionName_SecondSwingEnd)
+	{
+		return UCharacterLibrary::SectionName_ThirdSwing;
+	}
+	else if (CurrentSection == UCharacterLibrary::SectionName_ThirdSwing ||
+		CurrentSection == UCharacterLibrary::SectionName_ThirdSwingEnd)
+	{
+		if (GetEquippedWeaponType() == EWeaponType::GreatSword ||
+			GetEquippedWeaponType() == EWeaponType::WarHammer)
+		{
+			return NAME_None;
+		}
+		else
+		{
+			return UCharacterLibrary::SectionName_FourthSwing;
+		}
+	}
+	else if (CurrentSection == UCharacterLibrary::SectionName_FourthSwing ||
+		CurrentSection == UCharacterLibrary::SectionName_FourthSwingEnd)
+	{
+		if (GetEquippedWeaponType() == EWeaponType::Staff)
+		{
+			return NAME_None;
+		}
+		else
+		{
+			return UCharacterLibrary::SectionName_FifthSwing;
+		}
+	}
+
+	return NAME_None;
+}
+
+void AHumanCharacter::ChangeNormalAttackSection(FName OldSection, FName NewSection)
+{
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	UAnimMontage* NormalAttackMontage = AnimRef ? AnimRef->NormalAttacks.Get() : nullptr;
+
+	if (!NormalAttackMontage || !AnimInstance)
+	{
+		return;
+	}
+
+	if (OldSection == NAME_None)
+	{
+		AnimInstance->Montage_Play(NormalAttackMontage);
+		AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+	}
+	else
+	{
+		FString OldSectionString = OldSection.ToString();
+		if (OldSectionString.EndsWith("End"))
+		{
+			AnimInstance->Montage_Play(NormalAttackMontage);
+			AnimInstance->Montage_JumpToSection(NewSection, NormalAttackMontage);
+		}
+		else
+		{
+			AnimInstance->Montage_SetNextSection(OldSection, NewSection, NormalAttackMontage);
+		}
+	}
+}
+
+void AHumanCharacter::OnNormalAttackSectionStart(FName SectionName)
+{
+	FString SkillIDString = FString("");
+	SkillIDString += GetGenderPrefix();
+	SkillIDString += GetEquippedWeaponPrefix();
+	SkillIDString += GetNormalAttackSuffix(SectionName);
+
+	if (IsValid(GetGameplaySkillsComponent()) && IsValid(GetController()) && GetController()->IsLocalPlayerController())
+	{
+		// GetGameplaySkillsComponent()->SetCurrentActiveSkill(FName(*SkillIDString));
+	}
+
+	// @todo set current active skill
+}
+
+void AHumanCharacter::SetNormalAttackSectionChangeAllowed(bool bNewValue)
+{
+	bNormalAttackSectionChangeAllowed = bNewValue;
 }
 
 void AHumanCharacter::OnPressedForward()
