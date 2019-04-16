@@ -170,8 +170,6 @@ public:
 	/** Returns secondary weapon actor */
 	FORCEINLINE ASecondaryWeapon* GetSecondaryWeapon() const;
 
-	FORCEINLINE bool CanSwitchWeapon() const;
-
 	FORCEINLINE bool CanToggleSheathe() const;
 
 	FORCEINLINE bool IsSwitchingWeapon() const;
@@ -398,11 +396,6 @@ FORCEINLINE APrimaryWeapon* AHumanCharacter::GetPrimaryWeapon() const
 FORCEINLINE ASecondaryWeapon* AHumanCharacter::GetSecondaryWeapon() const
 {
 	return SecondaryWeapon;
-}
-
-FORCEINLINE bool AHumanCharacter::CanSwitchWeapon() const
-{
-	return IsIdleOrMoving();
 }
 
 FORCEINLINE bool AHumanCharacter::CanToggleSheathe() const

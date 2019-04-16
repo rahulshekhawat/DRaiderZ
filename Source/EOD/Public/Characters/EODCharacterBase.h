@@ -291,6 +291,7 @@ public:
 	virtual void StopInteraction();
 
 	/** Put or remove weapon inside sheath */
+	UFUNCTION(BlueprintCallable, Category = "Character State")
 	virtual void ToggleSheathe();
 
 	virtual void StartWeaponSwitch();

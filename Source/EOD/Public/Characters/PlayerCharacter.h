@@ -74,13 +74,20 @@ public:
 
 	FORCEINLINE UAudioComponent* GetSystemAudioComponent() const { return SystemAudioComponent; }
 
+	FORCEINLINE USphereComponent* GetInteractionSphere() const { return InteractionSphere; }
+
 	static const FName SystemAudioComponentName;
+
+	static const FName InteractionSphereComponentName;
 
 protected:
 
 	/** Audio component for playing system messages */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
 	UAudioComponent* SystemAudioComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Interaction")
+	USphereComponent* InteractionSphere;
 
 public:
 
@@ -148,6 +155,34 @@ public:
 
 	//~ DEPRECATED
 	FORCEINLINE void SetOffSmoothRotation(float DesiredYaw);
+
+	// --------------------------------------
+	//  Interaction
+	// --------------------------------------
+
+	/** Event called when interaction sphere begins overlap with interactive actors */
+	UFUNCTION()
+	void OnInteractionSphereBeginOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	/** Event called when interaction sphere ends overlap with interactive actors */
+	UFUNCTION()
+	void OnInteractionSphereEndOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Character Interaction")
+	TArray<AActor*> OverlappingInteractiveActors;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Character Interaction")
+	AActor* ActiveInteractiveActor;
 
 	// --------------------------------------
 	//  Weapon System
@@ -229,24 +264,19 @@ public:
 
 
 	/** On beginning overlap with an interactive actors */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
-	void OnInteractionSphereBeginOverlap(AActor* OtherActor);
+	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	// void OnInteractionSphereBeginOverlap(AActor* OtherActor);
 
 	/** On beginning overlap with an interactive actors */
-	virtual void OnInteractionSphereBeginOverlap_Implementation(AActor* OtherActor);
+	// virtual void OnInteractionSphereBeginOverlap_Implementation(AActor* OtherActor);
 
 	/** On ending overlap with an interactive actors */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
-	void OnInteractionSphereEndOverlap(AActor* OtherActor);
+	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	// void OnInteractionSphereEndOverlap(AActor* OtherActor);
 
 	/** On ending overlap with an interactive actors */
-	virtual void OnInteractionSphereEndOverlap_Implementation(AActor* OtherActor);
+	// virtual void OnInteractionSphereEndOverlap_Implementation(AActor* OtherActor);
 
-	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
-	TArray<AActor*> OverlappingInteractiveActors;
-
-	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
-	AActor* ActiveInteractiveActor;
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
 	UDialogueWindowWidget* DialogueWidget;

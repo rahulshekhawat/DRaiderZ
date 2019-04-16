@@ -34,6 +34,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 const FName APlayerCharacter::SystemAudioComponentName(TEXT("System Audio Component"));
+const FName APlayerCharacter::InteractionSphereComponentName(TEXT("Interaction Sphere"));
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerSkillsComponent>(AEODCharacterBase::GameplaySkillsComponentName))
@@ -47,16 +48,23 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 		SystemAudioComponent->SetupAttachment(RootComponent);
 	}
 
+	InteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, APlayerCharacter::InteractionSphereComponentName);
+	if (InteractionSphere)
+	{
+		InteractionSphere->SetupAttachment(RootComponent);
+		InteractionSphere->SetSphereRadius(150);
+	}
+
 	MaxWeaponSlots = 2;
 	
 	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
-	// OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::LoadWeaponAnimationReferences);
 	OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
-	// Perhaps unloading weapon animation references is not necessary until the equipped weapon type actually changes
-	// OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::UnloadWeaponAnimationReferences);
 
 	OnSecondaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
 	OnSecondaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
+
+	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnInteractionSphereBeginOverlap);
+	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnInteractionSphereEndOverlap);
 
 }
 
@@ -65,6 +73,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(APlayerCharacter, PrimaryWeaponID);
+	DOREPLIFETIME(APlayerCharacter, SecondaryWeaponID);
 
 }
 
@@ -1022,7 +1031,13 @@ void APlayerCharacter::SetCanUseChainSkill(bool bNewValue)
 	}
 }
 
-void APlayerCharacter::OnInteractionSphereBeginOverlap_Implementation(AActor* OtherActor)
+void APlayerCharacter::OnInteractionSphereBeginOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
 {
 	IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(OtherActor);
 	// If the actor is not interactive
@@ -1045,7 +1060,11 @@ void APlayerCharacter::OnInteractionSphereBeginOverlap_Implementation(AActor* Ot
 	GameplayAudioComponent->Play();
 }
 
-void APlayerCharacter::OnInteractionSphereEndOverlap_Implementation(AActor* OtherActor)
+void APlayerCharacter::OnInteractionSphereEndOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
 {
 	IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(OtherActor);
 	// If the actor is not interactive
