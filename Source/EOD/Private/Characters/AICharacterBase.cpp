@@ -298,15 +298,15 @@ float AAICharacterBase::GetActualDamage(AActor* HitInstigator, ICombatInterface*
 
 bool AAICharacterBase::CCEFlinch_Implementation(const float BCAngle)
 {
-	if (CanFlinch() && FlinchAnimMontage)
+	if (CanFlinch() && FlinchMontage)
 	{
 		if (BCAngle <= 90)
 		{
-			PlayAnimMontage(FlinchAnimMontage, 1.f, UCharacterLibrary::SectionName_ForwardFlinch);
+			PlayAnimMontage(FlinchMontage, 1.f, UCharacterLibrary::SectionName_ForwardFlinch);
 		}
 		else
 		{
-			PlayAnimMontage(FlinchAnimMontage, 1.f, UCharacterLibrary::SectionName_BackwardFlinch);
+			PlayAnimMontage(FlinchMontage, 1.f, UCharacterLibrary::SectionName_BackwardFlinch);
 		}
 
 		return true;
@@ -317,17 +317,15 @@ bool AAICharacterBase::CCEFlinch_Implementation(const float BCAngle)
 
 bool AAICharacterBase::CCEInterrupt_Implementation(const float BCAngle)
 {
-	if (CanInterrupt() && HitEffectsAnimMontage)
+	if (CanInterrupt() && InterruptMontage)
 	{
 		if (BCAngle <= 90)
 		{
-			// NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_ForwardInterrupt);
-			PlayAnimMontage(HitEffectsAnimMontage, 1.f, UCharacterLibrary::SectionName_ForwardInterrupt);
+			PlayAnimMontage(InterruptMontage, 1.f, UCharacterLibrary::SectionName_ForwardInterrupt);
 		}
 		else
 		{
-			// NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_BackwardInterrupt);
-			PlayAnimMontage(HitEffectsAnimMontage, 1.f, UCharacterLibrary::SectionName_BackwardInterrupt);
+			PlayAnimMontage(InterruptMontage, 1.f, UCharacterLibrary::SectionName_BackwardInterrupt);
 		}
 
 		return true;
@@ -341,8 +339,10 @@ bool AAICharacterBase::CCEStun_Implementation(const float Duration)
 	if (CanStun())
 	{
 		PlayStunAnimation();
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCERemoveStun, Duration, false);
 
+		UWorld* World = GetWorld();
+		check(World);
+		World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCERemoveStun, Duration, false);
 		return true;
 	}
 
@@ -379,10 +379,9 @@ void AAICharacterBase::CCEUnfreeze_Implementation()
 
 bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 {
-	if (CanKnockdown() && HitEffectsAnimMontage)
+	if (CanKnockdown() && KnockdownMontage)
 	{
-		// NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_KnockdownStart);
-		PlayAnimMontage(HitEffectsAnimMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
+		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 
 		return true;
@@ -393,20 +392,18 @@ bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 
 void AAICharacterBase::CCEEndKnockdown_Implementation()
 {
-	// NetPlayAnimMontage(HitEffectsAnimMontage, UCharacterLibrary::SectionName_KnockdownEnd);
-	PlayAnimMontage(HitEffectsAnimMontage, 1.f, UCharacterLibrary::SectionName_KnockdownEnd);
+	PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownEnd);
 }
 
 bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
 {
-	if (CanKnockdown() && HitEffectsAnimMontage)
+	if (CanKnockdown() && KnockdownMontage)
 	{
-		//~ @todo
-		// PlayAnimationMontage(HitEffectsAnimMontage,
-			// UCharacterLibrary::SectionName_KnockdownStart,
-			// ECharacterState::GotHit);
-		PlayAnimMontage(HitEffectsAnimMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
+		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
+
+		UWorld* World = GetWorld();
+		check(World);
+		World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 		PushBack(ImpulseDirection);
 		return true;
 	}
@@ -448,7 +445,7 @@ void AAICharacterBase::SetInCombat(bool bValue)
 void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
 {
 	// if (AnimMontage == FlinchAnimMontage || bUsingUniqueSkill)
-	if (AnimMontage == FlinchAnimMontage)
+	if (AnimMontage == FlinchMontage)
 	{
 		return;
 	}
@@ -607,7 +604,10 @@ void AAICharacterBase::AssistanceRequested_Implementation(const AAICharacterBase
 
 void AAICharacterBase::UpdateMaxWalkSpeed()
 {
-	GetCharacterMovement()->MaxWalkSpeed = bInCombat ? MaxWalkSpeedInCombat : MaxWalkSpeedOutsideCombat;	
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = bInCombat ? DefaultRunSpeed : DefaultWalkSpeed;
+	}
 }
 
 void AAICharacterBase::InitializeSkills()

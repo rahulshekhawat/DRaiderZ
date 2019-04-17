@@ -87,6 +87,10 @@ protected:
 
 public:
 
+	// --------------------------------------
+	//  Crowd Control Effects
+	// --------------------------------------
+
 	/** Flinch this character (visual feedback) */
 	virtual bool CCEFlinch_Implementation(const float BCAngle) override;
 
@@ -114,12 +118,72 @@ public:
 	/** Knockback this character */
 	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection) override;
 
+	// --------------------------------------
+	//  Combat
+	// --------------------------------------
+
 	/** Set whether character is in combat or not */
 	virtual void SetInCombat(bool bValue) override;
+
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
 
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted);
 
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
+
+protected:
+
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
+
+	/** In game name of this AI character. This may or may not differ for each instance of character */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
+	FString InGameName;
+
+	/** In game description of this AI character. This may or may not differ for each instance of character */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
+	FString InGameDescription;
+	
+	/** Animation montage containing animations for character flinch */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UAnimMontage* FlinchMontage;
+
+	/** Animation montage containing animations for character getting interrupted */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UAnimMontage* InterruptMontage;
+
+	/** Animation montage containing animations for character getting knocked down */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UAnimMontage* KnockdownMontage;
+
+	/** Animation montage containing animations for character getting stunned */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UAnimMontage* StunMontage;
+
+	/** Animation montage containing animations for character attack getting deflected */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UAnimMontage* AttackDeflectMontage;
+
+	/** Animation montage containing animations for character blocking an incoming attack */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UAnimMontage* BlockAttackMontage;
+
+	/** Animation montage containing animations for character dodging */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UAnimMontage* DodgeMontage;
+
+	/** Animation montage containing animations for character dodging */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UAnimMontage* DieMontage;
+
+	/** Animation montage containing animations for hit effects */
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	// UAnimMontage* HitEffectsAnimMontage;
+
+public:
 
 	/** Use a skill and play it's animation */
 	virtual bool UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill = nullptr) override;
@@ -152,29 +216,6 @@ public:
 
 private:
 
-	/** In game name of this AI character. This may or may not differ for each instance of character */
-	UPROPERTY(EditAnywhere, Category = BaseInfo, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	FString InGameName;
-
-	/** In game description of this AI character. This may or may not differ for each instance of character */
-	UPROPERTY(EditAnywhere, Category = BaseInfo, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	FString InGameDescription;
-
-	/** Maximum speed an AI character can walk with inside combat */
-	UPROPERTY(EditDefaultsOnly, Category = AIMovement, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float MaxWalkSpeedInCombat;
-
-	/** Maximum speed an AI character can walk with outside combat */
-	UPROPERTY(EditDefaultsOnly, Category = AIMovement, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float MaxWalkSpeedOutsideCombat;
-
-	/** Animation montage containing animations for hit effects */
-	UPROPERTY(EditDefaultsOnly, Category = Animations, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* HitEffectsAnimMontage;
-
-	/** Animation montage containing animations for character flinch */
-	UPROPERTY(EditDefaultsOnly, Category = Animations, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* FlinchAnimMontage;
 
 	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
 	void UpdateMaxWalkSpeed();
@@ -250,7 +291,7 @@ private:
 public:
 
 	// --------------------------------------
-	//  Components
+	//  Widgets
 	// --------------------------------------
 
 	void UpdateHealthWidget();

@@ -228,7 +228,7 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
 	TSoftObjectPtr<UAnimMontage> Stun;
 
-	/** Reference to player animation montage that contains animations for getting character attack deflected */
+	/** Reference to player animation montage that contains animations for character attack getting deflected */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
 	TSoftObjectPtr<UAnimMontage> AttackDeflect;
 
