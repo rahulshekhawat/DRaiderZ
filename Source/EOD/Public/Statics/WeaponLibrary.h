@@ -11,6 +11,8 @@
 #include "UObject/NoExportTypes.h"
 #include "WeaponLibrary.generated.h"
 
+class UWeaponDataAsset;
+
 /** This enum describes all the types of weapons available in-game */
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
@@ -177,6 +179,6 @@ public:
 	static FWeaponTableRow* GetWeaponData(FName WeaponID);
 
 	/** Returns weapon data asset for a given weaponID */
-	static class UWeaponDataAsset* GetWeaponDataAsset(FName WeaponID);
+	static UWeaponDataAsset* GetWeaponDataAsset(FName WeaponID);
 	
 };

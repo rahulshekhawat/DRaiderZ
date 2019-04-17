@@ -54,9 +54,6 @@ public:
 	/** Returns true if this skill is valid, i.e, skill belongs to a valid skill group */
 	FORCEINLINE bool IsValid() const { return SkillGroup != NAME_None && SkillIndex != 0; }
 
-	/** Event called when skill owner changes it's weapon */
-	// virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
-
 	// --------------------------------------
 	//  Pseudo Constants
 	// --------------------------------------
@@ -70,6 +67,8 @@ public:
 	FORCEINLINE FString	GetInGameDescription() const { return Description; }
 
 	FORCEINLINE FName GetSkillGroup() const { return SkillGroup; }
+
+	FORCEINLINE ESkillEffect GetSkillEffect() const { return SkillEffect; }
 
 	/** Set this to true if this skill can be charged */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")

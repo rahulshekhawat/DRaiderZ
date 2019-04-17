@@ -21,7 +21,12 @@ class EOD_API UStatsComponentBase : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	/** Sets default values for this component's properties */
 	UStatsComponentBase(const FObjectInitializer& ObjectInitializer);
 
@@ -32,11 +37,11 @@ public:
 
 	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Health
-public:
+	// --------------------------------------
+	//  Health
+	// --------------------------------------	
+
 	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
 	FOnStatChangedMCDelegate OnHealthChanged;
 
@@ -55,6 +60,7 @@ public:
 	inline void ModifyCurrentHealth(int32 Value, bool bPercent = false);
 
 protected:
+
 	/** Maximum health of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 BaseHealth;
@@ -72,16 +78,19 @@ protected:
 	int32 CurrentHealth;
 
 private:
+
 	FORCEINLINE void SetBaseHealth(int32 Value);
 
 	FORCEINLINE void SetMaxHealth(int32 Value);
 
 	FORCEINLINE void SetCurrentHealth(int32 Value);
 
-	
-	////////////////////////////////////////////////////////////////////////////////
-	// Mana
 public:
+
+	// --------------------------------------
+	//  Mana
+	// --------------------------------------
+
 	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
 	FOnStatChangedMCDelegate OnManaChanged;
 
@@ -98,6 +107,7 @@ public:
 	inline void ModifyCurrentMana(int32 Value, bool bPercent = false);
 
 protected:
+
 	/** Maximum mana of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 BaseMana;
@@ -111,16 +121,19 @@ protected:
 	int32 CurrentMana;
 
 private:
+
 	FORCEINLINE void SetBaseMana(int32 Value);
 
 	FORCEINLINE void SetMaxMana(int32 Value);
 
 	FORCEINLINE void SetCurrentMana(int32 Value);
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Stamina
 public:
+
+	// --------------------------------------
+	//  Stamina
+	// --------------------------------------
+
 	UPROPERTY(BlueprintAssignable, Category = "Stats Component")
 	FOnStatChangedMCDelegate OnStaminaChanged;
 
@@ -137,6 +150,7 @@ public:
 	inline void ModifyCurrentStamina(int32 Value, bool bPercent = false);
 
 protected:
+
 	/** Maximum mana of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 BaseStamina;
@@ -150,6 +164,7 @@ protected:
 	int32 CurrentStamina;
 
 private:
+
 	FORCEINLINE void SetBaseStamina(int32 Value);
 
 	FORCEINLINE void SetMaxStamina(int32 Value);

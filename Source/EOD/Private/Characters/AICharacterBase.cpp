@@ -399,32 +399,37 @@ bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const F
 
 void AAICharacterBase::SetInCombat(bool bValue)
 {
-	/*
-	if (bValue)
+	bInCombat = bValue;
+
+	if (bInCombat)
 	{
-		if (AggroWidgetComp->GetUserWidgetObject())
+		UUserWidget* AggroWidget = AggroWidgetComp->GetUserWidgetObject();
+		if (AggroWidget)
 		{
-			AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Visible);
+			AggroWidget->SetVisibility(ESlateVisibility::Visible);
 		}
-		if (HealthWidgetComp->GetUserWidgetObject())
+
+		UUserWidget* HealthWidget = HealthWidgetComp->GetUserWidgetObject();
+		if (HealthWidget)
 		{
-			HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Visible);
+			HealthWidget->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
 	else
 	{
-		if (AggroWidgetComp->GetUserWidgetObject())
+		UUserWidget* AggroWidget = AggroWidgetComp->GetUserWidgetObject();
+		if (AggroWidget)
 		{
-			AggroWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+			AggroWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
-		if (HealthWidgetComp->GetUserWidgetObject())
+
+		UUserWidget* HealthWidget = HealthWidgetComp->GetUserWidgetObject();
+		if (HealthWidget)
 		{
-			HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
+			HealthWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
-	*/
 
-	bInCombat = bValue;
 	UpdateMaxWalkSpeed();
 }
 

@@ -204,15 +204,15 @@ void UAISkillsComponent::GenerateSkillTypesList()
 		UAISkillBase* AISkill = Cast<UAISkillBase>(SkillGroupToSkillMap[Key]);
 		check(AISkill);
 
-		if (AISkill->SkillInfo.SkillType == ESkillType::BuffParty)
+		if (AISkill->GetSkillEffect() == ESkillEffect::BuffParty)
 		{
 			PartyBuffSkills.Add(Key);
 		}
-		else if (AISkill->SkillInfo.SkillType == ESkillType::BuffSelf)
+		else if (AISkill->GetSkillEffect() == ESkillEffect::BuffSelf)
 		{
 			SelfBuffSkills.Add(Key);
 		}
-		else if (AISkill->SkillInfo.SkillType == ESkillType::DamageMelee)
+		else if (AISkill->GetSkillEffect() == ESkillEffect::DamageMelee)
 		{
 			MeleeSkills.Add(Key);
 			if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::Crystalized)
@@ -240,7 +240,7 @@ void UAISkillsComponent::GenerateSkillTypesList()
 				StunSkills.Add(Key);
 			}
 		}
-		else if (AISkill->SkillInfo.SkillType == ESkillType::DamageRanged)
+		else if (AISkill->GetSkillEffect() == ESkillEffect::DamageRanged)
 		{
 			RangedSkills.Add(Key);
 			if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::Crystalized)
@@ -268,15 +268,15 @@ void UAISkillsComponent::GenerateSkillTypesList()
 				StunSkills.Add(Key);
 			}
 		}
-		else if (AISkill->SkillInfo.SkillType == ESkillType::DebuffEnemy)
+		else if (AISkill->GetSkillEffect() == ESkillEffect::DebuffEnemy)
 		{
 			DebuffSkills.Add(Key);
 		}
-		else if (AISkill->SkillInfo.SkillType == ESkillType::HealParty)
+		else if (AISkill->GetSkillEffect() == ESkillEffect::HealParty)
 		{
 			PartyHealSkills.Add(Key);
 		}
-		else if (AISkill->SkillInfo.SkillType == ESkillType::HealSelf)
+		else if (AISkill->GetSkillEffect() == ESkillEffect::HealSelf)
 		{
 			SelfHealSkills.Add(Key);
 		}

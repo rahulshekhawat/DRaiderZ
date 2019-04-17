@@ -17,12 +17,20 @@ class EOD_API UAIStatsComponent : public UStatsComponentBase
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	UAIStatsComponent(const FObjectInitializer& ObjectInitializer);
-	
-	virtual void BeginPlay() override;
-	
+
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void BeginPlay() override;
+
+	/** Dummy declaration. This component doesn't tick */
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual int32 GetPhysicalAttack() const override;
 

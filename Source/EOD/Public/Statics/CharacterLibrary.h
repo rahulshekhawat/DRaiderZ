@@ -100,20 +100,6 @@ enum class ECharacterState : uint8
 	Dead
 };
 
-//~ @todo replace ESkillType with ESkillEffect
-/** This enum describes the skill type */
-UENUM(BlueprintType)
-enum class ESkillType : uint8
-{
-	DamageMelee,
-	DamageRanged,
-	HealSelf,
-	HealParty,
-	BuffSelf,
-	BuffParty,
-	DebuffEnemy
-};
-
 /** This enum describes the effect of this skill */
 UENUM(BlueprintType)
 enum class ESkillEffect : uint8
@@ -200,7 +186,6 @@ struct EOD_API FSkillState
 		MaxUpgradeLevel = 1;
 		bUnlocked = false;
 	}
-
 };
 
 /**
@@ -336,6 +321,7 @@ struct EOD_API FGameplaySkillTableRow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
+	//~ @todo Change PlayerSkill to CharacterSkill
 	/** Player skill associated with this slot */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UGameplaySkillBase> PlayerSkill;
@@ -628,7 +614,7 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 
 	/** Determines skill type which will be used by AI for calculating most suitable skill to use */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skills)
-	ESkillType SkillType;
+	ESkillEffect SkillEffect;
 
 	/** Minimum stamina required to use this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
@@ -737,7 +723,7 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 		Icon = nullptr;
 		SupportedWeapons = 0;
 		DamageType = EDamageType::Physical;
-		SkillType = ESkillType::DamageMelee;
+		SkillEffect = ESkillEffect::DamageMelee;
 		StaminaRequired = 0;
 		ManaRequired = 0;
 		bAllowsMovement = false;
@@ -759,27 +745,6 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 		SkillStartMontageSectionName = FName("Default");
 		SkillLoopMontageSectionName = NAME_None;
 		SkillEndMontageSectionName = NAME_None;
-	}
-};
-
-/** Struct for in-game skills */
-USTRUCT(BlueprintType, Blueprintable)
-struct EOD_API FCharacterStateData
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY()
-	ECharacterState CharacterState;
-
-	UPROPERTY()
-	bool bValid;
-
-	UPROPERTY()
-	ECharMovementDirection CharMovementDirection;
-
-	inline bool IsValid()
-	{
-		return bValid;
 	}
 };
 
@@ -895,11 +860,15 @@ public:
 	static const FName SectionName_JumpEnd;
 
 	static const FName SectionName_ForwardJumpStart;
+
 	static const FName SectionName_ForwardJumpLoop;
+
 	static const FName SectionName_ForwardJumpEnd;
 
 	static const FName SectionName_BackwardJumpStart;
+
 	static const FName SectionName_BackwardJumpLoop;
+
 	static const FName SectionName_BackwardJumpEnd;
 
 	static const FName SectionName_FirstSwing;

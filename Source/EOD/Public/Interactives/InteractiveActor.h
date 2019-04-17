@@ -15,13 +15,20 @@ class EOD_API AInteractiveActor : public AActor, public IInteractionInterface
 	
 public:	
 
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	AInteractiveActor(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
 
+	// --------------------------------------
+	//  Interaction Interface
+	// --------------------------------------
+
 	virtual void OnInteract_Implementation(AEODCharacterBase* Character) override;
-	// virtual void OnInteract_Implementation(const AEODCharacterBase* Character, UUserWidget* DialogueWidget) override;
 
 };

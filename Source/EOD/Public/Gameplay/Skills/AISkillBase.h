@@ -45,9 +45,6 @@ struct EOD_API FAISkillInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
 	float Cooldown;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	ESkillType SkillType;
-
 	//~ @todo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
 	TSoftClassPtr<UStatusEffectBase> StatusEffectSoftClass;
@@ -62,7 +59,6 @@ struct EOD_API FAISkillInfo
 		CrowdControlEffectDuration = 0.f;
 		CrowdControlImmunities = 0;
 		Cooldown = 0.f;
-		SkillType = ESkillType::DamageMelee;
 		StatusEffectSoftClass = NULL;
 	}
 };

@@ -17,7 +17,7 @@ void UAnimNotify_JumpBase::GetJumpHitResults(USkeletalMeshComponent* MeshComp, U
 	if (Owner && World)
 	{
 		FVector TraceStart = Owner->GetActorLocation();
-		FVector TraceEnd = TraceStart + FVector(0.f, 0.f, -100.f);
+		FVector TraceEnd = TraceStart + FVector(0.f, 0.f, -200.f);
 
 		FCollisionQueryParams Params;
 		Params.bTraceComplex = false;
