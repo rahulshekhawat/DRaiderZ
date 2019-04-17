@@ -102,7 +102,7 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 		CompOwner = GetCharacterOwner();
 	}
 
-	check(CompOwner)
+	check(CompOwner);
 	if (!SkillsDataTable)
 	{
 		return;
@@ -116,7 +116,7 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 		FGameplaySkillTableRow* Row = SkillsDataTable->FindRow<FGameplaySkillTableRow>(Key, ContextString);
 		check(Row);
 		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->PlayerSkill, Key, RF_Transient);
-		check(GameplaySkill)
+		check(GameplaySkill);
 		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
 		GameplaySkill->SetSkillIndex(SkillIndex);
 

@@ -28,7 +28,7 @@ public:
 
 	AAICharacterBase(const FObjectInitializer& ObjectInitializer);
 
-	/** Initialize TArray<FSkill*> */
+	/** Initialize skills */
 	virtual void PostInitializeComponents() override;
 
 	/** Called when the game starts or when spawned */
@@ -133,8 +133,6 @@ public:
 
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
-protected:
-
 	// --------------------------------------
 	//  Pseudo Constants
 	// --------------------------------------
@@ -178,12 +176,6 @@ protected:
 	/** Animation montage containing animations for character dodging */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* DieMontage;
-
-	/** Animation montage containing animations for hit effects */
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
-	// UAnimMontage* HitEffectsAnimMontage;
-
-public:
 
 	/** Use a skill and play it's animation */
 	virtual bool UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill = nullptr) override;

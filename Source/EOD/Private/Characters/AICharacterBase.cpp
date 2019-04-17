@@ -11,6 +11,7 @@
 #include "EODPlayerController.h"
 #include "EODGameInstance.h"
 #include "FloatingHealthBarWidget.h"
+#include "AISkillsComponent.h"
 
 #include "Engine/Engine.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -21,7 +22,8 @@
 const FName AAICharacterBase::AggroWidgetCompName(TEXT("Aggro Indicator"));
 const FName AAICharacterBase::HealthWidgetCompName(TEXT("Health Indicator"));
 
-AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UAIStatsComponent>(FName("Character Stats Component")))
+AAICharacterBase::AAICharacterBase(const FObjectInitializer& ObjectInitializer) : 
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UAISkillsComponent>(AEODCharacterBase::GameplaySkillsComponentName))
 {
 	// Mob characters don't have strafe animations and so they must be rotated in the direction of their movement.
 	if (GetCharacterMovement())
@@ -51,7 +53,10 @@ void AAICharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	// InitializeSkills();
+	if (GetGameplaySkillsComponent())
+	{
+		GetGameplaySkillsComponent()->InitializeSkills(this);
+	}
 }
 
 void AAICharacterBase::BeginPlay()
