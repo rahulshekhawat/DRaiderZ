@@ -1097,6 +1097,20 @@ public:
 	// void DissolveCharacter();
 	// virtual void DissolveCharacter_Implementation();
 
+	// --------------------------------------
+	//  Replicated Stats
+	// --------------------------------------
+
+	UPROPERTY(ReplicatedUsing = OnRep_Health)
+	FCharacterStat Health;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Mana)
+	FCharacterStat Mana;
+
+	/** [server] Event called on server when character's health changes */
+	UFUNCTION()
+	virtual void OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
@@ -1123,6 +1137,12 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo);
+
+	UFUNCTION()
+	virtual void OnRep_Health(FCharacterStat& OldHealth);
+
+	UFUNCTION()
+	virtual void OnRep_Mana(FCharacterStat& OldMana);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Dodge(uint8 DodgeIndex, float RotationYaw);
@@ -1232,9 +1252,17 @@ protected:
 	virtual void Server_PlayAnimMontage_Implementation(UAnimMontage* MontageToPlay, FName SectionToPlay);
 	virtual bool Server_PlayAnimMontage_Validate(UAnimMontage* MontageToPlay, FName SectionToPlay);
 
-	UFUNCTION(NetMultiCast, Reliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
 	virtual void Multicast_PlayAnimMontage_Implementation(UAnimMontage* MontageToPlay, FName SectionToPlay);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_HealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
+	virtual void Multicast_HealthUpdated_Implementation(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ManaUpdated(int32 BaseMana, int32 MaxMana, int32 CurrentMana);
+	virtual void Multicast_ManaUpdated_Implementation(int32 BaseMana, int32 MaxMana, int32 CurrentMana);
 
 	friend class AEODPlayerController;
 	friend class UCharacterStateBase;

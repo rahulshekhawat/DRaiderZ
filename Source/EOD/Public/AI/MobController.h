@@ -16,23 +16,23 @@ class EOD_API AMobController : public AEODAIControllerBase
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	AMobController(const FObjectInitializer& ObjectInitializer);
 
-	UFUNCTION(BlueprintCallable, Category = Blackboard)
-	void InitializeBlackboardValues(class UBlackboardComponent* BlackboardComponent);
+	virtual void PostInitializeComponents() override;
 
-private:
-	UPROPERTY(EditDefaultsOnly, Category = BlackboardValues)
-	float AggroActivationRadius;
+	/** Called when the game starts or when spawned */
+	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, Category = BlackboardValues)
-	float AggroAreaRadius;
+	/** Called once this actor has been deleted */
+	virtual void Destroyed() override;
 
-	UPROPERTY(EditDefaultsOnly, Category = BlackboardValues)
-	float MaxEnemyChaseRadius;
 
-	UPROPERTY(EditDefaultsOnly, Category = BlackboardValues)
-	float WanderRadius;
+
 
 
 };

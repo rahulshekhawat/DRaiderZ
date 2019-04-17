@@ -154,6 +154,8 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(AEODCharacterBase, CurrentRide);
 	DOREPLIFETIME(AEODCharacterBase, MovementSpeedModifier);
 	DOREPLIFETIME(AEODCharacterBase, LastReceivedHit);
+	DOREPLIFETIME(AEODCharacterBase, Health);
+	DOREPLIFETIME(AEODCharacterBase, Mana);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterStateInfo, COND_SkipOwner);
 
@@ -607,7 +609,6 @@ void AEODCharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterru
 
 bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision, float RotationRate)
 {
-	PrintToScreen(this, FString("Rotating"));
 	float CurrentYaw = GetActorRotation().Yaw;
 	if (FMath::IsNearlyEqual(CurrentYaw, DesiredYaw, Precision))
 	{
@@ -656,6 +657,10 @@ float AEODCharacterBase::GetOrientationYawToActor(const AActor* TargetActor)
 	FVector OrientationVector = TargetActor->GetActorLocation() - GetActorLocation();
 	FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
 	return OrientationRotator.Yaw;
+}
+
+void AEODCharacterBase::OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth)
+{
 }
 
 void AEODCharacterBase::TurnOnTargetSwitch()
@@ -728,6 +733,14 @@ void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldS
 void AEODCharacterBase::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)
 {
 
+}
+
+void AEODCharacterBase::OnRep_Health(FCharacterStat& OldHealth)
+{
+}
+
+void AEODCharacterBase::OnRep_Mana(FCharacterStat& OldMana)
+{
 }
 
 void AEODCharacterBase::Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
@@ -909,6 +922,14 @@ void AEODCharacterBase::Multicast_PlayAnimMontage_Implementation(UAnimMontage* M
 		AnimInstance->Montage_Play(MontageToPlay);
 		AnimInstance->Montage_JumpToSection(SectionToPlay);
 	}
+}
+
+void AEODCharacterBase::Multicast_HealthUpdated_Implementation(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth)
+{
+}
+
+void AEODCharacterBase::Multicast_ManaUpdated_Implementation(int32 BaseMana, int32 MaxMana, int32 CurrentMana)
+{
 }
 
 void AEODCharacterBase::StartDodge()

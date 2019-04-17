@@ -2,14 +2,23 @@
 
 #include "EODAIControllerBase.h"
 #include "AIStatsComponent.h"
+#include "AILibrary.h"
+#include "EODPreprocessors.h"
+#include "AICharacterBase.h"
 
 #include "UnrealNetwork.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 const FName AEODAIControllerBase::StatsComponentName(TEXT("AI Stats"));
 
 AEODAIControllerBase::AEODAIControllerBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	StatsComponent = ObjectInitializer.CreateDefaultSubobject<UAIStatsComponent>(this, AEODAIControllerBase::StatsComponentName);
+
+	AggroActivationRadius = 500;
+	AggroAreaRadius = 5000;
+	MaxEnemyChaseRadius = 1000;
+	WanderRadius = 3500;
 }
 
 void AEODAIControllerBase::PostInitializeComponents()
@@ -31,4 +40,31 @@ void AEODAIControllerBase::BeginPlay()
 void AEODAIControllerBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AEODAIControllerBase::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+	AICharacter = InPawn ? Cast<AAICharacterBase>(InPawn) : nullptr;
+
+	if (StatsComponent && AICharacter)
+	{
+		AICharacter->OnHealthUpdated(StatsComponent->GetBaseHealth(), StatsComponent->GetMaxHealth(), StatsComponent->GetCurrentHealth());
+		StatsComponent->OnHealthChanged.AddDynamic(AICharacter, &AAICharacterBase::OnHealthUpdated);
+	}
+}
+
+void AEODAIControllerBase::InitializeBlackboardValues(UBlackboardComponent* BlackboardComponent)
+{
+	if (IsValid(BlackboardComponent))
+	{
+		if (IsValid(GetPawn()))
+		{
+			BlackboardComponent->SetValueAsVector(UAILibrary::BBKey_SpawnLocation, GetPawn()->GetActorLocation());
+		}
+		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_AggroActivationRadius, AggroActivationRadius);
+		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_MaxEnemyChaseRadius, MaxEnemyChaseRadius);
+		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_AggroAreaRadius, AggroAreaRadius);
+		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_WanderRadius, WanderRadius);
+	}
 }

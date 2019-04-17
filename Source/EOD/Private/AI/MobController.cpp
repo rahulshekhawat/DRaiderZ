@@ -3,27 +3,22 @@
 #include "MobController.h"
 #include "AILibrary.h"
 
-#include "BehaviorTree/BlackboardComponent.h"
 
 AMobController::AMobController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	AggroActivationRadius = 500;
-	AggroAreaRadius = 5000;
-	MaxEnemyChaseRadius = 1000;
-	WanderRadius = 3500;
 }
 
-void AMobController::InitializeBlackboardValues(UBlackboardComponent* BlackboardComponent)
+void AMobController::PostInitializeComponents()
 {
-	if (IsValid(BlackboardComponent))
-	{
-		if (IsValid(GetPawn()))
-		{
-			BlackboardComponent->SetValueAsVector(UAILibrary::BBKey_SpawnLocation, GetPawn()->GetActorLocation());
-		}
-		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_AggroActivationRadius, AggroActivationRadius);
-		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_MaxEnemyChaseRadius, MaxEnemyChaseRadius);
-		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_AggroAreaRadius, AggroAreaRadius);
-		BlackboardComponent->SetValueAsFloat(UAILibrary::BBKey_WanderRadius, WanderRadius);
-	}
+	Super::PostInitializeComponents();
+}
+
+void AMobController::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void AMobController::Destroyed()
+{
+	Super::Destroyed();
 }

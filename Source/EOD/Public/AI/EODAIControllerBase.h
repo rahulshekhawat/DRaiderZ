@@ -7,6 +7,8 @@
 #include "EODAIControllerBase.generated.h"
 
 class UAIStatsComponent;
+class UBlackboardComponent;
+class AAICharacterBase;
 
 /**
  * 
@@ -32,6 +34,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void SetPawn(APawn* InPawn) override;
+
 	// --------------------------------------
 	//  Components
 	// --------------------------------------
@@ -40,12 +44,41 @@ public:
 
 	FORCEINLINE UAIStatsComponent* GetStatsComponent() const { return StatsComponent; }
 
-private:
+protected:
 
-	UPROPERTY(Category = Components, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = Stats, VisibleAnywhere, BlueprintReadOnly)
 	UAIStatsComponent* StatsComponent;
 
+	// --------------------------------------
+	//  Blackboard and Behaviour Tree
+	// --------------------------------------
 
+	UFUNCTION(BlueprintCallable, Category = "Blackboard")
+	virtual void InitializeBlackboardValues(UBlackboardComponent* BlackboardComponent);
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Blackboard Values")
+	float AggroActivationRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Blackboard Values")
+	float AggroAreaRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Blackboard Values")
+	float MaxEnemyChaseRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Blackboard Values")
+	float WanderRadius;
+
+public:
+
+	// --------------------------------------
+	//  Pawn
+	// --------------------------------------
+
+	FORCEINLINE AAICharacterBase* GetAICharacter() const { return AICharacter; }
+
+private:
+
+	UPROPERTY(Transient)
+	AAICharacterBase* AICharacter;
 
 };

@@ -9,36 +9,49 @@
 #include "AttackDodgedEvent.h"
 #include "EODBlueprintFunctionLibrary.h"
 #include "EODPlayerController.h"
-#include "GenericPlatform/GenericPlatformTime.h"
 #include "EODGameInstance.h"
+#include "FloatingHealthBarWidget.h"
 
 #include "Engine/Engine.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "GenericPlatform/GenericPlatformTime.h"
 #include "GameFramework/CharacterMovementComponent.h"
+
+
+const FName AAICharacterBase::AggroWidgetCompName(TEXT("Aggro Indicator"));
+const FName AAICharacterBase::HealthWidgetCompName(TEXT("Health Indicator"));
 
 AAICharacterBase::AAICharacterBase(const FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UAIStatsComponent>(FName("Character Stats Component")))
 {
 	// Mob characters don't have strafe animations and so they must be rotated in the direction of their movement.
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+	}
 
-	AggroWidgetComp = ObjectInitializer.CreateDefaultSubobject<UEODWidgetComponent>(this, TEXT("Aggro Indicator"));
-	AggroWidgetComp->SetupAttachment(RootComponent);
-	// AggroWidgetComp->SetupAttachment(GetMesh(), FName("dummy_ef_head"));
-	HealthWidgetComp = ObjectInitializer.CreateDefaultSubobject<UEODWidgetComponent>(this, TEXT("Health Indicator"));
-	HealthWidgetComp->SetupAttachment(RootComponent);
-	// HealthWidgetComp->SetupAttachment(GetMesh(), FName("dummy_ef_head"));
+	AggroWidgetComp = ObjectInitializer.CreateDefaultSubobject<UEODWidgetComponent>(this, AAICharacterBase::AggroWidgetCompName);
+	if (AggroWidgetComp)
+	{
+		AggroWidgetComp->SetupAttachment(RootComponent);
+	}
+
+	HealthWidgetComp = ObjectInitializer.CreateDefaultSubobject<UEODWidgetComponent>(this, AAICharacterBase::HealthWidgetCompName);
+	if (HealthWidgetComp)
+	{
+		HealthWidgetComp->SetupAttachment(RootComponent);
+	}
 
 	AggroWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	HealthWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	AggroWidgetComp->SetCollisionProfileName(FName("NoCollision"));
-	HealthWidgetComp->SetCollisionProfileName(FName("NoCollision"));
+	AggroWidgetComp->SetCollisionProfileName(CollisionProfileNames::NoCollision);
+	HealthWidgetComp->SetCollisionProfileName(CollisionProfileNames::NoCollision);
 }
 
 void AAICharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	InitializeSkills();
+	// InitializeSkills();
 }
 
 void AAICharacterBase::BeginPlay()
@@ -46,9 +59,12 @@ void AAICharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	SetInCombat(false);
+	UpdateHealthWidget();
+}
 
-	// Following line is used to update the floating health bar widget (floating health bar widget is NULL when CurrentHealth is initially initialized)
-	// GetCharacterStatsComponent()->ModifyCurrentHealth(0);
+void AAICharacterBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 void AAICharacterBase::Destroyed()
@@ -280,16 +296,6 @@ float AAICharacterBase::GetActualDamage(AActor* HitInstigator, ICombatInterface*
 	return ActualDamage;
 }
 
-UEODWidgetComponent* AAICharacterBase::BP_GetAggroWidgetComp() const
-{
-	return GetAggroWidgetComp();
-}
-
-UEODWidgetComponent* AAICharacterBase::BP_GetHealthWidgetComp() const
-{
-	return GetHealthWidgetComp();
-}
-
 bool AAICharacterBase::CCEFlinch_Implementation(const float BCAngle)
 {
 	if (CanFlinch() && FlinchAnimMontage)
@@ -410,6 +416,7 @@ bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const F
 
 void AAICharacterBase::SetInCombat(bool bValue)
 {
+	/*
 	if (bValue)
 	{
 		if (AggroWidgetComp->GetUserWidgetObject())
@@ -432,6 +439,7 @@ void AAICharacterBase::SetInCombat(bool bValue)
 			HealthWidgetComp->GetUserWidgetObject()->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+	*/
 
 	bInCombat = bValue;
 	UpdateMaxWalkSpeed();
@@ -719,6 +727,29 @@ void AAICharacterBase::InitializeSkills()
 		}
 	}
 	*/
+}
+
+void AAICharacterBase::UpdateHealthWidget()
+{
+	if (HealthWidgetComp)
+	{
+		UFloatingHealthBarWidget* HealthWidget = Cast<UFloatingHealthBarWidget>(HealthWidgetComp->GetUserWidgetObject());
+		if (HealthWidget)
+		{
+			HealthWidget->UpdateHealth(Health.BaseValue, Health.MaxValue, Health.CurrentValue);
+		}
+	}
+}
+
+void AAICharacterBase::OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth)
+{
+	Health.SetStatValues(BaseHealth, MaxHealth, CurrentHealth);
+	UpdateHealthWidget();
+}
+
+void AAICharacterBase::OnRep_Health(FCharacterStat& OldHealth)
+{
+	UpdateHealthWidget();
 }
 
 void AAICharacterBase::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)

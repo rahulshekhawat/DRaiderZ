@@ -34,6 +34,9 @@ public:
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
+	/** Updates character state every frame */
+	virtual void Tick(float DeltaTime) override;
+
 	/** Called once this actor has been deleted */
 	virtual void Destroyed() override;
 
@@ -59,7 +62,7 @@ public:
 		const bool bAttackBlocked) override;
 
 	// --------------------------------------
-	//  
+	//  Components
 	// --------------------------------------
 
 	/** Get aggro widget component */
@@ -68,13 +71,21 @@ public:
 	/** Get health widget component */
 	FORCEINLINE UEODWidgetComponent* GetHealthWidgetComp() const { return HealthWidgetComp; }
 
-	/** Get aggro widget component */
-	UFUNCTION(BlueprintPure, Category = WidgetComponent, meta = (DisplayName = "Get Aggro Widget Component"))
-	UEODWidgetComponent* BP_GetAggroWidgetComp() const;
+	static const FName AggroWidgetCompName;
 
-	/** Get health widget component */
-	UFUNCTION(BlueprintPure, Category = WidgetComponent, meta = (DisplayName = "Get Health Widget Component"))
-	UEODWidgetComponent* BP_GetHealthWidgetComp() const;
+	static const FName HealthWidgetCompName;
+
+protected:
+
+	/** Used to display floating aggro widget above AI character */
+	UPROPERTY(Category = UI, VisibleAnywhere, BlueprintReadOnly)
+	UEODWidgetComponent* AggroWidgetComp;
+
+	/** Used to display floating health widget above AI character */
+	UPROPERTY(Category = UI, VisibleAnywhere, BlueprintReadOnly)
+	UEODWidgetComponent* HealthWidgetComp;
+
+public:
 
 	/** Flinch this character (visual feedback) */
 	virtual bool CCEFlinch_Implementation(const float BCAngle) override;
@@ -140,14 +151,6 @@ public:
 	virtual void AssistanceRequested_Implementation(const AAICharacterBase* Requestor);
 
 private:
-
-	/** Used to display floating aggro widget above AI character */
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UEODWidgetComponent* AggroWidgetComp;
-
-	/** Used to display floating health widget above AI character */
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UEODWidgetComponent* HealthWidgetComp;
 
 	/** In game name of this AI character. This may or may not differ for each instance of character */
 	UPROPERTY(EditAnywhere, Category = BaseInfo, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -244,12 +247,28 @@ private:
 
 	void InitializeSkills();
 
+public:
+
+	// --------------------------------------
+	//  Components
+	// --------------------------------------
+
+	void UpdateHealthWidget();
+
+	// --------------------------------------
+	//  Replicated Stats
+	// --------------------------------------
+
+	/** [server] Event called on server when character's health changes */
+	virtual void OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth) override;
+
 protected:
 
 	// --------------------------------------
 	//  Network
 	// --------------------------------------
 
-	virtual void OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo) override;	
+	virtual void OnRep_Health(FCharacterStat& OldHealth) override;
+	virtual void OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo) override;
 
 };
