@@ -74,11 +74,6 @@ void AAICharacterBase::Tick(float DeltaTime)
 
 void AAICharacterBase::Destroyed()
 {
-	if (SkillAnimationsStreamableHandle.IsValid())
-	{
-		SkillAnimationsStreamableHandle.Get()->ReleaseHandle();
-		SkillAnimationsStreamableHandle.Reset();
-	}
 }
 
 TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, const FHitResult& DirectHitResult, const bool bLineHitResultFound, const FHitResult& LineHitResult)
@@ -231,31 +226,6 @@ TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(AActor* HitInstigato
 		EODGI->DisplayDamageNumbers(LastReceivedHit.ActualDamage, LastReceivedHit.bCritHit, this, LastReceivedHit.HitInstigator, LastReceivedHit.HitLocation);
 	}
 
-	/*
-
-	/*
-	if (ResultingHitCharacterHP <= 0)
-	{
-		HitCharacter->InitiateDeathSequence();
-	}
-	NativeDisplayDamage(HitInstigator, HitCharacter, LineHitResult, ActualDamage, bCritHit);
-
-	// @todo make camera shake interesting
-	PlayCameraShake(ECameraShakeType::Medium, LineHitResult.ImpactPoint);
-	SpawnHitSFX(LineHitResult.ImpactPoint, LineHitResult.ImpactNormal);
-	PlayHitSound(HitInstigator, LineHitResult.ImpactPoint, bCritHit);
-
-	if (bAttackBlocked)
-	{
-		return;
-	}
-
-	HitCharacter->SetOffTargetSwitch();
-	*/
-
-
-
-
 	return AttackResponsePtr;
 }
 
@@ -366,11 +336,22 @@ bool AAICharacterBase::CCEFreeze_Implementation(const float Duration)
 
 	if (CanFreeze())
 	{
-		CustomTimeDilation = 0;
-		//~ @todo
-		// GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::EndFreeze, Duration, false);
+		/*
+		UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+		if (AnimInstance)
+		{
+			AnimInstance->Play
+		}
+		*/
 
+		/*
+		CustomTimeDilation = 0;
+		
+		UWorld* World = GetWorld();
+		check(World);
+		World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::CCEUnfreeze, Duration, false);
 		return true;
+		*/
 	}
 
 	return false;
@@ -483,31 +464,15 @@ void AAICharacterBase::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupt
 
 bool AAICharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill)
 {
-	if (CanUseAnySkill())
+	if (!CanUseSkill(SkillID, Skill))
 	{
-		//~ @todo
-		// FSkillTableRow* SkillToUse = GetSkill(SkillID, FString("AAICharacterBase::UseSkill, looking up AI skills for use"));
-		FSkillTableRow* SkillToUse = nullptr;
+		return false;
+	}
 
-		if (!SkillToUse)
-		{
-#if MESSAGE_LOGGING_ENABLED
-			FString Message = FString("Couldn't find AI character skill : ") + SkillID.ToString();
-			UKismetSystemLibrary::PrintString(this, FString());
-#endif // MESSAGE_LOGGING_ENABLED
-			return false;
-		}
-
-		if (SkillToUse->AnimMontage.Get())
-		{
-			//~ @todo
-			// PlayAnimationMontage(SkillToUse->AnimMontage.Get(), SkillToUse->SkillStartMontageSectionName, ECharacterState::UsingActiveSkill);
-		}
-		SetCurrentActiveSkillID(SkillID);
-		// SetCurrentActiveSkill(SkillToUse);
-		//~ @todo
-		// SkillIDToWeightMap[SkillID] = SkillIDToWeightMap[SkillID] - 1;
-		// bSkillAllowsMovement = SkillToUse->bAllowsMovement;
+	if (GetGameplaySkillsComponent())
+	{
+		uint8 SkillIndex = GetGameplaySkillsComponent()->GetSkillIndexForSkillGroup(SkillID);
+		GetGameplaySkillsComponent()->TriggerSkill(SkillIndex, Skill);
 		return true;
 	}
 
@@ -539,62 +504,11 @@ EEODTaskStatus AAICharacterBase::CheckSkillStatus(FName SkillID)
 FName AAICharacterBase::GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const
 {
 	FName MostWeightedSkillID = NAME_None;
-	TArray<FName> EligibleSkills;
-	// TArray<FName> MostWeightedSkills;
-
-	if (TargetCharacter->HasBeenHit())
+	UAISkillsComponent* SkillsComp = Cast<UAISkillsComponent>(GetGameplaySkillsComponent());
+	if (SkillsComp)
 	{
-		for (FName SkillID : MeleeSkills)
-		{
-			if (FlinchSkills.Contains(SkillID))
-			{
-				EligibleSkills.Add(SkillID);
-			}
-		}
-
-		for (FName SkillID : EligibleSkills)
-		{
-			if (MostWeightedSkillID == NAME_None)
-			{
-				MostWeightedSkillID = SkillID;
-				continue;
-			}
-
-			/* @fix
-			if (SkillIDToWeightMap[SkillID] > SkillIDToWeightMap[MostWeightedSkillID])
-			{
-				MostWeightedSkillID = SkillID;
-			}
-			*/
-		}
+		MostWeightedSkillID = SkillsComp->GetMostWeightedMeleeSkillID(TargetCharacter);
 	}
-	else
-	{
-		for (FName SkillID : MeleeSkills)
-		{
-			if (!FlinchSkills.Contains(SkillID))
-			{
-				EligibleSkills.Add(SkillID);
-			}
-		}
-
-		for (FName SkillID : EligibleSkills)
-		{
-			if (MostWeightedSkillID == NAME_None)
-			{
-				MostWeightedSkillID = SkillID;
-				continue;
-			}
-
-			/* @fix
-			if (SkillIDToWeightMap[SkillID] > SkillIDToWeightMap[MostWeightedSkillID])
-			{
-				MostWeightedSkillID = SkillID;
-			}
-			*/
-		}
-	}
-
 	return MostWeightedSkillID;
 }
 
@@ -613,125 +527,6 @@ void AAICharacterBase::UpdateMaxWalkSpeed()
 	{
 		GetCharacterMovement()->MaxWalkSpeed = bInCombat ? DefaultRunSpeed : DefaultWalkSpeed;
 	}
-}
-
-void AAICharacterBase::InitializeSkills()
-{
-	//~ @todo
-	/*
-	if (!SkillsDataTable)
-	{
-		return;
-	}
-
-	TArray<FSoftObjectPath> AnimationsToLoad;
-	TArray<FName> SkillIDs = SkillsDataTable->GetRowNames();
-	for (const FName& SkillID : SkillIDs)
-	{
-		FSkillTableRow* Skill = GetSkill(SkillID, FString("AAICharacterBase::InitializeSkills(), looking for AI skill"));
-		if (!Skill)
-		{
-#if MESSAGE_LOGGING_ENABLED
-			FString Message = FString("Couldn't find skil : ") + SkillID.ToString();
-			UKismetSystemLibrary::PrintString(this, Message);
-#endif // MESSAGE_LOGGING_ENABLED
-			return;
-		}
-		check(Skill); // Redundant
-		if (Skill->SkillType == ESkillType::BuffParty)
-		{
-			PartyBuffSkills.Add(SkillID);
-		}
-		else if (Skill->SkillType == ESkillType::BuffSelf)
-		{
-			SelfBuffSkills.Add(SkillID);
-		}
-		else if (Skill->SkillType == ESkillType::DamageMelee)
-		{
-			MeleeSkills.Add(SkillID);
-			if (Skill->CrowdControlEffect == ECrowdControlEffect::Crystalized)
-			{
-				CrystalizeSkills.Add(SkillID);
-			}
-			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Flinch)
-			{
-				FlinchSkills.Add(SkillID);
-			}
-			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Interrupt)
-			{
-				InterruptSkills.Add(SkillID);
-			}
-			else if (Skill->CrowdControlEffect == ECrowdControlEffect::KnockedBack)
-			{
-				KnockBackSkills.Add(SkillID);
-			}
-			else if (Skill->CrowdControlEffect == ECrowdControlEffect::KnockedDown)
-			{
-				KnockDownSkills.Add(SkillID);
-			}
-			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Stunned)
-			{
-				StunSkills.Add(SkillID);
-			}
-		}
-		else if (Skill->SkillType == ESkillType::DamageRanged)
-		{
-			RangedSkills.Add(SkillID);
-			if (Skill->CrowdControlEffect == ECrowdControlEffect::Crystalized)
-			{
-				CrystalizeSkills.Add(SkillID);
-			}
-			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Flinch)
-			{
-				FlinchSkills.Add(SkillID);
-			}
-			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Interrupt)
-			{
-				InterruptSkills.Add(SkillID);
-			}
-			else if (Skill->CrowdControlEffect == ECrowdControlEffect::KnockedBack)
-			{
-				KnockBackSkills.Add(SkillID);
-			}
-			else if (Skill->CrowdControlEffect == ECrowdControlEffect::KnockedDown)
-			{
-				KnockDownSkills.Add(SkillID);
-			}
-			else if (Skill->CrowdControlEffect == ECrowdControlEffect::Stunned)
-			{
-				StunSkills.Add(SkillID);
-			}
-		}
-		else if (Skill->SkillType == ESkillType::DebuffEnemy)
-		{
-			DebuffSkills.Add(SkillID);
-		}
-		else if (Skill->SkillType == ESkillType::HealParty)
-		{
-			PartyHealSkills.Add(SkillID);
-		}
-		else if (Skill->SkillType == ESkillType::HealSelf)
-		{
-			SelfHealSkills.Add(SkillID);
-		}
-
-		AnimationsToLoad.Add(Skill->AnimMontage.ToSoftObjectPath());
-	}
-
-	if (GEngine)
-	{
-		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-		if (GameSingleton)
-		{
-			if (SkillAnimationsStreamableHandle.IsValid())
-			{
-				SkillAnimationsStreamableHandle.Get()->ReleaseHandle();
-				SkillAnimationsStreamableHandle.Reset();
-			}
-			SkillAnimationsStreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AnimationsToLoad);
-		}
-	}
-	*/
 }
 
 void AAICharacterBase::UpdateHealthWidget()

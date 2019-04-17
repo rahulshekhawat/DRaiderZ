@@ -55,7 +55,7 @@ public:
 	FORCEINLINE bool IsValid() const { return SkillGroup != NAME_None && SkillIndex != 0; }
 
 	/** Event called when skill owner changes it's weapon */
-	virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
+	// virtual void OnOwnerWeaponChange(FName NewWeaponID, FWeaponTableRow* NewWeaponData, FName OldWeaponID, FWeaponTableRow* OldWeaponData);
 
 	// --------------------------------------
 	//  Pseudo Constants

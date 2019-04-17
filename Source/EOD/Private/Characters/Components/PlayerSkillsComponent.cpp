@@ -32,11 +32,6 @@ void UPlayerSkillsComponent::BeginPlay()
 void UPlayerSkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	for (UGameplaySkillBase* Skill : ActiveSkills)
-	{
-		Skill->UpdateSkill(DeltaTime);
-	}
 }
 
 void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)

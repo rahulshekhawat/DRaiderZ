@@ -110,7 +110,7 @@ protected:
 	virtual void UpdateCooldown() override;
 
 	// --------------------------------------
-	//	Constants : Default values that are not supposed to be modified
+	//  Constants : Default values that are not supposed to be modified
 	// --------------------------------------
 	
 	/**

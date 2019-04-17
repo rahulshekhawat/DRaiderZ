@@ -5,4 +5,10 @@
 
 UAISkillBase::UAISkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	bSkillCanBeCharged = false;
+}
+
+bool UAISkillBase::CanReleaseSkill() const
+{
+	return false;
 }

@@ -119,13 +119,6 @@ public:
 	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection) override;
 
 	// --------------------------------------
-	//  Combat
-	// --------------------------------------
-
-	/** Set whether character is in combat or not */
-	virtual void SetInCombat(bool bValue) override;
-
-	// --------------------------------------
 	//  Utility
 	// --------------------------------------
 
@@ -177,6 +170,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* DieMontage;
 
+	// --------------------------------------
+	//  Widgets
+	// --------------------------------------
+
+	void UpdateHealthWidget();
+
+	// --------------------------------------
+	//  Replicated Stats
+	// --------------------------------------
+
+	/** [server] Event called on server when character's health changes */
+	virtual void OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth) override;
+
+	// --------------------------------------
+	//  Skill System
+	// --------------------------------------
+
 	/** Use a skill and play it's animation */
 	virtual bool UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill = nullptr) override;
 
@@ -192,108 +202,31 @@ public:
 	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const override;
 
+	// --------------------------------------
+	//  Combat
+	// --------------------------------------
+
+	/** Set whether character is in combat or not */
+	virtual void SetInCombat(bool bValue) override;
+
 	/** Returns true if this AI character can currently assist an ally */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Behavior")
 	bool CanAssistAlly();
-
-	/** Returns true if this AI character can currently assist an ally */
 	virtual bool CanAssistAlly_Implementation();
 
 	/** Called when an ally requests assistance from this character */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Behavior")
 	void AssistanceRequested(const AAICharacterBase* Requestor);
-
-	/** Called when an ally requests assistance from this character */
 	virtual void AssistanceRequested_Implementation(const AAICharacterBase* Requestor);
 
-private:
+protected:
 
+	// --------------------------------------
+	//  Movement and Rotation
+	// --------------------------------------
 
 	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
 	void UpdateMaxWalkSpeed();
-
-	//~ @todo replace following boolean with just default crowd control immunities in stats component
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	bool bHasFlinchAnimations;
-
-	/** Cache for skills that can knock down enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> KnockDownSkills;
-
-	/** Cache for skills that can knock back enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> KnockBackSkills;
-
-	/** Cache for skills that can interrupt enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> InterruptSkills;
-
-	/** Cache for skills that can stun enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> StunSkills;
-	
-	/** Cache for skills that can crystalize enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> CrystalizeSkills;
-
-	/** Cache for skills that can flinch enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> FlinchSkills;
-
-	/** Cache for ranged skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> RangedSkills;
-
-	/** Cache for melee skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> MeleeSkills;
-
-	/** Cache for self healing skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> SelfHealSkills;
-
-	/** Cache for party healing skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> PartyHealSkills;
-
-	/** Cache for skills that put a debuff on enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> DebuffSkills;
-
-	/** Cache for self buff skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> SelfBuffSkills;
-
-	/** Cache for party buff skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> PartyBuffSkills;
-
-	/** A map of skills to their usability weight */
-	// UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// TMap<FName, int32> SkillPriorityMap;
-
-	/** A map of skills to their usability weight */
-	// UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// TMap<FName, int32> SkillWeightMap;
-
-	TSharedPtr<FStreamableHandle> SkillAnimationsStreamableHandle;
-
-	void InitializeSkills();
-
-public:
-
-	// --------------------------------------
-	//  Widgets
-	// --------------------------------------
-
-	void UpdateHealthWidget();
-
-	// --------------------------------------
-	//  Replicated Stats
-	// --------------------------------------
-
-	/** [server] Event called on server when character's health changes */
-	virtual void OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth) override;
 
 protected:
 
