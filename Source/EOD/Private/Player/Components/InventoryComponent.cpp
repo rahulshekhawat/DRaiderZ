@@ -2,7 +2,6 @@
 
 #include "InventoryComponent.h"
 #include "EODPlayerController.h"
-#include "HUDWidget.h"
 #include "InventoryWidget.h"
 
 #include "Kismet/KismetSystemLibrary.h"

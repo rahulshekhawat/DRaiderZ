@@ -8,7 +8,6 @@
 #include "PlayerStatsComponent.h"
 #include "EODPreprocessors.h"
 #include "EODSaveGame.h"
-#include "HUDWidget.h"
 #include "NPCBase.h"
 #include "EODPlayerController.h"
 #include "DialogueWindowWidget.h"
