@@ -328,9 +328,6 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
 	FOnWeaponChangedMCDelegate OnSecondaryWeaponUnequipped;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
-	TSubclassOf<USkillBarWidget> SkillBarWidgetClass;
-
 private:
 
 	TArray<UStatusEffectBase*> ManagedStatusEffectsList;

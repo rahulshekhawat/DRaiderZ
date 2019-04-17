@@ -7,7 +7,6 @@
 #include "EODBlueprintFunctionLibrary.h"
 #include "EODPlayerController.h"
 #include "EODAIControllerBase.h"
-#include "HUDWidget.h"
 #include "StatsComponentBase.h"
 #include "GameplaySkillsComponent.h"
 #include "EODCharacterMovementComponent.h"

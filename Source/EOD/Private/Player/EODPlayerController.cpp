@@ -15,7 +15,6 @@
 #include "StatusIndicatorWidget.h"
 #include "InventoryWidget.h"
 #include "PlayerStatsWidget.h"
-#include "SkillBarWidget.h"
 #include "DynamicSkillBarWidget.h"
 #include "DynamicSkillTreeWidget.h"
 
@@ -25,7 +24,6 @@
 #include "PlayerSaveGame.h"
 
 #include "SkillTreeComponent.h"
-#include "PlayerSkillTreeManager.h"
 #include "PlayerStatsComponent.h"
 
 #include "Engine/World.h"
