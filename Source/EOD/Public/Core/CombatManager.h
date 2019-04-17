@@ -23,11 +23,19 @@ class EOD_API ACombatManager : public AInfo
 	
 public:
 
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	ACombatManager(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	// --------------------------------------
+	//  Combat
+	// --------------------------------------
 
 	/** Called when an actor attacks another actor */
 	void OnMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
@@ -42,118 +50,17 @@ public:
 
 	//~ @todo OnRangedHit
 
+	bool AreEnemies(AEODCharacterBase* CharOne, AEODCharacterBase* CharTwo);
+
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
 	/** Returns angle between two vectors */
-	FORCEINLINE float CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2);
+	inline float CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2);
 
-	void NativeDisplayDamage(const AEODCharacterBase* HitInstigator,
-				 			 const AEODCharacterBase* HitCharacter,
-							 const FHitResult& LineHitResult,
-							 const float ActualDamage,
-				 			 const bool bCriticalHit);
-
-	/** Displays damage numbers on player screen */
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
-	void DisplayDamageMessage(const FString& Message, const FLinearColor& MessageColor, const FVector& Location);
-
-	/** Displays status effect text on player screen */
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
-	void DisplayStatusEffectMessage(const FString& Message, const FLinearColor& MessageColor, const FVector& Location);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = WidgetText)
-	void PlayCameraShake(ECameraShakeType CameraShakeType, const FVector& EpiCenter);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = CombatEvent)
-	void SpawnHitSFX(const FVector& HitLocation, const FVector& HitNormal);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = CombatEvent)
-	void SpawnBloodSpurt(const FVector& HitLocation, const FVector& HitNormal);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = CombatEvent)
-	void PlayHitSound(const AEODCharacterBase* HitInstigator, const FVector& HitLocation, const bool bCriticalHit);
-
-	/*
-	UFUNCTION(BlueprintImplementableEvent, Category = CombatEvent, meta = (DisplayName = "Character To Character Attack"))
-	void BP_CharacterToCharacterAttack(AEODCharacterBase* HitInstigator,
-									   AEODCharacterBase* HitCharacter,
-									   const FSkillDamageInfo& SkillDamageInfo,
-									   const FHitResult& AttackHitResult,
-									   const FHitResult& LineHitResult);
-	*/
-
-protected:
-
-	/** The maximum angle to which an incoming damage can be blocked */
-	UPROPERTY(EditDefaultsOnly, Category = Combat, BlueprintReadOnly)
-	float BlockDetectionAngle;
-
-	UPROPERTY(EditDefaultsOnly, Category = Combat, BlueprintReadOnly)
-	float PhysicalCritMultiplier;
-
-	UPROPERTY(EditDefaultsOnly, Category = Combat, BlueprintReadOnly)
-	float MagickalCritMultiplier;
-
-	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly)
-	FLinearColor BuffTextColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly)
-	FLinearColor DebuffTextColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly)
-	FLinearColor DodgeTextColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly)
-	FLinearColor PlayerDamagedTextColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly, meta = (DisplayName = "NPC Damaged Text Color"))
-	FLinearColor NPCNormalDamagedTextColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = Colors, BlueprintReadOnly, meta = (DisplayName = "NPC Critically Damaged Text Color"))
-	FLinearColor NPCCritDamagedTextColor;
-
-private:
-
-	/** Determines whether the hit actor succesfully blocked an attack based on the positions of itself and the attacking actor */
-	inline bool WasBlockSuccessful(
-		const AActor* HitInstigator,
-		const AActor* HitActor,
-		const bool bLineHitResultFound,
-		const FHitResult& LineHitResult);
-
-	/**
-	 * Generates a random boolean based on HitInstigator's crit rate and HitCharacter's crit resistance,
-	 * that could be used to determine if the attack was a critical attacl
-	 */
-	inline bool GetCritChanceBoolean(
-		const AEODCharacterBase* HitInstigator,
-		const AEODCharacterBase* HitCharacter,
-		const EDamageType& DamageType) const;
-
-	FORCEINLINE float GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult);
-
-	/*
-	float GetActualDamage(
-		const AEODCharacterBase* HitInstigator,
-		const AEODCharacterBase* HitCharacter,
-		const FSkillDamageInfo& SkillDamageInfo,
-		const bool bCriticalHit,
-		const bool bAttackBlocked);
-	*/
-
-	/**
-	 * Calculates and returns the actual damage that should be inflicted by HitInstigator on HitCharacter
-	 * @param HitInstigator The character that initiated the attack
-	 * @param HitCharacter The character that got damage by the attack
-	 * @param SkillUsed The skill that HitInstigator used to attack
-	 * @param bCriticalHit True if the hit was critical
-	 * @param bAttackBlocked True if the HitCharacter blocked the incoming attack from HitInstigator
-	 * @return Returns the actual damage that should be inflicted on HitCharacter
-	 */
-	float GetActualDamage(
-		const AEODCharacterBase* HitInstigator,
-		const AEODCharacterBase* HitCharacter,
-		const FSkillTableRow* SkillUsed,
-		const bool bCriticalHit,
-		const bool bAttackBlocked);
+	/** Returns angle between HitCharacter's forward actor and LineHitResult's ImpactNormal */
+	inline float GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult);
 
 	/**
 	 * Does a line trace from HitInstigator to HitTarget
@@ -172,79 +79,60 @@ private:
 	 * @param bOutLineHitResultFound True if line trace actually hit the HitTarget
 	 */
 	void GetLineHitResult(const AActor* HitInstigator, const UPrimitiveComponent* HitComponent, FHitResult& OutHitResult, bool& bOutLineHitResultFound) const;
+	
+	/** Displays damage numbers on player screen */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	void DisplayDamageMessage(const FString& Message, const FLinearColor& MessageColor, const FVector& Location);
 
-	/** Processes an attack from an Actor */
-	void ProcessActorAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
+	/** Displays status effect text on player screen */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	void DisplayStatusEffectMessage(const FString& Message, const FLinearColor& MessageColor, const FVector& Location);
 
-	/** Processes an attack from an EODCharacterBase */
-	void ProcessCharacterAttack(AEODCharacterBase* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	void PlayCameraShake(ECameraShakeType CameraShakeType, const FVector& EpiCenter);
 
-	/**
-	 * Handles an attack from one character to another character
-	 * @param HitInstigator The character that initiated the collision sweep
-	 * @param HitCharacter The character that got hit by collision sweep
-	 * @param SkillUsed The skill that HitInstigator used to initiate the collision sweep
-	 * @param bOutHitCharacterReceivedDamage Outs true if HitCharacter received any form of damage (i.e., true if HitCharacter didn't dodge or was not an enemy of HitInstigator). OutDamageInflicted may be zero even if bOutHitCharacterReceivedDamage is true.
-	 * @param OutDamageInflicted Actual damage inflicted on HitCharacter
-	 */
-	void CharacterToCharacterAttack(
-		AEODCharacterBase* HitInstigator,
-		AEODCharacterBase* HitCharacter,
-		const FSkillTableRow* SkillUsed,
-		const FHitResult& HitResult,
-		bool& bOutHitCharacterReceivedDamage,
-		float& OutDamageInflicted);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	void SpawnHitSFX(const FVector& HitLocation, const FVector& HitNormal);
 
-	/**
-	 * Handles an attack from one character to another character
-	 * @param HitInstigator The character that initiated the collision sweep
-	 * @param HitActor The actor that got hit by collision sweep
-	 * @param SkillUsed The skill that HitInstigator used to initiate the collision sweep
-	 * @param bOutHitActorReceivedDamage Outs true if HitActor received any form of damage (i.e., true if HitActor didn't dodge or was not an enemy of HitInstigator). OutDamageInflicted may be zero even if bOutHitActorReceivedDamage is true.
-	 * @param OutDamageInflicted Actual damage inflicted on HitCharacter
-	 */
-	void CharacterToActorAttack(
-		AEODCharacterBase* HitInstigator,
-		AActor* HitActor,
-		const FSkillTableRow* SkillUsed,
-		const FHitResult& HitResult,
-		bool& bOutHitActorReceivedDamage,
-		float& OutDamageInflicted);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	void SpawnBloodSpurt(const FVector& HitLocation, const FVector& HitNormal);
 
-	/** Handles an attack from one character to another character */
-	/*
-	void CharacterToCharacterAttack(
-		AEODCharacterBase* HitInstigator,
-		AEODCharacterBase* HitCharacter,
-		const FSkillDamageInfo& SkillDamageInfo,
-		const FHitResult& HitResult);
-	*/
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	void PlayHitSound(const AEODCharacterBase* HitInstigator, const FVector& HitLocation, const bool bCriticalHit);
 
-	/** Handles an attack from a character to an actor */
-	/*
-	void CharacterToActorAttack(
-		AEODCharacterBase* HitInstigator,
-		AActor* HitActor,
-		const FSkillDamageInfo& SkillDamageInfo,
-		const FHitResult& HitResult);
-	*/
+protected:
 
-	/*
-	bool ApplyCrowdControlEffects(
-		AEODCharacterBase* HitInstigator,
-		AEODCharacterBase* HitCharacter,
-		const FSkillDamageInfo& SkillDamageInfo,
-		const FHitResult& LineHitResult,
-		const float BCAngle);
-	*/
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
 
-	// FORCEINLINE FSkillDamageInfo GetSkillDamageInfoFromSkill(FSkillTableRow* Skill);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	float PhysicalCritMultiplier;
 
-	bool AreEnemies(AEODCharacterBase* CharOne, AEODCharacterBase* CharTwo);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	float MagickalCritMultiplier;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	FLinearColor BuffTextColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	FLinearColor DebuffTextColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	FLinearColor DodgeTextColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	FLinearColor PlayerDamagedTextColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Colors, meta = (DisplayName = "NPC Damaged Text Color"))
+	FLinearColor NPCNormalDamagedTextColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Colors, meta = (DisplayName = "NPC Critically Damaged Text Color"))
+	FLinearColor NPCCritDamagedTextColor;
 
 };
 
-FORCEINLINE float ACombatManager::CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2)
+inline float ACombatManager::CalculateAngleBetweenVectors(FVector Vec1, FVector Vec2)
 {
 	FVector NormalizedVec1 = Vec1.GetSafeNormal();
 	FVector NormalizedVec2 = Vec2.GetSafeNormal();
@@ -253,48 +141,7 @@ FORCEINLINE float ACombatManager::CalculateAngleBetweenVectors(FVector Vec1, FVe
 	return Angle;
 }
 
-inline bool ACombatManager::WasBlockSuccessful(
-	const AActor* HitInstigator,
-	const AActor* HitActor,
-	const bool bLineHitResultFound,
-	const FHitResult& LineHitResult)
-{
-	FVector HitActorForwardVector = HitActor->GetActorForwardVector();
-	FVector HitNormal = LineHitResult.ImpactNormal;
-	float Angle = CalculateAngleBetweenVectors(HitActorForwardVector, HitNormal);
-	bool bResult = Angle < BlockDetectionAngle ? true : false;
-	return bResult;
-}
-
-inline bool ACombatManager::GetCritChanceBoolean(
-	const AEODCharacterBase* HitInstigator,
-	const AEODCharacterBase* HitCharacter,
-	const EDamageType& DamageType) const
-{
-	//~ @todo
-	// float CritRate = DamageType == EDamageType::Physical ? HitInstigator->GetCharacterStatsComponent()->GetPhysicalCritRate() : HitInstigator->GetCharacterStatsComponent()->GetMagickCritRate();
-	float CritRate = 0.f;
-	bool bResult = CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
-	return bResult;
-}
-
-FORCEINLINE float ACombatManager::GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult)
+inline float ACombatManager::GetBCAngle(AEODCharacterBase* HitCharacter, const FHitResult& LineHitResult)
 {
 	return CalculateAngleBetweenVectors(HitCharacter->GetActorForwardVector(), LineHitResult.ImpactNormal);
 }
-
-/*
-FORCEINLINE FSkillDamageInfo ACombatManager::GetSkillDamageInfoFromSkill(FSkillTableRow* Skill)
-{
-	check(Skill);
-	FSkillDamageInfo SkillDamageInfo;
-	SkillDamageInfo.bIgnoresBlock = Skill->bIgnoresBlock;
-	SkillDamageInfo.bUnblockable = Skill->bUnblockable;
-	SkillDamageInfo.bUndodgable = Skill->bUndodgable;
-	SkillDamageInfo.CrowdControlEffect = Skill->CrowdControlEffect;
-	SkillDamageInfo.CrowdControlEffectDuration = Skill->CrowdControlEffectDuration;
-	SkillDamageInfo.DamagePercent = Skill->DamagePercent;
-	SkillDamageInfo.DamageType = Skill->DamageType;
-	return SkillDamageInfo;
-}
-*/
