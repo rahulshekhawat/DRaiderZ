@@ -455,11 +455,11 @@ void AEODCharacterBase::EnableDamageBlocking()
 
 void AEODCharacterBase::DisableDamageBlocking()
 {
-	/*
 	bBlockingDamage = false;
 	// Clear block damage timer just in case it is still active
-	GetWorld()->GetTimerManager().ClearTimer(BlockTimerHandle); 
-	*/
+	UWorld* World = GetWorld();
+	check(World);
+	World->GetTimerManager().ClearTimer(DamageBlockingTimerHandle);
 }
 
 bool AEODCharacterBase::BP_IsInCombat() const

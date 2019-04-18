@@ -219,14 +219,15 @@ public:
 	void AssistanceRequested(const AAICharacterBase* Requestor);
 	virtual void AssistanceRequested_Implementation(const AAICharacterBase* Requestor);
 
-protected:
-
 	// --------------------------------------
-	//  Movement and Rotation
+	//  Character States
 	// --------------------------------------
 
-	/** Changes maximum walk speed of character based on whether character is engaged in combat or not */
-	void UpdateMaxWalkSpeed();
+	/** Updates character movement every frame */
+	virtual void UpdateMovement(float DeltaTime) override;
+
+	/** Updates character rotation every frame */
+	virtual void UpdateRotation(float DeltaTime) override;
 
 protected:
 

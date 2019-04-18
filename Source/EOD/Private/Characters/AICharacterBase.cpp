@@ -70,6 +70,24 @@ void AAICharacterBase::BeginPlay()
 void AAICharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (Controller && Controller->IsLocalController())
+	{
+		bool bCanGuardAgainstAttacks = CanGuardAgainstAttacks();
+		// If character wants to guard but it's guard is not yet active
+		if (bWantsToGuard && !IsBlocking() && bCanGuardAgainstAttacks)
+		{
+			StartBlockingAttacks();
+		}
+		// If the character guard is active but it doesn't want to guard anymore
+		else if (!bWantsToGuard && IsBlocking())
+		{
+			StopBlockingAttacks();
+		}
+
+		UpdateMovement(DeltaTime);
+		UpdateRotation(DeltaTime);
+	}
 }
 
 void AAICharacterBase::Destroyed()
@@ -398,6 +416,7 @@ bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const F
 void AAICharacterBase::SetInCombat(bool bValue)
 {
 	bInCombat = bValue;
+	SetIsRunning(bInCombat);
 
 	if (bInCombat)
 	{
@@ -427,8 +446,6 @@ void AAICharacterBase::SetInCombat(bool bValue)
 			HealthWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
-
-	UpdateMaxWalkSpeed();
 }
 
 void AAICharacterBase::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)
@@ -524,12 +541,35 @@ void AAICharacterBase::AssistanceRequested_Implementation(const AAICharacterBase
 {
 }
 
-void AAICharacterBase::UpdateMaxWalkSpeed()
+void AAICharacterBase::UpdateMovement(float DeltaTime)
 {
-	if (GetCharacterMovement())
+	if (!bCharacterStateAllowsMovement)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = bInCombat ? DefaultRunSpeed : DefaultWalkSpeed;
+		return;
 	}
+
+	float NewSpeed = 0.f;
+	if (IsBlocking())
+	{
+		NewSpeed = DefaultWalkSpeedWhileBlocking * MovementSpeedModifier;
+	}
+	else
+	{
+		float DesiredSpeed = IsRunning() ? DefaultRunSpeed : DefaultWalkSpeed;
+		NewSpeed = DesiredSpeed * MovementSpeedModifier;
+	}
+
+	SetWalkSpeed(NewSpeed);
+
+	float CurrentSpeed = GetVelocity().Size();
+	if (CurrentSpeed > 0.f)
+	{
+		SetCharacterMovementDirection(ECharMovementDirection::F);
+	}
+}
+
+void AAICharacterBase::UpdateRotation(float DeltaTime)
+{
 }
 
 void AAICharacterBase::UpdateHealthWidget()
