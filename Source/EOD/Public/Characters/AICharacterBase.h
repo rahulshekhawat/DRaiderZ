@@ -187,6 +187,11 @@ public:
 	//  Skill System
 	// --------------------------------------
 
+	/** Returns true if character can use any skill at all */
+	virtual bool CanUseAnySkill() const;
+
+	virtual bool CanUseSkill(FName SkillID, UGameplaySkillBase* Skill = nullptr);
+
 	/** Use a skill and play it's animation */
 	virtual bool UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill = nullptr) override;
 

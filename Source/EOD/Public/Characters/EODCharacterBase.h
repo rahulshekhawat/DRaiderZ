@@ -870,23 +870,12 @@ public:
 	// --------------------------------------
 
 	/** Returns the ID of skill that character is currently using. Returns NAME_None if character is not using any skill */
-	FORCEINLINE FName GetCurrentActiveSkillID() const;
-
-	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
-	UFUNCTION(BlueprintPure, Category = "Skill System", meta = (DisplayName = "Get Current Active Skill ID"))
-	FName BP_GetCurrentActiveSkillID() const;
-
-	//  Set the ID of the skill that is currently being used
-	FORCEINLINE void SetCurrentActiveSkillID(FName SkillID);
-
-	/** Returns the ID of skill that character is using currently. Returns NAME_None if character is not using any skill */
-	UFUNCTION(BlueprintCallable, Category = "Skill System", meta = (DisplayName = "Set Current Active Skill ID"))
-	void BP_SetCurrentActiveSkillID(FName SkillID);
+	UFUNCTION(BlueprintPure, Category = "Skill System")
+	FName GetCurrentActiveSkillID() const;
 
 	/** Returns the skill that character is currently using. Returns nullptr if character is not using any skill */
-	FORCEINLINE UGameplaySkillBase* GetCurrentActiveSkill() const;
-
-	FORCEINLINE void SetCurrentActiveSkill(UGameplaySkillBase* Skill);
+	UFUNCTION(BlueprintPure, Category = "Skill System")
+	UGameplaySkillBase* GetCurrentActiveSkill() const;
 
 	/** Returns true if character can use any skill at all */
 	UFUNCTION(BlueprintPure, Category = "Skill System")
@@ -931,14 +920,6 @@ public:
 	virtual bool UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill = nullptr);
 
 private:
-
-	/** SkillID of skill that this character is currently using */
-	UPROPERTY()
-	FName CurrentActiveSkillID;
-
-	/** The skill that this character is currently using */
-	UPROPERTY(Transient)
-	UGameplaySkillBase* CurrentActiveSkill;
 
 	/** Information of last used skill */
 	UPROPERTY()
@@ -1630,26 +1611,6 @@ inline void AEODCharacterBase::SetOffTargetSwitch(float Duration)
 FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 {
 	return Faction;
-}
-
-FORCEINLINE FName AEODCharacterBase::GetCurrentActiveSkillID() const
-{
-	return CurrentActiveSkillID;
-}
-
-FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkillID(FName SkillID)
-{
-	CurrentActiveSkillID = SkillID;
-}
-
-FORCEINLINE UGameplaySkillBase* AEODCharacterBase::GetCurrentActiveSkill() const
-{
-	return CurrentActiveSkill;
-}
-
-FORCEINLINE void AEODCharacterBase::SetCurrentActiveSkill(UGameplaySkillBase* Skill)
-{
-	CurrentActiveSkill = Skill;
 }
 
 FORCEINLINE FLastUsedSkillInfo AEODCharacterBase::GetLastUsedSkill()

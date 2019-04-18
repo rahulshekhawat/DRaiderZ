@@ -482,6 +482,22 @@ void AAICharacterBase::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupt
 	// @todo
 }
 
+bool AAICharacterBase::CanUseAnySkill() const
+{
+	return false;
+}
+
+bool AAICharacterBase::CanUseSkill(FName SkillID, UGameplaySkillBase* Skill)
+{
+	bool bCanUseSkill = false;
+	if (GetGameplaySkillsComponent())
+	{
+		uint8 SkillIndex = GetGameplaySkillsComponent()->GetSkillIndexForSkillGroup(SkillID);
+		bCanUseSkill = GetGameplaySkillsComponent()->CanUseSkill(SkillIndex, Skill);
+	}
+	return bCanUseSkill;
+}
+
 bool AAICharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill)
 {
 	if (!CanUseSkill(SkillID, Skill))

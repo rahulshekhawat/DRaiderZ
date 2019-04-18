@@ -89,13 +89,15 @@ public:
 
 	FORCEINLINE bool CanUseChainSkill() const { return bCanUseChainSkill; }
 
-	inline void SetCanUseChainSkill(bool bValue) { bCanUseChainSkill = bValue; }
+	FORCEINLINE void SetCanUseChainSkill(bool bValue) { bCanUseChainSkill = bValue; }
 
 	FORCEINLINE FName GetLastUsedSkillGroup() const { return LastUsedSkillGroup; }
 
 	FORCEINLINE uint8 GetLastUsedSkillIndex() const { return LastUsedSkillIndex; }
 
 	FORCEINLINE TPair<uint8, uint8> GetSupersedingChainSkillGroup() const { return SupersedingChainSkillGroup; };
+
+	FORCEINLINE TArray<UGameplaySkillBase*> GetActiveSkills() const { return ActiveSkills; }
 	
 protected:
 

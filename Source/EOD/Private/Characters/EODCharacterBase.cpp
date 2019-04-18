@@ -104,9 +104,6 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 
 	MovementSpeedModifier = 1.f;
 
-	CurrentActiveSkillID = NAME_None;
-	CurrentActiveSkill = nullptr;
-
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
@@ -564,14 +561,36 @@ FName AEODCharacterBase::GetMostWeightedMeleeSkillID(AEODCharacterBase const * c
 	return FName();
 }
 
-FName AEODCharacterBase::BP_GetCurrentActiveSkillID() const
+FName AEODCharacterBase::GetCurrentActiveSkillID() const
 {
-	return GetCurrentActiveSkillID();
+	FName ActiveSkillID = NAME_None;
+	if (SkillManager)
+	{
+		TArray<UGameplaySkillBase*> ActiveSkills = SkillManager->GetActiveSkills();
+		if (ActiveSkills.Num() > 0)
+		{
+			UGameplaySkillBase* Skill = ActiveSkills[0];
+			if (Skill)
+			{
+				ActiveSkillID = Skill->GetSkillGroup();
+			}
+		}
+	}
+	return ActiveSkillID;
 }
 
-void AEODCharacterBase::BP_SetCurrentActiveSkillID(FName SkillID)
+UGameplaySkillBase* AEODCharacterBase::GetCurrentActiveSkill() const
 {
-	SetCurrentActiveSkillID(SkillID);
+	if (SkillManager)
+	{
+		TArray<UGameplaySkillBase*> ActiveSkills = SkillManager->GetActiveSkills();
+		if (ActiveSkills.Num() > 0)
+		{
+			UGameplaySkillBase* Skill = ActiveSkills[0];
+			return Skill;
+		}
+	}
+	return nullptr;
 }
 
 FLastUsedSkillInfo AEODCharacterBase::BP_GetLastUsedSkill()
@@ -581,7 +600,7 @@ FLastUsedSkillInfo AEODCharacterBase::BP_GetLastUsedSkill()
 
 UGameplaySkillBase* AEODCharacterBase::GetSkill(FName SkillID) const
 {
-	return nullptr;
+	return SkillManager ? SkillManager->GetSkillForSkillGroup(SkillID) : nullptr;
 }
 
 bool AEODCharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill)
