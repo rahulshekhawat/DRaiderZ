@@ -34,6 +34,18 @@ EBTNodeResult::Type UBTTask_SelectBestMeleeAttack::ExecuteTask(UBehaviorTreeComp
 	{
 		return EBTNodeResult::Failed;
 	}
+	else
+	{
+		return EBTNodeResult::Succeeded;
+	}
+}
 
-	return EBTNodeResult::Succeeded;
+void UBTTask_SelectBestMeleeAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+}
+
+EBTNodeResult::Type UBTTask_SelectBestMeleeAttack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+	return EBTNodeResult::Aborted;
 }

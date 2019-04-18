@@ -18,6 +18,11 @@ class EOD_API UBTTask_EODRotateToFaceBBEntry : public UBTTask_BlackboardBase
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	UBTTask_EODRotateToFaceBBEntry(const FObjectInitializer& ObjectInitializer);
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
@@ -27,6 +32,11 @@ public:
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	
 protected:
+
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
+
 	/** Success condition precision in degrees */
 	UPROPERTY(EditAnywhere, Category = Node, meta = (ClampMin = "0.0"))
 	float Precision;
