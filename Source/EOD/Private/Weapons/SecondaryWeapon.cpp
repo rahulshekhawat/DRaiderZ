@@ -6,13 +6,18 @@
 
 #include "Components/SkeletalMeshComponent.h"
 
+
+const FName ASecondaryWeapon::LeftHandWeaponMeshCompName(TEXT("Left Hand Weapon"));
+const FName ASecondaryWeapon::FallenWeaponMeshCompName(TEXT("Fallen Weapon"));
+const FName ASecondaryWeapon::SheathedWeaponMeshCompName(TEXT("Sheathed Weapon"));
+
 ASecondaryWeapon::ASecondaryWeapon(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// This actor doesn't tick
 	PrimaryActorTick.bCanEverTick = false;
 
 	//~ @note Weapon's skeletal components do not have any collision. Also, we do not setup attachment for these components at construction.
-	LeftHandWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Left Hand Weapon"));
+	LeftHandWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, ASecondaryWeapon::LeftHandWeaponMeshCompName);
 	if (LeftHandWeaponMeshComp)
 	{
 		RootComponent = LeftHandWeaponMeshComp;
@@ -25,7 +30,7 @@ ASecondaryWeapon::ASecondaryWeapon(const FObjectInitializer& ObjectInitializer) 
 		LeftHandWeaponMeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	}
 
-	SheathedWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Sheathed Weapon"));
+	SheathedWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, ASecondaryWeapon::SheathedWeaponMeshCompName);
 	if (SheathedWeaponMeshComp)
 	{
 		SheathedWeaponMeshComp->SetCollisionObjectType(ECC_WorldDynamic);
@@ -36,7 +41,7 @@ ASecondaryWeapon::ASecondaryWeapon(const FObjectInitializer& ObjectInitializer) 
 		SheathedWeaponMeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	}
 
-	FallenWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Fallen Weapon"));
+	FallenWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, ASecondaryWeapon::FallenWeaponMeshCompName);
 	{
 		FallenWeaponMeshComp->SetCollisionObjectType(ECC_WorldDynamic);
 		FallenWeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -102,6 +107,11 @@ void ASecondaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData
 	SetWeaponType(NewWeaponData->WeaponType);
 
 	// @todo intialize weapon stats
+}
+
+void ASecondaryWeapon::OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset)
+{
+	// @todo
 }
 
 void ASecondaryWeapon::OnUnEquip()

@@ -11,10 +11,10 @@ AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer): Super(Obj
 	// This actor doesn't tick
 	PrimaryActorTick.bCanEverTick = false;
 	SetReplicates(false);
+	SetReplicateMovement(false);
 
-	// Setup stats component
-	// StatsComp = ObjectInitializer.CreateDefaultSubobject<UWeaponStatsComponent>(this, FName("Weapon Stats Component"));
-
+	bAttachedToCharacter = false;
+	WeaponID = NAME_None;
 	WeaponType = EWeaponType::None;
 }
 
@@ -24,11 +24,19 @@ void AWeaponBase::BeginPlay()
 	AttachParentCharacter = Cast<AEODCharacterBase>(GetOwner());
 }
 
-void AWeaponBase::OnEquip(FName NewWeaponID)
+void AWeaponBase::Tick(float DeltaTime)
 {
-	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(NewWeaponID);
-	if (WeaponData)
-	{
-		OnEquip(NewWeaponID, WeaponData);
-	}
+	Super::Tick(DeltaTime);
+}
+
+void AWeaponBase::OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData)
+{
+}
+
+void AWeaponBase::OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset)
+{
+}
+
+void AWeaponBase::OnUnEquip()
+{
 }

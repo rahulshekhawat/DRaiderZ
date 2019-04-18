@@ -20,74 +20,58 @@ class EOD_API AWeaponBase : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	/** Create the default stats component */
 	AWeaponBase(const FObjectInitializer& ObjectInitializer);
 
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaTime) override;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// 
-	////////////////////////////////////////////////////////////////////////////////
-private:
-	/** True if this weapon actor is currently attached to the character that owns this actor */
-	UPROPERTY(Transient)
-	bool bAttachedToCharacter;
+	// --------------------------------------
+	//  Weapon Interface
+	// --------------------------------------
 
-	UPROPERTY(Transient)
-	FName WeaponID;
+	/** Called when a new weapon is attached to it's character owner */
+	virtual void OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData = nullptr);
 
-	UPROPERTY(Transient)
-	EWeaponType WeaponType;
+	/** Called when a new weapon is attached to it's character owner */
+	virtual void OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset = nullptr);
 
-	UPROPERTY(Transient)
-	AEODCharacterBase* AttachParentCharacter;
+	/** Called to detach this weapon is from it's character owner */
+	virtual void OnUnEquip();
+
+	FORCEINLINE bool IsAttachedToCharacterOwner() const { return bAttachedToCharacter; }
+
+	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 
 protected:
+
 	FORCEINLINE void SetAttachedToCharacter(bool bNewValue) { bAttachedToCharacter = bNewValue; }
 
 	FORCEINLINE void SetWeaponID(FName ID) { WeaponID = ID; }
 
 	FORCEINLINE void SetWeaponType(EWeaponType NewWeaponType) { WeaponType = NewWeaponType; }
 
-public:
-	FORCEINLINE UWeaponStatsComponent* GetWeaponStatsComponent() const { return StatsComp; }
-
-	FORCEINLINE bool IsAttachedToCharacterOwner() const { return bAttachedToCharacter; }
-
-	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
-
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Components
-	////////////////////////////////////////////////////////////////////////////////
 private:
-	/**
-	 * Contains the stats information of this weapon
-	 * @warning This component may get removed in future iterations of code
-	 */
-	UPROPERTY(Category = Weapon, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UWeaponStatsComponent* StatsComp;
 
+	/** True if this weapon actor is currently attached to the character that owns this actor */
+	UPROPERTY()
+	bool bAttachedToCharacter;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// WEAPON INTERFACE
-	////////////////////////////////////////////////////////////////////////////////
-public:
-	/** Called when a new weapon is attached to it's character owner */
-	void OnEquip(FName NewWeaponID);
+	UPROPERTY()
+	FName WeaponID;
 
-	/** Called when a new weapon is attached to it's character owner */
-	virtual void OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData) { }
+	UPROPERTY()
+	EWeaponType WeaponType;
 
-	/** Called when a new weapon is attached to it's character owner */
-	virtual void OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset) { }
+	UPROPERTY(Transient)
+	AEODCharacterBase* AttachParentCharacter;
 
-	/** Called to detach this weapon is from it's character owner */
-	virtual void OnUnEquip() { }
-	
-
-	
 };

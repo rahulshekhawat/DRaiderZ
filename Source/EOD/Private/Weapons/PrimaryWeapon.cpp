@@ -8,13 +8,19 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+
+const FName APrimaryWeapon::LeftHandWeaponMeshCompName(TEXT("Left Hand Weapon"));
+const FName APrimaryWeapon::RightHandWeaponMeshCompName(TEXT("Right Hand Weapon"));
+const FName APrimaryWeapon::FallenWeaponMeshCompName(TEXT("Fallen Weapon"));
+const FName APrimaryWeapon::SheathedWeaponMeshCompName(TEXT("Sheathed Weapon"));
+
 APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 	// This actor doesn't tick
 	PrimaryActorTick.bCanEverTick = false;
 
 	//~ @note Weapon's skeletal components do not have any collision. Also, we do not setup attachment for these components at construction.
-	RightHandWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Right Hand Weapon"));
+	RightHandWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, APrimaryWeapon::RightHandWeaponMeshCompName);
 	if (RightHandWeaponMeshComp)
 	{
 		RootComponent = RightHandWeaponMeshComp;
@@ -27,7 +33,7 @@ APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Sup
 		RightHandWeaponMeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	}
 
-	LeftHandWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Left Hand Weapon"));
+	LeftHandWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, APrimaryWeapon::LeftHandWeaponMeshCompName);
 	if (LeftHandWeaponMeshComp)
 	{
 		LeftHandWeaponMeshComp->SetCollisionObjectType(ECC_WorldDynamic);
@@ -38,7 +44,7 @@ APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Sup
 		LeftHandWeaponMeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	}
 
-	SheathedWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Sheathed Weapon"));
+	SheathedWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, APrimaryWeapon::SheathedWeaponMeshCompName);
 	if (SheathedWeaponMeshComp)
 	{
 		SheathedWeaponMeshComp->SetCollisionObjectType(ECC_WorldDynamic);
@@ -49,7 +55,7 @@ APrimaryWeapon::APrimaryWeapon(const FObjectInitializer& ObjectInitializer): Sup
 		SheathedWeaponMeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	}
 
-	FallenWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Fallen Weapon"));
+	FallenWeaponMeshComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, APrimaryWeapon::FallenWeaponMeshCompName);
 	{
 		FallenWeaponMeshComp->SetCollisionObjectType(ECC_WorldDynamic);
 		FallenWeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
