@@ -590,6 +590,11 @@ void AAICharacterBase::OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 
 	UpdateHealthWidget();
 }
 
+void AAICharacterBase::OnRep_InCombat()
+{
+	SetInCombat(IsInCombat());
+}
+
 void AAICharacterBase::OnRep_Health(FCharacterStat& OldHealth)
 {
 	UpdateHealthWidget();

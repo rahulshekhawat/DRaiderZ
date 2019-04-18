@@ -81,7 +81,8 @@ void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& Own
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
 	AEODCharacterBase* CharacterOwner = IsValid(AIController) ? Cast<AEODCharacterBase>(AIController->GetPawn()) : nullptr;
 	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
-	if (!IsValid(BlackboardComp) || !IsValid(CharacterOwner) || !IsValid(OwnerComp.GetWorld()))
+	UWorld* World = OwnerComp.GetWorld();
+	if (!IsValid(BlackboardComp) || !IsValid(CharacterOwner) || !IsValid(World))
 	{
 		return;
 	}
@@ -94,7 +95,8 @@ void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& Own
 	FCollisionQueryParams Params = UCombatLibrary::GenerateCombatCollisionQueryParams(CharacterOwner);
 	FVector OwnerLocation = CharacterOwner->GetActorLocation();
 
-	bool bHit = OwnerComp.GetWorld()->SweepMultiByChannel(HitResults, OwnerLocation, OwnerLocation, FQuat::Identity, COLLISION_COMBAT, CollisionShape, Params);
+	FVector TraceEnd = OwnerLocation + FVector(0.f, 0.f, 1.f);
+	bool bHit = World->SweepMultiByChannel(HitResults, OwnerLocation, TraceEnd, FQuat::Identity, COLLISION_COMBAT, CollisionShape, Params);
 	for (FHitResult& HitResult : HitResults)
 	{
 		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.GetActor());

@@ -404,7 +404,7 @@ protected:
 	FTimerHandle CrowdControlTimerHandle;
 
 	/** Determines whether character is currently engaged in combat or not */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Combat System")
+	UPROPERTY(ReplicatedUsing = OnRep_InCombat)
 	uint32 bInCombat : 1;
 
 	/** Set this to true to enable God Mode */
@@ -1128,6 +1128,9 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_WeaponSheathed();
+
+	UFUNCTION()
+	virtual void OnRep_InCombat();
 
 	UFUNCTION()
 	virtual void OnRep_CharacterState(ECharacterState OldState);

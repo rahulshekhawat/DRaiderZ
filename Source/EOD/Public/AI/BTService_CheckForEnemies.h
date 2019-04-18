@@ -15,6 +15,11 @@ class EOD_API UBTService_CheckForEnemies : public UBTService
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	UBTService_CheckForEnemies(const FObjectInitializer& ObjectInitializer);
 
 	/** called when auxiliary node becomes active
@@ -34,6 +39,11 @@ public:
 	virtual void OnSearchStart(FBehaviorTreeSearchData& SearchData) override;
 
 private:
+
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
 	void LookForAnotherEnemy(UBehaviorTreeComponent& OwnerComp, uint8 * NodeMemory, float DeltaSeconds);
 
 };

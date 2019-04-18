@@ -235,6 +235,7 @@ protected:
 	//  Network
 	// --------------------------------------
 
+	virtual void OnRep_InCombat() override;
 	virtual void OnRep_Health(FCharacterStat& OldHealth) override;
 	virtual void OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo) override;
 

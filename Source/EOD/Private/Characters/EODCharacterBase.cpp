@@ -155,6 +155,7 @@ void AEODCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(AEODCharacterBase, LastReceivedHit);
 	DOREPLIFETIME(AEODCharacterBase, Health);
 	DOREPLIFETIME(AEODCharacterBase, Mana);
+	DOREPLIFETIME(AEODCharacterBase, bInCombat);
 
 	DOREPLIFETIME_CONDITION(AEODCharacterBase, CharacterStateInfo, COND_SkipOwner);
 
@@ -682,6 +683,10 @@ void AEODCharacterBase::OnRep_WeaponSheathed()
 {
 	StartWeaponSwitch();
 	// PlayToggleSheatheAnimation();
+}
+
+void AEODCharacterBase::OnRep_InCombat()
+{
 }
 
 void AEODCharacterBase::OnRep_CharacterState(ECharacterState OldState)
