@@ -327,31 +327,23 @@ bool AAICharacterBase::CCEStun_Implementation(const float Duration)
 void AAICharacterBase::CCERemoveStun_Implementation()
 {
 	StopStunAnimation();
+
+	UWorld* World = GetWorld();
+	check(World);
+	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
 	// @todo Restore character state to IdleWalkRun if necessary (if OnMontageBlendingOut event doesn't restore character state to IdleWalkRun)
 }
 
 bool AAICharacterBase::CCEFreeze_Implementation(const float Duration)
 {
-	// @todo maybe just freeze animation instead of freezing entire character since it might freeze additional effects like glow
-
-	if (CanFreeze())
+	if (CanFreeze() && GetMesh())
 	{
-		/*
-		UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
-		if (AnimInstance)
-		{
-			AnimInstance->Play
-		}
-		*/
+		GetMesh()->GlobalAnimRateScale = 0.f;
 
-		/*
-		CustomTimeDilation = 0;
-		
 		UWorld* World = GetWorld();
 		check(World);
 		World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::CCEUnfreeze, Duration, false);
 		return true;
-		*/
 	}
 
 	return false;
@@ -359,8 +351,14 @@ bool AAICharacterBase::CCEFreeze_Implementation(const float Duration)
 
 void AAICharacterBase::CCEUnfreeze_Implementation()
 {
-	//~ @todo
-	// CustomTimeDilation = GetCharacterStatsComponent()->GetActiveTimeDilation();
+	if (GetMesh())
+	{
+		GetMesh()->GlobalAnimRateScale = 1.f;
+	}
+
+	UWorld* World = GetWorld();
+	check(World);
+	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
 }
 
 bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
