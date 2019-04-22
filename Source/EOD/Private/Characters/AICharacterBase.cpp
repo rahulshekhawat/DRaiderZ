@@ -12,6 +12,7 @@
 #include "EODGameInstance.h"
 #include "FloatingHealthBarWidget.h"
 #include "AISkillsComponent.h"
+#include "EODCharacterMovementComponent.h"
 
 #include "Engine/Engine.h"
 #include "Components/AudioComponent.h"
@@ -181,9 +182,39 @@ TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(AActor* HitInstigato
 			break;
 		case ECrowdControlEffect::KnockedDown:
 			bCCEApplied = CCEKnockdown(AttackInfoPtr->CrowdControlEffectDuration);
+			if (bCCEApplied)
+			{
+				FVector OrientationVector = HitInstigator->GetActorLocation() - GetActorLocation();
+				FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
+				
+				float DesiredYaw = OrientationRotator.Yaw;
+
+				UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+				if (MoveComp)
+				{
+					MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+				}
+
+				SetCharacterRotationYaw(DesiredYaw);
+			}
 			break;
 		case ECrowdControlEffect::KnockedBack:
 			bCCEApplied = CCEKnockback(AttackInfoPtr->CrowdControlEffectDuration, HitInstigator->GetActorForwardVector());
+			if (bCCEApplied)
+			{
+				FVector OrientationVector = HitInstigator->GetActorLocation() - GetActorLocation();
+				FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
+
+				float DesiredYaw = OrientationRotator.Yaw;
+
+				UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+				if (MoveComp)
+				{
+					MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+				}
+
+				SetCharacterRotationYaw(DesiredYaw);
+			}
 			break;
 		case ECrowdControlEffect::Stunned:
 			bCCEApplied = CCEStun(AttackInfoPtr->CrowdControlEffectDuration);
@@ -393,7 +424,7 @@ bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 	{
 		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
-
+		// PushBack(ImpulseDirection);
 		return true;
 	}
 
@@ -665,6 +696,7 @@ void AAICharacterBase::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)
 		CCEInterrupt(LastReceivedHit.BCAngle);
 		break;
 	case ECrowdControlEffect::KnockedDown:
+
 		CCEKnockdown(LastReceivedHit.CrowdControlEffectDuration);
 		break;
 	case ECrowdControlEffect::KnockedBack:

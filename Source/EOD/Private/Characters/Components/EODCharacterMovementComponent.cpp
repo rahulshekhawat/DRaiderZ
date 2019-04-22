@@ -101,7 +101,7 @@ void UEODCharacterMovementComponent::ServerMoveDual_Implementation(float TimeSta
 
 void UEODCharacterMovementComponent::Server_SetDesiredCustomRotation_Implementation(const FRotator& NewRotation)
 {
-	SetDesiredCustomRotation(NewRotation);
+	SetDesiredCustomRotation_LocalOnly(NewRotation);
 }
 
 bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotation_Validate(const FRotator& NewRotation)
@@ -111,7 +111,7 @@ bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotation_Validate(co
 
 void UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Implementation(float RotationYaw)
 {
-	SetDesiredCustomRotation(FRotator(DesiredCustomRotation.Pitch, RotationYaw, DesiredCustomRotation.Roll));
+	SetDesiredCustomRotationYaw_LocalOnly(RotationYaw);
 }
 
 bool UEODCharacterMovementComponent::Server_SetDesiredCustomRotationYaw_Validate(float RotationYaw)
