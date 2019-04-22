@@ -6,6 +6,7 @@
 #include "CombatLibrary.h"
 #include "CombatInterface.generated.h"
 
+class USoundBase;
 class UActiveSkillBase;
 
 /** An interface that must be implemented by all in-game actors that can engage in combat */
@@ -53,5 +54,11 @@ public:
 		const TSharedPtr<FAttackInfo>& AttackInfoPtr,
 		const bool bCritHit,
 		const bool bAttackBlocked);
+
+	/** Returns the sound that should be played when this character hits a physical surface */
+	virtual USoundBase* GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
+
+	/** Returns the sound that should be played when this character fails to hit anything */
+	virtual USoundBase* GetMeleeHitMissSound() const;
 
 };

@@ -82,6 +82,18 @@ void AHumanCharacter::BeginPlay()
 void AHumanCharacter::Destroyed()
 {
 	Super::Destroyed();
+
+	AnimationReferencesMap.Empty(0);
+
+	//~ Unload animation references for weapons
+	TArray<EWeaponType> Weapons;
+	AnimationReferencesStreamableHandles.GetKeys(Weapons);
+	for (EWeaponType Weapon : Weapons)
+	{
+		UnloadAnimationReferencesForWeapon(Weapon);
+	}
+
+	AnimationReferencesStreamableHandles.Empty(0);
 }
 
 void AHumanCharacter::SaveCharacterState()

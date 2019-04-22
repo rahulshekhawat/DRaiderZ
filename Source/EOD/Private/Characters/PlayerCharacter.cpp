@@ -538,16 +538,6 @@ void APlayerCharacter::Destroyed()
 		SecondaryWeapon->OnUnEquip();
 		SecondaryWeapon->Destroy();
 	}
-
-	/*
-	//~ Unload animation references for weapons
-	TArray<EWeaponType> Weapons;
-	AnimationReferencesStreamableHandles.GetKeys(Weapons);
-	for (EWeaponType Weapon : Weapons)
-	{
-		UnloadAnimationReferencesForWeapon(Weapon);
-	}
-	*/
 }
 
 void APlayerCharacter::SaveCharacterState()
@@ -556,6 +546,102 @@ void APlayerCharacter::SaveCharacterState()
 	{
 		// GetGameplaySkillsComponent()->SaveSkillBarLayout();
 	}
+}
+
+TSharedPtr<FAttackResponse> APlayerCharacter::ReceiveAttack(
+	AActor* HitInstigator,
+	ICombatInterface* InstigatorCI,
+	const TSharedPtr<FAttackInfo>& AttackInfoPtr,
+	const FHitResult& DirectHitResult,
+	const bool bLineHitResultFound,
+	const FHitResult& LineHitResult)
+{
+	return TSharedPtr<FAttackResponse>();
+}
+
+float APlayerCharacter::GetActualDamage(
+	AActor* HitInstigator,
+	ICombatInterface* InstigatorCI,
+	const TSharedPtr<FAttackInfo>& AttackInfoPtr,
+	const bool bCritHit,
+	const bool bAttackBlocked)
+{
+	return 0.0f;
+}
+
+USoundBase* APlayerCharacter::GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
+{
+	// Crit
+	// Flesh
+	// Metal
+	// Stone
+	// Undead
+	// Wood
+
+	USoundBase* Sound = nullptr;
+	EWeaponType WeaponType = GetEquippedWeaponType();
+	switch (WeaponType)
+	{
+	case EWeaponType::GreatSword:
+		Sound = GetGreatswordHitSound(HitSurface, bCritHit);
+		break;
+	case EWeaponType::WarHammer:
+		Sound = GetWarhammerHitSound(HitSurface, bCritHit);
+		break;
+	case EWeaponType::LongSword:
+		Sound = GetLongswordHitSound(HitSurface, bCritHit);
+		break;
+	case EWeaponType::Mace:
+		Sound = GetMaceHitSound(HitSurface, bCritHit);
+		break;
+	case EWeaponType::Dagger:
+		Sound = GetDaggerHitSound(HitSurface, bCritHit);
+		break;
+	case EWeaponType::Staff:
+		Sound = GetStaffHitSound(HitSurface, bCritHit);
+		break;
+	default:
+		break;
+	}
+	return Sound;
+}
+
+USoundBase* APlayerCharacter::GetMeleeHitMissSound() const
+{
+	USoundBase* Sound = nullptr;
+	EWeaponType WeaponType = GetEquippedWeaponType();
+
+	switch (WeaponType)
+	{
+	case EWeaponType::GreatSword:
+		// Slash2
+		Sound = GetRandomSound(WeaponHitSounds.Slash2HitMissSounds);
+		break;
+	case EWeaponType::WarHammer:
+		// blunt3
+		Sound = GetRandomSound(WeaponHitSounds.Blunt3HitMissSounds);
+		break;
+	case EWeaponType::LongSword:
+		// Slash1
+		Sound = GetRandomSound(WeaponHitSounds.SlashHitMissSounds);
+		break;
+	case EWeaponType::Mace:
+		// blunt1
+		Sound = GetRandomSound(WeaponHitSounds.BluntHitMissSounds);
+		break;
+	case EWeaponType::Dagger:
+		// slice
+		Sound = GetRandomSound(WeaponHitSounds.SliceHitMissSounds);
+		break;
+	case EWeaponType::Staff:
+		// blunt2
+		Sound = GetRandomSound(WeaponHitSounds.Blunt2HitMissSounds);
+		break;
+	default:
+		break;
+	}
+
+	return Sound;
 }
 
 void APlayerCharacter::DisplayDialogueWidget(FName DialogueWindowID)
@@ -946,6 +1032,10 @@ void APlayerCharacter::OnRep_PrimaryWeaponID()
 }
 
 void APlayerCharacter::OnRep_SecondaryWeaponID()
+{
+}
+
+void APlayerCharacter::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)
 {
 }
 
