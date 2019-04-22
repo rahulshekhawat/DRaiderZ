@@ -14,6 +14,8 @@
 #include "AISkillsComponent.h"
 
 #include "Engine/Engine.h"
+#include "Components/AudioComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GenericPlatform/GenericPlatformTime.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -226,6 +228,12 @@ TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(AActor* HitInstigato
 	ReceivedHitInfo.BCAngle = BCAngle;
 	ReceivedHitInfo.bCritHit = AttackResponsePtr->bCritHit;
 	ReceivedHitInfo.HitInstigator = HitInstigator;
+	UPhysicalMaterial* PhysMat = LineHitResult.PhysMaterial.Get();
+	if (PhysMat)
+	{
+		ReceivedHitInfo.HitSurface = PhysMat->SurfaceType;
+	}
+
 	if (bLineHitResultFound)
 	{
 		ReceivedHitInfo.HitLocation = LineHitResult.ImpactPoint;
@@ -668,5 +676,17 @@ void AAICharacterBase::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)
 		break;
 	default:
 		break;
+	}
+
+	ICombatInterface* InstigatorCI = Cast<ICombatInterface>(LastReceivedHit.HitInstigator);
+	if (InstigatorCI)
+	{
+		USoundBase* Sound = InstigatorCI->GetMeleeHitSound(LastReceivedHit.HitSurface, LastReceivedHit.bCritHit);
+		if (Sound && GameplayAudioComponent)
+		{
+			GameplayAudioComponent->SetSound(Sound);
+			GameplayAudioComponent->Play();
+
+		}
 	}
 }

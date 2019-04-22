@@ -35,6 +35,12 @@ void ACombatManager::Tick(float DeltaTime)
 void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
 {
 	ICombatInterface* InstigatorCI = Cast<ICombatInterface>(HitInstigator);
+	if (!HitInstigator || !InstigatorCI)
+	{
+		return;
+	}
+
+
 	if (!HitInstigator || HitResults.Num() == 0 || !InstigatorCI)
 	{
 		return;

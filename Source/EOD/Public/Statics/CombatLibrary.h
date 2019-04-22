@@ -6,6 +6,7 @@
 #include "Engine/EngineTypes.h"
 #include "CollisionQueryParams.h"
 #include "UObject/NoExportTypes.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "CombatLibrary.generated.h"
 
 class AEODCharacterBase;
@@ -76,6 +77,9 @@ struct EOD_API FReceivedHitInfo
 	UPROPERTY()
 	uint8 ReplicationIndex;
 
+	UPROPERTY()
+	TEnumAsByte<EPhysicalSurface> HitSurface;
+
 	FReceivedHitInfo()
 	{
 		HitInstigator = nullptr;
@@ -85,6 +89,8 @@ struct EOD_API FReceivedHitInfo
 		BCAngle = 0.f;
 		ActualDamage = 0.f;
 		bCritHit = false;
+		ReplicationIndex = 0;
+		HitSurface = EPhysicalSurface::SurfaceType_Default;
 	}
 
 	void operator=(const FReceivedHitInfo& OtherHitInfo)
@@ -98,6 +104,7 @@ struct EOD_API FReceivedHitInfo
 		this->bCritHit = OtherHitInfo.bCritHit;
 		this->HitLocation = OtherHitInfo.HitLocation;
 		this->ReplicationIndex = OtherHitInfo.ReplicationIndex;
+		this->HitSurface = OtherHitInfo.HitSurface;
 	}
 };
 
