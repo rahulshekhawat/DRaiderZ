@@ -598,6 +598,11 @@ FLastUsedSkillInfo AEODCharacterBase::BP_GetLastUsedSkill()
 	return GetLastUsedSkill();
 }
 
+void AEODCharacterBase::SetLastUsedSkill(const FLastUsedSkillInfo& SkillInfo)
+{
+	LastUsedSkillInfo = SkillInfo;
+}
+
 UGameplaySkillBase* AEODCharacterBase::GetSkill(FName SkillID) const
 {
 	return SkillManager ? SkillManager->GetSkillForSkillGroup(SkillID) : nullptr;

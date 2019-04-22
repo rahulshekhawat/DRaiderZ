@@ -160,6 +160,10 @@ struct EOD_API FLastUsedSkillInfo
 		bInterrupted = false;
 		LastUsedSkillID = NAME_None;
 	}
+
+	FLastUsedSkillInfo(FName SkillID, bool bWasInterrupted) : LastUsedSkillID(SkillID) , bInterrupted(bWasInterrupted)
+	{
+	}
 };
 
 /** A struct containing current skill state */

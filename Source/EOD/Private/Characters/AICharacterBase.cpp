@@ -551,6 +551,11 @@ FName AAICharacterBase::GetMostWeightedMeleeSkillID(const AEODCharacterBase* Tar
 	return MostWeightedSkillID;
 }
 
+void AAICharacterBase::OnSkillActivated(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
+{
+	SetLastUsedSkill(FLastUsedSkillInfo());
+}
+
 bool AAICharacterBase::CanAssistAlly_Implementation()
 {
 	return false;

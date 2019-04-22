@@ -46,6 +46,8 @@ void UAIInstantMeleeSkill::TriggerSkill()
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindUObject(this, &UAIInstantMeleeSkill::FinishSkill);
 		World->GetTimerManager().SetTimer(SkillTimerHandle, TimerDelegate, ActualSkillDuration, false);
+
+		Instigator->OnSkillActivated(SkillIndex, SkillGroup, this);
 	}
 	else
 	{

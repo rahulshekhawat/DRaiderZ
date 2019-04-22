@@ -207,6 +207,9 @@ public:
 	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const override;
 
+	/** Event called when this character activates a skill */
+	virtual void OnSkillActivated(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill) override;
+
 	// --------------------------------------
 	//  Combat
 	// --------------------------------------

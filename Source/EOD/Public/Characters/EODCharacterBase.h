@@ -894,6 +894,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Skill System", meta = (DisplayName = "Get Last Used Skill"))
 	FLastUsedSkillInfo BP_GetLastUsedSkill();
 
+	void SetLastUsedSkill(const FLastUsedSkillInfo& SkillInfo);
+
 	UFUNCTION(BlueprintPure, Category = "Skill System")
 	UGameplaySkillBase* GetSkill(FName SkillID) const;
 

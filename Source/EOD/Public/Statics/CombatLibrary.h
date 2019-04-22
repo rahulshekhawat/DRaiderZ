@@ -227,7 +227,7 @@ public:
 
 	UCombatLibrary(const FObjectInitializer& ObjectInitializer);
 
-	static FCollisionQueryParams GenerateCombatCollisionQueryParams(const AActor* ActorToIgnore, EQueryMobilityType MobilityType = EQueryMobilityType::Dynamic, bool bReturnPhysicalMaterial = false, FName TraceTag = FName("CollisionQueryForCombat"));
+	static FCollisionQueryParams GenerateCombatCollisionQueryParams(const AActor* ActorToIgnore, EQueryMobilityType MobilityType = EQueryMobilityType::Dynamic, bool bReturnPhysicalMaterial = true, FName TraceTag = FName("CollisionQueryForCombat"));
 
 	static float CalculateDamage(float Attack, float Defense);
 

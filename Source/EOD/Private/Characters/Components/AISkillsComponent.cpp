@@ -141,8 +141,31 @@ bool UAISkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill
 	return bCanTriggerSkill;
 }
 
+void UAISkillsComponent::OnSkillCancelled(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
+{
+	Super::OnSkillCancelled(SkillIndex, SkillGroup, Skill);
+
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	if (CharOwner)
+	{
+		CharOwner->SetLastUsedSkill(FLastUsedSkillInfo(SkillGroup, true));
+	}
+}
+
+void UAISkillsComponent::OnSkillFinished(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
+{
+	Super::OnSkillFinished(SkillIndex, SkillGroup, Skill);
+
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	if (CharOwner)
+	{
+		CharOwner->SetLastUsedSkill(FLastUsedSkillInfo(SkillGroup, false));
+	}
+}
+
 FName UAISkillsComponent::GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const
 {
+	/*
 	FName MostWeightedSkillID = NAME_None;
 	TArray<FName> EligibleSkills;
 	// TArray<FName> MostWeightedSkills;
@@ -170,7 +193,7 @@ FName UAISkillsComponent::GetMostWeightedMeleeSkillID(const AEODCharacterBase* T
 			{
 				MostWeightedSkillID = SkillID;
 			}
-			*/
+			//// 
 		}
 	}
 	else
@@ -196,8 +219,23 @@ FName UAISkillsComponent::GetMostWeightedMeleeSkillID(const AEODCharacterBase* T
 			{
 				MostWeightedSkillID = SkillID;
 			}
-			*/
+			///// 
 		}
+	}
+
+	return MostWeightedSkillID;
+	*/
+
+	FName MostWeightedSkillID = NAME_None;
+	TArray<FName> Keys;
+	SkillGroupToSkillIndexMap.GetKeys(Keys);
+	
+
+	int32 KeysNum = Keys.Num();
+	if (KeysNum > 0)
+	{
+		int32 RandSkillIndex = FMath::RandRange(0, KeysNum - 1);
+		MostWeightedSkillID = Keys[RandSkillIndex];
 	}
 
 	return MostWeightedSkillID;

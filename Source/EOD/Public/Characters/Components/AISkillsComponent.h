@@ -49,6 +49,12 @@ public:
 
 	virtual bool CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr) override;
 
+	/** Event called when a skill gets cancelled */
+	virtual void OnSkillCancelled(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill) override;
+
+	/** Event called when a skill gets finished */
+	virtual void OnSkillFinished(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill) override;
+
 	/** Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const;
 
