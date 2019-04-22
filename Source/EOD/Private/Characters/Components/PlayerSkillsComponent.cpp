@@ -110,7 +110,7 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 	{
 		FGameplaySkillTableRow* Row = SkillsDataTable->FindRow<FGameplaySkillTableRow>(Key, ContextString);
 		check(Row);
-		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->PlayerSkill, Key, RF_Transient);
+		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->SkillClass, Key, RF_Transient);
 		check(GameplaySkill);
 		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
 		GameplaySkill->SetSkillIndex(SkillIndex);

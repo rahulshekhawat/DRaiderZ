@@ -49,7 +49,7 @@ void UAISkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 	{
 		FGameplaySkillTableRow* Row = SkillsDataTable->FindRow<FGameplaySkillTableRow>(Key, ContextString);
 		check(Row);
-		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->PlayerSkill, Key, RF_Transient);
+		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->SkillClass, Key, RF_Transient);
 		check(GameplaySkill);
 		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
 		GameplaySkill->SetSkillIndex(SkillIndex);
@@ -100,6 +100,7 @@ void UAISkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skil
 	else
 	{
 		AISkill->TriggerSkill();
+		ActiveSkills.Add(AISkill);
 	}
 
 
@@ -125,11 +126,19 @@ bool UAISkillsComponent::CanUseAnySkill() const
 
 bool UAISkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
 {
-	return false;
-}
+	if (!SkillIndexToSkillMap.Contains(SkillIndex))
+	{
+		return false;
+	}
 
-void UAISkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill)
-{
+	UAISkillBase* AISkill = Skill ? Cast<UAISkillBase>(Skill) : Cast<UAISkillBase>(SkillIndexToSkillMap[SkillIndex]);
+	if (!AISkill)
+	{
+		return false;
+	}
+
+	bool bCanTriggerSkill = AISkill->CanTriggerSkill();
+	return bCanTriggerSkill;
 }
 
 FName UAISkillsComponent::GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const

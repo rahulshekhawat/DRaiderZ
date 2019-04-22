@@ -324,11 +324,11 @@ struct EOD_API FGameplaySkillTableRow : public FTableRowBase
 	//~ @todo Change PlayerSkill to CharacterSkill
 	/** Player skill associated with this slot */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UGameplaySkillBase> PlayerSkill;
+	TSubclassOf<UGameplaySkillBase> SkillClass;
 
 	FGameplaySkillTableRow()
 	{
-		PlayerSkill = NULL;
+		SkillClass = NULL;
 	}
 };
 

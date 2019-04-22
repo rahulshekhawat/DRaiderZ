@@ -49,8 +49,6 @@ public:
 
 	virtual bool CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr) override;
 
-	virtual void ActivateChainSkill(UGameplaySkillBase* CurrentSkill) override;
-
 	/** Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const;
 

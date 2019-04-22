@@ -500,12 +500,7 @@ bool AAICharacterBase::CanUseSkill(FName SkillID, UGameplaySkillBase* Skill)
 
 bool AAICharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill)
 {
-	if (!CanUseSkill(SkillID, Skill))
-	{
-		return false;
-	}
-
-	if (GetGameplaySkillsComponent())
+	if (CanUseSkill(SkillID, Skill))
 	{
 		uint8 SkillIndex = GetGameplaySkillsComponent()->GetSkillIndexForSkillGroup(SkillID);
 		GetGameplaySkillsComponent()->TriggerSkill(SkillIndex, Skill);
@@ -553,7 +548,7 @@ bool AAICharacterBase::CanAssistAlly_Implementation()
 	return false;
 }
 
-void AAICharacterBase::AssistanceRequested_Implementation(const AAICharacterBase * Requestor)
+void AAICharacterBase::AssistanceRequested_Implementation(const AAICharacterBase* Requestor)
 {
 }
 

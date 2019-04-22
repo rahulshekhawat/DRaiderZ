@@ -79,7 +79,14 @@ public:
 	//	Gameplay Skill Interface
 	// --------------------------------------
 
+	virtual bool CanTriggerSkill() const override;
+
+	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
+	virtual void TriggerSkill() override;
+
 	virtual bool CanReleaseSkill() const override;
+
+	virtual void FinishSkill() override;
 
 	// --------------------------------------
 	//  Pseudo Constants
@@ -98,5 +105,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Info")
 	FAISkillInfo SkillInfo;
 
+	float SkillDuration;
 
 };

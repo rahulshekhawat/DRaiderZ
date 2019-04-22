@@ -71,5 +71,5 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 
 EBTNodeResult::Type UBTTask_Attack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	return EBTNodeResult::Aborted;
+	return Super::AbortTask(OwnerComp, NodeMemory);
 }
