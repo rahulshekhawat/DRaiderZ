@@ -7,6 +7,7 @@
 #include "AISkillBase.generated.h"
 
 class UCameraShake;
+class UGameplayEffectBase;
 
 USTRUCT(BlueprintType, DisplayName = "AI Skill Info")
 struct EOD_API FAISkillInfo
@@ -47,7 +48,7 @@ struct EOD_API FAISkillInfo
 
 	//~ @todo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
-	TSoftClassPtr<UStatusEffectBase> StatusEffectSoftClass;
+	TSoftClassPtr<UGameplayEffectBase> GameplayEffectSoftClass;
 
 	FAISkillInfo()
 	{
@@ -59,7 +60,7 @@ struct EOD_API FAISkillInfo
 		CrowdControlEffectDuration = 0.f;
 		CrowdControlImmunities = 0;
 		Cooldown = 0.f;
-		StatusEffectSoftClass = NULL;
+		GameplayEffectSoftClass = NULL;
 	}
 };
 

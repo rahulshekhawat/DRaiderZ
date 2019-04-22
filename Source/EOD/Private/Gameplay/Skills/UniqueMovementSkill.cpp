@@ -3,6 +3,7 @@
 
 #include "UniqueMovementSkill.h"
 #include "EODCharacterBase.h"
+#include "GameplayEffectBase.h"
 #include "GameplaySkillsComponent.h"
 
 #include "TimerManager.h"
@@ -36,6 +37,31 @@ void UUniqueMovementSkill::TriggerSkill()
 		check(World);
 		World->GetTimerManager().SetTimer(MovementEndTimerHandle, this, &UUniqueMovementSkill::FinishSkill, SpecialMovementDuration, false);
 	}
+
+	//~ @todo
+	/*
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+
+	if (!Instigator || !SkillsComp)
+	{
+		return;
+	}
+
+	bool bIsLocalPlayerController = Instigator->Controller && Instigator->Controller->IsLocalPlayerController();
+	if (bIsLocalPlayerController)
+	{
+		FActiveSkillLevelUpInfo SkillInfo = GetCurrentSkillLevelupInfo();
+		UClass* GameplayEffectClass = SkillInfo.GameplayEffectSoftClass.Get();
+		if (GameplayEffectClass)
+		{
+			UGameplayEffectBase* GameplayEffect = NewObject<UGameplayEffectBase>(SkillsComp, GameplayEffectClass, NAME_None, RF_Transient);
+			check(GameplayEffect);
+			GameplayEffect->InitEffect(Instigator, Instigator);
+			SkillsComp->AddGameplayEffect(GameplayEffect);
+		}
+	}
+	*/
 }
 
 void UUniqueMovementSkill::CancelSkill()

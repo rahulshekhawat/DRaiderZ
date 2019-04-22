@@ -7,6 +7,7 @@
 #include "EODGameInstance.h"
 #include "GameplaySkillBase.h"
 #include "EODCharacterMovementComponent.h"
+#include "GameplayEffectBase.h"
 
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -57,6 +58,12 @@ void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	{
 		check(Skill);
 		Skill->UpdateSkill(DeltaTime);
+	}
+
+	for (UGameplayEffectBase* Effect : ActiveGameplayEffects)
+	{
+		check(Effect);
+		Effect->UpdateEffect(DeltaTime);
 	}
 
 	// bool bIsLocallyControlled = EODCharacterOwner && EODCharacterOwner->Controller && EODCharacterOwner->Controller->IsLocalController();
@@ -158,6 +165,30 @@ void UGameplaySkillsComponent::UpdateSkillCooldown(FName SkillGroup, float Remai
 
 void UGameplaySkillsComponent::UpdateSkillCooldown(uint8 SkillIndex, float RemainingCooldown)
 {
+}
+
+void UGameplaySkillsComponent::AddGameplayEffect(UGameplayEffectBase* GameplayEffect)
+{
+	if (GameplayEffect)
+	{
+		ActiveGameplayEffects.Add(GameplayEffect);
+		if (!GameplayEffect->IsActive())
+		{
+			GameplayEffect->ActivateEffect();
+		}
+	}
+}
+
+void UGameplaySkillsComponent::RemoveGameplayEffect(UGameplayEffectBase* GameplayEffect)
+{
+	if (GameplayEffect)
+	{
+		ActiveGameplayEffects.Remove(GameplayEffect);
+		if (GameplayEffect->IsActive())
+		{
+			GameplayEffect->DeactivateEffect();
+		}
+	}
 }
 
 void UGameplaySkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)

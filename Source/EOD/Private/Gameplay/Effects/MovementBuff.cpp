@@ -3,6 +3,7 @@
 
 #include "MovementBuff.h"
 #include "EODCharacterBase.h"
+#include "GameplaySkillsComponent.h"
 
 #include "TimerManager.h"
 
@@ -19,6 +20,8 @@ void UMovementBuff::ActivateEffect()
 		UWorld* World = Instigator->GetWorld();
 		check(World);
 		World->GetTimerManager().SetTimer(MovementEndTimerHandle, this, &UMovementBuff::DeactivateEffect, GameplayEffectDuration, false);
+
+		bActive = true;
 	}
 }
 
@@ -28,6 +31,13 @@ void UMovementBuff::DeactivateEffect()
 	if (Instigator && Instigator->Controller)
 	{
 		Instigator->SetIsRunning(false);
+		bActive = false;
+	}
+
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if (SkillsComp)
+	{
+		SkillsComp->RemoveGameplayEffect(this);
 	}
 }
 

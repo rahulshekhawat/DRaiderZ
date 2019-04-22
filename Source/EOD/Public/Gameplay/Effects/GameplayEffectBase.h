@@ -12,7 +12,7 @@ class UGameplaySkillsComponent;
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class EOD_API UGameplayEffectBase : public UObject
 {
 	GENERATED_BODY()
@@ -33,6 +33,30 @@ public:
 
 	virtual void UpdateEffect(float DeltaTime);
 
+	FORCEINLINE bool IsActive() const { return bActive; }
+
+protected:
+
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
+	
+	/** Name of this gameplay effect that will be displayed to player inside the game */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
+	FString InGameName;
+
+	/** Description of this gameplay effect that will be displayed to player inside the game */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
+	FString Description;
+	
+	/** Icon used to represent this gameplay effect inside the game */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
+	UTexture* Icon;
+	
+	/** The duration for which this effect will last */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	float GameplayEffectDuration;
+
 	// --------------------------------------
 	//	Cache
 	// --------------------------------------
@@ -49,13 +73,13 @@ public:
 	UPROPERTY(Transient)
 	TWeakObjectPtr<AEODCharacterBase> EffectTarget;
 
-	// --------------------------------------
-	//  Pseudo Constants
-	// --------------------------------------
+	/** Skill component of this effect's target */
+	UPROPERTY(Transient)
+	TWeakObjectPtr<UGameplaySkillsComponent> TargetSkillComponent;
 
-	/** The duration for which this effect will last */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
-	float GameplayEffectDuration;
+	/** Determines if this gameplay effect is currently active */
+	UPROPERTY(Transient)
+	bool bActive;
 
 	
 };

@@ -9,7 +9,7 @@
 #include "Gameplay/Skills/PlayerSkillBase.h"
 #include "ActiveSkillBase.generated.h"
 
-class UStatusEffectBase;
+class UGameplayEffectBase;
 
 
 USTRUCT(BlueprintType)
@@ -59,8 +59,7 @@ struct EOD_API FActiveSkillLevelUpInfo
 
 	//~ @todo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
-	TSoftClassPtr<UStatusEffectBase> StatusEffectSoftClass;
-
+	TSoftClassPtr<UGameplayEffectBase> GameplayEffectSoftClass;
 
 	FActiveSkillLevelUpInfo()
 	{
@@ -74,9 +73,8 @@ struct EOD_API FActiveSkillLevelUpInfo
 		CrowdControlEffectDuration = 0.f;
 		CrowdControlImmunities = 0;
 		Cooldown = 0.f;
-		StatusEffectSoftClass = NULL;
+		GameplayEffectSoftClass = NULL;
 	}
-
 };
 
 /**

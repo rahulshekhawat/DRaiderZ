@@ -12,9 +12,15 @@ void UGameplayEffectBase::InitEffect(AEODCharacterBase* Instigator, AEODCharacte
 {
 	EffectInstigator = Instigator;
 	EffectTarget = Target;
+
 	if (Instigator)
 	{
 		InstigatorSkillComponent = Instigator->GetGameplaySkillsComponent();
+	}
+
+	if (Target)
+	{
+		TargetSkillComponent = Target->GetGameplaySkillsComponent();
 	}
 }
 

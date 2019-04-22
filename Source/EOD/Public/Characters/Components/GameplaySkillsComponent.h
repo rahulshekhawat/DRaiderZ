@@ -11,6 +11,7 @@
 
 class AEODCharacterBase;
 class UGameplaySkillBase;
+class UGameplayEffectBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EOD_API UGameplaySkillsComponent : public UActorComponent
@@ -115,6 +116,9 @@ protected:
 	TMap<FName, uint8> SkillGroupToSkillIndexMap;
 
 	UPROPERTY(Transient)
+	TArray<UGameplayEffectBase*> ActiveGameplayEffects;
+
+	UPROPERTY(Transient)
 	bool bCanUseChainSkill;
 
 	/** The skill that the character used last time */
@@ -171,6 +175,12 @@ public:
 	virtual void UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown);
 
 	virtual void UpdateSkillCooldown(uint8 SkillIndex, float RemainingCooldown);
+
+	UFUNCTION(BlueprintCallable, Category = "Gameplay Effects")
+	virtual void AddGameplayEffect(UGameplayEffectBase* GameplayEffect);
+
+	UFUNCTION(BlueprintCallable, Category = "Gameplay Effects")
+	virtual void RemoveGameplayEffect(UGameplayEffectBase* GameplayEffect);
 
 	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return EODCharacterOwner; }
 
