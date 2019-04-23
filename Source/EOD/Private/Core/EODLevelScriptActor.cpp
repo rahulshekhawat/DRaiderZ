@@ -4,16 +4,25 @@
 #include "EODCharacterBase.h"
 #include "PlayerCharacter.h"
 
+#include "Components/AudioComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
+const FName AEODLevelScriptActor::BGMAudioComponentName(TEXT("BGM Audio Component"));
+
 AEODLevelScriptActor::AEODLevelScriptActor(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	BGMAudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, AEODLevelScriptActor::BGMAudioComponentName);
+	if (BGMAudioComponent)
+	{
+		BGMAudioComponent->SetupAttachment(RootComponent);
+	}
 }
 
 void AEODLevelScriptActor::BeginPlay()
 {
 	Super::BeginPlay();
+
 	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
 	APlayerCharacter* PlayerPawn = PC ? Cast<APlayerCharacter>(PC->GetPawn()) : nullptr;
 	if (IsValid(PlayerPawn))
