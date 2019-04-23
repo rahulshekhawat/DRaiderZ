@@ -131,8 +131,8 @@ void UDynamicHUDWidget::DisplayNotification(UNotificationWidget* NotificationWid
 void UDynamicHUDWidget::RemoveNotification(UNotificationWidget* NotificationWidget)
 {
 	check(NotificationWidget);
-	NotificationWidget->DeleteNotification();
 	Notifications.Remove(NotificationWidget);
+	NotificationWidget->DeleteNotification();
 }
 
 bool UDynamicHUDWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
