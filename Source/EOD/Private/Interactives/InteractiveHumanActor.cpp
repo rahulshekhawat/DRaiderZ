@@ -46,7 +46,7 @@ AInteractiveHumanActor::AInteractiveHumanActor(const FObjectInitializer& ObjectI
 	{
 		InteractionCamera->SetupAttachment(RootComponent);
 		InteractionCamera->AddLocalRotation(FRotator(0.f, 180.f, 0.f));
-		InteractionCamera->SetWorldLocation(FVector(400.f, 0.f, 150.f));
+		InteractionCamera->SetWorldLocation(FVector(400.f, 0.f, 0.f));
 	}
 
 	Hair				= CreateNewArmorComponent(AInteractiveHumanActor::HairComponentName, ObjectInitializer);
@@ -56,11 +56,16 @@ AInteractiveHumanActor::AInteractiveHumanActor(const FObjectInitializer& ObjectI
 	Hands				= CreateNewArmorComponent(AInteractiveHumanActor::HandsComponentName, ObjectInitializer);
 	Legs				= CreateNewArmorComponent(AInteractiveHumanActor::LegsComponentName, ObjectInitializer);
 	Feet				= CreateNewArmorComponent(AInteractiveHumanActor::FeetComponentName, ObjectInitializer);
+
+	SetMasterPoseComponentForMeshes();
 }
 
 void AInteractiveHumanActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Since setting master pose component from constructor doesn't work in packaged game
+	SetMasterPoseComponentForMeshes();
 }
 
 void AInteractiveHumanActor::Tick(float DeltaTime)
