@@ -465,6 +465,11 @@ bool AEODCharacterBase::BP_IsInCombat() const
 	return IsInCombat();
 }
 
+AActor* AEODCharacterBase::GetInterfaceOwner()
+{
+	return this;
+}
+
 TSharedPtr<FAttackInfo> AEODCharacterBase::GetAttackInfoPtr() const
 {
 	return CurrentAttackInfoPtr;

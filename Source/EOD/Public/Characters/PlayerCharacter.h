@@ -70,6 +70,9 @@ public:
 	// --------------------------------------
 	//  Combat Interface
 	// --------------------------------------
+ 
+	/** [server] Called to process the post attack event */
+	virtual void PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors);
 
 	/** [server] Receive an attack on server */
 	virtual TSharedPtr<FAttackResponse> ReceiveAttack(
@@ -93,6 +96,9 @@ public:
 
 	/** Returns the sound that should be played when this character fails to hit anything */
 	virtual USoundBase* GetMeleeHitMissSound() const override;
+
+	UPROPERTY(ReplicatedUsing = OnRep_LastAttackResponses)
+	TArray<FAttackResponse> LastAttackResponses;
 
 	// --------------------------------------
 	//	Components
@@ -502,6 +508,9 @@ protected:
 	// --------------------------------------
 	//  Network
 	// --------------------------------------
+
+	UFUNCTION()
+	virtual void OnRep_LastAttackResponses(const TArray<FAttackResponse>& OldAttackResponses);
 
 	virtual void OnRep_PrimaryWeaponID() override;
 	virtual	void OnRep_SecondaryWeaponID() override;

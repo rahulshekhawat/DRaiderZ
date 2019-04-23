@@ -40,14 +40,16 @@ void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const
 		return;
 	}
 
-
-	if (!HitInstigator || HitResults.Num() == 0 || !InstigatorCI)
+	TArray<FAttackResponse> AttackResponses;
+	TArray<AActor*> HitActors;
+	if (HitResults.Num() == 0)
 	{
+		InstigatorCI->PostAttack(AttackResponses, HitActors);
 		return;
 	}
 
 	TSharedPtr<FAttackInfo> AttackInfoPtr = InstigatorCI->GetAttackInfoPtr();
-	TArray<TSharedPtr<FAttackResponse>> DamageResponses;
+	TArray<TSharedPtr<FAttackResponse>> AttackResponsePtrs;
 	for (const FHitResult& HitResult : HitResults)
 	{
 		AActor* HitActor = HitResult.GetActor();
@@ -59,12 +61,20 @@ void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const
 			continue;
 		}
 
-		TSharedPtr<FAttackResponse> DamageResponsePtr = ProcessAttack(HitInstigator, InstigatorCI, AttackInfoPtr, HitActor, TargetCI, HitResult);
-		if (DamageResponsePtr.IsValid())
+		TSharedPtr<FAttackResponse> AttackResponsePtr = ProcessAttack(HitInstigator, InstigatorCI, AttackInfoPtr, HitActor, TargetCI, HitResult);
+		if (AttackResponsePtr.IsValid())
 		{
-			DamageResponses.Add(DamageResponsePtr);
+			AttackResponsePtrs.Add(AttackResponsePtr);
+			HitActors.Add(HitActor);
+			FAttackResponse* ResponsePtr = AttackResponsePtr.Get();
+			if (ResponsePtr)
+			{
+				AttackResponses.Add(*ResponsePtr);
+			}
 		}
 	}
+
+	InstigatorCI->PostAttack(AttackResponses, HitActors);
 }
 
 TSharedPtr<FAttackResponse> ACombatManager::ProcessAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, AActor* HitTarget, ICombatInterface* TargetCI, const FHitResult& HitResult)
@@ -140,8 +150,13 @@ void ACombatManager::GetLineHitResult(const AActor* HitInstigator, const UPrimit
 
 bool ACombatManager::AreEnemies(AEODCharacterBase* CharOne, AEODCharacterBase* CharTwo)
 {
-	// @todo
-	// return CharOne->GetFaction() != CharTwo->GetFaction();
-	// @todo Need a better system to determine if two characters are enemies
-	return true;
+	ICombatInterface* CIOne = Cast<ICombatInterface>(CharOne);
+	ICombatInterface* CITwo = Cast<ICombatInterface>(CharTwo);
+
+	bool bResult = false;
+	if (CIOne && CITwo)
+	{
+		bResult = CIOne->IsEnemyOf(CITwo);
+	}
+	return bResult;
 }

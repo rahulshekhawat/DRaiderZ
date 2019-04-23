@@ -31,7 +31,9 @@ public:
 	// --------------------------------------
 	//  Combat Interface
 	// --------------------------------------
-	
+
+	virtual AActor* GetInterfaceOwner();
+
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() const;
 
 	virtual void SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill);
@@ -39,6 +41,8 @@ public:
 	virtual void ResetAttackInfo();
 
 	virtual bool IsEnemyOf(ICombatInterface* TargetCI) const;
+
+	virtual void PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors);
 
 	virtual TSharedPtr<FAttackResponse> ReceiveAttack(
 		AActor* HitInstigator,

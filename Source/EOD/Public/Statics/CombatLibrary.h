@@ -137,6 +137,14 @@ struct FAttackResponse
 		ActualDamage = 0;
 		bCritHit = false;
 	}
+
+	void operator=(const FAttackResponse& OtherAttackResponse)
+	{
+		this->DamageResult = OtherAttackResponse.DamageResult;
+		this->CrowdControlEffect = OtherAttackResponse.CrowdControlEffect;
+		this->ActualDamage = OtherAttackResponse.ActualDamage;
+		this->bCritHit = OtherAttackResponse.bCritHit;
+	}
 };
 
 /** This struct contains information of current attack */

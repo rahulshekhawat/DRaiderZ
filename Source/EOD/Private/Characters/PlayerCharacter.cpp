@@ -74,6 +74,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(APlayerCharacter, PrimaryWeaponID);
 	DOREPLIFETIME(APlayerCharacter, SecondaryWeaponID);
+	// DOREPLIFETIME(APlayerCharacter, LastAttackResponses);
 
 }
 
@@ -546,6 +547,18 @@ void APlayerCharacter::SaveCharacterState()
 	{
 		// GetGameplaySkillsComponent()->SaveSkillBarLayout();
 	}
+}
+
+void APlayerCharacter::PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors)
+{
+	LastAttackResponses = AttackResponses;
+	/*
+	if (AttackResponses.Num() == 0 && GameplayAudioComponent)
+	{
+		GameplayAudioComponent->SetSound(GetMeleeHitMissSound());
+		GameplayAudioComponent->Play();
+	}
+	*/
 }
 
 TSharedPtr<FAttackResponse> APlayerCharacter::ReceiveAttack(
@@ -1024,6 +1037,11 @@ void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)
 void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString & SkillGroup)
 {
 	// GetSkillsComponent()->OnSkillGroupRemovedFromSkillBar(SkillGroup);
+}
+
+void APlayerCharacter::OnRep_LastAttackResponses(const TArray<FAttackResponse>& OldAttackResponses)
+{
+
 }
 
 void APlayerCharacter::OnRep_PrimaryWeaponID()

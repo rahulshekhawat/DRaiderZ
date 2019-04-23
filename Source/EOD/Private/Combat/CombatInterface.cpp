@@ -12,6 +12,11 @@ TSharedPtr<FAttackInfo> ICombatInterface::GetAttackInfoPtr() const
 	return TSharedPtr<FAttackInfo>();
 }
 
+AActor* ICombatInterface::GetInterfaceOwner()
+{
+	return nullptr;
+}
+
 void ICombatInterface::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill)
 {
 }
@@ -23,6 +28,10 @@ void ICombatInterface::ResetAttackInfo()
 bool ICombatInterface::IsEnemyOf(ICombatInterface* TargetCI) const
 {
 	return true;
+}
+
+void ICombatInterface::PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors)
+{
 }
 
 TSharedPtr<FAttackResponse> ICombatInterface::ReceiveAttack(

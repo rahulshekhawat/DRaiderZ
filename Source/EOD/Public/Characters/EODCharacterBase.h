@@ -443,6 +443,8 @@ public:
 	//  Combat Interface
 	// --------------------------------------
 
+	virtual AActor* GetInterfaceOwner() override;
+
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() const override;
 
 	virtual void SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill) override;
