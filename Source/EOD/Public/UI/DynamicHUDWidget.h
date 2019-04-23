@@ -6,14 +6,17 @@
 #include "Blueprint/UserWidget.h"
 #include "DynamicHUDWidget.generated.h"
 
+class USoundBase;
 class UTextBlock;
 class UCanvasPanel;
+class UCanvasPanelSlot;
 class UDynamicSkillBarWidget;
 class UInventoryWidget;
 class UPlayerStatsWidget;
 class UStatusIndicatorWidget;
 class UDialogueWindowWidget;
 class UDynamicSkillTreeWidget;
+class UNotificationWidget;
 
 /**
  * 
@@ -38,6 +41,8 @@ public:
 	virtual void NativeDestruct() override;
 
 protected:
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 	// --------------------------------------
 	//	Child Widgets
@@ -87,11 +92,11 @@ public:
 	/** Add dialogue widget as a child to HUD widget */
 	void AddDialogueWidget(UDialogueWindowWidget* NewWidget);
 
-protected:
-
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-
 private:
+
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
 
 	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FVector2D DialogueWidgetSize;
@@ -107,5 +112,26 @@ private:
 
 	UPROPERTY(Category = WidgetParams, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FAnchors SkillBarWidgetAnchor;
+
+	UPROPERTY(Category = Sounds, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USoundBase* NotificationSound;
+
+public:
+
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void DisplayNotification(UNotificationWidget* NotificationWidget);
+
+	UFUNCTION()
+	void RemoveNotification(UNotificationWidget* NotificationWidget);
+
+protected:
+
+	// TQueue<UNotificationWidget*> Notifications;
+	UPROPERTY(Transient)
+	TMap<UNotificationWidget*, UCanvasPanelSlot*> Notifications;
 
 };

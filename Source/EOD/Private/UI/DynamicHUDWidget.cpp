@@ -9,9 +9,13 @@
 #include "DialogueWindowWidget.h"
 #include "ContainerDragDropOperation.h"
 #include "ContainerWidget.h"
+#include "NotificationWidget.h"
 
+#include "TimerManager.h"
+#include "Engine/World.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Kismet/GameplayStatics.h"
 
 UDynamicHUDWidget::UDynamicHUDWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -80,6 +84,55 @@ void UDynamicHUDWidget::AddDialogueWidget(UDialogueWindowWidget* NewWidget)
 		CPSlot->SetSize(DialogueWidgetSize);
 		CPSlot->SetPosition(DialogueWidgetPosition);
 	}
+}
+
+void UDynamicHUDWidget::DisplayNotification(UNotificationWidget* NotificationWidget)
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	if (NotificationWidget)
+	{
+		for (TPair<UNotificationWidget*, UCanvasPanelSlot*> NotificationPair : Notifications)
+		{
+			if (NotificationPair.Value)
+			{
+				FVector2D OldPosition = NotificationPair.Value->GetPosition();
+				FVector2D NewPosition = OldPosition + FVector2D(0.f, -84.f);
+				NotificationPair.Value->SetPosition(NewPosition);
+			}
+		}
+
+		if (MainCanvas)
+		{
+			UCanvasPanelSlot* NotificationSlot = MainCanvas->AddChildToCanvas(NotificationWidget);
+			if (NotificationSlot)
+			{
+				NotificationSlot->SetSize(FVector2D(500.f, 64.f));
+				NotificationSlot->SetPosition(FVector2D(-525.f, -100.f));
+				NotificationSlot->SetAnchors(FAnchors(1.f, 1.f, 1.f, 1.f));
+				UGameplayStatics::PlaySound2D(this, NotificationSound);
+
+				Notifications.Add(NotificationWidget, NotificationSlot);
+
+				FTimerDelegate TimerDelegate;
+				TimerDelegate.BindUObject(this, &UDynamicHUDWidget::RemoveNotification, NotificationWidget);
+
+				FTimerHandle TimerHandle;
+				World->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 10.f, false);
+			}
+		}
+	}
+}
+
+void UDynamicHUDWidget::RemoveNotification(UNotificationWidget* NotificationWidget)
+{
+	check(NotificationWidget);
+	NotificationWidget->DeleteNotification();
+	Notifications.Remove(NotificationWidget);
 }
 
 bool UDynamicHUDWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
