@@ -8,7 +8,7 @@
 
 AMainMenuPlayerController::AMainMenuPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	// PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void AMainMenuPlayerController::BeginPlay()
@@ -169,6 +169,8 @@ void AMainMenuPlayerController::CreatePlayerMenu()
 		{
 			ActiveWidget = TitleScreenWidget;
 			ActiveWidget->AddToViewport();
+			
+			// TitleScreenWidget->OnAd
 		}
 
 		SwitchToUIInput();

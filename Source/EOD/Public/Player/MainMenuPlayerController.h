@@ -21,7 +21,7 @@ class EOD_API AMainMenuPlayerController : public APlayerController
 public:
 
 	// --------------------------------------
-	//	UE4 Method Overrides
+	//  UE4 Method Overrides
 	// --------------------------------------
 
 	AMainMenuPlayerController(const FObjectInitializer& ObjectInitializer);
@@ -33,7 +33,7 @@ public:
 public:
 
 	// --------------------------------------
-	//	User Interface
+	//  User Interface
 	// --------------------------------------
 
 	/** Replaces current widget with title screen widget. */
@@ -64,6 +64,7 @@ public:
 	void StartNewCampaign();
 
 protected:
+
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
 	UUserWidget* ActiveWidget;
 
@@ -81,11 +82,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
 	TSubclassOf<UUserWidget> NewProfileCreationWidgetClass;
-	// TSubclassOf<UUserWidget> CreateNewProfileWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
 	UUserWidget* NewProfileCreationWidget;
-	// UUserWidget* CreateNewProfileWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
 	TSubclassOf<UUserWidget> MultiplayerWidgetClass;
@@ -98,17 +97,7 @@ protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
 	UUserWidget* SettingsWidget;
-	//~ End UI
 
-
-	/** This method can only be called from 'CreateNewProfileWidget' */
-	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
-	void CreateAndLoadNewProfile(const FString& NewProfileName);
-
-	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
-	void HandleTitleScreenAnyKeyEvent(const FKey& Key);
-	//~ 
-private:
 	inline void SwitchToUIInput();
 
 	void CreatePlayerMenu();
@@ -119,6 +108,16 @@ private:
 	inline void CreateMultiplayerWidget();
 	inline void CreateNewProfileCreationWidget();
 
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
+	/** This method can only be called from 'CreateNewProfileWidget' */
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void CreateAndLoadNewProfile(const FString& NewProfileName);
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void HandleTitleScreenAnyKeyEvent(const FKey& Key);
 
 };
 

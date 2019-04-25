@@ -19,7 +19,7 @@ class EOD_API UTitleScreenWidget : public UUserWidget
 public:
 
 	// --------------------------------------
-	//	UE4 Method Overrides
+	//  UE4 Method Overrides
 	// --------------------------------------
 
 	UTitleScreenWidget(const FObjectInitializer& ObjectInitializer);
@@ -31,7 +31,7 @@ public:
 	virtual void NativeDestruct() override;
 
 	// --------------------------------------
-	//	Child Widgets
+	//  Child Widgets
 	// --------------------------------------
 
 	/** Title of the Game */
@@ -40,5 +40,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
 	UTextBlock* CreditText;
+
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	void OnWidgetAddedToViewport();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	void OnWidgetRemovedFromViewport();
 
 };

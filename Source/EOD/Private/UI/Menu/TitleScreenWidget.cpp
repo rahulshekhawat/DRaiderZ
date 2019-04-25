@@ -21,6 +21,8 @@ bool UTitleScreenWidget::Initialize()
 		{
 			TitleText->SetText(GI->GameTitle.ToUpper());
 		}
+
+		SetRenderOpacity(0.f);
 		return true;
 	}
 	
