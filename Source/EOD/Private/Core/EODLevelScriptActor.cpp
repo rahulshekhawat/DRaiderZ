@@ -5,6 +5,7 @@
 #include "PlayerCharacter.h"
 #include "MusicTriggerBox.h"
 
+#include "UserWidget.h"
 #include "EngineUtils.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
@@ -31,15 +32,11 @@ void AEODLevelScriptActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
-	APlayerCharacter* PlayerPawn = PC ? Cast<APlayerCharacter>(PC->GetPawn()) : nullptr;
-	if (IsValid(PlayerPawn))
-	{
-		PlayerPawn->OnInitiatingCombat.AddDynamic(this, &AEODLevelScriptActor::OnCombatStarted);
-		PlayerPawn->OnLeavingCombat.AddDynamic(this, &AEODLevelScriptActor::OnCombatEnded);
-	}
-
+	BindCombatDelegates();
 	SetupBindingsForMusicTriggers();
+
+	DisplayLevelTitle();
+
 	InitiateBackgroundMusic();
 }
 
@@ -179,6 +176,31 @@ void AEODLevelScriptActor::QueueNextNonCombatMusic()
 		if (World)
 		{
 			World->GetTimerManager().SetTimer(MusicTimerHandle, this, &AEODLevelScriptActor::PlayNonCombatMusic, QueuedBGMTriggerDelay, false);
+		}
+	}
+}
+
+void AEODLevelScriptActor::BindCombatDelegates()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	APlayerCharacter* PlayerPawn = PC ? Cast<APlayerCharacter>(PC->GetPawn()) : nullptr;
+	if (IsValid(PlayerPawn))
+	{
+		PlayerPawn->OnInitiatingCombat.AddDynamic(this, &AEODLevelScriptActor::OnCombatStarted);
+		PlayerPawn->OnLeavingCombat.AddDynamic(this, &AEODLevelScriptActor::OnCombatEnded);
+	}
+}
+
+void AEODLevelScriptActor::DisplayLevelTitle()
+{
+	UClass* WidgetClass = LevelTitleWidgetClass.Get();
+	if (WidgetClass)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+		UUserWidget* LevelTitleWidget = CreateWidget<UUserWidget>(PC, WidgetClass);
+		if (LevelTitleWidget)
+		{
+			LevelTitleWidget->AddToViewport(1000);
 		}
 	}
 }

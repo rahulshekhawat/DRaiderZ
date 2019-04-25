@@ -6,6 +6,7 @@
 #include "Engine/LevelScriptActor.h"
 #include "EODLevelScriptActor.generated.h"
 
+class UUserWidget;
 class USoundBase;
 class UAudioComponent;
 class AEODCharacterBase;
@@ -42,6 +43,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
 	void OnCombatEnded(AEODCharacterBase* PlayerCharacter);
 	virtual void OnCombatEnded_Implementation(AEODCharacterBase* PlayerCharacter);
+	
+	// --------------------------------------
+	//  Components
+	// --------------------------------------
+
+	static const FName BGMAudioComponentName;
+
+protected:
+
+	/** Audio component for playing sound effects on getting hit */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
+	UAudioComponent* BGMAudioComponent;
 
 	// --------------------------------------
 	//  Pseudo Constants
@@ -66,17 +79,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
 	float BGMFadeOutDuration;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UUserWidget> LevelTitleWidgetClass;
+
 	// --------------------------------------
-	//  Components
+	//  Utility
 	// --------------------------------------
 
-	static const FName BGMAudioComponentName;
+	void BindCombatDelegates();
 
-protected:
-
-	/** Audio component for playing sound effects on getting hit */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
-	UAudioComponent* BGMAudioComponent;
+	void DisplayLevelTitle();
 
 	// --------------------------------------
 	//  Sound
