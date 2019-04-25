@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "MenuWidgetBase.h"
 #include "TitleScreenWidget.generated.h"
 
 class UTextBlock;
@@ -12,7 +12,7 @@ class UTextBlock;
  * 
  */
 UCLASS()
-class EOD_API UTitleScreenWidget : public UUserWidget
+class EOD_API UTitleScreenWidget : public UMenuWidgetBase
 {
 	GENERATED_BODY()
 
@@ -40,15 +40,5 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
 	UTextBlock* CreditText;
-
-	// --------------------------------------
-	//  Utility
-	// --------------------------------------
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
-	void OnWidgetAddedToViewport();
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
-	void OnWidgetRemovedFromViewport();
 
 };

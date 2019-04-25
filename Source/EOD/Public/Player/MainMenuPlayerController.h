@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "MenuWidgetBase.h"
 #include "GameFramework/PlayerController.h"
 #include "MainMenuPlayerController.generated.h"
 
-
+class UMenuWidgetBase;
 class UPlayerSaveGame;
 
 /**
@@ -35,6 +35,8 @@ public:
 	// --------------------------------------
 	//  User Interface
 	// --------------------------------------
+
+	void CreateMenuWidgets();
 
 	/** Replaces current widget with title screen widget. */
 	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
@@ -66,37 +68,37 @@ public:
 protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* ActiveWidget;
+	UMenuWidgetBase* ActiveWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> TitleScreenWidgetClass;
+	TSubclassOf<UMenuWidgetBase> TitleScreenWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* TitleScreenWidget;
+	UMenuWidgetBase* TitleScreenWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> MainMenuWidgetClass;
+	TSubclassOf<UMenuWidgetBase> MainMenuWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* MainMenuWidget;
+	UMenuWidgetBase* MainMenuWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> NewProfileCreationWidgetClass;
+	TSubclassOf<UMenuWidgetBase> NewProfileCreationWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* NewProfileCreationWidget;
+	UMenuWidgetBase* NewProfileCreationWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> MultiplayerWidgetClass;
+	TSubclassOf<UMenuWidgetBase> MultiplayerWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* MultiplayerWidget;
+	UMenuWidgetBase* MultiplayerWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> SettingsWidgetClass;
+	TSubclassOf<UMenuWidgetBase> SettingsWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* SettingsWidget;
+	UMenuWidgetBase* SettingsWidget;
 
 	inline void SwitchToUIInput();
 
@@ -134,7 +136,7 @@ inline void AMainMenuPlayerController::CreateTitleScreenWidget()
 {
 	if (!IsValid(TitleScreenWidget) && TitleScreenWidgetClass.Get())
 	{
-		TitleScreenWidget = CreateWidget<UUserWidget>(this, TitleScreenWidgetClass);
+		TitleScreenWidget = CreateWidget<UMenuWidgetBase>(this, TitleScreenWidgetClass);
 	}
 }
 
@@ -142,7 +144,7 @@ inline void AMainMenuPlayerController::CreateMainMenuWidget()
 {
 	if (!IsValid(MainMenuWidget) && MainMenuWidgetClass.Get())
 	{
-		MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
+		MainMenuWidget = CreateWidget<UMenuWidgetBase>(this, MainMenuWidgetClass);
 	}
 }
 
@@ -150,7 +152,7 @@ inline void AMainMenuPlayerController::CreateSettingsWidget()
 {
 	if (!IsValid(SettingsWidget) && SettingsWidgetClass.Get())
 	{
-		SettingsWidget = CreateWidget<UUserWidget>(this, SettingsWidgetClass);
+		SettingsWidget = CreateWidget<UMenuWidgetBase>(this, SettingsWidgetClass);
 	}
 }
 
@@ -158,7 +160,7 @@ inline void AMainMenuPlayerController::CreateMultiplayerWidget()
 {
 	if (!IsValid(MultiplayerWidget) && MultiplayerWidgetClass.Get())
 	{
-		MultiplayerWidget = CreateWidget<UUserWidget>(this, MultiplayerWidgetClass);
+		MultiplayerWidget = CreateWidget<UMenuWidgetBase>(this, MultiplayerWidgetClass);
 	}
 }
 
@@ -166,6 +168,6 @@ inline void AMainMenuPlayerController::CreateNewProfileCreationWidget()
 {
 	if (!IsValid(NewProfileCreationWidget) && NewProfileCreationWidgetClass.Get())
 	{
-		NewProfileCreationWidget = CreateWidget<UUserWidget>(this, NewProfileCreationWidgetClass);
+		NewProfileCreationWidget = CreateWidget<UMenuWidgetBase>(this, NewProfileCreationWidgetClass);
 	}
 }

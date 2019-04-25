@@ -3,28 +3,35 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "MenuWidgetBase.h"
 #include "MainMenuWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EOD_API UMainMenuWidget : public UUserWidget
+class EOD_API UMainMenuWidget : public UMenuWidgetBase
 {
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	UMainMenuWidget(const FObjectInitializer& ObjectInitializer);
 
-	bool Initialize() override;
+	virtual bool Initialize() override;
 
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
 
-	//~ Begin Child Widgets
-public:
+	// --------------------------------------
+	//  Child Widgets
+	// --------------------------------------
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UUserWidget* CONTINUE;
 
@@ -45,6 +52,5 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UUserWidget* QUIT;
-	//~ End Child Widgets
 
 };

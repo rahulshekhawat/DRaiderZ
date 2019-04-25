@@ -15,7 +15,12 @@ void AMainMenuPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CreatePlayerMenu();
+	if (IsLocalPlayerController())
+	{
+		CreateMenuWidgets();
+		SwitchToTitleScreenWidget();
+		SwitchToUIInput();
+	}
 }
 
 void AMainMenuPlayerController::Tick(float DeltaTime)
@@ -23,20 +28,29 @@ void AMainMenuPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AMainMenuPlayerController::CreateMenuWidgets()
+{
+	if (IsLocalPlayerController())
+	{
+		CreateTitleScreenWidget();
+		CreateMainMenuWidget();
+		CreateSettingsWidget();
+		CreateNewProfileCreationWidget();
+	}
+}
+
 void AMainMenuPlayerController::SwitchToTitleScreenWidget()
 {
-	if (IsValid(ActiveWidget) && ActiveWidget != TitleScreenWidget)
+	if (ActiveWidget && ActiveWidget != TitleScreenWidget)
 	{
-		ActiveWidget->RemoveFromParent();
+		ActiveWidget->RemoveMenuFromScreen();
 		ActiveWidget = nullptr;
 	}
 
-	CreateTitleScreenWidget();
-
-	if (IsValid(TitleScreenWidget))
+	if (TitleScreenWidget)
 	{
 		ActiveWidget = TitleScreenWidget;
-		ActiveWidget->AddToViewport();
+		ActiveWidget->AddMenuToScreen();
 	}
 }
 
@@ -51,16 +65,16 @@ void AMainMenuPlayerController::SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSa
 
 	if (IsValid(ActiveWidget) && ActiveWidget != MainMenuWidget)
 	{
-		ActiveWidget->RemoveFromParent();
+		ActiveWidget->RemoveMenuFromScreen();
 		ActiveWidget = nullptr;
 	}
 
-	CreateMainMenuWidget();
+	// CreateMainMenuWidget();
 
 	if (IsValid(MainMenuWidget))
 	{
 		ActiveWidget = MainMenuWidget;
-		ActiveWidget->AddToViewport();
+		ActiveWidget->AddMenuToScreen();
 
 		// @todo load main menu widget state from player save game
 	}
@@ -160,10 +174,6 @@ void AMainMenuPlayerController::CreatePlayerMenu()
 {
 	if (IsLocalPlayerController())
 	{
-		CreateTitleScreenWidget();
-		CreateMainMenuWidget();
-		CreateSettingsWidget();
-		CreateNewProfileCreationWidget();
 
 		if (IsValid(TitleScreenWidget))
 		{
