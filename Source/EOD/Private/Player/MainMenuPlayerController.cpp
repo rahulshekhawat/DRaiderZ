@@ -39,7 +39,7 @@ void AMainMenuPlayerController::CreateMenuWidgets()
 	}
 }
 
-void AMainMenuPlayerController::SwitchToTitleScreenWidget()
+void AMainMenuPlayerController::SwitchToTitleScreenWidget_Implementation()
 {
 	if (ActiveWidget && ActiveWidget != TitleScreenWidget)
 	{
@@ -54,7 +54,7 @@ void AMainMenuPlayerController::SwitchToTitleScreenWidget()
 	}
 }
 
-void AMainMenuPlayerController::SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSaveGame)
+void AMainMenuPlayerController::SwitchToMainMenuWidget_Implementation(UPlayerSaveGame* PlayerSaveGame)
 {
 	// If a proper player save game was not passed as an argument, we try to get the current player save game object from game instance
 	if (!IsValid(PlayerSaveGame))
@@ -80,7 +80,7 @@ void AMainMenuPlayerController::SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSa
 	}
 }
 
-void AMainMenuPlayerController::SwitchToNewProfileCreationWidget()
+void AMainMenuPlayerController::SwitchToNewProfileCreationWidget_Implementation()
 {
 	if (IsValid(ActiveWidget) && ActiveWidget != NewProfileCreationWidget)
 	{
@@ -97,7 +97,7 @@ void AMainMenuPlayerController::SwitchToNewProfileCreationWidget()
 	}
 }
 
-void AMainMenuPlayerController::SwitchToMultiplayerWidget()
+void AMainMenuPlayerController::SwitchToMultiplayerWidget_Implementation()
 {
 	if (IsValid(ActiveWidget) && ActiveWidget != MultiplayerWidget)
 	{
@@ -114,7 +114,7 @@ void AMainMenuPlayerController::SwitchToMultiplayerWidget()
 	}
 }
 
-void AMainMenuPlayerController::SwitchToSettingsWidget()
+void AMainMenuPlayerController::SwitchToSettingsWidget_Implementation()
 {
 	if (IsValid(ActiveWidget) && ActiveWidget != SettingsWidget)
 	{
@@ -168,6 +168,8 @@ void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent(const FKey& Key)
 	{
 		SwitchToNewProfileCreationWidget();
 	}
+
+
 }
 
 void AMainMenuPlayerController::CreatePlayerMenu()
