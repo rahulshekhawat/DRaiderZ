@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "MenuWidgetBase.h"
 #include "GameFramework/PlayerController.h"
 #include "MainMenuPlayerController.generated.h"
 
-
+class UMenuWidgetBase;
 class UPlayerSaveGame;
 
 /**
@@ -36,71 +36,73 @@ public:
 	//  User Interface
 	// --------------------------------------
 
+	void CreateMenuWidgets();
+
 	/** Replaces current widget with title screen widget. */
-	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "UI")
 	void SwitchToTitleScreenWidget();
+	virtual void SwitchToTitleScreenWidget_Implementation();
+
 
 	/**
 	 * Replaces current widget with main menu widget.
 	 * @param PlayerSaveGame It is used to initialize the main menu widget state (e.g., to determine whether 'CONTINUE' button should be enabled in main menu)
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "UI")
 	void SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSaveGame = nullptr);
+	virtual void SwitchToMainMenuWidget_Implementation(UPlayerSaveGame* PlayerSaveGame = nullptr);
 
 	/** Replaces current widget with new profile creation widget. */
-	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "UI")
 	void SwitchToNewProfileCreationWidget();
+	virtual void SwitchToNewProfileCreationWidget_Implementation();
 
 	/** Replaces current widget with multiplayer options widget. */
-	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "UI")
 	void SwitchToMultiplayerWidget();
+	virtual void SwitchToMultiplayerWidget_Implementation();
 
 	/** Replaces current widget with settings widget. */
-	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "UI")
 	void SwitchToSettingsWidget();
-
-	/** Begin a new campaign */
-	UFUNCTION(BlueprintCallable, Category = "Main Menu UI")
-	void StartNewCampaign();
+	virtual void SwitchToSettingsWidget_Implementation();
 
 protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* ActiveWidget;
+	UMenuWidgetBase* ActiveWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> TitleScreenWidgetClass;
+	TSubclassOf<UMenuWidgetBase> TitleScreenWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* TitleScreenWidget;
+	UMenuWidgetBase* TitleScreenWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> MainMenuWidgetClass;
+	TSubclassOf<UMenuWidgetBase> MainMenuWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* MainMenuWidget;
+	UMenuWidgetBase* MainMenuWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> NewProfileCreationWidgetClass;
+	TSubclassOf<UMenuWidgetBase> NewProfileCreationWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* NewProfileCreationWidget;
+	UMenuWidgetBase* NewProfileCreationWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> MultiplayerWidgetClass;
+	TSubclassOf<UMenuWidgetBase> MultiplayerWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* MultiplayerWidget;
+	UMenuWidgetBase* MultiplayerWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
-	TSubclassOf<UUserWidget> SettingsWidgetClass;
+	TSubclassOf<UMenuWidgetBase> SettingsWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
-	UUserWidget* SettingsWidget;
+	UMenuWidgetBase* SettingsWidget;
 
 	inline void SwitchToUIInput();
-
-	void CreatePlayerMenu();
 
 	inline void CreateTitleScreenWidget();
 	inline void CreateMainMenuWidget();
@@ -112,12 +114,17 @@ protected:
 	//  Utility
 	// --------------------------------------
 
+	/** Begin a new campaign */
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void StartNewCampaign();
+
 	/** This method can only be called from 'CreateNewProfileWidget' */
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void CreateAndLoadNewProfile(const FString& NewProfileName);
 
-	UFUNCTION(BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Utility")
 	void HandleTitleScreenAnyKeyEvent(const FKey& Key);
+	void HandleTitleScreenAnyKeyEvent_Implementation(const FKey& Key);
 
 };
 
@@ -134,7 +141,7 @@ inline void AMainMenuPlayerController::CreateTitleScreenWidget()
 {
 	if (!IsValid(TitleScreenWidget) && TitleScreenWidgetClass.Get())
 	{
-		TitleScreenWidget = CreateWidget<UUserWidget>(this, TitleScreenWidgetClass);
+		TitleScreenWidget = CreateWidget<UMenuWidgetBase>(this, TitleScreenWidgetClass);
 	}
 }
 
@@ -142,7 +149,7 @@ inline void AMainMenuPlayerController::CreateMainMenuWidget()
 {
 	if (!IsValid(MainMenuWidget) && MainMenuWidgetClass.Get())
 	{
-		MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
+		MainMenuWidget = CreateWidget<UMenuWidgetBase>(this, MainMenuWidgetClass);
 	}
 }
 
@@ -150,7 +157,7 @@ inline void AMainMenuPlayerController::CreateSettingsWidget()
 {
 	if (!IsValid(SettingsWidget) && SettingsWidgetClass.Get())
 	{
-		SettingsWidget = CreateWidget<UUserWidget>(this, SettingsWidgetClass);
+		SettingsWidget = CreateWidget<UMenuWidgetBase>(this, SettingsWidgetClass);
 	}
 }
 
@@ -158,7 +165,7 @@ inline void AMainMenuPlayerController::CreateMultiplayerWidget()
 {
 	if (!IsValid(MultiplayerWidget) && MultiplayerWidgetClass.Get())
 	{
-		MultiplayerWidget = CreateWidget<UUserWidget>(this, MultiplayerWidgetClass);
+		MultiplayerWidget = CreateWidget<UMenuWidgetBase>(this, MultiplayerWidgetClass);
 	}
 }
 
@@ -166,6 +173,6 @@ inline void AMainMenuPlayerController::CreateNewProfileCreationWidget()
 {
 	if (!IsValid(NewProfileCreationWidget) && NewProfileCreationWidgetClass.Get())
 	{
-		NewProfileCreationWidget = CreateWidget<UUserWidget>(this, NewProfileCreationWidgetClass);
+		NewProfileCreationWidget = CreateWidget<UMenuWidgetBase>(this, NewProfileCreationWidgetClass);
 	}
 }

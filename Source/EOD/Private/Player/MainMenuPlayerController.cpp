@@ -15,7 +15,12 @@ void AMainMenuPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CreatePlayerMenu();
+	if (IsLocalPlayerController())
+	{
+		CreateMenuWidgets();
+		SwitchToTitleScreenWidget();
+		SwitchToUIInput();
+	}
 }
 
 void AMainMenuPlayerController::Tick(float DeltaTime)
@@ -23,24 +28,33 @@ void AMainMenuPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AMainMenuPlayerController::SwitchToTitleScreenWidget()
+void AMainMenuPlayerController::CreateMenuWidgets()
 {
-	if (IsValid(ActiveWidget) && ActiveWidget != TitleScreenWidget)
+	if (IsLocalPlayerController())
 	{
-		ActiveWidget->RemoveFromParent();
-		ActiveWidget = nullptr;
-	}
-
-	CreateTitleScreenWidget();
-
-	if (IsValid(TitleScreenWidget))
-	{
-		ActiveWidget = TitleScreenWidget;
-		ActiveWidget->AddToViewport();
+		CreateTitleScreenWidget();
+		CreateMainMenuWidget();
+		CreateSettingsWidget();
+		CreateNewProfileCreationWidget();
 	}
 }
 
-void AMainMenuPlayerController::SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSaveGame)
+void AMainMenuPlayerController::SwitchToTitleScreenWidget_Implementation()
+{
+	if (ActiveWidget && ActiveWidget != TitleScreenWidget)
+	{
+		ActiveWidget->RemoveMenuFromScreen();
+		ActiveWidget = nullptr;
+	}
+
+	if (TitleScreenWidget)
+	{
+		ActiveWidget = TitleScreenWidget;
+		ActiveWidget->AddMenuToScreen();
+	}
+}
+
+void AMainMenuPlayerController::SwitchToMainMenuWidget_Implementation(UPlayerSaveGame* PlayerSaveGame)
 {
 	// If a proper player save game was not passed as an argument, we try to get the current player save game object from game instance
 	if (!IsValid(PlayerSaveGame))
@@ -51,26 +65,24 @@ void AMainMenuPlayerController::SwitchToMainMenuWidget(UPlayerSaveGame* PlayerSa
 
 	if (IsValid(ActiveWidget) && ActiveWidget != MainMenuWidget)
 	{
-		ActiveWidget->RemoveFromParent();
+		ActiveWidget->RemoveMenuFromScreen();
 		ActiveWidget = nullptr;
 	}
-
-	CreateMainMenuWidget();
 
 	if (IsValid(MainMenuWidget))
 	{
 		ActiveWidget = MainMenuWidget;
-		ActiveWidget->AddToViewport();
+		ActiveWidget->AddMenuToScreen();
 
 		// @todo load main menu widget state from player save game
 	}
 }
 
-void AMainMenuPlayerController::SwitchToNewProfileCreationWidget()
+void AMainMenuPlayerController::SwitchToNewProfileCreationWidget_Implementation()
 {
 	if (IsValid(ActiveWidget) && ActiveWidget != NewProfileCreationWidget)
 	{
-		ActiveWidget->RemoveFromParent();
+		ActiveWidget->RemoveMenuFromScreen();
 		ActiveWidget = nullptr;
 	}
 
@@ -79,15 +91,15 @@ void AMainMenuPlayerController::SwitchToNewProfileCreationWidget()
 	if (IsValid(NewProfileCreationWidget))
 	{
 		ActiveWidget = NewProfileCreationWidget;
-		ActiveWidget->AddToViewport();
+		ActiveWidget->AddMenuToScreen();
 	}
 }
 
-void AMainMenuPlayerController::SwitchToMultiplayerWidget()
+void AMainMenuPlayerController::SwitchToMultiplayerWidget_Implementation()
 {
 	if (IsValid(ActiveWidget) && ActiveWidget != MultiplayerWidget)
 	{
-		ActiveWidget->RemoveFromParent();
+		ActiveWidget->RemoveMenuFromScreen();
 		ActiveWidget = nullptr;
 	}
 
@@ -96,15 +108,15 @@ void AMainMenuPlayerController::SwitchToMultiplayerWidget()
 	if (IsValid(MultiplayerWidget))
 	{
 		ActiveWidget = MultiplayerWidget;
-		ActiveWidget->AddToViewport();
+		ActiveWidget->AddMenuToScreen();
 	}
 }
 
-void AMainMenuPlayerController::SwitchToSettingsWidget()
+void AMainMenuPlayerController::SwitchToSettingsWidget_Implementation()
 {
 	if (IsValid(ActiveWidget) && ActiveWidget != SettingsWidget)
 	{
-		ActiveWidget->RemoveFromParent();
+		ActiveWidget->RemoveMenuFromScreen();
 		ActiveWidget = nullptr;
 	}
 
@@ -113,7 +125,7 @@ void AMainMenuPlayerController::SwitchToSettingsWidget()
 	if (IsValid(SettingsWidget))
 	{
 		ActiveWidget = SettingsWidget;
-		ActiveWidget->AddToViewport();
+		ActiveWidget->AddMenuToScreen();
 	}
 }
 
@@ -136,9 +148,9 @@ void AMainMenuPlayerController::CreateAndLoadNewProfile(const FString& NewProfil
 	}
 }
 
-void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent(const FKey& Key)
+void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent_Implementation(const FKey& Key)
 {
-	if (Key.IsMouseButton() || Key == EKeys::Escape || (IsValid(ActiveWidget) && ActiveWidget != TitleScreenWidget))
+	if (Key.IsMouseButton() || Key == EKeys::Escape || ActiveWidget == nullptr || (IsValid(ActiveWidget) && ActiveWidget != TitleScreenWidget))
 	{
 		return;
 	}
@@ -153,26 +165,5 @@ void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent(const FKey& Key)
 	else
 	{
 		SwitchToNewProfileCreationWidget();
-	}
-}
-
-void AMainMenuPlayerController::CreatePlayerMenu()
-{
-	if (IsLocalPlayerController())
-	{
-		CreateTitleScreenWidget();
-		CreateMainMenuWidget();
-		CreateSettingsWidget();
-		CreateNewProfileCreationWidget();
-
-		if (IsValid(TitleScreenWidget))
-		{
-			ActiveWidget = TitleScreenWidget;
-			ActiveWidget->AddToViewport();
-			
-			// TitleScreenWidget->OnAd
-		}
-
-		SwitchToUIInput();
 	}
 }
