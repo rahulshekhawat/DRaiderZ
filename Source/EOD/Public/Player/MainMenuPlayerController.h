@@ -104,8 +104,6 @@ protected:
 
 	inline void SwitchToUIInput();
 
-	void CreatePlayerMenu();
-
 	inline void CreateTitleScreenWidget();
 	inline void CreateMainMenuWidget();
 	inline void CreateSettingsWidget();

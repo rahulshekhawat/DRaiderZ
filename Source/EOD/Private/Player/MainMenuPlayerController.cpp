@@ -69,8 +69,6 @@ void AMainMenuPlayerController::SwitchToMainMenuWidget_Implementation(UPlayerSav
 		ActiveWidget = nullptr;
 	}
 
-	// CreateMainMenuWidget();
-
 	if (IsValid(MainMenuWidget))
 	{
 		ActiveWidget = MainMenuWidget;
@@ -85,7 +83,6 @@ void AMainMenuPlayerController::SwitchToNewProfileCreationWidget_Implementation(
 	if (IsValid(ActiveWidget) && ActiveWidget != NewProfileCreationWidget)
 	{
 		ActiveWidget->RemoveMenuFromScreen();
-		// ActiveWidget->RemoveFromParent();
 		ActiveWidget = nullptr;
 	}
 
@@ -94,7 +91,6 @@ void AMainMenuPlayerController::SwitchToNewProfileCreationWidget_Implementation(
 	if (IsValid(NewProfileCreationWidget))
 	{
 		ActiveWidget = NewProfileCreationWidget;
-		// ActiveWidget->AddToViewport();
 		ActiveWidget->AddMenuToScreen();
 	}
 }
@@ -104,7 +100,6 @@ void AMainMenuPlayerController::SwitchToMultiplayerWidget_Implementation()
 	if (IsValid(ActiveWidget) && ActiveWidget != MultiplayerWidget)
 	{
 		ActiveWidget->RemoveMenuFromScreen();
-		// ActiveWidget->RemoveFromParent();
 		ActiveWidget = nullptr;
 	}
 
@@ -113,7 +108,6 @@ void AMainMenuPlayerController::SwitchToMultiplayerWidget_Implementation()
 	if (IsValid(MultiplayerWidget))
 	{
 		ActiveWidget = MultiplayerWidget;
-		// ActiveWidget->AddToViewport();
 		ActiveWidget->AddMenuToScreen();
 	}
 }
@@ -123,7 +117,6 @@ void AMainMenuPlayerController::SwitchToSettingsWidget_Implementation()
 	if (IsValid(ActiveWidget) && ActiveWidget != SettingsWidget)
 	{
 		ActiveWidget->RemoveMenuFromScreen();
-		// ActiveWidget->RemoveFromParent();
 		ActiveWidget = nullptr;
 	}
 
@@ -133,7 +126,6 @@ void AMainMenuPlayerController::SwitchToSettingsWidget_Implementation()
 	{
 		ActiveWidget = SettingsWidget;
 		ActiveWidget->AddMenuToScreen();
-		// ActiveWidget->AddToViewport();
 	}
 }
 
@@ -173,22 +165,5 @@ void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent_Implementation(cons
 	else
 	{
 		SwitchToNewProfileCreationWidget();
-	}
-}
-
-void AMainMenuPlayerController::CreatePlayerMenu()
-{
-	if (IsLocalPlayerController())
-	{
-
-		if (IsValid(TitleScreenWidget))
-		{
-			ActiveWidget = TitleScreenWidget;
-			ActiveWidget->AddToViewport();
-			
-			// TitleScreenWidget->OnAd
-		}
-
-		SwitchToUIInput();
 	}
 }
