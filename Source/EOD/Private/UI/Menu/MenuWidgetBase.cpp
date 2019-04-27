@@ -26,3 +26,13 @@ void UMenuWidgetBase::NativeDestruct()
 {
 	Super::NativeDestruct();
 }
+
+void UMenuWidgetBase::AddMenuToScreen_Implementation()
+{
+	AddToViewport();
+}
+
+void UMenuWidgetBase::RemoveMenuFromScreen_Implementation()
+{
+	RemoveFromParent();
+}

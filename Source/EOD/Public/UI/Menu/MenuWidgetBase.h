@@ -32,11 +32,13 @@ public:
 	//  Utility
 	// --------------------------------------
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Utility")
 	void AddMenuToScreen();
+	virtual void AddMenuToScreen_Implementation();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Utility")
 	void RemoveMenuFromScreen();
+	virtual void RemoveMenuFromScreen_Implementation();
 
 
 };

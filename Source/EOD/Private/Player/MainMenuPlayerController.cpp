@@ -84,7 +84,8 @@ void AMainMenuPlayerController::SwitchToNewProfileCreationWidget_Implementation(
 {
 	if (IsValid(ActiveWidget) && ActiveWidget != NewProfileCreationWidget)
 	{
-		ActiveWidget->RemoveFromParent();
+		ActiveWidget->RemoveMenuFromScreen();
+		// ActiveWidget->RemoveFromParent();
 		ActiveWidget = nullptr;
 	}
 
@@ -93,7 +94,8 @@ void AMainMenuPlayerController::SwitchToNewProfileCreationWidget_Implementation(
 	if (IsValid(NewProfileCreationWidget))
 	{
 		ActiveWidget = NewProfileCreationWidget;
-		ActiveWidget->AddToViewport();
+		// ActiveWidget->AddToViewport();
+		ActiveWidget->AddMenuToScreen();
 	}
 }
 
@@ -101,7 +103,8 @@ void AMainMenuPlayerController::SwitchToMultiplayerWidget_Implementation()
 {
 	if (IsValid(ActiveWidget) && ActiveWidget != MultiplayerWidget)
 	{
-		ActiveWidget->RemoveFromParent();
+		ActiveWidget->RemoveMenuFromScreen();
+		// ActiveWidget->RemoveFromParent();
 		ActiveWidget = nullptr;
 	}
 
@@ -110,7 +113,8 @@ void AMainMenuPlayerController::SwitchToMultiplayerWidget_Implementation()
 	if (IsValid(MultiplayerWidget))
 	{
 		ActiveWidget = MultiplayerWidget;
-		ActiveWidget->AddToViewport();
+		// ActiveWidget->AddToViewport();
+		ActiveWidget->AddMenuToScreen();
 	}
 }
 
@@ -118,7 +122,8 @@ void AMainMenuPlayerController::SwitchToSettingsWidget_Implementation()
 {
 	if (IsValid(ActiveWidget) && ActiveWidget != SettingsWidget)
 	{
-		ActiveWidget->RemoveFromParent();
+		ActiveWidget->RemoveMenuFromScreen();
+		// ActiveWidget->RemoveFromParent();
 		ActiveWidget = nullptr;
 	}
 
@@ -127,7 +132,8 @@ void AMainMenuPlayerController::SwitchToSettingsWidget_Implementation()
 	if (IsValid(SettingsWidget))
 	{
 		ActiveWidget = SettingsWidget;
-		ActiveWidget->AddToViewport();
+		ActiveWidget->AddMenuToScreen();
+		// ActiveWidget->AddToViewport();
 	}
 }
 
@@ -150,9 +156,9 @@ void AMainMenuPlayerController::CreateAndLoadNewProfile(const FString& NewProfil
 	}
 }
 
-void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent(const FKey& Key)
+void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent_Implementation(const FKey& Key)
 {
-	if (Key.IsMouseButton() || Key == EKeys::Escape || (IsValid(ActiveWidget) && ActiveWidget != TitleScreenWidget))
+	if (Key.IsMouseButton() || Key == EKeys::Escape || ActiveWidget == nullptr || (IsValid(ActiveWidget) && ActiveWidget != TitleScreenWidget))
 	{
 		return;
 	}
@@ -168,8 +174,6 @@ void AMainMenuPlayerController::HandleTitleScreenAnyKeyEvent(const FKey& Key)
 	{
 		SwitchToNewProfileCreationWidget();
 	}
-
-
 }
 
 void AMainMenuPlayerController::CreatePlayerMenu()

@@ -124,11 +124,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void CreateAndLoadNewProfile(const FString& NewProfileName);
 
-	UFUNCTION(BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Utility")
 	void HandleTitleScreenAnyKeyEvent(const FKey& Key);
-
-	// UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
-	// void InterpolateToMainMenuLocation();
+	void HandleTitleScreenAnyKeyEvent_Implementation(const FKey& Key);
 
 };
 
