@@ -7,6 +7,7 @@
 #include "ResolutionWidget.generated.h"
 
 class UScrollBox;
+class UVideoOptionsWidget;
 class UScrollButtonWidget;
 
 /**
@@ -58,6 +59,15 @@ public:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
 	TArray<FString> AvailableResolutions;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
+	UVideoOptionsWidget* ParentWidget;
+
 	void GenerateAvailableResolutionButtons();
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetParentWidget(UVideoOptionsWidget* NewParent);
+
+	// UFUNCTION(BlueprintCallable, Category = "Utility")
+		// void RequestResolution()
 	
 };

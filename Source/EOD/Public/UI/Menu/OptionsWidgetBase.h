@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "OptionsWidgetBase.generated.h"
 
+class USettingsWidget;
+
 /**
  * 
  */
@@ -34,5 +36,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	virtual void CloseDownOptions();
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	virtual void ResetOptions();
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
+	bool bIsDirty;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
+	USettingsWidget* SettingsParentWidget;
+
 
 };

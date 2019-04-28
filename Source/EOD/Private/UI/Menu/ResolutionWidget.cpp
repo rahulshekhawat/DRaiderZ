@@ -78,3 +78,8 @@ void UResolutionWidget::GenerateAvailableResolutionButtons()
 		}
 	}
 }
+
+void UResolutionWidget::SetParentWidget(UVideoOptionsWidget* NewParent)
+{
+	ParentWidget = NewParent;
+}

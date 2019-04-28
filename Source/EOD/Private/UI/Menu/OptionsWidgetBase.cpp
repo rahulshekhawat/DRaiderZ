@@ -30,3 +30,7 @@ void UOptionsWidgetBase::NativeDestruct()
 void UOptionsWidgetBase::CloseDownOptions()
 {
 }
+
+void UOptionsWidgetBase::ResetOptions()
+{
+}
