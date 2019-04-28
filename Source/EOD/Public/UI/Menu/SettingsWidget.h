@@ -6,6 +6,9 @@
 #include "UI/Menu/MenuWidgetBase.h"
 #include "SettingsWidget.generated.h"
 
+class UButton;
+class UFooterButtonWidget;
+class URegularButtonWidget;
 
 /**
  * 
@@ -18,7 +21,7 @@ class EOD_API USettingsWidget : public UMenuWidgetBase
 public:
 
 	// --------------------------------------
-	//	UE4 Method Overrides
+	//  UE4 Method Overrides
 	// --------------------------------------
 
 	USettingsWidget(const FObjectInitializer& ObjectInitializer);
@@ -29,6 +32,30 @@ public:
 
 	virtual void NativeDestruct() override;
 
+	// --------------------------------------
+	//  Child Widgets
+	// --------------------------------------
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	URegularButtonWidget* GameButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	URegularButtonWidget* ControllerButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	URegularButtonWidget* MouseKeyboardButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	URegularButtonWidget* AudioButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	URegularButtonWidget* VideoButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	URegularButtonWidget* AdvancedButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UButton* BackMainMenuButton;
 
 
 };

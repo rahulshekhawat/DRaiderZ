@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UILibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "ScrollButtonWidget.generated.h"
 
@@ -14,9 +15,6 @@ class USizeBox;
 class UTextBlock;
 class UProgressBar;
 class UMaterialInterface;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMenuButtonClickMCDelegate);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSliderChangeMCDelegate, float, Value);
 
 /**
  * 
@@ -136,7 +134,7 @@ public:
 	// --------------------------------------
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
-	FMenuButtonClickMCDelegate OnClicked;
+	FCustomWidgetClickedMCDelegate OnClicked;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
 	FSliderChangeMCDelegate OnSliderValueChanged;
