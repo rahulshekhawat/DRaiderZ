@@ -46,9 +46,11 @@ void UActionConfirmationWidget::NativeDestruct()
 void UActionConfirmationWidget::HandleYesButtonClicked()
 {
 	OnYesButtonClicked.Broadcast();
+	RemoveFromParent();
 }
 
 void UActionConfirmationWidget::HandleNoButtonClicked()
 {
 	OnNoButtonClicked.Broadcast();
+	RemoveFromParent();
 }

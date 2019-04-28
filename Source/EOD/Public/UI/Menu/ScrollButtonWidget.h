@@ -84,6 +84,9 @@ public:
 	FORCEINLINE bool IsChecked() const { return bIsChecked; }
 
 	UFUNCTION(BlueprintCallable, Category = "Behaviour")
+	void SetDisplayText(FText NewText);
+
+	UFUNCTION(BlueprintCallable, Category = "Behaviour")
 	void SetInfoText(FText NewText);
 
 	UFUNCTION(BlueprintCallable, Category = "Behaviour")

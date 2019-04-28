@@ -86,6 +86,15 @@ void UScrollButtonWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void UScrollButtonWidget::SetDisplayText(FText NewText)
+{
+	if (DisplayTextBlock)
+	{
+		DisplayText = NewText;
+		DisplayTextBlock->SetText(DisplayText);
+	}
+}
+
 void UScrollButtonWidget::SetInfoText(FText NewText)
 {
 	if (InfoTextBlock)

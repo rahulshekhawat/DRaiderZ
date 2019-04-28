@@ -7,6 +7,7 @@
 #include "ResolutionWidget.generated.h"
 
 class UScrollBox;
+class UScrollButtonWidget;
 
 /**
  * 
@@ -26,6 +27,8 @@ public:
 
 	virtual bool Initialize() override;
 
+	virtual void NativePreConstruct() override;
+
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
@@ -38,6 +41,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UScrollBox* ResolutionScroller;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Child")
+	TArray<UScrollButtonWidget*> ResolutionWidgets;
+
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Classes")
+	TSubclassOf<UScrollButtonWidget> ScrollButtonWidgetClass;
+
 	// --------------------------------------
 	//  Utility
 	// --------------------------------------
@@ -45,12 +58,6 @@ public:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
 	TArray<FString> AvailableResolutions;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Classes")
-	TSubclassOf<UUserWidget> ResolutionButtonClass;
-
 	void GenerateAvailableResolutionButtons();
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
-	void AddResolutionButtonToScrollBox(const FString& Resolution);
 	
 };

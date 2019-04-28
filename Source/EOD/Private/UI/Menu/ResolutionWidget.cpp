@@ -3,24 +3,31 @@
 
 #include "ResolutionWidget.h"
 #include "EODLibrary.h"
+#include "ScrollButtonWidget.h"
 
 #include "Components/ScrollBox.h"
+#include "Components/ScrollBoxSlot.h"
 #include "GameFramework/GameUserSettings.h"
 
 UResolutionWidget::UResolutionWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-
 }
 
 bool UResolutionWidget::Initialize()
 {
 	if (Super::Initialize())
 	{
-		GenerateAvailableResolutionButtons();
 		return true;
 	}
 
 	return false;
+}
+
+void UResolutionWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
+	GenerateAvailableResolutionButtons();
 }
 
 void UResolutionWidget::NativeConstruct()
@@ -35,7 +42,6 @@ void UResolutionWidget::NativeDestruct()
 
 void UResolutionWidget::GenerateAvailableResolutionButtons()
 {
-	TArray<FString> Resolutions;
 	FScreenResolutionArray ResolutionsArray;
 	if (RHIGetAvailableResolutions(ResolutionsArray, true))  // needs the "RHI" dependency
 	{
@@ -51,9 +57,24 @@ void UResolutionWidget::GenerateAvailableResolutionButtons()
 		}
 	}
 
-	for (FString Resolution : Resolutions)
+	UClass* ButtonClass = ScrollButtonWidgetClass.Get();
+	APlayerController* OwningPlayer = GetOwningPlayer();
+	if (ButtonClass && AvailableResolutions.Num() > 0)
 	{
-		AddResolutionButtonToScrollBox(Resolution);
+		for (FString Resolution : AvailableResolutions)
+		{
+			UScrollButtonWidget* ButtonWidget = CreateWidget<UScrollButtonWidget>(OwningPlayer, ButtonClass);
+			if (ButtonWidget)
+			{
+				ResolutionWidgets.AddUnique(ButtonWidget);
+				ButtonWidget->SetDisplayText(FText::FromString(Resolution));
+				UScrollBoxSlot* ButtonSlot = Cast<UScrollBoxSlot>(ResolutionScroller->AddChild(ButtonWidget));
+				if (ButtonSlot)
+				{
+					ButtonSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
+					ButtonSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
+				}
+			}
+		}
 	}
-
 }
