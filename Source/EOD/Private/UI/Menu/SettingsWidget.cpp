@@ -2,7 +2,10 @@
 
 
 #include "SettingsWidget.h"
+#include "OptionsWidgetBase.h"
+#include "RegularButtonWidget.h"
 
+#include "Components/TextBlock.h"
 #include "Components/WidgetSwitcher.h"
 
 USettingsWidget::USettingsWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -32,9 +35,26 @@ void USettingsWidget::NativeDestruct()
 void USettingsWidget::SetWidgetSwitcherLayout(UWidget* NewActiveWidget, URegularButtonWidget* InCallingButton)
 {
 	UWidget* CurrentActiveWidget = OptionsWidgetSwitcher->GetActiveWidget();
-	if (NewActiveWidget != CurrentActiveWidget || CurrentActiveWidget->GetVisibility() != ESlateVisibility::Visible)
+	if (CurrentActiveWidget && NewActiveWidget != CurrentActiveWidget || CurrentActiveWidget->GetVisibility() != ESlateVisibility::Visible)
 	{
+		UOptionsWidgetBase* CurrentOptions = Cast<UOptionsWidgetBase>(CurrentActiveWidget);
+		if (CurrentOptions)
+		{
+			CurrentOptions->CloseDownOptions();
+		}
 
+		OptionsWidgetSwitcher->SetActiveWidget(NewActiveWidget);
+		OptionsWidgetSwitcher->SetVisibility(ESlateVisibility::Visible);
+		OptionsNameTextBlock->SetVisibility(ESlateVisibility::Visible);
+
+		if (InCallingButton)
+		{
+			InCallingButton->LockButton(true);
+		}
 	}
+}
+
+void USettingsWidget::UnlockAllButtons()
+{
 
 }

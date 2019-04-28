@@ -9,6 +9,7 @@
 class UButton;
 class UTextBlock;
 class UWidgetSwitcher;
+class UOptionsWidgetBase;
 class UFooterButtonWidget;
 class URegularButtonWidget;
 
@@ -74,12 +75,27 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UWidgetSwitcher* OptionsWidgetSwitcher;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UOptionsWidgetBase* GameOptionsMain;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UOptionsWidgetBase* AudioOptionsMain;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UOptionsWidgetBase* VideoOptionsMain;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UOptionsWidgetBase* AdvancedOptionsMain;
+
 	// --------------------------------------
 	//  Utility
 	// --------------------------------------
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void SetWidgetSwitcherLayout(UWidget* NewActiveWidget, URegularButtonWidget* InCallingButton);
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void UnlockAllButtons();
 
 
 
