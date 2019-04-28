@@ -7,7 +7,11 @@
 
 UGameSingleton* UEODLibrary::GetGameSingleton()
 {
-	UGameSingleton* GameSingleton = nullptr;
-	GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
+	UGameSingleton* GameSingleton = GEngine ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
 	return GameSingleton;
+}
+
+UGameUserSettings* UEODLibrary::GetGameUserSettings()
+{
+	return GEngine ? GEngine->GameUserSettings : nullptr;
 }

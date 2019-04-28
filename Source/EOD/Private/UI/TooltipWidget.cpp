@@ -10,7 +10,7 @@ bool UTooltipWidget::Initialize()
 {
 	if (Super::Initialize())
 	{
-
+		return true;
 	}
 
 	return false;

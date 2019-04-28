@@ -29,7 +29,7 @@ class EOD_API UMenuButtonWidget : public UUserWidget
 public:
 
 	// --------------------------------------
-	//	UE4 Method Overrides
+	//  UE4 Method Overrides
 	// --------------------------------------
 
 	UMenuButtonWidget(const FObjectInitializer& ObjectInitializer);
@@ -41,7 +41,7 @@ public:
 	virtual void NativeDestruct() override;
 
 	// --------------------------------------
-	//	Child Widgets
+	//  Child Widgets
 	// --------------------------------------
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
@@ -74,7 +74,7 @@ public:
 protected:
 
 	// --------------------------------------
-	//	Constants / Defaults
+	//  Constants / Defaults
 	// --------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
@@ -98,7 +98,7 @@ protected:
 public:
 
 	// --------------------------------------
-	//	Widget Behaviour
+	//  Widget Behaviour
 	// --------------------------------------
 
 	FORCEINLINE FText GetDisplayText() const { return DisplayText; }
@@ -120,7 +120,7 @@ protected:
 public:
 
 	// --------------------------------------
-	//	Delegates
+	//  Delegates
 	// --------------------------------------
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
@@ -140,7 +140,7 @@ private:
 protected:
 
 	// --------------------------------------
-	//	Handle Mouse Events
+	//  Handle Mouse Events
 	// --------------------------------------
 
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

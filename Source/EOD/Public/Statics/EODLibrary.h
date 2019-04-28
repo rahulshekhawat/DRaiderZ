@@ -6,8 +6,12 @@
 #include "UObject/NoExportTypes.h"
 #include "EODLibrary.generated.h"
 
+#define MIN_SCREEN_WIDTH 1024
+#define MIN_SCREEN_HEIGHT 768
+
 class UTexture;
 class UGameSingleton;
+class UGameUserSettings;
 
 UENUM(BlueprintType)
 enum class EEODContainerType : uint8
@@ -114,6 +118,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EOD Library")
 	static UGameSingleton* GetGameSingleton();
 	
+	static UGameUserSettings* GetGameUserSettings();
 	
 };
 

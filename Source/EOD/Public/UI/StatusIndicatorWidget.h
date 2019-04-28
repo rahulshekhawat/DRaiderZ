@@ -26,13 +26,24 @@ class EOD_API UStatusIndicatorWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	UStatusIndicatorWidget(const FObjectInitializer& ObjectInitializer);
 
-	bool Initialize() override;
+	virtual bool Initialize() override;
+
+	virtual void NativePreConstruct() override;
 
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
+
+	// --------------------------------------
+	//  Child Widgets
+	// --------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* HealthBarEmpty;
@@ -78,6 +89,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	USpacer* StaminaSpacer;
+	
+	// --------------------------------------
+	//  Widget Behaviour
+	// --------------------------------------
 
 	UFUNCTION()
 	void UpdateHealthBar(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
@@ -89,6 +104,7 @@ public:
 	void UpdateStaminaBar(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina);
 
 private:
+
 	inline void SetHorizontalSlotSize(UHorizontalBoxSlot* HBSlot, float FillValue);
 
 	inline void UpdateHealthBar_Internal(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);

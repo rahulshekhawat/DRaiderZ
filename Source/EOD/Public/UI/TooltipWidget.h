@@ -18,7 +18,7 @@ class EOD_API UTooltipWidget : public UUserWidget
 public:
 
 	// --------------------------------------
-	//	UE4 Method Overrides
+	//  UE4 Method Overrides
 	// --------------------------------------
 
 	UTooltipWidget(const FObjectInitializer& ObjectInitializer);

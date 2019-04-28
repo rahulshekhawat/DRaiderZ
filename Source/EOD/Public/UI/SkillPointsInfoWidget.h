@@ -18,6 +18,11 @@ class EOD_API USkillPointsInfoWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	USkillPointsInfoWidget(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
@@ -62,6 +67,10 @@ protected:
 
 public:
 
+	// --------------------------------------
+	//  Widget Behaviour
+	// --------------------------------------
+
 	UFUNCTION()
 	void UpdateSkillPointAllocationText(const FSkillPointsAllocationInfo& SkillPointsAllocationInfo);
 	
@@ -89,7 +98,7 @@ public:
 private:
 
 	// --------------------------------------
-	//	Cache
+	//  Cache
 	// --------------------------------------
 
 	int32 Cache_AvailableSkillPoints;

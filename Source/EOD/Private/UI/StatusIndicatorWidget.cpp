@@ -31,6 +31,11 @@ bool UStatusIndicatorWidget::Initialize()
 	return false;
 }
 
+void UStatusIndicatorWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+}
+
 void UStatusIndicatorWidget::NativeConstruct()
 {
 	Super::NativeConstruct();

@@ -19,7 +19,7 @@ class EOD_API UVocationInfoWidget : public UUserWidget
 public:
 
 	// --------------------------------------
-	//	UE4 Method Overrides
+	//  UE4 Method Overrides
 	// --------------------------------------
 
 	UVocationInfoWidget(const FObjectInitializer& ObjectInitializer);
@@ -31,7 +31,7 @@ public:
 	virtual void NativeDestruct() override;
 
 	// --------------------------------------
-	//	Necessary Child Widget
+	//  Child Widgets
 	// --------------------------------------
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
@@ -39,6 +39,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* CharacteristicsListText;
+
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Info Text")
 	FString WeaponsList;

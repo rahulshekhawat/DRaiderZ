@@ -23,7 +23,7 @@ class EOD_API UDialogueOptionWidget : public UUserWidget
 public:
 	UDialogueOptionWidget(const FObjectInitializer& ObjectInitializer);
 
-	bool Initialize() override;
+	virtual bool Initialize() override;
 
 	virtual void NativeConstruct() override;
 
