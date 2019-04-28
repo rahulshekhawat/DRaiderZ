@@ -7,12 +7,16 @@
 #include "ScrollButtonWidget.generated.h"
 
 class UBorder;
-class UButton;
 class UImage;
 class USlider;
+class UButton;
 class USizeBox;
 class UTextBlock;
 class UProgressBar;
+class UMaterialInterface;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMenuButtonClickMCDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSliderChangeMCDelegate, float, Value);
 
 /**
  * 
@@ -44,53 +48,112 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UBorder* RootBorder;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UButton* MainButton;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UTextBlock* DisplayTextBlock;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UButton* PrimaryButton;
+	UTextBlock* InfoTextBlock;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UTextBlock* DisplayText;
+	UTextBlock* SliderValueTextBlock;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UImage* CheckBoxImage;
+	USizeBox* SliderSizeBox;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	USlider* OptionsSlider;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UProgressBar* OptionsSliderFillBar;
+	UProgressBar* SliderProgressBar;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UTextBlock* SliderText;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UTextBlock* InfoText;
+	UImage* CheckBoxImage;
 	
-	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	USizeBox* SliderSizeBox;
+public:
+
+	// --------------------------------------
+	//  Widget Behaviour
+	// --------------------------------------
+
+	FORCEINLINE FText GetDisplayText() const { return DisplayText; }
+
+	FORCEINLINE bool IsChecked() const { return bIsChecked; }
+
+	UFUNCTION(BlueprintCallable, Category = "Behaviour")
+	void SetInfoText(FText NewText);
+
+	UFUNCTION(BlueprintCallable, Category = "Behaviour")
+	void SetChecked(bool bValue);
+
+	UFUNCTION(BlueprintCallable, Category = "Behaviour")
+	void SetSliderValue(float InValue);
+
+	UFUNCTION(BlueprintCallable, Category = "Behaviour")
+	FText GetText() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Behaviour")
+	bool IsOptionChecked() const;
+
+protected:
+
+	/** Determines whether this button is currently checked */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Behaviour")
+	bool bIsChecked;
 
 	// --------------------------------------
 	//  Pseudo Constants
 	// --------------------------------------
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FText DisplayText;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pseudo Constants")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FText InfoText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	bool bHasCheckBox;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pseudo Constants")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	bool bHasSlider;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pseudo Constants")
-	FText TextToDisplay;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	UMaterialInterface* CheckedMaterialInterface;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	UMaterialInterface* UncheckedMaterialInterface;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pseudo Constants")
-	FText InfoTextToDisplay;
-	
+public:
+
 	// --------------------------------------
-	//  Utility
+	//  Delegates
 	// --------------------------------------
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
-	bool bIsChecked;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
+	FMenuButtonClickMCDelegate OnClicked;
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
+	FSliderChangeMCDelegate OnSliderValueChanged;
+
+private:
+
+	UFUNCTION()
+	void OnMainButtonClicked();
+
+	UFUNCTION()
+	void OnOptionSliderValueChanged(float NewValue);
+
+protected:
+
+	// --------------------------------------
+	//  Handle Mouse Events
+	// --------------------------------------
+
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 
 };
