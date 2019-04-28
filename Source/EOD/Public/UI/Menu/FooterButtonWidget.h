@@ -63,6 +63,9 @@ protected:
 	FCustomWidgetClickedMCDelegate OnClicked;
 
 	UFUNCTION()
+	void HandleFootButtonClicked();
+
+	UFUNCTION()
 	void HandleFootButtonHovered();
 
 	UFUNCTION()

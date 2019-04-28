@@ -18,6 +18,7 @@ bool UFooterButtonWidget::Initialize()
 		DisplayTextBlock)
 	{
 		DisplayTextBlock->SetText(DisplayText);
+		FooterButton->OnClicked.AddDynamic(this, &UFooterButtonWidget::HandleFootButtonClicked);
 		FooterButton->OnHovered.AddDynamic(this, &UFooterButtonWidget::HandleFootButtonHovered);
 		FooterButton->OnUnhovered.AddDynamic(this, &UFooterButtonWidget::HandleFootButtonUnhovered);
 
@@ -36,10 +37,23 @@ void UFooterButtonWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void UFooterButtonWidget::HandleFootButtonClicked()
+{
+	OnClicked.Broadcast();
+}
+
 void UFooterButtonWidget::HandleFootButtonHovered()
 {
+	if (RootBorder)
+	{
+		RootBorder->SetContentColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f));
+	}
 }
 
 void UFooterButtonWidget::HandleFootButtonUnhovered()
 {
+	if (RootBorder)
+	{
+		RootBorder->SetContentColorAndOpacity(FLinearColor(0.5f, 0.5f, 0.5f, 1.f));
+	}
 }

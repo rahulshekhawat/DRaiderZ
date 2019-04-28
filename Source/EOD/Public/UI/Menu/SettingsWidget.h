@@ -7,6 +7,7 @@
 #include "SettingsWidget.generated.h"
 
 class UButton;
+class UTextBlock;
 class UFooterButtonWidget;
 class URegularButtonWidget;
 
@@ -57,5 +58,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UButton* BackMainMenuButton;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UFooterButtonWidget* BackFooterButton;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UFooterButtonWidget* ResetDefaultsFooterButton;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UTextBlock* TipTextBlock;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UTextBlock* OptionsNameTextBlock;
 
 };
