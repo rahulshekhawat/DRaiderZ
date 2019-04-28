@@ -8,6 +8,7 @@
 
 class UButton;
 class UTextBlock;
+class UCanvasPanel;
 class UWidgetSwitcher;
 class UOptionsWidgetBase;
 class UFooterButtonWidget;
@@ -86,6 +87,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UOptionsWidgetBase* AdvancedOptionsMain;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UCanvasPanel* MainCanvasPanel;
 
 	// --------------------------------------
 	//  Utility

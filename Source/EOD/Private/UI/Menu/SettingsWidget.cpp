@@ -5,6 +5,7 @@
 #include "OptionsWidgetBase.h"
 #include "RegularButtonWidget.h"
 
+#include "Components/CanvasPanel.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetSwitcher.h"
 
@@ -56,5 +57,19 @@ void USettingsWidget::SetWidgetSwitcherLayout(UWidget* NewActiveWidget, URegular
 
 void USettingsWidget::UnlockAllButtons()
 {
+	if (MainCanvasPanel == nullptr)
+	{
+		return;
+	}
 
+	int32 ChildrenCount = MainCanvasPanel->GetChildrenCount();
+	for (int i = 0; i < ChildrenCount; i++)
+	{
+		URegularButtonWidget* RegularButton = Cast<URegularButtonWidget>(MainCanvasPanel->GetChildAt(i));
+		if (RegularButton)
+		{
+			RegularButton->LockButton(false);
+			RegularButton->StartUnhovered();
+		}
+	}
 }

@@ -60,7 +60,7 @@ protected:
 	// --------------------------------------
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
-	FCustomWidgetClickedMCDelegate OnClicked;
+	FCustomWidgetEventMCDelegate OnClicked;
 
 	UFUNCTION()
 	void HandleFootButtonClicked();

@@ -130,11 +130,11 @@ protected:
 public:
 
 	// --------------------------------------
-	//  Delegates
+	//  Events
 	// --------------------------------------
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
-	FCustomWidgetClickedMCDelegate OnClicked;
+	FCustomWidgetEventMCDelegate OnClicked;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
 	FSliderChangeMCDelegate OnSliderValueChanged;

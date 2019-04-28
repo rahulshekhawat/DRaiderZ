@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UILibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "RegularButtonWidget.generated.h"
 
@@ -47,15 +48,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UTextBlock* DisplayText;
 
-	UFUNCTION()
-	void OnPrimaryButtonClicked();
-
-	UFUNCTION()
-	void OnPrimaryButtonHovered();
-
-	UFUNCTION()
-	void OnPrimaryButtonUnhovered();
-
 	// --------------------------------------
 	//  Pseudo Constants
 	// --------------------------------------
@@ -72,5 +64,40 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void LockButton(bool bInLocked);
+
+protected:
+
+	// --------------------------------------
+	//  Events
+	// --------------------------------------
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
+	FCustomWidgetEventMCDelegate OnClicked;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
+	FCustomWidgetEventMCDelegate OnHovered;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
+	FCustomWidgetEventMCDelegate OnUnhovered;
+
+	UFUNCTION()
+	void OnPrimaryButtonClicked();
+
+	UFUNCTION()
+	void OnPrimaryButtonHovered();
+
+	UFUNCTION()
+	void OnPrimaryButtonUnhovered();
+
+public:
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Events")
+	void StartHovered();
+	virtual void StartHovered_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Events")
+	void StartUnhovered();
+	virtual void StartUnhovered_Implementation();
+
 
 };

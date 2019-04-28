@@ -47,18 +47,6 @@ void URegularButtonWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void URegularButtonWidget::OnPrimaryButtonClicked()
-{
-}
-
-void URegularButtonWidget::OnPrimaryButtonHovered()
-{
-}
-
-void URegularButtonWidget::OnPrimaryButtonUnhovered()
-{
-}
-
 void URegularButtonWidget::LockButton(bool bInLocked)
 {
 	if (bIsLocked != bInLocked)
@@ -73,4 +61,29 @@ void URegularButtonWidget::LockButton(bool bInLocked)
 			PrimaryButton->SetBackgroundColor(FLinearColor(1.f, 1.f, 1.f, 0.f));
 		}
 	}
+}
+
+void URegularButtonWidget::OnPrimaryButtonClicked()
+{
+	OnClicked.Broadcast();
+}
+
+void URegularButtonWidget::OnPrimaryButtonHovered()
+{
+	OnHovered.Broadcast();
+	StartHovered();
+}
+
+void URegularButtonWidget::OnPrimaryButtonUnhovered()
+{
+	OnUnhovered.Broadcast();
+	StartUnhovered();
+}
+
+void URegularButtonWidget::StartHovered_Implementation()
+{
+}
+
+void URegularButtonWidget::StartUnhovered_Implementation()
+{
 }

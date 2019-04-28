@@ -7,7 +7,7 @@
 #include "UILibrary.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCustomWidgetClickedMCDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCustomWidgetEventMCDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSliderChangeMCDelegate, float, Value);
 
 /**
