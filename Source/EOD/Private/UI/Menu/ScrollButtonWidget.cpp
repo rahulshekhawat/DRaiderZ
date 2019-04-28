@@ -33,35 +33,6 @@ bool UScrollButtonWidget::Initialize()
 		RootBorder &&
 		SliderValueTextBlock)
 	{
-		DisplayTextBlock->SetText(DisplayText);
-		if (bHasCheckBox)
-		{
-			InfoTextBlock->SetText(FText::FromString(FString("")));
-			SliderSizeBox->SetVisibility(ESlateVisibility::Collapsed);
-			CheckBoxImage->SetVisibility(ESlateVisibility::HitTestInvisible);
-		}
-		else
-		{
-			CheckBoxImage->SetVisibility(ESlateVisibility::Collapsed);
-
-			if (bHasSlider)
-			{
-				SliderSizeBox->SetVisibility(ESlateVisibility::Visible);
-				float SliderValue = OptionsSlider->GetValue();
-				FText TempText = FText::FromString(FString::SanitizeFloat(SliderValue));
-				InfoTextBlock->SetText(TempText);
-
-				SliderProgressBar->SetPercent(SliderValue);
-				InfoTextBlock->SetVisibility(ESlateVisibility::Collapsed);
-			}
-			else
-			{
-				SliderSizeBox->SetVisibility(ESlateVisibility::Collapsed);
-				InfoTextBlock->SetText(InfoText);
-				InfoTextBlock->SetVisibility(ESlateVisibility::HitTestInvisible);
-			}
-		}
-
 		MainButton->OnClicked.AddDynamic(this, &UScrollButtonWidget::OnMainButtonClicked);
 		OptionsSlider->OnValueChanged.AddDynamic(this, &UScrollButtonWidget::OnOptionSliderValueChanged);
 
@@ -74,6 +45,35 @@ bool UScrollButtonWidget::Initialize()
 void UScrollButtonWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
+
+	DisplayTextBlock->SetText(DisplayText);
+	if (bHasCheckBox)
+	{
+		InfoTextBlock->SetText(FText::FromString(FString("")));
+		SliderSizeBox->SetVisibility(ESlateVisibility::Collapsed);
+		CheckBoxImage->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+	else
+	{
+		CheckBoxImage->SetVisibility(ESlateVisibility::Collapsed);
+
+		if (bHasSlider)
+		{
+			SliderSizeBox->SetVisibility(ESlateVisibility::Visible);
+			float SliderValue = OptionsSlider->GetValue();
+			FText TempText = FText::FromString(FString::SanitizeFloat(SliderValue));
+			InfoTextBlock->SetText(TempText);
+
+			SliderProgressBar->SetPercent(SliderValue);
+			InfoTextBlock->SetVisibility(ESlateVisibility::Collapsed);
+		}
+		else
+		{
+			SliderSizeBox->SetVisibility(ESlateVisibility::Collapsed);
+			InfoTextBlock->SetText(InfoText);
+			InfoTextBlock->SetVisibility(ESlateVisibility::HitTestInvisible);
+		}
+	}
 }
 
 void UScrollButtonWidget::NativeConstruct()

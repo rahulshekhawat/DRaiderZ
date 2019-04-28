@@ -8,6 +8,7 @@
 
 class UButton;
 class UTextBlock;
+class UWidgetSwitcher;
 class UFooterButtonWidget;
 class URegularButtonWidget;
 
@@ -69,5 +70,17 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UTextBlock* OptionsNameTextBlock;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UWidgetSwitcher* OptionsWidgetSwitcher;
+
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetWidgetSwitcherLayout(UWidget* NewActiveWidget, URegularButtonWidget* InCallingButton);
+
+
 
 };

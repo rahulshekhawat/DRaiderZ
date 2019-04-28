@@ -3,13 +3,16 @@
 
 #include "SettingsWidget.h"
 
+#include "Components/WidgetSwitcher.h"
+
 USettingsWidget::USettingsWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
 bool USettingsWidget::Initialize()
 {
-	if (Super::Initialize())
+	if (Super::Initialize() &&
+		OptionsWidgetSwitcher)
 	{
 		return true;
 	}
@@ -24,4 +27,14 @@ void USettingsWidget::NativeConstruct()
 void USettingsWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
+
+void USettingsWidget::SetWidgetSwitcherLayout(UWidget* NewActiveWidget, URegularButtonWidget* InCallingButton)
+{
+	UWidget* CurrentActiveWidget = OptionsWidgetSwitcher->GetActiveWidget();
+	if (NewActiveWidget != CurrentActiveWidget || CurrentActiveWidget->GetVisibility() != ESlateVisibility::Visible)
+	{
+
+	}
+
 }
