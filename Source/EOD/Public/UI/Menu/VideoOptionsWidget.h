@@ -32,6 +32,8 @@ public:
 
 	virtual bool Initialize() override;
 
+	virtual void NativePreConstruct() override;
+
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
@@ -64,20 +66,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UFrameRateSubWidget* FrameRateSub;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UScrollBox* VideoOptionsScrollBox;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UWidgetSwitcher* SubWidgetSwitcher;
-
 	// --------------------------------------
-	//  Widget Initialization and Update
+	//  Widget Update
 	// --------------------------------------
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
-	bool bIsInitialized;
-
-	void InitializeOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void UpdateCurrentWindowMode(UGameUserSettings* GameUserSettings = nullptr);
@@ -91,17 +82,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void UpdateCurrentFrameRate(UGameUserSettings* GameUserSettings = nullptr);
 
-	UFUNCTION(BlueprintCallable, Category = "Utility")
-	void EnableScrollBoxItems();
-
-	UFUNCTION(BlueprintCallable, Category = "Utility")
-	void DisableScrollBoxItems(UWidget* ExcludedItem);
-
-	UFUNCTION(BlueprintCallable, Category = "Utility")
-	void MoveSubMenu(UWidget* InScrollItem);
-
-	UFUNCTION(BlueprintCallable, Category = "Utility")
-	void ToggleSubOptions(UWidget* SubWidget, UScrollButtonWidget* CallingScrollButton);
+	virtual void InitializeOptions() override;
 
 	virtual void CloseDownOptions() override;
 
@@ -114,10 +95,19 @@ protected:
 	// --------------------------------------
 
 	UFUNCTION()
+	void HandleWindowModeButtonClicked();
+
+	UFUNCTION()
 	void HandleResolutionButtonClicked();
 
 	UFUNCTION()
 	void HandleVSyncButtonClicked();
+
+	UFUNCTION()
+	void HandleFrameRateButtonClicked();
+	
+	// UFUNCTION()
+	// void HandleGammaButtonClicked();
 
 
 };

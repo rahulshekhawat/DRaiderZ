@@ -6,7 +6,10 @@
 #include "Blueprint/UserWidget.h"
 #include "OptionsWidgetBase.generated.h"
 
+class UScrollBox;
+class UWidgetSwitcher;
 class USettingsWidget;
+class UScrollButtonWidget;
 
 /**
  * 
@@ -31,14 +34,49 @@ public:
 	virtual void NativeDestruct() override;
 
 	// --------------------------------------
-	//  Utility
+	//  Child Widgets
 	// --------------------------------------
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UScrollBox* OptionsScrollBox;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UWidgetSwitcher* SubWidgetSwitcher;
+
+	// --------------------------------------
+	//  Widget Update
+	// --------------------------------------
+
+	virtual void InitializeOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	virtual void CloseDownOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	virtual void ResetOptions();
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	virtual void EnableScrollBoxItems();
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	virtual void DisableScrollBoxItems(UWidget* ExcludedItem);
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	virtual void ToggleSubOptions(UWidget* SubWidget, UScrollButtonWidget* CallingScrollButton);
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void GetQualityText(int32 InQualityLevel, FText& OutText);
+
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
+	FORCEINLINE USettingsWidget* GetSettingsParentWidget() const { return SettingsParentWidget; }
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetSettingsParentWidget(USettingsWidget* NewParent);
+
+protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
 	bool bIsDirty;

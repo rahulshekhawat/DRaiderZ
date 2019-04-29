@@ -6,6 +6,7 @@
 #include "UI/Menu/OptionsWidgetBase.h"
 #include "AudioOptionsWidget.generated.h"
 
+class UGameUserSettings;
 class UScrollButtonWidget;
 class UQualitySettingSubWidget;
 
@@ -26,6 +27,8 @@ public:
 	UAudioOptionsWidget(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
+
+	virtual void NativePreConstruct() override;
 
 	virtual void NativeConstruct() override;
 
@@ -53,5 +56,22 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UQualitySettingSubWidget* AudioQualitySub;
 
+	// --------------------------------------
+	//  Widget Update
+	// --------------------------------------
+
+	virtual void InitializeOptions() override;
+	
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void UpdateCurrentAudioQuality(UGameUserSettings* GameUserSettings = nullptr);
+	
+protected:
+
+	// --------------------------------------
+	//  Events
+	// --------------------------------------
+
+	UFUNCTION()
+	void HandleAudioQualityButtonClicked();
 
 };

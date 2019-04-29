@@ -40,6 +40,11 @@ void UResolutionSubWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void UResolutionSubWidget::SetParentOptionsWidget(UVideoOptionsWidget* NewParent)
+{
+	ParentOptionsWidget = NewParent;
+}
+
 void UResolutionSubWidget::GenerateAvailableResolutionButtons()
 {
 	FScreenResolutionArray ResolutionsArray;
@@ -77,9 +82,4 @@ void UResolutionSubWidget::GenerateAvailableResolutionButtons()
 			}
 		}
 	}
-}
-
-void UResolutionSubWidget::SetParentWidget(UVideoOptionsWidget* NewParent)
-{
-	ParentWidget = NewParent;
 }

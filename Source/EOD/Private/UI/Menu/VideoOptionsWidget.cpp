@@ -4,7 +4,9 @@
 #include "VideoOptionsWidget.h"
 #include "EODLibrary.h"
 #include "ResolutionSubWidget.h"
+#include "WindowModeSubWidget.h"
 #include "ScrollButtonWidget.h"
+#include "FrameRateSubWidget.h"
 #include "MainMenuPlayerController.h"
 
 #include "Components/ScrollBox.h"
@@ -18,86 +20,50 @@ UVideoOptionsWidget::UVideoOptionsWidget(const FObjectInitializer& ObjectInitial
 bool UVideoOptionsWidget::Initialize()
 {
 	if (Super::Initialize() &&
+		WindowMode &&
 		Resolution &&
-		VerticalSync)
+		VerticalSync &&
+		FrameRate &&
+		Gamma &&
+		WindowModeSub &&
+		ResolutionSub &&
+		FrameRateSub &&
+		SubWidgetSwitcher)
 	{
+		WindowMode->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleWindowModeButtonClicked);
 		Resolution->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleResolutionButtonClicked);
 		VerticalSync->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleVSyncButtonClicked);
+		FrameRate->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleFrameRateButtonClicked);
 
+		InitializeOptions();
 		return true;
 	}
 
 	return false;
 }
 
+void UVideoOptionsWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
+	check(WindowModeSub);
+	check(ResolutionSub);
+	check(FrameRateSub);
+
+	WindowModeSub->SetParentOptionsWidget(this);
+	ResolutionSub->SetParentOptionsWidget(this);
+	FrameRateSub->SetParentOptionsWidget(this);
+
+}
+
 void UVideoOptionsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	if (!bIsInitialized)
-	{
-		InitializeOptions();
-	}
 }
 
 void UVideoOptionsWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
-}
-
-void UVideoOptionsWidget::EnableScrollBoxItems()
-{
-	if (VideoOptionsScrollBox)
-	{
-		int32 ChildCount = VideoOptionsScrollBox->GetChildrenCount();
-		for (int i = 0; i < ChildCount; i++)
-		{
-			UWidget* Widget = VideoOptionsScrollBox->GetChildAt(i);
-			if (Widget)
-			{
-				Widget->SetIsEnabled(true);
-			}
-		}
-	}
-}
-
-void UVideoOptionsWidget::DisableScrollBoxItems(UWidget* ExcludedItem)
-{
-	if (VideoOptionsScrollBox)
-	{
-		int32 ChildCount = VideoOptionsScrollBox->GetChildrenCount();
-		for (int i = 0; i < ChildCount; i++)
-		{
-			UWidget* Widget = VideoOptionsScrollBox->GetChildAt(i);
-			if (Widget && Widget != ExcludedItem)
-			{
-				Widget->SetIsEnabled(false);
-			}
-		}
-	}
-}
-
-void UVideoOptionsWidget::MoveSubMenu(UWidget* InScrollItem)
-{
-	// SubWidgetSwitcher
-}
-
-void UVideoOptionsWidget::ToggleSubOptions(UWidget* SubWidget, UScrollButtonWidget* CallingScrollButton)
-{
-	check(SubWidgetSwitcher);
-
-	if (SubWidgetSwitcher->GetVisibility() == ESlateVisibility::Visible)
-	{
-		EnableScrollBoxItems();
-		SubWidgetSwitcher->SetVisibility(ESlateVisibility::Hidden);
-	}
-	else
-	{
-		SubWidgetSwitcher->SetActiveWidget(SubWidget);
-		SubWidgetSwitcher->SetVisibility(ESlateVisibility::Visible);
-		DisableScrollBoxItems(CallingScrollButton);
-		MoveSubMenu(CallingScrollButton);
-	}
 }
 
 void UVideoOptionsWidget::CloseDownOptions()
@@ -127,8 +93,6 @@ void UVideoOptionsWidget::CloseDownOptions()
 
 void UVideoOptionsWidget::InitializeOptions()
 {
-	bIsInitialized = true;
-
 	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
 	if (GameUserSettings)
 	{
@@ -224,18 +188,18 @@ void UVideoOptionsWidget::UpdateCurrentFrameRate(UGameUserSettings* GameUserSett
 
 }
 
+void UVideoOptionsWidget::HandleWindowModeButtonClicked()
+{
+	ToggleSubOptions(WindowModeSub, WindowMode);
+}
+
 void UVideoOptionsWidget::HandleResolutionButtonClicked()
 {
-	if (ResolutionSub)
-	{
-		ResolutionSub->SetParentWidget(this);
-		ToggleSubOptions(ResolutionSub, Resolution);
-	}
+	ToggleSubOptions(ResolutionSub, Resolution);
 }
 
 void UVideoOptionsWidget::HandleVSyncButtonClicked()
 {
-	//~ @todo fix
 	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
 	bool bVSyncChecked = VerticalSync->IsOptionChecked();
 	if (GameUserSettings && GameUserSettings->IsVSyncEnabled() != bVSyncChecked)
@@ -243,7 +207,9 @@ void UVideoOptionsWidget::HandleVSyncButtonClicked()
 		GameUserSettings->SetVSyncEnabled(bVSyncChecked);
 		bIsDirty = true;
 	}
+}
 
-
-	// VerticalSync->IsOptionChecked()
+void UVideoOptionsWidget::HandleFrameRateButtonClicked()
+{
+	ToggleSubOptions(FrameRateSub, FrameRate);
 }

@@ -26,3 +26,8 @@ void UWindowModeSubWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 }
+
+void UWindowModeSubWidget::SetParentOptionsWidget(UVideoOptionsWidget* NewParent)
+{
+	ParentOptionsWidget = NewParent;
+}

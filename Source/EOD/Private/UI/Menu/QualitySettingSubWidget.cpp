@@ -24,3 +24,8 @@ void UQualitySettingSubWidget::NativeConstruct()
 void UQualitySettingSubWidget::NativeDestruct()
 {
 }
+
+void UQualitySettingSubWidget::SetCustomParentWidget(UUserWidget* NewParent)
+{
+	CustomParentWidget = NewParent;
+}

@@ -56,16 +56,17 @@ public:
 	//  Utility
 	// --------------------------------------
 
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetParentOptionsWidget(UVideoOptionsWidget* NewParent);
+	
+protected:
+
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
 	TArray<FString> AvailableResolutions;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
-	UVideoOptionsWidget* ParentWidget;
+	UVideoOptionsWidget* ParentOptionsWidget;
 
 	void GenerateAvailableResolutionButtons();
-
-	UFUNCTION(BlueprintCallable, Category = "Utility")
-	void SetParentWidget(UVideoOptionsWidget* NewParent);
-
 
 };

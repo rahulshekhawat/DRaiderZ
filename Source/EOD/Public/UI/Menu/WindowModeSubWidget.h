@@ -7,6 +7,7 @@
 #include "WindowModeSubWidget.generated.h"
 
 class UScrollButtonWidget;
+class UVideoOptionsWidget;
 
 /**
  * 
@@ -42,6 +43,18 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UScrollButtonWidget* Borderless;
+	
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetParentOptionsWidget(UVideoOptionsWidget* NewParent);
+
+protected:
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
+	UVideoOptionsWidget* ParentOptionsWidget;
 
 
 };

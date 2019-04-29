@@ -48,6 +48,18 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UScrollButtonWidget* Cinematic;
+	
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetCustomParentWidget(UUserWidget* NewParent);
+	
+protected:
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
+	UUserWidget* CustomParentWidget;
 
 
 };
