@@ -3,7 +3,7 @@
 
 #include "VideoOptionsWidget.h"
 #include "EODLibrary.h"
-#include "ResolutionWidget.h"
+#include "ResolutionSubWidget.h"
 #include "ScrollButtonWidget.h"
 #include "MainMenuPlayerController.h"
 

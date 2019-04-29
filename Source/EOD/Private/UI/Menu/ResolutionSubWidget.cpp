@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 
-#include "ResolutionWidget.h"
+#include "ResolutionSubWidget.h"
 #include "EODLibrary.h"
 #include "ScrollButtonWidget.h"
 
@@ -9,11 +9,11 @@
 #include "Components/ScrollBoxSlot.h"
 #include "GameFramework/GameUserSettings.h"
 
-UResolutionWidget::UResolutionWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+UResolutionSubWidget::UResolutionSubWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
-bool UResolutionWidget::Initialize()
+bool UResolutionSubWidget::Initialize()
 {
 	if (Super::Initialize())
 	{
@@ -23,24 +23,24 @@ bool UResolutionWidget::Initialize()
 	return false;
 }
 
-void UResolutionWidget::NativePreConstruct()
+void UResolutionSubWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
 	GenerateAvailableResolutionButtons();
 }
 
-void UResolutionWidget::NativeConstruct()
+void UResolutionSubWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 }
 
-void UResolutionWidget::NativeDestruct()
+void UResolutionSubWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 }
 
-void UResolutionWidget::GenerateAvailableResolutionButtons()
+void UResolutionSubWidget::GenerateAvailableResolutionButtons()
 {
 	FScreenResolutionArray ResolutionsArray;
 	if (RHIGetAvailableResolutions(ResolutionsArray, true))  // needs the "RHI" dependency
@@ -79,7 +79,7 @@ void UResolutionWidget::GenerateAvailableResolutionButtons()
 	}
 }
 
-void UResolutionWidget::SetParentWidget(UVideoOptionsWidget* NewParent)
+void UResolutionSubWidget::SetParentWidget(UVideoOptionsWidget* NewParent)
 {
 	ParentWidget = NewParent;
 }

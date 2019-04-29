@@ -3,17 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UI/Menu/OptionsWidgetBase.h"
-#include "AudioOptionsWidget.generated.h"
+#include "Blueprint/UserWidget.h"
+#include "QualitySettingSubWidget.generated.h"
 
 class UScrollButtonWidget;
-class UQualitySettingSubWidget;
 
 /**
  * 
  */
 UCLASS()
-class EOD_API UAudioOptionsWidget : public UOptionsWidgetBase
+class EOD_API UQualitySettingSubWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -23,35 +22,32 @@ public:
 	//  UE4 Method Overrides
 	// --------------------------------------
 
-	UAudioOptionsWidget(const FObjectInitializer& ObjectInitializer);
+	UQualitySettingSubWidget(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
 
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
-
+	
 	// --------------------------------------
 	//  Child Widgets
 	// --------------------------------------
+
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UScrollButtonWidget* Low;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UScrollButtonWidget* AudioQuality;
+	UScrollButtonWidget* Medium;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UScrollButtonWidget* Master;
+	UScrollButtonWidget* High;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UScrollButtonWidget* Music;
+	UScrollButtonWidget* Epic;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UScrollButtonWidget* Voice;
-	
-	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UScrollButtonWidget* SFX;
-	
-	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UQualitySettingSubWidget* AudioQualitySub;
+	UScrollButtonWidget* Cinematic;
 
 
 };

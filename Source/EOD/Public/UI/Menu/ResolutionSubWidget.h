@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ResolutionWidget.generated.h"
+#include "ResolutionSubWidget.generated.h"
 
 class UScrollBox;
 class UVideoOptionsWidget;
@@ -14,17 +14,17 @@ class UScrollButtonWidget;
  * 
  */
 UCLASS()
-class EOD_API UResolutionWidget : public UUserWidget
+class EOD_API UResolutionSubWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
+	
 public:
 
 	// --------------------------------------
 	//  UE4 Method Overrides
 	// --------------------------------------
 
-	UResolutionWidget(const FObjectInitializer& ObjectInitializer);
+	UResolutionSubWidget(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
 
@@ -67,7 +67,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void SetParentWidget(UVideoOptionsWidget* NewParent);
 
-	// UFUNCTION(BlueprintCallable, Category = "Utility")
-		// void RequestResolution()
-	
+
 };

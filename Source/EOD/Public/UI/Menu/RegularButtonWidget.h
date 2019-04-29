@@ -65,8 +65,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void LockButton(bool bInLocked);
 
-protected:
-
 	// --------------------------------------
 	//  Events
 	// --------------------------------------
@@ -80,6 +78,16 @@ protected:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
 	FCustomWidgetEventMCDelegate OnUnhovered;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Events")
+	void StartHovered();
+	virtual void StartHovered_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Events")
+	void StartUnhovered();
+	virtual void StartUnhovered_Implementation();
+
+protected:
+
 	UFUNCTION()
 	void OnPrimaryButtonClicked();
 
@@ -88,16 +96,6 @@ protected:
 
 	UFUNCTION()
 	void OnPrimaryButtonUnhovered();
-
-public:
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Events")
-	void StartHovered();
-	virtual void StartHovered_Implementation();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Events")
-	void StartUnhovered();
-	virtual void StartUnhovered_Implementation();
 
 
 };

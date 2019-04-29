@@ -9,8 +9,10 @@
 class UScrollBox;
 class UWidgetSwitcher;
 class UGameUserSettings;
-class UResolutionWidget;
 class UScrollButtonWidget;
+class UResolutionSubWidget;
+class UWindowModeSubWidget;
+class UFrameRateSubWidget;
 
 /**
  * 
@@ -54,13 +56,13 @@ public:
 	UScrollButtonWidget* Gamma;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UUserWidget* WindowModeSub;
+	UWindowModeSubWidget* WindowModeSub;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UResolutionWidget* ResolutionSub;
+	UResolutionSubWidget* ResolutionSub;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UUserWidget* FrameRateSub;
+	UFrameRateSubWidget* FrameRateSub;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UScrollBox* VideoOptionsScrollBox;
@@ -111,7 +113,10 @@ protected:
 	//  Events
 	// --------------------------------------
 
+	UFUNCTION()
 	void HandleResolutionButtonClicked();
+
+	UFUNCTION()
 	void HandleVSyncButtonClicked();
 
 

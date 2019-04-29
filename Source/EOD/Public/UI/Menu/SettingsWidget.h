@@ -101,6 +101,28 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void UnlockAllButtons();
 
+protected:
 
+	// --------------------------------------
+	//  Events
+	// --------------------------------------
+
+	UFUNCTION()
+	void HandleGameButtonClicked();
+	
+	UFUNCTION()
+	void HandleControllerButtonClicked();
+	
+	UFUNCTION()
+	void HandleMouseKeyButtonClicked();
+	
+	UFUNCTION()
+	void HandleAudioButtonClicked();
+	
+	UFUNCTION()
+	void HandleVideoButtonClicked();
+	
+	UFUNCTION()
+	void HandleAdvancedButtonClicked();
 
 };
