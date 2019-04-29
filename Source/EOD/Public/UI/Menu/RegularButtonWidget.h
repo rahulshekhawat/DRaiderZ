@@ -79,12 +79,12 @@ public:
 	FCustomWidgetEventMCDelegate OnUnhovered;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Events")
-	void StartHovered();
-	virtual void StartHovered_Implementation();
-
+	void PlayHoveredAnimation();
+	virtual void PlayHoveredAnimation_Implementation();
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Events")
-	void StartUnhovered();
-	virtual void StartUnhovered_Implementation();
+	void PlayUnhoveredAnimation();
+	virtual void PlayUnhoveredAnimation_Implementation();
 
 protected:
 

@@ -62,6 +62,8 @@ void USettingsWidget::SetWidgetSwitcherLayout(UWidget* NewActiveWidget, URegular
 		OptionsWidgetSwitcher->SetVisibility(ESlateVisibility::Visible);
 		OptionsNameTextBlock->SetVisibility(ESlateVisibility::Visible);
 
+		UnlockAllButtons();
+
 		if (InCallingButton)
 		{
 			InCallingButton->LockButton(true);
@@ -83,7 +85,6 @@ void USettingsWidget::UnlockAllButtons()
 		if (RegularButton)
 		{
 			RegularButton->LockButton(false);
-			RegularButton->StartUnhovered();
 		}
 	}
 }

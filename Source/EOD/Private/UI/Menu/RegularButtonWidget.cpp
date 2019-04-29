@@ -18,7 +18,6 @@ bool URegularButtonWidget::Initialize()
 		DisplayText &&
 		PrimaryButton)
 	{
-		DisplayText->SetText(TextToDisplay);
 		PrimaryButton->OnClicked.AddDynamic(this, &URegularButtonWidget::OnPrimaryButtonClicked);
 		PrimaryButton->OnHovered.AddDynamic(this, &URegularButtonWidget::OnPrimaryButtonHovered);
 		PrimaryButton->OnUnhovered.AddDynamic(this, &URegularButtonWidget::OnPrimaryButtonUnhovered);
@@ -33,7 +32,7 @@ void URegularButtonWidget::NativePreConstruct()
 	Super::NativePreConstruct();
 	if (DisplayText)
 	{
-		// DisplayText->SetText(TextToDisplay);
+		DisplayText->SetText(TextToDisplay);
 	}
 }
 
@@ -49,16 +48,39 @@ void URegularButtonWidget::NativeDestruct()
 
 void URegularButtonWidget::LockButton(bool bInLocked)
 {
-	if (bIsLocked != bInLocked)
+	check(PrimaryButton);
+	if (bIsLocked == bInLocked)
 	{
-		bIsLocked = bInLocked;
+		return;
+	}
+
+	bIsLocked = bInLocked;
+	bool bIsHovered = PrimaryButton->IsHovered();
+	if (bIsHovered)
+	{
 		if (bIsLocked)
 		{
 			RootBorder->SetBrushColor(FLinearColor(1.f, 1.f, 1.f, 0.f));
+			PrimaryButton->SetBackgroundColor(FLinearColor(1.f, 1.f, 1.f, 1.f));
 		}
 		else
 		{
+			RootBorder->SetBrushColor(FLinearColor(1.f, 1.f, 1.f, 1.f));
+			PrimaryButton->SetBackgroundColor(FLinearColor(1.f, 1.f, 1.f, 1.f));
+		}
+	}
+	else
+	{
+		if (bIsLocked)
+		{
+			RootBorder->SetBrushColor(FLinearColor(1.f, 1.f, 1.f, 0.f));
+			PrimaryButton->SetBackgroundColor(FLinearColor(1.f, 1.f, 1.f, 1.f));
+		}
+		else
+		{
+			RootBorder->SetBrushColor(FLinearColor(1.f, 1.f, 1.f, 0.f));
 			PrimaryButton->SetBackgroundColor(FLinearColor(1.f, 1.f, 1.f, 0.f));
+			PlayUnhoveredAnimation();
 		}
 	}
 }
@@ -71,19 +93,19 @@ void URegularButtonWidget::OnPrimaryButtonClicked()
 void URegularButtonWidget::OnPrimaryButtonHovered()
 {
 	OnHovered.Broadcast();
-	StartHovered();
+	PlayHoveredAnimation();
 }
 
 void URegularButtonWidget::OnPrimaryButtonUnhovered()
 {
 	OnUnhovered.Broadcast();
-	StartUnhovered();
+	PlayUnhoveredAnimation();
 }
 
-void URegularButtonWidget::StartHovered_Implementation()
+void URegularButtonWidget::PlayHoveredAnimation_Implementation()
 {
 }
 
-void URegularButtonWidget::StartUnhovered_Implementation()
+void URegularButtonWidget::PlayUnhoveredAnimation_Implementation()
 {
 }
