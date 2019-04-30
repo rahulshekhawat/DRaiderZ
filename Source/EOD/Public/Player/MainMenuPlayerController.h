@@ -12,7 +12,7 @@ class UMenuWidgetBase;
 class UPlayerSaveGame;
 class ACameraActor;
 class ALevelSequenceActor;
-class AEODLevelScriptActor;
+class AMainMenuLevelScriptActor;
 
 /**
  * 
@@ -33,17 +33,6 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
-
-	// --------------------------------------
-	//  Sound
-	// --------------------------------------
-
-	/** Audio component for playing main menu music */
-	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Sound)
-	// UAudioComponent* MainMenuAudioComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
-	USoundBase* MainMenuMusic;
 
 	// --------------------------------------
 	//  User Interface
@@ -81,37 +70,37 @@ public:
 
 protected:
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "UI")
 	UMenuWidgetBase* ActiveWidget;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UMenuWidgetBase> TitleScreenWidgetClass;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "UI")
 	UMenuWidgetBase* TitleScreenWidget;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UMenuWidgetBase> MainMenuWidgetClass;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "UI")
 	UMenuWidgetBase* MainMenuWidget;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UMenuWidgetBase> NewProfileCreationWidgetClass;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "UI")
 	UMenuWidgetBase* NewProfileCreationWidget;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UMenuWidgetBase> MultiplayerWidgetClass;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "UI")
 	UMenuWidgetBase* MultiplayerWidget;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI")
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UMenuWidgetBase> SettingsWidgetClass;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Main Menu UI")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "UI")
 	UMenuWidgetBase* SettingsWidget;
 
 	inline void SwitchToUIInput();
@@ -121,38 +110,16 @@ protected:
 	inline void CreateSettingsWidget();
 	inline void CreateMultiplayerWidget();
 	inline void CreateNewProfileCreationWidget();
-	
-	// --------------------------------------
-	//  Pseudo Constants
-	// --------------------------------------
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Search Tags")
-	FName CameraActorTag;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Search Tags")
-	FName LevelSequenceTag;
 
 	// --------------------------------------
 	//  Utility
 	// --------------------------------------
 
 	UPROPERTY(Transient)
-	ACameraActor* MainMenuCameraActor;
-
-	UPROPERTY(Transient)
-	ALevelSequenceActor* MainMenuLevelSeqActor;
-
-	UPROPERTY(Transient)
-	AEODLevelScriptActor* LevelScriptActor;
-
+	AMainMenuLevelScriptActor* LevelScriptActor;
+	
 	UFUNCTION(BlueprintCallable, Category = "Utility")
-	AEODLevelScriptActor* GetEODLevelScriptActor() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Utility")
-	ACameraActor* GetMainMenuCameraActor() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Utility")
-	ALevelSequenceActor* GetMainMenuLevelSeqActor() const;
+	AMainMenuLevelScriptActor* GetMainMenuLevelScriptActor() const;
 
 	/** Begin a new campaign */
 	UFUNCTION(BlueprintCallable, Category = "Utility")

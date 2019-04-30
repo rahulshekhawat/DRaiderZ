@@ -85,13 +85,13 @@ protected:
 public:
 
 	// --------------------------------------
-	//  Utility
+	//  Events
 	// --------------------------------------
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Events")
 	void FadeInViewport();
 	
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Events")
 	void FadeOutViewport();
 
 protected:

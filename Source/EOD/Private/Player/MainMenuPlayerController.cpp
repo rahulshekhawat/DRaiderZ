@@ -3,7 +3,7 @@
 #include "MainMenuPlayerController.h"
 #include "EODGameInstance.h"
 #include "PlayerSaveGame.h"
-#include "EODLevelScriptActor.h"
+#include "MainMenuLevelScriptActor.h"
 
 #include "EngineUtils.h"
 #include "Camera/CameraActor.h"
@@ -15,17 +15,6 @@
 AMainMenuPlayerController::AMainMenuPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	LevelSequenceTag = FName("MainMenuLevelSequence");
-	CameraActorTag = FName("MainMenuCamera");
-
-	/*
-	MainMenuAudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, TEXT("MainMenuMusicComponent"));
-	if (MainMenuAudioComponent)
-	{
-		MainMenuAudioComponent->SetupAttachment(RootComponent);
-	}
-	*/
 }
 
 void AMainMenuPlayerController::BeginPlay()
@@ -38,8 +27,8 @@ void AMainMenuPlayerController::BeginPlay()
 		SwitchToTitleScreenWidget();
 		SwitchToUIInput();
 	}
-
-	LevelScriptActor = GetEODLevelScriptActor();
+	
+	LevelScriptActor = GetMainMenuLevelScriptActor();
 	check(LevelScriptActor);
 }
 
@@ -61,81 +50,74 @@ void AMainMenuPlayerController::CreateMenuWidgets()
 
 void AMainMenuPlayerController::SwitchToTitleScreenWidget_Implementation()
 {
+	check(TitleScreenWidget);
+
+	// If title screen widget is already active
+	if (ActiveWidget && ActiveWidget == TitleScreenWidget)
+	{
+		return;
+	}
+
 	if (ActiveWidget && ActiveWidget != TitleScreenWidget)
 	{
 		ActiveWidget->RemoveMenuFromScreen();
 		ActiveWidget = nullptr;
 	}
 
-	if (TitleScreenWidget)
-	{
-		ActiveWidget = TitleScreenWidget;
-		ActiveWidget->AddMenuToScreen();
-	}
+	ActiveWidget = TitleScreenWidget;
+	ActiveWidget->AddMenuToScreen();
 }
 
 void AMainMenuPlayerController::SwitchToMainMenuWidget_Implementation(UPlayerSaveGame* PlayerSaveGame)
 {
+	check(MainMenuWidget);
+
+	// If main menu widget is already active
+	if (ActiveWidget && ActiveWidget == MainMenuWidget)
+	{
+		return;
+	}
+
 	// If a proper player save game was not passed as an argument, we try to get the current player save game object from game instance
-	if (!IsValid(PlayerSaveGame))
+	if (PlayerSaveGame)
 	{
 		UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
 		PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
 	}
 
-	if (IsValid(ActiveWidget) && ActiveWidget != MainMenuWidget)
+	if (ActiveWidget && ActiveWidget != MainMenuWidget)
 	{
 		ActiveWidget->RemoveMenuFromScreen();
 		ActiveWidget = nullptr;
 	}
 
-	if (IsValid(MainMenuWidget))
-	{
-		ActiveWidget = MainMenuWidget;
-		ActiveWidget->AddMenuToScreen();
-	}
+	ActiveWidget = MainMenuWidget;
+	ActiveWidget->AddMenuToScreen();
 
 	if (LevelScriptActor)
 	{
-		LevelScriptActor->FadeInViewport();
-		LevelScriptActor->SwitchToBGM(MainMenuMusic);
+		LevelScriptActor->OnSwitchingToMainMenu();
 	}
-
-	if (MainMenuCameraActor == nullptr)
-	{
-		MainMenuCameraActor = GetMainMenuCameraActor();
-	}
-	if (MainMenuCameraActor)
-	{
-		SetViewTargetWithBlend(MainMenuCameraActor);
-	}
-
-	//~ @todo Play LoginIdle animation
-
-	/*
-	if (MainMenuAudioComponent && MainMenuMusic)
-	{
-		MainMenuAudioComponent->SetSound(MainMenuMusic);
-		MainMenuAudioComponent->Play();
-	}
-	*/
 }
 
 void AMainMenuPlayerController::SwitchToNewProfileCreationWidget_Implementation()
 {
-	if (IsValid(ActiveWidget) && ActiveWidget != NewProfileCreationWidget)
+	check(NewProfileCreationWidget);
+
+	// If title screen widget is already active
+	if (ActiveWidget && ActiveWidget == NewProfileCreationWidget)
+	{
+		return;
+	}
+
+	if (ActiveWidget && ActiveWidget != NewProfileCreationWidget)
 	{
 		ActiveWidget->RemoveMenuFromScreen();
 		ActiveWidget = nullptr;
 	}
 
-	CreateNewProfileCreationWidget();
-
-	if (IsValid(NewProfileCreationWidget))
-	{
-		ActiveWidget = NewProfileCreationWidget;
-		ActiveWidget->AddMenuToScreen();
-	}
+	ActiveWidget = NewProfileCreationWidget;
+	ActiveWidget->AddMenuToScreen();
 }
 
 void AMainMenuPlayerController::SwitchToMultiplayerWidget_Implementation()
@@ -172,10 +154,10 @@ void AMainMenuPlayerController::SwitchToSettingsWidget_Implementation()
 	}
 }
 
-AEODLevelScriptActor* AMainMenuPlayerController::GetEODLevelScriptActor() const
+AMainMenuLevelScriptActor* AMainMenuPlayerController::GetMainMenuLevelScriptActor() const
 {
 	UWorld* World = GetWorld();
-	UClass* ActorClass = AEODLevelScriptActor::StaticClass();
+	UClass* ActorClass = AMainMenuLevelScriptActor::StaticClass();
 
 	// We do nothing if no is class provided, rather than giving ALL actors!
 	if (World)
@@ -184,56 +166,10 @@ AEODLevelScriptActor* AMainMenuPlayerController::GetEODLevelScriptActor() const
 		{
 			AActor* Actor = *It;
 
-			AEODLevelScriptActor* LevelActor = Cast<AEODLevelScriptActor>(*It);
+			AMainMenuLevelScriptActor* LevelActor = Cast<AMainMenuLevelScriptActor>(*It);
 			if (IsValid(LevelActor))
 			{
 				return LevelActor;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-ACameraActor* AMainMenuPlayerController::GetMainMenuCameraActor() const
-{
-	UWorld* World = GetWorld();
-	UClass* ActorClass = ACameraActor::StaticClass();
-
-	// We do nothing if no is class provided, rather than giving ALL actors!
-	if (World)
-	{
-		for (TActorIterator<AActor> It(World, ActorClass); It; ++It)
-		{
-			AActor* Actor = *It;
-
-			ACameraActor* CameraActor = Cast<ACameraActor>(*It);
-			if (IsValid(CameraActor) && CameraActor->Tags.Contains(CameraActorTag))
-			{
-				return CameraActor;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-ALevelSequenceActor* AMainMenuPlayerController::GetMainMenuLevelSeqActor() const
-{
-	UWorld* World = GetWorld();
-	UClass* ActorClass = ALevelSequenceActor::StaticClass();
-
-	// We do nothing if no is class provided, rather than giving ALL actors!
-	if (World)
-	{
-		for (TActorIterator<AActor> It(World, ActorClass); It; ++It)
-		{
-			AActor* Actor = *It;
-
-			ALevelSequenceActor* SeqActor = Cast<ALevelSequenceActor>(*It);
-			if (IsValid(SeqActor) && SeqActor->Tags.Contains(CameraActorTag))
-			{
-				return SeqActor;
 			}
 		}
 	}
