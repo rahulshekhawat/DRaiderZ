@@ -25,13 +25,13 @@ bool UVideoOptionsWidget::Initialize()
 		Resolution &&
 		VerticalSync &&
 		FrameRate &&
+		GraphicsQuality &&
 		Gamma &&
 		WindowModeSub &&
 		ResolutionSub &&
 		FrameRateSub &&
-		SubWidgetSwitcher &&
-		GraphicsQuality &&
-		GraphicsSub)
+		GraphicsSub &&
+		SubWidgetSwitcher)
 	{
 		WindowMode->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleWindowModeButtonClicked);
 		Resolution->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleResolutionButtonClicked);
@@ -40,9 +40,9 @@ bool UVideoOptionsWidget::Initialize()
 		GraphicsQuality->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleGraphicsQualityButtonClicked);
 
 		WindowModeSub->OnWindowModeSelected.AddDynamic(this, &UVideoOptionsWidget::HandleWindowModeSelected);
-		GraphicsSub->OnQualitySelected.AddDynamic(this, &UVideoOptionsWidget::HandleGraphicsQualitySelected);
-		FrameRateSub->OnFrameRateSelected.AddDynamic(this, &UVideoOptionsWidget::HandleFrameRateSelected);
 		ResolutionSub->OnResolutionSelected.AddDynamic(this, &UVideoOptionsWidget::HandleResolutionSelected);
+		FrameRateSub->OnFrameRateSelected.AddDynamic(this, &UVideoOptionsWidget::HandleFrameRateSelected);
+		GraphicsSub->OnQualitySelected.AddDynamic(this, &UVideoOptionsWidget::HandleGraphicsQualitySelected);
 
 		InitializeOptions(true);
 		return true;
@@ -273,8 +273,10 @@ void UVideoOptionsWidget::HandleGraphicsQualitySelected(int32 SelectedQuality)
 	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
 	if (GameUserSettings)
 	{
+		bIsDirty = true;
 		GameUserSettings->SetAntiAliasingQuality(SelectedQuality);
 		GameUserSettings->SetViewDistanceQuality(SelectedQuality);
+		//~ @note For some reason changing visual effects quality freezes the game when saving game user settings
 		GameUserSettings->SetVisualEffectQuality(SelectedQuality);
 		GameUserSettings->SetShadowQuality(SelectedQuality);
 		GameUserSettings->SetTextureQuality(SelectedQuality);
@@ -289,12 +291,39 @@ void UVideoOptionsWidget::HandleGraphicsQualitySelected(int32 SelectedQuality)
 
 void UVideoOptionsWidget::HandleWindowModeSelected(EWindowMode::Type SelectedWindowMode)
 {
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings && GameUserSettings->GetFullscreenMode() != SelectedWindowMode)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetFullscreenMode(SelectedWindowMode);
+	}
+	UpdateCurrentWindowMode(GameUserSettings);
+
+	ToggleSubOptions(WindowModeSub, WindowMode);
 }
 
 void UVideoOptionsWidget::HandleFrameRateSelected(float SelectedFrameRate)
 {
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings && GameUserSettings->GetFrameRateLimit() != SelectedFrameRate)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetFrameRateLimit(SelectedFrameRate);
+	}
+	UpdateCurrentFrameRate(GameUserSettings);
+
+	ToggleSubOptions(FrameRateSub, FrameRate);
 }
 
 void UVideoOptionsWidget::HandleResolutionSelected(FIntPoint SelectedResolution)
 {
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings && GameUserSettings->GetScreenResolution() != SelectedResolution)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetScreenResolution(SelectedResolution);
+	}
+	UpdateCurrentResolution(GameUserSettings);
+
+	ToggleSubOptions(ResolutionSub, Resolution);
 }

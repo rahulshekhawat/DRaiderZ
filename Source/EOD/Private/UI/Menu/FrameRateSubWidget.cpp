@@ -17,6 +17,12 @@ bool UFrameRateSubWidget::Initialize()
 		F120 &&
 		Unlimited)
 	{
+		F30->OnClicked.AddDynamic(this, &UFrameRateSubWidget::HandleF30Clicked);
+		F60->OnClicked.AddDynamic(this, &UFrameRateSubWidget::HandleF60Clicked);
+		F90->OnClicked.AddDynamic(this, &UFrameRateSubWidget::HandleF90Clicked);
+		F120->OnClicked.AddDynamic(this, &UFrameRateSubWidget::HandleF120Clicked);
+		Unlimited->OnClicked.AddDynamic(this, &UFrameRateSubWidget::HandleUnlimitedClicked);
+
 		return true;
 	}
 

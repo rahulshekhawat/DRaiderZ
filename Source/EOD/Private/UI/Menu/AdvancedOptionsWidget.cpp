@@ -346,4 +346,16 @@ void UAdvancedOptionsWidget::HandleFoliageQualitySelected(int32 SelectedQuality)
 
 void UAdvancedOptionsWidget::HandleResolutionScaleSliderValueChanged(float NewValue)
 {
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	// GameUserSettings->Getresolu
+	/*
+	if (GameUserSettings && GameUserSettings->GetResolutionScaleInformation() != SelectedQuality)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetFoliageQuality(SelectedQuality);
+	}
+	UpdateCurrentFoliage(GameUserSettings);
+
+	ToggleSubOptions(FoliageSub, Foliage);
+	*/
 }

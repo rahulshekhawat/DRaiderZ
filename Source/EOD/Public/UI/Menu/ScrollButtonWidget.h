@@ -120,7 +120,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	bool bHasSlider;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	UMaterialInterface* CheckedMaterialInterface;
 
