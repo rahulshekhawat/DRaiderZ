@@ -82,24 +82,38 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<UUserWidget> LevelTitleWidgetClass;
 
+public:
+
 	// --------------------------------------
 	//  Utility
 	// --------------------------------------
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	void FadeInViewport();
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Utility")
+	void FadeOutViewport();
+
+protected:
 
 	void BindCombatDelegates();
 
 	void DisplayLevelTitle();
 
+public:
+
 	// --------------------------------------
 	//  Sound
 	// --------------------------------------
+	
+	UFUNCTION(BlueprintCallable, Category = "Sound")
+	void SwitchToBGM(USoundBase* NewBGM);
+
+protected:
 
 	void SetupBindingsForMusicTriggers();
 
 	void InitiateBackgroundMusic();
-	
-	UFUNCTION(BlueprintCallable, Category = "Sound")
-	void SwitchToBGM(USoundBase* NewBGM);
 
 	UFUNCTION()
 	void PlayMusic(USoundBase* Music);

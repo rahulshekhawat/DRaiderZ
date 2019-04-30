@@ -38,6 +38,8 @@ void AEODLevelScriptActor::BeginPlay()
 	DisplayLevelTitle();
 
 	InitiateBackgroundMusic();
+
+	FadeInViewport();
 }
 
 void AEODLevelScriptActor::Tick(float DeltaTime)

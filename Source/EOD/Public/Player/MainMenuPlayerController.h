@@ -7,8 +7,12 @@
 #include "GameFramework/PlayerController.h"
 #include "MainMenuPlayerController.generated.h"
 
+class USoundBase;
 class UMenuWidgetBase;
 class UPlayerSaveGame;
+class ACameraActor;
+class ALevelSequenceActor;
+class AEODLevelScriptActor;
 
 /**
  * 
@@ -30,7 +34,16 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-public:
+	// --------------------------------------
+	//  Sound
+	// --------------------------------------
+
+	/** Audio component for playing main menu music */
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Sound)
+	// UAudioComponent* MainMenuAudioComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+	USoundBase* MainMenuMusic;
 
 	// --------------------------------------
 	//  User Interface
@@ -42,7 +55,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "UI")
 	void SwitchToTitleScreenWidget();
 	virtual void SwitchToTitleScreenWidget_Implementation();
-
 
 	/**
 	 * Replaces current widget with main menu widget.
@@ -109,10 +121,38 @@ protected:
 	inline void CreateSettingsWidget();
 	inline void CreateMultiplayerWidget();
 	inline void CreateNewProfileCreationWidget();
+	
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Search Tags")
+	FName CameraActorTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Search Tags")
+	FName LevelSequenceTag;
 
 	// --------------------------------------
 	//  Utility
 	// --------------------------------------
+
+	UPROPERTY(Transient)
+	ACameraActor* MainMenuCameraActor;
+
+	UPROPERTY(Transient)
+	ALevelSequenceActor* MainMenuLevelSeqActor;
+
+	UPROPERTY(Transient)
+	AEODLevelScriptActor* LevelScriptActor;
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	AEODLevelScriptActor* GetEODLevelScriptActor() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	ACameraActor* GetMainMenuCameraActor() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	ALevelSequenceActor* GetMainMenuLevelSeqActor() const;
 
 	/** Begin a new campaign */
 	UFUNCTION(BlueprintCallable, Category = "Utility")

@@ -3,12 +3,29 @@
 #include "MainMenuPlayerController.h"
 #include "EODGameInstance.h"
 #include "PlayerSaveGame.h"
+#include "EODLevelScriptActor.h"
 
+#include "EngineUtils.h"
+#include "Camera/CameraActor.h"
+#include "LevelSequenceActor.h"
+#include "LevelSequencePlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 AMainMenuPlayerController::AMainMenuPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	LevelSequenceTag = FName("MainMenuLevelSequence");
+	CameraActorTag = FName("MainMenuCamera");
+
+	/*
+	MainMenuAudioComponent = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, TEXT("MainMenuMusicComponent"));
+	if (MainMenuAudioComponent)
+	{
+		MainMenuAudioComponent->SetupAttachment(RootComponent);
+	}
+	*/
 }
 
 void AMainMenuPlayerController::BeginPlay()
@@ -21,6 +38,9 @@ void AMainMenuPlayerController::BeginPlay()
 		SwitchToTitleScreenWidget();
 		SwitchToUIInput();
 	}
+
+	LevelScriptActor = GetEODLevelScriptActor();
+	check(LevelScriptActor);
 }
 
 void AMainMenuPlayerController::Tick(float DeltaTime)
@@ -73,9 +93,32 @@ void AMainMenuPlayerController::SwitchToMainMenuWidget_Implementation(UPlayerSav
 	{
 		ActiveWidget = MainMenuWidget;
 		ActiveWidget->AddMenuToScreen();
-
-		// @todo load main menu widget state from player save game
 	}
+
+	if (LevelScriptActor)
+	{
+		LevelScriptActor->FadeInViewport();
+		LevelScriptActor->SwitchToBGM(MainMenuMusic);
+	}
+
+	if (MainMenuCameraActor == nullptr)
+	{
+		MainMenuCameraActor = GetMainMenuCameraActor();
+	}
+	if (MainMenuCameraActor)
+	{
+		SetViewTargetWithBlend(MainMenuCameraActor);
+	}
+
+	//~ @todo Play LoginIdle animation
+
+	/*
+	if (MainMenuAudioComponent && MainMenuMusic)
+	{
+		MainMenuAudioComponent->SetSound(MainMenuMusic);
+		MainMenuAudioComponent->Play();
+	}
+	*/
 }
 
 void AMainMenuPlayerController::SwitchToNewProfileCreationWidget_Implementation()
@@ -127,6 +170,75 @@ void AMainMenuPlayerController::SwitchToSettingsWidget_Implementation()
 		ActiveWidget = SettingsWidget;
 		ActiveWidget->AddMenuToScreen();
 	}
+}
+
+AEODLevelScriptActor* AMainMenuPlayerController::GetEODLevelScriptActor() const
+{
+	UWorld* World = GetWorld();
+	UClass* ActorClass = AEODLevelScriptActor::StaticClass();
+
+	// We do nothing if no is class provided, rather than giving ALL actors!
+	if (World)
+	{
+		for (TActorIterator<AActor> It(World, ActorClass); It; ++It)
+		{
+			AActor* Actor = *It;
+
+			AEODLevelScriptActor* LevelActor = Cast<AEODLevelScriptActor>(*It);
+			if (IsValid(LevelActor))
+			{
+				return LevelActor;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+ACameraActor* AMainMenuPlayerController::GetMainMenuCameraActor() const
+{
+	UWorld* World = GetWorld();
+	UClass* ActorClass = ACameraActor::StaticClass();
+
+	// We do nothing if no is class provided, rather than giving ALL actors!
+	if (World)
+	{
+		for (TActorIterator<AActor> It(World, ActorClass); It; ++It)
+		{
+			AActor* Actor = *It;
+
+			ACameraActor* CameraActor = Cast<ACameraActor>(*It);
+			if (IsValid(CameraActor) && CameraActor->Tags.Contains(CameraActorTag))
+			{
+				return CameraActor;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+ALevelSequenceActor* AMainMenuPlayerController::GetMainMenuLevelSeqActor() const
+{
+	UWorld* World = GetWorld();
+	UClass* ActorClass = ALevelSequenceActor::StaticClass();
+
+	// We do nothing if no is class provided, rather than giving ALL actors!
+	if (World)
+	{
+		for (TActorIterator<AActor> It(World, ActorClass); It; ++It)
+		{
+			AActor* Actor = *It;
+
+			ALevelSequenceActor* SeqActor = Cast<ALevelSequenceActor>(*It);
+			if (IsValid(SeqActor) && SeqActor->Tags.Contains(CameraActorTag))
+			{
+				return SeqActor;
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 void AMainMenuPlayerController::StartNewCampaign()

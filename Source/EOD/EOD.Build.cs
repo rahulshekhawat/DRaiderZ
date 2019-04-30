@@ -56,7 +56,8 @@ public class EOD : ModuleRules
                 "Json",
                 "MoviePlayer",
                 "GameplayTags",
-                "RHI"
+                "RHI",
+                "LevelSequence"
             }
         );
 
