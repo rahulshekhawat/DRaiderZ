@@ -31,7 +31,7 @@ void UOptionsWidgetBase::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UOptionsWidgetBase::InitializeOptions()
+void UOptionsWidgetBase::InitializeOptions(bool bForceUserSettingReload)
 {
 }
 
@@ -121,4 +121,10 @@ void UOptionsWidgetBase::GetQualityText(int32 InQualityLevel, FText& OutText)
 
 void UOptionsWidgetBase::SetSettingsParentWidget(USettingsWidget* NewParent)
 {
+	SettingsParentWidget = NewParent;
+}
+
+void UOptionsWidgetBase::SetDirty(bool bValue)
+{
+	bIsDirty = bValue;
 }

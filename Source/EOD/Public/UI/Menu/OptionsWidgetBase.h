@@ -47,7 +47,7 @@ public:
 	//  Widget Update
 	// --------------------------------------
 
-	virtual void InitializeOptions();
+	virtual void InitializeOptions(bool bForceUserSettingReload = false);
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	virtual void CloseDownOptions();
@@ -73,8 +73,13 @@ public:
 
 	FORCEINLINE USettingsWidget* GetSettingsParentWidget() const { return SettingsParentWidget; }
 
+	FORCEINLINE bool IsDirty() const { return bIsDirty; }
+
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void SetSettingsParentWidget(USettingsWidget* NewParent);
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetDirty(bool bValue);
 
 protected:
 

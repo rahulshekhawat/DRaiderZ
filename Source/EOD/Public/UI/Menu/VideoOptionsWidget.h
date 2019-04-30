@@ -92,7 +92,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void UpdateCurrentGraphicsQuality(UGameUserSettings* GameUserSettings = nullptr);
 
-	virtual void InitializeOptions() override;
+	virtual void InitializeOptions(bool bForceUserSettingReload = false) override;
 
 	virtual void CloseDownOptions() override;
 
@@ -118,6 +118,9 @@ protected:
 	
 	UFUNCTION()
 	void HandleGraphicsQualityButtonClicked();
+	
+	UFUNCTION()
+	void HandleGraphicsQualitySelected(int32 SelectedQuality);
 
 
 };

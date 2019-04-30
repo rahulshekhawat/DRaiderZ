@@ -88,7 +88,7 @@ public:
 	//  Widget Update
 	// --------------------------------------
 
-	virtual void InitializeOptions() override;
+	virtual void InitializeOptions(bool bForceUserSettingReload = false) override;
 	
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void UpdateCurrentAntiAliasing(UGameUserSettings* GameUserSettings = nullptr);
@@ -139,24 +139,24 @@ protected:
 	void HandleFoliageButtonClicked();
 
 	UFUNCTION()
-	void HandleAntiAliasingQualitySelected();
+	void HandleAntiAliasingQualitySelected(int32 SelectedQuality);
 
 	UFUNCTION()
-	void HandleViewDistanceQualitySelected();
+	void HandleViewDistanceQualitySelected(int32 SelectedQuality);
 
 	UFUNCTION()
-	void HandleEffectsQualitySelected();
+	void HandleEffectsQualitySelected(int32 SelectedQuality);
 
 	UFUNCTION()
-	void HandleLightingQualitySelected();
+	void HandleLightingQualitySelected(int32 SelectedQuality);
 
 	UFUNCTION()
-	void HandleTexturesQualitySelected();
+	void HandleTexturesQualitySelected(int32 SelectedQuality);
 
 	UFUNCTION()
-	void HandlePostProcessingQualitySelected();
+	void HandlePostProcessingQualitySelected(int32 SelectedQuality);
 
 	UFUNCTION()
-	void HandleFoliageQualitySelected();
+	void HandleFoliageQualitySelected(int32 SelectedQuality);
 
 };

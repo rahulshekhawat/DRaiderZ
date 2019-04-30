@@ -20,7 +20,7 @@ bool UAudioOptionsWidget::Initialize()
 		AudioQuality->OnClicked.AddDynamic(this, &UAudioOptionsWidget::HandleAudioQualityButtonClicked);
 		AudioQualitySub->OnQualitySelected.AddDynamic(this, &UAudioOptionsWidget::HandleAudioQualitySelected);
 
-		InitializeOptions();
+		InitializeOptions(true);
 		return true;
 	}
 
@@ -39,6 +39,8 @@ void UAudioOptionsWidget::NativePreConstruct()
 void UAudioOptionsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	InitializeOptions();
 }
 
 void UAudioOptionsWidget::NativeDestruct()
@@ -46,12 +48,12 @@ void UAudioOptionsWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UAudioOptionsWidget::InitializeOptions()
+void UAudioOptionsWidget::InitializeOptions(bool bForceUserSettingReload)
 {
 	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
 	if (GameUserSettings)
 	{
-		GameUserSettings->LoadSettings(true);
+		GameUserSettings->LoadSettings(bForceUserSettingReload);
 		UpdateCurrentAudioQuality(GameUserSettings);
 	}
 }
@@ -77,12 +79,13 @@ void UAudioOptionsWidget::HandleAudioQualityButtonClicked()
 	ToggleSubOptions(AudioQualitySub, AudioQuality);
 }
 
-void UAudioOptionsWidget::HandleAudioQualitySelected(int32 QualityLevelSelected)
+void UAudioOptionsWidget::HandleAudioQualitySelected(int32 SelectedQuality)
 {
 	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
-	if (GameUserSettings)
+	if (GameUserSettings && GameUserSettings->GetAudioQualityLevel() != SelectedQuality)
 	{
-		GameUserSettings->SetAudioQualityLevel(QualityLevelSelected);
+		bIsDirty = true;
+		GameUserSettings->SetAudioQualityLevel(SelectedQuality);
 	}
 	UpdateCurrentAudioQuality(GameUserSettings);
 

@@ -60,7 +60,7 @@ public:
 	//  Widget Update
 	// --------------------------------------
 
-	virtual void InitializeOptions() override;
+	virtual void InitializeOptions(bool bForceUserSettingReload = false) override;
 	
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void UpdateCurrentAudioQuality(UGameUserSettings* GameUserSettings = nullptr);
@@ -75,6 +75,6 @@ protected:
 	void HandleAudioQualityButtonClicked();
 
 	UFUNCTION()
-	void HandleAudioQualitySelected(int32 QualityLevelSelected);
+	void HandleAudioQualitySelected(int32 SelectedQuality);
 
 };

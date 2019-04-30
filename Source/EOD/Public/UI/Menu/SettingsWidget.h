@@ -13,6 +13,7 @@ class UWidgetSwitcher;
 class UOptionsWidgetBase;
 class UFooterButtonWidget;
 class URegularButtonWidget;
+class UActionConfirmationWidget;
 
 /**
  * 
@@ -101,7 +102,29 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void UnlockAllButtons();
 
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SaveUserSettings();
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void ReloadUserSettings();
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void ExitSettings();
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void ResetOptionWidgetsDirtyState();
+
 protected:
+
+	/** Returns true if a confirmation widget was added to screen */
+	bool SwitchToConfirmationWidget();
+
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Classes")
+	TSubclassOf<UActionConfirmationWidget> ConfirmationWidgetClass;
 
 	// --------------------------------------
 	//  Events
@@ -124,5 +147,11 @@ protected:
 	
 	UFUNCTION()
 	void HandleAdvancedButtonClicked();
+
+	UFUNCTION()
+	void SaveUserSettingsAndExit();
+	
+	UFUNCTION()
+	void ReloadUserSettingsAndExit();
 
 };

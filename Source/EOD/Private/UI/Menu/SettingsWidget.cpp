@@ -2,13 +2,17 @@
 
 
 #include "SettingsWidget.h"
+#include "EODLibrary.h"
 #include "EODPreprocessors.h"
 #include "OptionsWidgetBase.h"
 #include "RegularButtonWidget.h"
+#include "MainMenuPlayerController.h"
+#include "ActionConfirmationWidget.h"
 
 #include "Components/CanvasPanel.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetSwitcher.h"
+#include "GameFramework/GameUserSettings.h"
 
 USettingsWidget::USettingsWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -89,6 +93,74 @@ void USettingsWidget::UnlockAllButtons()
 	}
 }
 
+void USettingsWidget::SaveUserSettings()
+{
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	check(GameUserSettings);
+	GameUserSettings->ApplySettings(false);
+}
+
+void USettingsWidget::ReloadUserSettings()
+{
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings)
+	{
+		GameUserSettings->LoadSettings(true);
+		GameUserSettings->ApplySettings(false);
+	}
+}
+
+void USettingsWidget::ExitSettings()
+{
+	if (VideoOptionsMain->IsDirty() ||
+		GameOptionsMain->IsDirty() ||
+		AudioOptionsMain->IsDirty() ||
+		AdvancedOptionsMain->IsDirty()) 
+	{
+		bool bSwitchSuccessful = SwitchToConfirmationWidget();
+		if (bSwitchSuccessful)
+		{
+			return;
+		}
+	}
+
+	AMainMenuPlayerController* MainMenuPC = Cast<AMainMenuPlayerController>(GetOwningPlayer());
+	if (MainMenuPC)
+	{
+		MainMenuPC->SwitchToMainMenuWidget();
+	}
+}
+
+void USettingsWidget::ResetOptionWidgetsDirtyState()
+{
+	VideoOptionsMain->SetDirty(false);
+	GameOptionsMain->SetDirty(false);
+	AudioOptionsMain->SetDirty(false);
+	AdvancedOptionsMain->SetDirty(false);
+}
+
+bool USettingsWidget::SwitchToConfirmationWidget()
+{
+	UClass* WidgetClass = ConfirmationWidgetClass.Get();
+	if (WidgetClass == nullptr)
+	{
+		return false;
+	}
+
+	UActionConfirmationWidget* ConfirmationWidget = CreateWidget<UActionConfirmationWidget>(GetOwningPlayer(), WidgetClass);
+	if (ConfirmationWidget == nullptr)
+	{
+		return false;
+	}
+
+	ConfirmationWidget->OnYesButtonClicked.AddDynamic(this, &USettingsWidget::SaveUserSettingsAndExit);
+	ConfirmationWidget->OnNoButtonClicked.AddDynamic(this, &USettingsWidget::ReloadUserSettingsAndExit);
+
+	ConfirmationWidget->AddToViewport(100);
+
+	return true;
+}
+
 void USettingsWidget::HandleGameButtonClicked()
 {
 	//~ @todo
@@ -126,4 +198,18 @@ void USettingsWidget::HandleAdvancedButtonClicked()
 	check(OptionsNameTextBlock);
 	SetWidgetSwitcherLayout(AdvancedOptionsMain, AdvancedButton);
 	OptionsNameTextBlock->SetText(FText::FromString("ADVANCED"));
+}
+
+void USettingsWidget::SaveUserSettingsAndExit()
+{
+	SaveUserSettings();
+	ResetOptionWidgetsDirtyState();
+	ExitSettings();
+}
+
+void USettingsWidget::ReloadUserSettingsAndExit()
+{
+	ReloadUserSettings();
+	ResetOptionWidgetsDirtyState();
+	ExitSettings();
 }

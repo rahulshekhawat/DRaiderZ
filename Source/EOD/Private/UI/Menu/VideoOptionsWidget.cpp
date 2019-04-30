@@ -37,7 +37,9 @@ bool UVideoOptionsWidget::Initialize()
 		FrameRate->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleFrameRateButtonClicked);
 		GraphicsQuality->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleGraphicsQualityButtonClicked);
 
-		InitializeOptions();
+		GraphicsSub->OnQualitySelected.AddDynamic(this, &UVideoOptionsWidget::HandleGraphicsQualitySelected);
+
+		InitializeOptions(true);
 		return true;
 	}
 
@@ -61,6 +63,8 @@ void UVideoOptionsWidget::NativePreConstruct()
 void UVideoOptionsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	InitializeOptions();
 }
 
 void UVideoOptionsWidget::NativeDestruct()
@@ -130,12 +134,12 @@ void UVideoOptionsWidget::UpdateCurrentGraphicsQuality(UGameUserSettings* GameUs
 	}
 }
 
-void UVideoOptionsWidget::InitializeOptions()
+void UVideoOptionsWidget::InitializeOptions(bool bForceUserSettingReload)
 {
 	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
 	if (GameUserSettings)
 	{
-		GameUserSettings->LoadSettings(true);
+		GameUserSettings->LoadSettings(bForceUserSettingReload);
 		UpdateCurrentWindowMode(GameUserSettings);
 		UpdateCurrentResolution(GameUserSettings);
 		UpdateCurrentVerticalSync(GameUserSettings);
@@ -256,5 +260,24 @@ void UVideoOptionsWidget::HandleFrameRateButtonClicked()
 
 void UVideoOptionsWidget::HandleGraphicsQualityButtonClicked()
 {
+	ToggleSubOptions(GraphicsSub, GraphicsQuality);
+}
+
+void UVideoOptionsWidget::HandleGraphicsQualitySelected(int32 SelectedQuality)
+{
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings)
+	{
+		GameUserSettings->SetAntiAliasingQuality(SelectedQuality);
+		GameUserSettings->SetViewDistanceQuality(SelectedQuality);
+		GameUserSettings->SetVisualEffectQuality(SelectedQuality);
+		GameUserSettings->SetShadowQuality(SelectedQuality);
+		GameUserSettings->SetTextureQuality(SelectedQuality);
+		GameUserSettings->SetPostProcessingQuality(SelectedQuality);
+		GameUserSettings->SetFoliageQuality(SelectedQuality);
+	}
+
+	UpdateCurrentGraphicsQuality(GameUserSettings);
+
 	ToggleSubOptions(GraphicsSub, GraphicsQuality);
 }

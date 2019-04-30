@@ -40,9 +40,15 @@ bool UAdvancedOptionsWidget::Initialize()
 		PostProcessing->OnClicked.AddDynamic(this, &UAdvancedOptionsWidget::HandlePostProcessingButtonClicked);
 		Foliage->OnClicked.AddDynamic(this, &UAdvancedOptionsWidget::HandleFoliageButtonClicked);
 
+		AntiAliasingSub->OnQualitySelected.AddDynamic(this, &UAdvancedOptionsWidget::HandleAntiAliasingQualitySelected);
+		ViewDistanceSub->OnQualitySelected.AddDynamic(this, &UAdvancedOptionsWidget::HandleViewDistanceQualitySelected);
+		EffectsSub->OnQualitySelected.AddDynamic(this, &UAdvancedOptionsWidget::HandleEffectsQualitySelected);
+		LightingSub->OnQualitySelected.AddDynamic(this, &UAdvancedOptionsWidget::HandleLightingQualitySelected);
+		TexturesSub->OnQualitySelected.AddDynamic(this, &UAdvancedOptionsWidget::HandleTexturesQualitySelected);
+		PostProcessingSub->OnQualitySelected.AddDynamic(this, &UAdvancedOptionsWidget::HandlePostProcessingQualitySelected);
+		FoliageSub->OnQualitySelected.AddDynamic(this, &UAdvancedOptionsWidget::HandleFoliageQualitySelected);
 
-
-		InitializeOptions();
+		InitializeOptions(true);
 		return true;
 	}
 
@@ -73,6 +79,8 @@ void UAdvancedOptionsWidget::NativePreConstruct()
 void UAdvancedOptionsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	InitializeOptions();
 }
 
 void UAdvancedOptionsWidget::NativeDestruct()
@@ -80,12 +88,12 @@ void UAdvancedOptionsWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UAdvancedOptionsWidget::InitializeOptions()
+void UAdvancedOptionsWidget::InitializeOptions(bool bForceUserSettingReload)
 {
 	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
 	if (GameUserSettings)
 	{
-		GameUserSettings->LoadSettings(true);
+		GameUserSettings->LoadSettings(bForceUserSettingReload);
 		UpdateCurrentAntiAliasing(GameUserSettings);
 		UpdateCurrentViewDistance(GameUserSettings);
 		UpdateCurrentEffects(GameUserSettings);
@@ -243,30 +251,30 @@ void UAdvancedOptionsWidget::HandleFoliageButtonClicked()
 	ToggleSubOptions(FoliageSub, Foliage);
 }
 
-void UAdvancedOptionsWidget::HandleAntiAliasingQualitySelected()
+void UAdvancedOptionsWidget::HandleAntiAliasingQualitySelected(int32 SelectedQuality)
 {
 }
 
-void UAdvancedOptionsWidget::HandleViewDistanceQualitySelected()
+void UAdvancedOptionsWidget::HandleViewDistanceQualitySelected(int32 SelectedQuality)
 {
 }
 
-void UAdvancedOptionsWidget::HandleEffectsQualitySelected()
+void UAdvancedOptionsWidget::HandleEffectsQualitySelected(int32 SelectedQuality)
 {
 }
 
-void UAdvancedOptionsWidget::HandleLightingQualitySelected()
+void UAdvancedOptionsWidget::HandleLightingQualitySelected(int32 SelectedQuality)
 {
 }
 
-void UAdvancedOptionsWidget::HandleTexturesQualitySelected()
+void UAdvancedOptionsWidget::HandleTexturesQualitySelected(int32 SelectedQuality)
 {
 }
 
-void UAdvancedOptionsWidget::HandlePostProcessingQualitySelected()
+void UAdvancedOptionsWidget::HandlePostProcessingQualitySelected(int32 SelectedQuality)
 {
 }
 
-void UAdvancedOptionsWidget::HandleFoliageQualitySelected()
+void UAdvancedOptionsWidget::HandleFoliageQualitySelected(int32 SelectedQuality)
 {
 }
