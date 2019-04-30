@@ -9,6 +9,8 @@
 class UScrollButtonWidget;
 class UVideoOptionsWidget;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWindowModeSelectedMCDelegate, EWindowMode::Type, SelectedWindowMode);
+
 /**
  * 
  */
@@ -55,6 +57,25 @@ protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
 	UVideoOptionsWidget* ParentOptionsWidget;
+	
+public:
 
+	// --------------------------------------
+	//  Events
+	// --------------------------------------
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
+	FWindowModeSelectedMCDelegate OnWindowModeSelected;
+
+protected:
+
+	UFUNCTION()
+	void HandleWindowButtonClicked();
+
+	UFUNCTION()
+	void HandleFullscreenButtonClicked();
+
+	UFUNCTION()
+	void HandleBorderlessButtonClicked();
 
 };

@@ -77,4 +77,16 @@ protected:
 	UFUNCTION()
 	void HandleAudioQualitySelected(int32 SelectedQuality);
 
+	UFUNCTION()
+	void HandleMasterSliderValueChanged(float NewValue);
+
+	UFUNCTION()
+	void HandleMusicSliderValueChanged(float NewValue);
+
+	UFUNCTION()
+	void HandleVoiceSliderValueChanged(float NewValue);
+	
+	UFUNCTION()
+	void HandleSFXSliderValueChanged(float NewValue);
+
 };

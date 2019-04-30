@@ -139,15 +139,13 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
 	FSliderChangeMCDelegate OnSliderValueChanged;
 
-private:
+protected:
 
 	UFUNCTION()
-	void OnMainButtonClicked();
+	virtual void OnMainButtonClicked();
 
 	UFUNCTION()
 	void OnOptionSliderValueChanged(float NewValue);
-
-protected:
 
 	// --------------------------------------
 	//  Handle Mouse Events

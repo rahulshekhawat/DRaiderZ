@@ -3,7 +3,7 @@
 
 #include "ResolutionSubWidget.h"
 #include "EODLibrary.h"
-#include "ScrollButtonWidget.h"
+#include "ResolutionButtonWidget.h"
 
 #include "Components/ScrollBox.h"
 #include "Components/ScrollBoxSlot.h"
@@ -48,7 +48,9 @@ void UResolutionSubWidget::SetParentOptionsWidget(UVideoOptionsWidget* NewParent
 void UResolutionSubWidget::GenerateAvailableResolutionButtons()
 {
 	FScreenResolutionArray ResolutionsArray;
-	if (RHIGetAvailableResolutions(ResolutionsArray, true))  // needs the "RHI" dependency
+	UClass* ButtonClass = ScrollButtonWidgetClass.Get();
+	APlayerController* OwningPlayer = GetOwningPlayer();
+	if (RHIGetAvailableResolutions(ResolutionsArray, true) && ButtonClass)  // needs the "RHI" dependency
 	{
 		for (const FScreenResolutionRHI& Resolution : ResolutionsArray)
 		{
@@ -57,29 +59,30 @@ void UResolutionSubWidget::GenerateAvailableResolutionButtons()
 				continue;
 			}
 
-			FString Str = FString::FromInt(Resolution.Width) + "x" + FString::FromInt(Resolution.Height);
-			AvailableResolutions.AddUnique(Str);
-		}
-	}
+			FIntPoint IntResolution = FIntPoint(Resolution.Width, Resolution.Height);
+			AvailableResolutions.Add(IntResolution);
 
-	UClass* ButtonClass = ScrollButtonWidgetClass.Get();
-	APlayerController* OwningPlayer = GetOwningPlayer();
-	if (ButtonClass && AvailableResolutions.Num() > 0)
-	{
-		for (FString Resolution : AvailableResolutions)
-		{
-			UScrollButtonWidget* ButtonWidget = CreateWidget<UScrollButtonWidget>(OwningPlayer, ButtonClass);
+			FString ResolutionStr = FString::FromInt(Resolution.Width) + "x" + FString::FromInt(Resolution.Height);
+			UResolutionButtonWidget* ButtonWidget = CreateWidget<UResolutionButtonWidget>(OwningPlayer, ButtonClass);
 			if (ButtonWidget)
 			{
-				ResolutionWidgets.AddUnique(ButtonWidget);
-				ButtonWidget->SetDisplayText(FText::FromString(Resolution));
+				ButtonWidget->ButtonResolution = IntResolution;
+				ButtonWidget->SetDisplayText(FText::FromString(ResolutionStr));
 				UScrollBoxSlot* ButtonSlot = Cast<UScrollBoxSlot>(ResolutionScroller->AddChild(ButtonWidget));
 				if (ButtonSlot)
 				{
 					ButtonSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
 					ButtonSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
 				}
+				ButtonWidget->OnClicked_ResolutionPayload.AddDynamic(this, &UResolutionSubWidget::HandleResolutionButtonClicked);
+
+				ResolutionWidgets.AddUnique(ButtonWidget);
 			}
 		}
 	}
+}
+
+void UResolutionSubWidget::HandleResolutionButtonClicked(FIntPoint ButtonResolution)
+{
+	OnResolutionSelected.Broadcast(ButtonResolution);
 }

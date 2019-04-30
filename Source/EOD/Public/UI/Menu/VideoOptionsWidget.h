@@ -121,6 +121,14 @@ protected:
 	
 	UFUNCTION()
 	void HandleGraphicsQualitySelected(int32 SelectedQuality);
-
+	
+	UFUNCTION()
+	void HandleWindowModeSelected(EWindowMode::Type SelectedWindowMode);
+	
+	UFUNCTION()
+	void HandleFrameRateSelected(float SelectedFrameRate);
+	
+	UFUNCTION()
+	void HandleResolutionSelected(FIntPoint SelectedResolution);
 
 };

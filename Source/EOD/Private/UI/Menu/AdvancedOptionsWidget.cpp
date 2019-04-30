@@ -48,6 +48,8 @@ bool UAdvancedOptionsWidget::Initialize()
 		PostProcessingSub->OnQualitySelected.AddDynamic(this, &UAdvancedOptionsWidget::HandlePostProcessingQualitySelected);
 		FoliageSub->OnQualitySelected.AddDynamic(this, &UAdvancedOptionsWidget::HandleFoliageQualitySelected);
 
+		ResolutionScale->OnSliderValueChanged.AddDynamic(this, &UAdvancedOptionsWidget::HandleResolutionScaleSliderValueChanged);
+
 		InitializeOptions(true);
 		return true;
 	}
@@ -253,28 +255,95 @@ void UAdvancedOptionsWidget::HandleFoliageButtonClicked()
 
 void UAdvancedOptionsWidget::HandleAntiAliasingQualitySelected(int32 SelectedQuality)
 {
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings && GameUserSettings->GetAntiAliasingQuality() != SelectedQuality)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetAntiAliasingQuality(SelectedQuality);
+	}
+	UpdateCurrentAntiAliasing(GameUserSettings);
+
+	ToggleSubOptions(AntiAliasingSub, AntiAliasing);
 }
 
 void UAdvancedOptionsWidget::HandleViewDistanceQualitySelected(int32 SelectedQuality)
 {
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings && GameUserSettings->GetViewDistanceQuality() != SelectedQuality)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetViewDistanceQuality(SelectedQuality);
+	}
+	UpdateCurrentViewDistance(GameUserSettings);
+
+	ToggleSubOptions(ViewDistanceSub, ViewDistance);
 }
 
 void UAdvancedOptionsWidget::HandleEffectsQualitySelected(int32 SelectedQuality)
 {
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings && GameUserSettings->GetVisualEffectQuality() != SelectedQuality)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetVisualEffectQuality(SelectedQuality);
+	}
+	UpdateCurrentEffects(GameUserSettings);
+
+	ToggleSubOptions(EffectsSub, Effects);
 }
 
 void UAdvancedOptionsWidget::HandleLightingQualitySelected(int32 SelectedQuality)
 {
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings && GameUserSettings->GetShadowQuality() != SelectedQuality)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetShadowQuality(SelectedQuality);
+	}
+	UpdateCurrentLighting(GameUserSettings);
+
+	ToggleSubOptions(LightingSub, Lighting);
 }
 
 void UAdvancedOptionsWidget::HandleTexturesQualitySelected(int32 SelectedQuality)
 {
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings && GameUserSettings->GetTextureQuality() != SelectedQuality)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetTextureQuality(SelectedQuality);
+	}
+	UpdateCurrentTextures(GameUserSettings);
+
+	ToggleSubOptions(TexturesSub, Textures);
 }
 
 void UAdvancedOptionsWidget::HandlePostProcessingQualitySelected(int32 SelectedQuality)
 {
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings && GameUserSettings->GetPostProcessingQuality() != SelectedQuality)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetPostProcessingQuality(SelectedQuality);
+	}
+	UpdateCurrentPostProcessing(GameUserSettings);
+
+	ToggleSubOptions(PostProcessingSub, PostProcessing);
 }
 
 void UAdvancedOptionsWidget::HandleFoliageQualitySelected(int32 SelectedQuality)
+{
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings && GameUserSettings->GetFoliageQuality() != SelectedQuality)
+	{
+		bIsDirty = true;
+		GameUserSettings->SetFoliageQuality(SelectedQuality);
+	}
+	UpdateCurrentFoliage(GameUserSettings);
+
+	ToggleSubOptions(FoliageSub, Foliage);
+}
+
+void UAdvancedOptionsWidget::HandleResolutionScaleSliderValueChanged(float NewValue)
 {
 }

@@ -3,6 +3,7 @@
 
 #include "AudioOptionsWidget.h"
 #include "EODLibrary.h"
+#include "EODPreprocessors.h"
 #include "QualitySettingSubWidget.h"
 #include "ScrollButtonWidget.h"
 
@@ -15,10 +16,20 @@ UAudioOptionsWidget::UAudioOptionsWidget(const FObjectInitializer& ObjectInitial
 bool UAudioOptionsWidget::Initialize()
 {
 	if (Super::Initialize() &&
-		AudioQuality)
+		AudioQuality &&
+		AudioQualitySub &&
+		Master &&
+		Music &&
+		Voice &&
+		SFX)
 	{
 		AudioQuality->OnClicked.AddDynamic(this, &UAudioOptionsWidget::HandleAudioQualityButtonClicked);
 		AudioQualitySub->OnQualitySelected.AddDynamic(this, &UAudioOptionsWidget::HandleAudioQualitySelected);
+
+		Master->OnSliderValueChanged.AddDynamic(this, &UAudioOptionsWidget::HandleMasterSliderValueChanged);
+		Music->OnSliderValueChanged.AddDynamic(this, &UAudioOptionsWidget::HandleMusicSliderValueChanged);
+		Voice->OnSliderValueChanged.AddDynamic(this, &UAudioOptionsWidget::HandleVoiceSliderValueChanged);
+		SFX->OnSliderValueChanged.AddDynamic(this, &UAudioOptionsWidget::HandleSFXSliderValueChanged);
 
 		InitializeOptions(true);
 		return true;
@@ -90,4 +101,20 @@ void UAudioOptionsWidget::HandleAudioQualitySelected(int32 SelectedQuality)
 	UpdateCurrentAudioQuality(GameUserSettings);
 
 	ToggleSubOptions(AudioQualitySub, AudioQuality);
+}
+
+void UAudioOptionsWidget::HandleMasterSliderValueChanged(float NewValue)
+{
+}
+
+void UAudioOptionsWidget::HandleMusicSliderValueChanged(float NewValue)
+{
+}
+
+void UAudioOptionsWidget::HandleVoiceSliderValueChanged(float NewValue)
+{
+}
+
+void UAudioOptionsWidget::HandleSFXSliderValueChanged(float NewValue)
+{
 }

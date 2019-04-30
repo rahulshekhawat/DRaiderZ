@@ -29,7 +29,9 @@ bool UVideoOptionsWidget::Initialize()
 		WindowModeSub &&
 		ResolutionSub &&
 		FrameRateSub &&
-		SubWidgetSwitcher)
+		SubWidgetSwitcher &&
+		GraphicsQuality &&
+		GraphicsSub)
 	{
 		WindowMode->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleWindowModeButtonClicked);
 		Resolution->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleResolutionButtonClicked);
@@ -37,7 +39,10 @@ bool UVideoOptionsWidget::Initialize()
 		FrameRate->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleFrameRateButtonClicked);
 		GraphicsQuality->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleGraphicsQualityButtonClicked);
 
+		WindowModeSub->OnWindowModeSelected.AddDynamic(this, &UVideoOptionsWidget::HandleWindowModeSelected);
 		GraphicsSub->OnQualitySelected.AddDynamic(this, &UVideoOptionsWidget::HandleGraphicsQualitySelected);
+		FrameRateSub->OnFrameRateSelected.AddDynamic(this, &UVideoOptionsWidget::HandleFrameRateSelected);
+		ResolutionSub->OnResolutionSelected.AddDynamic(this, &UVideoOptionsWidget::HandleResolutionSelected);
 
 		InitializeOptions(true);
 		return true;
@@ -280,4 +285,16 @@ void UVideoOptionsWidget::HandleGraphicsQualitySelected(int32 SelectedQuality)
 	UpdateCurrentGraphicsQuality(GameUserSettings);
 
 	ToggleSubOptions(GraphicsSub, GraphicsQuality);
+}
+
+void UVideoOptionsWidget::HandleWindowModeSelected(EWindowMode::Type SelectedWindowMode)
+{
+}
+
+void UVideoOptionsWidget::HandleFrameRateSelected(float SelectedFrameRate)
+{
+}
+
+void UVideoOptionsWidget::HandleResolutionSelected(FIntPoint SelectedResolution)
+{
 }

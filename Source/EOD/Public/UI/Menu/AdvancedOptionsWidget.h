@@ -158,5 +158,8 @@ protected:
 
 	UFUNCTION()
 	void HandleFoliageQualitySelected(int32 SelectedQuality);
+	
+	UFUNCTION()
+	void HandleResolutionScaleSliderValueChanged(float NewValue);
 
 };

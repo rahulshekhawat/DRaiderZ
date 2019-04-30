@@ -8,7 +8,9 @@
 
 class UScrollBox;
 class UVideoOptionsWidget;
-class UScrollButtonWidget;
+class UResolutionButtonWidget;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FResolutionSelectedMCDelegate, FIntPoint, SelectedResolution);
 
 /**
  * 
@@ -43,14 +45,14 @@ public:
 	UScrollBox* ResolutionScroller;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Container Child")
-	TArray<UScrollButtonWidget*> ResolutionWidgets;
+	TArray<UResolutionButtonWidget*> ResolutionWidgets;
 
 	// --------------------------------------
 	//  Pseudo Constants
 	// --------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Classes")
-	TSubclassOf<UScrollButtonWidget> ScrollButtonWidgetClass;
+	TSubclassOf<UResolutionButtonWidget> ScrollButtonWidgetClass;
 
 	// --------------------------------------
 	//  Utility
@@ -62,11 +64,25 @@ public:
 protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
-	TArray<FString> AvailableResolutions;
+	TArray<FIntPoint> AvailableResolutions;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
 	UVideoOptionsWidget* ParentOptionsWidget;
 
 	void GenerateAvailableResolutionButtons();
+
+public:
+
+	// --------------------------------------
+	//  Events
+	// --------------------------------------
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
+	FResolutionSelectedMCDelegate OnResolutionSelected;
+
+protected:
+
+	UFUNCTION()
+	void HandleResolutionButtonClicked(FIntPoint ButtonResolution);
 
 };
