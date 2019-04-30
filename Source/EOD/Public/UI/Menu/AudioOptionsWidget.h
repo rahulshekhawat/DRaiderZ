@@ -74,4 +74,7 @@ protected:
 	UFUNCTION()
 	void HandleAudioQualityButtonClicked();
 
+	UFUNCTION()
+	void HandleAudioQualitySelected(int32 QualityLevelSelected);
+
 };

@@ -40,6 +40,8 @@ bool UAdvancedOptionsWidget::Initialize()
 		PostProcessing->OnClicked.AddDynamic(this, &UAdvancedOptionsWidget::HandlePostProcessingButtonClicked);
 		Foliage->OnClicked.AddDynamic(this, &UAdvancedOptionsWidget::HandleFoliageButtonClicked);
 
+
+
 		InitializeOptions();
 		return true;
 	}
@@ -239,4 +241,32 @@ void UAdvancedOptionsWidget::HandlePostProcessingButtonClicked()
 void UAdvancedOptionsWidget::HandleFoliageButtonClicked()
 {
 	ToggleSubOptions(FoliageSub, Foliage);
+}
+
+void UAdvancedOptionsWidget::HandleAntiAliasingQualitySelected()
+{
+}
+
+void UAdvancedOptionsWidget::HandleViewDistanceQualitySelected()
+{
+}
+
+void UAdvancedOptionsWidget::HandleEffectsQualitySelected()
+{
+}
+
+void UAdvancedOptionsWidget::HandleLightingQualitySelected()
+{
+}
+
+void UAdvancedOptionsWidget::HandleTexturesQualitySelected()
+{
+}
+
+void UAdvancedOptionsWidget::HandlePostProcessingQualitySelected()
+{
+}
+
+void UAdvancedOptionsWidget::HandleFoliageQualitySelected()
+{
 }

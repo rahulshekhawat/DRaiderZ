@@ -8,6 +8,8 @@
 
 class UScrollButtonWidget;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQualityLevelSelectedMCDelegate, int32, QualityLevelSelected);
+
 /**
  * 
  */
@@ -48,7 +50,7 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UScrollButtonWidget* Cinematic;
-	
+
 	// --------------------------------------
 	//  Utility
 	// --------------------------------------
@@ -60,6 +62,32 @@ protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Utility")
 	UUserWidget* CustomParentWidget;
+
+public:
+
+	// --------------------------------------
+	//  Events
+	// --------------------------------------
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
+	FQualityLevelSelectedMCDelegate OnQualitySelected;
+
+protected:
+
+	UFUNCTION()
+	void HandleLowButtonClicked();
+
+	UFUNCTION()
+	void HandleMediumButtonClicked();
+
+	UFUNCTION()
+	void HandleHighButtonClicked();
+
+	UFUNCTION()
+	void HandleEpicButtonClicked();
+
+	UFUNCTION()
+	void HandleCinematicButtonClicked();
 
 
 };

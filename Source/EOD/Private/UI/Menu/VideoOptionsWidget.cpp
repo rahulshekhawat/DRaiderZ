@@ -7,6 +7,7 @@
 #include "WindowModeSubWidget.h"
 #include "ScrollButtonWidget.h"
 #include "FrameRateSubWidget.h"
+#include "QualitySettingSubWidget.h"
 #include "MainMenuPlayerController.h"
 
 #include "Components/ScrollBox.h"
@@ -34,6 +35,7 @@ bool UVideoOptionsWidget::Initialize()
 		Resolution->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleResolutionButtonClicked);
 		VerticalSync->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleVSyncButtonClicked);
 		FrameRate->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleFrameRateButtonClicked);
+		GraphicsQuality->OnClicked.AddDynamic(this, &UVideoOptionsWidget::HandleGraphicsQualityButtonClicked);
 
 		InitializeOptions();
 		return true;
@@ -91,6 +93,43 @@ void UVideoOptionsWidget::CloseDownOptions()
 	*/
 }
 
+void UVideoOptionsWidget::UpdateCurrentGraphicsQuality(UGameUserSettings* GameUserSettings)
+{
+	if (GameUserSettings == nullptr)
+	{
+		GameUserSettings = UEODLibrary::GetGameUserSettings();
+	}
+
+	check(GameUserSettings);
+	check(GraphicsQuality);
+
+	bool bCustom = false;
+	int32 AAQL = GameUserSettings->GetAntiAliasingQuality();
+	int32 VDQL = GameUserSettings->GetViewDistanceQuality();
+	int32 VEQL = GameUserSettings->GetVisualEffectQuality();
+	int32 ShadowQL = GameUserSettings->GetShadowQuality();
+	int32 TQL = GameUserSettings->GetTextureQuality();
+	int32 PPQL = GameUserSettings->GetPostProcessingQuality();
+	int32 FQL = GameUserSettings->GetFoliageQuality();
+
+	// If even one of the quality level is different from the rest
+	if (AAQL != VDQL && AAQL != VEQL && AAQL != ShadowQL && AAQL != TQL && AAQL != PPQL && AAQL != FQL)
+	{
+		bCustom = true;
+	}
+
+	if (bCustom)
+	{
+		GraphicsQuality->SetInfoText(FText::FromString("CUSTOM"));
+	}
+	else
+	{
+		FText QLText;
+		GetQualityText(AAQL, QLText);
+		GraphicsQuality->SetInfoText(QLText);		
+	}
+}
+
 void UVideoOptionsWidget::InitializeOptions()
 {
 	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
@@ -101,6 +140,7 @@ void UVideoOptionsWidget::InitializeOptions()
 		UpdateCurrentResolution(GameUserSettings);
 		UpdateCurrentVerticalSync(GameUserSettings);
 		UpdateCurrentFrameRate(GameUserSettings);
+		UpdateCurrentGraphicsQuality(GameUserSettings);
 	}
 }
 
@@ -212,4 +252,9 @@ void UVideoOptionsWidget::HandleVSyncButtonClicked()
 void UVideoOptionsWidget::HandleFrameRateButtonClicked()
 {
 	ToggleSubOptions(FrameRateSub, FrameRate);
+}
+
+void UVideoOptionsWidget::HandleGraphicsQualityButtonClicked()
+{
+	ToggleSubOptions(GraphicsSub, GraphicsQuality);
 }

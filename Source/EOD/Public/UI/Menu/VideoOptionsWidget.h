@@ -13,6 +13,7 @@ class UScrollButtonWidget;
 class UResolutionSubWidget;
 class UWindowModeSubWidget;
 class UFrameRateSubWidget;
+class UQualitySettingSubWidget;
 
 /**
  * 
@@ -47,6 +48,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UScrollButtonWidget* Resolution;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UScrollButtonWidget* GraphicsQuality;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UScrollButtonWidget* VerticalSync;
@@ -63,6 +67,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UResolutionSubWidget* ResolutionSub;
 	
+	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
+	UQualitySettingSubWidget* GraphicsSub;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UFrameRateSubWidget* FrameRateSub;
 
@@ -81,6 +88,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void UpdateCurrentFrameRate(UGameUserSettings* GameUserSettings = nullptr);
+	
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void UpdateCurrentGraphicsQuality(UGameUserSettings* GameUserSettings = nullptr);
 
 	virtual void InitializeOptions() override;
 
@@ -106,8 +116,8 @@ protected:
 	UFUNCTION()
 	void HandleFrameRateButtonClicked();
 	
-	// UFUNCTION()
-	// void HandleGammaButtonClicked();
+	UFUNCTION()
+	void HandleGraphicsQualityButtonClicked();
 
 
 };

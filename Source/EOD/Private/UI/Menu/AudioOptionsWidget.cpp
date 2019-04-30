@@ -18,6 +18,7 @@ bool UAudioOptionsWidget::Initialize()
 		AudioQuality)
 	{
 		AudioQuality->OnClicked.AddDynamic(this, &UAudioOptionsWidget::HandleAudioQualityButtonClicked);
+		AudioQualitySub->OnQualitySelected.AddDynamic(this, &UAudioOptionsWidget::HandleAudioQualitySelected);
 
 		InitializeOptions();
 		return true;
@@ -73,5 +74,17 @@ void UAudioOptionsWidget::UpdateCurrentAudioQuality(UGameUserSettings* GameUserS
 
 void UAudioOptionsWidget::HandleAudioQualityButtonClicked()
 {
+	ToggleSubOptions(AudioQualitySub, AudioQuality);
+}
+
+void UAudioOptionsWidget::HandleAudioQualitySelected(int32 QualityLevelSelected)
+{
+	UGameUserSettings* GameUserSettings = UEODLibrary::GetGameUserSettings();
+	if (GameUserSettings)
+	{
+		GameUserSettings->SetAudioQualityLevel(QualityLevelSelected);
+	}
+	UpdateCurrentAudioQuality(GameUserSettings);
+
 	ToggleSubOptions(AudioQualitySub, AudioQuality);
 }

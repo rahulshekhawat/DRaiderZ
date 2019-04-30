@@ -138,5 +138,25 @@ protected:
 	UFUNCTION()
 	void HandleFoliageButtonClicked();
 
+	UFUNCTION()
+	void HandleAntiAliasingQualitySelected();
+
+	UFUNCTION()
+	void HandleViewDistanceQualitySelected();
+
+	UFUNCTION()
+	void HandleEffectsQualitySelected();
+
+	UFUNCTION()
+	void HandleLightingQualitySelected();
+
+	UFUNCTION()
+	void HandleTexturesQualitySelected();
+
+	UFUNCTION()
+	void HandlePostProcessingQualitySelected();
+
+	UFUNCTION()
+	void HandleFoliageQualitySelected();
 
 };
