@@ -10,6 +10,7 @@
 #define MIN_SCREEN_HEIGHT 768
 
 class UTexture;
+class USoundBase;
 class UGameSingleton;
 class UGameUserSettings;
 
@@ -119,7 +120,10 @@ public:
 	static UGameSingleton* GetGameSingleton();
 	
 	static UGameUserSettings* GetGameUserSettings();
-	
+
+	UFUNCTION(BlueprintCallable, Category = "EOD Library")
+	static USoundBase* GetRandomSound(const TArray<USoundBase*> Sounds);
+
 };
 
 template<typename ObjType = UObject>
