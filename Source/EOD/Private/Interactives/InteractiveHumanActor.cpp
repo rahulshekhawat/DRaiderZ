@@ -2,10 +2,13 @@
 
 
 #include "InteractiveHumanActor.h"
+#include "EODPreprocessors.h"
+#include "EODGlobalNames.h"
 
 #include "Engine/CollisionProfile.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 const FName AInteractiveHumanActor::CapsuleComponentName(TEXT("CollisionCylinder"));
 const FName AInteractiveHumanActor::HairComponentName(TEXT("Hair"));
@@ -20,6 +23,8 @@ const FName AInteractiveHumanActor::InteractionCameraComponentName(TEXT("Camera"
 
 AInteractiveHumanActor::AInteractiveHumanActor(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(AInteractiveHumanActor::CapsuleComponentName);
 	if (CapsuleComponent)
 	{
@@ -58,6 +63,39 @@ AInteractiveHumanActor::AInteractiveHumanActor(const FObjectInitializer& ObjectI
 	Feet				= CreateNewArmorComponent(AInteractiveHumanActor::FeetComponentName, ObjectInitializer);
 
 	SetMasterPoseComponentForMeshes();
+
+	ClothOverrideColor = FLinearColor::Black;
+	HairOverrideColor = FLinearColor::Black;
+	HatItemOverrideColor = FLinearColor::Black;
+}
+
+void AInteractiveHumanActor::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	TArray<UActorComponent*> SkeletalMeshComponentArray = this->GetComponentsByClass(USkeletalMeshComponent::StaticClass());
+	for (UActorComponent* ActorComp : SkeletalMeshComponentArray)
+	{
+		USkeletalMeshComponent* SMComp = Cast<USkeletalMeshComponent>(ActorComp);
+		if (!IsValid(SMComp))
+		{
+			continue;
+		}
+
+		if (SMComp->GetFName() == AInteractiveHumanActor::HairComponentName)
+		{
+			SMComp->SetVectorParameterValueOnMaterials(MaterialParameterNames::BaseColor, FVector(HairOverrideColor));
+		}
+		else if (SMComp->GetFName() == AInteractiveHumanActor::HatItemComponentName)
+		{
+			SMComp->SetVectorParameterValueOnMaterials(MaterialParameterNames::BaseColor, FVector(HatItemOverrideColor));
+
+		}
+		else
+		{
+			SMComp->SetVectorParameterValueOnMaterials(MaterialParameterNames::BaseColor, FVector(ClothOverrideColor));
+		}
+	}
 }
 
 void AInteractiveHumanActor::BeginPlay()

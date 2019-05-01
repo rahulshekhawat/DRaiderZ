@@ -26,9 +26,24 @@ public:
 
 	AInteractiveHumanActor(const FObjectInitializer& ObjectInitializer);
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	// --------------------------------------
+	//  Psuedo Constants
+	// --------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Material Colors")
+	FLinearColor ClothOverrideColor;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Material Colors")
+	FLinearColor HairOverrideColor;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Material Colors")
+	FLinearColor HatItemOverrideColor;
 
 	// --------------------------------------
 	//  Interaction Interface
