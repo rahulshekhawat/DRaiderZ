@@ -89,7 +89,6 @@ void AInteractiveHumanActor::OnConstruction(const FTransform& Transform)
 		else if (SMComp->GetFName() == AInteractiveHumanActor::HatItemComponentName)
 		{
 			SMComp->SetVectorParameterValueOnMaterials(MaterialParameterNames::BaseColor, FVector(HatItemOverrideColor));
-
 		}
 		else
 		{
