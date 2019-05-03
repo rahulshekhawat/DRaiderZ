@@ -58,8 +58,14 @@ struct EOD_API FActiveSkillLevelUpInfo
 	float Cooldown;
 
 	//~ @todo
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
 	TSoftClassPtr<UGameplayEffectBase> GameplayEffectSoftClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	EGameplayEffectActivationCondition GameplayEffectActivationCondition;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	EGameplayEffectAuthority GameplayEffectAuthority;
 
 	FActiveSkillLevelUpInfo()
 	{
@@ -74,6 +80,8 @@ struct EOD_API FActiveSkillLevelUpInfo
 		CrowdControlImmunities = 0;
 		Cooldown = 0.f;
 		GameplayEffectSoftClass = NULL;
+		GameplayEffectActivationCondition = EGameplayEffectActivationCondition::ActivatesOnSkillTrigger;
+		GameplayEffectAuthority = EGameplayEffectAuthority::ClientOwner;
 	}
 };
 
@@ -86,6 +94,7 @@ class EOD_API UActiveSkillBase : public UPlayerSkillBase
 	GENERATED_BODY()
 
 public:
+
 	UActiveSkillBase(const FObjectInitializer& ObjectInitializer);
 
 	// --------------------------------------
@@ -95,7 +104,32 @@ public:
 	/** Initialize this skill. Intended to be called immediately after the skill object is created */
 	virtual void InitSkill(AEODCharacterBase* Instigator, AController* Owner) override;
 
+	/**
+	 * Returns true if the skill owner has enough stats to commit this skill
+	 * @note Intended to be called from server or client owner
+	 */
+	virtual bool CanCommitSkill() const;
+
+	/**
+	 * Commits this ability by deducting skill cost from player stats
+	 * @note Intended to be called from server or client owner
+	 */
 	virtual void CommitSkill();
+
+	virtual void ApplyRotation();
+
+	virtual bool CanTriggerSkill() const;
+
+	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
+	virtual void TriggerSkill() override;
+
+	/** Returns true if this skill can be cancelled */
+	virtual bool CanCancelSkill() const override;
+
+	/** Cancel this skill */
+	virtual void CancelSkill() override;
+
+	virtual void FinishSkill() override;
 
 	inline FActiveSkillLevelUpInfo GetCurrentSkillLevelupInfo() const;
 
@@ -110,7 +144,7 @@ protected:
 	virtual void UpdateCooldown() override;
 
 	// --------------------------------------
-	//  Constants : Default values that are not supposed to be modified
+	//  Pseudo Constants : Default values that are not supposed to be modified
 	// --------------------------------------
 	
 	/**
@@ -155,6 +189,8 @@ protected:
 
 	UFUNCTION()
 	virtual void OnMaleAnimationsLoaded();
+
+	FTimerHandle SkillTimerHandle;
 
 };
 

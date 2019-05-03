@@ -4,36 +4,169 @@
 #include "EODCharacterBase.h"
 #include "EODGameInstance.h"
 #include "PlayerSkillsComponent.h"
+#include "EODPlayerController.h"
+#include "PlayerStatsComponent.h"
+#include "EODCharacterMovementComponent.h"
 
 #include "TimerManager.h"
 
 UActiveSkillBase::UActiveSkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	SupersedingSkillGroup = NAME_None;
-	AnimationStartSectionName = FName("Default");
-	CooldownRemaining = 0.f;
+	SupersedingSkillGroup			= NAME_None;
+	AnimationStartSectionName		= FName("Default");
+	CooldownRemaining				= 0.f;
 }
 
 void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
 {
 	Super::InitSkill(Instigator, Owner);
 
-	if (Instigator)
+	check(Instigator);
+	if (Instigator->Gender == ECharacterGender::Female)
 	{
-		if (Instigator->Gender == ECharacterGender::Female)
+		LoadFemaleAnimations();
+	}
+	else
+	{
+		LoadMaleAnimations();
+	}
+}
+
+bool UActiveSkillBase::CanCommitSkill() const
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	AEODPlayerController* PC = Instigator ? Cast<AEODPlayerController>(Instigator->Controller) : nullptr;
+
+	UPlayerStatsComponent* StatsComponent = PC ? PC->GetStatsComponent() : nullptr;
+	if (StatsComponent)
+	{
+		const FActiveSkillLevelUpInfo LevelUpInfo = GetCurrentSkillLevelupInfo();
+		if (StatsComponent->GetCurrentStamina() >= LevelUpInfo.StaminaCost &&
+			StatsComponent->GetCurrentMana() >= LevelUpInfo.ManaCost)
 		{
-			LoadFemaleAnimations();
-		}
-		else
-		{
-			LoadMaleAnimations();
+			return true;
 		}
 	}
+
+	return false;
 }
 
 void UActiveSkillBase::CommitSkill()
 {
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	AEODPlayerController* PC = Instigator ? Cast<AEODPlayerController>(Instigator->Controller) : nullptr;
 
+	UPlayerStatsComponent* StatsComponent = PC ? PC->GetStatsComponent() : nullptr;
+	if (StatsComponent)
+	{
+		const FActiveSkillLevelUpInfo LevelUpInfo = GetCurrentSkillLevelupInfo();
+
+		int32 StaminaChange = -1 * LevelUpInfo.StaminaCost;
+		int32 ManaChange = -1 * LevelUpInfo.ManaCost;
+		StatsComponent->ModifyCurrentStamina(StaminaChange);
+		StatsComponent->ModifyCurrentMana(ManaChange);
+	}
+}
+
+void UActiveSkillBase::ApplyRotation()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(Instigator->GetCharacterMovement());
+	if (MoveComp)
+	{
+		float DesiredRotationYaw = Instigator->GetControllerRotationYaw();
+		MoveComp->SetDesiredCustomRotationYaw(DesiredRotationYaw);
+	}
+}
+
+bool UActiveSkillBase::CanTriggerSkill() const
+{
+	// Along with UPlayerSkillBase::CanTriggerSkill() implementation, also check if player has enough stats to commit this skill.
+	return CanCommitSkill() && Super::CanTriggerSkill();
+}
+
+void UActiveSkillBase::TriggerSkill()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (!Instigator)
+	{
+		return;
+	}
+
+	bool bIsLocalPlayerController = Instigator->Controller && Instigator->Controller->IsLocalPlayerController();
+	if (bIsLocalPlayerController)
+	{
+		ApplyRotation();
+
+		Instigator->SetCharacterStateAllowsMovement(false);
+		Instigator->SetCharacterStateAllowsRotation(false);
+
+		//~ consume stamina and mana
+		CommitSkill();
+
+		StartCooldown();
+	}
+
+	bool bHasController = Instigator->Controller != nullptr;
+	if (bHasController)
+	{
+		FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
+		StateInfo.NewReplicationIndex = Instigator->CharacterStateInfo.NewReplicationIndex + 1;
+		Instigator->CharacterStateInfo = StateInfo;
+	}
+
+	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
+	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
+	if (Montage)
+	{
+		SkillDuration = Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
+		float ActualSkillDuration;
+
+		if (Montage->BlendOutTriggerTime >= 0.f)
+		{
+			ActualSkillDuration = SkillDuration;
+		}
+		else
+		{
+			ActualSkillDuration = SkillDuration - Montage->BlendOut.GetBlendTime();
+		}
+
+		UWorld* World = Instigator->GetWorld();
+		check(World);
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUObject(this, &UActiveSkillBase::FinishSkill);
+		World->GetTimerManager().SetTimer(SkillTimerHandle, TimerDelegate, ActualSkillDuration, false);
+	}
+	else
+	{
+		Instigator->ResetState();
+	}
+}
+
+bool UActiveSkillBase::CanCancelSkill() const
+{
+	return false;
+}
+
+void UActiveSkillBase::CancelSkill()
+{
+
+
+}
+
+void UActiveSkillBase::FinishSkill()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (Instigator)
+	{
+		Instigator->ResetState();
+	}
+
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if (SkillsComp)
+	{
+		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
+	}
 }
 
 void UActiveSkillBase::LoadFemaleAnimations()

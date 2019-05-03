@@ -22,9 +22,6 @@ public:
 	//	Gameplay Skill Interface
 	// --------------------------------------
 
-	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
-	virtual void TriggerSkill() override;
-
 	/** Returns true if this skill can be cancelled */
 	virtual bool CanCancelSkill() const override;
 
@@ -33,8 +30,5 @@ public:
 
 	virtual void FinishSkill() override;
 
-protected:
-
-	FTimerHandle SkillTimerHandle;
 
 };

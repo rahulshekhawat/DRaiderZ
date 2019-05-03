@@ -215,19 +215,16 @@ protected:
 	/** Called to activate this status effect on a recipient character */
 	UFUNCTION(BlueprintNativeEvent, Category = StatusEffects)
 	void ActivateStatusEffect(AEODCharacterBase* TargetCharacter);
+	virtual void ActivateStatusEffect_Implementation(AEODCharacterBase* TargetCharacter);
 
 	/** Called to deactivate this status effect on a recipient character */
 	UFUNCTION(BlueprintNativeEvent, Category = StatusEffects)
 	void DeactivateStatusEffect(AEODCharacterBase* TargetCharacter);
+	virtual void DeactivateStatusEffect_Implementation(AEODCharacterBase* TargetCharacter);
 
 	/** Called to process the ticking of this status effect. Must be overridden in inherited classes */
 	UFUNCTION(BlueprintNativeEvent, Category = StatusEffects)
 	void OnStatusEffectTick(AEODCharacterBase* TargetCharacter);
-
-	virtual void ActivateStatusEffect_Implementation(AEODCharacterBase* TargetCharacter);
-
-	virtual void DeactivateStatusEffect_Implementation(AEODCharacterBase* TargetCharacter);
-
 	virtual void OnStatusEffectTick_Implementation(AEODCharacterBase* TargetCharacter);
 
 	// @todo add buffs/debuffs that activate on getting hit by another spell, buff, etc. - if that is even practical

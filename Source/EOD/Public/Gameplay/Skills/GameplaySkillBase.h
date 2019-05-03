@@ -123,7 +123,7 @@ protected:
 	// --------------------------------------
 
 	/** This skill's instigator */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly)
 	TWeakObjectPtr<AEODCharacterBase> SkillInstigator;
 
 	/** Skill component of this skill's instigator */

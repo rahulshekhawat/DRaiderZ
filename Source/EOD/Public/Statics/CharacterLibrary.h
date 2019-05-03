@@ -32,6 +32,27 @@ enum class ECharMovementDirection : uint8
 	BR 		UMETA(DisplayName = "Backward Right"),
 };
 
+/** This enum describes the condition for a gameplay effect from skill to activate */
+UENUM(BlueprintType)
+enum class EGameplayEffectActivationCondition : uint8
+{
+	ActivatesOnSkillTrigger,
+	ActivatesOnSkillRelease,
+	ActivatesOnSkillCancel,
+	ActivatesOnSkillFinish,
+	ActivatesOnSuccessfulAttack,
+	ActivatesOnUnsuccessfulAttack,
+	ActivatesOnGettingHit,
+};
+
+UENUM(BlueprintType)
+enum class EGameplayEffectAuthority : uint8
+{
+	Server,
+	ClientOwner,
+	AnyClient
+};
+
 /** This enum describes the cause of character death */
 UENUM(BlueprintType)
 enum class ECauseOfDeath : uint8

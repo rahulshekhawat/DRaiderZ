@@ -9,68 +9,6 @@ UInstantMeleeSkill::UInstantMeleeSkill(const FObjectInitializer& ObjectInitializ
 {
 }
 
-void UInstantMeleeSkill::TriggerSkill()
-{
-	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	if (!Instigator)
-	{
-		return;
-	}
-
-	bool bIsLocalPlayerController = Instigator->Controller && Instigator->Controller->IsLocalPlayerController();
-	if (bIsLocalPlayerController)
-	{
-		float DesiredRotationYaw = Instigator->GetControllerRotationYaw();
-		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(Instigator->GetCharacterMovement());
-		if (MoveComp)
-		{
-			MoveComp->SetDesiredCustomRotationYaw(DesiredRotationYaw);
-		}
-
-		Instigator->SetCharacterStateAllowsMovement(false);
-		Instigator->SetCharacterStateAllowsRotation(false);
-
-		//~ @todo consume stamina and mana
-
-		StartCooldown();
-	}
-
-	bool bHasController = Instigator->Controller != nullptr;
-	if (bHasController)
-	{
-		FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
-		StateInfo.NewReplicationIndex = Instigator->CharacterStateInfo.NewReplicationIndex + 1;
-		Instigator->CharacterStateInfo = StateInfo;
-	}
-
-	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
-	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
-	if (Montage)
-	{
-		SkillDuration = Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
-		float ActualSkillDuration;
-
-		if (Montage->BlendOutTriggerTime >= 0.f)
-		{
-			ActualSkillDuration = SkillDuration;
-		}
-		else
-		{
-			ActualSkillDuration = SkillDuration - Montage->BlendOut.GetBlendTime();
-		}
-
-		UWorld* World = Instigator->GetWorld();
-		check(World);
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindUObject(this, &UInstantMeleeSkill::FinishSkill);
-		World->GetTimerManager().SetTimer(SkillTimerHandle, TimerDelegate, ActualSkillDuration, false);
-	}
-	else
-	{
-		Instigator->ResetState();
-	}
-}
-
 bool UInstantMeleeSkill::CanCancelSkill() const
 {
 	return true;
