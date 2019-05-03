@@ -31,6 +31,11 @@ void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Own
 	}
 }
 
+void UActiveSkillBase::CommitSkill()
+{
+
+}
+
 void UActiveSkillBase::LoadFemaleAnimations()
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();

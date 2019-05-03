@@ -95,10 +95,28 @@ void UGameplaySkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase
 
 void UGameplaySkillsComponent::CancelSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
 {
+	check(SkillIndexToSkillMap.Contains(SkillIndex));
+	if (Skill == nullptr)
+	{
+		Skill = SkillIndexToSkillMap[SkillIndex];
+	}
+
+	if (ActiveSkills.Contains(Skill))
+	{
+		Skill->CancelSkill();
+	}
 }
 
 void UGameplaySkillsComponent::CancelAllActiveSkills()
 {
+	// It's important to loop in reverse because Skill->CancelSkill() modifies the ActiveSkills array.
+	int32 SkillsNum = ActiveSkills.Num();
+	for (int i = SkillsNum - 1; i >= 0; i--)
+	{
+		UGameplaySkillBase* Skill = ActiveSkills[i];
+		check(Skill);
+		Skill->CancelSkill();
+	}
 }
 
 bool UGameplaySkillsComponent::CanUseAnySkill() const

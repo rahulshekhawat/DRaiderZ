@@ -684,6 +684,20 @@ void AHumanCharacter::OnNormalAttackSectionStart(FName SectionName)
 	}
 
 	// @todo set current active skill
+
+	if (CurrentAttackInfoPtr.IsValid())
+	{
+		CurrentAttackInfoPtr.Reset();
+	}
+
+	CurrentAttackInfoPtr = MakeShareable(new FAttackInfo);
+	if (CurrentAttackInfoPtr.IsValid())
+	{
+		CurrentAttackInfoPtr->bUnblockable = false;
+		CurrentAttackInfoPtr->bUndodgable = false;
+		CurrentAttackInfoPtr->CrowdControlEffect = ECrowdControlEffect::Flinch;
+		CurrentAttackInfoPtr->DamageType = EDamageType::Physical;
+	}
 }
 
 void AHumanCharacter::SetNormalAttackSectionChangeAllowed(bool bNewValue)

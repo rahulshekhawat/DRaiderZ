@@ -133,6 +133,13 @@ bool APlayerCharacter::CanUseAnySkill() const
 	return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsNormalAttacking());
 }
 
+void APlayerCharacter::PlaySystemSound(USoundBase* SoundToPlay)
+{
+	check(SystemAudioComponent);
+	SystemAudioComponent->SetSound(SoundToPlay);
+	SystemAudioComponent->Play();
+}
+
 bool APlayerCharacter::CCEFlinch_Implementation(const float BCAngle)
 {
 	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Flinch.Get())

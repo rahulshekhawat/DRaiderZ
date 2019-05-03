@@ -19,10 +19,12 @@ bool UPlayerSkillBase::CanPlayerActivateThisSkill() const
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	EWeaponType EquippedWeaponType = Instigator ? Instigator->GetEquippedWeaponType() : EWeaponType::None;
 
+	// bool bUnlocked = IsUnlocked();
 	bool bHasValidWeapon = EquippedWeaponType != EWeaponType::None && IsWeaponTypeSupported(EquippedWeaponType) && !Instigator->IsWeaponSheathed();
 	bool bInCooldown = IsSkillInCooldown();
 	bool bHasNoPrecedingSkillGroups = PrecedingSkillGroups.Num() == 0;
 
+	// return bHasValidWeapon && !bInCooldown && bHasNoPrecedingSkillGroups && bUnlocked;
 	return bHasValidWeapon && !bInCooldown && bHasNoPrecedingSkillGroups;
 }
 

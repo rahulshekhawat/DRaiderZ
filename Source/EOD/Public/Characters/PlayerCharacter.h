@@ -152,7 +152,7 @@ public:
 	virtual bool CanGuardAgainstAttacks() const override;
 
 	/** Returns true if character can use any skill at all */
-	virtual bool CanUseAnySkill() const;
+	virtual bool CanUseAnySkill() const override;
 
 	// --------------------------------------
 	//  Sounds
@@ -163,6 +163,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
 	FPlayerGameplaySounds GameplaySounds;
+
+	UFUNCTION(BlueprintCallable, Category = "Sounds")
+	void PlaySystemSound(USoundBase* SoundToPlay);
 
 	inline USoundBase* GetGreatswordHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
 	inline USoundBase* GetWarhammerHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;

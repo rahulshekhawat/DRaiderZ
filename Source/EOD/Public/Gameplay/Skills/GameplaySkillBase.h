@@ -31,6 +31,8 @@ public:
 	/** Initialize this skill. Intended to be called immediately after the skill object is created */
 	virtual void InitSkill(AEODCharacterBase* Instigator, AController* Owner);
 
+	virtual void CommitSkill();
+
 	virtual bool CanTriggerSkill() const;
 
 	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */

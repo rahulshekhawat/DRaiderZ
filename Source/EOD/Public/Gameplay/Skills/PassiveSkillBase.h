@@ -15,6 +15,7 @@ class EOD_API UPassiveSkillBase : public UPlayerSkillBase
 	GENERATED_BODY()
 
 public:
+
 	UPassiveSkillBase(const FObjectInitializer& ObjectInitializer);
 
 	// --------------------------------------

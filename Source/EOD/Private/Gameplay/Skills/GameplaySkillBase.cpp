@@ -20,6 +20,10 @@ void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* O
 	}
 }
 
+void UGameplaySkillBase::CommitSkill()
+{
+}
+
 bool UGameplaySkillBase::CanTriggerSkill() const
 {
 	return true;

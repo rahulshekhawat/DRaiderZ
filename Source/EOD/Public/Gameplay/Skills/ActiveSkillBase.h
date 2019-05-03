@@ -95,6 +95,8 @@ public:
 	/** Initialize this skill. Intended to be called immediately after the skill object is created */
 	virtual void InitSkill(AEODCharacterBase* Instigator, AController* Owner) override;
 
+	virtual void CommitSkill();
+
 	inline FActiveSkillLevelUpInfo GetCurrentSkillLevelupInfo() const;
 
 protected:

@@ -22,8 +22,6 @@ public:
 	//	Gameplay Skill Interface
 	// --------------------------------------
 
-	virtual bool CanTriggerSkill() const override;
-
 	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
 	virtual void TriggerSkill() override;
 

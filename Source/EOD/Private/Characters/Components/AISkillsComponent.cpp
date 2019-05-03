@@ -117,6 +117,7 @@ void UAISkillsComponent::CancelSkill(uint8 SkillIndex, UGameplaySkillBase* Skill
 
 void UAISkillsComponent::CancelAllActiveSkills()
 {
+	Super::CancelAllActiveSkills();
 }
 
 bool UAISkillsComponent::CanUseAnySkill() const

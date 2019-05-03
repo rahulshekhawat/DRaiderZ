@@ -351,6 +351,15 @@ bool AAICharacterBase::CCEInterrupt_Implementation(const float BCAngle)
 {
 	if (CanInterrupt() && InterruptMontage)
 	{
+		if (IsUsingAnySkill())
+		{
+			UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
+			check(SkillsComponent);
+			SkillsComponent->CancelAllActiveSkills();
+		}
+
+		CharacterStateInfo = FCharacterStateInfo(ECharacterState::GotHit);
+
 		if (BCAngle <= 90)
 		{
 			PlayAnimMontage(InterruptMontage, 1.f, UCharacterLibrary::SectionName_ForwardInterrupt);
@@ -370,6 +379,15 @@ bool AAICharacterBase::CCEStun_Implementation(const float Duration)
 {
 	if (CanStun())
 	{
+		if (IsUsingAnySkill())
+		{
+			UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
+			check(SkillsComponent);
+			SkillsComponent->CancelAllActiveSkills();
+		}
+
+		CharacterStateInfo = FCharacterStateInfo(ECharacterState::GotHit);
+
 		PlayStunAnimation();
 
 		UWorld* World = GetWorld();
@@ -385,6 +403,8 @@ void AAICharacterBase::CCERemoveStun_Implementation()
 {
 	StopStunAnimation();
 
+	ResetState();
+
 	UWorld* World = GetWorld();
 	check(World);
 	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
@@ -395,6 +415,14 @@ bool AAICharacterBase::CCEFreeze_Implementation(const float Duration)
 {
 	if (CanFreeze() && GetMesh())
 	{
+		if (IsUsingAnySkill())
+		{
+			UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
+			check(SkillsComponent);
+			SkillsComponent->CancelAllActiveSkills();
+		}
+
+		CharacterStateInfo = FCharacterStateInfo(ECharacterState::GotHit);
 		GetMesh()->GlobalAnimRateScale = 0.f;
 
 		UWorld* World = GetWorld();
@@ -413,6 +441,8 @@ void AAICharacterBase::CCEUnfreeze_Implementation()
 		GetMesh()->GlobalAnimRateScale = 1.f;
 	}
 
+	ResetState();
+
 	UWorld* World = GetWorld();
 	check(World);
 	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
@@ -422,6 +452,15 @@ bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 {
 	if (CanKnockdown() && KnockdownMontage)
 	{
+		if (IsUsingAnySkill())
+		{
+			UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
+			check(SkillsComponent);
+			SkillsComponent->CancelAllActiveSkills();
+		}
+
+		CharacterStateInfo = FCharacterStateInfo(ECharacterState::GotHit);
+
 		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
 		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 		// PushBack(ImpulseDirection);
@@ -440,6 +479,15 @@ bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const F
 {
 	if (CanKnockdown() && KnockdownMontage)
 	{
+		if (IsUsingAnySkill())
+		{
+			UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
+			check(SkillsComponent);
+			SkillsComponent->CancelAllActiveSkills();
+		}
+
+		CharacterStateInfo = FCharacterStateInfo(ECharacterState::GotHit);
+
 		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
 
 		UWorld* World = GetWorld();

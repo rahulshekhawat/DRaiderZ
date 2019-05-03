@@ -77,7 +77,7 @@ void UPlayerSkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
 	if (Skill)
 	{
 		SkillIndex += 100; // Skill Index while releasing skill is offset by 100 for replication purposes
-		ReleaseSkill(SkillIndex, Skill);
+		ReleaseSkill(SkillIndex, Skill, SkillChargeDuration);
 	}
 
 	LastReleasedSkillKey = SkillKeyIndex;
@@ -199,24 +199,19 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	check(SkillIndexToSkillMap.Contains(SkillIndex));
 	UPlayerSkillBase* PlayerSkill = Skill ? Cast<UPlayerSkillBase>(Skill) : Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SkillIndex]);
 
-	if (!PlayerSkill || !CharOwner)
-	{
-		return;
-	}
+	check(PlayerSkill);
+	check(CharOwner);
+
+	// if (!PlayerSkill || !CharOwner) { return; }
 
 	bool bIsLocalPlayerController = CharOwner->Controller && CharOwner->Controller->IsLocalPlayerController();
 	if (bIsLocalPlayerController)
 	{
 		if (PlayerSkill->CanTriggerSkill())
 		{
-			if (ActiveSkills.Num() > 0)
-			{
-				UGameplaySkillBase* PreviousSkill = ActiveSkills[0];
-				if (PreviousSkill)
-				{
-					PreviousSkill->CancelSkill();
-				}
-			}
+			// If this skill is a chain skill, it may have been activated before the previous skill finished.
+			// We need to finish/cancel previous skills before using this
+			CancelAllActiveSkills();
 
 			ResetChainSkill();
 
@@ -246,27 +241,17 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(CharOwner);
 			if (PlayerChar && (PlayerChar->IsIdleOrMoving() || PlayerChar->IsNormalAttacking() || PlayerChar->IsBlocking()))
 			{
-				UAudioComponent* AC = PlayerChar->GetSystemAudioComponent();
-				if (AC)
-				{
-					AC->SetSound(PlayerChar->SystemSounds.SkillNotAvailable);
-					AC->Play();
-				}
+				PlayerChar->PlaySystemSound(PlayerChar->SystemSounds.SkillNotAvailable);
 			}
 		}
 	}
 	else
 	{
-		if (ActiveSkills.Num() > 0)
-		{
-			UGameplaySkillBase* PreviousSkill = ActiveSkills[0];
-			if (PreviousSkill)
-			{
-				PreviousSkill->CancelSkill();
-			}
-		}
+		CancelAllActiveSkills();
 
 		PlayerSkill->TriggerSkill();
+		LastUsedSkillGroup = PlayerSkill->GetSkillGroup();
+		LastUsedSkillIndex = SkillIndex;
 		ActiveSkills.Add(PlayerSkill);
 	}
 
@@ -286,15 +271,12 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	AEODCharacterBase* CharOwner = GetCharacterOwner();
 	uint8 ActualSkillIndex = SkillIndex % 100;
 
-	if (!Skill)
-	{
-		Skill = SkillIndexToSkillMap[ActualSkillIndex];
-	}
+	UPlayerSkillBase* PlayerSkill = Skill ? Cast<UPlayerSkillBase>(Skill) : Cast<UPlayerSkillBase>(SkillIndexToSkillMap[ActualSkillIndex]);
 
-	if (!Skill || !CharOwner)
-	{
-		return;
-	}
+	check(PlayerSkill);
+	check(CharOwner);
+
+	// if (!Skill || !CharOwner) { return; }
 
 	bool bIsLocalPlayerController = CharOwner->Controller && CharOwner->Controller->IsLocalPlayerController();
 	if (bIsLocalPlayerController)
@@ -314,8 +296,7 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 				Server_ReleaseSkill(SkillIndex, ReleaseDelay);
 			}
 
-			bSkillCharging = false;
-			SkillChargeDuration = 0.f;
+			StopChargingSkill();
 		}
 	}
 	else
@@ -331,6 +312,7 @@ void UPlayerSkillsComponent::CancelSkill(uint8 SkillIndex, UGameplaySkillBase* S
 
 void UPlayerSkillsComponent::CancelAllActiveSkills()
 {
+	Super::CancelAllActiveSkills();
 }
 
 bool UPlayerSkillsComponent::CanUseAnySkill() const
