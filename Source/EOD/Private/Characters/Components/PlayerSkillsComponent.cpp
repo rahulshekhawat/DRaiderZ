@@ -10,6 +10,7 @@
 #include "DynamicSkillBarWidget.h"
 #include "EODPlayerController.h"
 #include "ContainerWidget.h"
+#include "PlayerStatsComponent.h"
 
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
@@ -241,7 +242,32 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(CharOwner);
 			if (PlayerChar && (PlayerChar->IsIdleOrMoving() || PlayerChar->IsNormalAttacking() || PlayerChar->IsBlocking()))
 			{
-				PlayerChar->PlaySystemSound(PlayerChar->SystemSounds.SkillNotAvailable);
+				UActiveSkillBase* ActiveSkill = Cast<UActiveSkillBase>(PlayerSkill);
+				if (ActiveSkill)
+				{
+					const FActiveSkillLevelUpInfo LevelUpInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
+					AEODPlayerController* PC = Cast<AEODPlayerController>(CharOwner->Controller);
+					UPlayerStatsComponent* StatsComponent = PC->GetStatsComponent();
+					if (StatsComponent)
+					{
+						if (StatsComponent->GetCurrentStamina() < LevelUpInfo.StaminaCost)
+						{
+							PlayerChar->PlaySystemSound(PlayerChar->SystemSounds.NotEnoughStamina);
+						}
+						else if (StatsComponent->GetCurrentMana() < LevelUpInfo.ManaCost)
+						{
+							PlayerChar->PlaySystemSound(PlayerChar->SystemSounds.NotEnoughEnergy);
+						}
+						else
+						{
+							PlayerChar->PlaySystemSound(PlayerChar->SystemSounds.SkillNotAvailable);
+						}
+					}
+				}
+				else
+				{
+					PlayerChar->PlaySystemSound(PlayerChar->SystemSounds.SkillNotAvailable);
+				}
 			}
 		}
 	}
