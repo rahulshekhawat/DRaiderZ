@@ -64,6 +64,11 @@ void UGameplaySkillBase::FinishSkill()
 	}
 }
 
+TSharedPtr<FAttackInfo> UGameplaySkillBase::GetAttackInfoPtr()
+{
+	return TSharedPtr<FAttackInfo>(nullptr);
+}
+
 bool UGameplaySkillBase::CanCancelSkill() const
 {
 	return true;

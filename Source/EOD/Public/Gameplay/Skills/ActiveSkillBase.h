@@ -131,6 +131,8 @@ public:
 
 	virtual void FinishSkill() override;
 
+	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() override;
+
 	inline FActiveSkillLevelUpInfo GetCurrentSkillLevelupInfo() const;
 
 protected:
@@ -172,6 +174,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Level Up Info")
 	TArray<FActiveSkillLevelUpInfo> SkillLevelUpsInfo;
+
+	// --------------------------------------
+	//  Cache
+	// --------------------------------------
+
+	TSharedPtr<FAttackInfo> AttackInfoPtr;
 
 	UPROPERTY(Transient)
 	TMap<EWeaponType, UAnimMontage*> SkillAnimations;

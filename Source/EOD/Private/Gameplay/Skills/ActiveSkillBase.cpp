@@ -180,6 +180,45 @@ void UActiveSkillBase::FinishSkill()
 	}
 }
 
+TSharedPtr<FAttackInfo> UActiveSkillBase::GetAttackInfoPtr()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	AEODPlayerController* PC = Instigator ? Cast<AEODPlayerController>(Instigator->Controller) : nullptr;
+	UPlayerStatsComponent* StatsComponent = PC ? PC->GetStatsComponent() : nullptr;
+
+	if (!StatsComponent)
+	{
+		return TSharedPtr<FAttackInfo>(nullptr);
+	}
+
+	if (AttackInfoPtr.IsValid())
+	{
+		AttackInfoPtr.Reset();
+	}
+
+	check(AttackInfoPtr.IsValid());
+	const FActiveSkillLevelUpInfo SkillInfo = GetCurrentSkillLevelupInfo();
+	AttackInfoPtr->bUnblockable = SkillInfo.bUnblockable;
+	AttackInfoPtr->bUndodgable = SkillInfo.bUndodgable;
+	AttackInfoPtr->CrowdControlEffect = SkillInfo.CrowdControlEffect;
+	AttackInfoPtr->CrowdControlEffectDuration = SkillInfo.CrowdControlEffectDuration;
+	AttackInfoPtr->DamageType = GetDamageType();
+	if (AttackInfoPtr->DamageType == EDamageType::Magickal)
+	{
+		AttackInfoPtr->CritRate = StatsComponent->GetMagickCritRate();
+		AttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->GetMagickAttack();
+		AttackInfoPtr->CritDamage = AttackInfoPtr->NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComponent->GetMagickCritBonus();
+	}
+	else
+	{
+		AttackInfoPtr->CritRate = StatsComponent->GetPhysicalCritRate();
+		AttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->GetPhysicalAttack();
+		AttackInfoPtr->CritDamage = AttackInfoPtr->NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComponent->GetPhysicalCritBonus();
+	}
+
+	return AttackInfoPtr;
+}
+
 void UActiveSkillBase::LoadFemaleAnimations()
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
