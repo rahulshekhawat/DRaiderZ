@@ -101,9 +101,6 @@ void UActiveSkillBase::TriggerSkill()
 		Instigator->SetCharacterStateAllowsMovement(false);
 		Instigator->SetCharacterStateAllowsRotation(false);
 
-		//~ consume stamina and mana
-		CommitSkill();
-
 		StartCooldown();
 	}
 
@@ -113,6 +110,9 @@ void UActiveSkillBase::TriggerSkill()
 		FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
 		StateInfo.NewReplicationIndex = Instigator->CharacterStateInfo.NewReplicationIndex + 1;
 		Instigator->CharacterStateInfo = StateInfo;
+
+		//~ consume stamina and mana
+		CommitSkill();
 	}
 
 	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
@@ -150,8 +150,19 @@ bool UActiveSkillBase::CanCancelSkill() const
 
 void UActiveSkillBase::CancelSkill()
 {
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (Instigator)
+	{
+		UWorld* World = Instigator->GetWorld();
+		check(World);
+		World->GetTimerManager().ClearTimer(SkillTimerHandle);
+	}
 
-
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if (SkillsComp)
+	{
+		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
+	}
 }
 
 void UActiveSkillBase::FinishSkill()

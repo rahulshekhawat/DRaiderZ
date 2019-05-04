@@ -9,6 +9,11 @@ UInstantMeleeSkill::UInstantMeleeSkill(const FObjectInitializer& ObjectInitializ
 {
 }
 
+void UInstantMeleeSkill::TriggerSkill()
+{
+	Super::TriggerSkill();
+}
+
 bool UInstantMeleeSkill::CanCancelSkill() const
 {
 	return true;
@@ -16,32 +21,10 @@ bool UInstantMeleeSkill::CanCancelSkill() const
 
 void UInstantMeleeSkill::CancelSkill()
 {
-	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	if (Instigator)
-	{
-		UWorld* World = Instigator->GetWorld();
-		check(World);
-		World->GetTimerManager().ClearTimer(SkillTimerHandle);
-	}
-	
-	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
-	if(SkillsComp)
-	{
-		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
-	}
+	Super::CancelSkill();
 }
 
 void UInstantMeleeSkill::FinishSkill()
 {
-	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	if (Instigator)
-	{
-		Instigator->ResetState();
-	}
-	
-	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
-	if(SkillsComp)
-	{
-		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
-	}
+	Super::FinishSkill();
 }

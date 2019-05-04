@@ -56,6 +56,9 @@ public:
 	/** Returns true if this skill is valid, i.e, skill belongs to a valid skill group */
 	FORCEINLINE bool IsValid() const { return SkillGroup != NAME_None && SkillIndex != 0; }
 
+	/** Returns true if this skill is currently active */
+	FORCEINLINE bool IsActive() const { return bIsActive; }
+
 	// --------------------------------------
 	//  Pseudo Constants
 	// --------------------------------------
@@ -123,7 +126,7 @@ protected:
 	// --------------------------------------
 
 	/** This skill's instigator */
-	UPROPERTY(Transient, BlueprintReadOnly)
+	UPROPERTY(Transient)
 	TWeakObjectPtr<AEODCharacterBase> SkillInstigator;
 
 	/** Skill component of this skill's instigator */
@@ -133,6 +136,9 @@ protected:
 	/** This skill's owner (player controller or ai controller) */
 	UPROPERTY(Transient)
 	TWeakObjectPtr<AController> SkillOwner;
+
+	UPROPERTY(Transient)
+	bool bIsActive;
 
 public:
 
