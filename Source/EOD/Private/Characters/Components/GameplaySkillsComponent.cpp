@@ -158,6 +158,14 @@ void UGameplaySkillsComponent::OnSkillFinished(uint8 SkillIndex, FName SkillGrou
 	if (Skill)
 	{
 		ActiveSkills.Remove(Skill);
+		if (EventsOnSkillFinished.Contains(Skill))
+		{
+			const FGameplayEventInfo& EventInfo = EventsOnSkillFinished[Skill];
+			if (EventInfo.EventClassType == EGameplayEventClassType::GameplayEffect)
+			{
+				ActivateGameplayEffect(EventInfo.EventClass, EventInfo.Instigator, EventInfo.Targets, EventInfo.bDetermineTargetsDynamically);
+			}
+		}
 	}
 }
 
@@ -207,6 +215,24 @@ void UGameplaySkillsComponent::RemoveGameplayEffect(UGameplayEffectBase* Gamepla
 			GameplayEffect->DeactivateEffect();
 		}
 	}
+}
+
+void UGameplaySkillsComponent::ActivateGameplayEffect(UClass* GameplayEffectClass, AActor* Instigator, TArray<AActor*> Targets, bool bDetermineTargetDynamically)
+{
+	UGameplayEffectBase* GameplayEffect = NewObject<UGameplayEffectBase>(this, GameplayEffectClass, NAME_None, RF_Transient);
+	check(GameplayEffect);
+
+	TArray<AEODCharacterBase*> TargetChars;
+	AEODCharacterBase* InstigatorChar = Cast<AEODCharacterBase>(Instigator);
+	for (AActor* Target : Targets)
+	{
+		AEODCharacterBase* TargetChar = Cast<AEODCharacterBase>(Target);
+		TargetChars.Add(TargetChar);
+	}
+
+	GameplayEffect->InitEffect(InstigatorChar, TargetChars);
+	GameplayEffect->ActivateEffect();
+	AddGameplayEffect(GameplayEffect);
 }
 
 void UGameplaySkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)

@@ -64,6 +64,10 @@ void UGameplaySkillBase::FinishSkill()
 	}
 }
 
+void UGameplaySkillBase::TriggerGameplayEffects()
+{
+}
+
 TSharedPtr<FAttackInfo> UGameplaySkillBase::GetAttackInfoPtr()
 {
 	return TSharedPtr<FAttackInfo>(nullptr);

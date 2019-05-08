@@ -46,6 +46,17 @@ enum class EGameplayEffectActivationCondition : uint8
 };
 
 UENUM(BlueprintType)
+enum class ESkillEventTriggerCondition : uint8
+{
+	TriggersOnSkillTrigger,
+	TriggersOnSkillRelease,
+	TriggersOnSkillCancel,
+	TriggersOnSkillFinish,
+	TriggersOnSkillHitSuccess,
+	TriggersOnSkillHitFailure
+};
+
+UENUM(BlueprintType)
 enum class EGameplayEffectAuthority : uint8
 {
 	Server,
@@ -159,6 +170,40 @@ enum class ESkillSlotStatus : uint8
 	Blocked,
 	Unblocked,
 	Available,
+};
+
+UENUM(BlueprintType)
+enum class EGameplayEventClassType : uint8
+{
+	GameplayEffect,
+	None,
+};
+
+
+USTRUCT(BlueprintType)
+struct EOD_API FGameplayEventInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	// UPROPERTY(Transient, BlueprintReadOnly, Category = GameplayEvent)
+	UPROPERTY()
+	AActor* Instigator;
+
+	UPROPERTY()
+	TArray<AActor*> Targets;
+
+	UPROPERTY()
+	UClass* EventClass;
+
+	UPROPERTY()
+	EGameplayEventClassType EventClassType;
+
+	UPROPERTY()
+	bool bDetermineTargetsDynamically;
+
+	FGameplayEventInfo() : Instigator(nullptr), EventClass(nullptr), EventClassType(EGameplayEventClassType::None), bDetermineTargetsDynamically(false)
+	{
+	}
 };
 
 

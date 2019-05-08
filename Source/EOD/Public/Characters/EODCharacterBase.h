@@ -525,6 +525,9 @@ public:
 	/** [server + local] Sets whether this character is running or not */
 	inline void SetIsRunning(bool bNewValue);
 
+	UFUNCTION(BlueprintCallable, Category = "Movement", DisplayName = "Set bIsRunning")
+	void BP_SetIsRunning(bool bNewValue) { SetIsRunning(bNewValue); }
+
 	/** [server + client] Change character rotation. Do not use this for consecutive rotation change */
 	UFUNCTION(BlueprintCallable, Category = "Rotation", meta = (DisplayName = "Set Character Rotation"))
 	void BP_SetCharacterRotation(const FRotator NewRotation);

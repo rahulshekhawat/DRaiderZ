@@ -184,6 +184,11 @@ public:
 
 	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return EODCharacterOwner; }
 
+	// TArray<UClass*> GameplayEffectOnSkillFinished;
+	TMap<UGameplaySkillBase*, FGameplayEventInfo> EventsOnSkillFinished;
+
+	void ActivateGameplayEffect(UClass* GameplayEffectClass, AActor* Instigator, TArray<AActor*> Targets, bool bDetermineTargetDynamically = false);
+
 private:
 
 	UPROPERTY(Transient)

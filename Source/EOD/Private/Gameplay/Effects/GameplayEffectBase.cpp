@@ -3,24 +3,27 @@
 
 #include "GameplayEffectBase.h"
 #include "EODCharacterBase.h"
+#include "GameplaySkillsComponent.h"
 
 UGameplayEffectBase::UGameplayEffectBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
-void UGameplayEffectBase::InitEffect(AEODCharacterBase* Instigator, AEODCharacterBase* Target)
+void UGameplayEffectBase::InitEffect(AEODCharacterBase* Instigator, TArray<AEODCharacterBase*> Targets)
 {
 	EffectInstigator = Instigator;
-	EffectTarget = Target;
-
 	if (Instigator)
 	{
 		InstigatorSkillComponent = Instigator->GetGameplaySkillsComponent();
 	}
 
-	if (Target)
+	for (AEODCharacterBase* Target : Targets)
 	{
-		TargetSkillComponent = Target->GetGameplaySkillsComponent();
+		EffectTargets.Add(Target);
+		if (Target)
+		{
+			TargetSkillComponents.Add(Target->GetGameplaySkillsComponent());
+		}
 	}
 }
 

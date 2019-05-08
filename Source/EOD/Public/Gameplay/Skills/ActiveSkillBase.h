@@ -59,10 +59,12 @@ struct EOD_API FActiveSkillLevelUpInfo
 
 	//~ @todo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
-	TSoftClassPtr<UGameplayEffectBase> GameplayEffectSoftClass;
+	TSubclassOf<UGameplayEffectBase> GameplayEffectClass;
+	// TSoftClassPtr<UGameplayEffectBase> GameplayEffectSoftClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
-	EGameplayEffectActivationCondition GameplayEffectActivationCondition;
+	ESkillEventTriggerCondition GameplayEffectTriggerCondition;
+	// EGameplayEffectActivationCondition GameplayEffectActivationCondition;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
 	EGameplayEffectAuthority GameplayEffectAuthority;
@@ -79,8 +81,10 @@ struct EOD_API FActiveSkillLevelUpInfo
 		CrowdControlEffectDuration = 0.f;
 		CrowdControlImmunities = 0;
 		Cooldown = 0.f;
-		GameplayEffectSoftClass = NULL;
-		GameplayEffectActivationCondition = EGameplayEffectActivationCondition::ActivatesOnSkillTrigger;
+		GameplayEffectClass = NULL;
+		// GameplayEffectSoftClass = NULL;
+		GameplayEffectTriggerCondition = ESkillEventTriggerCondition::TriggersOnSkillTrigger;
+		// GameplayEffectActivationCondition = EGameplayEffectActivationCondition::ActivatesOnSkillTrigger;
 		GameplayEffectAuthority = EGameplayEffectAuthority::ClientOwner;
 	}
 };

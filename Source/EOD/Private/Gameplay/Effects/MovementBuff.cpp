@@ -14,9 +14,14 @@ UMovementBuff::UMovementBuff(const FObjectInitializer& ObjectInitializer) : Supe
 void UMovementBuff::ActivateEffect()
 {
 	AEODCharacterBase* Instigator = EffectInstigator.Get();
-	if (Instigator && Instigator->Controller && Instigator->Controller->IsLocalPlayerController())
+	if (Instigator)
 	{
-		Instigator->SetIsRunning(true);
+		bool bIsLocallyControlled = Instigator->Controller && Instigator->Controller->IsLocalController();
+		if (bIsLocallyControlled)
+		{
+			Instigator->SetIsRunning(true);
+		}
+
 		UWorld* World = Instigator->GetWorld();
 		check(World);
 		World->GetTimerManager().SetTimer(MovementEndTimerHandle, this, &UMovementBuff::DeactivateEffect, GameplayEffectDuration, false);
@@ -28,16 +33,26 @@ void UMovementBuff::ActivateEffect()
 void UMovementBuff::DeactivateEffect()
 {
 	AEODCharacterBase* Instigator = EffectInstigator.Get();
-	if (Instigator && Instigator->Controller)
+	if (Instigator)
 	{
-		Instigator->SetIsRunning(false);
-		bActive = false;
-	}
+		if (Instigator && Instigator->Controller)
+		{
+			Instigator->SetIsRunning(false);
+		}
 
-	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
-	if (SkillsComp)
-	{
+		bActive = false;
+
+		UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+		check(SkillsComp);
 		SkillsComp->RemoveGameplayEffect(this);
+
+		UWorld* World = Instigator->GetWorld();
+		check(World);
+		World->GetTimerManager().ClearTimer(MovementEndTimerHandle);
+	}
+	else
+	{
+		this->MarkPendingKill();
 	}
 }
 

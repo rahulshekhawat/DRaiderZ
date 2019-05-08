@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CharacterLibrary.h"
 #include "UObject/NoExportTypes.h"
 #include "GameplayEffectBase.generated.h"
 
@@ -25,7 +26,7 @@ public:
 	//	Gameplay Effect Interface
 	// --------------------------------------
 
-	virtual void InitEffect(AEODCharacterBase* Instigator, AEODCharacterBase* Target);
+	virtual void InitEffect(AEODCharacterBase* Instigator, TArray<AEODCharacterBase*> Targets);
 
 	virtual void ActivateEffect();
 
@@ -57,25 +58,32 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	float GameplayEffectDuration;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	EGameplayEffectAuthority GameplayEffectAuthority;
+
 	// --------------------------------------
 	//	Cache
 	// --------------------------------------
 
 	/** This effect's instigator */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Cache")
 	TWeakObjectPtr<AEODCharacterBase> EffectInstigator;
 
 	/** Skill component of this effect's instigator */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Cache")
 	TWeakObjectPtr<UGameplaySkillsComponent> InstigatorSkillComponent;
 
-	/** This effect's target */
+	/** This effect's targets */
 	UPROPERTY(Transient)
-	TWeakObjectPtr<AEODCharacterBase> EffectTarget;
+	TArray<TWeakObjectPtr<AEODCharacterBase>> EffectTargets;
+
+	// TWeakObjectPtr<AEODCharacterBase> EffectTarget;
 
 	/** Skill component of this effect's target */
 	UPROPERTY(Transient)
-	TWeakObjectPtr<UGameplaySkillsComponent> TargetSkillComponent;
+	TArray<TWeakObjectPtr<UGameplaySkillsComponent>> TargetSkillComponents;
+
+	// TWeakObjectPtr<UGameplaySkillsComponent> TargetSkillComponent;
 
 	/** Determines if this gameplay effect is currently active */
 	UPROPERTY(Transient)

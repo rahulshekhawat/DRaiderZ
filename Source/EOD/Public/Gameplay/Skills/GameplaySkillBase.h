@@ -53,6 +53,8 @@ public:
 
 	virtual void FinishSkill();
 
+	virtual void TriggerGameplayEffects();
+
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr();
 
 	/** Returns true if this skill is valid, i.e, skill belongs to a valid skill group */
