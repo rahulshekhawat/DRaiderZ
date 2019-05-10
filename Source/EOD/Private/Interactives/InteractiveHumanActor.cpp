@@ -85,6 +85,7 @@ void AInteractiveHumanActor::OnConstruction(const FTransform& Transform)
 		{
 			SMComp->Deactivate();
 			SMComp->DestroyComponent();
+			SMComp = nullptr;
 			continue;
 		}
 

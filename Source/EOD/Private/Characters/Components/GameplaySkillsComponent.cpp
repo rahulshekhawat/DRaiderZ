@@ -56,37 +56,23 @@ void UGameplaySkillsComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 	for (UGameplaySkillBase* Skill : ActiveSkills)
 	{
-		check(Skill);
-		Skill->UpdateSkill(DeltaTime);
+		if (Skill && Skill->bNeedsUpdate)
+		{
+			Skill->UpdateSkill(DeltaTime);
+		}
 	}
 
 	for (UGameplayEffectBase* Effect : ActiveGameplayEffects)
 	{
-		check(Effect);
-		Effect->UpdateEffect(DeltaTime);
+		if (Effect && Effect->bNeedsUpdate)
+		{
+			Effect->UpdateEffect(DeltaTime);
+		}
 	}
-
-	// bool bIsLocallyControlled = EODCharacterOwner && EODCharacterOwner->Controller && EODCharacterOwner->Controller->IsLocalController();
-	// bool bIsLocallyControlledByPlayer = EODCharacterOwner && EODCharacterOwner->Controller && EODCharacterOwner->Controller->IsLocalPlayerController();
-	// if (bIsLocallyControlled)
-	// {
-	// }
 }
 
 void UGameplaySkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
 {
-	if (!Skill)
-	{
-		check(SkillIndexToSkillMap.Contains(SkillIndex));
-		Skill = SkillIndexToSkillMap[SkillIndex];
-	}
-
-	if (!Skill || !EODCharacterOwner)
-	{
-		return;
-	}
-
-	//~ @todo
 }
 
 void UGameplaySkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill, float ReleaseDelay)
@@ -126,7 +112,13 @@ bool UGameplaySkillsComponent::CanUseAnySkill() const
 
 bool UGameplaySkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
 {
-	return false;
+	check(SkillIndexToSkillMap.Contains(SkillIndex));
+	if (Skill == nullptr)
+	{
+		Skill = SkillIndexToSkillMap[SkillIndex];
+	}
+
+	return Skill ? Skill->CanTriggerSkill() : false;
 }
 
 void UGameplaySkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill)

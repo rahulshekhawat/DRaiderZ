@@ -73,22 +73,7 @@ void UEscapeSkillBase::TriggerSkill()
 		Instigator->ResetState();
 	}
 
-	const FActiveSkillLevelUpInfo LevelUpInfo = GetCurrentSkillLevelupInfo();
-	UClass* GameplayEffectClass = LevelUpInfo.GameplayEffectClass.Get();
-	UGameplaySkillsComponent* SkillsComponent = InstigatorSkillComponent.Get();
-	if (GameplayEffectClass != nullptr && SkillsComponent != nullptr)
-	{
-		if (LevelUpInfo.GameplayEffectTriggerCondition == ESkillEventTriggerCondition::TriggersOnSkillFinish)
-		{
-			FGameplayEventInfo EventInfo;
-			EventInfo.EventClass = GameplayEffectClass;
-			EventInfo.EventClassType = EGameplayEventClassType::GameplayEffect;
-			EventInfo.Instigator = Instigator;
-			EventInfo.Targets.Add(Instigator);
-			EventInfo.bDetermineTargetsDynamically = false;
-			SkillsComponent->EventsOnSkillFinished.Add(this, EventInfo);
-		}
-	}
+	TriggerGameplayEffects();
 }
 
 void UEscapeSkillBase::ReleaseSkill(float ChargeDuration)

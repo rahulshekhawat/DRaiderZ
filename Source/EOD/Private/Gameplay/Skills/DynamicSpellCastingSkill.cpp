@@ -10,19 +10,11 @@
 UDynamicSpellCastingSkill::UDynamicSpellCastingSkill(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bMovableMontagePlaying = false;
+	bNeedsUpdate = true;
 }
 
 void UDynamicSpellCastingSkill::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
 {
-	/*
-	SkillInstigator = Instigator;
-	SkillOwner = Owner;
-	if (Instigator)
-	{
-		InstigatorSkillComponent = Instigator->GetGameplaySkillsComponent();
-	}
-	*/
-
 	Super::InitSkill(Instigator, Owner);
 }
 

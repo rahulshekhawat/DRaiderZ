@@ -14,21 +14,11 @@ UUniqueMovementSkill::UUniqueMovementSkill(const FObjectInitializer& ObjectIniti
 	bSkillCanBeCharged = false;
 }
 
-bool UUniqueMovementSkill::CanTriggerSkill() const
-{
-	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	EWeaponType EquippedWeaponType = Instigator ? Instigator->GetEquippedWeaponType() : EWeaponType::None;
-
-	bool bHasValidWeapon = EquippedWeaponType != EWeaponType::None && IsWeaponTypeSupported(EquippedWeaponType) && !Instigator->IsWeaponSheathed();
-	bool bInCooldown = IsSkillInCooldown();
-
-	bool bInstigatorCanUseSkill = Instigator ? Instigator->IsIdleOrMoving() || Instigator->IsBlocking() || Instigator->IsNormalAttacking() : false;
-
-	return bHasValidWeapon && !bInCooldown && bInstigatorCanUseSkill;
-}
-
 void UUniqueMovementSkill::TriggerSkill()
 {
+	Super::TriggerSkill();
+
+	/*
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	if (Instigator && Instigator->Controller && Instigator->Controller->IsLocalPlayerController())
 	{
@@ -37,6 +27,7 @@ void UUniqueMovementSkill::TriggerSkill()
 		check(World);
 		World->GetTimerManager().SetTimer(MovementEndTimerHandle, this, &UUniqueMovementSkill::FinishSkill, SpecialMovementDuration, false);
 	}
+	*/
 
 	//~ @todo
 	/*
@@ -66,6 +57,8 @@ void UUniqueMovementSkill::TriggerSkill()
 
 void UUniqueMovementSkill::CancelSkill()
 {
+	Super::CancelSkill();
+	/*
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	if (Instigator && Instigator->Controller)
 	{
@@ -77,10 +70,13 @@ void UUniqueMovementSkill::CancelSkill()
 	{
 		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
 	}
+	*/
 }
 
 void UUniqueMovementSkill::FinishSkill()
 {
+	Super::FinishSkill();
+	/*
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	if (Instigator && Instigator->Controller)
 	{
@@ -92,4 +88,5 @@ void UUniqueMovementSkill::FinishSkill()
 	{
 		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
 	}
+	*/
 }

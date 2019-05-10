@@ -7,6 +7,7 @@
 #include "EODPlayerController.h"
 #include "PlayerStatsComponent.h"
 #include "EODCharacterMovementComponent.h"
+#include "GameplayEffectBase.h"
 
 #include "TimerManager.h"
 
@@ -15,6 +16,7 @@ UActiveSkillBase::UActiveSkillBase(const FObjectInitializer& ObjectInitializer) 
 	SupersedingSkillGroup			= NAME_None;
 	AnimationStartSectionName		= FName("Default");
 	CooldownRemaining				= 0.f;
+	FailSafeDuration				= 0.5f;
 }
 
 void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
@@ -30,6 +32,8 @@ void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Own
 	{
 		LoadMaleAnimations();
 	}
+
+
 }
 
 bool UActiveSkillBase::CanCommitSkill() const
@@ -133,14 +137,18 @@ void UActiveSkillBase::TriggerSkill()
 
 		UWorld* World = Instigator->GetWorld();
 		check(World);
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindUObject(this, &UActiveSkillBase::FinishSkill);
-		World->GetTimerManager().SetTimer(SkillTimerHandle, TimerDelegate, ActualSkillDuration, false);
+		World->GetTimerManager().SetTimer(SkillTimerHandle, this, &UActiveSkillBase::FinishSkill, ActualSkillDuration, false);
 	}
 	else
 	{
-		Instigator->ResetState();
+		SkillDuration = FailSafeDuration;
+		UWorld* World = Instigator->GetWorld();
+		check(World);
+		World->GetTimerManager().SetTimer(SkillTimerHandle, Instigator, &AEODCharacterBase::ResetState, SkillDuration, false);
+		// Instigator->ResetState();
 	}
+
+	TriggerGameplayEffects();
 }
 
 bool UActiveSkillBase::CanCancelSkill() const
@@ -177,6 +185,34 @@ void UActiveSkillBase::FinishSkill()
 	if (SkillsComp)
 	{
 		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
+	}
+}
+
+void UActiveSkillBase::TriggerGameplayEffects()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+
+	const FActiveSkillLevelUpInfo LevelUpInfo = GetCurrentSkillLevelupInfo();
+	UClass* GameplayEffectClass = LevelUpInfo.GameplayEffectClass.Get();
+	UGameplaySkillsComponent* SkillsComponent = InstigatorSkillComponent.Get();
+	if (GameplayEffectClass != nullptr && SkillsComponent != nullptr)
+	{
+		if (LevelUpInfo.GameplayEffectTriggerCondition == ESkillEventTriggerCondition::TriggersOnSkillFinish)
+		{
+			FGameplayEventInfo EventInfo;
+			EventInfo.EventClass = GameplayEffectClass;
+			EventInfo.EventClassType = EGameplayEventClassType::GameplayEffect;
+			EventInfo.Instigator = Instigator;
+			EventInfo.Targets.Add(Instigator);
+			EventInfo.bDetermineTargetsDynamically = false;
+			SkillsComponent->EventsOnSkillFinished.Add(this, EventInfo);
+		}
+		else if (LevelUpInfo.GameplayEffectTriggerCondition == ESkillEventTriggerCondition::TriggersOnSkillTrigger)
+		{
+		}
+		else if (LevelUpInfo.GameplayEffectTriggerCondition == ESkillEventTriggerCondition::TriggersOnSkillRelease)
+		{
+		}
 	}
 }
 

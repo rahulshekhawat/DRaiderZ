@@ -83,6 +83,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	bool bSkillCanBeCharged;
 
+	/** Set this to true if this skill needs to be updated every frame */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	bool bNeedsUpdate;
+
 protected:
 
 	/** Name of this skill that will be displayed to player inside the game */

@@ -36,11 +36,15 @@ public:
 
 	FORCEINLINE bool IsActive() const { return bActive; }
 
-protected:
-
 	// --------------------------------------
 	//  Pseudo Constants
 	// --------------------------------------
+
+	/** Set this to true if this effect needs to be updated every frame */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	bool bNeedsUpdate;
+
+protected:
 	
 	/** Name of this gameplay effect that will be displayed to player inside the game */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")

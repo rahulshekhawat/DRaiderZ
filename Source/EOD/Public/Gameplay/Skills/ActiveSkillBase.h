@@ -135,6 +135,8 @@ public:
 
 	virtual void FinishSkill() override;
 
+	virtual void TriggerGameplayEffects() override;
+
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() override;
 
 	inline FActiveSkillLevelUpInfo GetCurrentSkillLevelupInfo() const;
@@ -152,7 +154,11 @@ protected:
 	// --------------------------------------
 	//  Pseudo Constants : Default values that are not supposed to be modified
 	// --------------------------------------
-	
+
+	/** Duration of this skill in case it doesn't have any animation */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	float FailSafeDuration;
+
 	/**
 	 * A map of weapons supported by this skill to their animation montages for male version of character
 	 * @note If the character doesn't have any specified gender, then this will the default variable to access animation from

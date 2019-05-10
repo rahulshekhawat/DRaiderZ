@@ -61,7 +61,7 @@ enum class EGameplayEffectAuthority : uint8
 {
 	Server,
 	ClientOwner,
-	AnyClient
+	None
 };
 
 /** This enum describes the cause of character death */
