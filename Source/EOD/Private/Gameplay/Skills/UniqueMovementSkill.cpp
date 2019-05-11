@@ -16,9 +16,8 @@ UUniqueMovementSkill::UUniqueMovementSkill(const FObjectInitializer& ObjectIniti
 
 void UUniqueMovementSkill::TriggerSkill()
 {
-	Super::TriggerSkill();
+	// Super::TriggerSkill();
 
-	/*
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	if (Instigator && Instigator->Controller && Instigator->Controller->IsLocalPlayerController())
 	{
@@ -27,7 +26,6 @@ void UUniqueMovementSkill::TriggerSkill()
 		check(World);
 		World->GetTimerManager().SetTimer(MovementEndTimerHandle, this, &UUniqueMovementSkill::FinishSkill, SpecialMovementDuration, false);
 	}
-	*/
 
 	//~ @todo
 	/*
@@ -57,8 +55,8 @@ void UUniqueMovementSkill::TriggerSkill()
 
 void UUniqueMovementSkill::CancelSkill()
 {
-	Super::CancelSkill();
-	/*
+	// Super::CancelSkill();
+
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	if (Instigator && Instigator->Controller)
 	{
@@ -70,13 +68,12 @@ void UUniqueMovementSkill::CancelSkill()
 	{
 		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
 	}
-	*/
 }
 
 void UUniqueMovementSkill::FinishSkill()
 {
-	Super::FinishSkill();
-	/*
+	// Super::FinishSkill();
+	
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
 	if (Instigator && Instigator->Controller)
 	{
@@ -88,5 +85,4 @@ void UUniqueMovementSkill::FinishSkill()
 	{
 		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
 	}
-	*/
 }
