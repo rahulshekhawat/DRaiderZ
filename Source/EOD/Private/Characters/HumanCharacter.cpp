@@ -247,7 +247,8 @@ TSharedPtr<FStreamableHandle> AHumanCharacter::LoadAnimationReferences(FPlayerAn
 		AddAnimationSoftObjectPathToArray(AnimationReferences->Die, AssetsToLoad);
 	}
 
-	StreamableHandle = GameSingleton->StreamableManager.RequestAsyncLoad(AssetsToLoad);
+	// StreamableHandle = GameSingleton->StreamableManager.RequestAsyncLoad(AssetsToLoad);
+	StreamableHandle = GameSingleton->StreamableManager.RequestSyncLoad(AssetsToLoad, true);
 	return StreamableHandle;
 }
 
