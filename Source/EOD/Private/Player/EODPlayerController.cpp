@@ -158,6 +158,7 @@ void AEODPlayerController::BeginPlay()
 
 	// LoadPlayerState();
 	InitializeWidgets();
+	SwitchToGameInput();
 }
 
 void AEODPlayerController::Tick(float DeltaTime)
