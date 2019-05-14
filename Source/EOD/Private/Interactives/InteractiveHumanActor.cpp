@@ -83,10 +83,13 @@ void AInteractiveHumanActor::OnConstruction(const FTransform& Transform)
 		}
 		else if (IsValid(SMComp) && !IsValid(SMComp->SkeletalMesh))
 		{
+			//~ @todo
+			/*
 			SMComp->Deactivate();
 			SMComp->DestroyComponent();
 			SMComp = nullptr;
 			continue;
+			*/
 		}
 
 		if (SMComp->GetFName() == AInteractiveHumanActor::HairComponentName)

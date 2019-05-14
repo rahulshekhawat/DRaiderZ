@@ -179,7 +179,8 @@ AMainMenuLevelScriptActor* AMainMenuPlayerController::GetMainMenuLevelScriptActo
 
 void AMainMenuPlayerController::StartNewCampaign()
 {
-	UGameplayStatics::OpenLevel(this, FName("Level0_Haddon"));
+	// UGameplayStatics::OpenLevel(this, FName("Level0_Haddon"));
+	UGameplayStatics::OpenLevel(this, FName("RietZ"));
 }
 
 void AMainMenuPlayerController::CreateAndLoadNewProfile(const FString& NewProfileName)

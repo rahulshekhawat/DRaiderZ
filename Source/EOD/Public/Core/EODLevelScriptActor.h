@@ -118,7 +118,7 @@ protected:
 	UFUNCTION()
 	void PlayMusic(USoundBase* Music);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Sound")
 	void StopMusic(USoundBase* Music);
 
 	UFUNCTION()
