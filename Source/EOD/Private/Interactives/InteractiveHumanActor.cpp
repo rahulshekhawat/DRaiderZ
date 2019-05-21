@@ -73,38 +73,7 @@ void AInteractiveHumanActor::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	TArray<UActorComponent*> SkeletalMeshComponentArray = this->GetComponentsByClass(USkeletalMeshComponent::StaticClass());
-	for (UActorComponent* ActorComp : SkeletalMeshComponentArray)
-	{
-		USkeletalMeshComponent* SMComp = Cast<USkeletalMeshComponent>(ActorComp);
-		if (!IsValid(SMComp))
-		{
-			continue;
-		}
-		else if (IsValid(SMComp) && !IsValid(SMComp->SkeletalMesh))
-		{
-			//~ @todo
-			/*
-			SMComp->Deactivate();
-			SMComp->DestroyComponent();
-			SMComp = nullptr;
-			continue;
-			*/
-		}
-
-		if (SMComp->GetFName() == AInteractiveHumanActor::HairComponentName)
-		{
-			SMComp->SetVectorParameterValueOnMaterials(MaterialParameterNames::BaseColor, FVector(HairOverrideColor));
-		}
-		else if (SMComp->GetFName() == AInteractiveHumanActor::HatItemComponentName)
-		{
-			SMComp->SetVectorParameterValueOnMaterials(MaterialParameterNames::BaseColor, FVector(HatItemOverrideColor));
-		}
-		else
-		{
-			SMComp->SetVectorParameterValueOnMaterials(MaterialParameterNames::BaseColor, FVector(ClothOverrideColor));
-		}
-	}
+	UpdateMeshColors();
 }
 
 void AInteractiveHumanActor::BeginPlay()
@@ -113,6 +82,8 @@ void AInteractiveHumanActor::BeginPlay()
 
 	// Since setting master pose component from constructor doesn't work in packaged game
 	SetMasterPoseComponentForMeshes();
+
+	DeleteUnusedComponents();
 }
 
 void AInteractiveHumanActor::Tick(float DeltaTime)
@@ -158,4 +129,43 @@ USkeletalMeshComponent* AInteractiveHumanActor::CreateNewArmorComponent(const FN
 		Sk->bUseAttachParentBound = true;
 	}
 	return Sk;
+}
+
+void AInteractiveHumanActor::DeleteUnusedComponents()
+{
+	TArray<UActorComponent*> SkeletalMeshComponentArray = this->GetComponentsByClass(USkeletalMeshComponent::StaticClass());
+	for (UActorComponent* ActorComp : SkeletalMeshComponentArray)
+	{
+		USkeletalMeshComponent* SMComp = Cast<USkeletalMeshComponent>(ActorComp);
+		if (SMComp && !IsValid(SMComp->SkeletalMesh))
+		{
+			SMComp->Deactivate();
+			SMComp->DestroyComponent();
+			SMComp = nullptr;
+		}
+	}
+}
+
+void AInteractiveHumanActor::UpdateMeshColors()
+{
+	TArray<UActorComponent*> SkeletalMeshComponentArray = this->GetComponentsByClass(USkeletalMeshComponent::StaticClass());
+	for (UActorComponent* ActorComp : SkeletalMeshComponentArray)
+	{
+		USkeletalMeshComponent* SMComp = Cast<USkeletalMeshComponent>(ActorComp);
+		if (SMComp)
+		{
+			if (SMComp->GetFName() == AInteractiveHumanActor::HairComponentName)
+			{
+				SMComp->SetVectorParameterValueOnMaterials(MaterialParameterNames::BaseColor, FVector(HairOverrideColor));
+			}
+			else if (SMComp->GetFName() == AInteractiveHumanActor::HatItemComponentName)
+			{
+				SMComp->SetVectorParameterValueOnMaterials(MaterialParameterNames::BaseColor, FVector(HatItemOverrideColor));
+			}
+			else
+			{
+				SMComp->SetVectorParameterValueOnMaterials(MaterialParameterNames::BaseColor, FVector(ClothOverrideColor));
+			}
+		}
+	}
 }

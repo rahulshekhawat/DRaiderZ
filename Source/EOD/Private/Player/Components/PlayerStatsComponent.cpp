@@ -10,7 +10,6 @@
 
 UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
-	MovementSpeedModifier			= 1.f;
 	StaminaConsumptionModifier		= 1.f;
 
 	bHasHealthRegenration			= true;

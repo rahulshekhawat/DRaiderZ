@@ -17,7 +17,6 @@ UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitial
 	bHasStaminaRegenration = false;
 
 	LowHealthPercent = 0.15f;
-	MovementSpeedModifier = 1.0f;
 }
 
 void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -30,7 +29,6 @@ void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(UStatsComponentBase, CurrentMana);
 	DOREPLIFETIME(UStatsComponentBase, MaxStamina);
 	DOREPLIFETIME(UStatsComponentBase, CurrentStamina);
-	DOREPLIFETIME(UStatsComponentBase, MovementSpeedModifier);
 
 	DOREPLIFETIME_CONDITION(UStatsComponentBase, HealthRegenRate, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(UStatsComponentBase, ManaRegenRate, COND_OwnerOnly);
@@ -91,9 +89,10 @@ void UStatsComponentBase::OnRep_CurrentStamina()
 
 void UStatsComponentBase::ActivateHealthRegeneration()
 {
-	if (IsValid(GetWorld()) && HealthRegenTickInterval > 0.f)
+	UWorld* World = GetWorld();
+	if (World && HealthRegenTickInterval > 0.f)
 	{
-		GetWorld()->GetTimerManager().SetTimer(HealthRegenTimerHandle,
+		World->GetTimerManager().SetTimer(HealthRegenTimerHandle,
 			this,
 			&UStatsComponentBase::RegenerateHealth,
 			HealthRegenTickInterval,
@@ -104,9 +103,10 @@ void UStatsComponentBase::ActivateHealthRegeneration()
 
 void UStatsComponentBase::ActivateManaRegeneration()
 {
-	if (IsValid(GetWorld()) && ManaRegenTickInterval > 0.f)
+	UWorld* World = GetWorld();
+	if (World && ManaRegenTickInterval > 0.f)
 	{
-		GetWorld()->GetTimerManager().SetTimer(ManaRegenTimerHandle,
+		World->GetTimerManager().SetTimer(ManaRegenTimerHandle,
 			this,
 			&UStatsComponentBase::RegenerateMana,
 			ManaRegenTickInterval,
@@ -117,9 +117,10 @@ void UStatsComponentBase::ActivateManaRegeneration()
 
 void UStatsComponentBase::ActivateStaminaRegeneration()
 {
-	if (IsValid(GetWorld()) && StaminaRegenTickInterval > 0.f)
+	UWorld* World = GetWorld();
+	if (World && StaminaRegenTickInterval > 0.f)
 	{
-		GetWorld()->GetTimerManager().SetTimer(StaminaRegenTimerHandle,
+		World->GetTimerManager().SetTimer(StaminaRegenTimerHandle,
 			this,
 			&UStatsComponentBase::RegenerateStamina,
 			StaminaRegenTickInterval,
@@ -140,18 +141,20 @@ void UStatsComponentBase::DeactivateHealthRegeneration()
 
 void UStatsComponentBase::DeactivateManaRegeneration()
 {
-	if (IsValid(GetWorld()))
+	UWorld* World = GetWorld();
+	if (World)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(ManaRegenTimerHandle);
+		World->GetTimerManager().ClearTimer(ManaRegenTimerHandle);
 	}
 	bIsRegeneratingMana = false;
 }
 
 void UStatsComponentBase::DeactivateStaminaRegeneration()
 {
-	if (IsValid(GetWorld()))
+	UWorld* World = GetWorld();
+	if (World)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(StaminaRegenTimerHandle);
+		World->GetTimerManager().ClearTimer(StaminaRegenTimerHandle);
 	}
 	bIsRegeneratingStamina = false;
 }

@@ -171,25 +171,12 @@ private:
 
 	FORCEINLINE void SetCurrentStamina(int32 Value);
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Character attribute modifiers
 public:
-	FORCEINLINE float GetMovementSpeedModifier() const { return MovementSpeedModifier; }
 
-	inline void ModifyMovementSpeedModifier(float Value);
+	// --------------------------------------
+	//  Regeneration
+	// --------------------------------------
 
-protected:
-	UPROPERTY(Replicated)
-	float MovementSpeedModifier;
-
-private:
-	inline void SetMovementSpeedModifier(float Value);
-
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Regeneration
-public:
 	FORCEINLINE int32 GetHealthRegenRate() const;
 
 	FORCEINLINE int32 GetManaRegenRate() const;
@@ -203,6 +190,7 @@ public:
 	inline void ModifyStaminaRegenRate(int32 Value);
 
 protected:
+
 	/** Determines whether this character can regenerate health at all */
 	UPROPERTY(EditDefaultsOnly, Category = "Regeneration")
 	uint32 bHasHealthRegenration : 1;
@@ -276,6 +264,7 @@ protected:
 	void DeactivateStaminaRegeneration();
 
 private:
+
 	void RegenerateHealth();
 
 	void RegenerateMana();
@@ -288,11 +277,16 @@ private:
 
 	inline void SetStaminaRegenRate(int32 Value);
 
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Attack
 public:
-	// virtual void GetPhysicalAttack
+
+	// --------------------------------------
+	//  Attack
+	// --------------------------------------
+
+	virtual int32 GetPhysicalAttack() const { return 0; }
+
+	virtual int32 GetMagickAttack() const { return 0; }
+
 
 protected:
 
@@ -303,9 +297,6 @@ private:
 
 
 public:
-	virtual int32 GetPhysicalAttack() const PURE_VIRTUAL(UStatsComponentBase::GetPhysicalAttack, return 0; );
-
-	virtual int32 GetMagickAttack() const PURE_VIRTUAL(UStatsComponentBase::GetMagickAttack, return 0; );
 
 	virtual int32 ModifyPhysicalAttack(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyPhysicalAttack, return 0; );
 
@@ -469,8 +460,6 @@ public:
 	
 	virtual float ModifyStaminaConsumptionModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyStaminaConsumptionModifier, return 0.f; );
 	
-	// virtual float ModifyMovementSpeedModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyMovementSpeedModifier, return 0.f; );
-	
 	virtual float ModifyActiveTimeDilation(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifyActiveTimeDilation, return 0.f; );
 	
 	virtual float ModifySpellCastingSpeedModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::ModifySpellCastingSpeedModifier, return 0.f; );
@@ -482,8 +471,6 @@ public:
 	virtual void SetDropRateModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::SetDropRateModifier, );
 	
 	virtual void SetStaminaConsumptionModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::SetStaminaConsumptionModifier, );
-	
-	// virtual void SetMovementSpeedModifier(float Value) PURE_VIRTUAL(UStatsComponentBase::SetMovementSpeedModifier, );
 	
 	virtual void SetActiveTimeDilation(float Value) PURE_VIRTUAL(UStatsComponentBase::SetActiveTimeDilation, );
 	
@@ -515,25 +502,27 @@ public:
 
 protected:
 
-	//~ Begin network code
-private:
-	UFUNCTION()
-	void OnRep_MaxHealth();
+	// --------------------------------------
+	//  Network
+	// --------------------------------------
 
 	UFUNCTION()
-	void OnRep_CurrentHealth();
+	virtual void OnRep_MaxHealth();
 
 	UFUNCTION()
-	void OnRep_MaxMana();
+	virtual void OnRep_CurrentHealth();
 
 	UFUNCTION()
-	void OnRep_CurrentMana();
+	virtual void OnRep_MaxMana();
 
 	UFUNCTION()
-	void OnRep_MaxStamina();
+	virtual void OnRep_CurrentMana();
 
 	UFUNCTION()
-	void OnRep_CurrentStamina();
+	virtual void OnRep_MaxStamina();
+
+	UFUNCTION()
+	virtual void OnRep_CurrentStamina();
 
 };
 
@@ -814,16 +803,6 @@ FORCEINLINE void UStatsComponentBase::SetCurrentStamina(int32 Value)
 	{
 		ActivateStaminaRegeneration();
 	}
-}
-
-inline void UStatsComponentBase::ModifyMovementSpeedModifier(float Value)
-{
-	SetMovementSpeedModifier(MovementSpeedModifier + Value);
-}
-
-inline void UStatsComponentBase::SetMovementSpeedModifier(float Value)
-{
-	MovementSpeedModifier = Value;
 }
 
 FORCEINLINE int32 UStatsComponentBase::GetHealthRegenRate() const

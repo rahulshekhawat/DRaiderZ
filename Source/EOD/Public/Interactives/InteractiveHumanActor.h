@@ -138,6 +138,10 @@ private:
 	/** [Constructor Only] A helper function that creates and returns new armor skeletal mesh component */
 	USkeletalMeshComponent* CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer);
 
+	void DeleteUnusedComponents();
+
+	void UpdateMeshColors();
+
 	inline void SetMasterPoseComponentForMeshes();
 
 };
