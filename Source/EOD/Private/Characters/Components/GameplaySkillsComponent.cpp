@@ -227,6 +227,32 @@ void UGameplaySkillsComponent::ActivateGameplayEffect(UClass* GameplayEffectClas
 	AddGameplayEffect(GameplayEffect);
 }
 
+bool UGameplaySkillsComponent::IsGameplayEffectTypeActive(TSubclassOf<UGameplayEffectBase> GameplayEffectClass, UGameplayEffectBase* GameplayEffectToIgnore)
+{
+	if (GameplayEffectToIgnore)
+	{
+		for (UGameplayEffectBase* GameplayEffect : ActiveGameplayEffects)
+		{
+			if (GameplayEffect->IsA(GameplayEffectClass))
+			{
+				return true;
+			}
+		}
+	}
+	else
+	{
+		for (UGameplayEffectBase* GameplayEffect : ActiveGameplayEffects)
+		{
+			if (GameplayEffect != GameplayEffectToIgnore && GameplayEffect->IsA(GameplayEffectClass))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 void UGameplaySkillsComponent::Server_TriggerSkill_Implementation(uint8 SkillIndex)
 {
 }

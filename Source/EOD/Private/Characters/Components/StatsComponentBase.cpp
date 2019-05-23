@@ -57,6 +57,44 @@ void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 }
 
+// int32 UStatsComponentBase::ModifyPhysicalAttack(int32 Value, bool bPercent)
+int32 UStatsComponentBase::ModifyPhysicalAttack(int32 Value)
+{
+	if (Value == 0)
+	{
+		return int32();
+	}
+
+	/*
+	int32 PhysicalAttack = GetPhysicalAttack();
+	if (bPercent)
+	{
+		int32 ModificationValue = (float)(PhysicalAttack * Value) / 100.f;
+		SetPhysicalAttack(PhysicalAttack + ModificationValue);
+	}
+	else
+	{
+		SetPhysicalAttack(PhysicalAttack + Value);
+	}
+	*/
+
+	return int32();
+}
+
+// int32 UStatsComponentBase::ModifyMagickAttack(int32 Value, bool bPercent)
+int32 UStatsComponentBase::ModifyMagickAttack(int32 Value)
+{
+	return int32();
+}
+
+void UStatsComponentBase::SetPhysicalAttack(int32 Value)
+{
+}
+
+void UStatsComponentBase::SetMagickAttack(int32 Value)
+{
+}
+
 void UStatsComponentBase::OnRep_MaxHealth()
 {
 	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);

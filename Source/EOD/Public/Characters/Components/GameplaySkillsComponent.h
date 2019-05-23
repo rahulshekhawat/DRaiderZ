@@ -188,6 +188,8 @@ public:
 
 	void ActivateGameplayEffect(UClass* GameplayEffectClass, AActor* Instigator, TArray<AActor*> Targets, bool bDetermineTargetDynamically = false);
 
+	virtual bool IsGameplayEffectTypeActive(TSubclassOf<UGameplayEffectBase> GameplayEffectClass, UGameplayEffectBase* GameplayEffectToIgnore = nullptr);
+
 private:
 
 	UPROPERTY(Transient)

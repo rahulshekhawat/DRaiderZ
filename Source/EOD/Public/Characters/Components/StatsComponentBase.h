@@ -287,8 +287,33 @@ public:
 
 	virtual int32 GetMagickAttack() const { return 0; }
 
+	// virtual int32 ModifyPhysicalAttack
+
+
+	// virtual int32 ModifyPhysicalAttack(int32 Value, bool bPercent = false);
+	virtual int32 ModifyPhysicalAttack(int32 Value);
+
+	// virtual int32 ModifyMagickAttack(int32 Value, bool bPercent = false);
+	virtual int32 ModifyMagickAttack(int32 Value);
+
+	virtual void SetPhysicalAttack(int32 Value);
+
+	virtual void SetMagickAttack(int32 Value);
 
 protected:
+
+	/** Maximum mana of character without any status effects */
+	// UPROPERTY(EditDefaultsOnly, Category = BaseStats)
+		// int32 BaseStamina;
+
+	/** Current maximum stamina of character - with or without any status effects */
+	// UPROPERTY(ReplicatedUsing = OnRep_MaxStamina)
+		// int32 MaxStamina;
+
+	/** Current stamina of character */
+	// UPROPERTY(ReplicatedUsing = OnRep_CurrentStamina)
+		// int32 CurrentStamina;
+
 
 
 
@@ -298,13 +323,6 @@ private:
 
 public:
 
-	virtual int32 ModifyPhysicalAttack(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyPhysicalAttack, return 0; );
-
-	virtual int32 ModifyMagickAttack(int32 Value) PURE_VIRTUAL(UStatsComponentBase::ModifyMagickAttack, return 0; );
-
-	virtual void SetPhysicalAttack(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetPhysicalAttack, );
-
-	virtual void SetMagickAttack(int32 Value) PURE_VIRTUAL(UStatsComponentBase::SetMagickAttack, );
 
 	virtual int32 GetPhysicalResistance() const PURE_VIRTUAL(UStatsComponentBase::GetPhysicalResistance, return 0; );
 

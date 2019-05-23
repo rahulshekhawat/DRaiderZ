@@ -35,15 +35,23 @@ void UMovementBuff::DeactivateEffect()
 	AEODCharacterBase* Instigator = EffectInstigator.Get();
 	if (Instigator)
 	{
-		if (Instigator && Instigator->Controller)
+		UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+		check(SkillsComp);
+
+		// If another gameplay effect of movement buff type is active, we do not need to disable running
+		if (SkillsComp->IsGameplayEffectTypeActive(UMovementBuff::StaticClass(), this))
 		{
-			Instigator->SetIsRunning(false);
+		}
+		else
+		{
+			if (Instigator->Controller)
+			{
+				Instigator->SetIsRunning(false);
+			}
 		}
 
 		bActive = false;
 
-		UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
-		check(SkillsComp);
 		SkillsComp->RemoveGameplayEffect(this);
 
 		UWorld* World = Instigator->GetWorld();
