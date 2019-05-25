@@ -13,6 +13,7 @@ class UTexture;
 class USoundBase;
 class UGameSingleton;
 class UGameUserSettings;
+class UContainerWidget;
 
 UENUM(BlueprintType)
 enum class EEODContainerType : uint8
@@ -93,17 +94,81 @@ USTRUCT(BlueprintType)
 struct EOD_API FInventoryItem
 {
 	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(BlueprintReadOnly, Category = "In-Game Info")
+	FString Name;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Inventory Item")
+	UPROPERTY(BlueprintReadOnly, Category = "In-Game Info")
+	FString Description;
+	
+	UPROPERTY(BlueprintReadOnly)
 	FName ItemID;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Inventory Item")
+	UPROPERTY(BlueprintReadOnly)
+	FName ItemType;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FName ItemCategory;
+
+	UPROPERTY(BlueprintReadOnly)
 	UTexture* ItemIcon;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Inventory Item")
-	FString Description;
+	/** Unique items cannot be stacked */
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsUnique;
 
-	// @todo hover info
+	FInventoryItem() :
+		Name(TEXT("")),
+		Description(TEXT("")),
+		ItemID(NAME_None),
+		ItemType(NAME_None),
+		ItemCategory(NAME_None),
+		ItemIcon(nullptr),
+		bIsUnique(false)
+	{
+	}
+
+	FInventoryItem(const FInventoryItem& SourceItem) :
+		Name(SourceItem.Name),
+		Description(SourceItem.Description),
+		ItemID(SourceItem.ItemID),
+		ItemType(SourceItem.ItemType),
+		ItemCategory(SourceItem.ItemCategory),
+		ItemIcon(SourceItem.ItemIcon),
+		bIsUnique(SourceItem.bIsUnique)
+	{
+	}
+
+	void operator=(const FInventoryItem& OtherItem)
+	{
+		this->Name = OtherItem.Name;
+		this->Description = OtherItem.Description;
+		this->ItemID = OtherItem.ItemID;
+		this->ItemType = OtherItem.ItemType;
+		this->ItemCategory = OtherItem.ItemCategory;
+		this->ItemIcon = OtherItem.ItemIcon;
+		this->bIsUnique = OtherItem.bIsUnique;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct EOD_API FInventorySlot
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 SlotIndex;				// Not uint32 only because uint32 is not supported in blueprints
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 ItemStackCount;			// Not uint32 only because uint32 is not supported in blueprints
+
+	UPROPERTY(BlueprintReadOnly)
+	FInventoryItem ItemInSlot;
+
+	/** Container widget associated with this inventory slot */
+	UPROPERTY(BlueprintReadOnly)
+	UContainerWidget* SlotWidget;
+
 };
 
 /**

@@ -11,9 +11,9 @@
 // class UTexture;
 // class APlayerCharacter;
 // class UInventoryWidget;
+class UDataTable;
 
 /** Delegate for when a new inventory item is added */
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryItemChangedMCDelegate, const FInventoryItem&, InventoryItem);
 
 
@@ -28,6 +28,10 @@ class EOD_API UInventoryComponent : public UActorComponent
 
 public:	
 
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	/** Sets default values for this component's properties */
 	UInventoryComponent(const FObjectInitializer& ObjectInitializer);
 
@@ -37,6 +41,11 @@ public:
 	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
+	// --------------------------------------
+	//  Inventory
+	// --------------------------------------
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	TArray<FInventoryItem>& GetInventoryItems();
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Inventory")
@@ -45,38 +54,35 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Inventory")
 	FOnInventoryItemChangedMCDelegate OnInventoryItemRemoved;
 
-protected:
-
-	/** Maximum number of inventory slots */
+	/** Maximum number of items that can be placed in this inventory*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
-	int32 MaxSlots;
+	int32 MaxItems;
 
-private:
+	/**
+	 * Maximum number of times an item is allowed to be stacked in a single inventory slot. 
+	 * @note	Only inventory items that have 'bIsUnique' set to 'false' can be stacked.
+	 *			If an inventory has 'bIsUnique' set to 'true', it cannot be stacked.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	int32 MaxStackCount;
 
-	// void InitializeInventoryWidget();
-
-	// FInventoryItem& GetItem(int32 ItemIndex) const;
-
+	void AddItem(FInventoryItem NewItem);
 	void AddItem(FName ItemID);
+	void AddItem(FName ItemID, FName ItemType, UDataTable* ItemLookupTable = nullptr);
+
+	/** Removes a specified number of a specific item. Removes the entire stack */
+	// void RemoveItem(FInventoryItem ItemToRemove, int32 ItemCount = 0);		// If ItemCount is <= 0 then all stacks of ItemToRemove are removed
 
 	void RemoveItem(FName ItemID);
-
 	void UseItem(FName ItemID);
-
 	void UseItem(int32 ItemIndex);
 
 	void SaveInventory();
-
 	void LoadInventory();
 	
 	TArray<FInventoryItem> Items;
 
+	TMap<FName, FInventorySlot> InventorySlots;
+
 
 };
-
-/*
-FORCEINLINE UInventoryWidget* UInventoryComponent::GetInventoryWidget() const
-{
-	return InventoryWidget;
-}
-*/

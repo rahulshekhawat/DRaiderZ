@@ -11,23 +11,22 @@ UInventoryComponent::UInventoryComponent(const FObjectInitializer& ObjectInitial
 {
 	// This component doesn't tick
 	PrimaryComponentTick.bCanEverTick = false;
-	
+
 	// Inventory doesn't need to be replicated
 	SetIsReplicated(false);
 
-	MaxSlots = 100;
+	MaxItems 				= 100;
+	MaxStackCount			= 100;
 }
 
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 }
 
 TArray<FInventoryItem>& UInventoryComponent::GetInventoryItems()
@@ -35,9 +34,17 @@ TArray<FInventoryItem>& UInventoryComponent::GetInventoryItems()
 	return Items;
 }
 
+void UInventoryComponent::AddItem(FInventoryItem NewItem)
+{
+}
+
 void UInventoryComponent::AddItem(FName ItemID)
 {
 	// @todo definition
+}
+
+void UInventoryComponent::AddItem(FName ItemID, FName ItemType, UDataTable* ItemLookupTable)
+{
 }
 
 void UInventoryComponent::RemoveItem(FName ItemID)
