@@ -11,6 +11,24 @@
 
 class UGameplayEffectBase;
 
+USTRUCT(BlueprintType)
+struct EOD_API FGameplayEffectInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	TSubclassOf<UGameplayEffectBase> Class;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	int32 Level;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	FName TriggerCondition;
+
+	FGameplayEffectInfo() : Class(NULL), Level(1), TriggerCondition(NAME_None)
+	{
+	}
+};
 
 USTRUCT(BlueprintType)
 struct EOD_API FActiveSkillLevelUpInfo
@@ -57,35 +75,21 @@ struct EOD_API FActiveSkillLevelUpInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
 	float Cooldown;
 
-	//~ @todo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
-	TSubclassOf<UGameplayEffectBase> GameplayEffectClass;
-	// TSoftClassPtr<UGameplayEffectBase> GameplayEffectSoftClass;
+	FGameplayEffectInfo GameplayEffectInfo;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
-	ESkillEventTriggerCondition GameplayEffectTriggerCondition;
-	// EGameplayEffectActivationCondition GameplayEffectActivationCondition;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
-	EGameplayEffectAuthority GameplayEffectAuthority;
-
-	FActiveSkillLevelUpInfo()
+	FActiveSkillLevelUpInfo() :
+		StaminaCost(0),
+		ManaCost(0),
+		DamagePercent(0.f),
+		bUnblockable(false),
+		bUndodgable(false),
+		bIgnoresBlock(false),
+		CrowdControlEffect(ECrowdControlEffect::Flinch),
+		CrowdControlEffectDuration(0.f),
+		Cooldown(0.f),
+		GameplayEffectInfo()
 	{
-		StaminaCost = 0;
-		ManaCost = 0;
-		DamagePercent = 0;
-		bUnblockable = false;
-		bUndodgable = false;
-		bIgnoresBlock = false;
-		CrowdControlEffect = ECrowdControlEffect::Flinch;
-		CrowdControlEffectDuration = 0.f;
-		CrowdControlImmunities = 0;
-		Cooldown = 0.f;
-		GameplayEffectClass = NULL;
-		// GameplayEffectSoftClass = NULL;
-		GameplayEffectTriggerCondition = ESkillEventTriggerCondition::TriggersOnSkillTrigger;
-		// GameplayEffectActivationCondition = EGameplayEffectActivationCondition::ActivatesOnSkillTrigger;
-		GameplayEffectAuthority = EGameplayEffectAuthority::ClientOwner;
 	}
 };
 
@@ -135,7 +139,9 @@ public:
 
 	virtual void FinishSkill() override;
 
-	virtual void TriggerGameplayEffects() override;
+	virtual void QueueGameplayEffectEvents() override;
+
+	virtual void DisableGameplayEffectEvents() override;
 
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() override;
 

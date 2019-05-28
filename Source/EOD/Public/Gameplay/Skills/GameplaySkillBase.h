@@ -55,6 +55,10 @@ public:
 
 	virtual void TriggerGameplayEffects();
 
+	virtual void QueueGameplayEffectEvents() { ; }
+
+	virtual void DisableGameplayEffectEvents() { ; }
+
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr();
 
 	/** Returns true if this skill is valid, i.e, skill belongs to a valid skill group */
@@ -127,7 +131,7 @@ protected:
 
 	/** The tags that are required on owner to use this ability */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tags")
-	FGameplayTag RequiredOwnerGameplayTag;
+	FGameplayTagContainer ActivationRequiredTags;
 
 	// --------------------------------------
 	//	Cache

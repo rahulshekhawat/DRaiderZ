@@ -46,7 +46,13 @@ bool UPlayerSkillBase::CanTriggerSkill() const
 		}
 	}
 
-	return bHasValidWeapon && !bInCooldown && bInstigatorCanUseSkill;
+	bool bOwnerHasTags = true;
+	if (!ActivationOwnedTags.IsEmpty())
+	{
+		bOwnerHasTags = Instigator->GameplayTagContainer.HasAll(ActivationOwnedTags);
+	}
+
+	return bHasValidWeapon && !bInCooldown && bInstigatorCanUseSkill && bOwnerHasTags;
 }
 
 void UPlayerSkillBase::OnWeaponChange(EWeaponType NewWeaponType, EWeaponType OldWeaponType)

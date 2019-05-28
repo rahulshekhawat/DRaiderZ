@@ -21,3 +21,11 @@ namespace KeyboardKeysNames
 	extern const FName LeftMouseButton;
 	extern const FName RightMouseButton;
 }
+
+namespace EventNames
+{
+	extern const FName OnSkillTriggered;
+	extern const FName OnSkillReleased;
+	extern const FName OnSkillCancelled;
+	extern const FName OnSkillFinished;
+}

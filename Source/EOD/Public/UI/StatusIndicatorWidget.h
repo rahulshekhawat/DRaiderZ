@@ -7,6 +7,7 @@
 #include "Components/Image.h"
 #include "Components/Spacer.h"
 #include "Components/Overlay.h"
+#include "Components/TextBlock.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Blueprint/UserWidget.h"
@@ -89,7 +90,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	USpacer* StaminaSpacer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* HealthValueText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* ManaValueText;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* StaminaValueText;
+
 	// --------------------------------------
 	//  Widget Behaviour
 	// --------------------------------------
@@ -145,6 +155,10 @@ inline void UStatusIndicatorWidget::UpdateHealthBar_Internal(int32 BaseHealth, i
 
 	SetHorizontalSlotSize(HealthBarFillHSlot, CMHratio);
 	SetHorizontalSlotSize(HealthSpacerHSlot, 1 - CMHratio);
+
+	FString HealthString = FString::FromInt(CurrentHealth) + FString("/") + FString::FromInt(MaxHealth);
+	FText HealthText = FText::FromString(HealthString);
+	HealthValueText->SetText(HealthText);
 }
 
 inline void UStatusIndicatorWidget::UpdateManaBar_Internal(int32 BaseMana, int32 MaxMana, int32 CurrentMana)
@@ -166,6 +180,10 @@ inline void UStatusIndicatorWidget::UpdateManaBar_Internal(int32 BaseMana, int32
 
 	SetHorizontalSlotSize(ManaBarFillHSlot, CMMratio);
 	SetHorizontalSlotSize(ManaSpacerHSlot, 1 - CMMratio);
+
+	FString ManaString = FString::FromInt(CurrentMana) + FString("/") + FString::FromInt(MaxMana);
+	FText ManaText = FText::FromString(ManaString);
+	ManaValueText->SetText(ManaText);
 }
 
 inline void UStatusIndicatorWidget::UpdateStaminaBar_Internal(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina)
@@ -187,4 +205,8 @@ inline void UStatusIndicatorWidget::UpdateStaminaBar_Internal(int32 BaseStamina,
 
 	SetHorizontalSlotSize(StaminaBarFillHSlot, CMSratio);
 	SetHorizontalSlotSize(StaminaSpacerHSlot, 1 - CMSratio);
+
+	FString StaminaString = FString::FromInt(CurrentStamina) + FString("/") + FString::FromInt(MaxStamina);
+	FText StaminaText = FText::FromString(StaminaString);
+	StaminaValueText->SetText(StaminaText);
 }

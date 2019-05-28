@@ -147,17 +147,29 @@ void UGameplaySkillsComponent::OnSkillCancelled(uint8 SkillIndex, FName SkillGro
 
 void UGameplaySkillsComponent::OnSkillFinished(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
 {
-	if (Skill)
+	if (!Skill)
 	{
-		ActiveSkills.Remove(Skill);
-		if (EventsOnSkillFinished.Contains(Skill))
-		{
-			const FGameplayEventInfo& EventInfo = EventsOnSkillFinished[Skill];
-			if (EventInfo.EventClassType == EGameplayEventClassType::GameplayEffect)
-			{
-				ActivateGameplayEffect(EventInfo.EventClass, EventInfo.Instigator, EventInfo.Targets, EventInfo.bDetermineTargetsDynamically);
-			}
-		}
+		return;
+	}
+
+	ActiveSkills.Remove(Skill);
+
+	if (!GameplayEvents.Contains(EventNames::OnSkillFinished))
+	{
+		return;
+	}
+
+	TMap<UGameplaySkillBase*, FGameplayEventInfo>& EventsOnSkillFinished = GameplayEvents[EventNames::OnSkillFinished];
+
+	if (!EventsOnSkillFinished.Contains(Skill))
+	{
+		return;
+	}
+
+	const FGameplayEventInfo& EventInfo = EventsOnSkillFinished[Skill];
+	if (EventInfo.EventClassType == EGameplayEventClassType::GameplayEffect)
+	{ 
+		ActivateGameplayEffect(EventInfo.EventClass, EventInfo.Instigator, EventInfo.Targets, EventInfo.bDetermineTargetsDynamically);
 	}
 }
 

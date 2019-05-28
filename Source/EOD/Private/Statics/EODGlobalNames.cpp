@@ -20,3 +20,11 @@ namespace KeyboardKeysNames
 	const FName LeftMouseButton(TEXT("LeftMouseButton"));
 	const FName RightMouseButton(TEXT("RightMouseButton"));
 }
+
+namespace EventNames
+{
+	const FName OnSkillTriggered(TEXT("OnSkillTriggered"));
+	const FName OnSkillReleased(TEXT("OnSkillReleased"));
+	const FName OnSkillCancelled(TEXT("OnSkillCancelled"));
+	const FName OnSkillFinished(TEXT("OnSkillFinished"));
+}

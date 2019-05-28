@@ -184,7 +184,7 @@ public:
 
 	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return EODCharacterOwner; }
 
-	TMap<UGameplaySkillBase*, FGameplayEventInfo> EventsOnSkillFinished;
+	TMap<FName, TMap<UGameplaySkillBase*, FGameplayEventInfo>> GameplayEvents;
 
 	void ActivateGameplayEffect(UClass* GameplayEffectClass, AActor* Instigator, TArray<AActor*> Targets, bool bDetermineTargetDynamically = false);
 
