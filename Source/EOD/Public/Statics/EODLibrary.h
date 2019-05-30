@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/NoExportTypes.h"
 #include "EODLibrary.generated.h"
 
@@ -50,6 +51,31 @@ enum class EEODTaskStatus : uint8
 	Active,
 	Finished,
 	Aborted
+};
+
+USTRUCT(BlueprintType)
+struct EOD_API FGameplayTagMod
+{
+	GENERATED_USTRUCT_BODY()
+
+	FGameplayTagContainer Tags;
+
+	TSoftObjectPtr<UObject> SourceObj;
+
+	FGameplayTagMod() : SourceObj(NULL)
+	{
+	}
+
+	FGameplayTagMod(FGameplayTagContainer TagContainer, UObject* SourceObject) :
+		Tags(TagContainer),
+		SourceObj(SourceObject)
+	{
+	}
+
+	FGameplayTagMod& operator=(FGameplayTagMod const& Other);
+	bool operator==(FGameplayTagMod const& Other) const;
+	bool operator!=(FGameplayTagMod const& Other) const;
+
 };
 
 USTRUCT(BlueprintType)

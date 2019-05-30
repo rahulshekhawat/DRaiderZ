@@ -32,3 +32,20 @@ USoundBase* UEODLibrary::GetRandomSound(const TArray<USoundBase*> Sounds)
 
 	return Sound;
 }
+
+FGameplayTagMod& FGameplayTagMod::operator=(FGameplayTagMod const& Other)
+{
+	this->Tags = Other.Tags;
+	this->SourceObj = Other.SourceObj;
+	return *this;
+}
+
+bool FGameplayTagMod::operator==(FGameplayTagMod const& Other) const
+{
+	return this->Tags == Other.Tags && this->SourceObj == Other.SourceObj;
+}
+
+bool FGameplayTagMod::operator!=(FGameplayTagMod const& Other) const
+{
+	return this->Tags != Other.Tags || this->SourceObj != Other.SourceObj;
+}

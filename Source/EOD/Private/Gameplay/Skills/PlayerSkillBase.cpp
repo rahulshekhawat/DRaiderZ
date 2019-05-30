@@ -24,8 +24,14 @@ bool UPlayerSkillBase::CanPlayerActivateThisSkill() const
 	bool bInCooldown = IsSkillInCooldown();
 	bool bHasNoPrecedingSkillGroups = PrecedingSkillGroups.Num() == 0;
 
+	bool bOwnerHasTags = true;
+	if (!ActivationRequiredTags.IsEmpty() && Instigator)
+	{
+		bOwnerHasTags = Instigator->GameplayTagContainer.HasAll(ActivationRequiredTags);
+	}
+
 	// return bHasValidWeapon && !bInCooldown && bHasNoPrecedingSkillGroups && bUnlocked;
-	return bHasValidWeapon && !bInCooldown && bHasNoPrecedingSkillGroups;
+	return bHasValidWeapon && !bInCooldown && bHasNoPrecedingSkillGroups && bOwnerHasTags;
 }
 
 bool UPlayerSkillBase::CanTriggerSkill() const
@@ -47,9 +53,9 @@ bool UPlayerSkillBase::CanTriggerSkill() const
 	}
 
 	bool bOwnerHasTags = true;
-	if (!ActivationOwnedTags.IsEmpty())
+	if (!ActivationRequiredTags.IsEmpty() && Instigator)
 	{
-		bOwnerHasTags = Instigator->GameplayTagContainer.HasAll(ActivationOwnedTags);
+		bOwnerHasTags = Instigator->GameplayTagContainer.HasAll(ActivationRequiredTags);
 	}
 
 	return bHasValidWeapon && !bInCooldown && bInstigatorCanUseSkill && bOwnerHasTags;

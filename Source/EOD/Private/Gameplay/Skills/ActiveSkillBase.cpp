@@ -33,8 +33,6 @@ void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Own
 	{
 		LoadMaleAnimations();
 	}
-
-
 }
 
 bool UActiveSkillBase::CanCommitSkill() const
@@ -148,10 +146,9 @@ void UActiveSkillBase::TriggerSkill()
 		World->GetTimerManager().SetTimer(SkillTimerHandle, Instigator, &AEODCharacterBase::ResetState, SkillDuration, false);
 	}
 
-	// ActivationOwnedTags.IsEmpty()
+	Instigator->AddGameplayTagModifier(FGameplayTagMod(ActivationOwnedTags, this));
 
-	// Instigator->GameplayTagContainer.AppendTags(ActivationOwnedTags);
-	// TriggerGameplayEffects();
+	QueueGameplayEffectEvents();
 }
 
 bool UActiveSkillBase::CanCancelSkill() const
@@ -174,6 +171,10 @@ void UActiveSkillBase::CancelSkill()
 	{
 		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
 	}
+
+	// Instigator->RemoveGameplayTagModifier(FGameplayTagMod(ActivationOwnedTags, this));
+
+	DisableGameplayEffectEvents();
 }
 
 void UActiveSkillBase::FinishSkill()
@@ -189,6 +190,10 @@ void UActiveSkillBase::FinishSkill()
 	{
 		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
 	}
+
+	// Instigator->RemoveGameplayTagModifier(FGameplayTagMod(ActivationOwnedTags, this));
+
+	DisableGameplayEffectEvents();
 }
 
 void UActiveSkillBase::QueueGameplayEffectEvents()

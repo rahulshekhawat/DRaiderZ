@@ -270,6 +270,32 @@ bool AEODCharacterBase::CanGuardAgainstAttacks() const
 	return (IsIdleOrMoving() || IsNormalAttacking()) && !(IsWeaponSheathed());
 }
 
+void AEODCharacterBase::AddGameplayTagModifier(FGameplayTagMod TagMod)
+{
+	if (!TagMod.Tags.IsEmpty())
+	{
+		TagModifiers.AddUnique(TagMod);
+		GameplayTagContainer.AppendTags(TagMod.Tags);
+	}
+}
+
+void AEODCharacterBase::RemoveGameplayTagModifier(FGameplayTagMod TagMod)
+{
+	if (!TagMod.Tags.IsEmpty())
+	{
+		if (TagModifiers.Contains(TagMod))
+		{
+			TagModifiers.Remove(TagMod);
+			GameplayTagContainer.RemoveTags(TagMod.Tags);
+		}
+
+		for (const FGameplayTagMod& TagMod : TagModifiers)
+		{
+			GameplayTagContainer.AppendTags(TagMod.Tags);
+		}
+	}
+}
+
 bool AEODCharacterBase::IsAlive() const
 {
 	//~ @todo

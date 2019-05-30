@@ -835,7 +835,12 @@ public:
 	// --------------------------------------
 	//  Gameplay
 	// --------------------------------------
+	
+	TArray<FGameplayTagMod> TagModifiers;
 
+	void AddGameplayTagModifier(FGameplayTagMod TagMod);
+	void RemoveGameplayTagModifier(FGameplayTagMod TagMod);
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gameplay")
 	FGameplayTagContainer GameplayTagContainer;
 
