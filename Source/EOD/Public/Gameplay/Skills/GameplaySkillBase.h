@@ -117,6 +117,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
 	EDamageType DamageType;
 
+public:
+
 	// --------------------------------------
 	//	Gameplay Tags
 	// --------------------------------------
@@ -132,6 +134,8 @@ protected:
 	/** The tags that are required on owner to use this ability */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tags")
 	FGameplayTagContainer ActivationRequiredTags;
+
+protected:
 
 	// --------------------------------------
 	//	Cache

@@ -289,9 +289,9 @@ void AEODCharacterBase::RemoveGameplayTagModifier(FGameplayTagMod TagMod)
 			GameplayTagContainer.RemoveTags(TagMod.Tags);
 		}
 
-		for (const FGameplayTagMod& TagMod : TagModifiers)
+		for (const FGameplayTagMod& _TagMod : TagModifiers)
 		{
-			GameplayTagContainer.AppendTags(TagMod.Tags);
+			GameplayTagContainer.AppendTags(_TagMod.Tags);
 		}
 	}
 }

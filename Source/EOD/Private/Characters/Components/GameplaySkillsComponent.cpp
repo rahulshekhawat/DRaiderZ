@@ -105,6 +105,20 @@ void UGameplaySkillsComponent::CancelAllActiveSkills()
 	}
 }
 
+void UGameplaySkillsComponent::CancelSkillsWithTag(FGameplayTag Tag)
+{
+	// It's important to loop in reverse because Skill->CancelSkill() modifies the ActiveSkills array.
+	int32 SkillsNum = ActiveSkills.Num();
+	for (int i = SkillsNum - 1; i >= 0; i--)
+	{
+		UGameplaySkillBase* Skill = ActiveSkills[i];
+		if (Skill->AbilityTags.HasTag(Tag))
+		{
+			Skill->CancelSkill();
+		}
+	}
+}
+
 bool UGameplaySkillsComponent::CanUseAnySkill() const
 {
 	return IsValid(EODCharacterOwner) && EODCharacterOwner->CanUseAnySkill();
@@ -132,17 +146,19 @@ uint8 UGameplaySkillsComponent::GetSkillIndexForSkillGroup(FName SkillGroup) con
 
 UGameplaySkillBase* UGameplaySkillsComponent::GetSkillForSkillGroup(FName SkillGroup) const
 {
-	uint8 SkillIndex = SkillGroupToSkillIndexMap.Contains(SkillGroup) ? SkillGroupToSkillIndexMap[SkillGroup] : 0;
-	UGameplaySkillBase* Skill = SkillIndexToSkillMap.Contains(SkillIndex) ? SkillIndexToSkillMap[SkillIndex] : nullptr;
-	return Skill;
+	return SkillGroupToSkillMap.Contains(SkillGroup) ? SkillGroupToSkillMap[SkillGroup] : nullptr;
 }
 
 void UGameplaySkillsComponent::OnSkillCancelled(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
 {
-	if (Skill)
+	if (!Skill)
 	{
-		ActiveSkills.Remove(Skill);
+		return;
 	}
+
+	ActiveSkills.Remove(Skill);
+
+	BroadcastGameplayEvents(EventNames::OnSkillCancelled, Skill);
 }
 
 void UGameplaySkillsComponent::OnSkillFinished(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
@@ -154,21 +170,26 @@ void UGameplaySkillsComponent::OnSkillFinished(uint8 SkillIndex, FName SkillGrou
 
 	ActiveSkills.Remove(Skill);
 
-	if (!GameplayEvents.Contains(EventNames::OnSkillFinished))
+	BroadcastGameplayEvents(EventNames::OnSkillFinished, Skill);
+}
+
+void UGameplaySkillsComponent::BroadcastGameplayEvents(FName EventType, UGameplaySkillBase* SourceSkill)
+{
+	if (!GameplayEvents.Contains(EventType))
 	{
 		return;
 	}
 
-	TMap<UGameplaySkillBase*, FGameplayEventInfo>& EventsOnSkillFinished = GameplayEvents[EventNames::OnSkillFinished];
+	TMap<UGameplaySkillBase*, FGameplayEventInfo>& Events = GameplayEvents[EventType];
 
-	if (!EventsOnSkillFinished.Contains(Skill))
+	if (!Events.Contains(SourceSkill))
 	{
 		return;
 	}
 
-	const FGameplayEventInfo& EventInfo = EventsOnSkillFinished[Skill];
+	const FGameplayEventInfo& EventInfo = Events[SourceSkill];
 	if (EventInfo.EventClassType == EGameplayEventClassType::GameplayEffect)
-	{ 
+	{
 		ActivateGameplayEffect(EventInfo.EventClass, EventInfo.Instigator, EventInfo.Targets, EventInfo.bDetermineTargetsDynamically);
 	}
 }
@@ -241,6 +262,9 @@ void UGameplaySkillsComponent::ActivateGameplayEffect(UClass* GameplayEffectClas
 
 bool UGameplaySkillsComponent::IsGameplayEffectTypeActive(TSubclassOf<UGameplayEffectBase> GameplayEffectClass, UGameplayEffectBase* GameplayEffectToIgnore)
 {
+	// Following line is just for future syntax reference
+	// TArray<UGameplayEffectBase*> Results = ActiveGameplayEffects.FilterByPredicate([&](UGameplayEffectBase* GE) { return GE->IsA(GameplayEffectClass); });
+
 	if (GameplayEffectToIgnore)
 	{
 		for (UGameplayEffectBase* GameplayEffect : ActiveGameplayEffects)

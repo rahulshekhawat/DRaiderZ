@@ -6,6 +6,7 @@
 #include "EODPreprocessors.h"
 #include "CharacterLibrary.h"
 
+#include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 #include "GameplaySkillsComponent.generated.h"
 
@@ -55,6 +56,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual void CancelAllActiveSkills();
 
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	virtual void CancelSkillsWithTag(FGameplayTag Tag);
+
 	/** Returns true if the character can use any skill right now */
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual bool CanUseAnySkill() const;
@@ -81,6 +85,8 @@ public:
 	/** Event called when a skill gets finished */
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual void OnSkillFinished(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill);
+
+	void BroadcastGameplayEvents(FName EventType, UGameplaySkillBase* SourceSkill);
 
 	inline FGameplaySkillTableRow* GetGameplaySkillTableRow(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
 

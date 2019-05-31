@@ -41,6 +41,7 @@ void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 
 	uint8 SkillIndex = 0;
 	UGameplaySkillBase* Skill = nullptr;
+
 	if (SupersedingChainSkillGroup.Key == SkillKeyIndex)
 	{
 		SkillIndex = SupersedingChainSkillGroup.Value;
@@ -55,6 +56,7 @@ void UPlayerSkillsComponent::OnPressingSkillKey(const int32 SkillKeyIndex)
 		Skill = SkillIndexToSkillMap[SkillIndex];
 	}
 
+	// Do not call TriggerSkill if Skill is nullptr
 	if (Skill)
 	{
 		TriggerSkill(SkillIndex, Skill);
@@ -65,6 +67,7 @@ void UPlayerSkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
 {
 	uint8 SkillIndex = 0;
 	UGameplaySkillBase* Skill = nullptr;
+
 	if (SkillBarMap.Contains(SkillKeyIndex))
 	{
 		SkillIndex = SkillBarMap[SkillKeyIndex];
