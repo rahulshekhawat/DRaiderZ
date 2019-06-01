@@ -3,7 +3,7 @@
 
 #include "SettingsWidget.h"
 #include "EODLibrary.h"
-#include "EODPreprocessors.h"
+#include "EOD.h"
 #include "OptionsWidgetBase.h"
 #include "RegularButtonWidget.h"
 #include "MainMenuPlayerController.h"

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EODPreprocessors.h"
+#include "EOD.h"
 #include "EODGlobalNames.h"
 #include "EODLibrary.h"
 #include "CharacterLibrary.h"

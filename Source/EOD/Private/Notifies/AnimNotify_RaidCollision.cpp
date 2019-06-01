@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "AnimNotify_RaidCollision.h"
-#include "EODPreprocessors.h"
+#include "EOD.h"
 #include "CombatLibrary.h"
 #include "EODCharacterBase.h"
 #include "CombatZoneModeBase.h"

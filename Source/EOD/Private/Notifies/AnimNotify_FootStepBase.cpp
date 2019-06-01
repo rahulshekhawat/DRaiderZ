@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "AnimNotify_FootStepBase.h"
-#include "EODPreprocessors.h"
+#include "EOD.h"
 
 #include "CollisionQueryParams.h"
 #include "Kismet/KismetSystemLibrary.h"

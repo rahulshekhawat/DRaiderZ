@@ -2,7 +2,7 @@
 
 #include "AnimNotify_SphereCollision.h"
 #include "CombatLibrary.h"
-#include "EODPreprocessors.h"
+#include "EOD.h"
 #include "CombatZoneModeBase.h"
 #include "CombatManager.h"
 #include "EODCharacterBase.h"

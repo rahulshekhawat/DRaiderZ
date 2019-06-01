@@ -3,7 +3,7 @@
 
 #include "ContainerWidget.h"
 #include "EODGlobalNames.h"
-#include "EODPreprocessors.h"
+#include "EOD.h"
 #include "InventoryWidget.h"
 #include "DynamicSkillTreeWidget.h"
 #include "ContainerDragDropOperation.h"

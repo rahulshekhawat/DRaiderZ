@@ -7,8 +7,6 @@
 #include "UObject/NoExportTypes.h"
 #include "EODLibrary.generated.h"
 
-#define MIN_SCREEN_WIDTH 1024
-#define MIN_SCREEN_HEIGHT 768
 
 class UTexture;
 class USoundBase;
@@ -195,6 +193,12 @@ struct EOD_API FInventorySlot
 	UPROPERTY(BlueprintReadOnly)
 	UContainerWidget* SlotWidget;
 
+	FInventorySlot() :
+		SlotIndex(0),
+		ItemStackCount(0),
+		SlotWidget(nullptr)
+	{
+	}
 };
 
 /**
@@ -212,8 +216,6 @@ public:
 	
 	static UGameUserSettings* GetGameUserSettings();
 
-	UFUNCTION(BlueprintCallable, Category = "EOD Library")
-	static USoundBase* GetRandomSound(const TArray<USoundBase*> Sounds);
 
 };
 

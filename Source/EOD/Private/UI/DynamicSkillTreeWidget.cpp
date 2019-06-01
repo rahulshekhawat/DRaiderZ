@@ -3,7 +3,7 @@
 
 #include "DynamicSkillTreeWidget.h"
 #include "SkillPointsInfoWidget.h"
-#include "EODPreprocessors.h"
+#include "EOD.h"
 #include "GameplaySkillBase.h"
 #include "ContainerWidget.h"
 #include "SkillTreeComponent.h"

@@ -15,24 +15,6 @@ UGameUserSettings* UEODLibrary::GetGameUserSettings()
 	return GEngine ? GEngine->GameUserSettings : nullptr;
 }
 
-USoundBase* UEODLibrary::GetRandomSound(const TArray<USoundBase*> Sounds)
-{
-	USoundBase* Sound = nullptr;
-
-	int32 SoundsNum = Sounds.Num();
-	if (SoundsNum == 1)
-	{
-		Sound = Sounds[0];
-	}
-	else if (SoundsNum > 1)
-	{
-		int32 RandSoundIndex = FMath::RandRange(0, SoundsNum - 1);
-		Sound = Sounds[RandSoundIndex];
-	}
-
-	return Sound;
-}
-
 FGameplayTagMod& FGameplayTagMod::operator=(FGameplayTagMod const& Other)
 {
 	this->Tags = Other.Tags;

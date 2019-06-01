@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODPlayerController.h"
-#include "EODPreprocessors.h"
+#include "EOD.h"
 #include "EODGameInstance.h"
 #include "PlayerCharacter.h"
 #include "SkillTreeComponent.h"
@@ -288,9 +288,6 @@ void AEODPlayerController::InitSkillTreeWidget()
 {
 	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetSkillTreeWidget()))
 	{
-
-
-
 	}
 }
 
@@ -451,7 +448,6 @@ void AEODPlayerController::OnPressingNormalAttackKey()
 	if (IsValid(EODCharacter))
 	{
 		EODCharacter->SetWantsToNormalAttack(true);
-		// EODCharacter->SetNormalAttackKeyPressed(true);
 	}
 }
 
@@ -460,7 +456,6 @@ void AEODPlayerController::OnReleasingNormalAttackKey()
 	if (IsValid(EODCharacter))
 	{
 		EODCharacter->SetWantsToNormalAttack(false);
-		// EODCharacter->SetNormalAttackKeyPressed(false);
 	}
 }
 
