@@ -634,27 +634,27 @@ USoundBase* APlayerCharacter::GetMeleeHitMissSound() const
 	{
 	case EWeaponType::GreatSword:
 		// Slash2
-		Sound = GetRandomSound(WeaponHitSounds.Slash2HitMissSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2HitMissSounds);
 		break;
 	case EWeaponType::WarHammer:
 		// blunt3
-		Sound = GetRandomSound(WeaponHitSounds.Blunt3HitMissSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3HitMissSounds);
 		break;
 	case EWeaponType::LongSword:
 		// Slash1
-		Sound = GetRandomSound(WeaponHitSounds.SlashHitMissSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashHitMissSounds);
 		break;
 	case EWeaponType::Mace:
 		// blunt1
-		Sound = GetRandomSound(WeaponHitSounds.BluntHitMissSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntHitMissSounds);
 		break;
 	case EWeaponType::Dagger:
 		// slice
-		Sound = GetRandomSound(WeaponHitSounds.SliceHitMissSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceHitMissSounds);
 		break;
 	case EWeaponType::Staff:
 		// blunt2
-		Sound = GetRandomSound(WeaponHitSounds.Blunt2HitMissSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2HitMissSounds);
 		break;
 	default:
 		break;

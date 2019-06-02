@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "WeaponBase.h"
 #include "HumanCharacter.h"
+#include "EODBlueprintFunctionLibrary.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "PlayerCharacter.generated.h"
@@ -173,7 +174,6 @@ public:
 	inline USoundBase* GetMaceHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
 	inline USoundBase* GetStaffHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
 	inline USoundBase* GetDaggerHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
-	inline USoundBase* GetRandomSound(const TArray<USoundBase*> Sounds) const;
 
 	// --------------------------------------
 	//  Skill System
@@ -576,33 +576,33 @@ inline USoundBase* APlayerCharacter::GetGreatswordHitSound(const TEnumAsByte<EPh
 
 	if (bCritHit)
 	{
-		Sound = GetRandomSound(WeaponHitSounds.Slash2CritHitSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2CritHitSounds);
 	}
 	else
 	{
 		if (HitSurface == SURFACETYPE_FLESH)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Slash2FleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2FleshHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_METAL)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Slash2MetalHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2MetalHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_STONE)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Slash2StoneHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2StoneHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_UNDEAD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Slash2UndeadHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2UndeadHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_WOOD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Slash2WoodHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2WoodHitSounds);
 		}
 		else
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Slash2FleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2FleshHitSounds);
 		}
 	}
 
@@ -616,33 +616,33 @@ inline USoundBase* APlayerCharacter::GetWarhammerHitSound(const TEnumAsByte<EPhy
 
 	if (bCritHit)
 	{
-		Sound = GetRandomSound(WeaponHitSounds.Blunt3CritHitSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3CritHitSounds);
 	}
 	else
 	{
 		if (HitSurface == SURFACETYPE_FLESH)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt3FleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3FleshHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_METAL)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt3MetalHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3MetalHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_STONE)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt3StoneHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3StoneHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_UNDEAD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt3UndeadHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3UndeadHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_WOOD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt3WoodHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3WoodHitSounds);
 		}
 		else
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt3FleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3FleshHitSounds);
 		}
 	}
 
@@ -656,33 +656,33 @@ inline USoundBase* APlayerCharacter::GetLongswordHitSound(const TEnumAsByte<EPhy
 
 	if (bCritHit)
 	{
-		Sound = GetRandomSound(WeaponHitSounds.SlashCritHitSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashCritHitSounds);
 	}
 	else
 	{
 		if (HitSurface == SURFACETYPE_FLESH)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SlashFleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashFleshHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_METAL)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SlashMetalHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashMetalHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_STONE)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SlashStoneHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashStoneHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_UNDEAD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SlashUndeadHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashUndeadHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_WOOD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SlashWoodHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashWoodHitSounds);
 		}
 		else
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SlashFleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashFleshHitSounds);
 		}
 	}
 	
@@ -696,33 +696,33 @@ inline USoundBase* APlayerCharacter::GetMaceHitSound(const TEnumAsByte<EPhysical
 
 	if (bCritHit)
 	{
-		Sound = GetRandomSound(WeaponHitSounds.BluntCritHitSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntCritHitSounds);
 	}
 	else
 	{
 		if (HitSurface == SURFACETYPE_FLESH)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.BluntFleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntFleshHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_METAL)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.BluntMetalHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntMetalHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_STONE)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.BluntStoneHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntStoneHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_UNDEAD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.BluntUndeadHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntUndeadHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_WOOD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.BluntWoodHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntWoodHitSounds);
 		}
 		else
 		{
-			Sound = GetRandomSound(WeaponHitSounds.BluntFleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntFleshHitSounds);
 		}
 	}
 	
@@ -736,33 +736,33 @@ inline USoundBase* APlayerCharacter::GetStaffHitSound(const TEnumAsByte<EPhysica
 
 	if (bCritHit)
 	{
-		Sound = GetRandomSound(WeaponHitSounds.Blunt2CritHitSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2CritHitSounds);
 	}
 	else
 	{
 		if (HitSurface == SURFACETYPE_FLESH)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt2FleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2FleshHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_METAL)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt2MetalHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2MetalHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_STONE)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt2StoneHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2StoneHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_UNDEAD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt2UndeadHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2UndeadHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_WOOD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt2WoodHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2WoodHitSounds);
 		}
 		else
 		{
-			Sound = GetRandomSound(WeaponHitSounds.Blunt2FleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2FleshHitSounds);
 		}
 	}
 	
@@ -776,51 +776,35 @@ inline USoundBase* APlayerCharacter::GetDaggerHitSound(const TEnumAsByte<EPhysic
 
 	if (bCritHit)
 	{
-		Sound = GetRandomSound(WeaponHitSounds.SliceCritHitSounds);
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceCritHitSounds);
 	}
 	else
 	{
 		if (HitSurface == SURFACETYPE_FLESH)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SliceFleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceFleshHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_METAL)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SliceMetalHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceMetalHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_STONE)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SliceStoneHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceStoneHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_UNDEAD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SliceUndeadHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceUndeadHitSounds);
 		}
 		else if (HitSurface == SURFACETYPE_WOOD)
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SliceWoodHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceWoodHitSounds);
 		}
 		else
 		{
-			Sound = GetRandomSound(WeaponHitSounds.SliceFleshHitSounds);
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceFleshHitSounds);
 		}
 	}
 	
-	return Sound;
-}
-
-inline USoundBase* APlayerCharacter::GetRandomSound(const TArray<USoundBase*> Sounds) const
-{
-	USoundBase* Sound = nullptr;
-	int32 SoundsNum = Sounds.Num();
-	if (SoundsNum == 1)
-	{
-		Sound = Sounds[0];
-	}
-	else if (SoundsNum > 1)
-	{
-		int32 RandSoundIndex = FMath::RandRange(0, SoundsNum - 1);
-		Sound = Sounds[RandSoundIndex];
-	}
 	return Sound;
 }

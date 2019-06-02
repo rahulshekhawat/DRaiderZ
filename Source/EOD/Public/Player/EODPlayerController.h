@@ -188,6 +188,8 @@ public:
 	/** Toggle display of InventoryWidget */
 	void TogglePlayerInventoryUI();
 
+	void TogglePlayerJournalUI();
+
 private:
 
 	/** Determines whether automatic movement is enabled on possessed pawn */

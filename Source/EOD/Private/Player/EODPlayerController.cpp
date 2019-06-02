@@ -93,6 +93,7 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("ToggleStats", IE_Pressed, this, &AEODPlayerController::TogglePlayerStatsUI);
 	InputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &AEODPlayerController::TogglePlayerSkillTreeUI);
 	InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AEODPlayerController::TogglePlayerInventoryUI);
+	InputComponent->BindAction("ToggleJournal", IE_Pressed, this, &AEODPlayerController::TogglePlayerJournalUI);
 
 	InputComponent->BindAction("Skill_1", IE_Pressed, this, &AEODPlayerController::PressedSkillKey<1>);
 	InputComponent->BindAction("Skill_2", IE_Pressed, this, &AEODPlayerController::PressedSkillKey<2>);
@@ -141,9 +142,6 @@ void AEODPlayerController::SetupInputComponent()
 void AEODPlayerController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	// Load save game files?
-
 }
 
 void AEODPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -342,6 +340,11 @@ void AEODPlayerController::TogglePlayerInventoryUI()
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Visible);
 	}
+}
+
+void AEODPlayerController::TogglePlayerJournalUI()
+{
+
 }
 
 void AEODPlayerController::OnPressedForward()
