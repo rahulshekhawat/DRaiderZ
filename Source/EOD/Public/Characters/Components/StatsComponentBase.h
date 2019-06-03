@@ -79,11 +79,11 @@ protected:
 
 private:
 
-	FORCEINLINE void SetBaseHealth(int32 Value);
+	inline void SetBaseHealth(int32 Value);
 
-	FORCEINLINE void SetMaxHealth(int32 Value);
+	inline void SetMaxHealth(int32 Value);
 
-	FORCEINLINE void SetCurrentHealth(int32 Value);
+	inline void SetCurrentHealth(int32 Value);
 
 public:
 
@@ -122,11 +122,11 @@ protected:
 
 private:
 
-	FORCEINLINE void SetBaseMana(int32 Value);
+	inline void SetBaseMana(int32 Value);
 
-	FORCEINLINE void SetMaxMana(int32 Value);
+	inline void SetMaxMana(int32 Value);
 
-	FORCEINLINE void SetCurrentMana(int32 Value);
+	inline void SetCurrentMana(int32 Value);
 
 public:
 
@@ -165,11 +165,11 @@ protected:
 
 private:
 
-	FORCEINLINE void SetBaseStamina(int32 Value);
+	inline void SetBaseStamina(int32 Value);
 
-	FORCEINLINE void SetMaxStamina(int32 Value);
+	inline void SetMaxStamina(int32 Value);
 
-	FORCEINLINE void SetCurrentStamina(int32 Value);
+	inline void SetCurrentStamina(int32 Value);
 
 public:
 
@@ -546,8 +546,7 @@ protected:
 
 FORCEINLINE bool UStatsComponentBase::IsLowOnHealth() const
 {
-	float CurrentPercent = (float)CurrentHealth / (float)MaxHealth;
-	return CurrentPercent <= LowHealthPercent;
+	return ((float)CurrentHealth / (float)MaxHealth) <= LowHealthPercent;
 }
 
 FORCEINLINE int32 UStatsComponentBase::GetBaseHealth() const
@@ -619,21 +618,25 @@ inline void UStatsComponentBase::ModifyCurrentHealth(int32 Value, bool bPercent)
 	}
 }
 
-FORCEINLINE void UStatsComponentBase::SetBaseHealth(int32 Value)
+inline void UStatsComponentBase::SetBaseHealth(int32 Value)
 {
 	BaseHealth = Value <= 0 ? 0 : Value;
 	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
 }
 
-FORCEINLINE void UStatsComponentBase::SetMaxHealth(int32 Value)
+inline void UStatsComponentBase::SetMaxHealth(int32 Value)
 {
 	MaxHealth = Value <= 0 ? 0 : Value;
 	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
+	if (bHasHealthRegenration && CurrentHealth < MaxHealth && !bIsRegeneratingHealth)
+	{
+		ActivateHealthRegeneration();
+	}
 }
 
-FORCEINLINE void UStatsComponentBase::SetCurrentHealth(int32 Value)
+inline void UStatsComponentBase::SetCurrentHealth(int32 Value)
 {
-	CurrentHealth = Value <= 0 ? 0 : Value;
+	CurrentHealth = Value <= 0 ? 0 : Value >= MaxHealth ? MaxHealth : Value;
 	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
 	if (bHasHealthRegenration && CurrentHealth < MaxHealth && !bIsRegeneratingHealth)
 	{
@@ -710,19 +713,19 @@ inline void UStatsComponentBase::ModifyCurrentMana(int32 Value, bool bPercent)
 	}
 }
 
-FORCEINLINE void UStatsComponentBase::SetBaseMana(int32 Value)
+inline void UStatsComponentBase::SetBaseMana(int32 Value)
 {
 	BaseMana = Value <= 0 ? 0 : Value;
 	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
 }
 
-FORCEINLINE void UStatsComponentBase::SetMaxMana(int32 Value)
+inline void UStatsComponentBase::SetMaxMana(int32 Value)
 {
 	MaxMana = Value <= 0 ? 0 : Value;
 	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
 }
 
-FORCEINLINE void UStatsComponentBase::SetCurrentMana(int32 Value)
+inline void UStatsComponentBase::SetCurrentMana(int32 Value)
 {
 	CurrentMana = Value <= 0 ? 0 : Value;
 	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
@@ -801,19 +804,19 @@ inline void UStatsComponentBase::ModifyCurrentStamina(int32 Value, bool bPercent
 	}
 }
 
-FORCEINLINE void UStatsComponentBase::SetBaseStamina(int32 Value)
+inline void UStatsComponentBase::SetBaseStamina(int32 Value)
 {
 	BaseStamina = Value <= 0 ? 0 : Value;
 	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
 }
 
-FORCEINLINE void UStatsComponentBase::SetMaxStamina(int32 Value)
+inline void UStatsComponentBase::SetMaxStamina(int32 Value)
 {
 	MaxStamina = Value <= 0 ? 0 : Value;
 	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
 }
 
-FORCEINLINE void UStatsComponentBase::SetCurrentStamina(int32 Value)
+inline void UStatsComponentBase::SetCurrentStamina(int32 Value)
 {
 	CurrentStamina = Value <= 0 ? 0 : Value;
 	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);

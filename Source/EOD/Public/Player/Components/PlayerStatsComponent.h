@@ -20,6 +20,11 @@ class EOD_API UPlayerStatsComponent : public UStatsComponentBase
 	GENERATED_BODY()
 	
 public:
+
+	// --------------------------------------
+	//  UE4 Method Overrides
+	// --------------------------------------
+
 	UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer);
 
 	/** Initialize current health, mana, and stamina */
@@ -29,6 +34,10 @@ public:
 
 	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	// --------------------------------------
+	//  Stats Component Interface
+	// --------------------------------------
 
 	virtual int32 GetPhysicalAttack() const override;
 

@@ -128,6 +128,9 @@ public:
 	//  Character States
 	// --------------------------------------
 
+	UFUNCTION(BlueprintCallable, Category = "Character Stats")
+	void SwitchToInteractionState();
+
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe() override;
 

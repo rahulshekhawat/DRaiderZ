@@ -453,6 +453,12 @@ void APlayerCharacter::SetActiveWeaponSlotIndex(int32 NewSlotIndex)
 	ActiveWeaponSlotIndex = NewSlotIndex;
 }
 
+void APlayerCharacter::SwitchToInteractionState()
+{
+	CharacterStateInfo.CharacterState = ECharacterState::Interacting;
+	CharacterStateInfo.SubStateIndex = 0;
+}
+
 void APlayerCharacter::ToggleSheathe()
 {
 	if (CanToggleSheathe())
@@ -805,6 +811,16 @@ void APlayerCharacter::TriggerInteraction()
 
 void APlayerCharacter::StartInteraction()
 {
+	IInteractionInterface* InteractionObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
+	if (InteractionObj)
+	{
+		InteractionObj->Execute_OnInteract(ActiveInteractiveActor, this);
+	}
+
+
+
+
+	/*
 	if (ActiveInteractiveActor)
 	{
 		IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
@@ -845,6 +861,7 @@ void APlayerCharacter::StartInteraction()
 	{
 		CancelInteraction();
 	}
+	*/
 }
 
 void APlayerCharacter::UpdateInteraction()

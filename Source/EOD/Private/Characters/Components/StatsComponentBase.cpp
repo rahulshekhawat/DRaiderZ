@@ -48,7 +48,6 @@ void UStatsComponentBase::BeginPlay()
 
 	SetMaxStamina(BaseStamina);
 	SetCurrentStamina(BaseStamina);
-
 }
 
 void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
