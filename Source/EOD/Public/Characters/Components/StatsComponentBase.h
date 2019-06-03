@@ -4,13 +4,296 @@
 
 #include "CoreMinimal.h"
 #include "CombatLibrary.h"
-
+#include "Engine/Engine.h"
 #include "Components/ActorComponent.h"
 #include "StatsComponentBase.generated.h"
 
 
 /** Delegate for whenever one of the health, mana, or stamina changes */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStatChangedMCDelegate, int32, BaseStatValue, int32, MaxStatValue, int32, CurrentStatValue);
+
+/**
+ * Delegate for when the primary stat value changes
+ * @param1 int32 MaxValue
+ * @param2 int32 CurrentValue
+ */
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnPrimaryStatChangedMCDelegate, int32, int32);
+
+/**
+ * Delegate for when the secondary stat value changes
+ * @param1 int32 CurrentValue
+ */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSecondaryStatChangedMCDelegate, int32);
+
+
+UENUM(BlueprintType)
+enum class EStatModType : uint8
+{
+	Flat,
+	PercentAdditive,
+	PercentMultiplicative
+};
+
+USTRUCT(BlueprintType)
+struct EOD_API FStatModifier
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	int32 Value;
+
+	UPROPERTY()
+	EStatModType ModType;
+
+	UPROPERTY()
+	int32 ModOrder;
+
+	FStatModifier() :
+		Value(0),
+		ModType(EStatModType::Flat),
+		ModOrder(0)
+	{
+	}
+
+	FStatModifier(int32 InValue, EStatModType InModType, int32 InModOrder) :
+		Value(InValue),
+		ModType(InModType),
+		ModOrder(InModOrder)
+	{
+	}
+
+	FORCEINLINE bool operator==(const FStatModifier& Other) const
+	{
+		return this->Value == Other.Value && this->ModType == Other.ModType && this->ModOrder == Other.ModOrder;
+	}
+	FORCEINLINE bool operator!=(const FStatModifier& Other) const
+	{
+		return this->Value != Other.Value || this->ModType != Other.ModType || this->ModOrder != Other.ModOrder;
+	}
+
+	/**
+	 * Comparison operator used for sorting based on ModOrder.
+	 */
+	FORCEINLINE bool operator<(const FStatModifier& Other) const
+	{
+		return this->ModOrder < Other.ModOrder;
+	}
+
+	/**
+	 * Comparison operator used for sorting based on ModOrder.
+	 */
+	FORCEINLINE bool operator>(const FStatModifier& Other) const
+	{
+		return this->ModOrder > Other.ModOrder;
+	}
+};
+
+
+USTRUCT(BlueprintType)
+struct EOD_API FPrimaryStat
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	~FPrimaryStat() { ; }
+
+	FPrimaryStat() :
+		bDirty(false),
+		MaxValue_NoMod(1),
+		MaxValue(1),
+		CurrentValue(0)
+	{
+	}
+
+	FPrimaryStat(int32 InMaxValue, int32 InCurrentValue)
+	{
+		SetMaxValue(InMaxValue);
+		SetCurrentValue(InCurrentValue);
+	}
+
+public:
+
+	/** Directly set the maximum value that doesn't have any modifier applied */
+	void SetMaxValue(int32 InValue)
+	{
+		MaxValue_NoMod = InValue <= 0 ? 1 : InValue;
+		bDirty = true;
+	}
+
+	void ModifyCurrentValue(int32 InValue, bool bPercent)
+	{
+		if (InValue == 0)
+		{
+			return;
+		}
+
+		if (bPercent)
+		{
+			int32 ModValue = (float)(CurrentValue * InValue) / 100.f;
+			SetCurrentValue(CurrentValue + ModValue);
+		}
+		else
+		{
+			SetCurrentValue(CurrentValue + InValue);
+		}
+	}
+
+	void SetCurrentValue(int32 InValue)
+	{
+		int32 Max = GetMaxValue();
+		CurrentValue = InValue <= 0 ? 0 : InValue >= Max ? Max : InValue;
+		OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
+	}
+
+	int32 RecalculateMaxValue()
+	{
+		Modifiers.ValueSort([&](const FStatModifier& Mod1, const FStatModifier& Mod2) { return Mod1 < Mod2; });
+		//~ @todo
+		// OnStatValueChanged
+		bDirty = false;
+		return 0;
+	}
+
+	int32 GetMaxValue() { return bDirty ? RecalculateMaxValue() : MaxValue; }
+
+	int32 GetCurrentValue() const { return CurrentValue; }
+
+	/** Add a modifier to the maximum value of this primary stat */
+	void AddModifier(UObject const * const SourceObj, const FStatModifier& NewMod)
+	{
+		if (SourceObj)
+		{
+			uint32 UniqueID = SourceObj->GetUniqueID();
+			if (Modifiers.Contains(UniqueID))
+			{
+				Modifiers[UniqueID] = NewMod;
+			}
+			else
+			{
+				Modifiers.Add(UniqueID, NewMod);
+			}
+			bDirty = true;
+		}
+	}
+
+	/** Remove a modifier from the maximum value of this primary stat */
+	void RemoveModifier(UObject const * const SourceObj)
+	{
+		if (SourceObj)
+		{
+			uint32 UniqueID = SourceObj->GetUniqueID();
+			if (Modifiers.Contains(UniqueID))
+			{
+				Modifiers.Remove(UniqueID);
+				bDirty = true;
+			}
+		}
+	}
+
+	FOnPrimaryStatChangedMCDelegate OnStatValueChanged;
+
+private:
+
+	bool bDirty;
+	int32 MaxValue_NoMod;
+
+	UPROPERTY()
+	int32 MaxValue;
+
+	UPROPERTY()
+	int32 CurrentValue;
+
+	UPROPERTY()
+	TMap<uint32, FStatModifier> Modifiers;
+};
+
+USTRUCT(BlueprintType)
+struct EOD_API FSecondaryStat
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	~FSecondaryStat() { ; }
+
+	FSecondaryStat() :
+		Value(0)
+	{
+	}
+
+	FSecondaryStat(int32 InValue) :
+		Value(InValue)
+	{
+	}
+
+public:
+
+	/** Directly set the value that doesn't have any modifier applied */
+	void SetMaxValue(int32 InValue)
+	{
+		Value_NoMod = InValue <= 0 ? 1 : InValue;
+		bDirty = true;
+	}
+
+	int32 RecalculateValue()
+	{
+		Modifiers.ValueSort([&](const FStatModifier& Mod1, const FStatModifier& Mod2) { return Mod1 < Mod2; });
+		//~ @todo
+		// OnStatValueChanged
+		bDirty = false;
+		return 0;
+	}
+
+	int32 GetValue() { return bDirty ? RecalculateValue() : Value; }
+
+	/** Add a modifier to the maximum value of this primary stat */
+	void AddModifier(UObject const* const SourceObj, const FStatModifier& NewMod)
+	{
+		if (SourceObj)
+		{
+			uint32 UniqueID = SourceObj->GetUniqueID();
+			if (Modifiers.Contains(UniqueID))
+			{
+				Modifiers[UniqueID] = NewMod;
+			}
+			else
+			{
+				Modifiers.Add(UniqueID, NewMod);
+			}
+			bDirty = true;
+		}
+	}
+
+	/** Remove a modifier from the maximum value of this primary stat */
+	void RemoveModifier(UObject const* const SourceObj)
+	{
+		if (SourceObj)
+		{
+			uint32 UniqueID = SourceObj->GetUniqueID();
+			if (Modifiers.Contains(UniqueID))
+			{
+				Modifiers.Remove(UniqueID);
+				bDirty = true;
+			}
+		}
+	}
+
+	FOnSecondaryStatChangedMCDelegate OnStatValueChanged;
+
+private:
+
+	UPROPERTY()
+	int32 Value;
+	
+	UPROPERTY()
+	TMap<uint32, FStatModifier> Modifiers;
+
+	bool bDirty;
+	int32 Value_NoMod;
+
+};
+
 
 
 /**
