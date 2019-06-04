@@ -165,10 +165,10 @@ struct FAttackInfo
 	float CritRate;
 
 	UPROPERTY(BlueprintReadWrite)
-	int32 NormalDamage;
+	float NormalDamage;
 
 	UPROPERTY(BlueprintReadWrite)
-	int32 CritDamage;
+	float CritDamage;
 
 	UPROPERTY(BlueprintReadWrite)
 	EDamageType DamageType;
@@ -179,16 +179,16 @@ struct FAttackInfo
 	UPROPERTY(BlueprintReadWrite)
 	float CrowdControlEffectDuration;
 
-	FAttackInfo()
+	FAttackInfo() :
+		bUndodgable(false),
+		bUnblockable(false),
+		CritRate(0.f),
+		NormalDamage(0.f),
+		CritDamage(0.f),
+		DamageType(EDamageType::Physical),
+		CrowdControlEffect(ECrowdControlEffect::Flinch),
+		CrowdControlEffectDuration(0.f)
 	{
-		bUndodgable = false;
-		bUnblockable = false;
-		CritRate = 0.f;
-		NormalDamage = 0;
-		CritDamage = 0;
-		DamageType = EDamageType::Physical;
-		CrowdControlEffect = ECrowdControlEffect::Flinch;
-		CrowdControlEffectDuration = 0.f;
 	}
 };
 

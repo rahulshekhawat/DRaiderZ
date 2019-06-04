@@ -39,6 +39,7 @@ void UAIStatsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 }
 
+/*
 int32 UAIStatsComponent::GetPhysicalAttack() const
 {
 	return PhysicalAttack;
@@ -368,13 +369,6 @@ float UAIStatsComponent::GetStaminaConsumptionModifier() const
 	return 1;
 }
 
-/*
-float UAIStatsComponent::GetMovementSpeedModifier() const
-{
-	return MovementSpeedModifier;
-}
-*/
-
 float UAIStatsComponent::GetActiveTimeDilation() const
 {
 	return ActiveTimeDilation;
@@ -406,12 +400,6 @@ void UAIStatsComponent::SetDropRateModifier(float Value)
 void UAIStatsComponent::SetStaminaConsumptionModifier(float Value)
 {
 }
-
-/*
-void UAIStatsComponent::SetMovementSpeedModifier(float Value)
-{
-}
-*/
 
 void UAIStatsComponent::SetActiveTimeDilation(float Value)
 {
@@ -445,13 +433,6 @@ float UAIStatsComponent::ModifyStaminaConsumptionModifier(float Value)
 {
 	return 0.0f;
 }
-
-/*
-float UAIStatsComponent::ModifyMovementSpeedModifier(float Value)
-{
-	return 0.0f;
-}
-*/
 
 int32 UAIStatsComponent::GetDarkness() const
 {
@@ -523,3 +504,4 @@ void UAIStatsComponent::SetElementalHolyDamage(int32 Value)
 void UAIStatsComponent::SetElementalDarkDamage(int32 Value)
 {
 }
+*/

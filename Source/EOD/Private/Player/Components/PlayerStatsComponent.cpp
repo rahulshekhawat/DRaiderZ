@@ -10,21 +10,19 @@
 
 UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
-	StaminaConsumptionModifier		= 1.f;
+	// StaminaConsumptionModifier		= 1.f;
 
 	bHasHealthRegenration			= true;
 	bHasManaRegenration				= true;
 	bHasStaminaRegenration			= true;
 
-	HealthRegenRate					= 10;
-	ManaRegenRate					= 10;
-	StaminaRegenRate				= 10;
+	// HealthRegenRate					= 10;
+	// ManaRegenRate					= 10;
+	// StaminaRegenRate				= 10;
 
 	HealthRegenTickInterval			= 1.f;
 	ManaRegenTickInterval			= 1.f;
 	StaminaRegenTickInterval		= 1.f;
-
-	ActiveTimeDilation = 1.f;
 }
 
 void UPlayerStatsComponent::PostInitProperties()
@@ -92,6 +90,7 @@ void UPlayerStatsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	*/
 }
 
+/*
 int32 UPlayerStatsComponent::GetPhysicalAttack() const
 {
 	return PhysicalAttack;
@@ -544,13 +543,6 @@ float UPlayerStatsComponent::GetStaminaConsumptionModifier() const
 	return StaminaConsumptionModifier;
 }
 
-/*
-float UPlayerStatsComponent::GetMovementSpeedModifier() const
-{
-	return MovementSpeedModifier;
-}
-*/
-
 float UPlayerStatsComponent::GetActiveTimeDilation() const
 {
 	return ActiveTimeDilation;
@@ -593,16 +585,6 @@ float UPlayerStatsComponent::ModifyStaminaConsumptionModifier(float Value)
 	return Result;
 }
 
-/*
-float UPlayerStatsComponent::ModifyMovementSpeedModifier(float Value)
-{
-	float Result = MovementSpeedModifier + Value;
-	Result = Result <= 0 ? 0 : Result;
-	SetMovementSpeedModifier(Result);
-	return Result;
-}
-*/
-
 float UPlayerStatsComponent::ModifyActiveTimeDilation(float Value)
 {
 	float Result = ActiveTimeDilation + Value;
@@ -638,13 +620,6 @@ void UPlayerStatsComponent::SetStaminaConsumptionModifier(float Value)
 {
 	StaminaConsumptionModifier = Value;
 }
-
-/*
-void UPlayerStatsComponent::SetMovementSpeedModifier(float Value)
-{
-	MovementSpeedModifier = Value;
-}
-*/
 
 void UPlayerStatsComponent::SetActiveTimeDilation(float Value)
 {
@@ -699,16 +674,7 @@ float UPlayerStatsComponent::ModifyMagickDamageReductionOnBlock(float Value)
 	SetMagickDamageReductionOnBlock(Result);
 	return Result;
 }
-
-void UPlayerStatsComponent::SetPhysicalDamageReductionOnBlock(float Value)
-{
-	PhysicalDamageReductionOnBlock = Value;
-}
-
-void UPlayerStatsComponent::SetMagickDamageReductionOnBlock(float Value)
-{
-	MagickDamageReductionOnBlock = Value;
-}
+*/
 
 void UPlayerStatsComponent::InitializeComponentWidget()
 {
@@ -719,12 +685,14 @@ void UPlayerStatsComponent::InitializeComponentWidget()
 		return;
 	}
 
+	/*
 	if (StatusIndicatorWidgetClass.Get())
 	{
 		StatusIndicatorWidget = CreateWidget<UStatusIndicatorWidget>(OwningPlayer->GetGameInstance(), StatusIndicatorWidgetClass);
 		//~ @todo
 		// OwningPlayer->GetHUDWidget()->AddStatusIndicatorWidget(StatusIndicatorWidget);
 	}
+	*/
 }
 
 void UPlayerStatsComponent::AddPrimaryWeaponStats(FWeaponTableRow* WeaponData)
@@ -763,19 +731,4 @@ void UPlayerStatsComponent::RemovePrimaryWeaponStats()
 void UPlayerStatsComponent::RemoveSecondaryWeaponStats()
 {
 	SecondaryWeaponData = nullptr;
-}
-
-void UPlayerStatsComponent::AddCrowdControlImmunitiesFromSkill(uint8 CCImmunities)
-{
-	this->CrowdControlImmunitiesFromSkill |= CCImmunities;
-}
-
-void UPlayerStatsComponent::RemoveCrowdControlImmunitiesFromSkil()
-{
-	this->CrowdControlImmunitiesFromSkill = 0;
-}
-
-uint8 UPlayerStatsComponent::GetCrowdControlImmunitiesFromSkill() const
-{
-	return CrowdControlImmunitiesFromSkill;
 }

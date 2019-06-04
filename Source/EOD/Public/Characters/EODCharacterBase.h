@@ -1102,7 +1102,7 @@ public:
 
 	/** [server] Event called on server when character's health changes */
 	UFUNCTION()
-	virtual void OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
+	virtual void OnHealthUpdated(int32 MaxHealth, int32 CurrentHealth);
 
 protected:
 

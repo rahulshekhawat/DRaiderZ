@@ -181,7 +181,7 @@ public:
 	// --------------------------------------
 
 	/** [server] Event called on server when character's health changes */
-	virtual void OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth) override;
+	virtual void OnHealthUpdated(int32 MaxHealth, int32 CurrentHealth) override;
 
 	// --------------------------------------
 	//  Skill System

@@ -259,9 +259,17 @@ void AEODPlayerController::InitStatusIndicatorWidget()
 		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
 		if (StatusIndicatorWidget)
 		{
-			StatsComponent->OnHealthChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
-			StatsComponent->OnManaChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
-			StatsComponent->OnStaminaChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+			//~ @todo
+			/*
+			if(!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
+			{
+				StatsComponent->Health.OnStatValueChanged.AddUObject(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+			}
+			*/
+
+			// StatsComponent->OnHealthChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+			// StatsComponent->OnManaChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+			// StatsComponent->OnStaminaChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
 		}
 	}
 }
@@ -471,8 +479,9 @@ void AEODPlayerController::AttemptDodge()
 			DisableAutoMove();
 		}
 
-		int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
-		int32 CurrentStamina = StatsComponent->GetCurrentStamina();
+		// int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
+		int32 DodgeCost = DodgeStaminaCost;
+		int32 CurrentStamina = StatsComponent->Stamina.GetCurrentValue();
 
 		bool bCanDodge = (CurrentStamina >= DodgeCost) && EODCharacter->CanDodge();
 		if (bCanDodge)
@@ -613,8 +622,9 @@ bool AEODPlayerController::Server_SetGender_Validate(ECharacterGender NewGender)
 void AEODPlayerController::Server_OnInitiateDodge_Implementation()
 {
 	check(StatsComponent);
-	int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
-	StatsComponent->ModifyCurrentStamina(-DodgeCost);
+	// int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
+	int32 DodgeCost = DodgeStaminaCost;
+	StatsComponent->Stamina.ModifyCurrentValue(-DodgeCost);
 }
 
 bool AEODPlayerController::Server_OnInitiateDodge_Validate()

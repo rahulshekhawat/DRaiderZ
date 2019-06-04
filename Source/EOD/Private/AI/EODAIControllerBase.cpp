@@ -48,8 +48,11 @@ void AEODAIControllerBase::SetPawn(APawn* InPawn)
 
 	if (StatsComponent && AICharacter)
 	{
-		AICharacter->OnHealthUpdated(StatsComponent->GetBaseHealth(), StatsComponent->GetMaxHealth(), StatsComponent->GetCurrentHealth());
-		StatsComponent->OnHealthChanged.AddDynamic(AICharacter, &AAICharacterBase::OnHealthUpdated);
+		int32 MaxValue = StatsComponent->Health.GetMaxValue();
+		int32 CurrentValue = StatsComponent->Health.GetCurrentValue();
+
+		AICharacter->OnHealthUpdated(MaxValue, CurrentValue);
+		StatsComponent->Health.OnStatValueChanged.AddUObject(AICharacter, &AAICharacterBase::OnHealthUpdated);
 	}
 }
 

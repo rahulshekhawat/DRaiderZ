@@ -165,8 +165,8 @@ TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(AActor* HitInstigato
 	}
 
 	float ActualDamage = GetActualDamage(HitInstigator, InstigatorCI, AttackInfoPtr, bCritHit, bAttackBlocked);
-	StatsComp->ModifyCurrentHealth(-ActualDamage);
-	int32 CurrentHP = StatsComp->GetCurrentHealth();
+	StatsComp->Health.ModifyCurrentValue(-ActualDamage);
+	int32 CurrentHP = StatsComp->Health.GetCurrentValue();
 
 	bool bCCEApplied = false;
 	if (!bAttackBlocked)
@@ -313,11 +313,11 @@ float AAICharacterBase::GetActualDamage(AActor* HitInstigator, ICombatInterface*
 		{
 			if (AttackInfoPtr->DamageType == EDamageType::Magickal)
 			{
-				DamageReductionOnBlock = StatsComp->GetMagickDamageReductionOnBlock();
+				DamageReductionOnBlock = StatsComp->MagickalDamageReductionOnBlock.GetValue();
 			}
 			else
 			{
-				DamageReductionOnBlock = StatsComp->GetPhysicalDamageReductionOnBlock();
+				DamageReductionOnBlock = StatsComp->PhysicalDamageReductionOnBlock.GetValue();
 			}
 		}
 
@@ -686,10 +686,12 @@ void AAICharacterBase::UpdateHealthWidget()
 	}
 }
 
-void AAICharacterBase::OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth)
+void AAICharacterBase::OnHealthUpdated(int32 MaxHealth, int32 CurrentHealth)
 {
+	/*
 	Health.SetStatValues(BaseHealth, MaxHealth, CurrentHealth);
 	UpdateHealthWidget();
+	*/
 }
 
 void AAICharacterBase::OnRep_InCombat()

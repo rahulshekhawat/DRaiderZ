@@ -253,11 +253,11 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 					UPlayerStatsComponent* StatsComponent = PC->GetStatsComponent();
 					if (StatsComponent)
 					{
-						if (StatsComponent->GetCurrentStamina() < LevelUpInfo.StaminaCost)
+						if (StatsComponent->Stamina.GetCurrentValue() < LevelUpInfo.StaminaCost)
 						{
 							PlayerChar->PlaySystemSound(PlayerChar->SystemSounds.NotEnoughStamina);
 						}
-						else if (StatsComponent->GetCurrentMana() < LevelUpInfo.ManaCost)
+						else if (StatsComponent->Mana.GetCurrentValue() < LevelUpInfo.ManaCost)
 						{
 							PlayerChar->PlaySystemSound(PlayerChar->SystemSounds.NotEnoughEnergy);
 						}

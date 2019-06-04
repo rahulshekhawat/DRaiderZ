@@ -539,15 +539,15 @@ void AEODCharacterBase::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSki
 		CurrentAttackInfoPtr->DamageType = ActiveSkill->GetDamageType();
 		if (CurrentAttackInfoPtr->DamageType == EDamageType::Magickal)
 		{
-			CurrentAttackInfoPtr->CritRate = StatsComponent->GetMagickCritRate();
-			CurrentAttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->GetMagickAttack();
-			CurrentAttackInfoPtr->CritDamage = CurrentAttackInfoPtr->NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComponent->GetMagickCritBonus();
+			CurrentAttackInfoPtr->CritRate = StatsComponent->MagickalCritRate.GetValue();
+			CurrentAttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->MagickalAttack.GetValue();
+			CurrentAttackInfoPtr->CritDamage = CurrentAttackInfoPtr->NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComponent->MagickalCritBonus.GetValue();
 		}
 		else
 		{
-			CurrentAttackInfoPtr->CritRate = StatsComponent->GetPhysicalCritRate();
-			CurrentAttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->GetPhysicalAttack();
-			CurrentAttackInfoPtr->CritDamage = CurrentAttackInfoPtr->NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComponent->GetPhysicalCritBonus();
+			CurrentAttackInfoPtr->CritRate = StatsComponent->PhysicalCritRate.GetValue();
+			CurrentAttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->PhysicalAttack.GetValue();
+			CurrentAttackInfoPtr->CritDamage = CurrentAttackInfoPtr->NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComponent->PhysicalCritBonus.GetValue();
 		}
 	}
 }
@@ -714,7 +714,7 @@ float AEODCharacterBase::GetOrientationYawToActor(const AActor* TargetActor)
 	return OrientationRotator.Yaw;
 }
 
-void AEODCharacterBase::OnHealthUpdated(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth)
+void AEODCharacterBase::OnHealthUpdated(int32 MaxHealth, int32 CurrentHealth)
 {
 }
 

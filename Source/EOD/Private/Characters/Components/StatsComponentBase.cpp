@@ -6,7 +6,7 @@
 #include "TimerManager.h"
 #include "Engine/World.h"
 
-UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
+UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// This compnent doesn't tick
 	PrimaryComponentTick.bCanEverTick = false;
@@ -17,18 +17,25 @@ UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitial
 	bHasStaminaRegenration = false;
 
 	LowHealthPercent = 0.15f;
+
+	Health.OnStatValueChanged.AddUObject(this, &UStatsComponentBase::OnHealthChanged);
+	Mana.OnStatValueChanged.AddUObject(this, &UStatsComponentBase::OnManaChanged);
+	Stamina.OnStatValueChanged.AddUObject(this, &UStatsComponentBase::OnStaminaChanged);
+
 }
 
 void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	/*
 	DOREPLIFETIME(UStatsComponentBase, MaxHealth);
 	DOREPLIFETIME(UStatsComponentBase, CurrentHealth);
 	DOREPLIFETIME(UStatsComponentBase, MaxMana);
 	DOREPLIFETIME(UStatsComponentBase, CurrentMana);
 	DOREPLIFETIME(UStatsComponentBase, MaxStamina);
 	DOREPLIFETIME(UStatsComponentBase, CurrentStamina);
+	*/
 
 	DOREPLIFETIME_CONDITION(UStatsComponentBase, HealthRegenRate, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(UStatsComponentBase, ManaRegenRate, COND_OwnerOnly);
@@ -39,6 +46,8 @@ void UStatsComponentBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//~ @todo
+	/*
 	//~ Initialize current variables
 	SetMaxHealth(BaseHealth);
 	SetCurrentHealth(BaseHealth);
@@ -48,6 +57,7 @@ void UStatsComponentBase::BeginPlay()
 
 	SetMaxStamina(BaseStamina);
 	SetCurrentStamina(BaseStamina);
+	*/
 }
 
 void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -56,44 +66,59 @@ void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 }
 
-// int32 UStatsComponentBase::ModifyPhysicalAttack(int32 Value, bool bPercent)
-int32 UStatsComponentBase::ModifyPhysicalAttack(int32 Value)
+void UStatsComponentBase::OnRep_Health()
 {
-	if (Value == 0)
+	int32 MaxValue = Health.GetMaxValue();
+	int32 CurrentValue = Health.GetCurrentValue();
+	Health.OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
+}
+
+void UStatsComponentBase::OnRep_Mana()
+{
+	int32 MaxValue = Mana.GetMaxValue();
+	int32 CurrentValue = Mana.GetCurrentValue();
+	Mana.OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
+}
+
+void UStatsComponentBase::OnRep_Stamina()
+{
+	int32 MaxValue = Stamina.GetMaxValue();
+	int32 CurrentValue = Stamina.GetCurrentValue();
+	Stamina.OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
+}
+
+bool UStatsComponentBase::IsLowOnHealth()
+{
+	float CurrentHealth = (float)Health.GetCurrentValue();
+	float MaxHealth = (float)Health.GetMaxValue();
+	return (CurrentHealth / MaxHealth) <= LowHealthPercent;
+}
+
+void UStatsComponentBase::OnHealthChanged(int32 MaxValue, int32 CurrentValue)
+{
+	if (bHasHealthRegenration && CurrentValue < MaxValue && !bIsRegeneratingHealth)
 	{
-		return int32();
+		ActivateHealthRegeneration();
 	}
+}
 
-	/*
-	int32 PhysicalAttack = GetPhysicalAttack();
-	if (bPercent)
+void UStatsComponentBase::OnManaChanged(int32 MaxValue, int32 CurrentValue)
+{
+	if (bHasManaRegenration && CurrentValue < MaxValue && !bIsRegeneratingMana)
 	{
-		int32 ModificationValue = (float)(PhysicalAttack * Value) / 100.f;
-		SetPhysicalAttack(PhysicalAttack + ModificationValue);
+		ActivateManaRegeneration();
 	}
-	else
+}
+
+void UStatsComponentBase::OnStaminaChanged(int32 MaxValue, int32 CurrentValue)
+{
+	if (bHasStaminaRegenration && CurrentValue < MaxValue && !bIsRegeneratingStamina)
 	{
-		SetPhysicalAttack(PhysicalAttack + Value);
+		ActivateStaminaRegeneration();
 	}
-	*/
-
-	return int32();
 }
 
-// int32 UStatsComponentBase::ModifyMagickAttack(int32 Value, bool bPercent)
-int32 UStatsComponentBase::ModifyMagickAttack(int32 Value)
-{
-	return int32();
-}
-
-void UStatsComponentBase::SetPhysicalAttack(int32 Value)
-{
-}
-
-void UStatsComponentBase::SetMagickAttack(int32 Value)
-{
-}
-
+/*
 void UStatsComponentBase::OnRep_MaxHealth()
 {
 	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
@@ -123,6 +148,7 @@ void UStatsComponentBase::OnRep_CurrentStamina()
 {
 	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
 }
+*/
 
 void UStatsComponentBase::ActivateHealthRegeneration()
 {
@@ -198,8 +224,12 @@ void UStatsComponentBase::DeactivateStaminaRegeneration()
 
 void UStatsComponentBase::RegenerateHealth()
 {
-	ModifyCurrentHealth(HealthRegenRate);
-	if (CurrentHealth >= MaxHealth)
+	float RegenRate = HealthRegenRate.GetValue();
+	Health.ModifyCurrentValue(RegenRate);
+	int32 CurrentValue = Health.GetCurrentValue();
+	int32 MaxValue = Health.GetMaxValue();
+
+	if (CurrentValue >= MaxValue)
 	{
 		DeactivateHealthRegeneration();
 	}
@@ -207,8 +237,12 @@ void UStatsComponentBase::RegenerateHealth()
 
 void UStatsComponentBase::RegenerateMana()
 {
-	ModifyCurrentMana(ManaRegenRate);
-	if (CurrentMana >= MaxMana)
+	float RegenRate = ManaRegenRate.GetValue();
+	Mana.ModifyCurrentValue(RegenRate);
+	int32 CurrentValue = Mana.GetCurrentValue();
+	int32 MaxValue = Mana.GetMaxValue();
+
+	if (CurrentValue >= MaxValue)
 	{
 		DeactivateManaRegeneration();
 	}
@@ -216,8 +250,12 @@ void UStatsComponentBase::RegenerateMana()
 
 void UStatsComponentBase::RegenerateStamina()
 {
-	ModifyCurrentStamina(StaminaRegenRate);
-	if (CurrentStamina >= MaxStamina)
+	float RegenRate = StaminaRegenRate.GetValue();
+	Stamina.ModifyCurrentValue(RegenRate);
+	int32 CurrentValue = Stamina.GetCurrentValue();
+	int32 MaxValue = Stamina.GetMaxValue();
+
+	if (CurrentValue >= MaxValue)
 	{
 		DeactivateStaminaRegeneration();
 	}

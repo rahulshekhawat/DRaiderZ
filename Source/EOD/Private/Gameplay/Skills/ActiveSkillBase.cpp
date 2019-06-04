@@ -44,8 +44,8 @@ bool UActiveSkillBase::CanCommitSkill() const
 	if (StatsComponent)
 	{
 		const FActiveSkillLevelUpInfo LevelUpInfo = GetCurrentSkillLevelupInfo();
-		if (StatsComponent->GetCurrentStamina() >= LevelUpInfo.StaminaCost &&
-			StatsComponent->GetCurrentMana() >= LevelUpInfo.ManaCost)
+		if (StatsComponent->Stamina.GetCurrentValue() >= LevelUpInfo.StaminaCost &&
+			StatsComponent->Mana.GetCurrentValue() >= LevelUpInfo.ManaCost)
 		{
 			return true;
 		}
@@ -66,8 +66,8 @@ void UActiveSkillBase::CommitSkill()
 
 		int32 StaminaChange = -1 * LevelUpInfo.StaminaCost;
 		int32 ManaChange = -1 * LevelUpInfo.ManaCost;
-		StatsComponent->ModifyCurrentStamina(StaminaChange);
-		StatsComponent->ModifyCurrentMana(ManaChange);
+		StatsComponent->Stamina.ModifyCurrentValue(StaminaChange);
+		StatsComponent->Mana.ModifyCurrentValue(ManaChange);
 	}
 }
 
@@ -266,15 +266,15 @@ TSharedPtr<FAttackInfo> UActiveSkillBase::GetAttackInfoPtr()
 	AttackInfoPtr->DamageType = GetDamageType();
 	if (AttackInfoPtr->DamageType == EDamageType::Magickal)
 	{
-		AttackInfoPtr->CritRate = StatsComponent->GetMagickCritRate();
-		AttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->GetMagickAttack();
-		AttackInfoPtr->CritDamage = AttackInfoPtr->NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComponent->GetMagickCritBonus();
+		AttackInfoPtr->CritRate = StatsComponent->MagickalCritRate.GetValue();
+		AttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->MagickalAttack.GetValue();
+		AttackInfoPtr->CritDamage = AttackInfoPtr->NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComponent->MagickalCritBonus.GetValue();
 	}
 	else
 	{
-		AttackInfoPtr->CritRate = StatsComponent->GetPhysicalCritRate();
-		AttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->GetPhysicalAttack();
-		AttackInfoPtr->CritDamage = AttackInfoPtr->NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComponent->GetPhysicalCritBonus();
+		AttackInfoPtr->CritRate = StatsComponent->PhysicalCritRate.GetValue();
+		AttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->PhysicalAttack.GetValue();
+		AttackInfoPtr->CritDamage = AttackInfoPtr->NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComponent->PhysicalCritBonus.GetValue();
 	}
 
 	return AttackInfoPtr;
