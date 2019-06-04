@@ -45,6 +45,16 @@ void UStatusIndicatorWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void UStatusIndicatorWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if (bStaminaBarDirty)
+	{
+		UpdateStaminaProgressBar(InDeltaTime);
+	}
+}
+
 void UStatusIndicatorWidget::UpdateHealthBar(int32 MaxHealth, int32 CurrentHealth)
 {
 	float CMHratio = (float)CurrentHealth / (float)MaxHealth;
@@ -77,6 +87,7 @@ void UStatusIndicatorWidget::UpdateManaBar(int32 MaxMana, int32 CurrentMana)
 
 void UStatusIndicatorWidget::UpdateStaminaBar(int32 MaxStamina, int32 CurrentStamina)
 {
+	/*
 	float CMSratio = (float)CurrentStamina / (float)MaxStamina;
 	CMSratio = CMSratio > 1.0 ? 1.0 : CMSratio;
 
@@ -85,7 +96,38 @@ void UStatusIndicatorWidget::UpdateStaminaBar(int32 MaxStamina, int32 CurrentSta
 		StaminaBar->SetPercent(CMSratio);
 	}
 
+	*/
+
+	Cached_MaxStamina = MaxStamina;
+	Cached_CurrentStamina = CurrentStamina;
+
+	bStaminaBarDirty = true;
+
 	FString StaminaString = FString::FromInt(CurrentStamina) + FString("/") + FString::FromInt(MaxStamina);
 	FText StaminaText = FText::FromString(StaminaString);
 	StaminaValueText->SetText(StaminaText);
+}
+
+void UStatusIndicatorWidget::UpdateStaminaProgressBar(float DeltaTime)
+{
+	if (StaminaBar)
+	{
+		float CMSratio = (float)Cached_CurrentStamina / (float)Cached_MaxStamina;
+		CMSratio = CMSratio > 1.0 ? 1.0 : CMSratio;
+
+		float FillRate = 1.f;
+
+		float DeltaChange = DeltaTime * FillRate;
+		float CurrentValue = StaminaBar->Percent;
+		float DesiredValue = CMSratio;
+
+		float ValueToSet = FMath::FixedTurn(CurrentValue, DesiredValue, DeltaChange);
+
+		if (ValueToSet == DesiredValue)
+		{
+			bStaminaBarDirty = false;
+		}
+
+		StaminaBar->SetPercent(ValueToSet);
+	}
 }

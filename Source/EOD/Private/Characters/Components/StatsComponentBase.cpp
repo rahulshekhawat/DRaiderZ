@@ -9,8 +9,12 @@
 
 UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitializer) : 
 	Super(ObjectInitializer),
+	Health(100, 100),
+	Mana(100, 100),
 	Stamina(100, 100),
-	StaminaRegenRate(10)
+	HealthRegenRate(10.f),
+	ManaRegenRate(10.f),
+	StaminaRegenRate(10.f)
 {
 	// This compnent doesn't tick
 	PrimaryComponentTick.bCanEverTick = false;

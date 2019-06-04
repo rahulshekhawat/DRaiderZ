@@ -39,10 +39,9 @@ public:
 	virtual bool Initialize() override;
 
 	virtual void NativePreConstruct() override;
-
 	virtual void NativeConstruct() override;
-
 	virtual void NativeDestruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	// --------------------------------------
 	//  Child Widgets
@@ -104,6 +103,13 @@ private:
 	inline void UpdateHealthBar_Internal(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
 	inline void UpdateManaBar_Internal(int32 BaseMana, int32 MaxMana, int32 CurrentMana);
 	inline void UpdateStaminaBar_Internal(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina);
+
+	int32 Cached_MaxStamina;
+	int32 Cached_CurrentStamina;
+
+	bool bStaminaBarDirty;
+
+	void UpdateStaminaProgressBar(float DeltaTime);
 
 };
 
