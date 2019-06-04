@@ -259,17 +259,25 @@ void AEODPlayerController::InitStatusIndicatorWidget()
 		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
 		if (StatusIndicatorWidget)
 		{
-			//~ @todo
-			/*
-			if(!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
+			if (!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
 			{
 				StatsComponent->Health.OnStatValueChanged.AddUObject(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
 			}
-			*/
 
-			// StatsComponent->OnHealthChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
-			// StatsComponent->OnManaChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
-			// StatsComponent->OnStaminaChanged.AddUniqueDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+			if (!StatsComponent->Mana.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
+			{
+				StatsComponent->Mana.OnStatValueChanged.AddUObject(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+			}
+
+			if (!StatsComponent->Stamina.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
+			{
+				StatsComponent->Stamina.OnStatValueChanged.AddUObject(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+			}
+
+			//~ Catch up UI to current stat values
+			StatsComponent->Health.ForceBroadcastDelegate();
+			StatsComponent->Mana.ForceBroadcastDelegate();
+			StatsComponent->Stamina.ForceBroadcastDelegate();
 		}
 	}
 }

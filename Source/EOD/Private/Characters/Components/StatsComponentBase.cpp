@@ -28,14 +28,10 @@ void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	/*
-	DOREPLIFETIME(UStatsComponentBase, MaxHealth);
-	DOREPLIFETIME(UStatsComponentBase, CurrentHealth);
-	DOREPLIFETIME(UStatsComponentBase, MaxMana);
-	DOREPLIFETIME(UStatsComponentBase, CurrentMana);
-	DOREPLIFETIME(UStatsComponentBase, MaxStamina);
-	DOREPLIFETIME(UStatsComponentBase, CurrentStamina);
-	*/
+	DOREPLIFETIME(UStatsComponentBase, Health);
+	DOREPLIFETIME(UStatsComponentBase, Mana);
+	DOREPLIFETIME(UStatsComponentBase, Stamina);
+
 
 	DOREPLIFETIME_CONDITION(UStatsComponentBase, HealthRegenRate, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(UStatsComponentBase, ManaRegenRate, COND_OwnerOnly);

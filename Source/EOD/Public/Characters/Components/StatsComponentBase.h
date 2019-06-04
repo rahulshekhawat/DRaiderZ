@@ -193,6 +193,13 @@ public:
 		}
 	}
 
+	void ForceBroadcastDelegate()
+	{
+		int32 CV = GetCurrentValue();
+		int32 MV = GetMaxValue();
+		OnStatValueChanged.Broadcast(MV, CV);
+	}
+
 	FOnPrimaryStatChangedMCDelegate OnStatValueChanged;
 
 private:

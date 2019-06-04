@@ -118,8 +118,9 @@ protected:
 
 private:
 
-	void OnPreLoadMap(const FString& MapName);
+	void LoadSaveGame();
 
+	void OnPreLoadMap(const FString& MapName);
 	void OnPostLoadMap(UWorld* WorldObj);
 
 public:

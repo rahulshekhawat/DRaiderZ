@@ -8,6 +8,7 @@
 #include "Components/Spacer.h"
 #include "Components/Overlay.h"
 #include "Components/TextBlock.h"
+#include "Components/ProgressBar.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Blueprint/UserWidget.h"
@@ -16,6 +17,7 @@
 class UImage;
 class USpacer;
 class UOverlay;
+class UProgressBar;
 class UHorizontalBoxSlot;
 
 /**
@@ -47,49 +49,31 @@ public:
 	// --------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UImage* HealthBarEmpty;
-
+	UProgressBar* HealthBar;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UImage* HealthBarFill;
-
+	UProgressBar* ManaBar;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UProgressBar* StaminaBar;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* HealthBarBlocked;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UOverlay* HealthOverlay;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	USpacer* HealthSpacer;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UImage* ManaBarEmpty;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UImage* ManaBarFill;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* ManaBarBlocked;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UOverlay* ManaOverlay;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	USpacer* ManaSpacer;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UImage* StaminaBarEmpty;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UImage* StaminaBarFill;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* StaminaBarBlocked;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UOverlay* StaminaOverlay;
-
+	UOverlay* HealthOverlay;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	USpacer* StaminaSpacer;
+	UOverlay* ManaOverlay;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UOverlay* StaminaOverlay;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* HealthValueText;
@@ -105,33 +89,31 @@ public:
 	// --------------------------------------
 
 	UFUNCTION()
-	void UpdateHealthBar(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
+	void UpdateHealthBar(int32 MaxHealth, int32 CurrentHealth);
 
 	UFUNCTION()
-	void UpdateManaBar(int32 BaseMana, int32 MaxMana, int32 CurrentMana);
+	void UpdateManaBar(int32 MaxMana, int32 CurrentMana);
 
 	UFUNCTION()
-	void UpdateStaminaBar(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina);
+	void UpdateStaminaBar(int32 MaxStamina, int32 CurrentStamina);
 
 private:
 
 	inline void SetHorizontalSlotSize(UHorizontalBoxSlot* HBSlot, float FillValue);
 
 	inline void UpdateHealthBar_Internal(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
-
 	inline void UpdateManaBar_Internal(int32 BaseMana, int32 MaxMana, int32 CurrentMana);
-
 	inline void UpdateStaminaBar_Internal(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina);
 
 };
 
 inline void UStatusIndicatorWidget::SetHorizontalSlotSize(UHorizontalBoxSlot* HBSlot, float FillValue)
 {
-	FSlateChildSize StaminaOverlaySize;
-	StaminaOverlaySize.SizeRule = ESlateSizeRule::Fill;
-	StaminaOverlaySize.Value = FillValue;
 	if (IsValid(HBSlot))
 	{
+		FSlateChildSize StaminaOverlaySize;
+		StaminaOverlaySize.SizeRule = ESlateSizeRule::Fill;
+		StaminaOverlaySize.Value = FillValue;
 		HBSlot->SetSize(StaminaOverlaySize);
 	}
 }
@@ -150,11 +132,10 @@ inline void UStatusIndicatorWidget::UpdateHealthBar_Internal(int32 BaseHealth, i
 	float CMHratio = (float)CurrentHealth / (float)MaxHealth;
 	CMHratio = CMHratio > 1.0 ? 1.0 : CMHratio;
 
-	UHorizontalBoxSlot* HealthBarFillHSlot = IsValid(HealthBarFill) ? Cast<UHorizontalBoxSlot>(HealthBarFill->Slot) : nullptr;
-	UHorizontalBoxSlot* HealthSpacerHSlot = IsValid(HealthSpacer) ? Cast<UHorizontalBoxSlot>(HealthSpacer->Slot) : nullptr;
-
-	SetHorizontalSlotSize(HealthBarFillHSlot, CMHratio);
-	SetHorizontalSlotSize(HealthSpacerHSlot, 1 - CMHratio);
+	if (HealthBar)
+	{
+		HealthBar->SetPercent(CMHratio);
+	}
 
 	FString HealthString = FString::FromInt(CurrentHealth) + FString("/") + FString::FromInt(MaxHealth);
 	FText HealthText = FText::FromString(HealthString);
@@ -175,11 +156,10 @@ inline void UStatusIndicatorWidget::UpdateManaBar_Internal(int32 BaseMana, int32
 	float CMMratio = (float)CurrentMana / (float)MaxMana;
 	CMMratio = CMMratio > 1.0 ? 1.0 : CMMratio;
 
-	UHorizontalBoxSlot* ManaBarFillHSlot = IsValid(ManaBarFill) ? Cast<UHorizontalBoxSlot>(ManaBarFill->Slot) : nullptr;
-	UHorizontalBoxSlot* ManaSpacerHSlot = IsValid(ManaSpacer) ? Cast<UHorizontalBoxSlot>(ManaSpacer->Slot) : nullptr;
-
-	SetHorizontalSlotSize(ManaBarFillHSlot, CMMratio);
-	SetHorizontalSlotSize(ManaSpacerHSlot, 1 - CMMratio);
+	if (ManaBar)
+	{
+		ManaBar->SetPercent(CMMratio);
+	}
 
 	FString ManaString = FString::FromInt(CurrentMana) + FString("/") + FString::FromInt(MaxMana);
 	FText ManaText = FText::FromString(ManaString);
@@ -200,11 +180,10 @@ inline void UStatusIndicatorWidget::UpdateStaminaBar_Internal(int32 BaseStamina,
 	float CMSratio = (float)CurrentStamina / (float)MaxStamina;
 	CMSratio = CMSratio > 1.0 ? 1.0 : CMSratio;
 
-	UHorizontalBoxSlot* StaminaBarFillHSlot = IsValid(StaminaBarFill) ? Cast<UHorizontalBoxSlot>(StaminaBarFill->Slot) : nullptr;
-	UHorizontalBoxSlot* StaminaSpacerHSlot = IsValid(StaminaSpacer) ? Cast<UHorizontalBoxSlot>(StaminaSpacer->Slot) : nullptr;
-
-	SetHorizontalSlotSize(StaminaBarFillHSlot, CMSratio);
-	SetHorizontalSlotSize(StaminaSpacerHSlot, 1 - CMSratio);
+	if (StaminaBar)
+	{
+		StaminaBar->SetPercent(CMSratio);
+	}
 
 	FString StaminaString = FString::FromInt(CurrentStamina) + FString("/") + FString::FromInt(MaxStamina);
 	FText StaminaText = FText::FromString(StaminaString);

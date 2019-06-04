@@ -20,42 +20,14 @@ UEODGameInstance::UEODGameInstance(const FObjectInitializer& ObjectInitializer) 
 {
 	GameTitle = FText::FromString("Dark RaiderZ");
 	StartupMapName = FName("Level0_Haddon");
+
+	LoadSaveGame();
 }
 
 void UEODGameInstance::Init()
 {
 	Super::Init();
 
-	// Load the meta save game object
-	if (UGameplayStatics::DoesSaveGameExist(UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex))
-	{
-		MetaSaveGame = Cast<UMetaSaveGame>(UGameplayStatics::LoadGameFromSlot(UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex));
-	}
-	// If the meta save game object doesn't exist yet (running game for first time), create and save one 
-	else
-	{
-		MetaSaveGame = Cast<UMetaSaveGame>(UGameplayStatics::CreateSaveGameObject(UMetaSaveGame::StaticClass()));
-		if (IsValid(MetaSaveGame))
-		{
-			UGameplayStatics::SaveGameToSlot(MetaSaveGame, UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex);
-		}
-	}
-
-	if (IsValid(MetaSaveGame))
-	{
-		if (MetaSaveGame->LastUsedSlotName != FString("") && UGameplayStatics::DoesSaveGameExist(MetaSaveGame->LastUsedSlotName, UEODGameInstance::PlayerIndex))
-		{
-			CurrentProfileSaveGame = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(MetaSaveGame->LastUsedSlotName, UEODGameInstance::PlayerIndex));
-			CurrentProfileName = MetaSaveGame->LastUsedSlotName;
-		}
-#if WITH_EDITOR
-		else
-		{
-			CreateNewProfile(FString("Editor_SaveGame"));
-			LoadProfileAsCurrent(FString("Editor_SaveGame"));
-		}
-#endif
-	}
 
 	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UEODGameInstance::OnPreLoadMap);
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEODGameInstance::OnPostLoadMap);
@@ -125,24 +97,49 @@ UPlayerSaveGame* UEODGameInstance::LoadProfileAsCurrent(const FString& ProfileNa
 	return nullptr;
 }
 
+void UEODGameInstance::LoadSaveGame()
+{
+	// Load the meta save game object
+	if (UGameplayStatics::DoesSaveGameExist(UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex))
+	{
+		MetaSaveGame = Cast<UMetaSaveGame>(UGameplayStatics::LoadGameFromSlot(UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex));
+	}
+	// If the meta save game object doesn't exist yet (running game for first time), create and save one 
+	else
+	{
+		MetaSaveGame = Cast<UMetaSaveGame>(UGameplayStatics::CreateSaveGameObject(UMetaSaveGame::StaticClass()));
+		if (IsValid(MetaSaveGame))
+		{
+			UGameplayStatics::SaveGameToSlot(MetaSaveGame, UEODGameInstance::MetaSaveSlotName, UEODGameInstance::PlayerIndex);
+		}
+	}
+
+	if (IsValid(MetaSaveGame))
+	{
+		if (MetaSaveGame->LastUsedSlotName != FString("") && UGameplayStatics::DoesSaveGameExist(MetaSaveGame->LastUsedSlotName, UEODGameInstance::PlayerIndex))
+		{
+			CurrentProfileSaveGame = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(MetaSaveGame->LastUsedSlotName, UEODGameInstance::PlayerIndex));
+			CurrentProfileName = MetaSaveGame->LastUsedSlotName;
+		}
+#if WITH_EDITOR
+		else
+		{
+			CreateNewProfile(FString("Editor_SaveGame"));
+			LoadProfileAsCurrent(FString("Editor_SaveGame"));
+		}
+#endif
+	}
+}
+
 void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 {
-	//~ @todo
-	/*
-	if (SkillTreeManager)
-	{
-		SkillTreeManager->Destroy();
-	}
-	*/
+	IGameMoviePlayer* MoviePlayer = GetMoviePlayer();
 
-	// if (GetMoviePlayer()->IsStartupMoviePlaying() || IsRunningDedicatedServer())
-	if (GetMoviePlayer()->IsStartupMoviePlaying() || IsRunningDedicatedServer())
+	if (!MoviePlayer || MoviePlayer->IsStartupMoviePlaying() || IsRunningDedicatedServer())
 	{
 		return;
 	}
-
 	
-	// @note following code works fine for single player but causes a crash in PIE multiplayer tests. Temporarily disabled.
 	if (!IsValid(LoadingScreenWidget))
 	{
 		LoadingScreenWidget = CreateWidget<UUserWidget>(this, LoadingScreenWidgetClass);
@@ -155,19 +152,8 @@ void UEODGameInstance::OnPreLoadMap(const FString& MapName)
 		LoadingScreen.WidgetLoadingScreen = LoadingScreenWidget->TakeWidget();
 
 
-		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
+		MoviePlayer->SetupLoadingScreen(LoadingScreen);
 	}
-
-	/*
-	if (GetMoviePlayer())
-	{
-		FLoadingScreenAttributes LoadingScreen;
-		LoadingScreen.bAutoCompleteWhenLoadingCompletes = true;
-		LoadingScreen.WidgetLoadingScreen = FLoadingScreenAttributes::NewTestLoadingScreenWidget();
-
-		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
-	}
-	*/
 }
 
 void UEODGameInstance::OnPostLoadMap(UWorld* WorldObj)
