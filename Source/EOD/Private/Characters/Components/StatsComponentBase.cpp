@@ -1,12 +1,16 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "StatsComponentBase.h"
+#include "EOD.h"
 
 #include "UnrealNetwork.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
 
-UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitializer) : 
+	Super(ObjectInitializer),
+	Stamina(100, 100),
+	StaminaRegenRate(10)
 {
 	// This compnent doesn't tick
 	PrimaryComponentTick.bCanEverTick = false;
@@ -17,10 +21,6 @@ UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitial
 	bHasStaminaRegenration = false;
 
 	LowHealthPercent = 0.15f;
-
-	Health.OnStatValueChanged.AddUObject(this, &UStatsComponentBase::OnHealthChanged);
-	Mana.OnStatValueChanged.AddUObject(this, &UStatsComponentBase::OnManaChanged);
-	Stamina.OnStatValueChanged.AddUObject(this, &UStatsComponentBase::OnStaminaChanged);
 
 }
 
@@ -42,7 +42,29 @@ void UStatsComponentBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//~ @todo
+	/**
+	 * @note
+	 *	When I bound these delegates in constructor of UStatsComponentBase,
+	 *	GetWorld() always returned null in ActivateSTATRegen() function (which gets called through OnSTATChanged() function)
+	 *	So I've added these delegate bindings in BeginPlay() and everything works fine now.
+	 */		
+
+	if (!Health.OnStatValueChanged.IsBoundToObject(this))
+	{
+		Health.OnStatValueChanged.AddUObject(this, &UStatsComponentBase::OnHealthChanged);
+	}
+
+	if (!Mana.OnStatValueChanged.IsBoundToObject(this))
+	{
+		Mana.OnStatValueChanged.AddUObject(this, &UStatsComponentBase::OnManaChanged);
+	}
+
+	if (!Stamina.OnStatValueChanged.IsBoundToObject(this))
+	{
+		Stamina.OnStatValueChanged.AddUObject(this, &UStatsComponentBase::OnStaminaChanged);
+	}
+
+	//~ @todo Load stat values
 	/*
 	//~ Initialize current variables
 	SetMaxHealth(BaseHealth);
@@ -64,23 +86,17 @@ void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UStatsComponentBase::OnRep_Health()
 {
-	int32 MaxValue = Health.GetMaxValue();
-	int32 CurrentValue = Health.GetCurrentValue();
-	Health.OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
+	Health.ForceBroadcastDelegate();
 }
 
 void UStatsComponentBase::OnRep_Mana()
 {
-	int32 MaxValue = Mana.GetMaxValue();
-	int32 CurrentValue = Mana.GetCurrentValue();
-	Mana.OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
+	Mana.ForceBroadcastDelegate();
 }
 
 void UStatsComponentBase::OnRep_Stamina()
 {
-	int32 MaxValue = Stamina.GetMaxValue();
-	int32 CurrentValue = Stamina.GetCurrentValue();
-	Stamina.OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
+	Stamina.ForceBroadcastDelegate();
 }
 
 bool UStatsComponentBase::IsLowOnHealth()
@@ -113,38 +129,6 @@ void UStatsComponentBase::OnStaminaChanged(int32 MaxValue, int32 CurrentValue)
 		ActivateStaminaRegeneration();
 	}
 }
-
-/*
-void UStatsComponentBase::OnRep_MaxHealth()
-{
-	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
-}
-
-void UStatsComponentBase::OnRep_CurrentHealth()
-{
-	OnHealthChanged.Broadcast(BaseHealth, MaxHealth, CurrentHealth);
-}
-
-void UStatsComponentBase::OnRep_MaxMana()
-{
-	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
-}
-
-void UStatsComponentBase::OnRep_CurrentMana()
-{
-	OnManaChanged.Broadcast(BaseMana, MaxMana, CurrentMana);
-}
-
-void UStatsComponentBase::OnRep_MaxStamina()
-{
-	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
-}
-
-void UStatsComponentBase::OnRep_CurrentStamina()
-{
-	OnStaminaChanged.Broadcast(BaseStamina, MaxStamina, CurrentStamina);
-}
-*/
 
 void UStatsComponentBase::ActivateHealthRegeneration()
 {

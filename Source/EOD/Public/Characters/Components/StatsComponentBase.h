@@ -151,10 +151,21 @@ public:
 	int32 RecalculateMaxValue()
 	{
 		Modifiers.ValueSort([&](const FStatModifier& Mod1, const FStatModifier& Mod2) { return Mod1 < Mod2; });
+
+		for (const TPair<uint32, FStatModifier>& ModPair : Modifiers)
+		{
+
+
+		}
+
+		// temporary code
+		MaxValue = MaxValue_NoMod;
+		OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
+
 		//~ @todo
 		// OnStatValueChanged
 		bDirty = false;
-		return 0;
+		return MaxValue;
 	}
 
 	int32 GetMaxValue() { return bDirty ? RecalculateMaxValue() : MaxValue; }
@@ -236,6 +247,7 @@ public:
 	FGenericStat(float InValue)
 	{
 		SetValue(InValue);
+		RecalculateValue();
 	}
 
 public:
@@ -250,10 +262,14 @@ public:
 	float RecalculateValue()
 	{
 		Modifiers.ValueSort([&](const FStatModifier& Mod1, const FStatModifier& Mod2) { return Mod1 < Mod2; });
+
+		// temporary
+		Value = Value_NoMod;
+
 		//~ @todo
 		// OnStatValueChanged
 		bDirty = false;
-		return 0;
+		return Value;
 	}
 
 	float GetValue() { return bDirty ? RecalculateValue() : Value; }
@@ -533,8 +549,13 @@ public:
 
 	bool IsLowOnHealth();
 
+	UFUNCTION()
 	void OnHealthChanged(int32 MaxValue, int32 CurrentValue);
+
+	UFUNCTION()
 	void OnManaChanged(int32 MaxValue, int32 CurrentValue);
+
+	UFUNCTION()
 	void OnStaminaChanged(int32 MaxValue, int32 CurrentValue);
 
 
@@ -615,6 +636,7 @@ public:
 
 	void RegenerateMana();
 
+	UFUNCTION()
 	void RegenerateStamina();
 
 	// --------------------------------------
