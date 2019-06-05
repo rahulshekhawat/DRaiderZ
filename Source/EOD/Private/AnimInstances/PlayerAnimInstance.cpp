@@ -59,7 +59,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	//~ @todo return if player is dead.
 
 	bool bIsFalling = EODPlayerOwner->GetCharacterMovement() && EODPlayerOwner->GetCharacterMovement()->IsFalling();
-	bool bCanJumpAnimationPlay = EODPlayerOwner->IsIdleOrMoving() || EODPlayerOwner->IsJumping();
+	bool bCanJumpAnimationPlay = EODPlayerOwner->IsIdleOrMoving() || EODPlayerOwner->IsJumping() || EODPlayerOwner->IsBlocking();
 	if (bIsFalling && !bJumpAnimationPlayingLocally && bCanJumpAnimationPlay)
 	{
 		UAnimMontage* JumpMontage = AnimationReferences->Jump.Get();
