@@ -40,10 +40,10 @@ public:
 	//	Manager Classes
 	// --------------------------------------
 
-	FORCEINLINE AStatusEffectsManager* GetStatusEffectsManager() const;
+	// FORCEINLINE AStatusEffectsManager* GetStatusEffectsManager() const;
 
-	UFUNCTION(BlueprintPure, Category = Managers, meta = (DisplayName = "Get Status Effects Manager"))
-	AStatusEffectsManager* BP_GetStatusEffectsManager() const;
+	// UFUNCTION(BlueprintPure, Category = Managers, meta = (DisplayName = "Get Status Effects Manager"))
+	// AStatusEffectsManager* BP_GetStatusEffectsManager() const;
 
 protected:
 
@@ -56,15 +56,17 @@ protected:
 	TSubclassOf<AEODCharacterBase> MalePawnClass;
 
 	/** Blueprint class used for spawning status effect manager */
-	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
-	TSubclassOf<AStatusEffectsManager> StatusEffectsManagerClass;
+	// UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
+	// TSubclassOf<AStatusEffectsManager> StatusEffectsManagerClass;
 
-	UPROPERTY(Transient)
-	AStatusEffectsManager* StatusEffectsManager;
+	// UPROPERTY(Transient)
+	// AStatusEffectsManager* StatusEffectsManager;
 
 };
 
+/*
 FORCEINLINE AStatusEffectsManager* AEODGameModeBase::GetStatusEffectsManager() const
 {
 	return StatusEffectsManager;
 }
+*/

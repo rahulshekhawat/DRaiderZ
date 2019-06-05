@@ -7,7 +7,7 @@
 #include "EODGlobalNames.h"
 #include "EODLibrary.h"
 #include "CharacterLibrary.h"
-#include "StatusEffectBase.h"
+// #include "StatusEffectBase.h"
 #include "StatsComponentBase.h"
 #include "CombatInterface.h"
 

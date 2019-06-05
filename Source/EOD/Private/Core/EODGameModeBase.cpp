@@ -3,7 +3,7 @@
 #include "EODGameModeBase.h"
 #include "EODSaveGame.h"
 #include "GameSingleton.h"
-#include "StatusEffectsManager.h"
+// #include "StatusEffectsManager.h"
 
 #include "EODPlayerController.h"
 
@@ -22,6 +22,7 @@ void AEODGameModeBase::InitGame(const FString& MapName, const FString& Options, 
 	UWorld* World = GetWorld();
 	if (World)
 	{
+		/*
 		if (StatusEffectsManagerClass.Get())
 		{
 			FActorSpawnParameters SpawnInfo;
@@ -30,6 +31,7 @@ void AEODGameModeBase::InitGame(const FString& MapName, const FString& Options, 
 			SpawnInfo.ObjectFlags |= RF_Transient;
 			StatusEffectsManager = World->SpawnActor<AStatusEffectsManager>(StatusEffectsManagerClass, SpawnInfo);
 		}
+		*/
 	}
 }
 
@@ -60,7 +62,10 @@ UClass* AEODGameModeBase::GetDefaultPawnClassForController_Implementation(AContr
 	return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
 
+/*
 AStatusEffectsManager* AEODGameModeBase::BP_GetStatusEffectsManager() const
 {
 	return GetStatusEffectsManager();
 }
+*/
+

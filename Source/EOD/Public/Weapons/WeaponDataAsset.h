@@ -133,15 +133,15 @@ public:
 	bool bHasSpecialGemSlot;
 
 	/** Status effects (both buffs and debuffs) */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, Category = Stats)
-	TArray<TSubclassOf<UStatusEffectBase>> StatusEffects;
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, Category = Stats)
+	// TArray<TSubclassOf<UStatusEffectBase>> StatusEffects;
 
 	/**
 	 * Default elemental affinity of this weapon
 	 * @note The weapon won't support elemental enchant if the elemental affinity is not none
 	 */
-	 UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, Category = Stats)
-	 TSubclassOf<UElementalBase> ElementalAffinity;
+	 // UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, Category = Stats)
+	 // TSubclassOf<UElementalBase> ElementalAffinity;
 
 };
 

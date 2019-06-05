@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StatusEffectBase.h"
+// #include "StatusEffectBase.h"
 
 #include "Engine/Texture.h"
 #include "Engine/DataTable.h"
@@ -130,8 +130,8 @@ struct EOD_API FWeaponTableRow : public FTableRowBase
 	// bool bCanAddSpecialAbilityGem;
 	
 	/** Status effects (both buffs and debuffs) */
-	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	TArray<TSubclassOf<class UStatusEffectBase>> StatusEffects;
+	// UPROPERTY(EditAnywhere, Category = AdditionalInfo)
+	// TArray<TSubclassOf<class UStatusEffectBase>> StatusEffects;
 	
 	/**
 	 * Default elemental affinity of this weapon

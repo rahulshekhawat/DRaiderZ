@@ -785,8 +785,8 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 	uint8 CrowdControlImmunities;
 
 	/** Status effect that this skill triggers */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	TSubclassOf<class UStatusEffectBase> StatusEffect;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
+	// TSubclassOf<class UStatusEffectBase> StatusEffect;
 
 	FSkillTableRow()
 	{
