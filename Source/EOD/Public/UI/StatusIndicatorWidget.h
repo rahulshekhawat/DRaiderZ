@@ -87,6 +87,11 @@ public:
 	//  Widget Behaviour
 	// --------------------------------------
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget Behavior")
+	float BarFillRate;
+
+public:
+
 	UFUNCTION()
 	void UpdateHealthBar(int32 MaxHealth, int32 CurrentHealth);
 
@@ -104,11 +109,21 @@ private:
 	inline void UpdateManaBar_Internal(int32 BaseMana, int32 MaxMana, int32 CurrentMana);
 	inline void UpdateStaminaBar_Internal(int32 BaseStamina, int32 MaxStamina, int32 CurrentStamina);
 
+	int32 Cached_MaxHealth;
+	int32 Cached_CurrentHealth;
+
+	int32 Cached_MaxMana;
+	int32 Cached_CurrentMana;
+
 	int32 Cached_MaxStamina;
 	int32 Cached_CurrentStamina;
 
+	bool bHealthBarDirty;
+	bool bManaBarDirty;
 	bool bStaminaBarDirty;
 
+	void UpdateHealthProgressBar(float DeltaTime);
+	void UpdateManaProgressBar(float DeltaTime);
 	void UpdateStaminaProgressBar(float DeltaTime);
 
 };
