@@ -443,7 +443,8 @@ void AEODPlayerController::MakePawnJump()
 
 void AEODPlayerController::ZoomInCamera()
 {
-	if (IsValid(EODCharacter))
+	// Zoom in only if the mouse cursor is hidden. If mouse cursor is not hidden, it means the player is most likely interacting with UI.
+	if (!bShowMouseCursor && IsValid(EODCharacter))
 	{
 		EODCharacter->ZoomInCamera();
 	}
@@ -451,7 +452,8 @@ void AEODPlayerController::ZoomInCamera()
 
 void AEODPlayerController::ZoomOutCamera()
 {
-	if (IsValid(EODCharacter))
+	// Zoom out only if the mouse cursor is hidden. If mouse cursor is not hidden, it means the player is most likely interacting with UI.
+	if (!bShowMouseCursor && IsValid(EODCharacter))
 	{
 		EODCharacter->ZoomOutCamera();
 	}
@@ -464,7 +466,7 @@ void AEODPlayerController::OnPressingNormalAttackKey()
 		DisableAutoMove();
 	}
 
-	if (IsValid(EODCharacter))
+	if (!bShowMouseCursor && IsValid(EODCharacter))
 	{
 		EODCharacter->SetWantsToNormalAttack(true);
 	}
@@ -547,7 +549,7 @@ void AEODPlayerController::OnPressingGuardKey()
 		DisableAutoMove();
 	}
 
-	if (IsValid(EODCharacter))
+	if (!bShowMouseCursor && IsValid(EODCharacter))
 	{
 		EODCharacter->SetWantsToGuard(true);
 	}
