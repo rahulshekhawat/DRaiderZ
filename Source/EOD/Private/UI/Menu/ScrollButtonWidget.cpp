@@ -134,7 +134,7 @@ void UScrollButtonWidget::SetSliderValue(float InValue)
 
 	if (SliderValueTextBlock)
 	{
-		SliderValueTextBlock->SetText(FText::FromString(FString::SanitizeFloat(InValue * 100)));
+		SliderValueTextBlock->SetText(FText::FromString(FString::FromInt(InValue * 100)));
 	}
 }
 
@@ -167,7 +167,7 @@ void UScrollButtonWidget::OnOptionSliderValueChanged(float NewValue)
 	}
 	if (SliderValueTextBlock)
 	{
-		FString SliderString = FString::SanitizeFloat(NewValue * 100.f) + FString("%");
+		FString SliderString = FString::FromInt(NewValue * 100) + FString("%");
 		SliderValueTextBlock->SetText(FText::FromString(SliderString));
 	}
 }
