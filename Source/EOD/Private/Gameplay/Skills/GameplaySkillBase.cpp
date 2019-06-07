@@ -15,14 +15,7 @@ void UGameplaySkillBase::InitSkill(AEODCharacterBase* Instigator, AController* O
 {
 	SkillInstigator = Instigator;
 	SkillOwner = Owner;
-	if (Instigator)
-	{
-		InstigatorSkillComponent = Instigator->GetGameplaySkillsComponent();
-	}
-}
-
-void UGameplaySkillBase::CommitSkill()
-{
+	InstigatorSkillComponent = Instigator ? Instigator->GetGameplaySkillsComponent() : NULL;
 }
 
 bool UGameplaySkillBase::CanTriggerSkill() const
@@ -63,10 +56,6 @@ void UGameplaySkillBase::FinishSkill()
 	{
 		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
 	}
-}
-
-void UGameplaySkillBase::TriggerGameplayEffects()
-{
 }
 
 TSharedPtr<FAttackInfo> UGameplaySkillBase::GetAttackInfoPtr()

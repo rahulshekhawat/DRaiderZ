@@ -22,6 +22,9 @@ public:
 	//  Gameplay Skill Interface
 	// --------------------------------------
 
+	virtual void UnlockSkill(int32 UnlockLevel);
+	virtual void LockSkill();
+
 	virtual bool CanPlayerActivateThisSkill() const;
 
 	virtual bool CanTriggerSkill() const override;
@@ -77,7 +80,6 @@ public:
 
 	FORCEINLINE int32 GetCurrentUpgrade() const { return CurrentUpgrade; }
 
-	//~ @todo add check to make sure current upgrade is not more than maxupgrade
 	inline void SetCurrentUpgrade(int32 Value) { CurrentUpgrade = Value; }
 
 protected:

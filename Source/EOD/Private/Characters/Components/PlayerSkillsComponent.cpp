@@ -120,7 +120,15 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 
 		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
 		GameplaySkill->SetSkillIndex(SkillIndex);
-		check(GameplaySkill->GetSkillGroup() == Key);
+	
+		if (GameplaySkill->GetSkillGroup() == NAME_None)
+		{
+			GameplaySkill->SetSkillGroup(Key);
+		}
+		else
+		{
+			check(GameplaySkill->GetSkillGroup() == Key);
+		}
 
 		SkillIndexToSkillMap.Add(GameplaySkill->GetSkillIndex(), GameplaySkill);
 		SkillGroupToSkillMap.Add(GameplaySkill->GetSkillGroup(), GameplaySkill);
@@ -138,15 +146,13 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 		
 		TArray<FName> SkillGroups;
 		SkillTreeSlotsSaveData.GetKeys(SkillGroups);
-
 		for (FName SkillGroup : SkillGroups)
 		{
 			FSkillTreeSlotSaveData& SlotSaveData = SkillTreeSlotsSaveData[SkillGroup];
 			UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(GetSkillForSkillGroup(SkillGroup));
 			if (PlayerSkill)
 			{
-				PlayerSkill->ActivateSkill(SlotSaveData.CurrentUpgrade);
-				// PlayerSkill->SetCurrentUpgrade(SlotSaveData.CurrentUpgrade);
+				PlayerSkill->UnlockSkill(SlotSaveData.CurrentUpgrade);
 			}
 		}		
 	}

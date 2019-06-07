@@ -73,7 +73,7 @@ void UEscapeSkillBase::TriggerSkill()
 		Instigator->ResetState();
 	}
 
-	TriggerGameplayEffects();
+	QueueGameplayEffectEvents();
 }
 
 void UEscapeSkillBase::ReleaseSkill(float ChargeDuration)

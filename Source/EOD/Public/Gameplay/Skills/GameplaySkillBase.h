@@ -31,8 +31,6 @@ public:
 	/** Initialize this skill. Intended to be called immediately after the skill object is created */
 	virtual void InitSkill(AEODCharacterBase* Instigator, AController* Owner);
 
-	virtual void CommitSkill();
-
 	virtual bool CanTriggerSkill() const;
 
 	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
@@ -52,11 +50,6 @@ public:
 	virtual void CancelSkill();
 
 	virtual void FinishSkill();
-
-	virtual void ActivateSkill(int32 SkillLevel) { ; }
-	virtual void DeactivateSkill() { ; }
-
-	virtual void TriggerGameplayEffects();
 
 	virtual void QueueGameplayEffectEvents() { ; }
 
@@ -85,6 +78,8 @@ public:
 	FORCEINLINE FName GetSkillGroup() const { return SkillGroup; }
 
 	FORCEINLINE ESkillEffect GetSkillEffect() const { return SkillEffect; }
+
+	inline void SetSkillGroup(FName SG) { SkillGroup = SG; }
 
 	/** Set this to true if this skill can be charged */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")

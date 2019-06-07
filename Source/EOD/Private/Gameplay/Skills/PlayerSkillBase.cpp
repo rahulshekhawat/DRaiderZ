@@ -14,6 +14,18 @@ UPlayerSkillBase::UPlayerSkillBase(const FObjectInitializer& ObjectInitializer) 
 	MaxUpgrades = 1;
 }
 
+void UPlayerSkillBase::UnlockSkill(int32 UnlockLevel)
+{
+	check(UnlockLevel > 0 && UnlockLevel <= MaxUpgrades);
+	SetCurrentUpgrade(UnlockLevel);
+
+
+}
+
+void UPlayerSkillBase::LockSkill()
+{
+}
+
 bool UPlayerSkillBase::CanPlayerActivateThisSkill() const
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
