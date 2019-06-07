@@ -254,9 +254,9 @@ void UContainerWidget::SetCurrentValue(int32 NewValue)
 
 void UContainerWidget::SetMaxValue(int32 NewValue)
 {
+	ContainerData.MaxValue = NewValue;
 	if (bDisplaySubTextAsRatio && SubText)
 	{
-		ContainerData.MaxValue = NewValue;
 		SubText->SetVisibility(ESlateVisibility::Visible);
 		FString NewSubTextString = FString::FromInt(ContainerData.CurrentValue) + FString("/") + FString::FromInt(NewValue);
 		FText NewText = FText::FromString(NewSubTextString);
