@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "EODBlueprintFunctionLibrary.h"
+#include "CustomEODSettings.h"
 
 #include "GameFramework/Actor.h"
 
@@ -42,4 +43,9 @@ USoundBase* UEODBlueprintFunctionLibrary::GetRandomSound(const TArray<USoundBase
 	}
 
 	return Sound;
+}
+
+UCustomEODSettings* UEODBlueprintFunctionLibrary::GetCustomEODSettings()
+{
+	return GetMutableDefault<UCustomEODSettings>();
 }

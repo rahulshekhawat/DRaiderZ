@@ -7,6 +7,7 @@
 #include "EODBlueprintFunctionLibrary.generated.h"
 
 class USoundBase;
+class UCustomEODSettings;
 
 /**
  * 
@@ -36,5 +37,9 @@ public:
 	/** Returns a random sound out of a collection of sounds */
 	UFUNCTION(BlueprintCallable, Category = "EOD Library|Sound")
 	static USoundBase* GetRandomSound(const TArray<USoundBase*>& Sounds);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	static UCustomEODSettings* GetCustomEODSettings();
+
 
 };
