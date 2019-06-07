@@ -76,7 +76,7 @@ public:
 
 	FORCEINLINE TMap<uint8, uint8> GetSkillBarMap() const { return SkillBarMap; }
 
-	TArray<UContainerWidget*> GetAllContainerWidgetsForSkill(FName SkillGroup) const;
+	TArray<UContainerWidget*> GetAllContainerWidgetsForSkill(FName SkillGroup);
 
 protected:
 

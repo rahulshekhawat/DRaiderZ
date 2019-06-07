@@ -187,7 +187,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Gameplay Effects")
 	virtual void RemoveGameplayEffect(UGameplayEffectBase* GameplayEffect);
 
-	FORCEINLINE AEODCharacterBase* GetCharacterOwner() const { return EODCharacterOwner; }
+	AEODCharacterBase* GetCharacterOwner();
 
 	TMap<FName, TMap<UGameplaySkillBase*, FGameplayEventInfo>> GameplayEvents;
 
@@ -197,6 +197,7 @@ public:
 
 private:
 
+	/** Cached pointer to EOD character owner */
 	UPROPERTY(Transient)
 	AEODCharacterBase* EODCharacterOwner;
 

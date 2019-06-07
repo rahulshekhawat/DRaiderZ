@@ -114,10 +114,13 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 	{
 		FGameplaySkillTableRow* Row = SkillsDataTable->FindRow<FGameplaySkillTableRow>(Key, ContextString);
 		check(Row);
+
 		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->SkillClass, Key, RF_Transient);
 		check(GameplaySkill);
+
 		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
 		GameplaySkill->SetSkillIndex(SkillIndex);
+		check(GameplaySkill->GetSkillGroup() == Key);
 
 		SkillIndexToSkillMap.Add(GameplaySkill->GetSkillIndex(), GameplaySkill);
 		SkillGroupToSkillMap.Add(GameplaySkill->GetSkillGroup(), GameplaySkill);
@@ -131,16 +134,19 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 	if (SaveGame)
 	{
 		this->SkillBarMap = SaveGame->SkillBarMap;
-
 		TMap<FName, FSkillTreeSlotSaveData> SkillTreeSlotsSaveData = SaveGame->SkillTreeSlotsSaveData;
+		
 		TArray<FName> SkillGroups;
+		SkillTreeSlotsSaveData.GetKeys(SkillGroups);
+
 		for (FName SkillGroup : SkillGroups)
 		{
-			FSkillTreeSlotSaveData SlotSaveData = SkillTreeSlotsSaveData[SkillGroup];
+			FSkillTreeSlotSaveData& SlotSaveData = SkillTreeSlotsSaveData[SkillGroup];
 			UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(GetSkillForSkillGroup(SkillGroup));
 			if (PlayerSkill)
 			{
-				PlayerSkill->SetCurrentUpgrade(SlotSaveData.CurrentUpgrade);
+				PlayerSkill->ActivateSkill(SlotSaveData.CurrentUpgrade);
+				// PlayerSkill->SetCurrentUpgrade(SlotSaveData.CurrentUpgrade);
 			}
 		}		
 	}
@@ -378,9 +384,10 @@ void UPlayerSkillsComponent::UpdateSkillCooldown(uint8 SkillIndex, float Remaini
 {
 }
 
-TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill(FName SkillGroup) const
+TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill(FName SkillGroup) 
 {
-	AEODPlayerController* PC = GetCharacterOwner() ? Cast<AEODPlayerController>(GetCharacterOwner()->Controller) : nullptr;
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	AEODPlayerController* PC = CharOwner ? Cast<AEODPlayerController>(CharOwner->Controller) : nullptr;
 	UDynamicSkillBarWidget* SkillBarWidget = PC ? PC->GetSkillBarWidget() : nullptr;
 
 	if (!SkillBarWidget)

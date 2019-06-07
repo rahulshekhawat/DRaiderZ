@@ -53,6 +53,9 @@ public:
 
 	virtual void FinishSkill();
 
+	virtual void ActivateSkill(int32 SkillLevel) { ; }
+	virtual void DeactivateSkill() { ; }
+
 	virtual void TriggerGameplayEffects();
 
 	virtual void QueueGameplayEffectEvents() { ; }

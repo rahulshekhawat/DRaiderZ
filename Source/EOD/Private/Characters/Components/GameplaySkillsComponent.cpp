@@ -242,6 +242,21 @@ void UGameplaySkillsComponent::RemoveGameplayEffect(UGameplayEffectBase* Gamepla
 	}
 }
 
+AEODCharacterBase* UGameplaySkillsComponent::GetCharacterOwner()
+{
+	if (EODCharacterOwner)
+	{
+		return EODCharacterOwner;
+	}
+	else
+	{
+		EODCharacterOwner = Cast<AEODCharacterBase>(GetOwner());
+		return EODCharacterOwner;
+	}
+
+	return nullptr;
+}
+
 void UGameplaySkillsComponent::ActivateGameplayEffect(UClass* GameplayEffectClass, AActor* Instigator, TArray<AActor*> Targets, bool bDetermineTargetDynamically)
 {
 	UGameplayEffectBase* GameplayEffect = NewObject<UGameplayEffectBase>(this, GameplayEffectClass, NAME_None, RF_Transient);
