@@ -28,7 +28,7 @@ void AMainMenuPlayerController::BeginPlay()
 		SwitchToUIInput();
 	}
 	
-	LevelScriptActor = GetMainMenuLevelScriptActor();
+	AMainMenuLevelScriptActor* LevelScriptActor = GetMainMenuLevelScriptActor();
 	check(LevelScriptActor);
 }
 
@@ -94,6 +94,7 @@ void AMainMenuPlayerController::SwitchToMainMenuWidget_Implementation(UPlayerSav
 	ActiveWidget = MainMenuWidget;
 	ActiveWidget->AddMenuToScreen();
 
+	AMainMenuLevelScriptActor* LevelScriptActor = GetMainMenuLevelScriptActor();
 	if (LevelScriptActor)
 	{
 		LevelScriptActor->OnSwitchingToMainMenu();
@@ -154,22 +155,29 @@ void AMainMenuPlayerController::SwitchToSettingsWidget_Implementation()
 	}
 }
 
-AMainMenuLevelScriptActor* AMainMenuPlayerController::GetMainMenuLevelScriptActor() const
+AMainMenuLevelScriptActor* AMainMenuPlayerController::GetMainMenuLevelScriptActor()
 {
-	UWorld* World = GetWorld();
-	UClass* ActorClass = AMainMenuLevelScriptActor::StaticClass();
-
-	// We do nothing if no is class provided, rather than giving ALL actors!
-	if (World)
+	if (Cached_LevelScriptActor)
 	{
-		for (TActorIterator<AActor> It(World, ActorClass); It; ++It)
-		{
-			AActor* Actor = *It;
+		return Cached_LevelScriptActor;
+	}
+	else
+	{
+		UWorld* World = GetWorld();
+		UClass* ActorClass = AMainMenuLevelScriptActor::StaticClass();
 
-			AMainMenuLevelScriptActor* LevelActor = Cast<AMainMenuLevelScriptActor>(*It);
-			if (IsValid(LevelActor))
+		if (World && ActorClass)
+		{
+			for (TActorIterator<AActor> It(World, ActorClass); It; ++It)
 			{
-				return LevelActor;
+				AActor* Actor = *It;
+
+				AMainMenuLevelScriptActor* LevelActor = Cast<AMainMenuLevelScriptActor>(*It);
+				if (IsValid(LevelActor))
+				{
+					Cached_LevelScriptActor = LevelActor;
+					return Cached_LevelScriptActor;
+				}
 			}
 		}
 	}

@@ -116,10 +116,10 @@ protected:
 	// --------------------------------------
 
 	UPROPERTY(Transient)
-	AMainMenuLevelScriptActor* LevelScriptActor;
+	AMainMenuLevelScriptActor* Cached_LevelScriptActor;
 	
 	UFUNCTION(BlueprintCallable, Category = "Utility")
-	AMainMenuLevelScriptActor* GetMainMenuLevelScriptActor() const;
+	AMainMenuLevelScriptActor* GetMainMenuLevelScriptActor();
 
 	/** Begin a new campaign */
 	UFUNCTION(BlueprintCallable, Category = "Utility")
