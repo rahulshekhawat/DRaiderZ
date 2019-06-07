@@ -57,16 +57,48 @@ struct EOD_API FContainerData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxValue;
 
-	FContainerData()
+	FString ToString() const
 	{
-		ItemID = NAME_None;
-		ItemGroup = NAME_None;
-		Icon = nullptr;
-		InGameName = FString("");
-		Description = FString("");
-		EODItemType = EEODItemType::None;
-		CurrentValue = 0;
-		MaxValue = 1;
+		FString Str = FString("ItemID: ") + ItemID.ToString() + FString(", ItemGroup: ") + ItemGroup.ToString() +
+			FString(", InGameName: ") + InGameName + FString(", CurrentValue: ") + FString::FromInt(CurrentValue) +
+			FString(", MaxValue: ") + FString::FromInt(MaxValue);
+		return Str;
+	}
+
+	FContainerData() :
+		ItemID(NAME_None),
+		ItemGroup(NAME_None),
+		Icon(nullptr),
+		InGameName(""),
+		Description(""),
+		EODItemType(EEODItemType::None),
+		CurrentValue(0),
+		MaxValue(1)
+	{
+	}
+
+	void operator=(const FContainerData& Other)
+	{
+		this->ItemID = Other.ItemID;
+		this->ItemGroup = Other.ItemGroup;
+		this->Icon = Other.Icon;
+		this->InGameName = Other.InGameName;
+		this->Description = Other.Description;
+		this->EODItemType = Other.EODItemType;
+		this->CurrentValue = Other.CurrentValue;
+		this->MaxValue = Other.MaxValue;
+	}
+
+	bool operator==(const FContainerData& Other)
+	{
+		return this->ItemID == Other.ItemID &&
+			this->ItemGroup == Other.ItemGroup &&
+			this->Icon == Other.Icon &&
+			this->InGameName == Other.InGameName &&
+			this->Description == Other.Description &&
+			this->EODItemType == Other.EODItemType &&
+			this->CurrentValue == Other.CurrentValue &&
+			this->MaxValue == Other.MaxValue;
 	}
 };
 
