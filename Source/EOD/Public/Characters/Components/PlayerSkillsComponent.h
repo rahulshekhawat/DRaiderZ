@@ -69,8 +69,8 @@ public:
 	// @todo
 	// void OnPlayerWeaponChanged(EWeaponType NewWeaponType, EWeaponType OldWeaponType);
 
-	/** Event called when a new skill is added to skill bar */
-	void OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
+	/** Attempt to add a new skill to player skill bar. Returns true if skill succesfully added */
+	bool AddSkillToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 
 	void OnSkillRemovedFromSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 

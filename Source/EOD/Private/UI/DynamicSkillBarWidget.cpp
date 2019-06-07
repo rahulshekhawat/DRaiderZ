@@ -60,16 +60,20 @@ bool UDynamicSkillBarWidget::OnContainerDropped(UContainerWidget* FromContainer,
 	{
 		return false;
 	}
-	
-	ToChildContainer->SetContainerData(FromContainer->GetContainerData());
+
 	if (OwnerSkillsComponent.IsValid())
 	{
 		UPlayerSkillsComponent* SkillsComp = OwnerSkillsComponent.Get();
 		uint8 SkillBarIndex = GetIndexOfSkillContainer(ToChildContainer);
-		SkillsComp->OnSkillAddedToSkillBar(SkillBarIndex, FromContainer->GetContainerData().ItemGroup);
+		bool bResult = SkillsComp->AddSkillToSkillBar(SkillBarIndex, FromContainer->GetContainerData().ItemGroup);
+		if (bResult)
+		{
+			ToChildContainer->SetContainerData(FromContainer->GetContainerData());
+			return true;
+		}
 	}
 
-	return true;
+	return false;
 }
 
 bool UDynamicSkillBarWidget::OnContainersSwapped(UContainerWidget* Container1, UContainerWidget* Container2)

@@ -154,26 +154,19 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 			{
 				PlayerSkill->UnlockSkill(SlotSaveData.CurrentUpgrade);
 			}
-		}		
+		}
 	}
 }
 
-void UPlayerSkillsComponent::OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName SkillGroup)
+bool UPlayerSkillsComponent::AddSkillToSkillBar(uint8 SkillBarIndex, FName SkillGroup)
 {
 	uint8 SkillIndex = SkillGroupToSkillIndexMap.Contains(SkillGroup) ? SkillGroupToSkillIndexMap[SkillGroup] : 0;
 	if (SkillIndex == 0 || !SkillIndexToSkillMap.Contains(SkillIndex))
 	{
-		return;
+		return false;
 	}
 
-	if (SkillBarMap.Contains(SkillBarIndex))
-	{
-		SkillBarMap[SkillBarIndex] = SkillIndex;
-	}
-	else
-	{
-		SkillBarMap.Add(SkillBarIndex, SkillIndex);
-	}
+	SkillBarMap.Add(SkillBarIndex, SkillIndex);
 
 	AEODCharacterBase* CharOwner = GetCharacterOwner();
 	UEODGameInstance* GI = CharOwner ? Cast<UEODGameInstance>(CharOwner->GetGameInstance()) : nullptr;
@@ -183,6 +176,8 @@ void UPlayerSkillsComponent::OnSkillAddedToSkillBar(uint8 SkillBarIndex, FName S
 		SaveGame->SkillBarMap = this->SkillBarMap;
 		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
 	}
+
+	return true;
 }
 
 void UPlayerSkillsComponent::OnSkillRemovedFromSkillBar(uint8 SkillBarIndex, FName SkillGroup)
