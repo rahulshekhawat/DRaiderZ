@@ -7,6 +7,7 @@
 #include "PlayerSkillsComponent.generated.h"
 
 class UGameplaySkillBase;
+class UPlayerSkillBase;
 class UContainerWidget;
 
 /**
@@ -73,6 +74,8 @@ public:
 	bool AddSkillToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 	bool RemoveSkillFromSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 	bool SwapSkillsOnSkillBar(uint8 SBI1, FName SG1, uint8 SBI2, FName SG2);
+
+	UPlayerSkillBase const* const GetSkillAtSkillBarIndex(uint8 SkillBarIndex) const;
 
 	bool SaveSkillBarMap();
 

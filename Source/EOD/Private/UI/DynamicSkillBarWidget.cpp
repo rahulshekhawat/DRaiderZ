@@ -114,6 +114,9 @@ bool UDynamicSkillBarWidget::OnContainersSwapped(UContainerWidget* Container1, U
 			FContainerData ContData = Container1->GetContainerData();
 			Container1->SetContainerData(Container2->GetContainerData());
 			Container2->SetContainerData(ContData);
+
+			UpdateContainerState(Container1);
+			UpdateContainerState(Container2);
 			return true;
 		}
 	}
@@ -141,6 +144,47 @@ bool UDynamicSkillBarWidget::OnContainerRemoved(UContainerWidget* Container)
 	}
 
 	return false;
+}
+
+void UDynamicSkillBarWidget::UpdateContainerState(UContainerWidget* Container)
+{
+	if (!Container)
+	{
+		return;
+	}
+
+	uint8 SkillBarIndex = GetIndexOfSkillContainer(Container);
+	UPlayerSkillsComponent* SkillsComp = OwnerSkillsComponent.Get();
+	if (SkillsComp)
+	{
+		UPlayerSkillBase const* const Skill = SkillsComp->GetSkillAtSkillBarIndex(SkillBarIndex);
+		if (!Skill)
+		{
+			return;
+		}
+
+		if (Skill->IsSkillInCooldown())
+		{
+			float RemainingCooldown = Skill->GetRemainingCooldown();
+			Container->UpdateCooldown(RemainingCooldown);
+		}
+		else
+		{
+			Container->UpdateCooldown(0.f);
+
+			bool bCanActivate = Skill->CanPlayerActivateThisSkill();
+			if (bCanActivate)
+			{
+				Container->ItemImage->SetIsEnabled(true);
+				Container->SetCanBeClicked(true);
+			}
+			else
+			{
+				Container->ItemImage->SetIsEnabled(false);
+				Container->SetCanBeClicked(false);
+			}
+		}
+	}
 }
 
 void UDynamicSkillBarWidget::InitializeContainersParent()

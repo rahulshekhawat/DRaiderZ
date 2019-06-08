@@ -103,7 +103,7 @@ struct EOD_API FContainerData
 };
 
 /**  */
-UCLASS()
+UCLASS(meta = (DisableNativeTick))
 class EOD_API UContainerWidget : public UUserWidget
 {
 	GENERATED_BODY()

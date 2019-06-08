@@ -178,6 +178,8 @@ private:
 
 private:
 
+	void UpdateContainerState(UContainerWidget* Container);
+
 	void InitializeContainersParent();
 
 

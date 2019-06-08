@@ -78,6 +78,8 @@ public:
 	/** Returns true if this skill is currently in cooldown */
 	inline bool IsSkillInCooldown() const { return CooldownRemaining > 0.f; }
 
+	inline float GetRemainingCooldown() const { return CooldownRemaining; }
+
 	FORCEINLINE int32 GetCurrentUpgrade() const { return CurrentUpgrade; }
 
 	inline void SetCurrentUpgrade(int32 Value) { CurrentUpgrade = Value; }

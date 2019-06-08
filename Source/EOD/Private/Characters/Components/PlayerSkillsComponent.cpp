@@ -193,6 +193,17 @@ bool UPlayerSkillsComponent::SwapSkillsOnSkillBar(uint8 SBI1, FName SG1, uint8 S
 	return SaveSkillBarMap();
 }
 
+UPlayerSkillBase const* const UPlayerSkillsComponent::GetSkillAtSkillBarIndex(uint8 SkillBarIndex) const
+{
+	uint8 SkillIndex = SkillBarMap.Contains(SkillBarIndex) ? SkillBarMap[SkillBarIndex] : 0;
+	if (SkillIndex == 0 || !SkillIndexToSkillMap.Contains(SkillIndex))
+	{
+		return nullptr;
+	}
+
+	return Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SkillIndex]);
+}
+
 bool UPlayerSkillsComponent::SaveSkillBarMap()
 {
 	AEODCharacterBase* CharOwner = GetCharacterOwner();
