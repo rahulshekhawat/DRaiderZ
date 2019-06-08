@@ -118,6 +118,12 @@ void UActiveSkillBase::TriggerSkill()
 		CommitSkill();
 	}
 
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(Instigator->GetCharacterMovement());
+	if (MoveComp)
+	{
+		MoveComp->bUseControllerDesiredRotation = false;
+	}
+
 	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
 	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
 	if (Montage)
