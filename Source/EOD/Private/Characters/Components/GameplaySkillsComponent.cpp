@@ -206,7 +206,7 @@ void UGameplaySkillsComponent::BroadcastGameplayEvents(FName EventType, UGamepla
 	const FGameplayEventInfo& EventInfo = Events[SourceSkill];
 	if (EventInfo.EventClassType == EGameplayEventClassType::GameplayEffect)
 	{
-		ActivateGameplayEffect(EventInfo.EventClass, EventInfo.Instigator, EventInfo.Targets, EventInfo.bDetermineTargetsDynamically);
+		ActivateGameplayEffect(EventInfo.EventClass, EventInfo.EventSubIndex, EventInfo.Instigator, EventInfo.Targets, EventInfo.bDetermineTargetsDynamically);
 	}
 }
 
@@ -273,7 +273,12 @@ AEODCharacterBase* UGameplaySkillsComponent::GetCharacterOwner()
 	return nullptr;
 }
 
-void UGameplaySkillsComponent::ActivateGameplayEffect(UClass* GameplayEffectClass, AActor* Instigator, TArray<AActor*> Targets, bool bDetermineTargetDynamically)
+void UGameplaySkillsComponent::ActivateGameplayEffect(
+	UClass* GameplayEffectClass,
+	int32 Level,
+	AActor* Instigator,
+	TArray<AActor*> Targets,
+	bool bDetermineTargetDynamically)
 {
 	UGameplayEffectBase* GameplayEffect = NewObject<UGameplayEffectBase>(this, GameplayEffectClass, NAME_None, RF_Transient);
 	check(GameplayEffect);
@@ -287,7 +292,7 @@ void UGameplaySkillsComponent::ActivateGameplayEffect(UClass* GameplayEffectClas
 	}
 
 	GameplayEffect->InitEffect(InstigatorChar, TargetChars);
-	GameplayEffect->ActivateEffect();
+	GameplayEffect->ActivateEffect(Level);
 	AddGameplayEffect(GameplayEffect);
 }
 

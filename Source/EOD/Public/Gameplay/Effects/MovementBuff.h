@@ -22,7 +22,7 @@ public:
 	//	Gameplay Effect Interface
 	// --------------------------------------
 
-	virtual void ActivateEffect() override;
+	virtual void ActivateEffect(int32 ActivationLevel = 1) override;
 
 	virtual void DeactivateEffect() override;
 
@@ -31,6 +31,12 @@ public:
 	// --------------------------------------
 	//  Pseudo Constants
 	// --------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	int32 ExtraEffectDurationPerLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	int32 MaxUpgradeLevel;
 
 	FTimerHandle MovementEndTimerHandle;
 

@@ -185,7 +185,6 @@ struct EOD_API FGameplayEventInfo
 {
 	GENERATED_USTRUCT_BODY()
 
-	// UPROPERTY(Transient, BlueprintReadOnly, Category = GameplayEvent)
 	UPROPERTY()
 	AActor* Instigator;
 
@@ -199,9 +198,16 @@ struct EOD_API FGameplayEventInfo
 	EGameplayEventClassType EventClassType;
 
 	UPROPERTY()
+	int32 EventSubIndex;
+
+	UPROPERTY()
 	bool bDetermineTargetsDynamically;
 
-	FGameplayEventInfo() : Instigator(nullptr), EventClass(nullptr), EventClassType(EGameplayEventClassType::None), bDetermineTargetsDynamically(false)
+	FGameplayEventInfo() :
+		Instigator(nullptr),
+		EventClass(nullptr),
+		EventClassType(EGameplayEventClassType::None),
+		bDetermineTargetsDynamically(false)
 	{
 	}
 };

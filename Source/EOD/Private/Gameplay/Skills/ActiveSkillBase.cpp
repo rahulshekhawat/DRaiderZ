@@ -214,6 +214,7 @@ void UActiveSkillBase::QueueGameplayEffectEvents()
 		FGameplayEventInfo EventInfo;
 		EventInfo.EventClass = GameplayEffectClass;
 		EventInfo.EventClassType = EGameplayEventClassType::GameplayEffect;
+		EventInfo.EventSubIndex = LevelUpInfo.GameplayEffectInfo.Level;
 		EventInfo.Instigator = Instigator;
 		EventInfo.Targets.Add(Instigator);
 		EventInfo.bDetermineTargetsDynamically = false;

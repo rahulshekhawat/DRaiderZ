@@ -28,7 +28,7 @@ public:
 
 	virtual void InitEffect(AEODCharacterBase* Instigator, TArray<AEODCharacterBase*> Targets);
 
-	virtual void ActivateEffect();
+	virtual void ActivateEffect(int32 ActivationLevel = 1);
 
 	virtual void DeactivateEffect();
 
@@ -64,6 +64,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	EGameplayEffectAuthority GameplayEffectAuthority;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	USoundBase* GameplaySound;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
+	UParticleSystem* GameplayParticle;
 
 	// --------------------------------------
 	//	Cache

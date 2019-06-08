@@ -348,7 +348,7 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 		Skill->ReleaseSkill(ReleaseDelay);
 	}
 
-	OnSkillTriggered(SkillIndex, Skill->GetSkillGroup(), Skill);
+	OnSkillReleased(SkillIndex, Skill->GetSkillGroup(), Skill);
 }
 
 void UPlayerSkillsComponent::CancelSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)

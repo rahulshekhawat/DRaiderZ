@@ -5,6 +5,7 @@
 #include "EODCharacterBase.h"
 #include "GameplaySkillsComponent.h"
 #include "EOD.h"
+#include "Components/AudioComponent.h"
 
 #include "TimerManager.h"
 
@@ -12,8 +13,17 @@ UMovementBuff::UMovementBuff(const FObjectInitializer& ObjectInitializer) : Supe
 {
 }
 
-void UMovementBuff::ActivateEffect()
+void UMovementBuff::ActivateEffect(int32 ActivationLevel)
 {
+	if (ActivationLevel < 1)
+	{
+		ActivationLevel = 1;
+	}
+	else if (ActivationLevel > MaxUpgradeLevel)
+	{
+		ActivationLevel = MaxUpgradeLevel;
+	}
+
 	AEODCharacterBase* Instigator = EffectInstigator.Get();
 	if (Instigator)
 	{
@@ -23,9 +33,17 @@ void UMovementBuff::ActivateEffect()
 			Instigator->AddRunningModifier(this, true);
 		}
 
+		int32 NetDuration = GameplayEffectDuration + (ActivationLevel - 1) * (ExtraEffectDurationPerLevel);
+
 		UWorld* World = Instigator->GetWorld();
 		check(World);
-		World->GetTimerManager().SetTimer(MovementEndTimerHandle, this, &UMovementBuff::DeactivateEffect, GameplayEffectDuration, false);
+		World->GetTimerManager().SetTimer(MovementEndTimerHandle, this, &UMovementBuff::DeactivateEffect, NetDuration, false);
+
+		if (GameplaySound)
+		{
+			Instigator->GetGameplayAudioComponent()->SetSound(GameplaySound);
+			Instigator->GetGameplayAudioComponent()->Play();
+		}
 
 		bActive = true;
 	}

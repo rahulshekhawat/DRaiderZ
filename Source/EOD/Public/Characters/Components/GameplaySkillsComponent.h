@@ -194,7 +194,12 @@ public:
 
 	TMap<FName, TMap<UGameplaySkillBase*, FGameplayEventInfo>> GameplayEvents;
 
-	void ActivateGameplayEffect(UClass* GameplayEffectClass, AActor* Instigator, TArray<AActor*> Targets, bool bDetermineTargetDynamically = false);
+	void ActivateGameplayEffect(
+		UClass* GameplayEffectClass,
+		int32 Level,
+		AActor* Instigator,
+		TArray<AActor*> Targets,
+		bool bDetermineTargetDynamically = false);
 
 	virtual bool IsGameplayEffectTypeActive(TSubclassOf<UGameplayEffectBase> GameplayEffectClass, UGameplayEffectBase* GameplayEffectToIgnore = nullptr);
 

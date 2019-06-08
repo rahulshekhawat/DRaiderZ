@@ -27,7 +27,7 @@ void UGameplayEffectBase::InitEffect(AEODCharacterBase* Instigator, TArray<AEODC
 	}
 }
 
-void UGameplayEffectBase::ActivateEffect()
+void UGameplayEffectBase::ActivateEffect(int32 ActivationLevel)
 {
 }
 
