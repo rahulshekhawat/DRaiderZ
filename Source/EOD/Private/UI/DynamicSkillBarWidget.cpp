@@ -4,7 +4,6 @@
 #include "DynamicSkillBarWidget.h"
 #include "ContainerWidget.h"
 #include "PlayerSkillBase.h"
-#include "PlayerSkillsComponent.h"
 
 #include "Components/Image.h"
 

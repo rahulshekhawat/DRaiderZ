@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "PlayerSkillsComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "DynamicSkillBarWidget.generated.h"
 
@@ -130,6 +132,8 @@ public:
 
 	/** Removes all skills from skill bar */
 	void ResetSkillBar();
+
+	inline UPlayerSkillsComponent* GetOwnerSkillComponent() const { return OwnerSkillsComponent.Get(); }
 
 	void SetSkillOwnerComponent(UPlayerSkillsComponent* SkillsComponent);
 

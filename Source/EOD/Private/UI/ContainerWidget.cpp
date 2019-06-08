@@ -8,6 +8,8 @@
 #include "DynamicSkillTreeWidget.h"
 #include "ContainerDragDropOperation.h"
 #include "DynamicSkillBarWidget.h"
+#include "PlayerSkillsComponent.h"
+#include "PlayerSkillBase.h"
 
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -295,6 +297,39 @@ void UContainerWidget::DisableCooldownText()
 		ItemImage->SetIsEnabled(true);
 		SetCanBeClicked(true);
 		CooldownText->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (ContainerType == EContainerType::SkillBar)
+	{
+		UDynamicSkillBarWidget* SkillBarWidget = Cast<UDynamicSkillBarWidget>(ContainerParentWidget);
+		if (SkillBarWidget)
+		{
+			UPlayerSkillsComponent* SkillsComp = SkillBarWidget->GetOwnerSkillComponent();
+			if (SkillsComp)
+			{
+				uint8 SkillBarIndex = SkillBarWidget->GetIndexOfSkillContainer(this);
+				const TMap<uint8, uint8>& SkillBarMap = SkillsComp->GetSkillBarMap();
+				const TMap<uint8, UGameplaySkillBase*>& SkillsMap = SkillsComp->GetSkillsMap();
+				
+				uint8 SkillIndex = SkillBarMap.Contains(SkillBarIndex) ? SkillBarMap[SkillBarIndex] : 0;
+				UPlayerSkillBase* Skill = SkillsMap.Contains(SkillIndex) ? Cast<UPlayerSkillBase>(SkillsMap[SkillIndex]) : nullptr;
+
+				if (Skill)
+				{
+					bool bCanActivate = Skill->CanPlayerActivateThisSkill();
+					if (bCanActivate)
+					{
+						ItemImage->SetIsEnabled(true);
+						SetCanBeClicked(true);
+					}
+					else
+					{
+						ItemImage->SetIsEnabled(false);
+						SetCanBeClicked(false);
+					}
+				}
+			}
+		}
 	}
 }
 

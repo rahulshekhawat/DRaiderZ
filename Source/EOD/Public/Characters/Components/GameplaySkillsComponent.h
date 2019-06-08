@@ -89,7 +89,9 @@ public:
 
 	inline FGameplaySkillTableRow* GetGameplaySkillTableRow(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;
 
-	FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillIndexToSkillMap; }
+	inline const TMap<uint8, UGameplaySkillBase*>& GetSkillsMap() const { return SkillIndexToSkillMap; }
+
+	// FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillIndexToSkillMap; }
 
 	FORCEINLINE FName GetActivePrecedingChainSkillGroup() const { return ActivePrecedingChainSkillGroup; }
 

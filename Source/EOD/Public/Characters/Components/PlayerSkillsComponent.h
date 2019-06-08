@@ -74,7 +74,7 @@ public:
 	bool RemoveSkillFromSkillBar(uint8 SkillBarIndex, FName SkillGroup);
 	bool SwapSkillsOnSkillBar(uint8 SBI1, FName SG1, uint8 SBI2, FName SG2);
 
-	FORCEINLINE TMap<uint8, uint8> GetSkillBarMap() const { return SkillBarMap; }
+	inline const TMap<uint8, uint8>& GetSkillBarMap() const { return SkillBarMap; }
 
 	TArray<UContainerWidget*> GetAllContainerWidgetsForSkill(FName SkillGroup);
 
