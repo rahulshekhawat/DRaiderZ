@@ -69,6 +69,22 @@ bool UDynamicSkillBarWidget::OnContainerDropped(UContainerWidget* FromContainer,
 		if (bResult)
 		{
 			ToChildContainer->SetContainerData(FromContainer->GetContainerData());
+			
+			uint8 SkillIndex = SkillsComp->GetSkillBarMap()[SkillBarIndex];
+			UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(SkillsComp->GetSkillsMap()[SkillIndex]);
+			check(Skill);
+			bool bCanActivate = Skill->CanPlayerActivateThisSkill();
+			if (bCanActivate)
+			{
+				ToChildContainer->ItemImage->SetIsEnabled(true);
+				ToChildContainer->SetCanBeClicked(true);
+			}
+			else
+			{
+				ToChildContainer->ItemImage->SetIsEnabled(false);
+				ToChildContainer->SetCanBeClicked(false);
+			}
+			
 			return true;
 		}
 	}
