@@ -85,6 +85,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual void OnSkillFinished(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill);
 
+	virtual void OnSkillTriggered(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill);
+	virtual void OnSkillReleased(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill);
+
 	void BroadcastGameplayEvents(FName EventType, UGameplaySkillBase* SourceSkill);
 
 	inline FGameplaySkillTableRow* GetGameplaySkillTableRow(FName SkillID, const FString& ContextString = FString("AEODCharacterBase::GetSkill(), character skill lookup")) const;

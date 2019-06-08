@@ -25,10 +25,7 @@ public:
 	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
 	virtual void TriggerSkill() override;
 
-	/** Cancel this skill */
-	virtual void CancelSkill() override;
-
-	virtual void FinishSkill() override;
+	virtual void ApplyRotation() override;
 
 	// --------------------------------------
 	//  Pseudo Constants

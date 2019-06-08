@@ -16,23 +16,8 @@ UUniqueMovementSkill::UUniqueMovementSkill(const FObjectInitializer& ObjectIniti
 
 void UUniqueMovementSkill::TriggerSkill()
 {
-	// Super::TriggerSkill();
-
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	if (Instigator && Instigator->Controller && Instigator->Controller->IsLocalPlayerController())
-	{
-		Instigator->SetIsRunning(true);
-		UWorld* World = Instigator->GetWorld();
-		check(World);
-		World->GetTimerManager().SetTimer(MovementEndTimerHandle, this, &UUniqueMovementSkill::FinishSkill, SpecialMovementDuration, false);
-	}
-
-	//~ @todo
-	/*
-	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
-
-	if (!Instigator || !SkillsComp)
+	if (!Instigator)
 	{
 		return;
 	}
@@ -40,49 +25,35 @@ void UUniqueMovementSkill::TriggerSkill()
 	bool bIsLocalPlayerController = Instigator->Controller && Instigator->Controller->IsLocalPlayerController();
 	if (bIsLocalPlayerController)
 	{
-		FActiveSkillLevelUpInfo SkillInfo = GetCurrentSkillLevelupInfo();
-		UClass* GameplayEffectClass = SkillInfo.GameplayEffectSoftClass.Get();
-		if (GameplayEffectClass)
-		{
-			UGameplayEffectBase* GameplayEffect = NewObject<UGameplayEffectBase>(SkillsComp, GameplayEffectClass, NAME_None, RF_Transient);
-			check(GameplayEffect);
-			GameplayEffect->InitEffect(Instigator, Instigator);
-			SkillsComp->AddGameplayEffect(GameplayEffect);
-		}
+		ApplyRotation();
+
+		Instigator->SetCharacterStateAllowsMovement(true);
+		Instigator->SetCharacterStateAllowsRotation(true);
+
+		StartCooldown();
 	}
-	*/
+
+	bool bHasController = Instigator->Controller != nullptr;
+	if (bHasController)
+	{
+		FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
+		StateInfo.NewReplicationIndex = Instigator->CharacterStateInfo.NewReplicationIndex + 1;
+		Instigator->CharacterStateInfo = StateInfo;
+
+		//~ consume stamina and mana
+		CommitSkill();
+	}
+
+	SkillDuration = FailSafeDuration;
+	UWorld* World = Instigator->GetWorld();
+	check(World);
+	World->GetTimerManager().SetTimer(SkillTimerHandle, this, &UUniqueMovementSkill::FinishSkill, SkillDuration, false);
+
+	Instigator->AddGameplayTagModifier(FGameplayTagMod(ActivationOwnedTags, this));
+	QueueGameplayEffectEvents();
 }
 
-void UUniqueMovementSkill::CancelSkill()
+void UUniqueMovementSkill::ApplyRotation()
 {
-	// Super::CancelSkill();
-
-	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	if (Instigator && Instigator->Controller)
-	{
-		Instigator->SetIsRunning(false);
-	}
-
-	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
-	if(SkillsComp)
-	{
-		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
-	}
-}
-
-void UUniqueMovementSkill::FinishSkill()
-{
-	// Super::FinishSkill();
-	
-	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	if (Instigator && Instigator->Controller)
-	{
-		Instigator->SetIsRunning(false);
-	}
-	
-	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
-	if(SkillsComp)
-	{
-		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
-	}
+	//~ empty def
 }

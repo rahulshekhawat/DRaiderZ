@@ -173,6 +173,22 @@ void UGameplaySkillsComponent::OnSkillFinished(uint8 SkillIndex, FName SkillGrou
 	BroadcastGameplayEvents(EventNames::OnSkillFinished, Skill);
 }
 
+void UGameplaySkillsComponent::OnSkillTriggered(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
+{
+	if (Skill)
+	{
+		BroadcastGameplayEvents(EventNames::OnSkillTriggered, Skill);
+	}
+}
+
+void UGameplaySkillsComponent::OnSkillReleased(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)
+{
+	if (Skill)
+	{
+		BroadcastGameplayEvents(EventNames::OnSkillReleased, Skill);
+	}
+}
+
 void UGameplaySkillsComponent::BroadcastGameplayEvents(FName EventType, UGameplaySkillBase* SourceSkill)
 {
 	if (!GameplayEvents.Contains(EventType))

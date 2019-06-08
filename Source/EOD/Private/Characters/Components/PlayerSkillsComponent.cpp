@@ -305,6 +305,8 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			CharOwner->SetAttackInfoFromActiveSkill(_Skill);
 		}
 	}
+
+	OnSkillTriggered(SkillIndex, Skill->GetSkillGroup(), Skill);
 }
 
 void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill, float ReleaseDelay)
@@ -345,6 +347,8 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 		//~ @note Release delay is only relevant to server and client owner
 		Skill->ReleaseSkill(ReleaseDelay);
 	}
+
+	OnSkillTriggered(SkillIndex, Skill->GetSkillGroup(), Skill);
 }
 
 void UPlayerSkillsComponent::CancelSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
