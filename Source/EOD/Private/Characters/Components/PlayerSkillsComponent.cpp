@@ -167,35 +167,13 @@ bool UPlayerSkillsComponent::AddSkillToSkillBar(uint8 SkillBarIndex, FName Skill
 	}
 
 	SkillBarMap.Add(SkillBarIndex, SkillIndex);
-
-	AEODCharacterBase* CharOwner = GetCharacterOwner();
-	UEODGameInstance* GI = CharOwner ? Cast<UEODGameInstance>(CharOwner->GetGameInstance()) : nullptr;
-	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
-	if (SaveGame)
-	{
-		SaveGame->SkillBarMap = this->SkillBarMap;
-		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
-		return true;
-	}
-
-	return false;
+	return SaveSkillBarMap();
 }
 
 bool UPlayerSkillsComponent::RemoveSkillFromSkillBar(uint8 SkillBarIndex, FName SkillGroup)
 {
 	SkillBarMap.Remove(SkillBarIndex);
-
-	AEODCharacterBase* CharOwner = GetCharacterOwner();
-	UEODGameInstance* GI = CharOwner ? Cast<UEODGameInstance>(CharOwner->GetGameInstance()) : nullptr;
-	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
-	if (SaveGame)
-	{
-		SaveGame->SkillBarMap = this->SkillBarMap;
-		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
-		return true;
-	}
-
-	return false;
+	return SaveSkillBarMap();
 }
 
 bool UPlayerSkillsComponent::SwapSkillsOnSkillBar(uint8 SBI1, FName SG1, uint8 SBI2, FName SG2)
@@ -212,6 +190,11 @@ bool UPlayerSkillsComponent::SwapSkillsOnSkillBar(uint8 SBI1, FName SG1, uint8 S
 	SkillBarMap.Add(SBI1, SI2);
 	SkillBarMap.Add(SBI2, SI1);
 
+	return SaveSkillBarMap();
+}
+
+bool UPlayerSkillsComponent::SaveSkillBarMap()
+{
 	AEODCharacterBase* CharOwner = GetCharacterOwner();
 	UEODGameInstance* GI = CharOwner ? Cast<UEODGameInstance>(CharOwner->GetGameInstance()) : nullptr;
 	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;

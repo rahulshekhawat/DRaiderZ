@@ -91,8 +91,6 @@ public:
 
 	inline const TMap<uint8, UGameplaySkillBase*>& GetSkillsMap() const { return SkillIndexToSkillMap; }
 
-	// FORCEINLINE TMap<uint8, UGameplaySkillBase*> GetSkillsMap() const { return SkillIndexToSkillMap; }
-
 	FORCEINLINE FName GetActivePrecedingChainSkillGroup() const { return ActivePrecedingChainSkillGroup; }
 
 	FORCEINLINE bool CanUseChainSkill() const { return bCanUseChainSkill; }
