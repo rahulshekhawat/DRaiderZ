@@ -4,6 +4,7 @@
 #include "MovementBuff.h"
 #include "EODCharacterBase.h"
 #include "GameplaySkillsComponent.h"
+#include "EOD.h"
 
 #include "TimerManager.h"
 
@@ -19,7 +20,7 @@ void UMovementBuff::ActivateEffect()
 		bool bIsLocallyControlled = Instigator->Controller && Instigator->Controller->IsLocalController();
 		if (bIsLocallyControlled)
 		{
-			Instigator->SetIsRunning(true);
+			Instigator->AddRunningModifier(this, true);
 		}
 
 		UWorld* World = Instigator->GetWorld();
@@ -35,28 +36,17 @@ void UMovementBuff::DeactivateEffect()
 	AEODCharacterBase* Instigator = EffectInstigator.Get();
 	if (Instigator)
 	{
-		UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
-		check(SkillsComp);
-
-		// If another gameplay effect of movement buff type is active, we do not need to disable running
-		if (SkillsComp->IsGameplayEffectTypeActive(UMovementBuff::StaticClass(), this))
-		{
-		}
-		else
-		{
-			if (Instigator->Controller)
-			{
-				Instigator->SetIsRunning(false);
-			}
-		}
-
-		bActive = false;
-
-		SkillsComp->RemoveGameplayEffect(this);
+		Instigator->RemoveRunningModifier(this);
 
 		UWorld* World = Instigator->GetWorld();
 		check(World);
 		World->GetTimerManager().ClearTimer(MovementEndTimerHandle);
+
+		bActive = false;
+
+		UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+		check(SkillsComp);
+		SkillsComp->RemoveGameplayEffect(this);
 	}
 	else
 	{

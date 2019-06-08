@@ -521,8 +521,9 @@ public:
 	 */
 	inline void SetCharacterRotation(const FRotator NewRotation);
 
-	/** [server + local] Sets whether this character is running or not */
-	inline void SetIsRunning(bool bNewValue);
+	inline void AddRunningModifier(UObject* ModSource, bool bValue);
+	inline void RemoveRunningModifier(UObject* ModSource);
+	inline void UpdateRunningStatus();
 
 	UFUNCTION(BlueprintCallable, Category = "Movement", DisplayName = "Set bIsRunning")
 	void BP_SetIsRunning(bool bNewValue) { SetIsRunning(bNewValue); }
@@ -540,6 +541,9 @@ public:
 	void BP_SetWalkSpeed(const float WalkSpeed);
 
 protected:
+
+	/** [server + local] Sets whether this character is running or not */
+	inline void SetIsRunning(bool bNewValue);
 
 	/** [server + local] Sets the current character movement direction */
 	inline void SetCharacterMovementDirection(ECharMovementDirection NewDirection);
@@ -572,6 +576,9 @@ protected:
 	/** Max speed of character when it's moving while blocking attacks */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Constants")
 	float DefaultWalkSpeedWhileBlocking;
+
+	UPROPERTY(Transient)
+	TMap<uint32, bool> RunningModifiers;
 
 private:
 
@@ -1698,5 +1705,41 @@ inline void AEODCharacterBase::SetCharacterRotation(const FRotator NewRotation)
 		{
 			Server_SetCharacterRotation(NewRotation);
 		}
+	}
+}
+
+inline void AEODCharacterBase::AddRunningModifier(UObject* ModSource, bool bValue)
+{
+	if (ModSource)
+	{
+		uint32 UniqueID = ModSource->GetUniqueID();
+		RunningModifiers.Add(UniqueID, bValue);
+		UpdateRunningStatus();
+	}
+}
+
+inline void AEODCharacterBase::RemoveRunningModifier(UObject* ModSource)
+{
+	if (ModSource)
+	{
+		uint32 UniqueID = ModSource->GetUniqueID();
+		if (RunningModifiers.Contains(UniqueID))
+		{
+			RunningModifiers.Remove(UniqueID);
+			UpdateRunningStatus();
+		}
+	}
+}
+
+inline void AEODCharacterBase::UpdateRunningStatus()
+{
+	if (Controller)
+	{
+		bool bShouldRun = false;
+		for (const TPair<uint32, bool>& Pair : RunningModifiers)
+		{
+			bShouldRun = bShouldRun || Pair.Value;
+		}
+		SetIsRunning(bShouldRun);
 	}
 }

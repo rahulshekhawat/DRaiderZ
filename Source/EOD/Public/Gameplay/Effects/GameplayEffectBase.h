@@ -81,13 +81,9 @@ protected:
 	UPROPERTY(Transient)
 	TArray<TWeakObjectPtr<AEODCharacterBase>> EffectTargets;
 
-	// TWeakObjectPtr<AEODCharacterBase> EffectTarget;
-
 	/** Skill component of this effect's target */
 	UPROPERTY(Transient)
 	TArray<TWeakObjectPtr<UGameplaySkillsComponent>> TargetSkillComponents;
-
-	// TWeakObjectPtr<UGameplaySkillsComponent> TargetSkillComponent;
 
 	/** Determines if this gameplay effect is currently active */
 	UPROPERTY(Transient)
