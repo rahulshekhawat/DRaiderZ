@@ -149,8 +149,9 @@ bool UDynamicHUDWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 		if (ParentSkillBarWidget)
 		{
 			ParentSkillBarWidget->OnContainerRemoved(Operation->DraggedContainerWidget);
+			return true;
 		}
 	}
 
-	return true;
+	return false;
 }

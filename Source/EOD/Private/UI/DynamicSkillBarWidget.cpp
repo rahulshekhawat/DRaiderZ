@@ -99,11 +99,27 @@ bool UDynamicSkillBarWidget::OnContainersSwapped(UContainerWidget* Container1, U
 		return false;
 	}
 
-	FContainerData ContData = Container1->GetContainerData();
-	Container1->SetContainerData(Container2->GetContainerData());
-	Container2->SetContainerData(ContData);
+	if (OwnerSkillsComponent.IsValid())
+	{
+		UPlayerSkillsComponent* SkillsComp = OwnerSkillsComponent.Get();
 
-	return true;
+		uint8 SBI1 = GetIndexOfSkillContainer(Container1);
+		uint8 SBI2 = GetIndexOfSkillContainer(Container2);
+
+		FName SG1 = Container1->GetContainerData().ItemGroup;
+		FName SG2 = Container2->GetContainerData().ItemGroup;
+
+		bool bResult = SkillsComp->SwapSkillsOnSkillBar(SBI1, SG1, SBI2, SG2);
+		if (bResult)
+		{
+			FContainerData ContData = Container1->GetContainerData();
+			Container1->SetContainerData(Container2->GetContainerData());
+			Container2->SetContainerData(ContData);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool UDynamicSkillBarWidget::OnContainerRemoved(UContainerWidget* Container)
@@ -115,15 +131,17 @@ bool UDynamicSkillBarWidget::OnContainerRemoved(UContainerWidget* Container)
 
 	if (OwnerSkillsComponent.IsValid())
 	{
-		FContainerData NewData;
-		Container->SetContainerData(NewData);
-
 		UPlayerSkillsComponent* SkillsComp = OwnerSkillsComponent.Get();
 		uint8 SkillBarIndex = GetIndexOfSkillContainer(Container);
-		SkillsComp->OnSkillRemovedFromSkillBar(SkillBarIndex, Container->GetContainerData().ItemGroup);
+		bool bResult = SkillsComp->RemoveSkillFromSkillBar(SkillBarIndex, Container->GetContainerData().ItemGroup);
+		if (bResult)
+		{
+			Container->SetContainerData(FContainerData());
+			return true;
+		}
 	}
 
-	return true;
+	return false;
 }
 
 void UDynamicSkillBarWidget::InitializeContainersParent()

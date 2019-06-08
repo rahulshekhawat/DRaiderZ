@@ -175,23 +175,15 @@ bool UPlayerSkillsComponent::AddSkillToSkillBar(uint8 SkillBarIndex, FName Skill
 	{
 		SaveGame->SkillBarMap = this->SkillBarMap;
 		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
-void UPlayerSkillsComponent::OnSkillRemovedFromSkillBar(uint8 SkillBarIndex, FName SkillGroup)
+bool UPlayerSkillsComponent::RemoveSkillFromSkillBar(uint8 SkillBarIndex, FName SkillGroup)
 {
-	uint8 SkillIndex = SkillGroupToSkillIndexMap.Contains(SkillGroup) ? SkillGroupToSkillIndexMap[SkillGroup] : 0;
-	if (SkillIndex == 0 || !SkillIndexToSkillMap.Contains(SkillIndex))
-	{
-		return;
-	}
-
-	if (SkillBarMap.Contains(SkillBarIndex))
-	{
-		SkillBarMap.Remove(SkillBarIndex);
-	}
+	SkillBarMap.Remove(SkillBarIndex);
 
 	AEODCharacterBase* CharOwner = GetCharacterOwner();
 	UEODGameInstance* GI = CharOwner ? Cast<UEODGameInstance>(CharOwner->GetGameInstance()) : nullptr;
@@ -200,7 +192,37 @@ void UPlayerSkillsComponent::OnSkillRemovedFromSkillBar(uint8 SkillBarIndex, FNa
 	{
 		SaveGame->SkillBarMap = this->SkillBarMap;
 		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
+		return true;
 	}
+
+	return false;
+}
+
+bool UPlayerSkillsComponent::SwapSkillsOnSkillBar(uint8 SBI1, FName SG1, uint8 SBI2, FName SG2)
+{
+	check(SBI1 != SBI2);
+
+	uint8 SI1 = SkillGroupToSkillIndexMap.Contains(SG1) ? SkillGroupToSkillIndexMap[SG1] : 0;
+	uint8 SI2 = SkillGroupToSkillIndexMap.Contains(SG2) ? SkillGroupToSkillIndexMap[SG2] : 0;
+	if (SI1 == 0 || SI2 == 0 || !SkillIndexToSkillMap.Contains(SI1) || !SkillIndexToSkillMap.Contains(SI2))
+	{
+		return false;
+	}
+
+	SkillBarMap.Add(SBI1, SI2);
+	SkillBarMap.Add(SBI2, SI1);
+
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	UEODGameInstance* GI = CharOwner ? Cast<UEODGameInstance>(CharOwner->GetGameInstance()) : nullptr;
+	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
+	if (SaveGame)
+	{
+		SaveGame->SkillBarMap = this->SkillBarMap;
+		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
+		return true;
+	}
+
+	return false;
 }
 
 void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)

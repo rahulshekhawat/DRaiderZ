@@ -71,8 +71,8 @@ public:
 
 	/** Attempt to add a new skill to player skill bar. Returns true if skill succesfully added */
 	bool AddSkillToSkillBar(uint8 SkillBarIndex, FName SkillGroup);
-
-	void OnSkillRemovedFromSkillBar(uint8 SkillBarIndex, FName SkillGroup);
+	bool RemoveSkillFromSkillBar(uint8 SkillBarIndex, FName SkillGroup);
+	bool SwapSkillsOnSkillBar(uint8 SBI1, FName SG1, uint8 SBI2, FName SG2);
 
 	FORCEINLINE TMap<uint8, uint8> GetSkillBarMap() const { return SkillBarMap; }
 
