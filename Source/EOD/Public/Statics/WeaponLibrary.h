@@ -12,6 +12,7 @@
 #include "WeaponLibrary.generated.h"
 
 class UWeaponDataAsset;
+class UGameplayEffectBase;
 
 /** This enum describes all the types of weapons available in-game */
 UENUM(BlueprintType)
@@ -67,7 +68,7 @@ struct EOD_API FWeaponTableRow : public FTableRowBase
 
 	/** Minimum level that a character must be to equip this weapon */
 	UPROPERTY(EditAnywhere, Category = Stats)
-	int UnlockLevel;
+	int32 UnlockLevel;
 	
 	/** Maximum damage a weapon can block without consuming more stamina than OnBlock_MinStaminaConsumption */
 	UPROPERTY(EditAnywhere, Category = Stats)
@@ -79,11 +80,11 @@ struct EOD_API FWeaponTableRow : public FTableRowBase
 
 	/** Physical damage power of weapon */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
-	int PhysicalAttack;
+	int32 PhysicalAttack;
 	
 	/** Magickal damage power of weapon */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
-	int MagickalAttack;
+	int32 MagickalAttack;
 	
 	/** Chance of causing a physical critical damage */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
@@ -103,7 +104,7 @@ struct EOD_API FWeaponTableRow : public FTableRowBase
 	
 	/** Minimum amount of stamina consumed on blocking damage less than DamageThreshold */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
-	int OnBlock_MinStaminaConsumption;
+	int32 OnBlock_MinStaminaConsumption;
 	
 	/** Percentage of damage reduction on blocking a physical attack */
 	UPROPERTY(EditDefaultsOnly, Category = Stats)
@@ -114,7 +115,7 @@ struct EOD_API FWeaponTableRow : public FTableRowBase
 	float OnBlock_MagickalDamageReduction = 50.f;
 
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	uint8 MaxEnchantLevel = 5;
+	int32 MaxEnchantLevel;
 	
 	/** Weapon quality scale determines how much the weapon strengthens on enchant */
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
@@ -127,18 +128,36 @@ struct EOD_API FWeaponTableRow : public FTableRowBase
 	/** Determines whether a special ability gem can be added to weapon */
 	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
 	bool bHasSpecialGemSlot;
-	// bool bCanAddSpecialAbilityGem;
 	
-	/** Status effects (both buffs and debuffs) */
-	// UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	// TArray<TSubclassOf<class UStatusEffectBase>> StatusEffects;
+	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
+	TMap<FName, float> AdditionalStatsBonus;
 	
-	/**
-	 * Default elemental affinity of this weapon
-	 * @note The weapon won't support elemental enchant if the elemental affinity is not none
-	 */
-	// UPROPERTY(EditAnywhere, Category = AdditionalInfo)
-	// TSubclassOf<UElementalBase> ElementalAffinity;
+	/** A map of trigger condition to it's gameplay effect that it can trigger */
+	UPROPERTY(EditAnywhere, Category = AdditionalInfo)
+	TMap<FName, UGameplayEffectBase*> StatusEffects;
+
+	FWeaponTableRow() :
+		WeaponMesh(NULL),
+		Icon(NULL),
+		WeaponType(EWeaponType::None),
+		UnlockLevel(1),
+		Stability(0.f),
+		DamageThreshold(0.f),
+		PhysicalAttack(0),
+		MagickalAttack(0),
+		PhysicalCritRate(0.f),
+		MagickalCritRate(0.f),
+		PhysicalCritBonusDamage(0.f),
+		MagickalCritBonusDamage(0.f),
+		OnBlock_MinStaminaConsumption(0),
+		OnBlock_PhysicalDamageReduction(50.f),
+		OnBlock_MagickalDamageReduction(50.f),
+		MaxEnchantLevel(5),
+		WeaponQualityScale(1.f),
+		bSupportsElementalEnchant(false),
+		bHasSpecialGemSlot(false)
+	{
+	}
 };
 
 
