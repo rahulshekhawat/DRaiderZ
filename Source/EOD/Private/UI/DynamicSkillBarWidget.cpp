@@ -84,6 +84,7 @@ bool UDynamicSkillBarWidget::OnContainerDropped(UContainerWidget* FromContainer,
 				ToChildContainer->SetCanBeClicked(false);
 			}
 			
+			UpdateContainerState(ToChildContainer);
 			return true;
 		}
 	}
@@ -139,6 +140,7 @@ bool UDynamicSkillBarWidget::OnContainerRemoved(UContainerWidget* Container)
 		if (bResult)
 		{
 			Container->SetContainerData(FContainerData());
+			UpdateContainerState(Container);
 			return true;
 		}
 	}
@@ -160,6 +162,7 @@ void UDynamicSkillBarWidget::UpdateContainerState(UContainerWidget* Container)
 		UPlayerSkillBase const* const Skill = SkillsComp->GetSkillAtSkillBarIndex(SkillBarIndex);
 		if (!Skill)
 		{
+			Container->UpdateCooldown(0.f);
 			return;
 		}
 
