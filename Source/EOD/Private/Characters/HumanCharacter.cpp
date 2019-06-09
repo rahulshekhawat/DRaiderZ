@@ -54,16 +54,24 @@ void AHumanCharacter::PostInitializeComponents()
 	// Load animation references for no-weapon
 	LoadAnimationReferencesForWeapon(EWeaponType::None);
 
+	UWorld* World = GetWorld();
+	check(World);
+
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Instigator = this;
 	SpawnInfo.Owner = this;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	PrimaryWeapon = GetWorld()->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
-	SecondaryWeapon = GetWorld()->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
+	PrimaryWeapon = World->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
+	SecondaryWeapon = World->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
 
 	// @note Set secondary weapon first and primary weapon later during initialization
 	SetCurrentSecondaryWeapon(SecondaryWeaponID);
 	SetCurrentPrimaryWeapon(PrimaryWeaponID);
+
+	SetChestArmor(EquippedArmorIDs.ChestArmorID);
+	SetHandsArmor(EquippedArmorIDs.HandsArmorID);
+	SetLegsArmor(EquippedArmorIDs.LegsArmorID);
+	SetFeetArmor(EquippedArmorIDs.FeetArmorID);
 }
 
 void AHumanCharacter::Tick(float DeltaTime)
@@ -342,6 +350,38 @@ void AHumanCharacter::RemoveSecondaryWeapon()
 	SecondaryWeapon->OnUnEquip();
 	*/
 	// @todo remove weapon stats
+}
+
+void AHumanCharacter::SetChestArmor(const FName& ArmorID)
+{
+}
+
+void AHumanCharacter::SetHandsArmor(const FName& ArmorID)
+{
+}
+
+void AHumanCharacter::SetLegsArmor(const FName& ArmorID)
+{
+}
+
+void AHumanCharacter::SetFeetArmor(const FName& ArmorID)
+{
+}
+
+void AHumanCharacter::RemoveChestArmor()
+{
+}
+
+void AHumanCharacter::RemoveHandsArmor()
+{
+}
+
+void AHumanCharacter::RemoveLegsArmor()
+{
+}
+
+void AHumanCharacter::RemoveFeetArmor()
+{
 }
 
 bool AHumanCharacter::CanDodge() const
@@ -791,5 +831,9 @@ void AHumanCharacter::OnRep_PrimaryWeaponID()
 }
 
 void AHumanCharacter::OnRep_SecondaryWeaponID()
+{
+}
+
+void AHumanCharacter::OnRep_ArmorIDs()
 {
 }

@@ -17,6 +17,25 @@
 class UAudioComponent;
 class USkeletalMeshComponent;
 
+USTRUCT(BlueprintType)
+struct EOD_API FArmorsList
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	FName ChestArmorID;
+	
+	UPROPERTY()
+	FName HandsArmorID;
+	
+	UPROPERTY()
+	FName LegsArmorID;
+	
+	UPROPERTY()
+	FName FeetArmorID;
+
+};
+
 /**
  * 
  */
@@ -189,6 +208,17 @@ public:
 	/** Removes secondary weapon if it is currently equipped */
 	virtual void RemoveSecondaryWeapon();
 
+	//~ @note We're not using helm armor
+	virtual void SetChestArmor(const FName& ArmorID);
+	virtual void SetHandsArmor(const FName& ArmorID);
+	virtual void SetLegsArmor(const FName& ArmorID);
+	virtual void SetFeetArmor(const FName& ArmorID);
+
+	virtual void RemoveChestArmor();
+	virtual void RemoveHandsArmor();
+	virtual void RemoveLegsArmor();
+	virtual void RemoveFeetArmor();
+
 protected:
 
 	/** An actor for primary weapon equipped by the player */
@@ -206,6 +236,9 @@ protected:
 	/** ID of current secondary weapon equipped. It will be NAME_None if no secondary weapon is equipped */
 	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
 	FName SecondaryWeaponID;
+
+	UPROPERTY(ReplicatedUsing = OnRep_ArmorIDs, EditDefaultsOnly, BlueprintReadOnly)
+	FArmorsList EquippedArmorIDs;
 
 public:
 
@@ -331,6 +364,9 @@ protected:
 
 	UFUNCTION()
 	virtual	void OnRep_SecondaryWeaponID();
+
+	UFUNCTION()
+	virtual void OnRep_ArmorIDs();
 	
 };
 
