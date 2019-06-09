@@ -33,8 +33,7 @@ UENUM(BlueprintType)
 enum class EStatModType : uint8
 {
 	Flat,
-	PercentAdditive,
-	PercentMultiplicative
+	Percent
 };
 
 USTRUCT(BlueprintType)
@@ -48,30 +47,25 @@ struct EOD_API FStatModifier
 	UPROPERTY()
 	EStatModType ModType;
 
-	UPROPERTY()
-	int32 ModOrder;
-
 	FStatModifier() :
 		Value(0.f),
-		ModType(EStatModType::Flat),
-		ModOrder(0)
+		ModType(EStatModType::Flat)
 	{
 	}
 
 	FStatModifier(float InValue, EStatModType InModType, int32 InModOrder) :
 		Value(InValue),
-		ModType(InModType),
-		ModOrder(InModOrder)
+		ModType(InModType)
 	{
 	}
 
 	FORCEINLINE bool operator==(const FStatModifier& Other) const
 	{
-		return this->Value == Other.Value && this->ModType == Other.ModType && this->ModOrder == Other.ModOrder;
+		return this->Value == Other.Value && this->ModType == Other.ModType;
 	}
 	FORCEINLINE bool operator!=(const FStatModifier& Other) const
 	{
-		return this->Value != Other.Value || this->ModType != Other.ModType || this->ModOrder != Other.ModOrder;
+		return this->Value != Other.Value || this->ModType != Other.ModType;
 	}
 
 	/**
@@ -79,7 +73,7 @@ struct EOD_API FStatModifier
 	 */
 	FORCEINLINE bool operator<(const FStatModifier& Other) const
 	{
-		return this->ModOrder < Other.ModOrder;
+		return this->ModType < Other.ModType;
 	}
 
 	/**
@@ -87,7 +81,7 @@ struct EOD_API FStatModifier
 	 */
 	FORCEINLINE bool operator>(const FStatModifier& Other) const
 	{
-		return this->ModOrder > Other.ModOrder;
+		return this->ModType > Other.ModType;
 	}
 };
 
@@ -152,18 +146,21 @@ public:
 	{
 		Modifiers.ValueSort([&](const FStatModifier& Mod1, const FStatModifier& Mod2) { return Mod1 < Mod2; });
 
+		MaxValue = MaxValue_NoMod;
 		for (const TPair<uint32, FStatModifier>& ModPair : Modifiers)
 		{
-
-
+			if (ModPair.Value.ModType == EStatModType::Flat)
+			{
+				MaxValue += ModPair.Value.Value;
+			}
+			else if (ModPair.Value.ModType == EStatModType::Percent)
+			{
+				MaxValue += (MaxValue * (ModPair.Value.Value / 100.f));
+			}
 		}
 
-		// temporary code
-		MaxValue = MaxValue_NoMod;
 		OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
 
-		//~ @todo
-		// OnStatValueChanged
 		bDirty = false;
 		return MaxValue;
 	}
@@ -263,11 +260,21 @@ public:
 	{
 		Modifiers.ValueSort([&](const FStatModifier& Mod1, const FStatModifier& Mod2) { return Mod1 < Mod2; });
 
-		// temporary
 		Value = Value_NoMod;
+		for (const TPair<uint32, FStatModifier>& ModPair : Modifiers)
+		{
+			if (ModPair.Value.ModType == EStatModType::Flat)
+			{
+				Value += ModPair.Value.Value;
+			}
+			else if (ModPair.Value.ModType == EStatModType::Percent)
+			{
+				Value += (Value * (ModPair.Value.Value / 100.f));
+			}
+		}
 
-		//~ @todo
-		// OnStatValueChanged
+		OnStatValueChanged.Broadcast(Value);
+
 		bDirty = false;
 		return Value;
 	}
@@ -341,30 +348,25 @@ public:
 	UPROPERTY()
 	ECCImmunityModType ModType;
 
-	UPROPERTY()
-	int32 ModOrder;
-
 	FCCImmunityModifier() :
 		Value(0),
-		ModType(ECCImmunityModType::Additive),
-		ModOrder(0)
+		ModType(ECCImmunityModType::Additive)
 	{
 	}
 
 	FCCImmunityModifier(uint8 InValue, ECCImmunityModType InModType, int32 InModOrder) :
 		Value(InValue),
-		ModType(InModType),
-		ModOrder(InModOrder)
+		ModType(InModType)
 	{
 	}
 
 	FORCEINLINE bool operator==(const FCCImmunityModifier& Other) const
 	{
-		return this->Value == Other.Value && this->ModType == Other.ModType && this->ModOrder == Other.ModOrder;
+		return this->Value == Other.Value && this->ModType == Other.ModType;
 	}
 	FORCEINLINE bool operator!=(const FCCImmunityModifier& Other) const
 	{
-		return this->Value != Other.Value || this->ModType != Other.ModType || this->ModOrder != Other.ModOrder;
+		return this->Value != Other.Value || this->ModType != Other.ModType;
 	}
 
 	/**
@@ -372,7 +374,7 @@ public:
 	 */
 	FORCEINLINE bool operator<(const FCCImmunityModifier& Other) const
 	{
-		return this->ModOrder < Other.ModOrder;
+		return this->ModType < Other.ModType;
 	}
 
 	/**
@@ -380,7 +382,7 @@ public:
 	 */
 	FORCEINLINE bool operator>(const FCCImmunityModifier& Other) const
 	{
-		return this->ModOrder > Other.ModOrder;
+		return this->ModType > Other.ModType;
 	}
 };
 
@@ -417,10 +419,22 @@ public:
 	float RecalculateValue()
 	{
 		Modifiers.ValueSort([&](const FCCImmunityModifier& Mod1, const FCCImmunityModifier& Mod2) { return Mod1 < Mod2; });
-		//~ @todo
-		// OnStatValueChanged
+
+		Value = Value_NoMod;
+		for (const TPair<uint32, FCCImmunityModifier>& ModPair : Modifiers)
+		{
+			if (ModPair.Value.ModType == ECCImmunityModType::Additive)
+			{
+				AddImmunities(ModPair.Value.Value);
+			}
+			else if (ModPair.Value.ModType == ECCImmunityModType::Reductive)
+			{
+				RemoveImmunities(ModPair.Value.Value);
+			}
+		}
+
 		bDirty = false;
-		return 0;
+		return Value;
 	}
 
 	float GetValue() { return bDirty ? RecalculateValue() : Value; }
@@ -463,32 +477,32 @@ private:
 
 	void AddImmunity(ECrowdControlEffect CCImmunity)
 	{
-		Value_NoMod |= (1 << (uint8)CCImmunity);
+		Value |= (1 << (uint8)CCImmunity);
 	}
 
 	void AddImmunities(uint8 CCImmunities)
 	{
-		Value_NoMod |= CCImmunities;
+		Value |= CCImmunities;
 	}
 
 	void RemoveImmunity(ECrowdControlEffect CCImmunity)
 	{
-		Value_NoMod ^= (1 << (uint8)CCImmunity);
+		Value ^= (1 << (uint8)CCImmunity);
 	}
 
 	void RemoveImmunities(uint8 CCImmunities)
 	{
-		Value_NoMod ^= CCImmunities;
+		Value ^= CCImmunities;
 	}
 
 	void RemoveAllImmunities()
 	{
-		Value_NoMod = 0;
+		Value = 0;
 	}
 
 	bool HasCCImmunity(ECrowdControlEffect CCImmunity)
 	{
-		return (Value_NoMod & (1 << (uint8)CCImmunity));
+		return (Value & (1 << (uint8)CCImmunity));
 	}
 
 private:
