@@ -6,6 +6,9 @@
 #include "EODCharacterMovementComponent.h"
 #include "GameplayEffectBase.h"
 
+#include "TimerManager.h"
+#include "Engine/World.h"
+
 UEscapeSkillBase::UEscapeSkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
@@ -27,53 +30,6 @@ bool UEscapeSkillBase::CanTriggerSkill() const
 	bool bInstigatorCanUseSkill = Instigator ? Instigator->IsIdleOrMoving() || Instigator->IsBlocking() || Instigator->IsNormalAttacking() || Instigator->HasBeenHit() : false;
 
 	return bHasValidWeapon && !bInCooldown && bInstigatorCanUseSkill;
-}
-
-void UEscapeSkillBase::TriggerSkill()
-{
-	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	if (!Instigator)
-	{
-		return;
-	}
-
-	bool bIsLocalPlayerController = Instigator->Controller && Instigator->Controller->IsLocalPlayerController();
-	if (bIsLocalPlayerController)
-	{
-		float DesiredRotationYaw = Instigator->GetControllerRotationYaw();
-		Instigator->SetCharacterRotationYaw(DesiredRotationYaw);
-		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(Instigator->GetCharacterMovement());
-		if (MoveComp)
-		{
-			MoveComp->SetDesiredCustomRotationYaw(DesiredRotationYaw);
-		}
-
-		Instigator->SetCharacterStateAllowsMovement(false);
-		Instigator->SetCharacterStateAllowsRotation(false);
-
-		//~ @todo consume stamina and mana
-
-		StartCooldown();
-	}
-
-	EWeaponType CurrentWeapon = Instigator->GetEquippedWeaponType();
-	UAnimMontage* Montage = SkillAnimations.Contains(CurrentWeapon) ? SkillAnimations[CurrentWeapon] : nullptr;
-	if (Montage)
-	{
-		SkillDuration = Instigator->PlayAnimMontage(Montage, 1.f, AnimationStartSectionName);
-		float ActualSkillDuration = SkillDuration - Montage->GetDefaultBlendOutTime();
-		UWorld* World = Instigator->GetWorld();
-		check(World);
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindUObject(this, &UEscapeSkillBase::FinishSkill);
-		World->GetTimerManager().SetTimer(SkillTimerHandle, TimerDelegate, ActualSkillDuration, false);
-	}
-	else
-	{
-		Instigator->ResetState();
-	}
-
-	QueueGameplayEffectEvents();
 }
 
 void UEscapeSkillBase::ReleaseSkill(float ChargeDuration)
@@ -114,5 +70,17 @@ void UEscapeSkillBase::FinishSkill()
 	if(SkillsComp)
 	{
 		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
+	}
+}
+
+void UEscapeSkillBase::ApplyRotation()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(Instigator->GetCharacterMovement());
+	if (MoveComp)
+	{
+		float DesiredRotationYaw = Instigator->GetControllerRotationYaw();
+		MoveComp->SetDesiredCustomRotationYaw(DesiredRotationYaw);
+		Instigator->SetCharacterRotationYaw(DesiredRotationYaw);
 	}
 }

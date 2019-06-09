@@ -28,9 +28,6 @@ public:
 
 	virtual bool CanTriggerSkill() const override;
 
-	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
-	virtual void TriggerSkill() override;
-
 	/** Release this skill, i.e., if this skill is chargeable then activate this skill, otherwise it does nothing */
 	virtual void ReleaseSkill(float ChargeDuration) override;
 
@@ -41,6 +38,8 @@ public:
 	virtual void CancelSkill() override;
 
 	virtual void FinishSkill() override;
+
+	virtual void ApplyRotation() override;
 
 protected:
 

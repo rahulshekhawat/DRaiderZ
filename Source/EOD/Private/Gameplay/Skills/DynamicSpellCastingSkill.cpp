@@ -7,6 +7,9 @@
 #include "PlayerAnimInstance.h"
 #include "GameplaySkillsComponent.h"
 
+#include "TimerManager.h"
+#include "Engine/World.h"
+
 UDynamicSpellCastingSkill::UDynamicSpellCastingSkill(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bMovableMontagePlaying = false;
