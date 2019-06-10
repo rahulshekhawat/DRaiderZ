@@ -13,6 +13,7 @@
 #include "AISkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
 
+#include "Engine/World.h"
 #include "Engine/Engine.h"
 #include "Components/AudioComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"

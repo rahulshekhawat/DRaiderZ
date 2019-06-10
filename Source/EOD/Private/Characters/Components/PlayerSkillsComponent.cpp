@@ -262,6 +262,8 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			LastUsedSkillIndex = SkillIndex;
 			ActiveSkills.Add(PlayerSkill);
 			SetCanUseChainSkill(false);
+
+			OnSkillTriggered(SkillIndex, Skill->GetSkillGroup(), Skill);
 		}
 		else
 		{
@@ -305,6 +307,8 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 		LastUsedSkillGroup = PlayerSkill->GetSkillGroup();
 		LastUsedSkillIndex = SkillIndex;
 		ActiveSkills.Add(PlayerSkill);
+
+		OnSkillTriggered(SkillIndex, Skill->GetSkillGroup(), Skill);
 	}
 
 	//~ @todo Modify the way attack info is stored
@@ -316,8 +320,6 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			CharOwner->SetAttackInfoFromActiveSkill(_Skill);
 		}
 	}
-
-	OnSkillTriggered(SkillIndex, Skill->GetSkillGroup(), Skill);
 }
 
 void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill, float ReleaseDelay)
@@ -351,15 +353,17 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			}
 
 			StopChargingSkill();
+
+			OnSkillReleased(SkillIndex, Skill->GetSkillGroup(), Skill);
 		}
 	}
 	else
 	{
 		//~ @note Release delay is only relevant to server and client owner
 		Skill->ReleaseSkill(ReleaseDelay);
-	}
 
-	OnSkillReleased(SkillIndex, Skill->GetSkillGroup(), Skill);
+		OnSkillReleased(SkillIndex, Skill->GetSkillGroup(), Skill);
+	}
 }
 
 void UPlayerSkillsComponent::CancelSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
