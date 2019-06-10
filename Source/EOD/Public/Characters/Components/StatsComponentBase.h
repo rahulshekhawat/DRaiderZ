@@ -633,7 +633,6 @@ public:
 	/** Starts health regeneration on player. Automatically stops once the mana is full or if manually stopped */
 	void ActivateManaRegeneration();
 
-	//~ @note maybe its better to never stop stamina regeneration
 	/** Starts health regeneration on player. Automatically stops once the stamina is full or if manually stopped */
 	void ActivateStaminaRegeneration();
 
@@ -657,13 +656,28 @@ public:
 	//  Attack
 	// --------------------------------------
 
+	UPROPERTY(Replicated)
 	FGenericStat PhysicalAttack;
+
+	UPROPERTY(Replicated)
 	FGenericStat MagickalAttack;
+
+	UPROPERTY(Replicated)
 	FGenericStat PhysicalResistance;
+
+	UPROPERTY(Replicated)
 	FGenericStat MagickalResistance;
+
+	UPROPERTY(Replicated)
 	FGenericStat PhysicalCritRate;
+
+	UPROPERTY(Replicated)
 	FGenericStat MagickalCritRate;
+
+	UPROPERTY(Replicated)
 	FGenericStat PhysicalCritBonus;
+
+	UPROPERTY(Replicated)
 	FGenericStat MagickalCritBonus;
 
 	//~ @todo future
@@ -683,25 +697,40 @@ public:
 	FSecondaryStat ElementalDarkDamage;
 	*/
 
+	UPROPERTY(Replicated)
 	FGenericStat BleedResistance;
+
+	UPROPERTY(Replicated)
 	FGenericStat CrowdControlResistance;
 
+	UPROPERTY(Replicated)
+	FGenericStat CooldownModifier;
 
-	//~ @todo
+	UPROPERTY(Replicated)
+	FGenericStat ExpModifier;
+
+	UPROPERTY(Replicated)
+	FGenericStat SpellCastingSpeedModifier;
+
+	UPROPERTY(Replicated)
+	FGenericStat StaminaConsumptionModifier;
+
+	//~ @todo future
 	/*
-	FStat_Float CooldownModifier;
-	FStat_Float ExpModifier;
 	FStat_Float DropRateModifier;
-	FStat_Float StaminaConsumptionModifier;
-	FStat_Float SpellCastingSpeedModifier;
-
-	FGenericStat Darkness;
 	*/
 
+	UPROPERTY(Replicated)
 	FGenericStat PhysicalDamageReductionOnBlock;
+
+	UPROPERTY(Replicated)
 	FGenericStat MagickalDamageReductionOnBlock;
 
+	UPROPERTY(Replicated)
 	FCCImmunities CCImmunities;
+	
+	UPROPERTY(Replicated)
+	FGenericStat Darkness;
 
 protected:
 

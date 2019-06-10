@@ -28,7 +28,7 @@ void UFloatingHealthBarWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UFloatingHealthBarWidget::UpdateHealth(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth)
+void UFloatingHealthBarWidget::UpdateHealth(int32 MaxHealth, int32 CurrentHealth)
 {
 	check(HealthBar);
 	if (MaxHealth > 0)

@@ -830,18 +830,10 @@ struct EOD_API FCharacterStat
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY()
-	int32 BaseValue;
-
-	UPROPERTY()
 	int32 MaxValue;
 
 	UPROPERTY()
 	int32 CurrentValue;
-
-	void SetBaseValue(int32 Value)
-	{
-		BaseValue = Value;
-	}
 
 	void SetMaxValue(int32 Value)
 	{
@@ -855,26 +847,24 @@ struct EOD_API FCharacterStat
 
 	void SetStatValues(int32 Base, int32 Max, int32 Current)
 	{
-		BaseValue = Base;
 		MaxValue = Max;
 		CurrentValue = Current;
 	}
 
 	void operator=(const FCharacterStat& OtherStat)
 	{
-		this->BaseValue = OtherStat.BaseValue;
 		this->MaxValue = OtherStat.MaxValue;
 		this->CurrentValue = OtherStat.CurrentValue;
 	}
 
 	bool operator!=(const FCharacterStat& OtherStat)
 	{
-		return this->BaseValue != OtherStat.BaseValue || this->MaxValue != OtherStat.MaxValue || this->CurrentValue != OtherStat.CurrentValue;
+		return this->MaxValue != OtherStat.MaxValue || this->CurrentValue != OtherStat.CurrentValue;
 	}
 
 	bool operator==(const FCharacterStat& OtherStat)
 	{
-		return this->BaseValue == OtherStat.BaseValue && this->MaxValue == OtherStat.MaxValue && this->CurrentValue == OtherStat.CurrentValue;
+		return this->MaxValue == OtherStat.MaxValue && this->CurrentValue == OtherStat.CurrentValue;
 	}
 };
 

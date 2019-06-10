@@ -30,7 +30,7 @@ public:
 	UProgressBar* HealthBar;
 
 	UFUNCTION()
-	void UpdateHealth(int32 BaseHealth, int32 MaxHealth, int32 CurrentHealth);
+	void UpdateHealth(int32 MaxHealth, int32 CurrentHealth);
 
 	
 };

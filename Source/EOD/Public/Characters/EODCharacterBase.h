@@ -10,6 +10,7 @@
 #include "StatsComponentBase.h"
 #include "CombatInterface.h"
 
+#include "Engine/World.h"
 #include "GameplayTagContainer.h"
 #include "Animation/AnimInstance.h"
 #include "Components/SphereComponent.h"
@@ -1105,6 +1106,8 @@ public:
 
 	UPROPERTY(ReplicatedUsing = OnRep_Mana)
 	FCharacterStat Mana;
+
+	int32 InGameLevel;
 
 	/** [server] Event called on server when character's health changes */
 	UFUNCTION()

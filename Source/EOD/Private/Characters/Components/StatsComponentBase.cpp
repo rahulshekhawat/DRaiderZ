@@ -7,24 +7,37 @@
 #include "TimerManager.h"
 #include "Engine/World.h"
 
-UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitializer) : 
+UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer),
 	Health(100, 100),
 	Mana(100, 100),
 	Stamina(100, 100),
+	LowHealthPercent(0.15f),
 	HealthRegenRate(10.f),
 	ManaRegenRate(10.f),
-	StaminaRegenRate(10.f)
+	StaminaRegenRate(10.f),
+	bHasHealthRegenration(false),
+	bHasManaRegenration(false),
+	bHasStaminaRegenration(false),
+	HealthRegenTickInterval(1.f),
+	ManaRegenTickInterval(1.f),
+	StaminaRegenTickInterval(1.f),
+	PhysicalAttack(10.f),
+	MagickalAttack(8.f),
+	PhysicalResistance(10.f),
+	MagickalResistance(6.f),
+	PhysicalCritRate(10.f),
+	MagickalCritRate(10.f),
+	CooldownModifier(1.f),
+	ExpModifier(1.f),
+	SpellCastingSpeedModifier(1.f),
+	StaminaConsumptionModifier(1.f),
+	PhysicalDamageReductionOnBlock(10.f),
+	MagickalDamageReductionOnBlock(10.f)
 {
 	// This compnent doesn't tick
 	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicated(true);
-
-	bHasHealthRegenration = false;
-	bHasManaRegenration = false;
-	bHasStaminaRegenration = false;
-
-	LowHealthPercent = 0.15f;
 
 }
 
@@ -40,6 +53,29 @@ void UStatsComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME_CONDITION(UStatsComponentBase, HealthRegenRate, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(UStatsComponentBase, ManaRegenRate, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(UStatsComponentBase, StaminaRegenRate, COND_OwnerOnly);
+
+	DOREPLIFETIME(UStatsComponentBase, PhysicalAttack);
+	DOREPLIFETIME(UStatsComponentBase, MagickalAttack);
+	DOREPLIFETIME(UStatsComponentBase, PhysicalResistance);
+	DOREPLIFETIME(UStatsComponentBase, MagickalResistance);
+	DOREPLIFETIME(UStatsComponentBase, PhysicalCritRate);
+	DOREPLIFETIME(UStatsComponentBase, MagickalCritRate);
+	DOREPLIFETIME(UStatsComponentBase, PhysicalCritBonus);
+	DOREPLIFETIME(UStatsComponentBase, MagickalCritBonus);
+
+	DOREPLIFETIME(UStatsComponentBase, BleedResistance);
+	DOREPLIFETIME(UStatsComponentBase, CrowdControlResistance);
+	DOREPLIFETIME(UStatsComponentBase, CooldownModifier);
+	DOREPLIFETIME(UStatsComponentBase, ExpModifier);
+	DOREPLIFETIME(UStatsComponentBase, SpellCastingSpeedModifier);
+	DOREPLIFETIME(UStatsComponentBase, StaminaConsumptionModifier);
+
+	DOREPLIFETIME(UStatsComponentBase, PhysicalDamageReductionOnBlock);
+	DOREPLIFETIME(UStatsComponentBase, MagickalDamageReductionOnBlock);
+
+	DOREPLIFETIME(UStatsComponentBase, CCImmunities);
+	DOREPLIFETIME(UStatsComponentBase, Darkness);
+
 }
 
 void UStatsComponentBase::BeginPlay()
@@ -69,17 +105,6 @@ void UStatsComponentBase::BeginPlay()
 	}
 
 	//~ @todo Load stat values
-	/*
-	//~ Initialize current variables
-	SetMaxHealth(BaseHealth);
-	SetCurrentHealth(BaseHealth);
-
-	SetMaxMana(BaseMana);
-	SetCurrentMana(BaseMana);
-
-	SetMaxStamina(BaseStamina);
-	SetCurrentStamina(BaseStamina);
-	*/
 }
 
 void UStatsComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

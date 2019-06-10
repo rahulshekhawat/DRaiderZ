@@ -681,7 +681,7 @@ void AAICharacterBase::UpdateHealthWidget()
 		UFloatingHealthBarWidget* HealthWidget = Cast<UFloatingHealthBarWidget>(HealthWidgetComp->GetUserWidgetObject());
 		if (HealthWidget)
 		{
-			HealthWidget->UpdateHealth(Health.BaseValue, Health.MaxValue, Health.CurrentValue);
+			HealthWidget->UpdateHealth(Health.MaxValue, Health.CurrentValue);
 		}
 	}
 }
