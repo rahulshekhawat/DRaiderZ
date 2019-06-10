@@ -9,7 +9,6 @@
 #include "WeaponBase.generated.h"
 
 class AEODCharacterBase;
-class UWeaponDataAsset;
 class UWeaponStatsComponent;
 
 /**
@@ -40,9 +39,6 @@ public:
 
 	/** Called when a new weapon is attached to it's character owner */
 	virtual void OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData = nullptr);
-
-	/** Called when a new weapon is attached to it's character owner */
-	virtual void OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset = nullptr);
 
 	/** Called to detach this weapon is from it's character owner */
 	virtual void OnUnEquip();

@@ -63,9 +63,6 @@ public:
 	/** Called when a new weapon is attached to it's character owner */
 	virtual void OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData = nullptr) override;
 
-	/** Called when a new weapon is attached to it's character owner */
-	virtual void OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset = nullptr) override;
-
 	/** Called to detach this weapon is from it's character owner */
 	virtual void OnUnEquip() override;
 	

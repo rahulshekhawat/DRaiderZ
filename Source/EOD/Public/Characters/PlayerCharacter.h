@@ -27,7 +27,7 @@ class UWeaponDataAsset;
 class APlayerCharacter;
 
 /** Delegate for when a player changes it's weapon */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, WeaponID, UWeaponDataAsset*, WeaponDataAsset);
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, WeaponID, UWeaponDataAsset*, WeaponDataAsset);
 
 /**
  * PlayerCharacter is the base class for playable characters
@@ -253,11 +253,13 @@ public:
 	//  Weapon System
 	// --------------------------------------
 
+	/*
 	UFUNCTION()
 	void ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
 
 	UFUNCTION()
 	void DeactivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
+	*/
 
 	/** Add or replace primary weapon with a new weapon */
 	void AddPrimaryWeapon(FName WeaponID);
@@ -362,6 +364,7 @@ public:
 
 	virtual void ExitDialogue_Implementation(UDialogueWindowWidget* Widget);
 
+	/*
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
 	FOnWeaponChangedMCDelegate OnPrimaryWeaponEquipped;
 
@@ -373,6 +376,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
 	FOnWeaponChangedMCDelegate OnSecondaryWeaponUnequipped;
+	*/
 
 private:
 
@@ -414,11 +418,11 @@ public:
 private:
 
 
-	UPROPERTY()
-	UWeaponDataAsset* PrimaryWeaponDataAsset;
+	// UPROPERTY()
+	// UWeaponDataAsset* PrimaryWeaponDataAsset;
 
-	UPROPERTY()
-	UWeaponDataAsset* SecondaryWeaponDataAsset;
+	// UPROPERTY()
+	// UWeaponDataAsset* SecondaryWeaponDataAsset;
 
 	UPROPERTY(Transient)
 	bool bSkillHasDirectionalAnimations;

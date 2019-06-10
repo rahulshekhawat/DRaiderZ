@@ -3,7 +3,6 @@
 #include "PrimaryWeapon.h"
 #include "PlayerCharacter.h"
 #include "SecondaryWeapon.h"
-#include "WeaponDataAsset.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -166,98 +165,6 @@ void APrimaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData)
 
 	// @todo intialize weapon stats
 
-}
-
-void APrimaryWeapon::OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset)
-{
-	APlayerCharacter* PlayerOwner = Cast<APlayerCharacter>(GetOwner());
-	if (!WeaponDataAsset ||
-		!IsValid(PlayerOwner) ||
-		!IsValid(LeftHandWeaponMeshComp) ||
-		!IsValid(RightHandWeaponMeshComp) ||
-		!IsValid(SheathedWeaponMeshComp) ||
-		!IsValid(FallenWeaponMeshComp))
-	{
-		// @todo handle failed to equip
-		return;
-	}
-
-	USkeletalMesh* NewSkeletalMesh = WeaponDataAsset->GetWeaponMesh();
-	if (!NewSkeletalMesh)
-	{
-		// @todo handle missing weapon mesh
-		return;
-	}
-
-	// Do not Activate and SetSkeletalMesh for LeftHandWeaponMeshComp as not all weapon types have LeftHandWeaponMeshComp
-	RightHandWeaponMeshComp->Activate();
-	SheathedWeaponMeshComp->Activate();
-	FallenWeaponMeshComp->Activate();
-
-	RightHandWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
-	SheathedWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
-	FallenWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
-
-	// Setup attachment for all weapon mesh components as well as also Activate and SetSkeletalMesh for LeftHandWeaponMeshComp wherever applicable
-	switch (WeaponDataAsset->WeaponType)
-	{
-	case EWeaponType::GreatSword:
-		LeftHandWeaponMeshComp->Activate();
-		LeftHandWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
-
-		RightHandWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GS"));
-		LeftHandWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GS_c"));
-		SheathedWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GS_b"));
-		FallenWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GS_w"));
-		break;
-
-	case EWeaponType::WarHammer:
-		LeftHandWeaponMeshComp->Activate();
-		LeftHandWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
-
-		RightHandWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WH"));
-		LeftHandWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WH_c"));
-		SheathedWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WH_b"));
-		FallenWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WH_w"));
-		break;
-
-	case EWeaponType::LongSword:
-		RightHandWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("LS"));
-		SheathedWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("LS_b"));
-		FallenWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("LS_w"));
-		break;
-
-	case EWeaponType::Mace:
-		RightHandWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("MC"));
-		SheathedWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("MC_b"));
-		FallenWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("MC_w"));
-		break;
-
-	case EWeaponType::Dagger:
-		RightHandWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGR"));
-		SheathedWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGR_b"));
-		FallenWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("DGR_w"));
-		break;
-
-	case EWeaponType::Staff:
-		LeftHandWeaponMeshComp->Activate();
-		LeftHandWeaponMeshComp->SetSkeletalMesh(NewSkeletalMesh);
-
-		RightHandWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("ST"));
-		LeftHandWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("ST_c"));
-		SheathedWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("ST_b"));
-		FallenWeaponMeshComp->AttachToComponent(PlayerOwner->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("ST_w"));
-		break;
-
-	default:
-		break;
-	}
-
-	SetAttachedToCharacter(true);
-	SetWeaponID(NewWeaponID);
-	SetWeaponType(WeaponDataAsset->WeaponType);
-
-	// @todo intialize weapon stats
 }
 
 void APrimaryWeapon::OnUnEquip()

@@ -196,8 +196,5 @@ public:
 	
 	/** Returns FWeaponData corresponding to WeaponID from the weapons data table */
 	static FWeaponTableRow* GetWeaponData(FName WeaponID);
-
-	/** Returns weapon data asset for a given weaponID */
-	static UWeaponDataAsset* GetWeaponDataAsset(FName WeaponID);
 	
 };

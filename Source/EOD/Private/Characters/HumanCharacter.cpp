@@ -233,7 +233,6 @@ TSharedPtr<FStreamableHandle> AHumanCharacter::LoadAnimationReferences(FPlayerAn
 	TSharedPtr<FStreamableHandle> StreamableHandle;
 
 	UGameSingleton* GameSingleton = GEngine ? Cast<UGameSingleton>(GEngine->GameSingleton) : nullptr;
-
 	if (!GameSingleton)
 	{
 		return StreamableHandle;

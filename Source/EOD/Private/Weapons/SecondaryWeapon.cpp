@@ -109,11 +109,6 @@ void ASecondaryWeapon::OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData
 	// @todo intialize weapon stats
 }
 
-void ASecondaryWeapon::OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset)
-{
-	// @todo
-}
-
 void ASecondaryWeapon::OnUnEquip()
 {
 	FDetachmentTransformRules DetachmentRules(FAttachmentTransformRules::KeepRelativeTransform, true);

@@ -33,10 +33,6 @@ void AWeaponBase::OnEquip(FName NewWeaponID, FWeaponTableRow* NewWeaponData)
 {
 }
 
-void AWeaponBase::OnEquip(FName NewWeaponID, UWeaponDataAsset* WeaponDataAsset)
-{
-}
-
 void AWeaponBase::OnUnEquip()
 {
 }

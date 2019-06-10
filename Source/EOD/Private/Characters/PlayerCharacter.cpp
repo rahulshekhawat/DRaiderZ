@@ -11,11 +11,11 @@
 #include "EODPlayerController.h"
 #include "DialogueWindowWidget.h"
 #include "DialogueLibrary.h"
-#include "WeaponDataAsset.h"
 #include "GameplaySkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
 #include "PlayerSkillsComponent.h"
 
+#include "TimerManager.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
 #include "UnrealNetwork.h"
@@ -56,11 +56,13 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 
 	MaxWeaponSlots = 2;
 	
+	/*
 	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
 	OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
 
 	OnSecondaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
 	OnSecondaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
+	*/
 
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnInteractionSphereBeginOverlap);
 	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnInteractionSphereEndOverlap);
@@ -286,6 +288,7 @@ void APlayerCharacter::PlayAttackBlockedAnimation()
 	}
 }
 
+/*
 void APlayerCharacter::ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
 {
 }
@@ -293,11 +296,12 @@ void APlayerCharacter::ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDat
 void APlayerCharacter::DeactivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset)
 {
 }
+*/
 
 void APlayerCharacter::AddPrimaryWeapon(FName WeaponID)
 {
 
-
+	/*
 	//  You would call SetCurrentPrimaryWeapon(NAME_None) when you want to remove equipped primary weapon
 	if (WeaponID == NAME_None)
 	{
@@ -324,6 +328,7 @@ void APlayerCharacter::AddPrimaryWeapon(FName WeaponID)
 	PrimaryWeaponDataAsset = WeaponDataAsset;
 	
 	OnPrimaryWeaponEquipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
+	*/
 
 	/*
 	LoadEquippedWeaponAnimationReferences();
@@ -368,8 +373,8 @@ void APlayerCharacter::AddPrimaryWeaponToCurrentSlot(FName WeaponID)
 {
 	// @todo check whether a weapon is already equipped
 
-	UWeaponDataAsset* WeaponDataAsset = UWeaponLibrary::GetWeaponDataAsset(WeaponID);
-	if (WeaponDataAsset)
+	// UWeaponDataAsset* WeaponDataAsset = UWeaponLibrary::GetWeaponDataAsset(WeaponID);
+	// if (WeaponDataAsset)
 	{
 		//~ @todo
 		// Server_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset);

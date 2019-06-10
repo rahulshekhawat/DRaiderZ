@@ -4,7 +4,4 @@
 
 UGameSingleton::UGameSingleton(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
-	DefaultSaveSlotName = FString("DefaultSlot");
-	CurrentSaveSlotName = FString("DefaultSlot");
-	UserIndex = 0;
 }

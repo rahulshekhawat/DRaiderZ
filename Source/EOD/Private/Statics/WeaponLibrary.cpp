@@ -2,7 +2,6 @@
 
 #include "WeaponLibrary.h"
 #include "GameSingleton.h"
-#include "WeaponDataAsset.h"
 
 #include "Engine/Engine.h"
 
@@ -67,24 +66,4 @@ FWeaponTableRow* UWeaponLibrary::GetWeaponData(FName WeaponID)
 		}
 	}
 	return WeaponData;
-}
-
-UWeaponDataAsset* UWeaponLibrary::GetWeaponDataAsset(FName WeaponID)
-{
-	UWeaponDataAsset* WeaponDataAsset = nullptr;
-
-	if (GEngine && GEngine->GameSingleton)
-	{
-		UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
-		if (GameSingleton && GameSingleton->WeaponsDataAssetsDataTable)
-		{
-			FWeaponDataAssetTableRow* WeaponDataAssetRow = GameSingleton->WeaponsDataAssetsDataTable->FindRow<FWeaponDataAssetTableRow>(WeaponID, FString("UWeaponLibrary::GetWeaponDataAsset(), weapon data asset lookup"));
-			if (WeaponDataAssetRow && !WeaponDataAssetRow->WeaponDataAsset.IsNull())
-			{
-				WeaponDataAsset = WeaponDataAssetRow->WeaponDataAsset.LoadSynchronous();
-			}
-		}
-	}
-
-	return WeaponDataAsset;
 }

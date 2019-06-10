@@ -38,27 +38,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* ArmorsDataTable;
 
-	/** Data table containing weapon data assets */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
-	UDataTable* WeaponsDataAssetsDataTable;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* DialogueWindowsDataTable;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* DialogueOptionsDataTable;
-
-	/** Default save profile name */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = SaveGame)
-	FString DefaultSaveSlotName;	
-
-	/** Name of current save profile in use */
-	UPROPERTY(BlueprintReadOnly, Category = SaveGame)
-	FString CurrentSaveSlotName;
-
-	/** Always 0 in this game */
-	UPROPERTY(BlueprintReadOnly, Category = SaveGame)
-	int32 UserIndex;
-
 
 };
