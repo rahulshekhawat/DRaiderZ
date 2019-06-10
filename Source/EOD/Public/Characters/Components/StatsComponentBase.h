@@ -315,6 +315,12 @@ public:
 
 	FOnGenericStatChangedMCDelegate OnStatValueChanged;
 
+	void ForceBroadcastDelegate()
+	{
+		float CV = GetValue();
+		OnStatValueChanged.Broadcast(CV);
+	}
+
 private:
 
 	bool bDirty;
@@ -646,10 +652,7 @@ public:
 	void DeactivateStaminaRegeneration();
 	
 	void RegenerateHealth();
-
 	void RegenerateMana();
-
-	UFUNCTION()
 	void RegenerateStamina();
 
 	// --------------------------------------

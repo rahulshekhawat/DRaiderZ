@@ -10,8 +10,10 @@
 #include "PlayerStatsComponent.h"
 #include "EODPlayerController.h"
 
+#include "TimerManager.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
+#include "Engine/StreamableManager.h"
 #include "GameFramework/PlayerController.h"
 
 FName AHumanCharacter::HairComponentName(TEXT("Hair"));

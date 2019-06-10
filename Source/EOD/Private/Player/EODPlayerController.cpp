@@ -232,6 +232,7 @@ void AEODPlayerController::InitializeWidgets()
 		InitSkillBarWidget();
 		// InitInventoryWidget();
 		// InitSkillTreeWidget();
+		InitPlayerStatsWidget();
 	}
 }
 
@@ -312,6 +313,74 @@ void AEODPlayerController::InitSkillBarWidget()
 			SkillBarWidget->InitializeSkillBarLayout(SkillsComp->GetSkillBarMap(), SkillsComp->GetSkillsMap());
 		}
 	}	
+}
+
+void AEODPlayerController::InitPlayerStatsWidget()
+{
+	if (HUDWidget && StatsComponent)
+	{
+		UPlayerStatsWidget* StatsWidget = HUDWidget->GetPlayerStatsWidget();
+		if (StatsWidget)
+		{
+			if (!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			{
+				StatsComponent->Health.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateHealth);
+			}
+
+			if (!StatsComponent->Mana.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			{
+				StatsComponent->Mana.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMana);
+			}
+
+			if (!StatsComponent->Stamina.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			{
+				StatsComponent->Stamina.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateStamina);
+			}
+
+			//~ Catch up UI to current stat values
+			StatsComponent->Health.ForceBroadcastDelegate();
+			StatsComponent->Mana.ForceBroadcastDelegate();
+			StatsComponent->Stamina.ForceBroadcastDelegate();
+
+			if (!StatsComponent->PhysicalAttack.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			{
+				StatsComponent->PhysicalAttack.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdatePAtt);
+			}
+
+			if (!StatsComponent->PhysicalCritRate.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			{
+				StatsComponent->PhysicalCritRate.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdatePCrit);
+			}
+
+			if (!StatsComponent->PhysicalResistance.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			{
+				StatsComponent->PhysicalResistance.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdatePDef);
+			}
+
+			if (!StatsComponent->MagickalAttack.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			{
+				StatsComponent->MagickalAttack.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMAtt);
+			}
+
+			if (!StatsComponent->MagickalCritRate.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			{
+				StatsComponent->MagickalCritRate.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMCrit);
+			}
+
+			if (!StatsComponent->MagickalResistance.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			{
+				StatsComponent->MagickalResistance.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMDef);
+			}
+
+			//~ Catch up UI to current stat values
+			StatsComponent->PhysicalAttack.ForceBroadcastDelegate();
+			StatsComponent->PhysicalCritRate.ForceBroadcastDelegate();
+			StatsComponent->PhysicalResistance.ForceBroadcastDelegate();
+			StatsComponent->MagickalAttack.ForceBroadcastDelegate();
+			StatsComponent->MagickalCritRate.ForceBroadcastDelegate();
+			StatsComponent->MagickalResistance.ForceBroadcastDelegate();
+		}
+	}
 }
 
 void AEODPlayerController::TogglePlayerHUD()

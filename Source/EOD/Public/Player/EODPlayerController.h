@@ -161,6 +161,8 @@ private:
 
 	void InitSkillBarWidget();
 
+	void InitPlayerStatsWidget();
+
 public:
 
 	// --------------------------------------
