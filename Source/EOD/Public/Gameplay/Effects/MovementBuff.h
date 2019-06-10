@@ -22,11 +22,9 @@ public:
 	//	Gameplay Effect Interface
 	// --------------------------------------
 
-	virtual void ActivateEffect(int32 ActivationLevel = 1) override;
-
-	virtual void DeactivateEffect() override;
-
-	virtual void UpdateEffect(float DeltaTime) override;
+	virtual void ActivateEffect_Implementation(int32 ActivationLevel = 1) override;
+	virtual void DeactivateEffect_Implementation() override;
+	virtual void UpdateEffect_Implementation(float DeltaTime) override;
 
 	// --------------------------------------
 	//  Pseudo Constants

@@ -27,14 +27,50 @@ void UGameplayEffectBase::InitEffect(AEODCharacterBase* Instigator, TArray<AEODC
 	}
 }
 
-void UGameplayEffectBase::ActivateEffect(int32 ActivationLevel)
+void UGameplayEffectBase::ActivateEffect_Implementation(int32 ActivationLevel)
 {
 }
 
-void UGameplayEffectBase::DeactivateEffect()
+void UGameplayEffectBase::DeactivateEffect_Implementation()
 {
 }
 
-void UGameplayEffectBase::UpdateEffect(float DeltaTime)
+void UGameplayEffectBase::UpdateEffect_Implementation(float DeltaTime)
 {
+}
+
+AEODCharacterBase* UGameplayEffectBase::GetEffectInstigator() const
+{
+	return EffectInstigator.Get();
+}
+
+UGameplaySkillsComponent* UGameplayEffectBase::GetInstigatorSkillComponent() const
+{
+	return InstigatorSkillComponent.Get();
+}
+
+TArray<AEODCharacterBase*> UGameplayEffectBase::GetEffectTargets() const
+{
+	TArray<AEODCharacterBase*> Targets;
+	for (TWeakObjectPtr<AEODCharacterBase>Target : EffectTargets)
+	{
+		if (Target.IsValid())
+		{
+			Targets.Add(Target.Get());
+		}
+	}
+	return Targets;
+}
+
+TArray<UGameplaySkillsComponent*> UGameplayEffectBase::GetTargetSkillComponents() const
+{
+	TArray<UGameplaySkillsComponent*> SkillComponents;
+	for (TWeakObjectPtr<UGameplaySkillsComponent>SkillComp : TargetSkillComponents)
+	{
+		if (SkillComp.IsValid())
+		{
+			SkillComponents.Add(SkillComp.Get());
+		}
+	}
+	return SkillComponents;
 }

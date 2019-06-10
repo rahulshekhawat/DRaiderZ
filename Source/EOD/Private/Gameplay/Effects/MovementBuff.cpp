@@ -11,9 +11,10 @@
 
 UMovementBuff::UMovementBuff(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	bNeedsUpdate = false;
 }
 
-void UMovementBuff::ActivateEffect(int32 ActivationLevel)
+void UMovementBuff::ActivateEffect_Implementation(int32 ActivationLevel)
 {
 	if (ActivationLevel < 1)
 	{
@@ -49,7 +50,7 @@ void UMovementBuff::ActivateEffect(int32 ActivationLevel)
 	}
 }
 
-void UMovementBuff::DeactivateEffect()
+void UMovementBuff::DeactivateEffect_Implementation()
 {
 	AEODCharacterBase* Instigator = EffectInstigator.Get();
 	if (Instigator)
@@ -72,6 +73,6 @@ void UMovementBuff::DeactivateEffect()
 	}
 }
 
-void UMovementBuff::UpdateEffect(float DeltaTime)
+void UMovementBuff::UpdateEffect_Implementation(float DeltaTime)
 {
 }

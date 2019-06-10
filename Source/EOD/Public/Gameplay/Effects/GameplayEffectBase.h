@@ -23,16 +23,22 @@ public:
 	UGameplayEffectBase(const FObjectInitializer& ObjectInitializer);
 
 	// --------------------------------------
-	//	Gameplay Effect Interface
+	//  Gameplay Effect Interface
 	// --------------------------------------
 
 	virtual void InitEffect(AEODCharacterBase* Instigator, TArray<AEODCharacterBase*> Targets);
 
-	virtual void ActivateEffect(int32 ActivationLevel = 1);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gameplay Effects")
+	void ActivateEffect(int32 ActivationLevel = 1);
+	virtual void ActivateEffect_Implementation(int32 ActivationLevel = 1);
 
-	virtual void DeactivateEffect();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gameplay Effects")
+	void DeactivateEffect();
+	virtual void DeactivateEffect_Implementation();
 
-	virtual void UpdateEffect(float DeltaTime);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gameplay Effects")
+	void UpdateEffect(float DeltaTime);
+	virtual void UpdateEffect_Implementation(float DeltaTime);
 
 	FORCEINLINE bool IsActive() const { return bActive; }
 
@@ -72,7 +78,7 @@ protected:
 	UParticleSystem* GameplayParticle;
 
 	// --------------------------------------
-	//	Cache
+	//  Cache
 	// --------------------------------------
 
 	/** This effect's instigator */
@@ -92,8 +98,23 @@ protected:
 	TArray<TWeakObjectPtr<UGameplaySkillsComponent>> TargetSkillComponents;
 
 	/** Determines if this gameplay effect is currently active */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Effect Status")
 	bool bActive;
 
+	// --------------------------------------
+	//  Blueprints
+	// --------------------------------------
+
+	UFUNCTION(BlueprintPure, Category = "Cache")
+	AEODCharacterBase* GetEffectInstigator() const;
+
+	UFUNCTION(BlueprintPure, Category = "Cache")
+	UGameplaySkillsComponent* GetInstigatorSkillComponent() const;
+
+	UFUNCTION(BlueprintPure, Category = "Cache")
+	TArray<AEODCharacterBase*> GetEffectTargets() const;
 	
+	UFUNCTION(BlueprintPure, Category = "Cache")
+	TArray<UGameplaySkillsComponent*> GetTargetSkillComponents() const;
+
 };
