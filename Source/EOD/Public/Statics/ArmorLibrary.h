@@ -100,6 +100,8 @@ class EOD_API UArmorLibrary : public UObject
 
 public:
 
+	/** Returns FWeaponData corresponding to WeaponID from the weapons data table */
+	static FArmorTableRow* GetArmorData(FName ArmorID);
 
 	
 	

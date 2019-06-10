@@ -7,7 +7,10 @@
 #include "SecondaryWeapon.h"
 #include "GameplaySkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
+#include "PlayerStatsComponent.h"
+#include "EODPlayerController.h"
 
+#include "Engine/World.h"
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerController.h"
 
@@ -68,10 +71,10 @@ void AHumanCharacter::PostInitializeComponents()
 	SetCurrentSecondaryWeapon(SecondaryWeaponID);
 	SetCurrentPrimaryWeapon(PrimaryWeaponID);
 
-	SetChestArmor(EquippedArmorIDs.ChestArmorID);
-	SetHandsArmor(EquippedArmorIDs.HandsArmorID);
-	SetLegsArmor(EquippedArmorIDs.LegsArmorID);
-	SetFeetArmor(EquippedArmorIDs.FeetArmorID);
+	AddArmor(EquippedArmorIDs.ChestArmorID);
+	AddArmor(EquippedArmorIDs.HandsArmorID);
+	AddArmor(EquippedArmorIDs.LegsArmorID);
+	AddArmor(EquippedArmorIDs.FeetArmorID);
 }
 
 void AHumanCharacter::Tick(float DeltaTime)
@@ -352,36 +355,99 @@ void AHumanCharacter::RemoveSecondaryWeapon()
 	// @todo remove weapon stats
 }
 
-void AHumanCharacter::SetChestArmor(const FName& ArmorID)
+void AHumanCharacter::AddArmor(FName ArmorID)
 {
+	if (ArmorID == NAME_None)
+	{
+		return;
+	}
+
+	FArmorTableRow* ArmorData = UArmorLibrary::GetArmorData(ArmorID);
+	if (!ArmorData || ArmorData->ArmorMesh.IsNull())
+	{
+		return;
+	}
+
+	RemoveArmor(ArmorData->ArmorType);
+	USkeletalMeshComponent* SkComp = nullptr;
+
+	switch (ArmorData->ArmorType)
+	{
+	case EArmorType::Chest:
+		EquippedArmorIDs.ChestArmorID = ArmorID;
+		SkComp = Chest;
+		break;
+	case EArmorType::Hands:
+		EquippedArmorIDs.HandsArmorID = ArmorID;
+		SkComp = Hands;
+		break;
+	case EArmorType::Legs:
+		EquippedArmorIDs.LegsArmorID = ArmorID;
+		SkComp = Legs;
+		break;
+	case EArmorType::Feet:
+		EquippedArmorIDs.FeetArmorID = ArmorID;
+		SkComp = Feet;
+		break;
+	case EArmorType::None:
+	default:
+		break;
+	}
+
+	if (SkComp)
+	{
+		SkComp->Activate();
+		SkComp->SetSkeletalMesh(ArmorData->ArmorMesh.LoadSynchronous());
+	}
+
+	AEODPlayerController* EODPC = Cast<AEODPlayerController>(Controller);
+	UPlayerStatsComponent* PlayerStats = EODPC ? Cast<UPlayerStatsComponent>(EODPC->GetStatsComponent()) : nullptr;
+	if (PlayerStats)
+	{
+		PlayerStats->AddArmorStats(ArmorData);
+	}
 }
 
-void AHumanCharacter::SetHandsArmor(const FName& ArmorID)
+void AHumanCharacter::RemoveArmor(EArmorType ArmorType)
 {
-}
+	USkeletalMeshComponent* SkComp = nullptr;
 
-void AHumanCharacter::SetLegsArmor(const FName& ArmorID)
-{
-}
+	switch (ArmorType)
+	{
+	case EArmorType::Chest:
+		EquippedArmorIDs.ChestArmorID = NAME_None;
+		SkComp = Chest;
+		break;
+	case EArmorType::Hands:
+		EquippedArmorIDs.HandsArmorID = NAME_None;
+		SkComp = Hands;
+		break;
+	case EArmorType::Legs:
+		EquippedArmorIDs.LegsArmorID = NAME_None;
+		SkComp = Legs;
+		break;
+	case EArmorType::Feet:
+		EquippedArmorIDs.FeetArmorID = NAME_None;
+		SkComp = Feet;
+		break;
+	case EArmorType::None:
+		break;
+	default:
+		break;
+	}
 
-void AHumanCharacter::SetFeetArmor(const FName& ArmorID)
-{
-}
+	if (SkComp)
+	{
+		SkComp->SetSkeletalMesh(nullptr);
+		SkComp->Deactivate();
+	}
 
-void AHumanCharacter::RemoveChestArmor()
-{
-}
-
-void AHumanCharacter::RemoveHandsArmor()
-{
-}
-
-void AHumanCharacter::RemoveLegsArmor()
-{
-}
-
-void AHumanCharacter::RemoveFeetArmor()
-{
+	AEODPlayerController* EODPC = Cast<AEODPlayerController>(Controller);
+	UPlayerStatsComponent* PlayerStats = EODPC ? Cast<UPlayerStatsComponent>(EODPC->GetStatsComponent()) : nullptr;
+	if (PlayerStats)
+	{
+		PlayerStats->RemoveArmorStats(ArmorType);
+	}
 }
 
 bool AHumanCharacter::CanDodge() const

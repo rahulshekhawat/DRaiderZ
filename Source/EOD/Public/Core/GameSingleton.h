@@ -35,6 +35,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* WeaponsDataTable;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
+	UDataTable* ArmorsDataTable;
+
 	/** Data table containing weapon data assets */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* WeaponsDataAssetsDataTable;

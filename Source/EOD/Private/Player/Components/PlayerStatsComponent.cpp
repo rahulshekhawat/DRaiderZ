@@ -732,3 +732,22 @@ void UPlayerStatsComponent::RemoveSecondaryWeaponStats()
 {
 	SecondaryWeaponData = nullptr;
 }
+
+void UPlayerStatsComponent::AddArmorStats(FArmorTableRow* ArmorData)
+{
+	if (ArmorsData.Contains(ArmorData->ArmorType))
+	{
+		RemoveArmorStats(ArmorData->ArmorType);
+	}
+
+	ArmorsData.Add(ArmorData->ArmorType, ArmorData);
+
+	//~ @todo add armor stats to player stats
+}
+
+void UPlayerStatsComponent::RemoveArmorStats(EArmorType ArmorType)
+{
+	ArmorsData.Remove(ArmorType);
+
+	//~ @todo remove armor stats from player stats
+}

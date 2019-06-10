@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ArmorLibrary.h"
 #include "WeaponLibrary.h"
 #include "StatsComponentBase.h"
 
@@ -50,6 +51,9 @@ public:
 	void RemovePrimaryWeaponStats();
 
 	void RemoveSecondaryWeaponStats();
+
+	void AddArmorStats(FArmorTableRow* ArmorData);
+	void RemoveArmorStats(EArmorType ArmorType);
 
 private:
 	
@@ -184,8 +188,9 @@ private:
 	*/
 
 	FWeaponTableRow* PrimaryWeaponData;
-
 	FWeaponTableRow* SecondaryWeaponData;
 
+	TMap<EArmorType, FArmorTableRow*> ArmorsData;
+	
 
 };

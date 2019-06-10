@@ -7,6 +7,7 @@
 #include "SecondaryWeapon.h"
 #include "CharacterLibrary.h"
 #include "EODCharacterBase.h"
+#include "ArmorLibrary.h"
 
 #include "Engine/DataTable.h"
 #include "Engine/StreamableManager.h"
@@ -209,15 +210,8 @@ public:
 	virtual void RemoveSecondaryWeapon();
 
 	//~ @note We're not using helm armor
-	virtual void SetChestArmor(const FName& ArmorID);
-	virtual void SetHandsArmor(const FName& ArmorID);
-	virtual void SetLegsArmor(const FName& ArmorID);
-	virtual void SetFeetArmor(const FName& ArmorID);
-
-	virtual void RemoveChestArmor();
-	virtual void RemoveHandsArmor();
-	virtual void RemoveLegsArmor();
-	virtual void RemoveFeetArmor();
+	virtual void AddArmor(FName ArmorID);
+	virtual void RemoveArmor(EArmorType ArmorType);
 
 protected:
 
