@@ -709,6 +709,81 @@ struct EOD_API FPlayerStatsTableRow : public FTableRowBase
 	}
 };
 
+USTRUCT(BlueprintType, Blueprintable)
+struct EOD_API FCharacterStatsTableRow : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere)
+	int32 Level;
+
+	UPROPERTY(EditAnywhere)
+	int32 Health;
+	
+	UPROPERTY(EditAnywhere)
+	int32 Mana;
+	
+	UPROPERTY(EditAnywhere)
+	int32 Stamina;
+	
+	UPROPERTY(EditAnywhere)
+	int32 HealthRegenRate;
+	
+	UPROPERTY(EditAnywhere)
+	int32 ManaRegenRate;
+	
+	UPROPERTY(EditAnywhere)
+	int32 StaminaRegenRate;
+	
+	UPROPERTY(EditAnywhere)
+	int32 PhysicalAttack;
+	
+	UPROPERTY(EditAnywhere)
+	int32 MagickalAttack;
+	
+	UPROPERTY(EditAnywhere)
+	float PhysicalCritRate;
+	
+	UPROPERTY(EditAnywhere)
+	float MagickalCritRate;
+	
+	UPROPERTY(EditAnywhere)
+	int32 PhysicalResistance;
+	
+	UPROPERTY(EditAnywhere)
+	int32 MagickalResistance;
+	
+	UPROPERTY(EditAnywhere)
+	int32 BleedResistance;
+
+	UPROPERTY(EditAnywhere)
+	float PhysicalDamageReductionOnBlock;
+	
+	UPROPERTY(EditAnywhere)
+	float MagickalDamageReductionOnBlock;
+
+	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	uint8 CrowdControlImmunities;
+
+	FCharacterStatsTableRow() :
+		Level(0),
+		Health(0),
+		Mana(0),
+		Stamina(0),
+		HealthRegenRate(0),
+		ManaRegenRate(0),
+		StaminaRegenRate(0),
+		PhysicalAttack(0),
+		MagickalAttack(0),
+		PhysicalCritRate(0.f),
+		MagickalCritRate(0.f),
+		PhysicalResistance(0),
+		MagickalResistance(0),
+		BleedResistance(0)
+	{
+	}
+};
+
 /** Struct for in-game skills */
 USTRUCT(BlueprintType, Blueprintable)
 struct EOD_API FSkillTableRow : public FTableRowBase
