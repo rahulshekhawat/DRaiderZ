@@ -20,14 +20,13 @@ UEODGameInstance::UEODGameInstance(const FObjectInitializer& ObjectInitializer) 
 {
 	GameTitle = FText::FromString("Dark RaiderZ");
 	StartupMapName = FName("Level0_Haddon");
-
-	LoadSaveGame();
 }
 
 void UEODGameInstance::Init()
 {
 	Super::Init();
 
+	LoadSaveGame();
 
 	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UEODGameInstance::OnPreLoadMap);
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEODGameInstance::OnPostLoadMap);

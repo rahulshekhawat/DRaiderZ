@@ -27,6 +27,9 @@ public:
 	UPROPERTY()
 	ECharacterGender CharacterGender;
 
+	UPROPERTY()
+	int32 CharacterLevel;
+
 	/** Number of unlocked skill points currently available */
 	UPROPERTY()
 	int32 UnlockedSkillPoints;

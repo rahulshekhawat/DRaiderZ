@@ -2,8 +2,10 @@
 
 #include "PlayerSaveGame.h"
 
-UPlayerSaveGame::UPlayerSaveGame(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+UPlayerSaveGame::UPlayerSaveGame(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer),
+	CharacterGender(ECharacterGender::Female),
+	CharacterLevel(0),
+	UnlockedSkillPoints(0)
 {
-	CharacterGender = ECharacterGender::Female;
-	UnlockedSkillPoints = 0;
 }

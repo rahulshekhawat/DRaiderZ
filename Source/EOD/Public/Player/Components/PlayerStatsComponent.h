@@ -50,10 +50,14 @@ public:
 
 private:
 
+	void LoadPlayerStats();
+
 	FWeaponTableRow* PrimaryWeaponData;
 	FWeaponTableRow* SecondaryWeaponData;
 
 	TMap<EArmorType, FArmorTableRow*> ArmorsData;
+
+
 	
 
 };
