@@ -44,6 +44,12 @@ public:
 	/** Name of map where the player starts a new campaign */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EOD Global Variables")
 	FName StartupMapName;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
+	UDataTable* PlayerStatsDataTable;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
+	UDataTable* CharacterStatsDataTable;
 
 	// --------------------------------------
 	//	Campaign

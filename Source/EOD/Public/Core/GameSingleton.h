@@ -18,20 +18,15 @@ class EOD_API UGameSingleton : public UObject
 	GENERATED_BODY()
 	
 public:
-	UGameSingleton(const FObjectInitializer& ObjectInitializer);
 
-	/** A singleton instance of FStreamableManager */
-	FStreamableManager StreamableManager;
+	UGameSingleton(const FObjectInitializer& ObjectInitializer);
 	
-	/** Data table containing player animation references */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* PlayerAnimationReferencesDataTable;
 
-	/** Data table containing player skills */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* PlayerSkillsDataTable;
 
-	/** Data table containing weapons info */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* WeaponsDataTable;
 
@@ -43,5 +38,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = DataTable)
 	UDataTable* DialogueOptionsDataTable;
+
+public:
+
+	/** A singleton instance of FStreamableManager */
+	FStreamableManager StreamableManager;
+
 
 };
