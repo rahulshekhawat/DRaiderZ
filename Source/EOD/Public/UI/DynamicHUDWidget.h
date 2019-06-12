@@ -74,6 +74,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UDynamicSkillBarWidget* SkillBarWidget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UTextBlock* PlayerLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UTextBlock* PlayerName;
+
 public:
 
 	FORCEINLINE UCanvasPanel* GetMainCanvas() const { return MainCanvas; }
@@ -97,6 +103,10 @@ public:
 	void AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
 
 	void RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
+
+	void SetPlayerLevel(int32 Level);
+	
+	void SetPlayerName(FString Name);
 
 private:
 

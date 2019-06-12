@@ -132,3 +132,20 @@ void UPlayerStatsWidget::UpdateEXP(int32 Value)
 		EXPValue->SetText(Text);
 	}
 }
+
+void UPlayerStatsWidget::SetPlayerName(FString Name)
+{
+	if (PlayerName)
+	{
+		FText Text = FText::FromString(FString("<HEAD>") + Name + FString("</>"));
+		PlayerName->SetText(Text);
+	}
+}
+
+void UPlayerStatsWidget::SetPlayerType(FString Type)
+{
+	if (PlayerType)
+	{
+		PlayerType->SetText(FText::FromString(Type));
+	}
+}

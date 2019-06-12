@@ -604,6 +604,31 @@ void APlayerCharacter::LoadCharacterState()
 	}
 
 	SetCharacterLevel(SaveGame->CharacterLevel);
+
+	AEODPlayerController* EODPC = Cast<AEODPlayerController>(Controller);
+	if (EODPC && EODPC->GetHUDWidget() && EODGI)
+	{
+		FString PlayerName = EODGI->GetCurrentPlayerSaveGameName();
+		EODPC->GetHUDWidget()->SetPlayerName(PlayerName);
+
+		UPlayerStatsWidget* PSWidget = EODPC->GetHUDWidget()->GetPlayerStatsWidget();
+		if (PSWidget)
+		{
+			PSWidget->SetPlayerName(PlayerName);
+
+			FString Type = FString("Human");
+			ECharacterGender CharGender = GetCharacterGender();
+			if (CharGender == ECharacterGender::Female)
+			{
+				Type += FString(" Female");
+			}
+			else if (CharGender == ECharacterGender::Male)
+			{
+				Type += FString(" Male");
+			}
+			PSWidget->SetPlayerType(Type);
+		}
+	}
 }
 
 void APlayerCharacter::PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors)
@@ -1027,6 +1052,8 @@ void APlayerCharacter::SetCharacterLevel(int32 NewLevel)
 		{
 			PlayerStatsWidget->UpdateLevel(InGameLevel);
 		}
+
+		PC->GetHUDWidget()->SetPlayerLevel(NewLevel);
 	}
 }
 

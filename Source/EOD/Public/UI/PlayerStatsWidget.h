@@ -31,6 +31,12 @@ public:
 	// --------------------------------------
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
+	URichTextBlock* PlayerName;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
+	URichTextBlock* PlayerType;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
 	URichTextBlock* LevelValue;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
@@ -95,5 +101,12 @@ public:
 	
 	UFUNCTION()
 	void UpdateEXP(int32 Value);
+
+	UFUNCTION()
+	void SetPlayerName(FString Name);
+
+	UFUNCTION()
+	void SetPlayerType(FString Type);
+
 	
 };

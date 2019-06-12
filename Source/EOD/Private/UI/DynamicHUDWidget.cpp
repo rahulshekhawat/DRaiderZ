@@ -15,6 +15,7 @@
 
 #include "TimerManager.h"
 #include "Engine/World.h"
+#include "Components/TextBlock.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Kismet/GameplayStatics.h"
@@ -36,7 +37,9 @@ bool UDynamicHUDWidget::Initialize()
 		InventoryWidget &&
 		PlayerStatsWidget &&
 		SkillTreeWidget &&
-		SkillBarWidget)
+		SkillBarWidget &&
+		PlayerLevel &&
+		PlayerName)
 	{
 		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
 		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -107,8 +110,8 @@ void UDynamicHUDWidget::AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect)
 		UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(PSlot);
 		if (CanvasSlot)
 		{
-			CanvasSlot->SetSize(FVector2D(32.f, 32.f));
-			CanvasSlot->SetPosition(FVector2D(1000.f, 20.f));
+			CanvasSlot->SetSize(FVector2D(48.f, 48.f));
+			CanvasSlot->SetPosition(FVector2D(1900.f, 20.f));
 		}
 	}
 
@@ -124,6 +127,22 @@ void UDynamicHUDWidget::RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffe
 		// ContWidget->MarkPendingKill();
 	}
 	GameplayEffectUIMap.Remove(GameplayEffect);
+}
+
+void UDynamicHUDWidget::SetPlayerLevel(int32 Level)
+{
+	if (PlayerLevel)
+	{
+		PlayerLevel->SetText(FText::FromString(FString("Lv. ") + FString::FromInt(Level)));
+	}
+}
+
+void UDynamicHUDWidget::SetPlayerName(FString Name)
+{
+	if (PlayerName)
+	{
+		PlayerName->SetText(FText::FromString(Name));
+	}
 }
 
 void UDynamicHUDWidget::DisplayNotification(UNotificationWidget* NotificationWidget)
