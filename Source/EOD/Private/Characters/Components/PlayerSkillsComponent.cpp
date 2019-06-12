@@ -11,6 +11,8 @@
 #include "EODPlayerController.h"
 #include "ContainerWidget.h"
 #include "PlayerStatsComponent.h"
+#include "GameplayEffectBase.h"
+#include "DynamicHUDWidget.h"
 
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
@@ -407,6 +409,38 @@ void UPlayerSkillsComponent::UpdateSkillCooldown(FName SkillGroup, float Remaini
 
 void UPlayerSkillsComponent::UpdateSkillCooldown(uint8 SkillIndex, float RemainingCooldown)
 {
+}
+
+void UPlayerSkillsComponent::AddGameplayEffect(UGameplayEffectBase* GameplayEffect)
+{
+	Super::AddGameplayEffect(GameplayEffect);
+	if (GameplayEffect && GameplayEffect->Icon)
+	{
+		AEODCharacterBase* EODChar = GetCharacterOwner();
+		AEODPlayerController* EODPC = EODChar ? Cast<AEODPlayerController>(EODChar->Controller) : nullptr;
+		UDynamicHUDWidget* HUDWidget = EODPC ? EODPC->GetHUDWidget() : nullptr;
+
+		if (HUDWidget)
+		{
+			HUDWidget->AddGameplayEffectUI(GameplayEffect);
+		}
+	}
+}
+
+void UPlayerSkillsComponent::RemoveGameplayEffect(UGameplayEffectBase* GameplayEffect)
+{
+	Super::RemoveGameplayEffect(GameplayEffect);
+	if (GameplayEffect && GameplayEffect->Icon)
+	{
+		AEODCharacterBase* EODChar = GetCharacterOwner();
+		AEODPlayerController* EODPC = EODChar ? Cast<AEODPlayerController>(EODChar->Controller) : nullptr;
+		UDynamicHUDWidget* HUDWidget = EODPC ? EODPC->GetHUDWidget() : nullptr;
+
+		if (HUDWidget)
+		{
+			HUDWidget->RemoveGameplayEffectUI(GameplayEffect);
+		}
+	}
 }
 
 TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill(FName SkillGroup) 

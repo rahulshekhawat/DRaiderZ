@@ -11,7 +11,6 @@
 class UImage;
 class UScrollBox;
 class UGridPanel;
-class UEODItemContainer;
 
 /**
  * InventoryWidget is the visual representation of player inventory

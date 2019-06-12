@@ -10,6 +10,8 @@
 #include "ContainerDragDropOperation.h"
 #include "ContainerWidget.h"
 #include "NotificationWidget.h"
+#include "EODPlayerController.h"
+#include "GameplayEffectBase.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -84,6 +86,44 @@ void UDynamicHUDWidget::AddDialogueWidget(UDialogueWindowWidget* NewWidget)
 		CPSlot->SetSize(DialogueWidgetSize);
 		CPSlot->SetPosition(DialogueWidgetPosition);
 	}
+}
+
+void UDynamicHUDWidget::AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect)
+{
+	UClass* GEWClass = GameplayEffectWidgetClass.Get();
+	if (!GameplayEffect || !MainCanvas || !GEWClass)
+	{
+		return;
+	}
+
+	UContainerWidget* ContainerWidget = CreateWidget<UContainerWidget>(GetOwningPlayer(), GEWClass);
+	if (ContainerWidget)
+	{
+		FContainerData ContainerData;
+		ContainerData.Icon = GameplayEffect->Icon;
+		ContainerWidget->SetContainerData(ContainerData);
+
+		UPanelSlot* PSlot = MainCanvas->AddChild(ContainerWidget);
+		UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(PSlot);
+		if (CanvasSlot)
+		{
+			CanvasSlot->SetSize(FVector2D(32.f, 32.f));
+			CanvasSlot->SetPosition(FVector2D(1000.f, 20.f));
+		}
+	}
+
+	GameplayEffectUIMap.Add(GameplayEffect, ContainerWidget);
+}
+
+void UDynamicHUDWidget::RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect)
+{
+	UContainerWidget* ContWidget = GameplayEffectUIMap.Contains(GameplayEffect) ? GameplayEffectUIMap[GameplayEffect] : nullptr;
+	if (ContWidget)
+	{
+		ContWidget->RemoveFromParent();
+		// ContWidget->MarkPendingKill();
+	}
+	GameplayEffectUIMap.Remove(GameplayEffect);
 }
 
 void UDynamicHUDWidget::DisplayNotification(UNotificationWidget* NotificationWidget)

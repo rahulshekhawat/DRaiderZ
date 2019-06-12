@@ -50,8 +50,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	bool bNeedsUpdate;
 
-protected:
-	
 	/** Name of this gameplay effect that will be displayed to player inside the game */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
 	FString InGameName;
@@ -63,7 +61,9 @@ protected:
 	/** Icon used to represent this gameplay effect inside the game */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-Game Information")
 	UTexture* Icon;
-	
+
+protected:
+
 	/** The duration for which this effect will last */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	float GameplayEffectDuration;

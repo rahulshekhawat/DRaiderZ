@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "DynamicHUDWidget.generated.h"
 
+class UContainerWidget;
 class USoundBase;
 class UTextBlock;
 class UCanvasPanel;
@@ -17,6 +18,7 @@ class UStatusIndicatorWidget;
 class UDialogueWindowWidget;
 class UDynamicSkillTreeWidget;
 class UNotificationWidget;
+class UGameplayEffectBase;
 
 /**
  * 
@@ -92,7 +94,18 @@ public:
 	/** Add dialogue widget as a child to HUD widget */
 	void AddDialogueWidget(UDialogueWindowWidget* NewWidget);
 
+	void AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
+
+	void RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
+
 private:
+
+	// --------------------------------------
+	//  Cache
+	// --------------------------------------
+
+	UPROPERTY(Transient)
+	TMap<UGameplayEffectBase*, UContainerWidget*> GameplayEffectUIMap;
 
 	// --------------------------------------
 	//  Pseudo Constants
@@ -115,6 +128,9 @@ private:
 
 	UPROPERTY(Category = Sounds, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USoundBase* NotificationSound;
+
+	UPROPERTY(Category = Sounds, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UContainerWidget> GameplayEffectWidgetClass;
 
 public:
 

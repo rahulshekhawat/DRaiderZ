@@ -48,6 +48,10 @@ public:
 
 	virtual void UpdateSkillCooldown(uint8 SkillIndex, float RemainingCooldown) override;
 
+	virtual void AddGameplayEffect(UGameplayEffectBase* GameplayEffect) override;
+
+	virtual void RemoveGameplayEffect(UGameplayEffectBase* GameplayEffect) override;
+
 	// --------------------------------------
 	//  Skill System
 	// --------------------------------------
