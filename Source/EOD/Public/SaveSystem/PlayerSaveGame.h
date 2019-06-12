@@ -30,8 +30,9 @@ public:
 	UPROPERTY()
 	int32 CharacterLevel;
 
+	/** EXP required for player level up */
 	UPROPERTY()
-	int32 EXPThisLevel;
+	int32 LevelupEXP;
 
 	/** Number of unlocked skill points currently available */
 	UPROPERTY()

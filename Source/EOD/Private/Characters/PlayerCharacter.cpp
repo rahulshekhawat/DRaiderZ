@@ -576,14 +576,34 @@ void APlayerCharacter::LoadCharacterState()
 {
 	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
 	UPlayerSaveGame* SaveGame = EODGI ? EODGI->GetCurrentPlayerSaveGameObject() : nullptr;
+	UDataTable* PSDataTable = EODGI ? EODGI->PlayerStatsDataTable : nullptr;
 	
-	SaveGame->CharacterLevel = SaveGame->CharacterLevel <= 0 ? 1 : SaveGame->CharacterLevel >= 100 ? 99 : SaveGame->CharacterLevel;
+	if (SaveGame->CharacterLevel <= 0)
+	{
+		SaveGame->CharacterLevel = 1;
+		if (PSDataTable)
+		{
+			FName LevelName = FName(*FString::FromInt(SaveGame->CharacterLevel + 1));
+			FPlayerStatsTableRow* TableRow = PSDataTable->FindRow<FPlayerStatsTableRow>(LevelName, FString("APlayerCharacter::LoadCharacterState()"));
+			if (TableRow)
+			{
+				SetLeveupEXP(TableRow->ExpRequired);
+				SaveGame->LevelupEXP = TableRow->ExpRequired;
+			}
+		}
+	}
+	else if (SaveGame->CharacterLevel >= 100)
+	{
+		SaveGame->CharacterLevel = 99;
+		SetLeveupEXP(0);
+		SaveGame->LevelupEXP = 0;
+	}
+	else
+	{
+		SetLeveupEXP(SaveGame->LevelupEXP);
+	}
+
 	SetCharacterLevel(SaveGame->CharacterLevel);
-
-
-
-
-	//~ @todo save corrected character level is it was <= 0 || >= 100;
 }
 
 void APlayerCharacter::PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors)
@@ -1010,9 +1030,16 @@ void APlayerCharacter::SetCharacterLevel(int32 NewLevel)
 	}
 }
 
-void APlayerCharacter::SetPlayerEXP(int32 EXP)
+void APlayerCharacter::AddEXP(int32 Value)
 {
-	CurrentLevelEXP = EXP;
+	SetLeveupEXP(LeveupEXP - Value);
+}
+
+void APlayerCharacter::SetLeveupEXP(int32 EXP)
+{
+	//~ @todo Level up if LevelupEXP goes below zero
+
+	LeveupEXP = EXP;
 
 	AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
 	if (PC && PC->GetHUDWidget())

@@ -400,11 +400,13 @@ public:
 
 	virtual void SetCharacterLevel(int32 NewLevel) override;
 
-	void SetPlayerEXP(int32 EXP);
+	void AddEXP(int32 Value);
 
 private:
 
-	int32 CurrentLevelEXP;
+	void SetLeveupEXP(int32 EXP);
+
+	int32 LeveupEXP;
 
 	////////////////////////////////////////////////////////////////////////////////
 	// WEAPONS
