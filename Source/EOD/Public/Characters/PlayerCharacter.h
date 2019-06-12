@@ -68,6 +68,8 @@ public:
 	/** Saves current player state */
 	virtual void SaveCharacterState() override;
 
+	virtual void LoadCharacterState() override;
+
 	// --------------------------------------
 	//  Combat Interface
 	// --------------------------------------
@@ -390,6 +392,19 @@ private:
 	TArray<FOnGameplayEventMCDelegate> EventsOnSuccessfulSkillAttack;
 	// TArray<FCombatEvent> EventsOnSuccessfulSkillAttack;
 
+public:
+
+	// --------------------------------------
+	//  Replicated Stats
+	// --------------------------------------
+
+	virtual void SetCharacterLevel(int32 NewLevel) override;
+
+	void SetPlayerEXP(int32 EXP);
+
+private:
+
+	int32 CurrentLevelEXP;
 
 	////////////////////////////////////////////////////////////////////////////////
 	// WEAPONS

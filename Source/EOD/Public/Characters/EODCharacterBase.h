@@ -758,6 +758,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Save/Load System")
 	virtual void SaveCharacterState() { ; }
 
+	UFUNCTION(BlueprintCallable, Category = "Save/Load System")
+	virtual void LoadCharacterState() { ; }
+
 	// --------------------------------------
 	//  Ride System
 	// --------------------------------------
@@ -1107,13 +1110,16 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_Mana)
 	FCharacterStat Mana;
 
-	int32 InGameLevel;
-
 	/** [server] Event called on server when character's health changes */
 	UFUNCTION()
 	virtual void OnHealthUpdated(int32 MaxHealth, int32 CurrentHealth);
 
+	virtual void SetCharacterLevel(int32 NewLevel);
+
 protected:
+	
+	UPROPERTY(ReplicatedUsing = OnRep_InGameLevel)
+	int32 InGameLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 	float TargetSwitchDuration;
@@ -1148,6 +1154,9 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_Mana(FCharacterStat& OldMana);
+
+	UFUNCTION()
+	virtual void OnRep_InGameLevel(int32 OldLevel);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Dodge(uint8 DodgeIndex, float RotationYaw);

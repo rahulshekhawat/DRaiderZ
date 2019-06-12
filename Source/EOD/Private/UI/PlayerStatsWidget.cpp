@@ -117,8 +117,18 @@ void UPlayerStatsWidget::UpdateMDef(float Value)
 
 void UPlayerStatsWidget::UpdateLevel(int32 Value)
 {
+	if (LevelValue)
+	{
+		FText Text = FText::FromString(FString("<ADD>") + FString::FromInt(Value) + FString("</>"));
+		LevelValue->SetText(Text);
+	}
 }
 
 void UPlayerStatsWidget::UpdateEXP(int32 Value)
 {
+	if (EXPValue)
+	{
+		FText Text = FText::FromString(FString("<ADD>") + FString::FromInt(Value) + FString("</>"));
+		EXPValue->SetText(Text);
+	}
 }

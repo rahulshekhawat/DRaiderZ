@@ -176,6 +176,9 @@ void AEODCharacterBase::BeginPlay()
 	{
 		MoveComp->SetDesiredCustomRotation(GetActorRotation());
 	}
+
+
+
 }
 
 void AEODCharacterBase::PostInitializeComponents()
@@ -718,6 +721,11 @@ void AEODCharacterBase::OnHealthUpdated(int32 MaxHealth, int32 CurrentHealth)
 {
 }
 
+void AEODCharacterBase::SetCharacterLevel(int32 NewLevel)
+{
+	InGameLevel = NewLevel;
+}
+
 void AEODCharacterBase::TurnOnTargetSwitch()
 {
 	if (GetMesh())
@@ -800,6 +808,11 @@ void AEODCharacterBase::OnRep_Health(FCharacterStat& OldHealth)
 
 void AEODCharacterBase::OnRep_Mana(FCharacterStat& OldMana)
 {
+}
+
+void AEODCharacterBase::OnRep_InGameLevel(int32 OldLevel)
+{
+
 }
 
 void AEODCharacterBase::Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)

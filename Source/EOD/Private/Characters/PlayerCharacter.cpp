@@ -14,6 +14,10 @@
 #include "GameplaySkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
 #include "PlayerSkillsComponent.h"
+#include "DynamicHUDWidget.h"
+#include "PlayerStatsWidget.h"
+#include "EODGameInstance.h"
+#include "PlayerSaveGame.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -98,6 +102,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	LoadCharacterState();
 
 }
 
@@ -567,6 +572,20 @@ void APlayerCharacter::SaveCharacterState()
 	}
 }
 
+void APlayerCharacter::LoadCharacterState()
+{
+	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
+	UPlayerSaveGame* SaveGame = EODGI ? EODGI->GetCurrentPlayerSaveGameObject() : nullptr;
+	
+	SaveGame->CharacterLevel = SaveGame->CharacterLevel <= 0 ? 1 : SaveGame->CharacterLevel >= 100 ? 99 : SaveGame->CharacterLevel;
+	SetCharacterLevel(SaveGame->CharacterLevel);
+
+
+
+
+	//~ @todo save corrected character level is it was <= 0 || >= 100;
+}
+
 void APlayerCharacter::PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors)
 {
 	LastAttackResponses = AttackResponses;
@@ -974,6 +993,36 @@ void APlayerCharacter::FinishDialogue_Implementation(UDialogueWindowWidget* Widg
 
 void APlayerCharacter::ExitDialogue_Implementation(UDialogueWindowWidget* Widget)
 {
+}
+
+void APlayerCharacter::SetCharacterLevel(int32 NewLevel)
+{
+	InGameLevel = NewLevel;
+
+	AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
+	if (PC && PC->GetHUDWidget())
+	{
+		UPlayerStatsWidget* PlayerStatsWidget = PC->GetHUDWidget()->GetPlayerStatsWidget();
+		if (PlayerStatsWidget)
+		{
+			PlayerStatsWidget->UpdateLevel(InGameLevel);
+		}
+	}
+}
+
+void APlayerCharacter::SetPlayerEXP(int32 EXP)
+{
+	CurrentLevelEXP = EXP;
+
+	AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
+	if (PC && PC->GetHUDWidget())
+	{
+		UPlayerStatsWidget* PlayerStatsWidget = PC->GetHUDWidget()->GetPlayerStatsWidget();
+		if (PlayerStatsWidget)
+		{
+			PlayerStatsWidget->UpdateEXP(EXP);
+		}
+	}
 }
 
 void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)

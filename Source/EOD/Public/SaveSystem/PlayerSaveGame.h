@@ -30,6 +30,9 @@ public:
 	UPROPERTY()
 	int32 CharacterLevel;
 
+	UPROPERTY()
+	int32 EXPThisLevel;
+
 	/** Number of unlocked skill points currently available */
 	UPROPERTY()
 	int32 UnlockedSkillPoints;

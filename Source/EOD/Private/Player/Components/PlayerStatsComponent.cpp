@@ -111,8 +111,7 @@ void UPlayerStatsComponent::LoadPlayerStats()
 	}
 	
 	int32 PlayerLevel = SaveGame->CharacterLevel;
-	PlayerLevel = PlayerLevel <= 0 ? 1 : PlayerLevel;
-	PlayerLevel = PlayerLevel >= 99 ? 99 : PlayerLevel;
+	PlayerLevel = PlayerLevel <= 0 ? 1 : PlayerLevel >= 99 ? 99 : PlayerLevel;
 	FName LevelName = FName(*FString::FromInt(PlayerLevel));
 
 	FPlayerStatsTableRow* TableRow = PSDataTable->FindRow<FPlayerStatsTableRow>(LevelName, FString("UPlayerStatsComponent::LoadPlayerStats()"));
