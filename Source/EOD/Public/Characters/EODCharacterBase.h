@@ -461,6 +461,15 @@ public:
 		const bool bCritHit,
 		const bool bAttackBlocked) override;
 
+	virtual void TriggerReceivedHitCosmetics(const FReceivedHitInfo& HitInfo);
+
+	inline void SetLastReceivedHitInfo(const FReceivedHitInfo& HitInfo)
+	{
+		LastReceivedHit = HitInfo;
+	}
+
+	inline const FReceivedHitInfo& GetLastReceivedHitInfo() const { return LastReceivedHit; }
+
 protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_LastReceivedHit)
@@ -1047,6 +1056,7 @@ public:
 	// --------------------------------------
 
 	virtual void DodgeAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr);
+	virtual void BlockAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr);
 
 	FOnGameplayEventMCDelegate OnReceivingHit;
 

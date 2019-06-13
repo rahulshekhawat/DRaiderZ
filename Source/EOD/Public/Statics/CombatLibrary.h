@@ -82,7 +82,7 @@ struct EOD_API FReceivedHitInfo
 
 	FReceivedHitInfo() :
 		HitInstigator(nullptr),
-		DamageResult(EDamageResult::Nullified),
+		DamageResult(EDamageResult::Damaged),
 		CrowdControlEffect(ECrowdControlEffect::Flinch),
 		CrowdControlEffectDuration(0.f),
 		BCAngle(0.f),
