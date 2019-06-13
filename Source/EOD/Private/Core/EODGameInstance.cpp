@@ -123,8 +123,8 @@ void UEODGameInstance::LoadSaveGame()
 #if WITH_EDITOR
 		else
 		{
-			CreateNewProfile(FString("Editor_SaveGame"));
-			LoadProfileAsCurrent(FString("Editor_SaveGame"));
+			CreateNewProfile(FString("Chikara"));
+			LoadProfileAsCurrent(FString("Chikara"));
 		}
 #endif
 	}
