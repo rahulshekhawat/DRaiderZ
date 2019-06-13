@@ -13,6 +13,7 @@
 #include "AISkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
 
+#include "TimerManager.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
 #include "Components/AudioComponent.h"
@@ -239,11 +240,12 @@ TSharedPtr<FAttackResponse> AAICharacterBase::ReceiveAttack(AActor* HitInstigato
 		AttackResponsePtr->DamageResult = ActualDamage > 0 ? EDamageResult::Damaged : EDamageResult::Nullified;
 	}
 
-
 	if (bCCEApplied)
 	{
 		AttackResponsePtr->CrowdControlEffect = AttackInfoPtr->CrowdControlEffect;
 	}
+
+	AttackResponsePtr->bCritHit = bCritHit;
 
 	if (!bAttackBlocked)
 	{
