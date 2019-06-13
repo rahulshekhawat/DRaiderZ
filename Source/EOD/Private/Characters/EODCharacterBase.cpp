@@ -13,7 +13,10 @@
 #include "StatsComponentBase.h"
 #include "PlayerStatsComponent.h"
 #include "ActiveSkillBase.h"
-
+#include "AIStatsComponent.h"
+#include "PlayerStatsComponent.h"
+#include "AttackDodgedEvent.h"
+#include "EODGameInstance.h"
 #include "DynamicHUDWidget.h"
 
 #include "IdleWalkRunState.h"
@@ -25,6 +28,8 @@
 #include "UsingSkillState.h"
 
 #include "UnrealNetwork.h"
+#include "TimerManager.h"
+#include "Engine/World.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/AudioComponent.h"
@@ -560,14 +565,250 @@ void AEODCharacterBase::ResetAttackInfo()
 	CurrentAttackInfoPtr.Reset();
 }
 
-TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, const FHitResult& DirectHitResult, const bool bLineHitResultFound, const FHitResult& LineHitResult)
+TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(
+	AActor* HitInstigator,
+	ICombatInterface* InstigatorCI,
+	const TSharedPtr<FAttackInfo>& AttackInfoPtr,
+	const FHitResult& DirectHitResult,
+	const bool bLineHitResultFound,
+	const FHitResult& LineHitResult)
 {
-	return TSharedPtr<FAttackResponse>(nullptr);
+	TSharedPtr<FAttackResponse> AttackResponsePtr = TSharedPtr<FAttackResponse>(nullptr);
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	if (!StatsComp || !InstigatorCI || !AttackInfoPtr.IsValid())
+	{
+		return AttackResponsePtr;
+	}
+
+	// AEODCharacterBase* InstigatingChar = Cast<AEODCharacterBase>(HitInstigator);
+	// Handle dodge
+	if (!AttackInfoPtr->bUndodgable && this->IsDodgingDamage())
+	{
+		UAttackDodgedEvent* DodgeEvent = NewObject<UAttackDodgedEvent>(this, UAttackDodgedEvent::StaticClass(), FName("DodgeEvent"), RF_Transient);
+		DodgeEvent->AddToRoot();
+		this->OnDodgingAttack.Broadcast(this, HitInstigator, this, DodgeEvent);
+		DodgeEvent->RemoveFromRoot();
+		DodgeEvent->MarkPendingKill();
+
+		AttackResponsePtr = MakeShareable(new FAttackResponse);
+		if (AttackResponsePtr.IsValid())
+		{
+			AttackResponsePtr->ActualDamage = 0.f;
+			AttackResponsePtr->bCritHit = false;
+			AttackResponsePtr->CrowdControlEffect = ECrowdControlEffect::Flinch;
+			AttackResponsePtr->DamageResult = EDamageResult::Dodged;
+		}
+
+		// Replicate Hit Info
+		FReceivedHitInfo ReceivedHitInfo;
+		ReceivedHitInfo.DamageResult = EDamageResult::Dodged;
+		ReceivedHitInfo.HitInstigator = HitInstigator;
+		ReceivedHitInfo.ReplicationIndex = LastReceivedHit.ReplicationIndex + 1;
+		LastReceivedHit = ReceivedHitInfo;
+
+		return AttackResponsePtr;
+	}
+
+	/*
+	bool bAttackBlocked = false;
+	if (!AttackInfoPtr->bUnblockable && this->IsBlockingDamage())
+	{
+		const FVector& HIVec = HitInstigator->GetActorForwardVector();
+		const FVector& ForVec = this->GetActorForwardVector();
+
+		float Angle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(HIVec, ForVec);
+		if (Angle >= 120)
+		{
+			bAttackBlocked = true;
+		}
+	}
+	*/
+
+	bool bCritHit = AttackInfoPtr->CritRate >= FMath::RandRange(0.f, 100.f) ? true : false;
+	bool bAttackBlocked = false;
+	float BCAngle = 0.f;
+	if (bLineHitResultFound)
+	{
+		BCAngle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(GetActorForwardVector(), LineHitResult.ImpactNormal);
+		if (!AttackInfoPtr->bUnblockable && this->IsBlockingDamage())
+		{
+			bAttackBlocked = BCAngle < UCombatLibrary::BlockDetectionAngle ? true : false;
+			if (bAttackBlocked)
+			{
+				//~ @todo block event
+				PlayAttackBlockedAnimation();
+			}
+		}
+	}
+	else
+	{
+		BCAngle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(GetActorForwardVector(), DirectHitResult.ImpactNormal);
+	}
+
+	float ActualDamage = GetActualDamage(HitInstigator, InstigatorCI, AttackInfoPtr, bCritHit, bAttackBlocked);
+	StatsComp->Health.ModifyCurrentValue(-ActualDamage);
+	int32 CurrentHP = StatsComp->Health.GetCurrentValue();
+
+	bool bCCEApplied = false;
+	if (!bAttackBlocked)
+	{
+		switch (AttackInfoPtr->CrowdControlEffect)
+		{
+		case ECrowdControlEffect::Flinch:
+			bCCEApplied = CCEFlinch(BCAngle);
+			break;
+		case ECrowdControlEffect::Interrupt:
+			bCCEApplied = CCEInterrupt(BCAngle);
+			break;
+		case ECrowdControlEffect::KnockedDown:
+			bCCEApplied = CCEKnockdown(AttackInfoPtr->CrowdControlEffectDuration);
+			if (bCCEApplied)
+			{
+				FVector OrientationVector = HitInstigator->GetActorLocation() - GetActorLocation();
+				FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
+
+				float DesiredYaw = OrientationRotator.Yaw;
+
+				UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+				if (MoveComp)
+				{
+					MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+				}
+
+				SetCharacterRotationYaw(DesiredYaw);
+			}
+			break;
+		case ECrowdControlEffect::KnockedBack:
+			bCCEApplied = CCEKnockback(AttackInfoPtr->CrowdControlEffectDuration, HitInstigator->GetActorForwardVector());
+			if (bCCEApplied)
+			{
+				FVector OrientationVector = HitInstigator->GetActorLocation() - GetActorLocation();
+				FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
+
+				float DesiredYaw = OrientationRotator.Yaw;
+
+				UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+				if (MoveComp)
+				{
+					MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+				}
+
+				SetCharacterRotationYaw(DesiredYaw);
+			}
+			break;
+		case ECrowdControlEffect::Stunned:
+			bCCEApplied = CCEStun(AttackInfoPtr->CrowdControlEffectDuration);
+			break;
+		case ECrowdControlEffect::Crystalized:
+			bCCEApplied = CCEFreeze(AttackInfoPtr->CrowdControlEffectDuration);
+			break;
+		default:
+			break;
+		}
+	}
+
+	AttackResponsePtr = MakeShareable(new FAttackResponse);
+	AttackResponsePtr->ActualDamage = ActualDamage;
+	AttackResponsePtr->CrowdControlEffect = bCCEApplied ? AttackInfoPtr->CrowdControlEffect : ECrowdControlEffect::Flinch;
+	if (bAttackBlocked)
+	{
+		AttackResponsePtr->DamageResult = ActualDamage > 0 ? EDamageResult::Blocked : EDamageResult::Nullified;
+	}
+	else
+	{
+		AttackResponsePtr->DamageResult = ActualDamage > 0 ? EDamageResult::Damaged : EDamageResult::Nullified;
+	}
+
+	if (bCCEApplied)
+	{
+		AttackResponsePtr->CrowdControlEffect = AttackInfoPtr->CrowdControlEffect;
+	}
+
+	AttackResponsePtr->bCritHit = bCritHit;
+
+	if (!bAttackBlocked)
+	{
+		SetOffTargetSwitch(TargetSwitchDuration);
+	}
+
+	// Replicate Hit Info
+	FReceivedHitInfo ReceivedHitInfo;
+	ReceivedHitInfo.ActualDamage = AttackResponsePtr->ActualDamage;
+	ReceivedHitInfo.DamageResult = AttackResponsePtr->DamageResult;
+	ReceivedHitInfo.CrowdControlEffect = AttackResponsePtr->CrowdControlEffect;
+	ReceivedHitInfo.CrowdControlEffectDuration = AttackInfoPtr->CrowdControlEffectDuration;
+	ReceivedHitInfo.BCAngle = BCAngle;
+	ReceivedHitInfo.bCritHit = AttackResponsePtr->bCritHit;
+	ReceivedHitInfo.HitInstigator = HitInstigator;
+	UPhysicalMaterial* PhysMat = LineHitResult.PhysMaterial.Get();
+	if (PhysMat)
+	{
+		ReceivedHitInfo.HitSurface = PhysMat->SurfaceType;
+	}
+
+	if (bLineHitResultFound)
+	{
+		ReceivedHitInfo.HitLocation = LineHitResult.ImpactPoint;
+	}
+	else
+	{
+		ReceivedHitInfo.HitLocation = DirectHitResult.ImpactPoint;
+	}
+	ReceivedHitInfo.ReplicationIndex = LastReceivedHit.ReplicationIndex + 1;
+	LastReceivedHit = ReceivedHitInfo;
+
+
+	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
+	if (EODGI)
+	{
+		EODGI->DisplayDamageNumbers(LastReceivedHit.ActualDamage, LastReceivedHit.bCritHit, this, LastReceivedHit.HitInstigator, LastReceivedHit.HitLocation);
+	}
+
+	return AttackResponsePtr;
 }
 
-float AEODCharacterBase::GetActualDamage(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr, const bool bCritHit, const bool bAttackBlocked)
+float AEODCharacterBase::GetActualDamage(
+	AActor* HitInstigator,
+	ICombatInterface* InstigatorCI,
+	const TSharedPtr<FAttackInfo>& AttackInfoPtr,
+	const bool bCritHit,
+	const bool bAttackBlocked)
 {
-	return 0.0f;
+	float ActualDamage = 0.f;
+
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	if (!StatsComp || !AttackInfoPtr.IsValid())
+	{
+		return ActualDamage;
+	}
+
+	if (bCritHit)
+	{
+		ActualDamage = AttackInfoPtr->CritDamage;
+	}
+	else
+	{
+		ActualDamage = AttackInfoPtr->NormalDamage;
+	}
+
+	if (bAttackBlocked)
+	{
+		float DamageReductionOnBlock = 0.1f;
+		if (StatsComp)
+		{
+			if (AttackInfoPtr->DamageType == EDamageType::Magickal)
+			{
+				DamageReductionOnBlock = StatsComp->MagickalDamageReductionOnBlock.GetValue();
+			}
+			else
+			{
+				DamageReductionOnBlock = StatsComp->PhysicalDamageReductionOnBlock.GetValue();
+			}
+		}
+		ActualDamage = ActualDamage * (1 - DamageReductionOnBlock);
+	}
+
+	return ActualDamage;
 }
 
 void AEODCharacterBase::BP_SetWalkSpeed(const float WalkSpeed)
@@ -1336,6 +1577,25 @@ void AEODCharacterBase::OnMountingRide(ARideBase* RideCharacter)
 			AnimInstance->Montage_Play(RideCharacter->MountedCharacter_IdealAnimation);
 		}
 	}
+}
+
+UStatsComponentBase* AEODCharacterBase::GetStatsComponent()
+{
+	AEODAIControllerBase* AIController = Cast<AEODAIControllerBase>(Controller);
+	if (AIController)
+	{
+		return AIController->GetStatsComponent();
+	}
+	else
+	{
+		AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
+		if (PC)
+		{
+			return PC->GetStatsComponent();
+		}
+	}
+
+	return nullptr;
 }
 
 void AEODCharacterBase::Server_SetIsRunning_Implementation(bool bValue)

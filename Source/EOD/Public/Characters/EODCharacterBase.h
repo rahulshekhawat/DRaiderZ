@@ -780,6 +780,8 @@ public:
 	//  Components
 	// --------------------------------------
 
+	virtual UStatsComponentBase* GetStatsComponent();
+
 	FORCEINLINE USpringArmComponent* GetCameraBoomComponent() const { return CameraBoomComponent; }
 
 	FORCEINLINE UCameraComponent* GetCameraComponent() const { return CameraComponent; }
