@@ -52,6 +52,12 @@ void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const
 	for (const FHitResult& HitResult : HitResults)
 	{
 		AActor* HitActor = HitResult.GetActor();
+		// Multiple components of an actor can register multiple hits. We want to avoid damaging the same actor more than one time
+		if (HitActors.Contains(HitActor))
+		{
+			continue;
+		}
+
 		ICombatInterface* TargetCI = Cast<ICombatInterface>(HitActor);
 
 		// Do not process if the hit actor does not implement a combat interface
