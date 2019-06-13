@@ -80,31 +80,17 @@ struct EOD_API FReceivedHitInfo
 	UPROPERTY()
 	TEnumAsByte<EPhysicalSurface> HitSurface;
 
-	FReceivedHitInfo()
+	FReceivedHitInfo() :
+		HitInstigator(nullptr),
+		DamageResult(EDamageResult::Nullified),
+		CrowdControlEffect(ECrowdControlEffect::Flinch),
+		CrowdControlEffectDuration(0.f),
+		BCAngle(0.f),
+		ActualDamage(0.f),
+		bCritHit(false),
+		ReplicationIndex(0),
+		HitSurface(EPhysicalSurface::SurfaceType_Default)
 	{
-		HitInstigator = nullptr;
-		DamageResult = EDamageResult::Nullified;
-		CrowdControlEffect = ECrowdControlEffect::Flinch;
-		CrowdControlEffectDuration = 0.f;
-		BCAngle = 0.f;
-		ActualDamage = 0.f;
-		bCritHit = false;
-		ReplicationIndex = 0;
-		HitSurface = EPhysicalSurface::SurfaceType_Default;
-	}
-
-	void operator=(const FReceivedHitInfo& OtherHitInfo)
-	{
-		this->HitInstigator = OtherHitInfo.HitInstigator;
-		this->DamageResult = OtherHitInfo.DamageResult;
-		this->CrowdControlEffect = OtherHitInfo.CrowdControlEffect;
-		this->CrowdControlEffectDuration = OtherHitInfo.CrowdControlEffectDuration;
-		this->BCAngle = OtherHitInfo.BCAngle;
-		this->ActualDamage = OtherHitInfo.ActualDamage;
-		this->bCritHit = OtherHitInfo.bCritHit;
-		this->HitLocation = OtherHitInfo.HitLocation;
-		this->ReplicationIndex = OtherHitInfo.ReplicationIndex;
-		this->HitSurface = OtherHitInfo.HitSurface;
 	}
 };
 
@@ -130,20 +116,24 @@ struct FAttackResponse
 	UPROPERTY(BlueprintReadWrite)
 	bool bCritHit;
 
-	FAttackResponse()
+	FAttackResponse() :
+		DamageResult(EDamageResult::Damaged),
+		CrowdControlEffect(ECrowdControlEffect::Flinch),
+		ActualDamage(0),
+		bCritHit(false)
 	{
-		DamageResult = EDamageResult::Damaged;
-		CrowdControlEffect = ECrowdControlEffect::Flinch;
-		ActualDamage = 0;
-		bCritHit = false;
 	}
 
-	void operator=(const FAttackResponse& OtherAttackResponse)
+	FAttackResponse(
+		EDamageResult Result,
+		ECrowdControlEffect CCEffect,
+		int32 Damage,
+		bool bCritical)
 	{
-		this->DamageResult = OtherAttackResponse.DamageResult;
-		this->CrowdControlEffect = OtherAttackResponse.CrowdControlEffect;
-		this->ActualDamage = OtherAttackResponse.ActualDamage;
-		this->bCritHit = OtherAttackResponse.bCritHit;
+		DamageResult = Result;
+		CrowdControlEffect = CCEffect;
+		ActualDamage = Damage;
+		bCritHit = bCritical;
 	}
 };
 

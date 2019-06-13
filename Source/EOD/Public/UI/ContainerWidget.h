@@ -77,18 +77,6 @@ struct EOD_API FContainerData
 	{
 	}
 
-	void operator=(const FContainerData& Other)
-	{
-		this->ItemID = Other.ItemID;
-		this->ItemGroup = Other.ItemGroup;
-		this->Icon = Other.Icon;
-		this->InGameName = Other.InGameName;
-		this->Description = Other.Description;
-		this->EODItemType = Other.EODItemType;
-		this->CurrentValue = Other.CurrentValue;
-		this->MaxValue = Other.MaxValue;
-	}
-
 	bool operator==(const FContainerData& Other)
 	{
 		return this->ItemID == Other.ItemID &&

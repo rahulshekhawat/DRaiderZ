@@ -15,13 +15,6 @@ UGameUserSettings* UEODLibrary::GetGameUserSettings()
 	return GEngine ? GEngine->GameUserSettings : nullptr;
 }
 
-FGameplayTagMod& FGameplayTagMod::operator=(FGameplayTagMod const& Other)
-{
-	this->Tags = Other.Tags;
-	this->SourceObj = Other.SourceObj;
-	return *this;
-}
-
 bool FGameplayTagMod::operator==(FGameplayTagMod const& Other) const
 {
 	return this->Tags == Other.Tags && this->SourceObj == Other.SourceObj;

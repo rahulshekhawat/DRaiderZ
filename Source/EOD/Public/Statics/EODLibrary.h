@@ -70,7 +70,6 @@ struct EOD_API FGameplayTagMod
 	{
 	}
 
-	FGameplayTagMod& operator=(FGameplayTagMod const& Other);
 	bool operator==(FGameplayTagMod const& Other) const;
 	bool operator!=(FGameplayTagMod const& Other) const;
 
@@ -161,17 +160,6 @@ struct EOD_API FInventoryItem
 		ItemIcon(SourceItem.ItemIcon),
 		bIsUnique(SourceItem.bIsUnique)
 	{
-	}
-
-	void operator=(const FInventoryItem& OtherItem)
-	{
-		this->Name = OtherItem.Name;
-		this->Description = OtherItem.Description;
-		this->ItemID = OtherItem.ItemID;
-		this->ItemType = OtherItem.ItemType;
-		this->ItemCategory = OtherItem.ItemCategory;
-		this->ItemIcon = OtherItem.ItemIcon;
-		this->bIsUnique = OtherItem.bIsUnique;
 	}
 };
 

@@ -115,13 +115,6 @@ struct EOD_API FCharacterStateInfo
 			this->SubStateIndex != OtherStateInfo.SubStateIndex;
 	}
 
-	void operator=(const FCharacterStateInfo& OtherStateInfo)
-	{
-		this->CharacterState = OtherStateInfo.CharacterState;
-		this->SubStateIndex = OtherStateInfo.SubStateIndex;
-		this->NewReplicationIndex = OtherStateInfo.NewReplicationIndex;
-	}
-
 	FString ToString() const
 	{
 		FString String = FString("Character State: ") + EnumToString<ECharacterState>(FString("ECharacterState"), CharacterState, FString("Invalid Class")) +
@@ -1053,6 +1046,8 @@ public:
 	//  Gameplay Events
 	// --------------------------------------
 
+	virtual void DodgeAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr);
+
 	FOnGameplayEventMCDelegate OnReceivingHit;
 
 	FOnGameplayEventMCDelegate OnSuccessfulHit;
@@ -1078,7 +1073,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Events")
 	FOnCombatStateChangedMCDelegate OnLeavingCombat;
-
+	
 	/** Called on dodging an enemy attack */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Event")
 	FOnGameplayEventMCDelegate OnDodgingAttack;

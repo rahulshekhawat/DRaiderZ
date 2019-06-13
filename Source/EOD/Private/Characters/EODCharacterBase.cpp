@@ -404,6 +404,15 @@ void AEODCharacterBase::PushBack_Implementation(const FVector& ImpulseDirection)
 {
 }
 
+void AEODCharacterBase::DodgeAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr)
+{
+	UAttackDodgedEvent* DodgeEvent = NewObject<UAttackDodgedEvent>(this, UAttackDodgedEvent::StaticClass(), FName("DodgeEvent"), RF_Transient);
+	DodgeEvent->AddToRoot();
+	this->OnDodgingAttack.Broadcast(this, HitInstigator, this, DodgeEvent);
+	DodgeEvent->RemoveFromRoot();
+	DodgeEvent->MarkPendingKill();
+}
+
 void AEODCharacterBase::InitiateDeathSequence_Implementation()
 {
 }
@@ -580,24 +589,17 @@ TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(
 		return AttackResponsePtr;
 	}
 
-	// AEODCharacterBase* InstigatingChar = Cast<AEODCharacterBase>(HitInstigator);
 	// Handle dodge
 	if (!AttackInfoPtr->bUndodgable && this->IsDodgingDamage())
 	{
-		UAttackDodgedEvent* DodgeEvent = NewObject<UAttackDodgedEvent>(this, UAttackDodgedEvent::StaticClass(), FName("DodgeEvent"), RF_Transient);
-		DodgeEvent->AddToRoot();
-		this->OnDodgingAttack.Broadcast(this, HitInstigator, this, DodgeEvent);
-		DodgeEvent->RemoveFromRoot();
-		DodgeEvent->MarkPendingKill();
+		DodgeAttack(HitInstigator, InstigatorCI, AttackInfoPtr);
 
-		AttackResponsePtr = MakeShareable(new FAttackResponse);
-		if (AttackResponsePtr.IsValid())
-		{
-			AttackResponsePtr->ActualDamage = 0.f;
-			AttackResponsePtr->bCritHit = false;
-			AttackResponsePtr->CrowdControlEffect = ECrowdControlEffect::Flinch;
-			AttackResponsePtr->DamageResult = EDamageResult::Dodged;
-		}
+		AttackResponsePtr = MakeShareable(
+			new FAttackResponse(
+				EDamageResult::Dodged,
+				ECrowdControlEffect::Flinch,
+				0.f,
+				false));
 
 		// Replicate Hit Info
 		FReceivedHitInfo ReceivedHitInfo;
@@ -609,6 +611,7 @@ TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(
 		return AttackResponsePtr;
 	}
 
+	//~ possible alternative to current damage blocking
 	/*
 	bool bAttackBlocked = false;
 	if (!AttackInfoPtr->bUnblockable && this->IsBlockingDamage())

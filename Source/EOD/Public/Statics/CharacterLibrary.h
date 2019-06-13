@@ -991,13 +991,7 @@ struct EOD_API FCharacterStat
 		MaxValue = Max;
 		CurrentValue = Current;
 	}
-
-	void operator=(const FCharacterStat& OtherStat)
-	{
-		this->MaxValue = OtherStat.MaxValue;
-		this->CurrentValue = OtherStat.CurrentValue;
-	}
-
+	
 	bool operator!=(const FCharacterStat& OtherStat)
 	{
 		return this->MaxValue != OtherStat.MaxValue || this->CurrentValue != OtherStat.CurrentValue;
