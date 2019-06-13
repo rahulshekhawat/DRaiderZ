@@ -643,27 +643,6 @@ void APlayerCharacter::PostAttack(const TArray<FAttackResponse>& AttackResponses
 	*/
 }
 
-TSharedPtr<FAttackResponse> APlayerCharacter::ReceiveAttack(
-	AActor* HitInstigator,
-	ICombatInterface* InstigatorCI,
-	const TSharedPtr<FAttackInfo>& AttackInfoPtr,
-	const FHitResult& DirectHitResult,
-	const bool bLineHitResultFound,
-	const FHitResult& LineHitResult)
-{
-	return TSharedPtr<FAttackResponse>();
-}
-
-float APlayerCharacter::GetActualDamage(
-	AActor* HitInstigator,
-	ICombatInterface* InstigatorCI,
-	const TSharedPtr<FAttackInfo>& AttackInfoPtr,
-	const bool bCritHit,
-	const bool bAttackBlocked)
-{
-	return 0.0f;
-}
-
 USoundBase* APlayerCharacter::GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
 {
 	// Crit

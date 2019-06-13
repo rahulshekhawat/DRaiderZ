@@ -77,23 +77,6 @@ public:
 	/** [server] Called to process the post attack event */
 	virtual void PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors);
 
-	/** [server] Receive an attack on server */
-	virtual TSharedPtr<FAttackResponse> ReceiveAttack(
-		AActor* HitInstigator,
-		ICombatInterface* InstigatorCI,
-		const TSharedPtr<FAttackInfo>& AttackInfoPtr,
-		const FHitResult& DirectHitResult,
-		const bool bLineHitResultFound,
-		const FHitResult& LineHitResult) override;
-
-	/** Returns the actual damage received by this character */
-	virtual float GetActualDamage(
-		AActor* HitInstigator,
-		ICombatInterface* InstigatorCI,
-		const TSharedPtr<FAttackInfo>& AttackInfoPtr,
-		const bool bCritHit,
-		const bool bAttackBlocked) override;
-
 	/** Returns the sound that should be played when this character hits a physical surface */
 	virtual USoundBase* GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
 
