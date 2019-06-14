@@ -976,22 +976,18 @@ struct EOD_API FCharacterStat
 	UPROPERTY()
 	int32 CurrentValue;
 
-	void SetMaxValue(int32 Value)
+	FCharacterStat() :
+		MaxValue(0),
+		CurrentValue(0)
 	{
-		MaxValue = Value;
 	}
 
-	void SetCurrentValue(int32 Value)
+	FCharacterStat(int32 Max, int32 Current) :
+		MaxValue(Max),
+		CurrentValue(Current)
 	{
-		CurrentValue = Value;
 	}
 
-	void SetStatValues(int32 Base, int32 Max, int32 Current)
-	{
-		MaxValue = Max;
-		CurrentValue = Current;
-	}
-	
 	bool operator!=(const FCharacterStat& OtherStat)
 	{
 		return this->MaxValue != OtherStat.MaxValue || this->CurrentValue != OtherStat.CurrentValue;

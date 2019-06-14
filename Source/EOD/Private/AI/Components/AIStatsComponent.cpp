@@ -5,6 +5,7 @@
 #include "FloatingHealthBarWidget.h"
 #include "EODWidgetComponent.h"
 #include "EODGameInstance.h"
+#include "EODAIControllerBase.h"
 
 #include "UnrealNetwork.h"
 #include "Engine/DataTable.h"
@@ -18,8 +19,6 @@ UAIStatsComponent::UAIStatsComponent(const FObjectInitializer& ObjectInitializer
 void UAIStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//~ @todo Bind delegates for health/mana/stamina change
 
 	LoadAIStats();
 
@@ -51,6 +50,13 @@ void UAIStatsComponent::LoadAIStats()
 	{
 		//~ @todo maybe load some default stat values?
 		return;
+	}
+
+	AEODAIControllerBase* AIC = Cast<AEODAIControllerBase>(GetOwner());
+	AEODCharacterBase* AIChar = AIC ? Cast<AEODCharacterBase>(AIC->GetPawn()) : nullptr;
+	if (AIChar)
+	{
+		AIChar->SetCharacterLevel(TableRow->Level);
 	}
 
 	Health.SetMaxValue(TableRow->Health);

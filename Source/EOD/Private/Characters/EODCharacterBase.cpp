@@ -995,8 +995,14 @@ float AEODCharacterBase::GetOrientationYawToActor(const AActor* TargetActor)
 	return OrientationRotator.Yaw;
 }
 
-void AEODCharacterBase::OnHealthUpdated(int32 MaxHealth, int32 CurrentHealth)
+void AEODCharacterBase::UpdateHealth(int32 MaxHealth, int32 CurrentHealth)
 {
+	Health = FCharacterStat(MaxHealth, CurrentHealth);
+}
+
+void AEODCharacterBase::UpdateMana(int32 MaxMana, int32 CurrentMana)
+{
+	Mana = FCharacterStat(MaxMana, CurrentMana);
 }
 
 void AEODCharacterBase::SetCharacterLevel(int32 NewLevel)

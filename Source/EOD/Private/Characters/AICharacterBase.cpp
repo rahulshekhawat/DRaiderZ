@@ -458,12 +458,10 @@ void AAICharacterBase::UpdateHealthWidget()
 	}
 }
 
-void AAICharacterBase::OnHealthUpdated(int32 MaxHealth, int32 CurrentHealth)
+void AAICharacterBase::UpdateHealth(int32 MaxHealth, int32 CurrentHealth)
 {
-	/*
-	Health.SetStatValues(BaseHealth, MaxHealth, CurrentHealth);
+	Super::UpdateHealth(MaxHealth, CurrentHealth);
 	UpdateHealthWidget();
-	*/
 }
 
 void AAICharacterBase::OnRep_InCombat()

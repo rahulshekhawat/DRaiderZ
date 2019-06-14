@@ -124,16 +124,12 @@ struct FAttackResponse
 	{
 	}
 
-	FAttackResponse(
-		EDamageResult Result,
-		ECrowdControlEffect CCEffect,
-		int32 Damage,
-		bool bCritical)
+	FAttackResponse(EDamageResult Result, ECrowdControlEffect CCEffect, int32 Damage, bool bCritical) :
+		DamageResult(Result),
+		CrowdControlEffect(CCEffect),
+		ActualDamage(Damage),
+		bCritHit(bCritical)
 	{
-		DamageResult = Result;
-		CrowdControlEffect = CCEffect;
-		ActualDamage = Damage;
-		bCritHit = bCritical;
 	}
 };
 

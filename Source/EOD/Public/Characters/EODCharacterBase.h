@@ -1126,7 +1126,11 @@ public:
 
 	/** [server] Event called on server when character's health changes */
 	UFUNCTION()
-	virtual void OnHealthUpdated(int32 MaxHealth, int32 CurrentHealth);
+	virtual void UpdateHealth(int32 MaxHealth, int32 CurrentHealth);
+	
+	/** [server] Event called on server when character's mana changes */
+	UFUNCTION()
+	virtual void UpdateMana(int32 MaxMana, int32 CurrentMana);
 
 	virtual void SetCharacterLevel(int32 NewLevel);
 
