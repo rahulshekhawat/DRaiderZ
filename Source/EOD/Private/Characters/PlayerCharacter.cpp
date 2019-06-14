@@ -652,27 +652,33 @@ USoundBase* APlayerCharacter::GetMeleeHitSound(const TEnumAsByte<EPhysicalSurfac
 	// Undead
 	// Wood
 
+	bool bUseCritHitSound = bCritHit;
+	if (IsUsingAnySkill())
+	{
+		bUseCritHitSound = true;
+	}
+
 	USoundBase* Sound = nullptr;
 	EWeaponType WeaponType = GetEquippedWeaponType();
 	switch (WeaponType)
 	{
 	case EWeaponType::GreatSword:
-		Sound = GetGreatswordHitSound(HitSurface, bCritHit);
+		Sound = GetGreatswordHitSound(HitSurface, bUseCritHitSound);
 		break;
 	case EWeaponType::WarHammer:
-		Sound = GetWarhammerHitSound(HitSurface, bCritHit);
+		Sound = GetWarhammerHitSound(HitSurface, bUseCritHitSound);
 		break;
 	case EWeaponType::LongSword:
-		Sound = GetLongswordHitSound(HitSurface, bCritHit);
+		Sound = GetLongswordHitSound(HitSurface, bUseCritHitSound);
 		break;
 	case EWeaponType::Mace:
-		Sound = GetMaceHitSound(HitSurface, bCritHit);
+		Sound = GetMaceHitSound(HitSurface, bUseCritHitSound);
 		break;
 	case EWeaponType::Dagger:
-		Sound = GetDaggerHitSound(HitSurface, bCritHit);
+		Sound = GetDaggerHitSound(HitSurface, bUseCritHitSound);
 		break;
 	case EWeaponType::Staff:
-		Sound = GetStaffHitSound(HitSurface, bCritHit);
+		Sound = GetStaffHitSound(HitSurface, bUseCritHitSound);
 		break;
 	default:
 		break;
