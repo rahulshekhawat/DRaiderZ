@@ -1077,7 +1077,10 @@ void AEODCharacterBase::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldS
 
 void AEODCharacterBase::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)
 {
+	bool bAttackBlocked = LastReceivedHit.DamageResult == EDamageResult::Blocked ? true : false;
+	ApplyCCE(LastReceivedHit.HitInstigator, LastReceivedHit.CrowdControlEffect, LastReceivedHit.CrowdControlEffectDuration, LastReceivedHit.BCAngle, bAttackBlocked);
 
+	TriggerReceivedHitCosmetics(LastReceivedHit);
 }
 
 void AEODCharacterBase::OnRep_Health(FCharacterStat& OldHealth)
