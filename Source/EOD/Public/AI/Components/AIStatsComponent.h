@@ -32,8 +32,13 @@ public:
 	/** Dummy declaration. This component doesn't tick */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+protected:
+
+	UPROPERTY(EditAnywhere, Category = "Primary Info")
+	FName StatsRowName;
+
 private:
-	
-	AAICharacterBase* OwningAIChar;
+
+	void LoadAIStats();
 	
 };

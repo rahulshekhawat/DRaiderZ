@@ -28,6 +28,8 @@ void UPlayerStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//~ @todo Bind delegates for health/mana/stamina change
+
 	LoadPlayerStats();
 
 	// @todo load damage and resistance stats

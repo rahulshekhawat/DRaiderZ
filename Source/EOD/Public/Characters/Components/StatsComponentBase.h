@@ -418,7 +418,7 @@ public:
 	/** Directly set the value that doesn't have any modifier applied */
 	void SetValue(float InValue)
 	{
-		Value_NoMod = InValue <= 0 ? 1 : InValue;
+		Value_NoMod = InValue;
 		bDirty = true;
 	}
 
@@ -478,6 +478,12 @@ public:
 	}
 
 	FOnCCImmunitiesChangedMCDelegate OnStatValueChanged;
+
+	void ForceBroadcastDelegate()
+	{
+		uint8 CV = GetValue();
+		OnStatValueChanged.Broadcast(CV);
+	}
 
 private:
 
