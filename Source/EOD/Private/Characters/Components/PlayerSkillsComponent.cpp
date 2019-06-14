@@ -240,6 +240,7 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 		{
 			// If this skill is a chain skill, it may have been activated before the previous skill finished.
 			// We need to finish/cancel previous skills before using this
+			//~ @todo replace cancel all active skills with something that force finishes all active skills
 			CancelAllActiveSkills();
 
 			ResetChainSkill();
@@ -316,7 +317,7 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	//~ @todo Modify the way attack info is stored
 	if (CharOwner->Role >= ROLE_Authority)
 	{
-		CharOwner->SetAttackInfoFromSkill(Skill);
+		CharOwner->SetAttackInfoFromSkill(PlayerSkill);
 	}
 }
 
