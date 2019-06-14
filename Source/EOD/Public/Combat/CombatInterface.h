@@ -36,8 +36,6 @@ public:
 
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() const;
 
-	virtual void SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill);
-
 	virtual void ResetAttackInfo();
 
 	virtual bool IsEnemyOf(ICombatInterface* TargetCI) const;

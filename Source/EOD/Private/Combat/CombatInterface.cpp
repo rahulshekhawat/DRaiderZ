@@ -17,10 +17,6 @@ AActor* ICombatInterface::GetInterfaceOwner()
 	return nullptr;
 }
 
-void ICombatInterface::SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill)
-{
-}
-
 void ICombatInterface::ResetAttackInfo()
 {
 }

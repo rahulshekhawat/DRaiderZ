@@ -176,6 +176,18 @@ struct FAttackInfo
 		CrowdControlEffectDuration(0.f)
 	{
 	}
+
+	FAttackInfo(bool bInUndodgable, bool bInUnblockable, float InCritRate, float InNormalDamage, float InCritDamage, EDamageType InDamageType, ECrowdControlEffect InCCEffect, float InCCEDuration) :
+		bUndodgable(bInUndodgable),
+		bUnblockable(bInUnblockable),
+		CritRate(InCritRate),
+		NormalDamage(bInUnblockable),
+		CritDamage(InCritDamage),
+		DamageType(InDamageType),
+		CrowdControlEffect(InCCEffect),
+		CrowdControlEffectDuration(InCCEDuration)
+	{
+	}
 };
 
 USTRUCT()

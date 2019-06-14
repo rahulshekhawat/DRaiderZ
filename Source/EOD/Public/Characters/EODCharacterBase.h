@@ -28,7 +28,7 @@ class UAnimMontage;
 class USkillsComponent;
 class UInputComponent;
 class UCameraComponent;
-class UActiveSkillBase;
+class UGameplaySkillBase;
 class UCharacterStateBase;
 class UStatusEffectBase;
 class UGameplayEventBase;
@@ -440,7 +440,8 @@ public:
 
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() const override;
 
-	virtual void SetAttackInfoFromActiveSkill(UActiveSkillBase* ActiveSkill) override;
+	virtual void SetAttackInfoFromActiveSkill(UGameplaySkillBase* Skill);
+	virtual void SetAttackInfoFromNormalAttack(int32 NormalAttackIndex);
 
 	virtual void ResetAttackInfo() override;
 
