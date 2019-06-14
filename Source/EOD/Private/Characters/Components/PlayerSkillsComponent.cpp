@@ -314,13 +314,9 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	}
 
 	//~ @todo Modify the way attack info is stored
-	if (!(CharOwner->Role < ROLE_Authority))
+	if (CharOwner->Role >= ROLE_Authority)
 	{
-		UActiveSkillBase* _Skill = Cast<UActiveSkillBase>(PlayerSkill);
-		if (_Skill)
-		{
-			CharOwner->SetAttackInfoFromActiveSkill(_Skill);
-		}
+		CharOwner->SetAttackInfoFromSkill(Skill);
 	}
 }
 

@@ -181,7 +181,7 @@ struct FAttackInfo
 		bUndodgable(bInUndodgable),
 		bUnblockable(bInUnblockable),
 		CritRate(InCritRate),
-		NormalDamage(bInUnblockable),
+		NormalDamage(InNormalDamage),
 		CritDamage(InCritDamage),
 		DamageType(InDamageType),
 		CrowdControlEffect(InCCEffect),

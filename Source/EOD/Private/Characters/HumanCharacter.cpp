@@ -781,30 +781,10 @@ void AHumanCharacter::ChangeNormalAttackSection(FName OldSection, FName NewSecti
 
 void AHumanCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
-	FString SkillIDString = FString("");
-	SkillIDString += GetGenderPrefix();
-	SkillIDString += GetEquippedWeaponPrefix();
-	SkillIDString += GetNormalAttackSuffix(SectionName);
-
-	if (IsValid(GetGameplaySkillsComponent()) && IsValid(GetController()) && GetController()->IsLocalPlayerController())
+	if (Role >= ROLE_Authority)
 	{
-		// GetGameplaySkillsComponent()->SetCurrentActiveSkill(FName(*SkillIDString));
-	}
-
-	// @todo set current active skill
-
-	if (CurrentAttackInfoPtr.IsValid())
-	{
-		CurrentAttackInfoPtr.Reset();
-	}
-
-	CurrentAttackInfoPtr = MakeShareable(new FAttackInfo);
-	if (CurrentAttackInfoPtr.IsValid())
-	{
-		CurrentAttackInfoPtr->bUnblockable = false;
-		CurrentAttackInfoPtr->bUndodgable = false;
-		CurrentAttackInfoPtr->CrowdControlEffect = ECrowdControlEffect::Flinch;
-		CurrentAttackInfoPtr->DamageType = EDamageType::Physical;
+		int32 AttackIndex = GetNormalAttackIndex(SectionName);
+		SetAttackInfoFromNormalAttack(AttackIndex);
 	}
 }
 

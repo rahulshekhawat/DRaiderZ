@@ -440,7 +440,7 @@ public:
 
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() const override;
 
-	virtual void SetAttackInfoFromActiveSkill(UGameplaySkillBase* Skill);
+	virtual void SetAttackInfoFromSkill(UGameplaySkillBase* Skill);
 	virtual void SetAttackInfoFromNormalAttack(int32 NormalAttackIndex);
 
 	virtual void ResetAttackInfo() override;

@@ -525,7 +525,7 @@ TSharedPtr<FAttackInfo> AEODCharacterBase::GetAttackInfoPtr() const
 	return CurrentAttackInfoPtr;
 }
 
-void AEODCharacterBase::SetAttackInfoFromActiveSkill(UGameplaySkillBase* Skill)
+void AEODCharacterBase::SetAttackInfoFromSkill(UGameplaySkillBase* Skill)
 {
 	UStatsComponentBase* StatsComp = GetStatsComponent();
 	if (!StatsComp || !Controller)
@@ -604,6 +604,64 @@ void AEODCharacterBase::SetAttackInfoFromActiveSkill(UGameplaySkillBase* Skill)
 
 void AEODCharacterBase::SetAttackInfoFromNormalAttack(int32 NormalAttackIndex)
 {
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	if (NormalAttackIndex < 1 || NormalAttackIndex > 5 || !StatsComp)
+	{
+		return;
+	}
+
+	EWeaponType WeaponType = GetEquippedWeaponType();
+	float DamagePercent = 100.f;
+	EDamageType DamageType = EDamageType::Physical;
+	switch (WeaponType)
+	{
+	case EWeaponType::GreatSword:
+	case EWeaponType::WarHammer:
+		DamagePercent += ((NormalAttackIndex -1) * 25);
+		break;
+	case EWeaponType::LongSword:
+		break;
+	case EWeaponType::Mace:
+		break;
+	case EWeaponType::Dagger:
+		DamagePercent += ((NormalAttackIndex - 1) * 10);
+		break;
+	case EWeaponType::Staff:
+		DamagePercent += ((NormalAttackIndex - 1) * 12);
+		break;
+	case EWeaponType::Shield:
+	case EWeaponType::None:
+	default:
+		DamagePercent = 0.f;
+		break;
+	}
+
+	float CritRate = DamageType == EDamageType::Magickal ? StatsComp->MagickalCritRate.GetValue() : StatsComp->PhysicalCritRate.GetValue();
+	float NormalDamage =
+		DamageType == EDamageType::Magickal ?
+		((DamagePercent / 100.f) * StatsComp->MagickalAttack.GetValue()) :
+		((DamagePercent / 100.f) * StatsComp->PhysicalAttack.GetValue());
+	float CritDamage =
+		DamageType == EDamageType::Magickal ?
+		(NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComp->MagickalCritBonus.GetValue()) :
+		(NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComp->PhysicalCritBonus.GetValue());
+
+	if (CurrentAttackInfoPtr.IsValid())
+	{
+		CurrentAttackInfoPtr.Reset();
+	}
+
+	CurrentAttackInfoPtr =
+		MakeShareable(new FAttackInfo(
+			false,
+			false,
+			CritRate,
+			NormalDamage,
+			CritDamage,
+			DamageType,
+			ECrowdControlEffect::Flinch,
+			0.f
+		));
 }
 
 void AEODCharacterBase::ResetAttackInfo()
