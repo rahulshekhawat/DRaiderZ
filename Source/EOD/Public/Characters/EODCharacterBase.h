@@ -463,6 +463,13 @@ public:
 
 	virtual void TriggerReceivedHitCosmetics(const FReceivedHitInfo& HitInfo);
 
+	virtual bool ApplyCCE(
+		AActor* HitInstigator,
+		ECrowdControlEffect CCEToApply,
+		float CCEDuration,
+		float BCAngle,
+		bool bAttackBlocked = false);
+
 	inline void SetLastReceivedHitInfo(const FReceivedHitInfo& HitInfo)
 	{
 		LastReceivedHit = HitInfo;

@@ -650,63 +650,12 @@ TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(
 		ReceivedHitInfo.BCAngle = UEODBlueprintFunctionLibrary::CalculateAngleBetweenVectors(GetActorForwardVector(), DirectHitResult.ImpactNormal);
 	}
 
-	bool bCCEApplied = false;
-	if (!bAttackBlocked)
-	{
-		switch (AttackInfoPtr->CrowdControlEffect)
-		{
-		case ECrowdControlEffect::Flinch:
-			bCCEApplied = CCEFlinch(ReceivedHitInfo.BCAngle);
-			break;
-		case ECrowdControlEffect::Interrupt:
-			bCCEApplied = CCEInterrupt(ReceivedHitInfo.BCAngle);
-			break;
-		case ECrowdControlEffect::KnockedDown:
-			bCCEApplied = CCEKnockdown(AttackInfoPtr->CrowdControlEffectDuration);
-			if (bCCEApplied)
-			{
-				FVector OrientationVector = HitInstigator->GetActorLocation() - GetActorLocation();
-				FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
-
-				float DesiredYaw = OrientationRotator.Yaw;
-
-				UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-				if (MoveComp)
-				{
-					MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
-				}
-
-				SetCharacterRotationYaw(DesiredYaw);
-			}
-			break;
-		case ECrowdControlEffect::KnockedBack:
-			bCCEApplied = CCEKnockback(AttackInfoPtr->CrowdControlEffectDuration, HitInstigator->GetActorForwardVector());
-			if (bCCEApplied)
-			{
-				FVector OrientationVector = HitInstigator->GetActorLocation() - GetActorLocation();
-				FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
-
-				float DesiredYaw = OrientationRotator.Yaw;
-
-				UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
-				if (MoveComp)
-				{
-					MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
-				}
-
-				SetCharacterRotationYaw(DesiredYaw);
-			}
-			break;
-		case ECrowdControlEffect::Stunned:
-			bCCEApplied = CCEStun(AttackInfoPtr->CrowdControlEffectDuration);
-			break;
-		case ECrowdControlEffect::Crystalized:
-			bCCEApplied = CCEFreeze(AttackInfoPtr->CrowdControlEffectDuration);
-			break;
-		default:
-			break;
-		}
-	}
+	bool bCCEApplied = ApplyCCE(
+		HitInstigator,
+		AttackInfoPtr->CrowdControlEffect,
+		AttackInfoPtr->CrowdControlEffectDuration,
+		ReceivedHitInfo.BCAngle,
+		bAttackBlocked);
 
 	ReceivedHitInfo.CrowdControlEffect = bCCEApplied ? AttackInfoPtr->CrowdControlEffect : ECrowdControlEffect::Flinch;
 	ReceivedHitInfo.CrowdControlEffectDuration = AttackInfoPtr->CrowdControlEffectDuration;
@@ -728,9 +677,7 @@ TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(
 	SetLastReceivedHitInfo(ReceivedHitInfo);
 
 	StatsComp->Health.ModifyCurrentValue(-ReceivedHitInfo.ActualDamage);
-
 	TriggerReceivedHitCosmetics(ReceivedHitInfo);
-
 
 	TSharedPtr<FAttackResponse> AttackResponsePtr = 
 		TSharedPtr<FAttackResponse>(
@@ -740,6 +687,7 @@ TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(
 				ReceivedHitInfo.ActualDamage,
 				ReceivedHitInfo.bCritHit
 			));
+
 	return AttackResponsePtr;
 }
 
@@ -789,20 +737,115 @@ float AEODCharacterBase::GetActualDamage(
 
 void AEODCharacterBase::TriggerReceivedHitCosmetics(const FReceivedHitInfo& HitInfo)
 {
-	/*
-	if (!bAttackBlocked)
+	if (HitInfo.DamageResult == EDamageResult::Dodged)
+	{
+		//~ @todo Display dodge message
+		//~ @todo Play dodge sound
+	}
+	else if (HitInfo.DamageResult == EDamageResult::Blocked)
+	{
+		//~ @todo Play attack blocked animation
+		//~ @todo Play attack blocked sound
+	}
+	else if (HitInfo.DamageResult == EDamageResult::Immune)
+	{
+		//~ @todo Display immune message
+	}
+	else if (HitInfo.DamageResult == EDamageResult::Nullified || HitInfo.DamageResult == EDamageResult::Damaged)
 	{
 		SetOffTargetSwitch(TargetSwitchDuration);
+
 	}
-
-
 
 	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
 	if (EODGI)
 	{
-		EODGI->DisplayDamageNumbers(LastReceivedHit.ActualDamage, LastReceivedHit.bCritHit, this, LastReceivedHit.HitInstigator, LastReceivedHit.HitLocation);
+		EODGI->DisplayDamageNumbers(
+			LastReceivedHit.ActualDamage,
+			LastReceivedHit.bCritHit,
+			this,
+			LastReceivedHit.HitInstigator,
+			LastReceivedHit.HitLocation);
 	}
-	*/
+
+	ICombatInterface* InstigatorCI = Cast<ICombatInterface>(LastReceivedHit.HitInstigator);
+	if (InstigatorCI)
+	{
+		USoundBase* Sound = InstigatorCI->GetMeleeHitSound(LastReceivedHit.HitSurface, LastReceivedHit.bCritHit);
+		if (Sound && GameplayAudioComponent)
+		{
+			GameplayAudioComponent->SetSound(Sound);
+			GameplayAudioComponent->Play();
+
+		}
+	}
+}
+
+bool AEODCharacterBase::ApplyCCE(
+	AActor* HitInstigator,
+	ECrowdControlEffect CCEToApply,
+	float CCEDuration,
+	float BCAngle,
+	bool bAttackBlocked)
+{
+	bool bCCEApplied = false;
+	if (!bAttackBlocked)
+	{
+		switch (CCEToApply)
+		{
+		case ECrowdControlEffect::Flinch:
+			bCCEApplied = CCEFlinch(BCAngle);
+			break;
+		case ECrowdControlEffect::Interrupt:
+			bCCEApplied = CCEInterrupt(BCAngle);
+			break;
+		case ECrowdControlEffect::KnockedDown:
+			bCCEApplied = CCEKnockdown(CCEDuration);
+			if (bCCEApplied && Role >= ENetRole::ROLE_Authority)
+			{
+				FVector OrientationVector = HitInstigator->GetActorLocation() - GetActorLocation();
+				FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
+
+				float DesiredYaw = OrientationRotator.Yaw;
+
+				UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+				if (MoveComp)
+				{
+					MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+				}
+
+				SetCharacterRotationYaw(DesiredYaw);
+			}
+			break;
+		case ECrowdControlEffect::KnockedBack:
+			bCCEApplied = CCEKnockback(CCEDuration, HitInstigator->GetActorForwardVector());
+			if (bCCEApplied && Role >= ENetRole::ROLE_Authority)
+			{
+				FVector OrientationVector = HitInstigator->GetActorLocation() - GetActorLocation();
+				FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
+
+				float DesiredYaw = OrientationRotator.Yaw;
+
+				UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+				if (MoveComp)
+				{
+					MoveComp->SetDesiredCustomRotationYaw(DesiredYaw);
+				}
+
+				SetCharacterRotationYaw(DesiredYaw);
+			}
+			break;
+		case ECrowdControlEffect::Stunned:
+			bCCEApplied = CCEStun(CCEDuration);
+			break;
+		case ECrowdControlEffect::Crystalized:
+			bCCEApplied = CCEFreeze(CCEDuration);
+			break;
+		default:
+			break;
+		}
+	}
+	return bCCEApplied;
 }
 
 void AEODCharacterBase::BP_SetWalkSpeed(const float WalkSpeed)
