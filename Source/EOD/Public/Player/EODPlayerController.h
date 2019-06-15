@@ -18,7 +18,6 @@ class UInGameMenuWidget;
 class USkillTreeComponent;
 class APlayerSkillTreeManager;
 class USkillTreeWidget;
-class USkillsComponent;
 class UInventoryComponent;
 class UStatsComponentBase;
 class UDialogueWindowWidget;

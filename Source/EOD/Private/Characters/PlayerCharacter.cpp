@@ -18,6 +18,7 @@
 #include "PlayerStatsWidget.h"
 #include "EODGameInstance.h"
 #include "PlayerSaveGame.h"
+#include "GameplaySkillBase.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -628,6 +629,22 @@ void APlayerCharacter::LoadCharacterState()
 			}
 			PSWidget->SetPlayerType(Type);
 		}
+	}
+}
+
+TSharedPtr<FAttackInfo> APlayerCharacter::GetAttackInfoPtr(const FName& SkillGroup, const int32 CollisionIndex)
+{
+	const FString& SkillGroupStr = SkillGroup.ToString();
+	if (SkillGroupStr.Contains("-normal-"))
+	{
+		return GetAttackInfoPtrFromNormalAttack(SkillGroupStr);
+	}
+	else
+	{
+		UGameplaySkillsComponent* SkillComp = GetGameplaySkillsComponent();
+		UGameplaySkillBase* Skill = SkillComp ? SkillComp->GetSkillForSkillGroup(SkillGroup) : nullptr;
+		TSharedPtr<FAttackInfo> AttackInfoPtr = Skill ? Skill->GetAttackInfoPtr(CollisionIndex) : TSharedPtr<FAttackInfo>();
+		return AttackInfoPtr;
 	}
 }
 

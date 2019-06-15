@@ -89,6 +89,8 @@ public:
 
 	virtual void FinishSkill() override;
 
+	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr(int32 CollisionIndex = 1) override;
+
 	// --------------------------------------
 	//  Pseudo Constants
 	// --------------------------------------

@@ -34,9 +34,7 @@ public:
 
 	virtual AActor* GetInterfaceOwner();
 
-	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() const;
-
-	virtual void ResetAttackInfo();
+	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr(const FName& SkillGroup, const int32 CollisionIndex);
 
 	virtual bool IsEnemyOf(ICombatInterface* TargetCI) const;
 

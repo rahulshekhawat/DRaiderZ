@@ -73,7 +73,7 @@ void UAnimNotify_RaidCollision::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 			// If trace start and end position is same, the trace doesn't hit anything.
 			FVector End = TransformedCenter + FVector(0.f, 0.f, 1.f);
 			bool bHit = World->SweepMultiByChannel(HitResults, TransformedCenter, End, TransformedRotation.Quaternion(), COLLISION_COMBAT, CollisionShape, Params);
-			CombatManager->OnMeleeAttack(Owner, bHit, HitResults);
+			CombatManager->OnMeleeAttack(Owner, bHit, HitResults, SkillInfo);
 		}
 	}
 }

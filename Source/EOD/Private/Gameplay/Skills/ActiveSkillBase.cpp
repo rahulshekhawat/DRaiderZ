@@ -248,41 +248,40 @@ void UActiveSkillBase::DisableGameplayEffectEvents()
 	}
 }
 
-TSharedPtr<FAttackInfo> UActiveSkillBase::GetAttackInfoPtr()
+TSharedPtr<FAttackInfo> UActiveSkillBase::GetAttackInfoPtr(int32 CollisionIndex)
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (Instigator->Role < ROLE_Authority)
+	{
+		return TSharedPtr<FAttackInfo>();
+	}
+
 	AEODPlayerController* PC = Instigator ? Cast<AEODPlayerController>(Instigator->Controller) : nullptr;
-	UPlayerStatsComponent* StatsComponent = PC ? PC->GetStatsComponent() : nullptr;
+	UPlayerStatsComponent* StatsComp = PC ? PC->GetStatsComponent() : nullptr;
+	check(StatsComp);
 
-	if (!StatsComponent)
-	{
-		return TSharedPtr<FAttackInfo>(nullptr);
-	}
-
-	if (AttackInfoPtr.IsValid())
-	{
-		AttackInfoPtr.Reset();
-	}
-
-	check(AttackInfoPtr.IsValid());
 	const FActiveSkillLevelUpInfo SkillInfo = GetCurrentSkillLevelupInfo();
-	AttackInfoPtr->bUnblockable = SkillInfo.bUnblockable;
-	AttackInfoPtr->bUndodgable = SkillInfo.bUndodgable;
-	AttackInfoPtr->CrowdControlEffect = SkillInfo.CrowdControlEffect;
-	AttackInfoPtr->CrowdControlEffectDuration = SkillInfo.CrowdControlEffectDuration;
-	AttackInfoPtr->DamageType = GetDamageType();
-	if (AttackInfoPtr->DamageType == EDamageType::Magickal)
-	{
-		AttackInfoPtr->CritRate = StatsComponent->MagickalCritRate.GetValue();
-		AttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->MagickalAttack.GetValue();
-		AttackInfoPtr->CritDamage = AttackInfoPtr->NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComponent->MagickalCritBonus.GetValue();
-	}
-	else
-	{
-		AttackInfoPtr->CritRate = StatsComponent->PhysicalCritRate.GetValue();
-		AttackInfoPtr->NormalDamage = (SkillInfo.DamagePercent / 100.f) * StatsComponent->PhysicalAttack.GetValue();
-		AttackInfoPtr->CritDamage = AttackInfoPtr->NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComponent->PhysicalCritBonus.GetValue();
-	}
+	float CritRate = DamageType == EDamageType::Magickal ? StatsComp->MagickalCritRate.GetValue() : StatsComp->PhysicalCritRate.GetValue();
+	float NormalDamage =
+		DamageType == EDamageType::Magickal ?
+		((SkillInfo.DamagePercent / 100.f) * StatsComp->MagickalAttack.GetValue()) :
+		((SkillInfo.DamagePercent / 100.f) * StatsComp->PhysicalAttack.GetValue());
+	float CritDamage =
+		DamageType == EDamageType::Magickal ?
+		(NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComp->MagickalCritBonus.GetValue()) :
+		(NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComp->PhysicalCritBonus.GetValue());
+
+	TSharedPtr<FAttackInfo> AttackInfoPtr =
+		MakeShareable(new FAttackInfo(
+			SkillInfo.bUndodgable,
+			SkillInfo.bUnblockable,
+			CritRate,
+			NormalDamage,
+			CritDamage,
+			DamageType,
+			SkillInfo.CrowdControlEffect,
+			SkillInfo.CrowdControlEffectDuration
+		));
 
 	return AttackInfoPtr;
 }

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "EODCharacterBase.h"
 #include "CharacterLibrary.h"
+#include "CombatLibrary.h"
 
 #include "Camera/CameraShake.h"
 #include "GameFramework/Info.h"
@@ -38,7 +39,11 @@ public:
 	// --------------------------------------
 
 	/** Called when an actor attacks another actor */
-	void OnMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults);
+	void OnMeleeAttack(
+		AActor* HitInstigator,
+		const bool bHit,
+		const TArray<FHitResult>& HitResults,
+		const FCollisionSkillInfo& CollisionSkillInfo);
 
 	TSharedPtr<FAttackResponse> ProcessAttack(
 		AActor* HitInstigator,

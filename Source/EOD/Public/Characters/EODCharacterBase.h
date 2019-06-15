@@ -25,7 +25,6 @@ DECLARE_STATS_GROUP(TEXT("EOD"), STATGROUP_EOD, STATCAT_Advanced);
 
 class ARideBase;
 class UAnimMontage;
-class USkillsComponent;
 class UInputComponent;
 class UCameraComponent;
 class UGameplaySkillBase;
@@ -438,12 +437,7 @@ public:
 
 	virtual AActor* GetInterfaceOwner() override;
 
-	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() const override;
-
-	virtual void SetAttackInfoFromSkill(UGameplaySkillBase* Skill);
-	virtual void SetAttackInfoFromNormalAttack(int32 NormalAttackIndex);
-
-	virtual void ResetAttackInfo() override;
+	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr(const FName& SkillGroup, const int32 CollisionIndex) override;
 
 	/** [server] Receive an attack on server */
 	virtual TSharedPtr<FAttackResponse> ReceiveAttack(
@@ -480,10 +474,12 @@ public:
 
 protected:
 
+	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtrFromNormalAttack(const FString& NormalAttackStr);
+	virtual EWeaponType GetWeaponTypeFromNormalAttackString(const FString& NormalAttackStr);
+	virtual int32 GetAttackIndexFromNormalAttackString(const FString& NormalAttackStr);
+
 	UPROPERTY(ReplicatedUsing = OnRep_LastReceivedHit)
 	FReceivedHitInfo LastReceivedHit;
-
-	TSharedPtr<FAttackInfo> CurrentAttackInfoPtr;
 
 public:
 

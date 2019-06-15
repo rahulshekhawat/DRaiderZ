@@ -31,7 +31,11 @@ void ACombatManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const TArray<FHitResult>& HitResults)
+void ACombatManager::OnMeleeAttack(
+	AActor* HitInstigator,
+	const bool bHit,
+	const TArray<FHitResult>& HitResults,
+	const FCollisionSkillInfo& CollisionSkillInfo)
 {
 	ICombatInterface* InstigatorCI = Cast<ICombatInterface>(HitInstigator);
 	if (!HitInstigator || !InstigatorCI)
@@ -47,7 +51,7 @@ void ACombatManager::OnMeleeAttack(AActor* HitInstigator, const bool bHit, const
 		return;
 	}
 
-	TSharedPtr<FAttackInfo> AttackInfoPtr = InstigatorCI->GetAttackInfoPtr();
+	TSharedPtr<FAttackInfo> AttackInfoPtr = InstigatorCI->GetAttackInfoPtr(CollisionSkillInfo.SkillGroup, CollisionSkillInfo.CollisionIndex);
 	TArray<TSharedPtr<FAttackResponse>> AttackResponsePtrs;
 	for (const FHitResult& HitResult : HitResults)
 	{

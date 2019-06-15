@@ -20,7 +20,6 @@ class USkeletalMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInventoryComponent;
-class USkillsComponent;
 class USphereComponent;
 class UDialogueWindowWidget;
 class UWeaponDataAsset;
@@ -73,7 +72,9 @@ public:
 	// --------------------------------------
 	//  Combat Interface
 	// --------------------------------------
- 
+
+	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr(const FName& SkillGroup, const int32 CollisionIndex) override;
+
 	/** [server] Called to process the post attack event */
 	virtual void PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors);
 

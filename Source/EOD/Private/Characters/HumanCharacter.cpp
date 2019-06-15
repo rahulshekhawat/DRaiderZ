@@ -781,11 +781,13 @@ void AHumanCharacter::ChangeNormalAttackSection(FName OldSection, FName NewSecti
 
 void AHumanCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
+	/*
 	if (Role >= ROLE_Authority)
 	{
 		int32 AttackIndex = GetNormalAttackIndex(SectionName);
 		SetAttackInfoFromNormalAttack(AttackIndex);
 	}
+	*/
 }
 
 void AHumanCharacter::SetNormalAttackSectionChangeAllowed(bool bNewValue)

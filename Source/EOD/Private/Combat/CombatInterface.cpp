@@ -7,7 +7,7 @@ UCombatInterface::UCombatInterface(const FObjectInitializer& ObjectInitializer) 
 	
 }
 
-TSharedPtr<FAttackInfo> ICombatInterface::GetAttackInfoPtr() const
+TSharedPtr<FAttackInfo> ICombatInterface::GetAttackInfoPtr(const FName& SkillGroup, const int32 CollisionIndex)
 {
 	return TSharedPtr<FAttackInfo>();
 }
@@ -15,10 +15,6 @@ TSharedPtr<FAttackInfo> ICombatInterface::GetAttackInfoPtr() const
 AActor* ICombatInterface::GetInterfaceOwner()
 {
 	return nullptr;
-}
-
-void ICombatInterface::ResetAttackInfo()
-{
 }
 
 bool ICombatInterface::IsEnemyOf(ICombatInterface* TargetCI) const

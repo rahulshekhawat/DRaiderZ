@@ -520,152 +520,11 @@ AActor* AEODCharacterBase::GetInterfaceOwner()
 	return this;
 }
 
-TSharedPtr<FAttackInfo> AEODCharacterBase::GetAttackInfoPtr() const
+TSharedPtr<FAttackInfo> AEODCharacterBase::GetAttackInfoPtr(const FName& SkillGroup, const int32 CollisionIndex)
 {
-	return CurrentAttackInfoPtr;
-}
-
-void AEODCharacterBase::SetAttackInfoFromSkill(UGameplaySkillBase* Skill)
-{
-	UStatsComponentBase* StatsComp = GetStatsComponent();
-	if (!StatsComp || !Controller)
-	{
-		return;
-	}
-
-	if (CurrentAttackInfoPtr.IsValid())
-	{
-		CurrentAttackInfoPtr.Reset();
-	}
-
-	bool bIsPlayerControlled = Controller->IsPlayerController();
-	if (bIsPlayerControlled)
-	{
-		UActiveSkillBase* ActiveSkill = Cast<UActiveSkillBase>(Skill);
-		if (ActiveSkill)
-		{
-			const FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
-			EDamageType DamageType = ActiveSkill->GetDamageType();
-			float CritRate = DamageType == EDamageType::Magickal ? StatsComp->MagickalCritRate.GetValue() : StatsComp->PhysicalCritRate.GetValue();
-			float NormalDamage =
-				DamageType == EDamageType::Magickal ?
-				((SkillInfo.DamagePercent / 100.f) * StatsComp->MagickalAttack.GetValue()) :
-				((SkillInfo.DamagePercent / 100.f) * StatsComp->PhysicalAttack.GetValue());
-			float CritDamage =
-				DamageType == EDamageType::Magickal ?
-				(NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComp->MagickalCritBonus.GetValue()) :
-				(NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComp->PhysicalCritBonus.GetValue());
-
-			CurrentAttackInfoPtr =
-				MakeShareable(new FAttackInfo(
-					SkillInfo.bUndodgable,
-					SkillInfo.bUnblockable,
-					CritRate,
-					NormalDamage,
-					CritDamage,
-					DamageType,
-					SkillInfo.CrowdControlEffect,
-					SkillInfo.CrowdControlEffectDuration
-				));
-		}
-	}
-	else
-	{
-		UAISkillBase* AISkill = Cast<UAISkillBase>(Skill);
-		if (AISkill)
-		{
-			const FAISkillInfo& SkillInfo = AISkill->SkillInfo;
-			EDamageType DamageType = AISkill->GetDamageType();
-			float CritRate = DamageType == EDamageType::Magickal ? StatsComp->MagickalCritRate.GetValue() : StatsComp->PhysicalCritRate.GetValue();
-			float NormalDamage =
-				DamageType == EDamageType::Magickal ?
-				((SkillInfo.DamagePercent / 100.f) * StatsComp->MagickalAttack.GetValue()) :
-				((SkillInfo.DamagePercent / 100.f) * StatsComp->PhysicalAttack.GetValue());
-			float CritDamage =
-				DamageType == EDamageType::Magickal ?
-				(NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComp->MagickalCritBonus.GetValue()) :
-				(NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComp->PhysicalCritBonus.GetValue());
-
-			CurrentAttackInfoPtr =
-				MakeShareable(new FAttackInfo(
-					SkillInfo.bUndodgable,
-					SkillInfo.bUnblockable,
-					CritRate,
-					NormalDamage,
-					CritDamage,
-					DamageType,
-					SkillInfo.CrowdControlEffect,
-					SkillInfo.CrowdControlEffectDuration
-				));
-		}
-	}
-}
-
-void AEODCharacterBase::SetAttackInfoFromNormalAttack(int32 NormalAttackIndex)
-{
-	UStatsComponentBase* StatsComp = GetStatsComponent();
-	if (NormalAttackIndex < 1 || NormalAttackIndex > 5 || !StatsComp)
-	{
-		return;
-	}
-
-	EWeaponType WeaponType = GetEquippedWeaponType();
-	float DamagePercent = 100.f;
-	EDamageType DamageType = EDamageType::Physical;
-	switch (WeaponType)
-	{
-	case EWeaponType::GreatSword:
-	case EWeaponType::WarHammer:
-		DamagePercent += ((NormalAttackIndex -1) * 25);
-		break;
-	case EWeaponType::LongSword:
-		break;
-	case EWeaponType::Mace:
-		break;
-	case EWeaponType::Dagger:
-		DamagePercent += ((NormalAttackIndex - 1) * 10);
-		break;
-	case EWeaponType::Staff:
-		DamagePercent += ((NormalAttackIndex - 1) * 12);
-		break;
-	case EWeaponType::Shield:
-	case EWeaponType::None:
-	default:
-		DamagePercent = 0.f;
-		break;
-	}
-
-	float CritRate = DamageType == EDamageType::Magickal ? StatsComp->MagickalCritRate.GetValue() : StatsComp->PhysicalCritRate.GetValue();
-	float NormalDamage =
-		DamageType == EDamageType::Magickal ?
-		((DamagePercent / 100.f) * StatsComp->MagickalAttack.GetValue()) :
-		((DamagePercent / 100.f) * StatsComp->PhysicalAttack.GetValue());
-	float CritDamage =
-		DamageType == EDamageType::Magickal ?
-		(NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComp->MagickalCritBonus.GetValue()) :
-		(NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComp->PhysicalCritBonus.GetValue());
-
-	if (CurrentAttackInfoPtr.IsValid())
-	{
-		CurrentAttackInfoPtr.Reset();
-	}
-
-	CurrentAttackInfoPtr =
-		MakeShareable(new FAttackInfo(
-			false,
-			false,
-			CritRate,
-			NormalDamage,
-			CritDamage,
-			DamageType,
-			ECrowdControlEffect::Flinch,
-			0.f
-		));
-}
-
-void AEODCharacterBase::ResetAttackInfo()
-{
-	CurrentAttackInfoPtr.Reset();
+	UGameplaySkillBase* Skill = SkillManager ? SkillManager->GetSkillForSkillGroup(SkillGroup) : nullptr;
+	TSharedPtr<FAttackInfo> AttackInfoPtr = Skill ? Skill->GetAttackInfoPtr(CollisionIndex) : TSharedPtr<FAttackInfo>();
+	return AttackInfoPtr;
 }
 
 TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(
@@ -934,6 +793,143 @@ bool AEODCharacterBase::ApplyCCE(
 		}
 	}
 	return bCCEApplied;
+}
+
+TSharedPtr<FAttackInfo> AEODCharacterBase::GetAttackInfoPtrFromNormalAttack(const FString& NormalAttackStr)
+{
+	if (Role < ROLE_Authority)
+	{
+		return TSharedPtr<FAttackInfo>();
+	}
+
+	int32 NormalAttackIndex = GetAttackIndexFromNormalAttackString(NormalAttackStr);
+	check(NormalAttackIndex != 0);
+	
+	float DamagePercent = 100.f;
+	if (NormalAttackIndex > 10)
+	{
+		DamagePercent = 150.f;
+	}
+	else
+	{
+		EWeaponType WeaponType = GetWeaponTypeFromNormalAttackString(NormalAttackStr);
+		check(WeaponType != EWeaponType::None);
+
+		switch (WeaponType)
+		{
+		case EWeaponType::GreatSword:
+		case EWeaponType::WarHammer:
+			DamagePercent += ((NormalAttackIndex - 1) * 25);
+			break;
+		case EWeaponType::LongSword:
+			break;
+		case EWeaponType::Mace:
+			break;
+		case EWeaponType::Dagger:
+			DamagePercent += ((NormalAttackIndex - 1) * 10);
+			break;
+		case EWeaponType::Staff:
+			DamagePercent += ((NormalAttackIndex - 1) * 12);
+			break;
+		case EWeaponType::Shield:
+		case EWeaponType::None:
+		default:
+			DamagePercent = 0.f;
+			break;
+		}
+	}
+
+	EDamageType DamageType = EDamageType::Physical;
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	check(StatsComp && DamagePercent != 0.f);
+
+	float CritRate = DamageType == EDamageType::Magickal ? StatsComp->MagickalCritRate.GetValue() : StatsComp->PhysicalCritRate.GetValue();
+	float NormalDamage =
+		DamageType == EDamageType::Magickal ?
+		((DamagePercent / 100.f) * StatsComp->MagickalAttack.GetValue()) :
+		((DamagePercent / 100.f) * StatsComp->PhysicalAttack.GetValue());
+	float CritDamage =
+		DamageType == EDamageType::Magickal ?
+		(NormalDamage * UCombatLibrary::MagickalCritMultiplier + StatsComp->MagickalCritBonus.GetValue()) :
+		(NormalDamage * UCombatLibrary::PhysicalCritMultiplier + StatsComp->PhysicalCritBonus.GetValue());
+
+	TSharedPtr<FAttackInfo> AttackInfoPtr =
+		MakeShareable(new FAttackInfo(
+			false,
+			false,
+			CritRate,
+			NormalDamage,
+			CritDamage,
+			DamageType,
+			ECrowdControlEffect::Flinch,
+			0.f
+		));
+
+	return AttackInfoPtr;
+}
+
+EWeaponType AEODCharacterBase::GetWeaponTypeFromNormalAttackString(const FString& NormalAttackStr)
+{
+	if (NormalAttackStr.StartsWith(TEXT("gs"), ESearchCase::CaseSensitive))
+	{
+		return EWeaponType::GreatSword;
+	}
+	else if (NormalAttackStr.StartsWith(TEXT("wh"), ESearchCase::CaseSensitive))
+	{
+		return EWeaponType::WarHammer;
+	}
+	else if (NormalAttackStr.StartsWith(TEXT("ls"), ESearchCase::CaseSensitive))
+	{
+		return EWeaponType::LongSword;
+	}
+	else if (NormalAttackStr.StartsWith(TEXT("mc"), ESearchCase::CaseSensitive))
+	{
+		return EWeaponType::Mace;
+	}
+	else if (NormalAttackStr.StartsWith(TEXT("st"), ESearchCase::CaseSensitive))
+	{
+		return EWeaponType::Staff;
+	}
+	else if (NormalAttackStr.StartsWith(TEXT("dg"), ESearchCase::CaseSensitive))
+	{
+		return EWeaponType::Dagger;
+	}
+
+	return EWeaponType::None;
+}
+
+int32 AEODCharacterBase::GetAttackIndexFromNormalAttackString(const FString& NormalAttackStr)
+{
+	if (NormalAttackStr.EndsWith(TEXT("01"), ESearchCase::CaseSensitive))
+	{
+		return 1;
+	}
+	else if (NormalAttackStr.EndsWith(TEXT("02"), ESearchCase::CaseSensitive))
+	{
+		return 2;
+	}
+	else if (NormalAttackStr.EndsWith(TEXT("03"), ESearchCase::CaseSensitive))
+	{
+		return 3;
+	}
+	else if (NormalAttackStr.EndsWith(TEXT("04"), ESearchCase::CaseSensitive))
+	{
+		return 4;
+	}
+	else if (NormalAttackStr.EndsWith(TEXT("05"), ESearchCase::CaseSensitive))
+	{
+		return 5;
+	}
+	else if (NormalAttackStr.EndsWith(TEXT("11"), ESearchCase::CaseSensitive))
+	{
+		return 11;
+	}
+	else if (NormalAttackStr.EndsWith(TEXT("12"), ESearchCase::CaseSensitive))
+	{
+		return 12;
+	}
+
+	return 0;	
 }
 
 void AEODCharacterBase::BP_SetWalkSpeed(const float WalkSpeed)

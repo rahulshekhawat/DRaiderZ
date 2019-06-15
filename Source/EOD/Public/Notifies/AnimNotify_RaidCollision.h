@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatLibrary.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "AnimNotify_RaidCollision.generated.h"
 
@@ -49,4 +50,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CollisionInfo)
 	TArray<FRaidCapsule> CollisionCapsules;	
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
+	FCollisionSkillInfo SkillInfo;
+
 };

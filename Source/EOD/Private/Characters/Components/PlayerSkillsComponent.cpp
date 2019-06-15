@@ -315,10 +315,12 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 	}
 
 	//~ @todo Modify the way attack info is stored
+	/*
 	if (CharOwner->Role >= ROLE_Authority)
 	{
 		CharOwner->SetAttackInfoFromSkill(PlayerSkill);
 	}
+	*/
 }
 
 void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill, float ReleaseDelay)

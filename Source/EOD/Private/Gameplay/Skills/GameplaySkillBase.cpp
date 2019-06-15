@@ -58,7 +58,7 @@ void UGameplaySkillBase::FinishSkill()
 	}
 }
 
-TSharedPtr<FAttackInfo> UGameplaySkillBase::GetAttackInfoPtr()
+TSharedPtr<FAttackInfo> UGameplaySkillBase::GetAttackInfoPtr(int32 CollisionIndex)
 {
 	return TSharedPtr<FAttackInfo>(nullptr);
 }

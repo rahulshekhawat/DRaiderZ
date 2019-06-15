@@ -143,7 +143,7 @@ public:
 
 	virtual void DisableGameplayEffectEvents() override;
 
-	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr() override;
+	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr(int32 CollisionIndex = 1) override;
 
 	inline FActiveSkillLevelUpInfo GetCurrentSkillLevelupInfo() const;
 
@@ -194,8 +194,6 @@ protected:
 	// --------------------------------------
 	//  Cache
 	// --------------------------------------
-
-	TSharedPtr<FAttackInfo> AttackInfoPtr;
 
 	UPROPERTY(Transient)
 	TMap<EWeaponType, UAnimMontage*> SkillAnimations;
