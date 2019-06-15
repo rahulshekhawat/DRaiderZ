@@ -485,6 +485,10 @@ void AAICharacterBase::InitiateDeathSequence_Implementation()
 	{
 		DestroyFloatingHealthWidget();
 	}
+
+	FCharacterStateInfo StateInfo(ECharacterState::Dead, 0);
+	StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+	CharacterStateInfo = StateInfo;
 }
 
 void AAICharacterBase::DestroyFloatingHealthWidget()

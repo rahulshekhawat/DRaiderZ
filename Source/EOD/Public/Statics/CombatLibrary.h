@@ -11,6 +11,7 @@
 
 class AEODCharacterBase;
 class UAnimSequenceBase;
+class UGameplayEffectBase;
 
 /** This enum describes all the possible crowd control effects in game */
 UENUM(BlueprintType, Meta = (BitFlags))
