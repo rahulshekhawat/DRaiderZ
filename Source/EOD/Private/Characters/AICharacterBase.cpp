@@ -245,7 +245,10 @@ bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
 
 void AAICharacterBase::CCEEndKnockdown_Implementation()
 {
-	PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownEnd);
+	if (CharacterStateInfo.CharacterState == ECharacterState::GotHit)
+	{
+		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownEnd);
+	}
 }
 
 bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
@@ -486,9 +489,7 @@ void AAICharacterBase::InitiateDeathSequence_Implementation()
 		DestroyFloatingHealthWidget();
 	}
 
-	FCharacterStateInfo StateInfo(ECharacterState::Dead, 0);
-	StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
-	CharacterStateInfo = StateInfo;
+	CharacterStateInfo.CharacterState = ECharacterState::Dead;
 }
 
 void AAICharacterBase::DestroyFloatingHealthWidget()
@@ -548,4 +549,9 @@ void AAICharacterBase::OnRep_InCombat()
 void AAICharacterBase::OnRep_Health(FCharacterStat& OldHealth)
 {
 	UpdateHealthWidget();
+
+	if (Health.CurrentValue <= 0)
+	{
+		InitiateDeathSequence();
+	}
 }
