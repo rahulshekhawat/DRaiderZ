@@ -2,7 +2,6 @@
 
 #include "WeaponBase.h"
 #include "EODCharacterBase.h"
-#include "WeaponStatsComponent.h"
 
 
 // Sets default values
