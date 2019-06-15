@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Gameplay/Skills/GameplaySkillBase.h"
+#include "CombatLibrary.h"
+#include "GameplaySkillBase.h"
 #include "AISkillBase.generated.h"
 
 class UCameraShake;
@@ -45,22 +46,21 @@ struct EOD_API FAISkillInfo
 	/** The duration before which the same skill can be used again */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
 	float Cooldown;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	FGameplayEffectInfo GameplayEffectInfo;
 
-	//~ @todo
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
-	TSoftClassPtr<UGameplayEffectBase> GameplayEffectSoftClass;
-
-	FAISkillInfo()
+	FAISkillInfo() :
+		DamagePercent(0.f),
+		bUnblockable(false),
+		bUndodgable(false),
+		bIgnoresBlock(false),
+		CrowdControlEffect(ECrowdControlEffect::Flinch),
+		CrowdControlEffectDuration(0.f),
+		CrowdControlImmunities(0),
+		Cooldown(0.f),
+		GameplayEffectInfo()
 	{
-		DamagePercent = 0.f;
-		bUnblockable = false;
-		bUndodgable = false;
-		bIgnoresBlock = false;
-		CrowdControlEffect = ECrowdControlEffect::Flinch;
-		CrowdControlEffectDuration = 0.f;
-		CrowdControlImmunities = 0;
-		Cooldown = 0.f;
-		GameplayEffectSoftClass = NULL;
 	}
 };
 

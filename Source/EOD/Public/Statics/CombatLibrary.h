@@ -212,6 +212,25 @@ struct EOD_API FAttackInfo
 	}
 };
 
+USTRUCT(BlueprintType)
+struct EOD_API FGameplayEffectInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	TSubclassOf<UGameplayEffectBase> Class;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	int32 Level;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	FName TriggerCondition;
+
+	FGameplayEffectInfo() : Class(NULL), Level(1), TriggerCondition(NAME_None)
+	{
+	}
+};
+
 USTRUCT()
 struct EOD_API FMeleeDamageEvent : public FDamageEvent
 {
