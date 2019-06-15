@@ -1082,6 +1082,11 @@ float AEODCharacterBase::GetOrientationYawToActor(const AActor* TargetActor)
 void AEODCharacterBase::UpdateHealth(int32 MaxHealth, int32 CurrentHealth)
 {
 	Health = FCharacterStat(MaxHealth, CurrentHealth);
+
+	if (Health.CurrentValue <= 0)
+	{
+		InitiateDeathSequence();
+	}
 }
 
 void AEODCharacterBase::UpdateMana(int32 MaxMana, int32 CurrentMana)

@@ -216,6 +216,17 @@ public:
 	/** Updates character rotation every frame */
 	virtual void UpdateRotation(float DeltaTime) override;
 
+	// --------------------------------------
+	//  Gameplay
+	// --------------------------------------
+
+	virtual void InitiateDeathSequence_Implementation() override;
+
+	UFUNCTION()
+	virtual void DestroyFloatingHealthWidget();
+
+	FTimerHandle WidgetTimerHandle;
+
 protected:
 
 	// --------------------------------------

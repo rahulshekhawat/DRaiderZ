@@ -16,6 +16,8 @@
 #include "TimerManager.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
+#include "BrainComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/AudioComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -444,6 +446,76 @@ void AAICharacterBase::UpdateMovement(float DeltaTime)
 
 void AAICharacterBase::UpdateRotation(float DeltaTime)
 {
+}
+
+void AAICharacterBase::InitiateDeathSequence_Implementation()
+{
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	float DeathMontageDuration = 0.f;
+	if (AnimInstance)
+	{
+		AnimInstance->StopAllMontages(0.f);
+
+		if (DieMontage)
+		{
+			DeathMontageDuration = AnimInstance->Montage_Play(DieMontage);
+		}
+	}
+
+	AEODAIControllerBase* AIC = Cast<AEODAIControllerBase>(Controller);
+	UBrainComponent* BrainComp = AIC ? AIC->GetBrainComponent() : nullptr;
+
+	if (BrainComp)
+	{
+		BrainComp->StopLogic(FString("Character Died"));
+	}
+
+	UCapsuleComponent* CapComp = GetCapsuleComponent();
+	if (CapComp)
+	{
+		CapComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	if (DeathMontageDuration > 1.f)
+	{
+		UWorld* World = GetWorld();
+		World->GetTimerManager().SetTimer(WidgetTimerHandle, this, &AAICharacterBase::DestroyFloatingHealthWidget, 1.f, false);
+	}
+	else
+	{
+		DestroyFloatingHealthWidget();
+	}
+}
+
+void AAICharacterBase::DestroyFloatingHealthWidget()
+{
+	if (HealthWidgetComp)
+	{
+		UUserWidget* Widget = HealthWidgetComp->GetUserWidgetObject();
+		if (Widget)
+		{
+			Widget->RemoveFromParent();
+		}
+
+		HealthWidgetComp->SetWidget(nullptr);
+
+		HealthWidgetComp->DestroyComponent();
+		HealthWidgetComp = nullptr;
+	}
+
+	if (AggroWidgetComp)
+	{
+		UUserWidget* Widget = AggroWidgetComp->GetUserWidgetObject();
+		if (Widget)
+		{
+			Widget->RemoveFromParent();
+		}
+
+		AggroWidgetComp->SetWidget(nullptr);
+
+		AggroWidgetComp->DestroyComponent();
+		AggroWidgetComp = nullptr;
+	}
 }
 
 void AAICharacterBase::UpdateHealthWidget()
