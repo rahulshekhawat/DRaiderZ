@@ -60,13 +60,13 @@ void UAIStatsComponent::LoadAIStats()
 	}
 
 	Health.SetMaxValue(TableRow->Health);
-	Health.ForceBroadcastDelegate();
+	Health.RefillCurrentValue();
 
 	Mana.SetMaxValue(TableRow->Mana);
-	Mana.ForceBroadcastDelegate();
+	Mana.RefillCurrentValue();
 
 	Stamina.SetMaxValue(TableRow->Stamina);
-	Stamina.ForceBroadcastDelegate();
+	Stamina.RefillCurrentValue();
 
 	HealthRegenRate.SetValue(TableRow->HealthRegenRate);
 	HealthRegenRate.ForceBroadcastDelegate();

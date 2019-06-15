@@ -135,11 +135,18 @@ public:
 		}
 	}
 
+	void RefillCurrentValue()
+	{
+		int32 Max = GetMaxValue();
+		CurrentValue = Max;
+		OnStatValueChanged.Broadcast(Max, CurrentValue);
+	}
+
 	void SetCurrentValue(int32 InValue)
 	{
 		int32 Max = GetMaxValue();
 		CurrentValue = InValue <= 0 ? 0 : InValue >= Max ? Max : InValue;
-		OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
+		OnStatValueChanged.Broadcast(Max, CurrentValue);
 	}
 
 	int32 RecalculateMaxValue()
