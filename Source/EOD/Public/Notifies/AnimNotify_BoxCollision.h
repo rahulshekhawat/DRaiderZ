@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatLibrary.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "AnimNotify_BoxCollision.generated.h"
 
@@ -29,6 +30,8 @@ public:
 	/** Rotation of collision box */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BoxInfo)
 	FRotator Rotation;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
+	FCollisionSkillInfo SkillInfo;
 
 };

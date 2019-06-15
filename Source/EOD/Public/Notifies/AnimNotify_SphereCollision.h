@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatLibrary.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "AnimNotify_SphereCollision.generated.h"
 
@@ -25,5 +26,8 @@ public:
 	/** Radius of collision sphere */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SphereInfo)
 	float Radius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
+	FCollisionSkillInfo SkillInfo;
 	
 };

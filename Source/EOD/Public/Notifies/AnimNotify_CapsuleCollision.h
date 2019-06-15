@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatLibrary.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "AnimNotify_CapsuleCollision.generated.h"
 
@@ -34,5 +35,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = CapsuleInfo)
 	float HalfHeight;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
+	FCollisionSkillInfo SkillInfo;
 	
 };

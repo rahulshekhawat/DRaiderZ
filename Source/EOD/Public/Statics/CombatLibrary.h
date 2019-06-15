@@ -96,7 +96,7 @@ struct EOD_API FReceivedHitInfo
 
 /** This struct contains information of how the character received damage */
 USTRUCT(BlueprintType)
-struct FAttackResponse
+struct EOD_API FAttackResponse
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -133,9 +133,31 @@ struct FAttackResponse
 	}
 };
 
+/**
+ * This struct contains the information of the skill that initiated the collision
+ */
+USTRUCT(BlueprintType)
+struct EOD_API FCollisionSkillInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FName SkillGroup;
+
+	UPROPERTY(EditAnywhere)
+	int32 CollisionIndex;
+
+	FCollisionSkillInfo() :
+		SkillGroup(NAME_None),
+		CollisionIndex(1)
+	{
+	}
+};
+
+
 /** This struct contains information of current attack */
 USTRUCT(BlueprintType)
-struct FAttackInfo
+struct EOD_API FAttackInfo
 {
 	GENERATED_USTRUCT_BODY()
 
