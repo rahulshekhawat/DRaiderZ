@@ -193,6 +193,8 @@ public:
 	//  Combat
 	// --------------------------------------
 
+	virtual bool IsEnemyOf(ICombatInterface* TargetCI) const override;
+
 	/** Set whether character is in combat or not */
 	virtual void SetInCombat(bool bValue) override;
 

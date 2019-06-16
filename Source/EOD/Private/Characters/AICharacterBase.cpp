@@ -276,6 +276,16 @@ bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const F
 	return false;
 }
 
+bool AAICharacterBase::IsEnemyOf(ICombatInterface* TargetCI) const
+{
+	AActor* Target = TargetCI->GetInterfaceOwner();
+	if (Target->IsA(AAICharacterBase::StaticClass()))
+	{
+		return false;
+	}
+	return true;
+}
+
 void AAICharacterBase::SetInCombat(bool bValue)
 {
 	bInCombat = bValue;

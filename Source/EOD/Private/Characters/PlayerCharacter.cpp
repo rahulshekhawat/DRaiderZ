@@ -150,21 +150,18 @@ void APlayerCharacter::PlaySystemSound(USoundBase* SoundToPlay)
 
 bool APlayerCharacter::CCEFlinch_Implementation(const float BCAngle)
 {
-	if (CanInterrupt() && GetActiveAnimationReferences() && GetActiveAnimationReferences()->Flinch.Get())
+	FPlayerAnimationReferencesTableRow* Anims = GetActiveAnimationReferences();
+	if (CanFlinch() && Anims && Anims->Flinch.Get())
 	{
 		UAnimMontage* FlinchMontage = GetActiveAnimationReferences()->Flinch.Get();
-
 		if (BCAngle <= 90)
 		{
-			// PlayAnimationMontage(FlinchMontage,
-				// UCharacterLibrary::SectionName_ForwardFlinch);
+			PlayAnimMontage(FlinchMontage, 1.f, UCharacterLibrary::SectionName_ForwardFlinch);
 		}
 		else
 		{
-			// PlayAnimationMontage(FlinchMontage,
-				// UCharacterLibrary::SectionName_BackwardFlinch);
+			PlayAnimMontage(FlinchMontage, 1.f, UCharacterLibrary::SectionName_BackwardFlinch);
 		}
-
 		return true;
 	}
 

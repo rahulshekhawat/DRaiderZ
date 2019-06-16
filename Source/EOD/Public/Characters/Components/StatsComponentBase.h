@@ -446,6 +446,8 @@ public:
 			}
 		}
 
+		OnStatValueChanged.Broadcast(Value);
+
 		bDirty = false;
 		return Value;
 	}
@@ -467,6 +469,8 @@ public:
 				Modifiers.Add(UniqueID, NewMod);
 			}
 			bDirty = true;
+
+			RecalculateValue();
 		}
 	}
 
@@ -480,6 +484,8 @@ public:
 			{
 				Modifiers.Remove(UniqueID);
 				bDirty = true;
+
+				RecalculateValue();
 			}
 		}
 	}
@@ -490,6 +496,16 @@ public:
 	{
 		uint8 CV = GetValue();
 		OnStatValueChanged.Broadcast(CV);
+	}
+
+	bool HasCCImmunity(ECrowdControlEffect CCImmunity) const
+	{
+		return (Value & (1 << (uint8)CCImmunity));
+	}
+
+	bool HasCCImmunities(uint8 CCImmunities) const
+	{
+		return (Value & CCImmunities) == CCImmunities;
 	}
 
 private:
@@ -517,11 +533,6 @@ private:
 	void RemoveAllImmunities()
 	{
 		Value = 0;
-	}
-
-	bool HasCCImmunity(ECrowdControlEffect CCImmunity)
-	{
-		return (Value & (1 << (uint8)CCImmunity));
 	}
 
 private:

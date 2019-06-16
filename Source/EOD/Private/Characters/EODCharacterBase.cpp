@@ -1714,7 +1714,7 @@ void AEODCharacterBase::OnMountingRide(ARideBase* RideCharacter)
 	}
 }
 
-UStatsComponentBase* AEODCharacterBase::GetStatsComponent()
+UStatsComponentBase* AEODCharacterBase::GetStatsComponent() const
 {
 	AEODAIControllerBase* AIController = Cast<AEODAIControllerBase>(Controller);
 	if (AIController)
@@ -1796,30 +1796,60 @@ bool AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Validate(float NewYa
 
 bool AEODCharacterBase::CanFlinch() const
 {
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	if (StatsComp)
+	{
+		return !StatsComp->CCImmunities.HasCCImmunity(ECrowdControlEffect::Flinch);
+	}
 	return true;
 }
 
 bool AEODCharacterBase::CanStun() const
 {
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	if (StatsComp)
+	{
+		return !StatsComp->CCImmunities.HasCCImmunity(ECrowdControlEffect::Stunned);
+	}
 	return true;
 }
 
 bool AEODCharacterBase::CanKnockdown() const
 {
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	if (StatsComp)
+	{
+		return !StatsComp->CCImmunities.HasCCImmunity(ECrowdControlEffect::KnockedDown);
+	}
 	return true;
 }
 
 bool AEODCharacterBase::CanKnockback() const
 {
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	if (StatsComp)
+	{
+		return !StatsComp->CCImmunities.HasCCImmunity(ECrowdControlEffect::KnockedBack);
+	}
 	return true;
 }
 
 bool AEODCharacterBase::CanFreeze() const
 {
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	if (StatsComp)
+	{
+		return !StatsComp->CCImmunities.HasCCImmunity(ECrowdControlEffect::Crystalized);
+	}
 	return true;
 }
 
 bool AEODCharacterBase::CanInterrupt() const
 {
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	if (StatsComp)
+	{
+		return !StatsComp->CCImmunities.HasCCImmunity(ECrowdControlEffect::Interrupt);
+	}
 	return true;
 }
