@@ -94,6 +94,7 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("ToggleSkillTree", IE_Pressed, this, &AEODPlayerController::TogglePlayerSkillTreeUI);
 	InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AEODPlayerController::TogglePlayerInventoryUI);
 	InputComponent->BindAction("ToggleJournal", IE_Pressed, this, &AEODPlayerController::TogglePlayerJournalUI);
+	InputComponent->BindAction("ToggleWeapon", IE_Pressed, this, &AEODPlayerController::TogglePlayerWeapon);
 
 	InputComponent->BindAction("Skill_1", IE_Pressed, this, &AEODPlayerController::PressedSkillKey<1>);
 	InputComponent->BindAction("Skill_2", IE_Pressed, this, &AEODPlayerController::PressedSkillKey<2>);
@@ -425,6 +426,11 @@ void AEODPlayerController::TogglePlayerInventoryUI()
 void AEODPlayerController::TogglePlayerJournalUI()
 {
 
+}
+
+void AEODPlayerController::TogglePlayerWeapon()
+{
+	//~ @todo
 }
 
 void AEODPlayerController::OnPressedForward()

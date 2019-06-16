@@ -191,6 +191,8 @@ public:
 
 	void TogglePlayerJournalUI();
 
+	void TogglePlayerWeapon();
+
 private:
 
 	/** Determines whether automatic movement is enabled on possessed pawn */

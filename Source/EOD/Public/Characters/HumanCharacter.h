@@ -19,7 +19,25 @@ class UAudioComponent;
 class USkeletalMeshComponent;
 
 USTRUCT(BlueprintType)
-struct EOD_API FArmorsList
+struct EOD_API FWeaponSlot
+{
+	GENERATED_USTRUCT_BODY()
+		
+	UPROPERTY()
+	FName PrimaryWeaponID;
+	
+	UPROPERTY()
+	FName SecondaryWeaponID;
+	
+	FWeaponSlot() :
+		PrimaryWeaponID(NAME_None),
+		SecondaryWeaponID(NAME_None)
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
+struct EOD_API FArmorSlot
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -35,6 +53,33 @@ struct EOD_API FArmorsList
 	UPROPERTY()
 	FName FeetArmorID;
 
+	FArmorSlot() :
+		ChestArmorID(NAME_None),
+		HandsArmorID(NAME_None),
+		LegsArmorID(NAME_None),
+		FeetArmorID(NAME_None)
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
+struct EOD_API FEquippedWeapons
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	FWeaponSlot PrimaryWeaponSlot;
+	
+	UPROPERTY()
+	FWeaponSlot SecondaryWeaponSlot;
+	
+	UPROPERTY()
+	uint8 CurrentSlotIndex;
+	
+	FEquippedWeapons() :
+		CurrentSlotIndex(0)
+	{
+	}
 };
 
 /**
@@ -231,8 +276,11 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
 	FName SecondaryWeaponID;
 
-	UPROPERTY(ReplicatedUsing = OnRep_ArmorIDs, EditDefaultsOnly, BlueprintReadOnly)
-	FArmorsList EquippedArmorIDs;
+	UPROPERTY(ReplicatedUsing = OnRep_ArmorSlot, EditDefaultsOnly, BlueprintReadOnly)
+	FArmorSlot ArmorSlot;
+
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapons, EditDefaultsOnly, BlueprintReadOnly)
+	FEquippedWeapons EquippedWeapons;
 
 public:
 
@@ -391,8 +439,11 @@ protected:
 	virtual	void OnRep_SecondaryWeaponID();
 
 	UFUNCTION()
-	virtual void OnRep_ArmorIDs();
-	
+	virtual void OnRep_ArmorSlot();
+
+	UFUNCTION()
+	virtual void OnRep_EquippedWeapons();
+
 };
 
 inline void AHumanCharacter::SetMasterPoseComponentForMeshes()

@@ -73,10 +73,10 @@ void AHumanCharacter::PostInitializeComponents()
 	SetCurrentSecondaryWeapon(SecondaryWeaponID);
 	SetCurrentPrimaryWeapon(PrimaryWeaponID);
 
-	AddArmor(EquippedArmorIDs.ChestArmorID);
-	AddArmor(EquippedArmorIDs.HandsArmorID);
-	AddArmor(EquippedArmorIDs.LegsArmorID);
-	AddArmor(EquippedArmorIDs.FeetArmorID);
+	AddArmor(ArmorSlot.ChestArmorID);
+	AddArmor(ArmorSlot.HandsArmorID);
+	AddArmor(ArmorSlot.LegsArmorID);
+	AddArmor(ArmorSlot.FeetArmorID);
 }
 
 void AHumanCharacter::Tick(float DeltaTime)
@@ -375,19 +375,19 @@ void AHumanCharacter::AddArmor(FName ArmorID)
 	switch (ArmorData->ArmorType)
 	{
 	case EArmorType::Chest:
-		EquippedArmorIDs.ChestArmorID = ArmorID;
+		ArmorSlot.ChestArmorID = ArmorID;
 		SkComp = Chest;
 		break;
 	case EArmorType::Hands:
-		EquippedArmorIDs.HandsArmorID = ArmorID;
+		ArmorSlot.HandsArmorID = ArmorID;
 		SkComp = Hands;
 		break;
 	case EArmorType::Legs:
-		EquippedArmorIDs.LegsArmorID = ArmorID;
+		ArmorSlot.LegsArmorID = ArmorID;
 		SkComp = Legs;
 		break;
 	case EArmorType::Feet:
-		EquippedArmorIDs.FeetArmorID = ArmorID;
+		ArmorSlot.FeetArmorID = ArmorID;
 		SkComp = Feet;
 		break;
 	case EArmorType::None:
@@ -416,19 +416,19 @@ void AHumanCharacter::RemoveArmor(EArmorType ArmorType)
 	switch (ArmorType)
 	{
 	case EArmorType::Chest:
-		EquippedArmorIDs.ChestArmorID = NAME_None;
+		ArmorSlot.ChestArmorID = NAME_None;
 		SkComp = Chest;
 		break;
 	case EArmorType::Hands:
-		EquippedArmorIDs.HandsArmorID = NAME_None;
+		ArmorSlot.HandsArmorID = NAME_None;
 		SkComp = Hands;
 		break;
 	case EArmorType::Legs:
-		EquippedArmorIDs.LegsArmorID = NAME_None;
+		ArmorSlot.LegsArmorID = NAME_None;
 		SkComp = Legs;
 		break;
 	case EArmorType::Feet:
-		EquippedArmorIDs.FeetArmorID = NAME_None;
+		ArmorSlot.FeetArmorID = NAME_None;
 		SkComp = Feet;
 		break;
 	case EArmorType::None:
@@ -1078,6 +1078,10 @@ void AHumanCharacter::OnRep_SecondaryWeaponID()
 {
 }
 
-void AHumanCharacter::OnRep_ArmorIDs()
+void AHumanCharacter::OnRep_ArmorSlot()
+{
+}
+
+void AHumanCharacter::OnRep_EquippedWeapons()
 {
 }
