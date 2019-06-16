@@ -1120,10 +1120,6 @@ void APlayerCharacter::Server_Dodge_Implementation(uint8 DodgeIndex, float Rotat
 	StartDodge();
 }
 
-void APlayerCharacter::Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)
-{
-}
-
 void APlayerCharacter::Server_NormalAttack_Implementation(uint8 AttackIndex)
 {
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());

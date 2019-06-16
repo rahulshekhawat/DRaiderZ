@@ -498,9 +498,8 @@ protected:
 	//~ Begin AEODCharacterBase RPC overrides
 	virtual void OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo) override;
 	virtual void OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo) override;
-	virtual void Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
-	virtual void Multicast_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw);
-	virtual void Server_NormalAttack_Implementation(uint8 AttackIndex);
+	virtual void Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw) override;
+	virtual void Server_NormalAttack_Implementation(uint8 AttackIndex) override;
 	//~ End AEODCharacterBase RPC overrides
 
 	UFUNCTION(Server, Reliable, WithValidation)

@@ -10,6 +10,7 @@
 #include "StatsComponentBase.h"
 #include "CombatInterface.h"
 
+#include "TimerManager.h"
 #include "Engine/World.h"
 #include "GameplayTagContainer.h"
 #include "Animation/AnimInstance.h"
@@ -93,12 +94,15 @@ struct EOD_API FCharacterStateInfo
 		NewReplicationIndex = 0;
 	}
 
-	FCharacterStateInfo(ECharacterState State) : CharacterState(State)
+	FCharacterStateInfo(ECharacterState State) :
+		CharacterState(State)
 	{
 		SubStateIndex = 0;
 	}
 
-	FCharacterStateInfo(ECharacterState State, uint8 SSIndex) : CharacterState(State), SubStateIndex(SSIndex)
+	FCharacterStateInfo(ECharacterState State, uint8 SSIndex) :
+		CharacterState(State),
+		SubStateIndex(SSIndex)
 	{
 	}
 
@@ -116,7 +120,9 @@ struct EOD_API FCharacterStateInfo
 
 	FString ToString() const
 	{
-		FString String = FString("Character State: ") + EnumToString<ECharacterState>(FString("ECharacterState"), CharacterState, FString("Invalid Class")) +
+		FString String = 
+			FString("Character State: ") +
+			EnumToString<ECharacterState>(FString("ECharacterState"), CharacterState, FString("Invalid Class")) +
 			FString(", SubStateIndex: ") + FString::FromInt(SubStateIndex);
 		return String;
 	}
