@@ -458,6 +458,9 @@ public:
 
 	virtual void TriggerReceivedHitCosmetics(const FReceivedHitInfo& HitInfo);
 
+	/** Method called before entering CCE state */
+	virtual void PreCCEStateEnter();
+
 	virtual bool ApplyCCE(
 		AActor* HitInstigator,
 		ECrowdControlEffect CCEToApply,
@@ -996,49 +999,40 @@ public:
 	virtual bool CanInterrupt() const;
 
 	/** Flinch this character (visual feedback) */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Flinch"))
-	bool CCEFlinch(const float BCAngle);
-	virtual bool CCEFlinch_Implementation(const float BCAngle);
+	UFUNCTION(BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Flinch"))
+	virtual bool CCEFlinch(const float BCAngle);
 
 	/** Interrupt this character's current action */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Interrupt"))
-	bool CCEInterrupt(const float BCAngle);
-	virtual bool CCEInterrupt_Implementation(const float BCAngle);
+	UFUNCTION(BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Interrupt"))
+	virtual bool CCEInterrupt(const float BCAngle);
 
 	/** Applies stun to this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Stun"))
-	bool CCEStun(const float Duration);
-	virtual bool CCEStun_Implementation(const float Duration);
+	UFUNCTION(BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Stun"))
+	virtual bool CCEStun(const float Duration);
 
 	/** Removes 'stun' crowd control effect from this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Remove Stun"))
-	void CCERemoveStun();
-	virtual void CCERemoveStun_Implementation();
+	UFUNCTION(BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Remove Stun"))
+	virtual void CCERemoveStun();
 
 	/** Freeze this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Freeze"))
-	bool CCEFreeze(const float Duration);
-	virtual bool CCEFreeze_Implementation(const float Duration);
+	UFUNCTION(BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Freeze"))
+	virtual bool CCEFreeze(const float Duration);
 
 	/** Removes 'freeze' crowd control effect from this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Unfreeze"))
-	void CCEUnfreeze();
-	virtual void CCEUnfreeze_Implementation();
+	UFUNCTION(BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Unfreeze"))
+	virtual void CCEUnfreeze();
 
 	/** Knockdown this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockdown"))
-	bool CCEKnockdown(const float Duration);
-	virtual bool CCEKnockdown_Implementation(const float Duration);
+	UFUNCTION(BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockdown"))
+	virtual bool CCEKnockdown(const float Duration);
 
 	/** Removes 'knock-down' crowd control effect from this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE End Knockdown"))
-	void CCEEndKnockdown();
-	virtual void CCEEndKnockdown_Implementation();
+	UFUNCTION(BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE End Knockdown"))
+	virtual void CCEEndKnockdown();
 
 	/** Knockback this character */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockback"))
-	bool CCEKnockback(const float Duration, const FVector & ImpulseDirection);
-	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection);
+	UFUNCTION(BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockback"))
+	virtual bool CCEKnockback(const float Duration, const FVector & ImpulseDirection);
 
 	/** Plays stun animation */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CrowdControlEffect|Animations")

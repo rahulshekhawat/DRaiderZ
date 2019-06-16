@@ -71,31 +71,31 @@ public:
 	// --------------------------------------
 
 	/** Flinch this character (visual feedback) */
-	virtual bool CCEFlinch_Implementation(const float BCAngle) override;
+	virtual bool CCEFlinch(const float BCAngle) override;
 
 	/** Interrupt this character's current action */
-	virtual bool CCEInterrupt_Implementation(const float BCAngle) override;
+	virtual bool CCEInterrupt(const float BCAngle) override;
 
 	/** Applies stun to this character */
-	virtual bool CCEStun_Implementation(const float Duration) override;
+	virtual bool CCEStun(const float Duration) override;
 
 	/** Removes 'stun' crowd control effect from this character */
-	virtual void CCERemoveStun_Implementation() override;
+	virtual void CCERemoveStun() override;
 
 	/** Freeze this character */
-	virtual bool CCEFreeze_Implementation(const float Duration) override;
+	virtual bool CCEFreeze(const float Duration) override;
 
 	/** Removes 'freeze' crowd control effect from this character */
-	virtual void CCEUnfreeze_Implementation() override;
+	virtual void CCEUnfreeze() override;
 	
 	/** Knockdown this character */
-	virtual bool CCEKnockdown_Implementation(const float Duration) override;
+	virtual bool CCEKnockdown(const float Duration) override;
 	
 	/** Removes 'knock-down' crowd control effect from this character */
-	virtual void CCEEndKnockdown_Implementation() override;
+	virtual void CCEEndKnockdown() override;
 	
 	/** Knockback this character */
-	virtual bool CCEKnockback_Implementation(const float Duration, const FVector& ImpulseDirection) override;
+	virtual bool CCEKnockback(const float Duration, const FVector& ImpulseDirection) override;
 
 	// --------------------------------------
 	//  Utility

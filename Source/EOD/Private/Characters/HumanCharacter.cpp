@@ -781,18 +781,213 @@ void AHumanCharacter::ChangeNormalAttackSection(FName OldSection, FName NewSecti
 
 void AHumanCharacter::OnNormalAttackSectionStart(FName SectionName)
 {
-	/*
-	if (Role >= ROLE_Authority)
-	{
-		int32 AttackIndex = GetNormalAttackIndex(SectionName);
-		SetAttackInfoFromNormalAttack(AttackIndex);
-	}
-	*/
 }
 
 void AHumanCharacter::SetNormalAttackSectionChangeAllowed(bool bNewValue)
 {
 	bNormalAttackSectionChangeAllowed = bNewValue;
+}
+
+bool AHumanCharacter::CCEFlinch(const float BCAngle)
+{
+	if (CanFlinch())
+	{
+		FPlayerAnimationReferencesTableRow* Anims = GetActiveAnimationReferences();
+		UAnimMontage* FlinchMontage = Anims ? Anims->Flinch.Get() : nullptr;
+		if (FlinchMontage)
+		{
+			if (BCAngle <= 90)
+			{
+				PlayAnimMontage(FlinchMontage, 1.f, UCharacterLibrary::SectionName_ForwardFlinch);
+			}
+			else
+			{
+				PlayAnimMontage(FlinchMontage, 1.f, UCharacterLibrary::SectionName_BackwardFlinch);
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+bool AHumanCharacter::CCEInterrupt(const float BCAngle)
+{
+	if (CanInterrupt())
+	{
+		FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+		UAnimMontage* AnimMontage = AnimRef ? AnimRef->Interrupt.Get() : nullptr;
+		if (AnimMontage)
+		{
+			PreCCEStateEnter();
+
+			if (BCAngle <= 90)
+			{
+				PlayAnimMontage(AnimMontage, 1.f, UCharacterLibrary::SectionName_ForwardInterrupt);
+			}
+			else
+			{
+				PlayAnimMontage(AnimMontage, 1.f, UCharacterLibrary::SectionName_BackwardInterrupt);
+			}
+
+			CharacterStateInfo.CharacterState = ECharacterState::GotHit;
+			bCharacterStateAllowsMovement = false;
+			bCharacterStateAllowsRotation = false;
+			UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+			if (MoveComp)
+			{
+				MoveComp->bUseControllerDesiredRotation = false;
+			}
+
+			return true;
+		}
+	}
+	return false;
+}
+
+bool AHumanCharacter::CCEStun(const float Duration)
+{
+	if (CanStun())
+	{
+		FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+		UAnimMontage* AnimMontage = AnimRef ? AnimRef->Stun.Get() : nullptr;
+		if (AnimMontage)
+		{
+			PreCCEStateEnter();
+
+			PlayAnimMontage(AnimMontage, 1.f);
+
+			UWorld* World = GetWorld();
+			check(World);
+			World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AHumanCharacter::CCERemoveStun, Duration, false);
+
+			CharacterStateInfo.CharacterState = ECharacterState::GotHit;
+			bCharacterStateAllowsMovement = false;
+			bCharacterStateAllowsRotation = false;
+			UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+			if (MoveComp)
+			{
+				MoveComp->bUseControllerDesiredRotation = false;
+			}
+
+			return true;
+		}
+	}
+	return false;
+}
+
+void AHumanCharacter::CCERemoveStun()
+{
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* AnimMontage = AnimRef ? AnimRef->Stun.Get() : nullptr;
+
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (AnimInstance && AnimMontage && AnimInstance->Montage_IsPlaying(AnimMontage))
+	{
+		AnimInstance->Montage_Stop(AnimMontage->BlendOut.GetBlendTime(), AnimMontage);
+		ResetState();
+	}
+
+	UWorld* World = GetWorld();
+	check(World);
+	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
+}
+
+bool AHumanCharacter::CCEFreeze(const float Duration)
+{
+	if (CanFreeze() && GetMesh())
+	{
+		PreCCEStateEnter();
+
+		GetMesh()->GlobalAnimRateScale = 0.f;
+
+		UWorld* World = GetWorld();
+		check(World);
+		World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AHumanCharacter::CCEUnfreeze, Duration, false);
+
+		CharacterStateInfo.CharacterState = ECharacterState::GotHit;
+		bCharacterStateAllowsMovement = false;
+		bCharacterStateAllowsRotation = false;
+		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+		if (MoveComp)
+		{
+			MoveComp->bUseControllerDesiredRotation = false;
+		}
+
+		return true;
+	}
+	return false;
+}
+
+void AHumanCharacter::CCEUnfreeze()
+{
+	if (GetMesh())
+	{
+		GetMesh()->GlobalAnimRateScale = 1.f;
+	}
+
+	ResetState();
+
+	UWorld* World = GetWorld();
+	check(World);
+	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
+}
+
+bool AHumanCharacter::CCEKnockdown(const float Duration)
+{
+	if (CanKnockdown())
+	{
+		FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+		UAnimMontage* KnockdownMontage = AnimRef ? AnimRef->Knockdown.Get() : nullptr;
+		if (KnockdownMontage)
+		{
+			PreCCEStateEnter();
+
+			PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
+
+			UWorld* World = GetWorld();
+			check(World);
+			World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AHumanCharacter::CCEEndKnockdown, Duration, false);
+
+			CharacterStateInfo.CharacterState = ECharacterState::GotHit;
+			bCharacterStateAllowsMovement = false;
+			bCharacterStateAllowsRotation = false;
+			UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+			if (MoveComp)
+			{
+				MoveComp->bUseControllerDesiredRotation = false;
+			}
+
+			return true;
+		}
+	}
+	return false;
+}
+
+void AHumanCharacter::CCEEndKnockdown()
+{
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* KnockdownMontage = AnimRef ? AnimRef->Knockdown.Get() : nullptr;
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (AnimInstance && KnockdownMontage && AnimInstance->Montage_IsPlaying(KnockdownMontage))
+	{
+		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownEnd);
+		ResetState();
+	}
+
+	UWorld* World = GetWorld();
+	check(World);
+	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
+}
+
+bool AHumanCharacter::CCEKnockback(const float Duration, const FVector& ImpulseDirection)
+{
+	bool bKnockdownInitiated = CCEKnockdown(Duration);
+	if (bKnockdownInitiated)
+	{
+		PushBack(ImpulseDirection);
+		return true;
+	}
+	return false;
 }
 
 void AHumanCharacter::OnPressedForward()

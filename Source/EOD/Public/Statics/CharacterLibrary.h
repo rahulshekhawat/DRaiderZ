@@ -116,18 +116,15 @@ UENUM(BlueprintType)
 enum class ECharacterState : uint8
 {
 	IdleWalkRun,
-	AutoRun,
 	SwitchingWeapon,
 	Jumping,
 	Dodging,
 	Blocking,
 	Attacking,
 	Looting,
-	SpecialAction,
 	Interacting, 			// Interacting with another character, i.e., engaged in dialogue
 	UsingActiveSkill,
 	CastingSpell,
-	SpecialMovement,
 	GotHit,
 	Dead
 };

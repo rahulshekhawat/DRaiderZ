@@ -101,113 +101,128 @@ void AAICharacterBase::Destroyed()
 	Super::Destroyed();
 }
 
-bool AAICharacterBase::CCEFlinch_Implementation(const float BCAngle)
+bool AAICharacterBase::CCEFlinch(const float BCAngle)
 {
-	if (CanFlinch() && FlinchMontage)
+	if (CanFlinch())
 	{
-		if (BCAngle <= 90)
+		if (FlinchMontage)
 		{
-			PlayAnimMontage(FlinchMontage, 1.f, UCharacterLibrary::SectionName_ForwardFlinch);
+			if (BCAngle <= 90)
+			{
+				PlayAnimMontage(FlinchMontage, 1.f, UCharacterLibrary::SectionName_ForwardFlinch);
+			}
+			else
+			{
+				PlayAnimMontage(FlinchMontage, 1.f, UCharacterLibrary::SectionName_BackwardFlinch);
+			}
+			return true;
 		}
-		else
-		{
-			PlayAnimMontage(FlinchMontage, 1.f, UCharacterLibrary::SectionName_BackwardFlinch);
-		}
-
-		return true;
 	}
-
 	return false;
 }
 
-bool AAICharacterBase::CCEInterrupt_Implementation(const float BCAngle)
+bool AAICharacterBase::CCEInterrupt(const float BCAngle)
 {
-	if (CanInterrupt() && InterruptMontage)
+	if (CanInterrupt())
 	{
-		if (IsUsingAnySkill())
+		if (InterruptMontage)
 		{
-			UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
-			check(SkillsComponent);
-			SkillsComponent->CancelAllActiveSkills();
-		}
+			PreCCEStateEnter();
 
-		CharacterStateInfo = FCharacterStateInfo(ECharacterState::GotHit);
+			if (BCAngle <= 90)
+			{
+				PlayAnimMontage(InterruptMontage, 1.f, UCharacterLibrary::SectionName_ForwardInterrupt);
+			}
+			else
+			{
+				PlayAnimMontage(InterruptMontage, 1.f, UCharacterLibrary::SectionName_BackwardInterrupt);
+			}
 
-		if (BCAngle <= 90)
-		{
-			PlayAnimMontage(InterruptMontage, 1.f, UCharacterLibrary::SectionName_ForwardInterrupt);
-		}
-		else
-		{
-			PlayAnimMontage(InterruptMontage, 1.f, UCharacterLibrary::SectionName_BackwardInterrupt);
-		}
+			CharacterStateInfo.CharacterState = ECharacterState::GotHit;
+			bCharacterStateAllowsMovement = false;
+			bCharacterStateAllowsRotation = false;
+			UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+			if (MoveComp)
+			{
+				MoveComp->bUseControllerDesiredRotation = false;
+			}
 
-		return true;
+			return true;
+		}
 	}
-
 	return false;
 }
 
-bool AAICharacterBase::CCEStun_Implementation(const float Duration)
+bool AAICharacterBase::CCEStun(const float Duration)
 {
 	if (CanStun())
 	{
-		if (IsUsingAnySkill())
+		if (StunMontage)
 		{
-			UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
-			check(SkillsComponent);
-			SkillsComponent->CancelAllActiveSkills();
+			PreCCEStateEnter();
+
+			PlayAnimMontage(StunMontage, 1.f);
+
+			UWorld* World = GetWorld();
+			check(World);
+			World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::CCERemoveStun, Duration, false);
+
+			CharacterStateInfo.CharacterState = ECharacterState::GotHit;
+			bCharacterStateAllowsMovement = false;
+			bCharacterStateAllowsRotation = false;
+			UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+			if (MoveComp)
+			{
+				MoveComp->bUseControllerDesiredRotation = false;
+			}
+
+			return true;
 		}
-
-		CharacterStateInfo = FCharacterStateInfo(ECharacterState::GotHit);
-
-		PlayStunAnimation();
-
-		UWorld* World = GetWorld();
-		check(World);
-		World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCERemoveStun, Duration, false);
-		return true;
 	}
-
 	return false;
 }
 
-void AAICharacterBase::CCERemoveStun_Implementation()
+void AAICharacterBase::CCERemoveStun()
 {
-	StopStunAnimation();
-
-	ResetState();
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (AnimInstance && StunMontage && AnimInstance->Montage_IsPlaying(StunMontage))
+	{
+		AnimInstance->Montage_Stop(StunMontage->BlendOut.GetBlendTime(), StunMontage);
+		ResetState();
+	}
 
 	UWorld* World = GetWorld();
 	check(World);
 	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
-	// @todo Restore character state to IdleWalkRun if necessary (if OnMontageBlendingOut event doesn't restore character state to IdleWalkRun)
 }
 
-bool AAICharacterBase::CCEFreeze_Implementation(const float Duration)
+bool AAICharacterBase::CCEFreeze(const float Duration)
 {
 	if (CanFreeze() && GetMesh())
 	{
-		if (IsUsingAnySkill())
-		{
-			UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
-			check(SkillsComponent);
-			SkillsComponent->CancelAllActiveSkills();
-		}
+		PreCCEStateEnter();
 
-		CharacterStateInfo = FCharacterStateInfo(ECharacterState::GotHit);
 		GetMesh()->GlobalAnimRateScale = 0.f;
 
 		UWorld* World = GetWorld();
 		check(World);
 		World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::CCEUnfreeze, Duration, false);
+
+		CharacterStateInfo.CharacterState = ECharacterState::GotHit;
+		bCharacterStateAllowsMovement = false;
+		bCharacterStateAllowsRotation = false;
+		UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+		if (MoveComp)
+		{
+			MoveComp->bUseControllerDesiredRotation = false;
+		}
+
 		return true;
 	}
-
 	return false;
 }
 
-void AAICharacterBase::CCEUnfreeze_Implementation()
+void AAICharacterBase::CCEUnfreeze()
 {
 	if (GetMesh())
 	{
@@ -221,58 +236,57 @@ void AAICharacterBase::CCEUnfreeze_Implementation()
 	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
 }
 
-bool AAICharacterBase::CCEKnockdown_Implementation(const float Duration)
+bool AAICharacterBase::CCEKnockdown(const float Duration)
 {
-	if (CanKnockdown() && KnockdownMontage)
+	if (CanKnockdown())
 	{
-		if (IsUsingAnySkill())
+		if (KnockdownMontage)
 		{
-			UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
-			check(SkillsComponent);
-			SkillsComponent->CancelAllActiveSkills();
+			PreCCEStateEnter();
+
+			PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
+
+			UWorld* World = GetWorld();
+			check(World);
+			World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::CCEEndKnockdown, Duration, false);
+
+			CharacterStateInfo.CharacterState = ECharacterState::GotHit;
+			bCharacterStateAllowsMovement = false;
+			bCharacterStateAllowsRotation = false;
+			UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+			if (MoveComp)
+			{
+				MoveComp->bUseControllerDesiredRotation = false;
+			}
+
+			return true;
 		}
-
-		CharacterStateInfo = FCharacterStateInfo(ECharacterState::GotHit);
-
-		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
-		GetWorld()->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
-		// PushBack(ImpulseDirection);
-		return true;
 	}
-
 	return false;
 }
 
-void AAICharacterBase::CCEEndKnockdown_Implementation()
+void AAICharacterBase::CCEEndKnockdown()
 {
-	if (CharacterStateInfo.CharacterState == ECharacterState::GotHit)
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (AnimInstance && KnockdownMontage && AnimInstance->Montage_IsPlaying(KnockdownMontage))
 	{
 		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownEnd);
+		ResetState();
 	}
+
+	UWorld* World = GetWorld();
+	check(World);
+	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
 }
 
-bool AAICharacterBase::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
+bool AAICharacterBase::CCEKnockback(const float Duration, const FVector& ImpulseDirection)
 {
-	if (CanKnockdown() && KnockdownMontage)
+	bool bKnockdownInitiated = CCEKnockdown(Duration);
+	if (bKnockdownInitiated)
 	{
-		if (IsUsingAnySkill())
-		{
-			UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
-			check(SkillsComponent);
-			SkillsComponent->CancelAllActiveSkills();
-		}
-
-		CharacterStateInfo = FCharacterStateInfo(ECharacterState::GotHit);
-
-		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownStart);
-
-		UWorld* World = GetWorld();
-		check(World);
-		World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AEODCharacterBase::CCEEndKnockdown, Duration, false);
 		PushBack(ImpulseDirection);
 		return true;
 	}
-
 	return false;
 }
 

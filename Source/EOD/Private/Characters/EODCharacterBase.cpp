@@ -351,44 +351,44 @@ bool AEODCharacterBase::IsHealing() const
 	return false;
 }
 
-bool AEODCharacterBase::CCEInterrupt_Implementation(const float BCAngle)
+bool AEODCharacterBase::CCEFlinch(const float BCAngle)
 {
 	return false;
 }
 
-bool AEODCharacterBase::CCEStun_Implementation(const float Duration)
+bool AEODCharacterBase::CCEInterrupt(const float BCAngle)
 {
 	return false;
 }
 
-void AEODCharacterBase::CCERemoveStun_Implementation()
-{
-}
-
-bool AEODCharacterBase::CCEFreeze_Implementation(const float Duration)
+bool AEODCharacterBase::CCEStun(const float Duration)
 {
 	return false;
 }
 
-void AEODCharacterBase::CCEUnfreeze_Implementation()
+void AEODCharacterBase::CCERemoveStun()
 {
 }
 
-bool AEODCharacterBase::CCEKnockdown_Implementation(const float Duration)
-{
-	return false;
-}
-
-void AEODCharacterBase::CCEEndKnockdown_Implementation()
-{
-}
-
-bool AEODCharacterBase::CCEFlinch_Implementation(const float BCAngle)
+bool AEODCharacterBase::CCEFreeze(const float Duration)
 {
 	return false;
 }
 
-bool AEODCharacterBase::CCEKnockback_Implementation(const float Duration, const FVector & ImpulseDirection)
+void AEODCharacterBase::CCEUnfreeze()
+{
+}
+
+bool AEODCharacterBase::CCEKnockdown(const float Duration)
+{
+	return false;
+}
+
+void AEODCharacterBase::CCEEndKnockdown()
+{
+}
+
+bool AEODCharacterBase::CCEKnockback(const float Duration, const FVector & ImpulseDirection)
 {
 	return false;
 }
@@ -726,6 +726,25 @@ void AEODCharacterBase::TriggerReceivedHitCosmetics(const FReceivedHitInfo& HitI
 
 		}
 	}
+}
+
+void AEODCharacterBase::PreCCEStateEnter()
+{
+	if (IsUsingAnySkill())
+	{
+		UGameplaySkillsComponent* SkillsComponent = GetGameplaySkillsComponent();
+		check(SkillsComponent);
+		SkillsComponent->CancelAllActiveSkills();
+	}
+	else if (IsDodging())
+	{
+		CancelDodge();
+	}
+	else if (IsBlocking())
+	{
+		StopBlockingAttacks();
+	}
+
 }
 
 bool AEODCharacterBase::ApplyCCE(
@@ -1796,6 +1815,11 @@ bool AEODCharacterBase::Server_SetBlockMovementDirectionYaw_Validate(float NewYa
 
 bool AEODCharacterBase::CanFlinch() const
 {
+	if (CharacterStateInfo.CharacterState == ECharacterState::Dead)
+	{
+		return false;
+	}
+
 	UStatsComponentBase* StatsComp = GetStatsComponent();
 	if (StatsComp)
 	{
@@ -1806,6 +1830,11 @@ bool AEODCharacterBase::CanFlinch() const
 
 bool AEODCharacterBase::CanStun() const
 {
+	if (CharacterStateInfo.CharacterState == ECharacterState::Dead)
+	{
+		return false;
+	}
+
 	UStatsComponentBase* StatsComp = GetStatsComponent();
 	if (StatsComp)
 	{
@@ -1816,6 +1845,11 @@ bool AEODCharacterBase::CanStun() const
 
 bool AEODCharacterBase::CanKnockdown() const
 {
+	if (CharacterStateInfo.CharacterState == ECharacterState::Dead)
+	{
+		return false;
+	}
+
 	UStatsComponentBase* StatsComp = GetStatsComponent();
 	if (StatsComp)
 	{
@@ -1826,6 +1860,11 @@ bool AEODCharacterBase::CanKnockdown() const
 
 bool AEODCharacterBase::CanKnockback() const
 {
+	if (CharacterStateInfo.CharacterState == ECharacterState::Dead)
+	{
+		return false;
+	}
+
 	UStatsComponentBase* StatsComp = GetStatsComponent();
 	if (StatsComp)
 	{
@@ -1836,6 +1875,11 @@ bool AEODCharacterBase::CanKnockback() const
 
 bool AEODCharacterBase::CanFreeze() const
 {
+	if (CharacterStateInfo.CharacterState == ECharacterState::Dead)
+	{
+		return false;
+	}
+
 	UStatsComponentBase* StatsComp = GetStatsComponent();
 	if (StatsComp)
 	{
@@ -1846,6 +1890,11 @@ bool AEODCharacterBase::CanFreeze() const
 
 bool AEODCharacterBase::CanInterrupt() const
 {
+	if (CharacterStateInfo.CharacterState == ECharacterState::Dead)
+	{
+		return false;
+	}
+
 	UStatsComponentBase* StatsComp = GetStatsComponent();
 	if (StatsComp)
 	{
