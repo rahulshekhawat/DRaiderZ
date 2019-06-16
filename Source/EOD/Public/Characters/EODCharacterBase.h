@@ -919,11 +919,11 @@ public:
 	virtual void OnSkillActivated(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill);
 
 	/** Returns the last used skill */
-	FORCEINLINE FLastUsedSkillInfo GetLastUsedSkill();
+	FORCEINLINE const FLastUsedSkillInfo& GetLastUsedSkill() const;
 
 	/** Returns the last used skill */
 	UFUNCTION(BlueprintPure, Category = "Skill System", meta = (DisplayName = "Get Last Used Skill"))
-	FLastUsedSkillInfo BP_GetLastUsedSkill();
+	const FLastUsedSkillInfo& BP_GetLastUsedSkill() const;
 
 	void SetLastUsedSkill(const FLastUsedSkillInfo& SkillInfo);
 
@@ -1034,16 +1034,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = CrowdControlEffect, meta = (DisplayName = "CCE Knockback"))
 	virtual bool CCEKnockback(const float Duration, const FVector & ImpulseDirection);
 
-	/** Plays stun animation */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CrowdControlEffect|Animations")
-	void PlayStunAnimation();
-	virtual void PlayStunAnimation_Implementation();
-
-	/** Stops stun animation */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CrowdControlEffect|Animations")
-	void StopStunAnimation();
-	virtual void StopStunAnimation_Implementation();
-
 	/** Simulates the knock back effect */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CrowdControlEffect|Movement")
 	void PushBack(const FVector& ImpulseDirection);
@@ -1057,23 +1047,14 @@ public:
 	virtual void BlockAttack(AActor* HitInstigator, ICombatInterface* InstigatorCI, const TSharedPtr<FAttackInfo>& AttackInfoPtr);
 
 	FOnGameplayEventMCDelegate OnReceivingHit;
-
 	FOnGameplayEventMCDelegate OnSuccessfulHit;
-
 	FOnGameplayEventMCDelegate OnSuccessfulMagickAttack;
-
 	FOnGameplayEventMCDelegate OnSuccessfulPhysicalAttack;
-
 	FOnGameplayEventMCDelegate OnUnsuccessfulHit;
-
 	FOnGameplayEventMCDelegate OnCriticalHit;
-
 	FOnGameplayEventMCDelegate OnKillingEnemy;
-
 	FOnGameplayEventMCDelegate OnFullHealth;
-
 	FOnGameplayEventMCDelegate OnDamageAtFullHealth;
-
 	FOnGameplayEventMCDelegate OnLowHealth;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Gameplay Events")
@@ -1100,10 +1081,6 @@ public:
 
 	/** Temporarily trigger 'Target_Switch' material parameter to make the character glow */
 	inline void SetOffTargetSwitch(float Duration = 0.1f);
-
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Materials")
-	// void DissolveCharacter();
-	// virtual void DissolveCharacter_Implementation();
 
 	// --------------------------------------
 	//  Replicated Stats
@@ -1639,10 +1616,10 @@ FORCEINLINE bool AEODCharacterBase::IsWeaponSheathed() const
 
 inline void AEODCharacterBase::SetOffTargetSwitch(float Duration)
 {
-	TurnOnTargetSwitch();
 	UWorld* World = GetWorld();
 	if (Duration > 0.f && World)
 	{
+		TurnOnTargetSwitch();
 		World->GetTimerManager().SetTimer(TargetSwitchTimerHandle, this, &AEODCharacterBase::TurnOffTargetSwitch, Duration, false);
 	}
 }
@@ -1652,7 +1629,7 @@ FORCEINLINE EFaction AEODCharacterBase::GetFaction() const
 	return Faction;
 }
 
-FORCEINLINE FLastUsedSkillInfo AEODCharacterBase::GetLastUsedSkill()
+FORCEINLINE const FLastUsedSkillInfo& AEODCharacterBase::GetLastUsedSkill() const
 {
 	return LastUsedSkillInfo;
 }

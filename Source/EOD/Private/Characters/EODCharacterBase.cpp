@@ -308,12 +308,14 @@ void AEODCharacterBase::RemoveGameplayTagModifier(FGameplayTagMod TagMod)
 bool AEODCharacterBase::IsAlive() const
 {
 	//~ @todo
+	// return Health.CurrentValue > 0;
 	return true;
 }
 
 bool AEODCharacterBase::IsDead() const
 {
 	//~ @todo
+	// return Health.CurrentValue <= 0;
 	return false;
 }
 
@@ -391,14 +393,6 @@ void AEODCharacterBase::CCEEndKnockdown()
 bool AEODCharacterBase::CCEKnockback(const float Duration, const FVector & ImpulseDirection)
 {
 	return false;
-}
-
-void AEODCharacterBase::PlayStunAnimation_Implementation()
-{
-}
-
-void AEODCharacterBase::StopStunAnimation_Implementation()
-{
 }
 
 void AEODCharacterBase::PushBack_Implementation(const FVector& ImpulseDirection)
@@ -1008,7 +1002,7 @@ UGameplaySkillBase* AEODCharacterBase::GetCurrentActiveSkill() const
 	return nullptr;
 }
 
-FLastUsedSkillInfo AEODCharacterBase::BP_GetLastUsedSkill()
+const FLastUsedSkillInfo& AEODCharacterBase::BP_GetLastUsedSkill() const
 {
 	return GetLastUsedSkill();
 }

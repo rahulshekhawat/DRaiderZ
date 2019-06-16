@@ -230,7 +230,9 @@ struct EOD_API FLastUsedSkillInfo
 		LastUsedSkillID = NAME_None;
 	}
 
-	FLastUsedSkillInfo(FName SkillID, bool bWasInterrupted) : LastUsedSkillID(SkillID) , bInterrupted(bWasInterrupted)
+	FLastUsedSkillInfo(FName SkillID, bool bWasInterrupted) :
+		LastUsedSkillID(SkillID),
+		bInterrupted(bWasInterrupted)
 	{
 	}
 };
