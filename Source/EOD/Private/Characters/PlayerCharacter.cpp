@@ -78,8 +78,8 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(APlayerCharacter, PrimaryWeaponID);
-	DOREPLIFETIME(APlayerCharacter, SecondaryWeaponID);
+	// DOREPLIFETIME(APlayerCharacter, PrimaryWeaponID);
+	// DOREPLIFETIME(APlayerCharacter, SecondaryWeaponID);
 	// DOREPLIFETIME(APlayerCharacter, LastAttackResponses);
 
 }
@@ -220,7 +220,8 @@ void APlayerCharacter::AddSecondaryWeapon(FName WeaponID)
 		RemovePrimaryWeapon();
 		// RemovePrimaryWeaponFromDataAsset();
 	}
-	SecondaryWeaponID = WeaponID;
+	EquippedWeapons.SetSecondaryWeaponID(WeaponID);
+	// SecondaryWeaponID = WeaponID;
 	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
 
 	
@@ -1033,7 +1034,8 @@ void APlayerCharacter::OnRep_LastAttackResponses(const TArray<FAttackResponse>& 
 
 void APlayerCharacter::OnRep_PrimaryWeaponID()
 {
-	SetCurrentPrimaryWeapon(PrimaryWeaponID);
+	const FWeaponSlot& CurrentWeaponSlot = EquippedWeapons.GetCurrentWeaponSlot();
+	SetCurrentPrimaryWeapon(CurrentWeaponSlot.PrimaryWeaponID);
 }
 
 void APlayerCharacter::OnRep_SecondaryWeaponID()

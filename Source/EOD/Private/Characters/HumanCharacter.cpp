@@ -10,6 +10,7 @@
 #include "PlayerStatsComponent.h"
 #include "EODPlayerController.h"
 
+#include "UnrealNetwork.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -50,6 +51,9 @@ AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) : 
 void AHumanCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AHumanCharacter, ArmorSlot);
+	DOREPLIFETIME(AHumanCharacter, EquippedWeapons);
 }
 
 void AHumanCharacter::PostInitializeComponents()
@@ -69,9 +73,12 @@ void AHumanCharacter::PostInitializeComponents()
 	PrimaryWeapon = World->SpawnActor<APrimaryWeapon>(APrimaryWeapon::StaticClass(), SpawnInfo);
 	SecondaryWeapon = World->SpawnActor<ASecondaryWeapon>(ASecondaryWeapon::StaticClass(), SpawnInfo);
 
+
+	const FWeaponSlot& WepSlot = EquippedWeapons.GetCurrentWeaponSlot();
+
 	// @note Set secondary weapon first and primary weapon later during initialization
-	SetCurrentSecondaryWeapon(SecondaryWeaponID);
-	SetCurrentPrimaryWeapon(PrimaryWeaponID);
+	SetCurrentSecondaryWeapon(WepSlot.SecondaryWeaponID);
+	SetCurrentPrimaryWeapon(WepSlot.PrimaryWeaponID);
 
 	AddArmor(ArmorSlot.ChestArmorID);
 	AddArmor(ArmorSlot.HandsArmorID);
@@ -291,7 +298,7 @@ void AHumanCharacter::SetCurrentPrimaryWeapon(const FName WeaponID)
 		RemoveSecondaryWeapon();
 	}
 	PrimaryWeapon->OnEquip(WeaponID, WeaponData);
-	PrimaryWeaponID = WeaponID;
+	EquippedWeapons.SetPrimaryWeaponID(WeaponID);
 
 	LoadAnimationReferencesForWeapon(WeaponData->WeaponType);
 	// UpdateCurrentWeaponAnimationType();
@@ -321,7 +328,7 @@ void AHumanCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 	{
 		RemovePrimaryWeapon();
 	}
-	SecondaryWeaponID = WeaponID;
+	EquippedWeapons.SetSecondaryWeaponID(WeaponID);
 	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
 
 
@@ -331,7 +338,7 @@ void AHumanCharacter::SetCurrentSecondaryWeapon(const FName WeaponID)
 void AHumanCharacter::RemovePrimaryWeapon()
 {
 	// OnPrimaryWeaponUnequipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
-	PrimaryWeaponID = NAME_None;
+	EquippedWeapons.SetPrimaryWeaponID(NAME_None);
 	// PrimaryWeaponDataAsset = nullptr;
 
 	/*
@@ -346,7 +353,7 @@ void AHumanCharacter::RemovePrimaryWeapon()
 void AHumanCharacter::RemoveSecondaryWeapon()
 {
 	// OnSecondaryWeaponUnequipped.Broadcast(SecondaryWeaponID, SecondaryWeaponDataAsset);
-	SecondaryWeaponID = NAME_None;
+	EquippedWeapons.SetSecondaryWeaponID(NAME_None);
 	// SecondaryWeaponDataAsset = nullptr;
 
 	/*
@@ -449,6 +456,10 @@ void AHumanCharacter::RemoveArmor(EArmorType ArmorType)
 	{
 		PlayerStats->RemoveArmorStats(ArmorType);
 	}
+}
+
+void AHumanCharacter::ToggleWeapon()
+{
 }
 
 bool AHumanCharacter::CanDodge() const

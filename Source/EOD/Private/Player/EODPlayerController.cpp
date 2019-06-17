@@ -430,7 +430,11 @@ void AEODPlayerController::TogglePlayerJournalUI()
 
 void AEODPlayerController::TogglePlayerWeapon()
 {
-	//~ @todo
+	AHumanCharacter* HumanChar = Cast<AHumanCharacter>(EODCharacter);
+	if (IsValid(HumanChar))
+	{
+		HumanChar->ToggleWeapon();
+	}
 }
 
 void AEODPlayerController::OnPressedForward()

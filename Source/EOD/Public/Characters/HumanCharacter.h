@@ -23,10 +23,10 @@ struct EOD_API FWeaponSlot
 {
 	GENERATED_USTRUCT_BODY()
 		
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FName PrimaryWeaponID;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FName SecondaryWeaponID;
 	
 	FWeaponSlot() :
@@ -41,16 +41,16 @@ struct EOD_API FArmorSlot
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FName ChestArmorID;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FName HandsArmorID;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FName LegsArmorID;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FName FeetArmorID;
 
 	FArmorSlot() :
@@ -67,15 +67,44 @@ struct EOD_API FEquippedWeapons
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FWeaponSlot PrimaryWeaponSlot;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FWeaponSlot SecondaryWeaponSlot;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	uint8 CurrentSlotIndex;
 	
+	const FWeaponSlot& GetCurrentWeaponSlot() const
+	{
+		return CurrentSlotIndex == 1 ? SecondaryWeaponSlot : PrimaryWeaponSlot;
+	}
+
+	void SetPrimaryWeaponID(FName WeaponID)
+	{
+		if (CurrentSlotIndex == 1)
+		{
+			SecondaryWeaponSlot.PrimaryWeaponID = WeaponID;
+		}
+		else
+		{
+			PrimaryWeaponSlot.PrimaryWeaponID = WeaponID;
+		}
+	}
+
+	void SetSecondaryWeaponID(FName WeaponID)
+	{
+		if (CurrentSlotIndex == 1)
+		{
+			SecondaryWeaponSlot.SecondaryWeaponID = WeaponID;
+		}
+		else
+		{
+			PrimaryWeaponSlot.SecondaryWeaponID = WeaponID;
+		}
+	}
+
 	FEquippedWeapons() :
 		CurrentSlotIndex(0)
 	{
@@ -224,10 +253,15 @@ public:
 	// --------------------------------------
 
 	/** Returns true if primary weapon is equipped */
-	FORCEINLINE bool IsPrimaryWeaponEquippped() const;
+	inline bool IsPrimaryWeaponEquipped() const;
 
 	/** Returns true if secondary weapon is equipped */
-	FORCEINLINE bool IsSecondaryWeaponEquipped() const;
+	inline bool IsSecondaryWeaponEquipped() const;
+
+	// FORCEINLINE bool IsPrimaryWeaponEquipped() const;
+
+	/** Returns true if secondary weapon is equipped */
+	// FORCEINLINE bool IsSecondaryWeaponEquipped() const;
 
 	/** Returns primary weapon actor */
 	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
@@ -258,6 +292,8 @@ public:
 	virtual void AddArmor(FName ArmorID);
 	virtual void RemoveArmor(EArmorType ArmorType);
 
+	virtual void ToggleWeapon();
+
 protected:
 
 	/** An actor for primary weapon equipped by the player */
@@ -269,17 +305,17 @@ protected:
 	ASecondaryWeapon* SecondaryWeapon;
 
 	/** ID of the current primary weapon equipped. It will be NAME_None if no primary weapon is equipped */
-	UPROPERTY(ReplicatedUsing = OnRep_PrimaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
-	FName PrimaryWeaponID;
+	// UPROPERTY(ReplicatedUsing = OnRep_PrimaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
+	// FName PrimaryWeaponID;
 
 	/** ID of current secondary weapon equipped. It will be NAME_None if no secondary weapon is equipped */
-	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
-	FName SecondaryWeaponID;
+	// UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
+	// FName SecondaryWeaponID;
 
-	UPROPERTY(ReplicatedUsing = OnRep_ArmorSlot, EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(ReplicatedUsing = OnRep_ArmorSlot, EditAnywhere, BlueprintReadOnly)
 	FArmorSlot ArmorSlot;
 
-	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapons, EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapons, EditAnywhere, BlueprintReadOnly)
 	FEquippedWeapons EquippedWeapons;
 
 public:
@@ -490,7 +526,8 @@ inline void AHumanCharacter::AddAnimationSoftObjectPathToArray(const TSoftObject
 	}
 }
 
-FORCEINLINE bool AHumanCharacter::IsPrimaryWeaponEquippped() const
+/*
+FORCEINLINE bool AHumanCharacter::IsPrimaryWeaponEquipped() const
 {
 	return PrimaryWeaponID != NAME_None && PrimaryWeapon->IsAttachedToCharacterOwner();
 }
@@ -498,6 +535,19 @@ FORCEINLINE bool AHumanCharacter::IsPrimaryWeaponEquippped() const
 FORCEINLINE bool AHumanCharacter::IsSecondaryWeaponEquipped() const
 {
 	return SecondaryWeaponID != NAME_None && SecondaryWeapon->IsAttachedToCharacterOwner();
+}
+*/
+
+inline bool AHumanCharacter::IsPrimaryWeaponEquipped() const
+{
+	const FWeaponSlot& WepSlot = EquippedWeapons.GetCurrentWeaponSlot();
+	return WepSlot.PrimaryWeaponID != NAME_None && PrimaryWeapon && PrimaryWeapon->IsAttachedToCharacterOwner();
+}
+
+inline bool AHumanCharacter::IsSecondaryWeaponEquipped() const
+{
+	const FWeaponSlot& WepSlot = EquippedWeapons.GetCurrentWeaponSlot();
+	return WepSlot.SecondaryWeaponID != NAME_None && SecondaryWeapon && SecondaryWeapon->IsAttachedToCharacterOwner();
 }
 
 FORCEINLINE APrimaryWeapon* AHumanCharacter::GetPrimaryWeapon() const
@@ -512,7 +562,7 @@ FORCEINLINE ASecondaryWeapon* AHumanCharacter::GetSecondaryWeapon() const
 
 FORCEINLINE bool AHumanCharacter::CanToggleSheathe() const
 {
-	return IsIdleOrMoving() && IsPrimaryWeaponEquippped();
+	return IsIdleOrMoving() && IsPrimaryWeaponEquipped();
 }
 
 FORCEINLINE bool AHumanCharacter::IsSwitchingWeapon() const

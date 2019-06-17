@@ -517,7 +517,7 @@ FORCEINLINE void APlayerCharacter::SetPrimaryWeaponID(FName NewWeaponID)
 	}
 	else
 	{
-		PrimaryWeaponID = NewWeaponID;
+		EquippedWeapons.SetPrimaryWeaponID(NewWeaponID);
 		SetCurrentPrimaryWeapon(NewWeaponID);
 	}
 }
