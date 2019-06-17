@@ -1317,6 +1317,7 @@ bool AEODCharacterBase::Server_StartBlockingAttacks_Validate()
 
 void AEODCharacterBase::Server_StopBlockingAttacks_Implementation()
 {
+	StopBlockingDamage();
 	ResetState();
 }
 
