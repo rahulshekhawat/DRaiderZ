@@ -171,4 +171,40 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Utility|Colors", BlueprintReadOnly, DisplayName = "NPC Critically Damaged Text Color")
 	FLinearColor NPCCritDamagedTextColor;
 
+	// ----
+	
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void PlayCameraShake(ECameraShakeType CameraShakeType, const FVector& EpiCenter);
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Camera", BlueprintReadOnly)
+	TSubclassOf<UCameraShake> LowCamShakeClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Camera", BlueprintReadOnly)
+	TSubclassOf<UCameraShake> MediumCamShakeClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Camera", BlueprintReadOnly)
+	TSubclassOf<UCameraShake> HighCamShakeClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Camera", BlueprintReadOnly)
+	float CamShakeInnerRadius;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Utility|Camera", BlueprintReadOnly)
+	float CamShakeOuterRadius;
+
+	// ----
+	
+	/**
+	 * Displays damage numbers on player screen
+	 * @param DamageValue	The amount by which the character was damaged
+	 * @param bCritHit		True if the damage was critical
+	 * @param DamagedActor	The actor that was damaged
+	 * @param HitLocation	The hit position (in world space)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void DisplayGameplayText(
+		const FString& GameplayText,
+		const AActor* DamagedActor,
+		const AActor* DamageInstigator,
+		const FVector& HitLocation);
+
 };

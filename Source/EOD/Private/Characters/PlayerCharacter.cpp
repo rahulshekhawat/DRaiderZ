@@ -280,11 +280,19 @@ TSharedPtr<FAttackInfo> APlayerCharacter::GetAttackInfoPtr(const FName& SkillGro
 void APlayerCharacter::PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors)
 {
 	LastAttackResponses = AttackResponses;
+	if (AttackResponses.Num() == 0)
+	{
+		return;
+	}
+
+	//~ @todo
 	/*
 	if (AttackResponses.Num() == 0 && GameplayAudioComponent)
 	{
-		GameplayAudioComponent->SetSound(GetMeleeHitMissSound());
+		USoundBase* HitMissSound = GetMeleeHitMissSound();
+		GameplayAudioComponent->SetSound(HitMissSound);
 		GameplayAudioComponent->Play();
+		return;
 	}
 	*/
 }

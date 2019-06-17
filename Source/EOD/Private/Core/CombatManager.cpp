@@ -17,8 +17,6 @@ ACombatManager::ACombatManager(const FObjectInitializer & ObjectInitializer) : S
 
 	SetReplicates(false);
 	SetReplicateMovement(false);
-	PhysicalCritMultiplier = 1.6f;
-	MagickalCritMultiplier = 1.4f;
 }
 
 void ACombatManager::BeginPlay()

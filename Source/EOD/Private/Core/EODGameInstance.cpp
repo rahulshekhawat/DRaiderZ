@@ -20,6 +20,9 @@ UEODGameInstance::UEODGameInstance(const FObjectInitializer& ObjectInitializer) 
 {
 	GameTitle = FText::FromString("Dark RaiderZ");
 	StartupMapName = FName("Level0_Haddon");
+
+	CamShakeInnerRadius = 500.f;
+	CamShakeOuterRadius = 1000.f;
 }
 
 void UEODGameInstance::Init()
@@ -159,7 +162,12 @@ void UEODGameInstance::OnPostLoadMap(UWorld* WorldObj)
 {
 }
 
-void UEODGameInstance::DisplayDamageNumbers(const float DamageValue, const bool bCritHit, const AActor* DamagedActor, const AActor* DamageInstigator, const FVector& HitLocation)
+void UEODGameInstance::DisplayDamageNumbers(
+	const float DamageValue,
+	const bool bCritHit,
+	const AActor* DamagedActor,
+	const AActor* DamageInstigator,
+	const FVector& HitLocation)
 {
 	UClass* WidgetClass = DamageWidgetClass.Get();
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetFirstLocalPlayerController());
@@ -199,4 +207,31 @@ void UEODGameInstance::DisplayDamageNumbers(const float DamageValue, const bool 
 			DamageWidget->AddToViewport(-10);
 		}
 	}
+}
+
+void UEODGameInstance::PlayCameraShake(ECameraShakeType CameraShakeType, const FVector& EpiCenter)
+{
+	switch (CameraShakeType)
+	{
+	case ECameraShakeType::Weak:
+		UGameplayStatics::PlayWorldCameraShake(this, LowCamShakeClass, EpiCenter, CamShakeInnerRadius, CamShakeOuterRadius);
+		break;
+	case ECameraShakeType::Medium:
+		UGameplayStatics::PlayWorldCameraShake(this, MediumCamShakeClass, EpiCenter, CamShakeInnerRadius, CamShakeOuterRadius);
+		break;
+	case ECameraShakeType::Strong:
+		UGameplayStatics::PlayWorldCameraShake(this, HighCamShakeClass, EpiCenter, CamShakeInnerRadius, CamShakeOuterRadius);
+		break;
+	default:
+		break;
+	}
+}
+
+void UEODGameInstance::DisplayGameplayText(
+	const FString& GameplayText,
+	const AActor* DamagedActor,
+	const AActor* DamageInstigator,
+	const FVector& HitLocation)
+{
+	//~ @todo
 }
