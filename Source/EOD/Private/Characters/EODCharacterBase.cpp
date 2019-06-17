@@ -742,7 +742,8 @@ float AEODCharacterBase::GetActualDamage(
 				DamageReductionOnBlock = StatsComp->PhysicalDamageReductionOnBlock.GetValue();
 			}
 		}
-		ActualDamage = ActualDamage * (1 - DamageReductionOnBlock);
+		DamageReductionOnBlock = DamageReductionOnBlock > 100.f ? 100.f : DamageReductionOnBlock;
+		ActualDamage = ActualDamage * (1 - DamageReductionOnBlock / 100.f);
 	}
 
 	return ActualDamage;

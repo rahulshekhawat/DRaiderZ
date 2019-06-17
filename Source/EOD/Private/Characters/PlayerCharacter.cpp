@@ -712,10 +712,6 @@ void APlayerCharacter::OnRep_SecondaryWeaponID()
 {
 }
 
-void APlayerCharacter::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo)
-{
-}
-
 void APlayerCharacter::OnRep_CharacterStateInfo(const FCharacterStateInfo& OldStateInfo)
 {
 	// If the new character state is IdleWalkRun but the old character state wasn't idle walk run

@@ -14,10 +14,10 @@ AEODAIControllerBase::AEODAIControllerBase(const FObjectInitializer& ObjectIniti
 {
 	StatsComponent = ObjectInitializer.CreateDefaultSubobject<UAIStatsComponent>(this, AEODAIControllerBase::StatsComponentName);
 
-	AggroActivationRadius = 500;
-	AggroAreaRadius = 5000;
-	MaxEnemyChaseRadius = 1000;
-	WanderRadius = 3500;
+	AggroActivationRadius = 1000;
+	AggroAreaRadius = 10000;
+	MaxEnemyChaseRadius = 1500;
+	WanderRadius = 5000;
 }
 
 void AEODAIControllerBase::PostInitializeComponents()
