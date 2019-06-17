@@ -259,11 +259,6 @@ public:
 	/** Returns true if secondary weapon is equipped */
 	inline bool IsSecondaryWeaponEquipped() const;
 
-	// FORCEINLINE bool IsPrimaryWeaponEquipped() const;
-
-	/** Returns true if secondary weapon is equipped */
-	// FORCEINLINE bool IsSecondaryWeaponEquipped() const;
-
 	/** Returns primary weapon actor */
 	FORCEINLINE APrimaryWeapon* GetPrimaryWeapon() const;
 
@@ -291,6 +286,7 @@ public:
 
 	//~ @note We're not using helm armor
 	virtual void AddArmor(FName ArmorID);
+
 	virtual void RemoveArmor(EArmorType ArmorType);
 
 	virtual void ToggleWeapon();
@@ -304,14 +300,6 @@ protected:
 	/** An actor for secondary weapon equipped by the player */
 	UPROPERTY(Transient)
 	ASecondaryWeapon* SecondaryWeapon;
-
-	/** ID of the current primary weapon equipped. It will be NAME_None if no primary weapon is equipped */
-	// UPROPERTY(ReplicatedUsing = OnRep_PrimaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
-	// FName PrimaryWeaponID;
-
-	/** ID of current secondary weapon equipped. It will be NAME_None if no secondary weapon is equipped */
-	// UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeaponID, EditDefaultsOnly, BlueprintReadOnly)
-	// FName SecondaryWeaponID;
 
 	UPROPERTY(ReplicatedUsing = OnRep_ArmorSlot, EditAnywhere, BlueprintReadOnly)
 	FArmorSlot ArmorSlot;
@@ -542,18 +530,6 @@ inline void AHumanCharacter::AddAnimationSoftObjectPathToArray(const TSoftObject
 		PathArray.Add(MontageSoftPtr.ToSoftObjectPath());
 	}
 }
-
-/*
-FORCEINLINE bool AHumanCharacter::IsPrimaryWeaponEquipped() const
-{
-	return PrimaryWeaponID != NAME_None && PrimaryWeapon->IsAttachedToCharacterOwner();
-}
-
-FORCEINLINE bool AHumanCharacter::IsSecondaryWeaponEquipped() const
-{
-	return SecondaryWeaponID != NAME_None && SecondaryWeapon->IsAttachedToCharacterOwner();
-}
-*/
 
 inline bool AHumanCharacter::IsPrimaryWeaponEquipped() const
 {

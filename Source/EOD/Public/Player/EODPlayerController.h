@@ -61,9 +61,13 @@ public:
 
 	FORCEINLINE AEODCharacterBase* GetEODCharacter() const { return EODCharacter; }
 
+	void AddEXP(int32 Value);
+
 protected:
 
 	void SetGender(ECharacterGender NewGender);
+
+	void SetLeveupEXP(int32 EXP);
 
 private:
 
@@ -73,6 +77,9 @@ private:
 	/** The gender of the pawn that the player selected during player creation */
 	UPROPERTY(Transient)
 	ECharacterGender Gender;
+	
+	UPROPERTY(Transient)
+	int32 LeveupEXP;
 
 public:
 

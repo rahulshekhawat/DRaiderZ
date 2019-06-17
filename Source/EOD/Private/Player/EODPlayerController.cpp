@@ -155,7 +155,7 @@ void AEODPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// LoadPlayerState();
+	LoadPlayerState();
 	InitializeWidgets();
 	SwitchToGameInput();
 }
@@ -178,26 +178,90 @@ void AEODPlayerController::SetPawn(APawn* InPawn)
 
 void AEODPlayerController::LoadPlayerState()
 {
-	if (IsLocalController())
+	if (IsLocalController() && EODCharacter)
 	{
-		UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
-		UPlayerSaveGame* PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
+		UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
+		UPlayerSaveGame* SaveGame = EODGI ? EODGI->GetCurrentPlayerSaveGameObject() : nullptr;
+		UDataTable* PSDataTable = EODGI ? EODGI->PlayerStatsDataTable : nullptr;
 
-		if (IsValid(PlayerSaveGame))
+		if (!SaveGame)
 		{
-			SetGender(PlayerSaveGame->CharacterGender);
+			return;
+		}
+
+		// Load player gender
+		SetGender(SaveGame->CharacterGender);
+
+		// Load player level and exp
+		if (SaveGame->CharacterLevel <= 0)
+		{
+			SaveGame->CharacterLevel = 1;
+			if (PSDataTable)
+			{
+				FName LevelName = FName(*FString::FromInt(SaveGame->CharacterLevel + 1));
+				FPlayerStatsTableRow* TableRow = PSDataTable->FindRow<FPlayerStatsTableRow>(LevelName, FString("APlayerCharacter::LoadCharacterState()"));
+				if (TableRow)
+				{
+					SetLeveupEXP(TableRow->ExpRequired);
+					SaveGame->LevelupEXP = TableRow->ExpRequired;
+				}
+			}
+		}
+		else if (SaveGame->CharacterLevel >= 100)
+		{
+			SaveGame->CharacterLevel = 99;
+			SetLeveupEXP(0);
+			SaveGame->LevelupEXP = 0;
+		}
+		else
+		{
+			SetLeveupEXP(SaveGame->LevelupEXP);
+		}
+
+		if (HUDWidget && EODGI)
+		{
+			FString PlayerName = EODGI->GetCurrentPlayerSaveGameName();
+			HUDWidget->SetPlayerName(PlayerName);
+
+			UPlayerStatsWidget* PSWidget = HUDWidget->GetPlayerStatsWidget();
+			if (PSWidget)
+			{
+				PSWidget->SetPlayerName(PlayerName);
+
+				FString Type = FString("Human");
+				if (Gender == ECharacterGender::Female)
+				{
+					Type += FString(" Female");
+				}
+				else if (Gender == ECharacterGender::Male)
+				{
+					Type += FString(" Male");
+				}
+				PSWidget->SetPlayerType(Type);
+			}
 		}
 	}
+}
 
-	/*
-	UEODGameInstance* GameInstance = Cast<UEODGameInstance>(GetGameInstance());
-	UPlayerSaveGame* PlayerSaveGame = GameInstance ? GameInstance->GetCurrentPlayerSaveGameObject() : nullptr;
-	if (IsValid(PlayerSaveGame) && IsValid(SkillTreeComponent))
+void AEODPlayerController::AddEXP(int32 Value)
+{
+	SetLeveupEXP(LeveupEXP - Value);
+}
+
+void AEODPlayerController::SetLeveupEXP(int32 EXP)
+{
+	//~ @todo Level up if LevelupEXP goes below zero
+
+	LeveupEXP = EXP;
+
+	if (HUDWidget)
 	{
-		
-		// SkillTreeComponent->
+		UPlayerStatsWidget* PlayerStatsWidget = HUDWidget->GetPlayerStatsWidget();
+		if (PlayerStatsWidget)
+		{
+			PlayerStatsWidget->UpdateEXP(EXP);
+		}
 	}
-	*/
 }
 
 void AEODPlayerController::SetGender(ECharacterGender NewGender)

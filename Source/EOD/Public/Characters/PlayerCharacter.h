@@ -269,7 +269,10 @@ public:
 
 	FORCEINLINE bool SkillHasDirectionalAnimations() const;
 
-
+private:
+	
+	UPROPERTY(Transient)
+	bool bSkillHasDirectionalAnimations;
 
 public:
 
@@ -278,18 +281,6 @@ public:
 	// --------------------------------------
 
 	virtual void SetCharacterLevel(int32 NewLevel) override;
-
-	void AddEXP(int32 Value);
-
-private:
-
-	void SetLeveupEXP(int32 EXP);
-
-	int32 LeveupEXP;
-
-	UPROPERTY(Transient)
-	bool bSkillHasDirectionalAnimations;
-
 
 public:
 

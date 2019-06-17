@@ -254,58 +254,10 @@ void APlayerCharacter::LoadCharacterState()
 {
 	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
 	UPlayerSaveGame* SaveGame = EODGI ? EODGI->GetCurrentPlayerSaveGameObject() : nullptr;
-	UDataTable* PSDataTable = EODGI ? EODGI->PlayerStatsDataTable : nullptr;
-	
-	if (SaveGame->CharacterLevel <= 0)
-	{
-		SaveGame->CharacterLevel = 1;
-		if (PSDataTable)
-		{
-			FName LevelName = FName(*FString::FromInt(SaveGame->CharacterLevel + 1));
-			FPlayerStatsTableRow* TableRow = PSDataTable->FindRow<FPlayerStatsTableRow>(LevelName, FString("APlayerCharacter::LoadCharacterState()"));
-			if (TableRow)
-			{
-				SetLeveupEXP(TableRow->ExpRequired);
-				SaveGame->LevelupEXP = TableRow->ExpRequired;
-			}
-		}
-	}
-	else if (SaveGame->CharacterLevel >= 100)
-	{
-		SaveGame->CharacterLevel = 99;
-		SetLeveupEXP(0);
-		SaveGame->LevelupEXP = 0;
-	}
-	else
-	{
-		SetLeveupEXP(SaveGame->LevelupEXP);
-	}
 
-	SetCharacterLevel(SaveGame->CharacterLevel);
-
-	AEODPlayerController* EODPC = Cast<AEODPlayerController>(Controller);
-	if (EODPC && EODPC->GetHUDWidget() && EODGI)
+	if (SaveGame)
 	{
-		FString PlayerName = EODGI->GetCurrentPlayerSaveGameName();
-		EODPC->GetHUDWidget()->SetPlayerName(PlayerName);
-
-		UPlayerStatsWidget* PSWidget = EODPC->GetHUDWidget()->GetPlayerStatsWidget();
-		if (PSWidget)
-		{
-			PSWidget->SetPlayerName(PlayerName);
-
-			FString Type = FString("Human");
-			ECharacterGender CharGender = GetCharacterGender();
-			if (CharGender == ECharacterGender::Female)
-			{
-				Type += FString(" Female");
-			}
-			else if (CharGender == ECharacterGender::Male)
-			{
-				Type += FString(" Male");
-			}
-			PSWidget->SetPlayerType(Type);
-		}
+		SetCharacterLevel(SaveGame->CharacterLevel);
 	}
 }
 
@@ -652,28 +604,6 @@ void APlayerCharacter::SetCharacterLevel(int32 NewLevel)
 		}
 
 		PC->GetHUDWidget()->SetPlayerLevel(NewLevel);
-	}
-}
-
-void APlayerCharacter::AddEXP(int32 Value)
-{
-	SetLeveupEXP(LeveupEXP - Value);
-}
-
-void APlayerCharacter::SetLeveupEXP(int32 EXP)
-{
-	//~ @todo Level up if LevelupEXP goes below zero
-
-	LeveupEXP = EXP;
-
-	AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
-	if (PC && PC->GetHUDWidget())
-	{
-		UPlayerStatsWidget* PlayerStatsWidget = PC->GetHUDWidget()->GetPlayerStatsWidget();
-		if (PlayerStatsWidget)
-		{
-			PlayerStatsWidget->UpdateEXP(EXP);
-		}
 	}
 }
 
