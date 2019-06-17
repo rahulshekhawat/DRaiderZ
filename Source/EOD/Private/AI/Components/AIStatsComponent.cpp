@@ -105,6 +105,5 @@ void UAIStatsComponent::LoadAIStats()
 	MagickalDamageReductionOnBlock.ForceBroadcastDelegate();
 
 	CCImmunities.SetValue(TableRow->CrowdControlImmunities);
-	CCImmunities.ForceBroadcastDelegate();
 
 }

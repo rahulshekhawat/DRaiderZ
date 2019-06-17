@@ -95,7 +95,6 @@ public:
 	~FPrimaryStat() { ; }
 
 	FPrimaryStat() :
-		bDirty(false),
 		MaxValue_NoMod(1),
 		MaxValue(1),
 		CurrentValue(0)
@@ -113,8 +112,13 @@ public:
 	/** Directly set the maximum value that doesn't have any modifier applied */
 	void SetMaxValue(int32 InValue)
 	{
-		MaxValue_NoMod = InValue <= 0 ? 1 : InValue;
-		bDirty = true;
+		InValue = InValue <= 0 ? 1 : InValue;
+		if (MaxValue_NoMod != InValue)
+		{
+			MaxValue_NoMod = InValue;
+			RecalculateMaxValue();
+			OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
+		}
 	}
 
 	void ModifyCurrentValue(int32 InValue, bool bPercent = false)
@@ -138,8 +142,7 @@ public:
 	void RefillCurrentValue()
 	{
 		int32 Max = GetMaxValue();
-		CurrentValue = Max;
-		OnStatValueChanged.Broadcast(Max, CurrentValue);
+		SetCurrentValue(Max);
 	}
 
 	void SetCurrentValue(int32 InValue)
@@ -149,30 +152,9 @@ public:
 		OnStatValueChanged.Broadcast(Max, CurrentValue);
 	}
 
-	int32 RecalculateMaxValue()
-	{
-		Modifiers.ValueSort([&](const FStatModifier& Mod1, const FStatModifier& Mod2) { return Mod1 < Mod2; });
+	int32 GetMaxValue() const { return MaxValue; }
 
-		MaxValue = MaxValue_NoMod;
-		for (const TPair<uint32, FStatModifier>& ModPair : Modifiers)
-		{
-			if (ModPair.Value.ModType == EStatModType::Flat)
-			{
-				MaxValue += ModPair.Value.Value;
-			}
-			else if (ModPair.Value.ModType == EStatModType::Percent)
-			{
-				MaxValue += (MaxValue * (ModPair.Value.Value / 100.f));
-			}
-		}
-
-		OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
-
-		bDirty = false;
-		return MaxValue;
-	}
-
-	int32 GetMaxValue() { return bDirty ? RecalculateMaxValue() : MaxValue; }
+	// int32 GetMaxValue() { return bDirty ? RecalculateMaxValue() : MaxValue; }
 
 	int32 GetCurrentValue() const { return CurrentValue; }
 
@@ -190,7 +172,7 @@ public:
 			{
 				Modifiers.Add(UniqueID, NewMod);
 			}
-			bDirty = true;
+			RecalculateMaxValue();
 		}
 	}
 
@@ -203,7 +185,7 @@ public:
 			if (Modifiers.Contains(UniqueID))
 			{
 				Modifiers.Remove(UniqueID);
-				bDirty = true;
+				RecalculateMaxValue();
 			}
 		}
 	}
@@ -219,7 +201,29 @@ public:
 
 private:
 
-	bool bDirty;
+	int32 RecalculateMaxValue()
+	{
+		Modifiers.ValueSort([&](const FStatModifier& Mod1, const FStatModifier& Mod2) { return Mod1 < Mod2; });
+
+		int32 MaxFlat = MaxValue_NoMod;
+		float FlatPercent = 0.f;
+
+		for (const TPair<uint32, FStatModifier>& ModPair : Modifiers)
+		{
+			if (ModPair.Value.ModType == EStatModType::Flat)
+			{
+				MaxFlat += ModPair.Value.Value;
+			}
+			else if (ModPair.Value.ModType == EStatModType::Percent)
+			{
+				FlatPercent += ModPair.Value.Value;
+			}
+		}
+
+		MaxValue = MaxFlat + (MaxFlat * (FlatPercent / 100.f));
+		return MaxValue;
+	}
+
 	int32 MaxValue_NoMod;
 
 	UPROPERTY()
@@ -446,8 +450,6 @@ public:
 			}
 		}
 
-		OnStatValueChanged.Broadcast(Value);
-
 		bDirty = false;
 		return Value;
 	}
@@ -488,14 +490,6 @@ public:
 				RecalculateValue();
 			}
 		}
-	}
-
-	FOnCCImmunitiesChangedMCDelegate OnStatValueChanged;
-
-	void ForceBroadcastDelegate()
-	{
-		uint8 CV = GetValue();
-		OnStatValueChanged.Broadcast(CV);
 	}
 
 	bool HasCCImmunity(ECrowdControlEffect CCImmunity) const
