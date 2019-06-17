@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "WeaponBase.h"
 #include "HumanCharacter.h"
-#include "EODBlueprintFunctionLibrary.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "PlayerCharacter.generated.h"
@@ -24,9 +23,6 @@ class USphereComponent;
 class UDialogueWindowWidget;
 class UWeaponDataAsset;
 class APlayerCharacter;
-
-/** Delegate for when a player changes it's weapon */
-// DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponChangedMCDelegate, FName, WeaponID, UWeaponDataAsset*, WeaponDataAsset);
 
 /**
  * PlayerCharacter is the base class for playable characters
@@ -77,15 +73,6 @@ public:
 
 	/** [server] Called to process the post attack event */
 	virtual void PostAttack(const TArray<FAttackResponse>& AttackResponses, const TArray<AActor*> HitActors);
-
-	/** Returns the sound that should be played when this character hits a physical surface */
-	virtual USoundBase* GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
-
-	/** Returns the sound that should be played when this character fails to hit anything */
-	virtual USoundBase* GetMeleeHitMissSound() const override;
-
-	UPROPERTY(ReplicatedUsing = OnRep_LastAttackResponses)
-	TArray<FAttackResponse> LastAttackResponses;
 
 	// --------------------------------------
 	//	Components
@@ -157,13 +144,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Sounds")
 	void PlaySystemSound(USoundBase* SoundToPlay);
 
-	inline USoundBase* GetGreatswordHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
-	inline USoundBase* GetWarhammerHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
-	inline USoundBase* GetLongswordHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
-	inline USoundBase* GetMaceHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
-	inline USoundBase* GetStaffHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
-	inline USoundBase* GetDaggerHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
-
 	// --------------------------------------
 	//  Skill System
 	// --------------------------------------
@@ -214,83 +194,64 @@ public:
 
 	/** Trigger interaction with an NPC or an in-game interactive object */
 	virtual void TriggerInteraction() override;
-
 	virtual void StartInteraction() override;
-
 	virtual void UpdateInteraction() override;
-
 	virtual void CancelInteraction() override;
-
 	virtual void FinishInteraction() override;
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Character Interaction")
-	TArray<AActor*> OverlappingInteractiveActors;
-
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Character Interaction")
-	AActor* ActiveInteractiveActor;
 
 	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
 	void DisplayDialogueWidget(FName DialogueWindowID);
 
 	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
 	void RemoveDialogueWidget();
+	
+	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
+	void FocusCameraOnActor(AActor* TargetActor);
+	
+	/** End any interaction currently in progress */
+	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
+	void EndInteraction();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	void RequestDialogue(AActor* Requestor, FName DialogueWindowID);
+	virtual void RequestDialogue_Implementation(AActor* Requestor, FName DialogueWindowID);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	void FinishDialogue(UDialogueWindowWidget* Widget);
+	virtual void FinishDialogue_Implementation(UDialogueWindowWidget* Widget);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
+	void ExitDialogue(UDialogueWindowWidget* Widget);
+	virtual void ExitDialogue_Implementation(UDialogueWindowWidget* Widget);
+
+protected:
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = PlayerInteraction)
+	TSubclassOf<UDialogueWindowWidget> DialogueWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
+	USoundBase* DialogueTriggeredSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
+	USoundBase* DialogueEndSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
+	USoundBase* InteractiveActorDetectedSound;
+		
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Character Interaction")
+	TArray<AActor*> OverlappingInteractiveActors;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Character Interaction")
+	AActor* ActiveInteractiveActor;
+	
+	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
+	UDialogueWindowWidget* DialogueWidget;
+
+public:
 
 	// --------------------------------------
-	//  Weapon System
+	//  
 	// --------------------------------------
-
-	/*
-	UFUNCTION()
-	void ActivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
-
-	UFUNCTION()
-	void DeactivateStatusEffectFromWeapon(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
-	*/
-
-	/** Add or replace primary weapon with a new weapon */
-	void AddPrimaryWeapon(FName WeaponID);
-
-	/** Add or replace secondary weapon with a new weapon */
-	void AddSecondaryWeapon(FName WeaponID);
-
-	UPROPERTY()
-	int32 ActiveWeaponSlotIndex;
-
-	void AddPrimaryWeaponToCurrentSlot(FName WeaponID);
-
-	void AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
-
-	void AddSecondaryWeaponToCurrentSlot(FName WeaponID);
-
-	void AddSecondaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset);
-
-	void AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex);
-
-	void AddPrimaryWeaponToSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, int32 SlotIndex);
-
-	void AddSecondaryWeaponToSlot(FName WeaponID, int32 SlotIndex);
-
-	void AddSecondaryWeaponToSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, int32 SlotIndex);
-
-	void RemovePrimaryWeaponFromCurrentSlot();
-
-	void RemoveSecondaryWeaponFromCurrentSlot();
-
-	void RemovePrimaryWeaponFromSlot(int32 SlotIndex);
-
-	void RemoveSecondaryWeaponFromSlot(int32 SlotIndex);
-
-	void ToggleWeaponSlot();
-
-
-
-
-	/** [server + local] Change idle-walk-run direction of character */
-	// inline void SetIWRCharMovementDir(ECharMovementDirection NewDirection);
-
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void DisplayStatusMessage(const FString& Message);
 
 	/** Called on an animation montage blending out to clean up, reset, or change any state variables */
 	virtual void OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted) override;
@@ -308,73 +269,7 @@ public:
 
 	FORCEINLINE bool SkillHasDirectionalAnimations() const;
 
-	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
-	UDialogueWindowWidget* DialogueWidget;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = PlayerInteraction)
-	TSubclassOf<UDialogueWindowWidget> DialogueWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
-	USoundBase* DialogueTriggeredSound;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
-	USoundBase* DialogueEndSound;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
-	USoundBase* InteractiveActorDetectedSound;
-
-	// virtual void UpdateInteraction_Implementation();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
-	void RequestDialogue(AActor* Requestor, FName DialogueWindowID);
-
-	virtual void RequestDialogue_Implementation(AActor* Requestor, FName DialogueWindowID);
-
-	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
-	void FocusCameraOnActor(AActor* TargetActor);
-
-	// UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
-	// void UpdateActiveInteraction();
-
-	/** End any interaction currently in progress */
-	UFUNCTION(BlueprintCallable, Category = PlayerInteraction)
-	void EndInteraction();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
-	void FinishDialogue(UDialogueWindowWidget* Widget);
-
-	virtual void FinishDialogue_Implementation(UDialogueWindowWidget* Widget);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerInteraction)
-	void ExitDialogue(UDialogueWindowWidget* Widget);
-
-	virtual void ExitDialogue_Implementation(UDialogueWindowWidget* Widget);
-
-	/*
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
-	FOnWeaponChangedMCDelegate OnPrimaryWeaponEquipped;
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
-	FOnWeaponChangedMCDelegate OnPrimaryWeaponUnequipped;
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
-	FOnWeaponChangedMCDelegate OnSecondaryWeaponEquipped;
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat|Weapons")
-	FOnWeaponChangedMCDelegate OnSecondaryWeaponUnequipped;
-	*/
-
-private:
-
-	TArray<UStatusEffectBase*> ManagedStatusEffectsList;
-
-	TArray<UStatusEffectBase*> InflictedStatusEffectsList;
-
-	// TArray<FCombatEvent> EventsOnUsingSkill;
-	TArray<FOnGameplayEventMCDelegate> EventsOnUsingSkill;
-
-	TArray<FOnGameplayEventMCDelegate> EventsOnSuccessfulSkillAttack;
-	// TArray<FCombatEvent> EventsOnSuccessfulSkillAttack;
 
 public:
 
@@ -392,66 +287,8 @@ private:
 
 	int32 LeveupEXP;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// WEAPONS
-	////////////////////////////////////////////////////////////////////////////////
-private:
-	/** An actor for primary weapon equipped by the player */
-	// UPROPERTY(Transient)
-	// APrimaryWeapon* PrimaryWeapon;
-
-
-	FORCEINLINE void SetPrimaryWeaponID(FName NewWeaponID);
-
-protected:
-
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
-	void EquipPrimaryWeapon(FName WeaponID);
-
-public:
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon Slot")
-	int32 MaxWeaponSlots;
-
-	void SetActiveWeaponSlotIndex(int32 NewSlotIndex);
-
-
-private:
-
-
-	// UPROPERTY()
-	// UWeaponDataAsset* PrimaryWeaponDataAsset;
-
-	// UPROPERTY()
-	// UWeaponDataAsset* SecondaryWeaponDataAsset;
-
 	UPROPERTY(Transient)
 	bool bSkillHasDirectionalAnimations;
-
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skills, meta = (AllowPrivateAccess = "true"))
-	uint8 MaxNumberOfSkills;
-
-
-private:
-
-
-
-
-
-	//~ @note Pressing and releasing skill keys are separate events to support charge events (e.g. charge rage)
-
-	
-
-
-
-	////////////////////////////////////////////////////////////////////////////////
-	// ACTIONS
-	////////////////////////////////////////////////////////////////////////////////
-private:
-
-	/** Display or hide character stats UI */
-	void OnToggleCharacterStatsUI();
 
 
 public:
@@ -489,9 +326,6 @@ protected:
 	//  Network
 	// --------------------------------------
 
-	UFUNCTION()
-	virtual void OnRep_LastAttackResponses(const TArray<FAttackResponse>& OldAttackResponses);
-
 	virtual void OnRep_PrimaryWeaponID() override;
 	virtual	void OnRep_SecondaryWeaponID() override;
 
@@ -508,19 +342,6 @@ protected:
 	virtual bool Server_SetPrimaryWeaponID_Validate(FName NewWeaponID);
 
 };
-
-FORCEINLINE void APlayerCharacter::SetPrimaryWeaponID(FName NewWeaponID)
-{
-	if (Role < ROLE_Authority)
-	{
-		Server_SetPrimaryWeaponID(NewWeaponID);
-	}
-	else
-	{
-		EquippedWeapons.SetPrimaryWeaponID(NewWeaponID);
-		SetCurrentPrimaryWeapon(NewWeaponID);
-	}
-}
 
 template<uint32 SkillButtonIndex>
 inline void APlayerCharacter::PressedSkillKey()
@@ -543,244 +364,4 @@ FORCEINLINE void APlayerCharacter::SetOffSmoothRotation(float DesiredYaw)
 FORCEINLINE bool APlayerCharacter::SkillHasDirectionalAnimations() const
 {
 	return bSkillHasDirectionalAnimations;
-}
-
-inline USoundBase* APlayerCharacter::GetGreatswordHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
-{
-	// Slash2
-	USoundBase* Sound = nullptr;
-
-	if (bCritHit)
-	{
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2CritHitSounds);
-	}
-	else
-	{
-		if (HitSurface == SURFACETYPE_FLESH)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2FleshHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_METAL)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2MetalHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_STONE)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2StoneHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_UNDEAD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2UndeadHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_WOOD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2WoodHitSounds);
-		}
-		else
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2FleshHitSounds);
-		}
-	}
-
-	return Sound;
-}
-
-inline USoundBase* APlayerCharacter::GetWarhammerHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
-{
-	// blunt3
-	USoundBase* Sound = nullptr;
-
-	if (bCritHit)
-	{
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3CritHitSounds);
-	}
-	else
-	{
-		if (HitSurface == SURFACETYPE_FLESH)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3FleshHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_METAL)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3MetalHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_STONE)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3StoneHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_UNDEAD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3UndeadHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_WOOD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3WoodHitSounds);
-		}
-		else
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3FleshHitSounds);
-		}
-	}
-
-	return Sound;
-}
-
-inline USoundBase* APlayerCharacter::GetLongswordHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
-{
-	// Slash1
-	USoundBase* Sound = nullptr;
-
-	if (bCritHit)
-	{
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashCritHitSounds);
-	}
-	else
-	{
-		if (HitSurface == SURFACETYPE_FLESH)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashFleshHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_METAL)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashMetalHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_STONE)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashStoneHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_UNDEAD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashUndeadHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_WOOD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashWoodHitSounds);
-		}
-		else
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashFleshHitSounds);
-		}
-	}
-	
-	return Sound;
-}
-
-inline USoundBase* APlayerCharacter::GetMaceHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
-{
-	// blunt1
-	USoundBase* Sound = nullptr;
-
-	if (bCritHit)
-	{
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntCritHitSounds);
-	}
-	else
-	{
-		if (HitSurface == SURFACETYPE_FLESH)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntFleshHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_METAL)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntMetalHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_STONE)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntStoneHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_UNDEAD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntUndeadHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_WOOD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntWoodHitSounds);
-		}
-		else
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntFleshHitSounds);
-		}
-	}
-	
-	return Sound;
-}
-
-inline USoundBase* APlayerCharacter::GetStaffHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
-{
-	// blunt2
-	USoundBase* Sound = nullptr;
-
-	if (bCritHit)
-	{
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2CritHitSounds);
-	}
-	else
-	{
-		if (HitSurface == SURFACETYPE_FLESH)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2FleshHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_METAL)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2MetalHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_STONE)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2StoneHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_UNDEAD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2UndeadHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_WOOD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2WoodHitSounds);
-		}
-		else
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2FleshHitSounds);
-		}
-	}
-	
-	return Sound;
-}
-
-inline USoundBase* APlayerCharacter::GetDaggerHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
-{
-	// slice
-	USoundBase* Sound = nullptr;
-
-	if (bCritHit)
-	{
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceCritHitSounds);
-	}
-	else
-	{
-		if (HitSurface == SURFACETYPE_FLESH)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceFleshHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_METAL)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceMetalHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_STONE)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceStoneHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_UNDEAD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceUndeadHitSounds);
-		}
-		else if (HitSurface == SURFACETYPE_WOOD)
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceWoodHitSounds);
-		}
-		else
-		{
-			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceFleshHitSounds);
-		}
-	}
-	
-	return Sound;
 }

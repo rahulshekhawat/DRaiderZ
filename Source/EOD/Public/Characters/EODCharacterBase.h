@@ -30,7 +30,6 @@ class UInputComponent;
 class UCameraComponent;
 class UGameplaySkillBase;
 class UCharacterStateBase;
-class UStatusEffectBase;
 class UGameplayEventBase;
 class UStatsComponentBase;
 class UGameplaySkillsComponent;
@@ -489,6 +488,9 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_LastReceivedHit)
 	FReceivedHitInfo LastReceivedHit;
+	
+	UPROPERTY(ReplicatedUsing = OnRep_LastAttackResponses)
+	TArray<FAttackResponse> LastAttackResponses;
 
 public:
 
@@ -967,22 +969,6 @@ private:
 public:
 
 	// --------------------------------------
-	//  Status Effects
-	// --------------------------------------
-
-	/**
-	 * Applies status effect on the character
-	 * Handles activation of particle effects and sounds of the status effect (e.g. burning)
-	 */
-	virtual void ApplyStatusEffect(const UStatusEffectBase* StatusEffect);
-
-	/**
-	 * Removes status effect from the character
-	 * Handles deactivation of particle effects and sounds of the status effect (e.g. burning)
-	 */
-	virtual void RemoveStatusEffect(const UStatusEffectBase* StatusEffect);
-
-	// --------------------------------------
 	//  Crowd Control Effects
 	// --------------------------------------
 
@@ -1149,6 +1135,9 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_InGameLevel(int32 OldLevel);
+	
+	UFUNCTION()
+	virtual void OnRep_LastAttackResponses();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Dodge(uint8 DodgeIndex, float RotationYaw);

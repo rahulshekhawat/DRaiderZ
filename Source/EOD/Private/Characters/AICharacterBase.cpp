@@ -300,6 +300,17 @@ bool AAICharacterBase::IsEnemyOf(ICombatInterface* TargetCI) const
 	return true;
 }
 
+USoundBase* AAICharacterBase::GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
+{
+	USoundWave* Sound = bCritHit ? CritHitSound : HitSound;
+	return Sound ? Sound : HitSound; // A check just in case CritHitSound is not set
+}
+
+USoundBase* AAICharacterBase::GetMeleeHitMissSound() const
+{
+	return HitMissSound;
+}
+
 void AAICharacterBase::SetInCombat(bool bValue)
 {
 	bInCombat = bValue;

@@ -148,6 +148,15 @@ public:
 	/** Animation montage containing animations for character dodging */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* DieMontage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	USoundWave* HitSound;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	USoundWave* CritHitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	USoundWave* HitMissSound;
 
 	// --------------------------------------
 	//  Widgets
@@ -194,6 +203,12 @@ public:
 	// --------------------------------------
 
 	virtual bool IsEnemyOf(ICombatInterface* TargetCI) const override;
+
+	/** Returns the sound that should be played when this character hits a physical surface */
+	virtual USoundBase* GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
+
+	/** Returns the sound that should be played when this character fails to hit anything */
+	virtual USoundBase* GetMeleeHitMissSound() const override;
 
 	/** Set whether character is in combat or not */
 	virtual void SetInCombat(bool bValue) override;

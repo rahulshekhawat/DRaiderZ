@@ -1015,6 +1015,87 @@ bool AHumanCharacter::CCEKnockback(const float Duration, const FVector& ImpulseD
 	return false;
 }
 
+USoundBase* AHumanCharacter::GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
+{
+	// Crit
+	// Flesh
+	// Metal
+	// Stone
+	// Undead
+	// Wood
+
+	bool bUseCritHitSound = bCritHit;
+	if (IsUsingAnySkill())
+	{
+		bUseCritHitSound = true;
+	}
+
+	USoundBase* Sound = nullptr;
+	EWeaponType WeaponType = GetEquippedWeaponType();
+	switch (WeaponType)
+	{
+	case EWeaponType::GreatSword:
+		Sound = GetGreatswordHitSound(HitSurface, bUseCritHitSound);
+		break;
+	case EWeaponType::WarHammer:
+		Sound = GetWarhammerHitSound(HitSurface, bUseCritHitSound);
+		break;
+	case EWeaponType::LongSword:
+		Sound = GetLongswordHitSound(HitSurface, bUseCritHitSound);
+		break;
+	case EWeaponType::Mace:
+		Sound = GetMaceHitSound(HitSurface, bUseCritHitSound);
+		break;
+	case EWeaponType::Dagger:
+		Sound = GetDaggerHitSound(HitSurface, bUseCritHitSound);
+		break;
+	case EWeaponType::Staff:
+		Sound = GetStaffHitSound(HitSurface, bUseCritHitSound);
+		break;
+	default:
+		break;
+	}
+	return Sound;
+}
+
+USoundBase* AHumanCharacter::GetMeleeHitMissSound() const
+{
+	USoundBase* Sound = nullptr;
+	EWeaponType WeaponType = GetEquippedWeaponType();
+
+	switch (WeaponType)
+	{
+	case EWeaponType::GreatSword:
+		// Slash2
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2HitMissSounds);
+		break;
+	case EWeaponType::WarHammer:
+		// blunt3
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3HitMissSounds);
+		break;
+	case EWeaponType::LongSword:
+		// Slash1
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashHitMissSounds);
+		break;
+	case EWeaponType::Mace:
+		// blunt1
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntHitMissSounds);
+		break;
+	case EWeaponType::Dagger:
+		// slice
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceHitMissSounds);
+		break;
+	case EWeaponType::Staff:
+		// blunt2
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2HitMissSounds);
+		break;
+	default:
+		break;
+	}
+
+	return Sound;
+}
+
 void AHumanCharacter::OnPressedForward()
 {
 	UWorld* World = GetWorld();

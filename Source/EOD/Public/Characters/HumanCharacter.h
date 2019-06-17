@@ -8,6 +8,7 @@
 #include "CharacterLibrary.h"
 #include "EODCharacterBase.h"
 #include "ArmorLibrary.h"
+#include "EODBlueprintFunctionLibrary.h"
 
 #include "Engine/DataTable.h"
 #include "Engine/StreamableManager.h"
@@ -415,6 +416,15 @@ public:
 	/** Get the suffix string from the normal attack section */
 	inline FString GetNormalAttackSuffix(FName NormalAttackSection) const;
 
+	// --------------------------------------
+	//  Combat Interface
+	// --------------------------------------
+
+	/** Returns the sound that should be played when this character hits a physical surface */
+	virtual USoundBase* GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
+
+	/** Returns the sound that should be played when this character fails to hit anything */
+	virtual USoundBase* GetMeleeHitMissSound() const override;
 
 	// --------------------------------------
 	//  Input Handling
@@ -461,6 +471,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
 	FWeaponHitSounds WeaponHitSounds;
+
+	inline USoundBase* GetGreatswordHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
+	inline USoundBase* GetWarhammerHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
+	inline USoundBase* GetLongswordHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
+	inline USoundBase* GetMaceHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
+	inline USoundBase* GetStaffHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
+	inline USoundBase* GetDaggerHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const;
 
 protected:
 
@@ -685,4 +702,244 @@ inline FString AHumanCharacter::GetNormalAttackSuffix(FName NormalAttackSection)
 	{
 		return FString("");
 	}
+}
+
+inline USoundBase* AHumanCharacter::GetGreatswordHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
+{
+	// Slash2
+	USoundBase* Sound = nullptr;
+
+	if (bCritHit)
+	{
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2CritHitSounds);
+	}
+	else
+	{
+		if (HitSurface == SURFACETYPE_FLESH)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2FleshHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_METAL)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2MetalHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_STONE)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2StoneHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_UNDEAD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2UndeadHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_WOOD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2WoodHitSounds);
+		}
+		else
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2FleshHitSounds);
+		}
+	}
+
+	return Sound;
+}
+
+inline USoundBase* AHumanCharacter::GetWarhammerHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
+{
+	// blunt3
+	USoundBase* Sound = nullptr;
+
+	if (bCritHit)
+	{
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3CritHitSounds);
+	}
+	else
+	{
+		if (HitSurface == SURFACETYPE_FLESH)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3FleshHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_METAL)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3MetalHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_STONE)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3StoneHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_UNDEAD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3UndeadHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_WOOD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3WoodHitSounds);
+		}
+		else
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3FleshHitSounds);
+		}
+	}
+
+	return Sound;
+}
+
+inline USoundBase* AHumanCharacter::GetLongswordHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
+{
+	// Slash1
+	USoundBase* Sound = nullptr;
+
+	if (bCritHit)
+	{
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashCritHitSounds);
+	}
+	else
+	{
+		if (HitSurface == SURFACETYPE_FLESH)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashFleshHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_METAL)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashMetalHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_STONE)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashStoneHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_UNDEAD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashUndeadHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_WOOD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashWoodHitSounds);
+		}
+		else
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashFleshHitSounds);
+		}
+	}
+
+	return Sound;
+}
+
+inline USoundBase* AHumanCharacter::GetMaceHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
+{
+	// blunt1
+	USoundBase* Sound = nullptr;
+
+	if (bCritHit)
+	{
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntCritHitSounds);
+	}
+	else
+	{
+		if (HitSurface == SURFACETYPE_FLESH)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntFleshHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_METAL)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntMetalHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_STONE)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntStoneHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_UNDEAD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntUndeadHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_WOOD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntWoodHitSounds);
+		}
+		else
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntFleshHitSounds);
+		}
+	}
+
+	return Sound;
+}
+
+inline USoundBase* AHumanCharacter::GetStaffHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
+{
+	// blunt2
+	USoundBase* Sound = nullptr;
+
+	if (bCritHit)
+	{
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2CritHitSounds);
+	}
+	else
+	{
+		if (HitSurface == SURFACETYPE_FLESH)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2FleshHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_METAL)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2MetalHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_STONE)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2StoneHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_UNDEAD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2UndeadHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_WOOD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2WoodHitSounds);
+		}
+		else
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2FleshHitSounds);
+		}
+	}
+
+	return Sound;
+}
+
+inline USoundBase* AHumanCharacter::GetDaggerHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
+{
+	// slice
+	USoundBase* Sound = nullptr;
+
+	if (bCritHit)
+	{
+		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceCritHitSounds);
+	}
+	else
+	{
+		if (HitSurface == SURFACETYPE_FLESH)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceFleshHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_METAL)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceMetalHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_STONE)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceStoneHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_UNDEAD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceUndeadHitSounds);
+		}
+		else if (HitSurface == SURFACETYPE_WOOD)
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceWoodHitSounds);
+		}
+		else
+		{
+			Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceFleshHitSounds);
+		}
+	}
+
+	return Sound;
 }

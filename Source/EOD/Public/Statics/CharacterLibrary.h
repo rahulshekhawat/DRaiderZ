@@ -12,7 +12,6 @@
 
 class UGameplaySkillBase;
 class UAnimMontage;
-class UStatusEffectBase;
 
 /**
  * This enum describes the character movement direction relative to character's line of sight.

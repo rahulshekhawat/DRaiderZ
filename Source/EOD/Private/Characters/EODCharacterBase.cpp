@@ -1022,16 +1022,6 @@ bool AEODCharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBas
 	return false;
 }
 
-void AEODCharacterBase::ApplyStatusEffect(const UStatusEffectBase * StatusEffect)
-{
-	// @todo definition
-}
-
-void AEODCharacterBase::RemoveStatusEffect(const UStatusEffectBase * StatusEffect)
-{
-	// @todo definition
-}
-
 void AEODCharacterBase::OnMontageBlendingOut(UAnimMontage * AnimMontage, bool bInterrupted)
 {
 }
@@ -1202,6 +1192,10 @@ void AEODCharacterBase::OnRep_Mana(FCharacterStat& OldMana)
 void AEODCharacterBase::OnRep_InGameLevel(int32 OldLevel)
 {
 
+}
+
+void AEODCharacterBase::OnRep_LastAttackResponses()
+{
 }
 
 void AEODCharacterBase::Server_Dodge_Implementation(uint8 DodgeIndex, float RotationYaw)

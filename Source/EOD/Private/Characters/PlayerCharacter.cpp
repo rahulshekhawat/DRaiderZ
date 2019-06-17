@@ -59,16 +59,6 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer) 
 		InteractionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 
-	MaxWeaponSlots = 2;
-	
-	/*
-	OnPrimaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
-	OnPrimaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
-
-	OnSecondaryWeaponEquipped.AddDynamic(this, &APlayerCharacter::ActivateStatusEffectFromWeapon);
-	OnSecondaryWeaponUnequipped.AddDynamic(this, &APlayerCharacter::DeactivateStatusEffectFromWeapon);
-	*/
-
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnInteractionSphereBeginOverlap);
 	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnInteractionSphereEndOverlap);
 
@@ -157,168 +147,6 @@ void APlayerCharacter::PlayAttackBlockedAnimation()
 	}
 }
 
-void APlayerCharacter::AddPrimaryWeapon(FName WeaponID)
-{
-
-	/*
-	//  You would call SetCurrentPrimaryWeapon(NAME_None) when you want to remove equipped primary weapon
-	if (WeaponID == NAME_None)
-	{
-		RemovePrimaryWeapon();
-		// RemovePrimaryWeaponFromDataAsset();
-		return;
-	}
-
-	UWeaponDataAsset* WeaponDataAsset = UWeaponLibrary::GetWeaponDataAsset(WeaponID);
-	if (!WeaponDataAsset)
-	{
-		return;
-	}
-
-	RemovePrimaryWeapon();
-	// RemovePrimaryWeaponFromDataAsset();
-	if (UWeaponLibrary::IsWeaponDualHanded(WeaponDataAsset->WeaponType))
-	{
-		RemoveSecondaryWeapon();
-		// RemoveSecondaryWeaponFromDataAsset();
-	}
-
-	PrimaryWeaponID = WeaponID;
-	PrimaryWeaponDataAsset = WeaponDataAsset;
-	
-	OnPrimaryWeaponEquipped.Broadcast(PrimaryWeaponID, PrimaryWeaponDataAsset);
-	*/
-
-	/*
-	LoadEquippedWeaponAnimationReferences();
-	// @todo add weapon stats
-	*/
-}
-
-void APlayerCharacter::AddSecondaryWeapon(FName WeaponID)
-{
-	//  You would call SetCurrentSecondaryWeapon(NAME_None) when you want to remove equipped secondary weapon
-	if (WeaponID == NAME_None)
-	{
-		RemoveSecondaryWeapon();
-		// RemoveSecondaryWeaponFromDataAsset();
-		return;
-	}
-
-	FWeaponTableRow* WeaponData = UWeaponLibrary::GetWeaponData(WeaponID);
-	// If it's an invalid weapon
-	if (!WeaponData || WeaponData->WeaponMesh.IsNull())
-	{
-		return;
-	}
-
-	// Since secondary weapon is guaranteed to be single handed
-	RemoveSecondaryWeapon();
-	// RemoveSecondaryWeaponFromDataAsset();
-	if (UWeaponLibrary::IsWeaponDualHanded(PrimaryWeapon->GetWeaponType()))
-	{
-		RemovePrimaryWeapon();
-		// RemovePrimaryWeaponFromDataAsset();
-	}
-	EquippedWeapons.SetSecondaryWeaponID(WeaponID);
-	// SecondaryWeaponID = WeaponID;
-	SecondaryWeapon->OnEquip(WeaponID, WeaponData);
-
-	
-	// @todo add weapon stats
-
-}
-
-void APlayerCharacter::AddPrimaryWeaponToCurrentSlot(FName WeaponID)
-{
-	// @todo check whether a weapon is already equipped
-
-	// UWeaponDataAsset* WeaponDataAsset = UWeaponLibrary::GetWeaponDataAsset(WeaponID);
-	// if (WeaponDataAsset)
-	{
-		//~ @todo
-		// Server_AddPrimaryWeaponToCurrentSlot(WeaponID, WeaponDataAsset);
-	}
-}
-
-void APlayerCharacter::AddPrimaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset * WeaponDataAsset)
-{
-}
-
-void APlayerCharacter::AddSecondaryWeaponToCurrentSlot(FName WeaponID)
-{
-}
-
-void APlayerCharacter::AddSecondaryWeaponToCurrentSlot(FName WeaponID, UWeaponDataAsset * WeaponDataAsset)
-{
-}
-
-void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, int32 SlotIndex)
-{
-}
-
-void APlayerCharacter::AddPrimaryWeaponToSlot(FName WeaponID, UWeaponDataAsset* WeaponDataAsset, int32 SlotIndex)
-{
-}
-
-void APlayerCharacter::AddSecondaryWeaponToSlot(FName WeaponID, int32 SlotIndex)
-{
-
-}
-
-void APlayerCharacter::AddSecondaryWeaponToSlot(FName WeaponID, UWeaponDataAsset * WeaponDataAsset, int32 SlotIndex)
-{
-}
-
-void APlayerCharacter::RemovePrimaryWeaponFromCurrentSlot()
-{
-}
-
-void APlayerCharacter::RemoveSecondaryWeaponFromCurrentSlot()
-{
-}
-
-void APlayerCharacter::RemovePrimaryWeaponFromSlot(int32 SlotIndex)
-{
-	/*
-	if (SlotWeapons.Num() > SlotIndex)
-	{
-		FWeaponSlot WeaponSlot = SlotWeapons[SlotIndex];
-		if (WeaponSlot.IsPrimaryWeaponAttached())
-		{
-			
-		}
-	}
-	*/
-}
-
-void APlayerCharacter::RemoveSecondaryWeaponFromSlot(int32 SlotIndex)
-{
-}
-
-void APlayerCharacter::ToggleWeaponSlot()
-{
-}
-
-
-/*
-UWeaponSlot* APlayerCharacter::CreateNewWeaponSlot()
-{
-	UWeaponSlot* NewSlot = NewObject<UWeaponSlot>((UObject*)GetTransientPackage(), UWeaponSlot::StaticClass());
-	int32 NewSlotIndex = WeaponSlots.Add(NewSlot);
-	if (WeaponSlots.Num() == 1)
-	{
-		SetActiveWeaponSlotIndex(NewSlotIndex);
-	}
-	return NewSlot;
-}
-*/
-
-void APlayerCharacter::SetActiveWeaponSlotIndex(int32 NewSlotIndex)
-{
-	ActiveWeaponSlotIndex = NewSlotIndex;
-}
-
 void APlayerCharacter::SwitchToInteractionState()
 {
 	CharacterStateInfo.CharacterState = ECharacterState::Interacting;
@@ -377,11 +205,6 @@ void APlayerCharacter::CancelWeaponSwitch()
 void APlayerCharacter::FinishWeaponSwitch()
 {
 	ResetState();
-}
-
-void APlayerCharacter::OnToggleCharacterStatsUI()
-{
-	// @todo definition
 }
 
 void APlayerCharacter::OnToggleMouseCursor()
@@ -512,87 +335,6 @@ void APlayerCharacter::PostAttack(const TArray<FAttackResponse>& AttackResponses
 		GameplayAudioComponent->Play();
 	}
 	*/
-}
-
-USoundBase* APlayerCharacter::GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
-{
-	// Crit
-	// Flesh
-	// Metal
-	// Stone
-	// Undead
-	// Wood
-
-	bool bUseCritHitSound = bCritHit;
-	if (IsUsingAnySkill())
-	{
-		bUseCritHitSound = true;
-	}
-
-	USoundBase* Sound = nullptr;
-	EWeaponType WeaponType = GetEquippedWeaponType();
-	switch (WeaponType)
-	{
-	case EWeaponType::GreatSword:
-		Sound = GetGreatswordHitSound(HitSurface, bUseCritHitSound);
-		break;
-	case EWeaponType::WarHammer:
-		Sound = GetWarhammerHitSound(HitSurface, bUseCritHitSound);
-		break;
-	case EWeaponType::LongSword:
-		Sound = GetLongswordHitSound(HitSurface, bUseCritHitSound);
-		break;
-	case EWeaponType::Mace:
-		Sound = GetMaceHitSound(HitSurface, bUseCritHitSound);
-		break;
-	case EWeaponType::Dagger:
-		Sound = GetDaggerHitSound(HitSurface, bUseCritHitSound);
-		break;
-	case EWeaponType::Staff:
-		Sound = GetStaffHitSound(HitSurface, bUseCritHitSound);
-		break;
-	default:
-		break;
-	}
-	return Sound;
-}
-
-USoundBase* APlayerCharacter::GetMeleeHitMissSound() const
-{
-	USoundBase* Sound = nullptr;
-	EWeaponType WeaponType = GetEquippedWeaponType();
-
-	switch (WeaponType)
-	{
-	case EWeaponType::GreatSword:
-		// Slash2
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Slash2HitMissSounds);
-		break;
-	case EWeaponType::WarHammer:
-		// blunt3
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt3HitMissSounds);
-		break;
-	case EWeaponType::LongSword:
-		// Slash1
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SlashHitMissSounds);
-		break;
-	case EWeaponType::Mace:
-		// blunt1
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.BluntHitMissSounds);
-		break;
-	case EWeaponType::Dagger:
-		// slice
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.SliceHitMissSounds);
-		break;
-	case EWeaponType::Staff:
-		// blunt2
-		Sound = UEODBlueprintFunctionLibrary::GetRandomSound(WeaponHitSounds.Blunt2HitMissSounds);
-		break;
-	default:
-		break;
-	}
-
-	return Sound;
 }
 
 void APlayerCharacter::DisplayDialogueWidget(FName DialogueWindowID)
@@ -1002,11 +744,6 @@ void APlayerCharacter::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupt
 {
 }
 
-void APlayerCharacter::EquipPrimaryWeapon(FName WeaponID)
-{
-	SetPrimaryWeaponID(WeaponID);
-}
-
 void APlayerCharacter::TurnOnTargetSwitch()
 {
 	// Empty override to prevent call of Super::TurnOffTargetSwitch()
@@ -1025,11 +762,6 @@ void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)
 void APlayerCharacter::OnSkillGroupRemovedFromSkillBar(const FString & SkillGroup)
 {
 	// GetSkillsComponent()->OnSkillGroupRemovedFromSkillBar(SkillGroup);
-}
-
-void APlayerCharacter::OnRep_LastAttackResponses(const TArray<FAttackResponse>& OldAttackResponses)
-{
-
 }
 
 void APlayerCharacter::OnRep_PrimaryWeaponID()
@@ -1155,7 +887,6 @@ void APlayerCharacter::Server_NormalAttack_Implementation(uint8 AttackIndex)
 
 void APlayerCharacter::Server_SetPrimaryWeaponID_Implementation(FName NewWeaponID)
 {
-	SetPrimaryWeaponID(NewWeaponID);
 }
 
 bool APlayerCharacter::Server_SetPrimaryWeaponID_Validate(FName NewWeaponID)
