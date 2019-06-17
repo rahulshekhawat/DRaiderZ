@@ -22,13 +22,6 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnPrimaryStatChangedMCDelegate, int32, int
  */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGenericStatChangedMCDelegate, float);
 
-/**
- * Delegate for when the CC Immunity changes
- * @param1 uint8 NewImmunities
- */
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnCCImmunitiesChangedMCDelegate, uint8);
-
-
 UENUM(BlueprintType)
 enum class EStatModType : uint8
 {
@@ -417,7 +410,6 @@ public:
 	~FCCImmunities() { ; }
 
 	FCCImmunities() :
-		bDirty(false),
 		Value_NoMod(0),
 		Value(0)
 	{
@@ -434,8 +426,53 @@ public:
 	void SetValue(float InValue)
 	{
 		Value_NoMod = InValue;
-		bDirty = true;
 	}
+
+	float GetValue() { return Value; }
+
+	/** Add a modifier to the maximum value of this primary stat */
+	void AddModifier(UObject const* const SourceObj, const FCCImmunityModifier& NewMod)
+	{
+		if (SourceObj)
+		{
+			uint32 UniqueID = SourceObj->GetUniqueID();
+			if (Modifiers.Contains(UniqueID))
+			{
+				Modifiers[UniqueID] = NewMod;
+			}
+			else
+			{
+				Modifiers.Add(UniqueID, NewMod);
+			}
+			RecalculateValue();
+		}
+	}
+
+	/** Remove a modifier from the maximum value of this primary stat */
+	void RemoveModifier(UObject const* const SourceObj)
+	{
+		if (SourceObj)
+		{
+			uint32 UniqueID = SourceObj->GetUniqueID();
+			if (Modifiers.Contains(UniqueID))
+			{
+				Modifiers.Remove(UniqueID);
+				RecalculateValue();
+			}
+		}
+	}
+
+	bool HasCCImmunity(ECrowdControlEffect CCImmunity) const
+	{
+		return (Value & (1 << (uint8)CCImmunity));
+	}
+
+	bool HasCCImmunities(uint8 CCImmunities) const
+	{
+		return (Value & CCImmunities) == CCImmunities;
+	}
+
+private:
 
 	float RecalculateValue()
 	{
@@ -454,59 +491,8 @@ public:
 			}
 		}
 
-		bDirty = false;
 		return Value;
 	}
-
-	float GetValue() { return bDirty ? RecalculateValue() : Value; }
-
-	/** Add a modifier to the maximum value of this primary stat */
-	void AddModifier(UObject const* const SourceObj, const FCCImmunityModifier& NewMod)
-	{
-		if (SourceObj)
-		{
-			uint32 UniqueID = SourceObj->GetUniqueID();
-			if (Modifiers.Contains(UniqueID))
-			{
-				Modifiers[UniqueID] = NewMod;
-			}
-			else
-			{
-				Modifiers.Add(UniqueID, NewMod);
-			}
-			bDirty = true;
-
-			RecalculateValue();
-		}
-	}
-
-	/** Remove a modifier from the maximum value of this primary stat */
-	void RemoveModifier(UObject const* const SourceObj)
-	{
-		if (SourceObj)
-		{
-			uint32 UniqueID = SourceObj->GetUniqueID();
-			if (Modifiers.Contains(UniqueID))
-			{
-				Modifiers.Remove(UniqueID);
-				bDirty = true;
-
-				RecalculateValue();
-			}
-		}
-	}
-
-	bool HasCCImmunity(ECrowdControlEffect CCImmunity) const
-	{
-		return (Value & (1 << (uint8)CCImmunity));
-	}
-
-	bool HasCCImmunities(uint8 CCImmunities) const
-	{
-		return (Value & CCImmunities) == CCImmunities;
-	}
-
-private:
 
 	void AddImmunity(ECrowdControlEffect CCImmunity)
 	{
@@ -535,7 +521,6 @@ private:
 
 private:
 
-	bool bDirty;
 	uint8 Value_NoMod;
 
 	UPROPERTY()
