@@ -460,6 +460,20 @@ void AHumanCharacter::RemoveArmor(EArmorType ArmorType)
 
 void AHumanCharacter::ToggleWeapon()
 {
+	//~ @todo Server RPC
+
+	if (EquippedWeapons.CurrentSlotIndex == 1)
+	{
+		EquippedWeapons.CurrentSlotIndex = 0;
+	}
+	else
+	{
+		EquippedWeapons.CurrentSlotIndex = 1;
+	}
+
+	const FWeaponSlot& WepSlot = EquippedWeapons.GetCurrentWeaponSlot();
+	SetCurrentPrimaryWeapon(WepSlot.PrimaryWeaponID);
+	SetCurrentSecondaryWeapon(WepSlot.SecondaryWeaponID);
 }
 
 bool AHumanCharacter::CanDodge() const
