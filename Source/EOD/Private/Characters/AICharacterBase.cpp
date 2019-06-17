@@ -302,7 +302,7 @@ bool AAICharacterBase::IsEnemyOf(ICombatInterface* TargetCI) const
 
 USoundBase* AAICharacterBase::GetMeleeHitSound(const TEnumAsByte<EPhysicalSurface> HitSurface, const bool bCritHit) const
 {
-	USoundWave* Sound = bCritHit ? CritHitSound : HitSound;
+	USoundBase* Sound = bCritHit ? CritHitSound : HitSound;
 	return Sound ? Sound : HitSound; // A check just in case CritHitSound is not set
 }
 

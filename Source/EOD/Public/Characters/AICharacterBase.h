@@ -9,6 +9,7 @@
 #include "Engine/StreamableManager.h"
 #include "AICharacterBase.generated.h"
 
+class USoundBase;
 class UEODWidgetComponent;
 class UGameplaySkillBase;
 
@@ -150,13 +151,13 @@ public:
 	UAnimMontage* DieMontage;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
-	USoundWave* HitSound;
+	USoundBase* HitSound;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
-	USoundWave* CritHitSound;
+	USoundBase* CritHitSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
-	USoundWave* HitMissSound;
+	USoundBase* HitMissSound;
 
 	// --------------------------------------
 	//  Widgets
