@@ -30,6 +30,8 @@ public:
 
 	virtual void NativeDestruct() override;
 
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 	// --------------------------------------
 	//	Child Widgets
 	// --------------------------------------
@@ -37,10 +39,17 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UTextBlock* DamageText;
 
+	// --------------------------------------
+	//  Utility
+	// --------------------------------------
+
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void SetDamageValue(float Damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void SetDamageColor(FLinearColor NewColor);
+
+	UPROPERTY(Transient)
+	FVector WorldPosition;
 
 };

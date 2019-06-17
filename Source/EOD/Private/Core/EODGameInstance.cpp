@@ -189,7 +189,7 @@ void UEODGameInstance::DisplayDamageNumbers(
 	if (DamageWidget)
 	{
 		FVector2D WidgetLocation;
-		bool bResult = PC->ProjectWorldLocationToScreen(HitLocation, WidgetLocation);
+		bool bResult = PC->ProjectWorldLocationToScreen(HitLocation, WidgetLocation, true);
 		if (bResult)
 		{
 			DamageWidget->SetDamageValue(DamageValue);
@@ -202,6 +202,7 @@ void UEODGameInstance::DisplayDamageNumbers(
 			{
 				FinalColor = bCritHit ? NPCCritDamagedTextColor : NPCNormalDamagedTextColor;
 			}
+			DamageWidget->WorldPosition = HitLocation;
 			DamageWidget->SetDamageColor(FinalColor);
 			DamageWidget->SetPositionInViewport(WidgetLocation);
 			DamageWidget->AddToViewport(-10);
