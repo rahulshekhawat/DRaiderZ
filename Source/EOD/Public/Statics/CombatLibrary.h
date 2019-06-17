@@ -214,6 +214,28 @@ struct EOD_API FAttackInfo
 };
 
 USTRUCT(BlueprintType)
+struct EOD_API FCCEffectInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	ECrowdControlEffect CCEffect;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	float CCDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	float CCIntensity;
+
+	FCCEffectInfo() :
+		CCEffect(ECrowdControlEffect::Flinch),
+		CCDuration(0.f),
+		CCIntensity(0.f)
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
 struct EOD_API FGameplayEffectInfo
 {
 	GENERATED_USTRUCT_BODY()
