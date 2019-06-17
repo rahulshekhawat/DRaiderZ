@@ -19,6 +19,8 @@
 #include "EODGameInstance.h"
 #include "DynamicHUDWidget.h"
 #include "AISkillBase.h"
+#include "EODWidgetComponent.h"
+#include "DamageNumberWidget.h"
 
 #include "IdleWalkRunState.h"
 #include "DeadState.h"
@@ -31,6 +33,7 @@
 #include "UnrealNetwork.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/AudioComponent.h"
@@ -226,14 +229,83 @@ float AEODCharacterBase::BP_GetRotationYawFromAxisInput()
 	return GetRotationYawFromAxisInput();
 }
 
+void AEODCharacterBase::Display3DDamageNumbers(
+	const float DamageValue,
+	const bool bCritHit,
+	const AActor* DamagedActor,
+	const AActor* DamageInstigator,
+	const FVector& HitLocation)
+{
+	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
+	APlayerController* LPC = EODGI ? EODGI->GetFirstLocalPlayerController() : nullptr;
+	UClass* WidgetClass = EODGI ? EODGI->DamageWidgetClass.Get() : nullptr;
+
+	if (!LPC || !WidgetClass)
+	{
+		return;
+	}
+
+	APawn* LocalPlayerPawn = LPC->GetPawn();
+	check(LocalPlayerPawn);
+
+	// If neither the damaged actor or damage instigator is a player controlled character, then we do not want to display damage
+	if (LocalPlayerPawn != DamagedActor && LocalPlayerPawn != DamageInstigator)
+	{
+		return;
+	}
+
+	UDamageNumberWidget* DamageWidget = CreateWidget<UDamageNumberWidget>(LPC, WidgetClass);
+	if (DamageWidget)
+	{
+		FVector2D WidgetSize = FVector2D(72, 60);
+		DamageWidget->SetDamageValue(DamageValue);
+		FLinearColor FinalColor;
+		if (DamagedActor == LocalPlayerPawn)
+		{
+			FinalColor = EODGI->PlayerDamagedTextColor;
+		}
+		else
+		{
+			FinalColor = bCritHit ? EODGI->NPCCritDamagedTextColor : EODGI->NPCNormalDamagedTextColor;
+		}
+		DamageWidget->SetDamageColor(FinalColor);
+	}
+
+	UEODWidgetComponent* WidgetComp = NewObject<UEODWidgetComponent>(this, UEODWidgetComponent::StaticClass(), NAME_None, RF_Transient);
+	WidgetComp->RegisterComponent();
+	WidgetComp->SetWorldLocation(HitLocation);
+	WidgetComp->SetWidget(DamageWidget);
+	WidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WidgetComp->SetTickWhenOffscreen(true);
+	WidgetComp->bOrientPitch = false;
+	
+	//~ @todo set proper widget size;
+
+	WidgetComp->Activate();
+	WidgetComponents.Add(WidgetComp);
+
+	UWorld* World = GetWorld();
+
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindUObject(this, &AEODCharacterBase::RemoveWidgetComponent, WidgetComp);
+
+	FTimerHandle TempHandle;
+	World->GetTimerManager().SetTimer(TempHandle, TimerDelegate, 5.f, false);
+
+	int32 Size = WidgetComponents.Num();
+	PrintToScreen(this, FString::FromInt(Size), 10.f);
+}
+
 float AEODCharacterBase::BP_GetControllerRotationYaw() const
 {
 	return (Controller ? FMath::UnwindDegrees(Controller->GetControlRotation().Yaw) : 0.0f);
 }
 
+/*
 void AEODCharacterBase::CreateAndDisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
 {
 }
+*/
 
 void AEODCharacterBase::TriggeriFrames(float Duration, float Delay)
 {
@@ -1030,6 +1102,17 @@ void AEODCharacterBase::OnMontageEnded(UAnimMontage * AnimMontage, bool bInterru
 {
 }
 
+void AEODCharacterBase::RemoveWidgetComponent(UEODWidgetComponent* WidgetComp)
+{
+	if (WidgetComp && WidgetComponents.Contains(WidgetComp))
+	{
+		WidgetComponents.Remove(WidgetComp);
+		WidgetComp->UnregisterComponent();
+		WidgetComp->Deactivate();
+		WidgetComp->DestroyComponent();
+	}
+}
+
 bool AEODCharacterBase::DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision, float RotationRate)
 {
 	float CurrentYaw = GetActorRotation().Yaw;
@@ -1260,6 +1343,7 @@ bool AEODCharacterBase::Server_SpawnAndMountRideableCharacter_Validate(TSubclass
 	return true;
 }
 
+/*
 void AEODCharacterBase::Client_DisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
 {
 	if (IsPlayerControlled())
@@ -1267,6 +1351,7 @@ void AEODCharacterBase::Client_DisplayTextOnPlayerScreen_Implementation(const FS
 		CreateAndDisplayTextOnPlayerScreen(Message, TextColor, TextPosition);
 	}
 }
+*/
 
 void AEODCharacterBase::Server_StopBlockingDamage_Implementation()
 {

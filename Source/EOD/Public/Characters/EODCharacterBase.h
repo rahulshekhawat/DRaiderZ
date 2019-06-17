@@ -35,6 +35,8 @@ class UStatsComponentBase;
 class UGameplaySkillsComponent;
 class UAudioComponent;
 class AEODCharacterBase;
+class UDamageNumberWidget;
+class UEODWidgetComponent;
 
 /** Delegate for when a character either enters or leaves combat */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCombatStateChangedMCDelegate, AEODCharacterBase*, Character);
@@ -711,6 +713,21 @@ public:
 	// --------------------------------------
 	//  Utility
 	// --------------------------------------
+	
+	/**
+	 * Displays damage numbers on player screen
+	 * @param DamageValue	The amount by which the character was damaged
+	 * @param bCritHit		True if the damage was critical
+	 * @param DamagedActor	The actor that was damaged
+	 * @param HitLocation	The hit position (in world space)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void Display3DDamageNumbers(
+		const float DamageValue,
+		const bool bCritHit,
+		const AActor* DamagedActor,
+		const AActor* DamageInstigator,
+		const FVector& HitLocation);
 
 	/**
 	 * Returns controller rotation yaw in -180/180 range.
@@ -733,11 +750,6 @@ public:
 	UFUNCTION(BlueprintCallable, category = Rotation, meta = (DeprecatedFunction))
 	bool DeltaRotateCharacterToDesiredYaw(float DesiredYaw, float DeltaTime, float Precision = 1e-3f, float RotationRate = 600.f);
 
-	/** Displays status effect text on player screen */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Utility")
-	void CreateAndDisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
-	virtual void CreateAndDisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
-
 	/** Get the prefix string for player gender */
 	inline FString GetGenderPrefix() const;
 
@@ -753,7 +765,7 @@ public:
 	inline float GetControllerRotationYaw() const;
 
 	/** [server] Display status effect message on player screen */
-	inline void DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
+	// inline void DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 
 	/** [server + local] Plays an animation montage and changes character state over network */
 	inline void NetPlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay);
@@ -766,6 +778,12 @@ public:
 
 	/** Called when an animation montage is ending to clean up, reset, or change any state variables */
 	virtual void OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupted);
+
+	UFUNCTION()
+	void RemoveWidgetComponent(UEODWidgetComponent* WidgetComp);
+
+	UPROPERTY(Transient)
+	TArray<UEODWidgetComponent*> WidgetComponents;
 
 	// --------------------------------------
 	//  Save/Load System
@@ -1164,9 +1182,9 @@ protected:
 	virtual void Server_SpawnAndMountRideableCharacter_Implementation(TSubclassOf<ARideBase> RideCharacterClass);
 	virtual bool Server_SpawnAndMountRideableCharacter_Validate(TSubclassOf<ARideBase> RideCharacterClass);
 
-	UFUNCTION(Client, Unreliable)
-	void Client_DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
-	virtual void Client_DisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
+	// UFUNCTION(Client, Unreliable)
+	// void Client_DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
+	// virtual void Client_DisplayTextOnPlayerScreen_Implementation(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetBlockMovementDirectionYaw(float NewYaw);
@@ -1402,10 +1420,12 @@ inline float AEODCharacterBase::GetControllerRotationYaw() const
 	return (Controller ? FMath::UnwindDegrees(Controller->GetControlRotation().Yaw) : 0.0f);
 }
 
+/*
 inline void AEODCharacterBase::DisplayTextOnPlayerScreen(const FString& Message, const FLinearColor& TextColor, const FVector& TextPosition)
 {
 	Client_DisplayTextOnPlayerScreen(Message, TextColor, TextPosition);
 }
+*/
 
 inline void AEODCharacterBase::NetPlayAnimMontage(UAnimMontage* MontageToPlay, FName SectionToPlay)
 {

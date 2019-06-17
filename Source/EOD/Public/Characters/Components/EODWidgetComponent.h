@@ -16,7 +16,11 @@ class EOD_API UEODWidgetComponent : public UWidgetComponent
 
 public:
 
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;	
-	
+	UEODWidgetComponent(const FObjectInitializer& ObjectInitializer);
+
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(EditAnywhere, Category = UserInterface)
+	bool bOrientPitch;
 	
 };
