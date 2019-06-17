@@ -46,7 +46,7 @@ struct EOD_API FStatModifier
 	{
 	}
 
-	FStatModifier(float InValue, EStatModType InModType, int32 InModOrder) :
+	FStatModifier(float InValue, EStatModType InModType) :
 		Value(InValue),
 		ModType(InModType)
 	{
@@ -368,7 +368,7 @@ public:
 	{
 	}
 
-	FCCImmunityModifier(uint8 InValue, ECCImmunityModType InModType, int32 InModOrder) :
+	FCCImmunityModifier(uint8 InValue, ECCImmunityModType InModType) :
 		Value(InValue),
 		ModType(InModType)
 	{

@@ -125,6 +125,10 @@ public:
 
 	virtual void DisableGameplayEffectEvents() override;
 
+	virtual void AcquireCCImmunities();
+
+	virtual void LoseCCImmunities();
+
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr(int32 CollisionIndex = 1) override;
 
 	inline FActiveSkillLevelUpInfo GetCurrentSkillLevelupInfo() const;

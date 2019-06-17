@@ -116,6 +116,7 @@ void UActiveSkillBase::TriggerSkill()
 
 		//~ consume stamina and mana
 		CommitSkill();
+		AcquireCCImmunities();
 	}
 
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(Instigator->GetCharacterMovement());
@@ -181,6 +182,7 @@ void UActiveSkillBase::CancelSkill()
 	// Instigator->RemoveGameplayTagModifier(FGameplayTagMod(ActivationOwnedTags, this));
 
 	DisableGameplayEffectEvents();
+	LoseCCImmunities();
 }
 
 void UActiveSkillBase::FinishSkill()
@@ -200,6 +202,7 @@ void UActiveSkillBase::FinishSkill()
 	// Instigator->RemoveGameplayTagModifier(FGameplayTagMod(ActivationOwnedTags, this));
 
 	DisableGameplayEffectEvents();
+	LoseCCImmunities();
 }
 
 void UActiveSkillBase::QueueGameplayEffectEvents()
@@ -244,6 +247,41 @@ void UActiveSkillBase::DisableGameplayEffectEvents()
 		if (SkillsComponent->GameplayEvents.Contains(TriggerCondition))
 		{
 			SkillsComponent->GameplayEvents[TriggerCondition].Remove(this);
+		}
+	}
+}
+
+void UActiveSkillBase::AcquireCCImmunities()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	check(Instigator);
+
+	const FActiveSkillLevelUpInfo LevelUpInfo = GetCurrentSkillLevelupInfo();
+	if (LevelUpInfo.CrowdControlImmunities != 0)
+	{
+		AEODPlayerController* PC = Cast<AEODPlayerController>(Instigator->Controller);
+		UPlayerStatsComponent* StatsComp = PC ? PC->GetStatsComponent() : nullptr;
+		if (StatsComp)
+		{
+			FCCImmunityModifier CCImmunityMod(LevelUpInfo.CrowdControlImmunities, ECCImmunityModType::Additive);
+			StatsComp->CCImmunities.AddModifier(this, CCImmunityMod);
+		}
+	}
+}
+
+void UActiveSkillBase::LoseCCImmunities()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	check(Instigator);
+
+	const FActiveSkillLevelUpInfo LevelUpInfo = GetCurrentSkillLevelupInfo();
+	if (LevelUpInfo.CrowdControlImmunities != 0)
+	{
+		AEODPlayerController* PC = Cast<AEODPlayerController>(Instigator->Controller);
+		UPlayerStatsComponent* StatsComp = PC ? PC->GetStatsComponent() : nullptr;
+		if (StatsComp)
+		{
+			StatsComp->CCImmunities.RemoveModifier(this);
 		}
 	}
 }
