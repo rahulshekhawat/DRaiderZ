@@ -154,8 +154,6 @@ public:
 
 	int32 GetMaxValue() const { return MaxValue; }
 
-	// int32 GetMaxValue() { return bDirty ? RecalculateMaxValue() : MaxValue; }
-
 	int32 GetCurrentValue() const { return CurrentValue; }
 
 	/** Add a modifier to the maximum value of this primary stat */
@@ -173,6 +171,7 @@ public:
 				Modifiers.Add(UniqueID, NewMod);
 			}
 			RecalculateMaxValue();
+			OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
 		}
 	}
 
@@ -186,6 +185,7 @@ public:
 			{
 				Modifiers.Remove(UniqueID);
 				RecalculateMaxValue();
+				OnStatValueChanged.Broadcast(MaxValue, CurrentValue);
 			}
 		}
 	}
@@ -246,7 +246,6 @@ public:
 	~FGenericStat() { ; }
 
 	FGenericStat() :
-		bDirty(false),
 		Value_NoMod(0),
 		Value(0)
 	{
@@ -255,7 +254,6 @@ public:
 	FGenericStat(float InValue)
 	{
 		SetValue(InValue);
-		RecalculateValue();
 	}
 
 public:
@@ -263,34 +261,16 @@ public:
 	/** Directly set the value that doesn't have any modifier applied */
 	void SetValue(float InValue)
 	{
-		Value_NoMod = InValue <= 0 ? 1 : InValue;
-		bDirty = true;
-	}
-
-	float RecalculateValue()
-	{
-		Modifiers.ValueSort([&](const FStatModifier& Mod1, const FStatModifier& Mod2) { return Mod1 < Mod2; });
-
-		Value = Value_NoMod;
-		for (const TPair<uint32, FStatModifier>& ModPair : Modifiers)
+		InValue = InValue <= 0 ? 1 : InValue;
+		if (Value_NoMod != InValue)
 		{
-			if (ModPair.Value.ModType == EStatModType::Flat)
-			{
-				Value += ModPair.Value.Value;
-			}
-			else if (ModPair.Value.ModType == EStatModType::Percent)
-			{
-				Value += (Value * (ModPair.Value.Value / 100.f));
-			}
+			Value_NoMod = InValue;
+			RecalculateValue();
+			OnStatValueChanged.Broadcast(Value);
 		}
-
-		OnStatValueChanged.Broadcast(Value);
-
-		bDirty = false;
-		return Value;
 	}
 
-	float GetValue() { return bDirty ? RecalculateValue() : Value; }
+	float GetValue() { return Value; }
 
 	/** Add a modifier to the maximum value of this primary stat */
 	void AddModifier(UObject const* const SourceObj, const FStatModifier& NewMod)
@@ -306,7 +286,8 @@ public:
 			{
 				Modifiers.Add(UniqueID, NewMod);
 			}
-			bDirty = true;
+			RecalculateValue();
+			OnStatValueChanged.Broadcast(Value);
 		}
 	}
 
@@ -319,12 +300,11 @@ public:
 			if (Modifiers.Contains(UniqueID))
 			{
 				Modifiers.Remove(UniqueID);
-				bDirty = true;
+				RecalculateValue();
+				OnStatValueChanged.Broadcast(Value);
 			}
 		}
 	}
-
-	FOnGenericStatChangedMCDelegate OnStatValueChanged;
 
 	void ForceBroadcastDelegate()
 	{
@@ -332,9 +312,33 @@ public:
 		OnStatValueChanged.Broadcast(CV);
 	}
 
+	FOnGenericStatChangedMCDelegate OnStatValueChanged;
+
 private:
 
-	bool bDirty;
+	float RecalculateValue()
+	{
+		Modifiers.ValueSort([&](const FStatModifier& Mod1, const FStatModifier& Mod2) { return Mod1 < Mod2; });
+
+		int32 MaxFlat = Value_NoMod;
+		float FlatPercent = 0.f;
+
+		for (const TPair<uint32, FStatModifier>& ModPair : Modifiers)
+		{
+			if (ModPair.Value.ModType == EStatModType::Flat)
+			{
+				MaxFlat += ModPair.Value.Value;
+			}
+			else if (ModPair.Value.ModType == EStatModType::Percent)
+			{
+				FlatPercent += ModPair.Value.Value;
+			}
+		}
+
+		Value = MaxFlat + (MaxFlat * (FlatPercent / 100.f));
+		return Value;
+	}
+
 	float Value_NoMod;
 
 	UPROPERTY()
