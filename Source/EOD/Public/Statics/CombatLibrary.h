@@ -13,6 +13,15 @@ class AEODCharacterBase;
 class UAnimSequenceBase;
 class UGameplayEffectBase;
 
+/** This enum describes the intensity of camera shake */
+UENUM(BlueprintType)
+enum class ECameraShakeType : uint8
+{
+	Weak,
+	Medium,
+	Strong
+};
+
 /** This enum describes all the possible crowd control effects in game */
 UENUM(BlueprintType, Meta = (BitFlags))
 enum class ECrowdControlEffect : uint8
@@ -81,6 +90,9 @@ struct EOD_API FReceivedHitInfo
 	UPROPERTY()
 	TEnumAsByte<EPhysicalSurface> HitSurface;
 
+	UPROPERTY()
+	ECameraShakeType CamShakeType;
+
 	FReceivedHitInfo() :
 		HitInstigator(nullptr),
 		DamageResult(EDamageResult::Damaged),
@@ -90,7 +102,8 @@ struct EOD_API FReceivedHitInfo
 		ActualDamage(0.f),
 		bCritHit(false),
 		ReplicationIndex(0),
-		HitSurface(EPhysicalSurface::SurfaceType_Default)
+		HitSurface(EPhysicalSurface::SurfaceType_Default),
+		CamShakeType(ECameraShakeType::Weak)
 	{
 	}
 };
@@ -187,6 +200,9 @@ struct EOD_API FAttackInfo
 
 	UPROPERTY(BlueprintReadWrite)
 	float CrowdControlEffectDuration;
+	
+	UPROPERTY()
+	ECameraShakeType CamShakeType;
 
 	FAttackInfo() :
 		bUndodgable(false),
@@ -196,11 +212,21 @@ struct EOD_API FAttackInfo
 		CritDamage(0.f),
 		DamageType(EDamageType::Physical),
 		CrowdControlEffect(ECrowdControlEffect::Flinch),
-		CrowdControlEffectDuration(0.f)
+		CrowdControlEffectDuration(0.f),
+		CamShakeType(ECameraShakeType::Weak)
 	{
 	}
 
-	FAttackInfo(bool bInUndodgable, bool bInUnblockable, float InCritRate, float InNormalDamage, float InCritDamage, EDamageType InDamageType, ECrowdControlEffect InCCEffect, float InCCEDuration) :
+	FAttackInfo(
+		bool bInUndodgable,
+		bool bInUnblockable,
+		float InCritRate,
+		float InNormalDamage,
+		float InCritDamage,
+		EDamageType InDamageType,
+		ECrowdControlEffect InCCEffect,
+		float InCCEDuration,
+		ECameraShakeType InCamShakeType) :
 		bUndodgable(bInUndodgable),
 		bUnblockable(bInUnblockable),
 		CritRate(InCritRate),
@@ -208,7 +234,8 @@ struct EOD_API FAttackInfo
 		CritDamage(InCritDamage),
 		DamageType(InDamageType),
 		CrowdControlEffect(InCCEffect),
-		CrowdControlEffectDuration(InCCEDuration)
+		CrowdControlEffectDuration(InCCEDuration),
+		CamShakeType(InCamShakeType)
 	{
 	}
 };

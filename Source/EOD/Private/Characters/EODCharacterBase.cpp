@@ -686,6 +686,8 @@ TSharedPtr<FAttackResponse> AEODCharacterBase::ReceiveAttack(
 		ReceivedHitInfo.HitSurface = PhysMat->SurfaceType;
 	}
 
+	ReceivedHitInfo.CamShakeType = AttackInfoPtr->CamShakeType;
+
 	ReceivedHitInfo.ReplicationIndex = GetLastReceivedHitInfo().ReplicationIndex + 1;
 	SetLastReceivedHitInfo(ReceivedHitInfo);
 
@@ -751,6 +753,7 @@ float AEODCharacterBase::GetActualDamage(
 
 void AEODCharacterBase::TriggerReceivedHitCosmetics(const FReceivedHitInfo& HitInfo)
 {
+	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
 	if (HitInfo.DamageResult == EDamageResult::Dodged)
 	{
 		//~ @todo Display dodge message
@@ -768,10 +771,12 @@ void AEODCharacterBase::TriggerReceivedHitCosmetics(const FReceivedHitInfo& HitI
 	else if (HitInfo.DamageResult == EDamageResult::Nullified || HitInfo.DamageResult == EDamageResult::Damaged)
 	{
 		SetOffTargetSwitch(TargetSwitchDuration);
-
+		if (EODGI)
+		{
+			EODGI->PlayerCameraShakeOnHit(this, LastReceivedHit.HitInstigator, LastReceivedHit.CamShakeType, LastReceivedHit.HitLocation);
+		}
 	}
 
-	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
 	if (EODGI)
 	{
 		EODGI->DisplayDamageNumbers(
@@ -952,7 +957,8 @@ TSharedPtr<FAttackInfo> AEODCharacterBase::GetAttackInfoPtrFromNormalAttack(cons
 			CritDamage,
 			DamageType,
 			ECrowdControlEffect::Flinch,
-			0.f
+			0.f,
+			ECameraShakeType::Weak
 		));
 
 	return AttackInfoPtr;

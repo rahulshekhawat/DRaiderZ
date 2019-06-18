@@ -141,15 +141,6 @@ enum class ESkillEffect : uint8
 	DebuffEnemy
 };
 
-/** This enum describes the intensity of camera shake */
-UENUM(BlueprintType)
-enum class ECameraShakeType : uint8
-{
-	Weak,
-	Medium,
-	Strong
-};
-
 UENUM(BlueprintType)
 enum class EVocations : uint8
 {

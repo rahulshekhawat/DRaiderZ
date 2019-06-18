@@ -170,6 +170,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
 	FName AnimationStartSectionName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
+	ECameraShakeType CamShakeType;
+
 	/** The camera to play when this skill hits an enemy */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
 	TSoftClassPtr<UCameraShake> CameraShakeOnHitSoftClass;

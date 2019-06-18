@@ -172,6 +172,9 @@ public:
 	FLinearColor NPCCritDamagedTextColor;
 
 	// ----
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void PlayerCameraShakeOnHit(const AActor* DamagedActor, const AActor* DamageInstigator, ECameraShakeType CamShakeType, const FVector& EpiCenter);
 	
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void PlayCameraShake(ECameraShakeType CameraShakeType, const FVector& EpiCenter);

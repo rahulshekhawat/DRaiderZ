@@ -18,6 +18,7 @@ UActiveSkillBase::UActiveSkillBase(const FObjectInitializer& ObjectInitializer) 
 	AnimationStartSectionName		= FName("Default");
 	CooldownRemaining				= 0.f;
 	FailSafeDuration				= 0.5f;
+	CamShakeType					= ECameraShakeType::Weak;
 }
 
 void UActiveSkillBase::InitSkill(AEODCharacterBase* Instigator, AController* Owner)
@@ -318,7 +319,8 @@ TSharedPtr<FAttackInfo> UActiveSkillBase::GetAttackInfoPtr(int32 CollisionIndex)
 			CritDamage,
 			DamageType,
 			SkillInfo.CrowdControlEffect,
-			SkillInfo.CrowdControlEffectDuration
+			SkillInfo.CrowdControlEffectDuration,
+			CamShakeType
 		));
 
 	return AttackInfoPtr;

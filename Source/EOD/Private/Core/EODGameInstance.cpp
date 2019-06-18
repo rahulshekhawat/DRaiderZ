@@ -210,6 +210,16 @@ void UEODGameInstance::DisplayDamageNumbers(
 	}
 }
 
+void UEODGameInstance::PlayerCameraShakeOnHit(const AActor* DamagedActor, const AActor* DamageInstigator, ECameraShakeType CamShakeType, const FVector& EpiCenter)
+{
+	AEODPlayerController* PC = Cast<AEODPlayerController>(GetFirstLocalPlayerController());
+	APawn* ControlledPawn = PC ? PC->GetPawn() : nullptr;
+	if (DamagedActor == ControlledPawn || DamageInstigator == ControlledPawn)
+	{
+		PlayCameraShake(CamShakeType, EpiCenter);
+	}
+}
+
 void UEODGameInstance::PlayCameraShake(ECameraShakeType CameraShakeType, const FVector& EpiCenter)
 {
 	switch (CameraShakeType)

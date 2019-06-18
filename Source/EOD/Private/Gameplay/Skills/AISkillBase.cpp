@@ -9,8 +9,9 @@
 
 UAISkillBase::UAISkillBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bSkillCanBeCharged = false;
-	AnimationStartSectionName = FName("Default");
+	bSkillCanBeCharged					= false;
+	AnimationStartSectionName			= FName("Default");
+	CamShakeType						= ECameraShakeType::Weak;
 }
 
 bool UAISkillBase::CanTriggerSkill() const
@@ -81,7 +82,8 @@ TSharedPtr<FAttackInfo> UAISkillBase::GetAttackInfoPtr(int32 CollisionIndex)
 			CritDamage,
 			DamageType,
 			SkillInfo.CrowdControlEffect,
-			SkillInfo.CrowdControlEffectDuration
+			SkillInfo.CrowdControlEffectDuration,
+			CamShakeType
 		));
 
 	return AttackInfoPtr;
