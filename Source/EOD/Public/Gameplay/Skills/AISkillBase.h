@@ -31,17 +31,12 @@ struct EOD_API FAISkillInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
 	bool bIgnoresBlock;
 
-	/** Crowd control effect on hit */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	ECrowdControlEffect CrowdControlEffect;
-
-	/** The duration for which the crowd control effect should last (if applicable) */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
-	float CrowdControlEffectDuration;
+	FCCEffectInfo CCEffectInfo;
 
 	/** Immunities from crowd control effects granted on using this skill */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information", meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
-	uint8 CrowdControlImmunities;
+	uint8 AcquiredCCImmunities;
 
 	/** The duration before which the same skill can be used again */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Information")
@@ -55,9 +50,8 @@ struct EOD_API FAISkillInfo
 		bUnblockable(false),
 		bUndodgable(false),
 		bIgnoresBlock(false),
-		CrowdControlEffect(ECrowdControlEffect::Flinch),
-		CrowdControlEffectDuration(0.f),
-		CrowdControlImmunities(0),
+		CCEffectInfo(),
+		AcquiredCCImmunities(0),
 		Cooldown(0.f),
 		GameplayEffectInfo()
 	{

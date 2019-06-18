@@ -247,7 +247,8 @@ struct EOD_API FCCEffectInfo
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
 	ECrowdControlEffect CCEffect;
-	
+
+	/** The duration for which the crowd control effect should last (if applicable) */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
 	float CCDuration;
 

@@ -81,8 +81,8 @@ TSharedPtr<FAttackInfo> UAISkillBase::GetAttackInfoPtr(int32 CollisionIndex)
 			NormalDamage,
 			CritDamage,
 			DamageType,
-			SkillInfo.CrowdControlEffect,
-			SkillInfo.CrowdControlEffectDuration,
+			SkillInfo.CCEffectInfo.CCEffect,
+			SkillInfo.CCEffectInfo.CCDuration,
 			CamShakeType
 		));
 

@@ -257,27 +257,27 @@ void UAISkillsComponent::GenerateSkillTypesList()
 		else if (AISkill->GetSkillEffect() == ESkillEffect::DamageMelee)
 		{
 			MeleeSkills.Add(Key);
-			if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::Crystalized)
+			if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::Crystalized)
 			{
 				CrystalizeSkills.Add(Key);
 			}
-			else if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::Flinch)
+			else if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::Flinch)
 			{
 				FlinchSkills.Add(Key);
 			}
-			else if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::Interrupt)
+			else if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::Interrupt)
 			{
 				InterruptSkills.Add(Key);
 			}
-			else if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::KnockedBack)
+			else if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::KnockedBack)
 			{
 				KnockBackSkills.Add(Key);
 			}
-			else if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::KnockedDown)
+			else if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::KnockedDown)
 			{
 				KnockDownSkills.Add(Key);
 			}
-			else if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::Stunned)
+			else if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::Stunned)
 			{
 				StunSkills.Add(Key);
 			}
@@ -285,27 +285,27 @@ void UAISkillsComponent::GenerateSkillTypesList()
 		else if (AISkill->GetSkillEffect() == ESkillEffect::DamageRanged)
 		{
 			RangedSkills.Add(Key);
-			if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::Crystalized)
+			if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::Crystalized)
 			{
 				CrystalizeSkills.Add(Key);
 			}
-			else if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::Flinch)
+			else if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::Flinch)
 			{
 				FlinchSkills.Add(Key);
 			}
-			else if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::Interrupt)
+			else if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::Interrupt)
 			{
 				InterruptSkills.Add(Key);
 			}
-			else if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::KnockedBack)
+			else if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::KnockedBack)
 			{
 				KnockBackSkills.Add(Key);
 			}
-			else if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::KnockedDown)
+			else if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::KnockedDown)
 			{
 				KnockDownSkills.Add(Key);
 			}
-			else if (AISkill->SkillInfo.CrowdControlEffect == ECrowdControlEffect::Stunned)
+			else if (AISkill->SkillInfo.CCEffectInfo.CCEffect == ECrowdControlEffect::Stunned)
 			{
 				StunSkills.Add(Key);
 			}

@@ -386,8 +386,7 @@ struct EOD_API FGameplaySkillTableRow : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-	//~ @todo Change PlayerSkill to CharacterSkill
-	/** Player skill associated with this slot */
+	/** Character skill associated with this slot */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UGameplaySkillBase> SkillClass;
 
