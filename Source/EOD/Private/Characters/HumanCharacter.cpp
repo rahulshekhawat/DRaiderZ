@@ -850,13 +850,15 @@ bool AHumanCharacter::CCEInterrupt(const float BCAngle)
 		{
 			PreCCEStateEnter();
 
+			float InterruptDuration = 0.f;
+			int32 NumOfSections = 2; // Forward interrupt and backward interrupt
 			if (BCAngle <= 90)
 			{
-				PlayAnimMontage(AnimMontage, 1.f, UCharacterLibrary::SectionName_ForwardInterrupt);
+				InterruptDuration = (PlayAnimMontage(AnimMontage, 1.f, UCharacterLibrary::SectionName_ForwardInterrupt)) / NumOfSections;
 			}
 			else
 			{
-				PlayAnimMontage(AnimMontage, 1.f, UCharacterLibrary::SectionName_BackwardInterrupt);
+				InterruptDuration = (PlayAnimMontage(AnimMontage, 1.f, UCharacterLibrary::SectionName_BackwardInterrupt)) / NumOfSections;
 			}
 
 			CharacterStateInfo.CharacterState = ECharacterState::GotHit;
@@ -866,6 +868,18 @@ bool AHumanCharacter::CCEInterrupt(const float BCAngle)
 			if (MoveComp)
 			{
 				MoveComp->bUseControllerDesiredRotation = false;
+			}
+
+			InterruptDuration = InterruptDuration - AnimMontage->BlendOut.GetBlendTime();
+			if (InterruptDuration > 0.f)
+			{
+				UWorld* World = GetWorld();
+				check(World);
+				World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AHumanCharacter::ResetState, InterruptDuration);
+			}
+			else
+			{
+				ResetState();
 			}
 
 			return true;
