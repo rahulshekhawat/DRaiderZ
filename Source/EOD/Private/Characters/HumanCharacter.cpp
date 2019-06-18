@@ -492,6 +492,11 @@ void AHumanCharacter::StartDodge()
 {
 	if (Controller && Controller->IsLocalController())
 	{
+		if (IsBlocking())
+		{
+			StopBlockingAttacks();
+		}
+
 		// DodgeIndex
 		// 0 = Forward Dodge
 		// 1 = Backward Dodge

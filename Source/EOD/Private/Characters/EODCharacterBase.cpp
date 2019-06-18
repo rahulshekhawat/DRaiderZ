@@ -1533,6 +1533,11 @@ void AEODCharacterBase::StopBlockingAttacks()
 
 void AEODCharacterBase::OnJumpAnimationStart()
 {
+	if (IsBlocking())
+	{
+		StopBlockingAttacks();
+	}
+
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
 	{
