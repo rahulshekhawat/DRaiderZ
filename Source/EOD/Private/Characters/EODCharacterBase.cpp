@@ -834,13 +834,17 @@ bool AEODCharacterBase::ApplyCCE(
 			break;
 		case ECrowdControlEffect::KnockedDown:
 			bCCEApplied = CCEKnockdown(CCEDuration);
-			if (bCCEApplied && Role >= ENetRole::ROLE_Authority)
+			// If the character has a controller it means either character is locally controlled or on server, 
+			// so we don't need check for ENetRole
+			//~ @note:	Previously I was rotating the character only on server, which resulted in character rotating
+			//			everywhere except for the client owner. So now, I am forcing the rotation on client owner too.
+			//~ @see:	Bug # (@todo bug index)
+			if (bCCEApplied && Controller)
 			{
 				FVector OrientationVector = HitInstigator->GetActorLocation() - GetActorLocation();
 				FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
 
 				float DesiredYaw = OrientationRotator.Yaw;
-
 				UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 				if (MoveComp)
 				{
@@ -852,7 +856,7 @@ bool AEODCharacterBase::ApplyCCE(
 			break;
 		case ECrowdControlEffect::KnockedBack:
 			bCCEApplied = CCEKnockback(CCEDuration, HitInstigator->GetActorForwardVector());
-			if (bCCEApplied && Role >= ENetRole::ROLE_Authority)
+			if (bCCEApplied && Controller)
 			{
 				FVector OrientationVector = HitInstigator->GetActorLocation() - GetActorLocation();
 				FRotator OrientationRotator = OrientationVector.ToOrientationRotator();
