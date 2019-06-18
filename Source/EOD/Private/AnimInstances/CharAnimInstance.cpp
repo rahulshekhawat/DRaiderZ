@@ -13,13 +13,8 @@ void UCharAnimInstance::NativeInitializeAnimation()
 {
 	EODCharacterOwner = TryGetPawnOwner() ? Cast<AEODCharacterBase>(TryGetPawnOwner()) : nullptr;
 
-	FScriptDelegate OutDelegate;
-	OutDelegate.BindUFunction(this, FName("HandleMontageBlendingOut"));
-	OnMontageBlendingOut.AddUnique(OutDelegate);
-
-	FScriptDelegate EndDelegate;
-	EndDelegate.BindUFunction(this, FName("HandleMontageEnded"));
-	OnMontageEnded.AddUnique(EndDelegate);
+	OnMontageBlendingOut.AddDynamic(this, &UCharAnimInstance::HandleMontageBlendingOut);
+	OnMontageEnded.AddDynamic(this, &UCharAnimInstance::HandleMontageEnded);
 }
 
 void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -47,32 +42,70 @@ void UCharAnimInstance::NativeUninitializeAnimation()
 
 float UCharAnimInstance::GetMovementSpeed() const
 {
-	if (IsValid(EODCharacterOwner))
-	{
-		return EODCharacterOwner->GetVelocity().Size();
-	}
-
-	return 0.0f;
+	return EODCharacterOwner ? EODCharacterOwner->GetVelocity().Size() : 0.f;
 }
 
 bool UCharAnimInstance::IsBlocking() const
 {
-	if (IsValid(EODCharacterOwner))
-	{
-		return EODCharacterOwner->IsBlocking();
-	}
-
-	return false;
+	return EODCharacterOwner ? EODCharacterOwner->IsBlocking() : false;
 }
 
 ECharMovementDirection UCharAnimInstance::GetIWRCharMovementDir() const
 {
-	if (IsValid(EODCharacterOwner))
+	return EODCharacterOwner ? EODCharacterOwner->GetCharacterMovementDirection() : ECharMovementDirection::None;
+}
+
+void UCharAnimInstance::TransitionBetweenMontages(
+	UAnimMontage* TransitionFromMontage,
+	UAnimMontage* TransitionToMontage,
+	const FName Section,
+	bool bZeroBlendOut)
+{
+	if (Montage_IsPlaying(TransitionFromMontage))
 	{
-		return EODCharacterOwner->GetCharacterMovementDirection();
+		int32 MovingMontageSectionIndex = TransitionToMontage->GetSectionIndex(Section);
+		int32 StandStillMontageSectionIndex = TransitionFromMontage->GetSectionIndex(Section);
+		if (MovingMontageSectionIndex != INDEX_NONE && StandStillMontageSectionIndex != INDEX_NONE)
+		{
+			float SectionStartTime;
+			float SectionEndtime;
+			TransitionFromMontage->GetSectionStartAndEndTime(StandStillMontageSectionIndex, SectionStartTime, SectionEndtime);
+			float CurrentPosition = Montage_GetPosition(TransitionFromMontage);
+			float SectionOffset = CurrentPosition - SectionStartTime;
+			if (bZeroBlendOut)
+			{
+				Montage_Stop(0.f, TransitionFromMontage);
+			}
+			else
+			{
+				Montage_Stop(TransitionFromMontage->BlendOut.GetBlendTime(), TransitionFromMontage);
+			}
+
+			TransitionToMontage->GetSectionStartAndEndTime(MovingMontageSectionIndex, SectionStartTime, SectionEndtime);
+			float MontageStartPosition = SectionStartTime + SectionOffset;
+
+			Montage_Play(TransitionToMontage, 1.f, EMontagePlayReturnType::MontageLength, MontageStartPosition);
+		}
+	}
+}
+
+float UCharAnimInstance::GetSectionLength(UAnimMontage* AnimMontage, FName SectionName)
+{
+	if (!AnimMontage || SectionName == NAME_None)
+	{
+		return -1.f;
 	}
 
-	return ECharMovementDirection::None;
+	int32 SectionIndex = AnimMontage->GetSectionIndex(SectionName);
+	if (SectionIndex != INDEX_NONE)
+	{
+		float StartTime;
+		float EndTime;
+		AnimMontage->GetSectionStartAndEndTime(SectionIndex, StartTime, EndTime);
+		return EndTime - StartTime;
+	}
+
+	return -1.f;
 }
 
 void UCharAnimInstance::HandleMontageBlendingOut(UAnimMontage* AnimMontage, bool bInterrupted)

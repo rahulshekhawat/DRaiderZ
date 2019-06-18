@@ -29,8 +29,7 @@ public class EOD : ModuleRules
                 "EOD/Public/Statics",
                 "EOD/Public/UI",
                 "EOD/Public/UI/Menu",
-                "EOD/Public/Weapons",
-                "EOD/Public/Weapons/Components",
+                "EOD/Public/Weapons"
             }
         );
 

@@ -9,6 +9,7 @@
 #include "EODCharacterMovementComponent.h"
 #include "PlayerStatsComponent.h"
 #include "EODPlayerController.h"
+#include "HumanCharAnimInstance.h"
 
 #include "UnrealNetwork.h"
 #include "TimerManager.h"
@@ -1011,16 +1012,23 @@ void AHumanCharacter::CCEEndKnockdown()
 {
 	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
 	UAnimMontage* KnockdownMontage = AnimRef ? AnimRef->Knockdown.Get() : nullptr;
-	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	UHumanCharAnimInstance* AnimInstance = GetMesh() ? Cast<UHumanCharAnimInstance>(GetMesh()->GetAnimInstance()) : nullptr;
 	if (AnimInstance && KnockdownMontage && AnimInstance->Montage_IsPlaying(KnockdownMontage))
 	{
 		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownEnd);
-		ResetState();
+		float Duration = AnimInstance->GetSectionLength(KnockdownMontage, UCharacterLibrary::SectionName_KnockdownEnd);
+		Duration = Duration - KnockdownMontage->BlendOut.GetBlendTime();
+		if (Duration > 0.f)
+		{
+			UWorld* World = GetWorld();
+			check(World);
+			World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AHumanCharacter::ResetState, Duration);
+		}
+		else
+		{
+			ResetState();
+		}
 	}
-
-	UWorld* World = GetWorld();
-	check(World);
-	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
 }
 
 bool AHumanCharacter::CCEKnockback(const float Duration, const FVector& ImpulseDirection)
