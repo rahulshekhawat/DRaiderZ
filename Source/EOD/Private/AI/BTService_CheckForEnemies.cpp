@@ -38,26 +38,33 @@ void UBTService_CheckForEnemies::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 	}
 
 	UObject* EnemyObject = BlackboardComp->GetValueAsObject(UAILibrary::BBKey_TargetEnemy);
-	if (IsValid(EnemyObject))
+	AEODCharacterBase* EnemyCharacter = Cast<AEODCharacterBase>(EnemyObject);
+	if (IsValid(EnemyCharacter))
 	{
-		AEODCharacterBase* EnemyCharacter = Cast<AEODCharacterBase>(EnemyObject);
-		if (IsValid(EnemyCharacter))
+		float MaxEnemyChaseRadius = BlackboardComp->GetValueAsFloat(UAILibrary::BBKey_MaxEnemyChaseRadius);
+		float Distance = (PawnOwner->GetActorLocation() - EnemyCharacter->GetActorLocation()).Size();
+
+		if (Distance < MaxEnemyChaseRadius)
 		{
-			float MaxEnemyChaseRadius = BlackboardComp->GetValueAsFloat(UAILibrary::BBKey_MaxEnemyChaseRadius);
-			float Distance = (PawnOwner->GetActorLocation() - EnemyCharacter->GetActorLocation()).Size();
+			FVector SpawnLocation = BlackboardComp->GetValueAsVector(UAILibrary::BBKey_SpawnLocation);
+			FVector EnemyLocation = EnemyCharacter->GetActorLocation();
 
-			if (Distance < MaxEnemyChaseRadius)
+			float AggroAreaRadius = BlackboardComp->GetValueAsFloat(UAILibrary::BBKey_AggroAreaRadius);
+			if ((SpawnLocation - EnemyLocation).Size() < AggroAreaRadius)
 			{
-				FVector SpawnLocation = BlackboardComp->GetValueAsVector(UAILibrary::BBKey_SpawnLocation);
-				FVector EnemyLocation = EnemyCharacter->GetActorLocation();
-
-				float AggroAreaRadius = BlackboardComp->GetValueAsFloat(UAILibrary::BBKey_AggroAreaRadius);
-				if ((SpawnLocation - EnemyLocation).Size() < AggroAreaRadius)
-				{
-					// Nothing to do. Continue chasing/attacking
-					return;
-				}
+				// Nothing to do. Continue chasing/attacking
+				return;
 			}
+			// If the enemy being chased has left the aggro area
+			else
+			{
+				LookForAnotherEnemy(OwnerComp, NodeMemory, DeltaSeconds);
+			}
+		}
+		// If the enemy is no longer within enemy chase radius
+		else
+		{
+			LookForAnotherEnemy(OwnerComp, NodeMemory, DeltaSeconds);
 		}
 	}
 	// If we don't have any valid target enemy set
@@ -65,8 +72,6 @@ void UBTService_CheckForEnemies::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 	{
 		LookForAnotherEnemy(OwnerComp, NodeMemory, DeltaSeconds);
 	}
-
-	// @todo enemy detection logic needs improvement
 }
 
 void UBTService_CheckForEnemies::OnSearchStart(FBehaviorTreeSearchData& SearchData)
@@ -96,6 +101,10 @@ void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& Own
 
 	FVector TraceEnd = OwnerLocation + FVector(0.f, 0.f, 1.f);
 	bool bHit = World->SweepMultiByChannel(HitResults, OwnerLocation, TraceEnd, FQuat::Identity, COLLISION_COMBAT, CollisionShape, Params);
+
+	FVector SpawnLocation = BlackboardComp->GetValueAsVector(UAILibrary::BBKey_SpawnLocation);
+	float AggroAreaRadius = BlackboardComp->GetValueAsFloat(UAILibrary::BBKey_AggroAreaRadius);
+
 	for (FHitResult& HitResult : HitResults)
 	{
 		AEODCharacterBase* HitCharacter = Cast<AEODCharacterBase>(HitResult.GetActor());
@@ -104,13 +113,18 @@ void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& Own
 			continue;
 		}
 
-		BlackboardComp->SetValueAsObject(UAILibrary::BBKey_TargetEnemy, HitCharacter);
-		BlackboardComp->SetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget, true);
+		FVector EnemyLocation = HitCharacter->GetActorLocation();
+		if ((SpawnLocation - EnemyLocation).Size() < AggroAreaRadius)
+		{
+			BlackboardComp->SetValueAsObject(UAILibrary::BBKey_TargetEnemy, HitCharacter);
+			BlackboardComp->SetValueAsBool(UAILibrary::BBKey_bHasEnemyTarget, true);
 
-		// Put character in combat state
-		CharacterOwner->SetInCombat(true);
-		return;
+			// Put character in combat state
+			CharacterOwner->SetInCombat(true);
+			return;
+		}
 	}
+
 
 	CharacterOwner->SetInCombat(false);
 }
