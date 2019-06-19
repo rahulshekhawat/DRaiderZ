@@ -138,5 +138,5 @@ void UBTTask_EODRotateToFaceBBEntry::TickTask(UBehaviorTreeComponent& OwnerComp,
 
 EBTNodeResult::Type UBTTask_EODRotateToFaceBBEntry::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	return EBTNodeResult::Aborted;
+	return Super::AbortTask(OwnerComp, NodeMemory);
 }
