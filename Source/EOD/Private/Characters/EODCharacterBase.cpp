@@ -1053,6 +1053,11 @@ FName AEODCharacterBase::GetMostWeightedMeleeSkillID(AEODCharacterBase const * c
 	return FName();
 }
 
+FName AEODCharacterBase::GetMostWeightedRangedSkillID(const AEODCharacterBase* TargetCharacter) const
+{
+	return FName();
+}
+
 FName AEODCharacterBase::GetCurrentActiveSkillID() const
 {
 	FName ActiveSkillID = NAME_None;
@@ -1098,6 +1103,11 @@ void AEODCharacterBase::SetLastUsedSkill(const FLastUsedSkillInfo& SkillInfo)
 UGameplaySkillBase* AEODCharacterBase::GetSkill(FName SkillID) const
 {
 	return SkillManager ? SkillManager->GetSkillForSkillGroup(SkillID) : nullptr;
+}
+
+FName AEODCharacterBase::GetMostWeightedSkillID(const AEODCharacterBase* TargetCharacter) const
+{
+	return FName();
 }
 
 bool AEODCharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill)

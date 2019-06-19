@@ -193,8 +193,14 @@ public:
 	 */
 	virtual EEODTaskStatus CheckSkillStatus(FName SkillID) override;
 
-	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
+	/** [AI] Returns any (melee or ranged) attack skill that is most appropriate to use in current state against the given enemy */
+	virtual FName GetMostWeightedSkillID(const AEODCharacterBase* TargetCharacter) const override;
+
+	/** [AI] Returns the melee attack skill that is most appropriate to use in current state against the given enemy */
 	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const override;
+
+	/** [AI] Returns the ranged attack skill that is most appropriate to use in current state against the given enemy */
+	virtual FName GetMostWeightedRangedSkillID(const AEODCharacterBase* TargetCharacter) const override;
 
 	/** Event called when this character activates a skill */
 	virtual void OnSkillActivated(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill) override;

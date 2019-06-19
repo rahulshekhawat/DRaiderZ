@@ -444,6 +444,17 @@ EEODTaskStatus AAICharacterBase::CheckSkillStatus(FName SkillID)
 	}
 }
 
+FName AAICharacterBase::GetMostWeightedSkillID(const AEODCharacterBase* TargetCharacter) const
+{
+	FName MostWeightedSkillID = NAME_None;
+	UAISkillsComponent* SkillsComp = Cast<UAISkillsComponent>(GetGameplaySkillsComponent());
+	if (SkillsComp)
+	{
+		MostWeightedSkillID = SkillsComp->GetMostWeightedSkillID(TargetCharacter);
+	}
+	return MostWeightedSkillID;
+}
+
 FName AAICharacterBase::GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const
 {
 	FName MostWeightedSkillID = NAME_None;
@@ -451,6 +462,17 @@ FName AAICharacterBase::GetMostWeightedMeleeSkillID(const AEODCharacterBase* Tar
 	if (SkillsComp)
 	{
 		MostWeightedSkillID = SkillsComp->GetMostWeightedMeleeSkillID(TargetCharacter);
+	}
+	return MostWeightedSkillID;
+}
+
+FName AAICharacterBase::GetMostWeightedRangedSkillID(const AEODCharacterBase* TargetCharacter) const
+{
+	FName MostWeightedSkillID = NAME_None;
+	UAISkillsComponent* SkillsComp = Cast<UAISkillsComponent>(GetGameplaySkillsComponent());
+	if (SkillsComp)
+	{
+		MostWeightedSkillID = SkillsComp->GetMostWeightedRangedSkillID(TargetCharacter);
 	}
 	return MostWeightedSkillID;
 }

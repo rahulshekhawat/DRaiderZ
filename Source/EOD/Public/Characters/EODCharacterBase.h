@@ -956,9 +956,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Skill System")
 	UGameplaySkillBase* GetSkill(FName SkillID) const;
 
-	/** [AI] Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
+	/** [AI] Returns any (melee or ranged) attack skill that is most appropriate to use in current state against the given enemy */
+	UFUNCTION(BlueprintPure, Category = "Skill System")
+	virtual FName GetMostWeightedSkillID(const AEODCharacterBase* TargetCharacter) const;
+
+	/** [AI] Returns the melee attack skill that is most appropriate to use in current state against the given enemy */
 	UFUNCTION(BlueprintPure, Category = "Skill System")
 	virtual FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const;
+
+	/** [AI] Returns the ranged attack skill that is most appropriate to use in current state against the given enemy */
+	UFUNCTION(BlueprintPure, Category = "Skill System")
+	virtual FName GetMostWeightedRangedSkillID(const AEODCharacterBase* TargetCharacter) const;
 
 	/**
 	 * Determines and returns the status of a skill
