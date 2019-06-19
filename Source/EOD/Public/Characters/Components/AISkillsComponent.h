@@ -55,72 +55,105 @@ public:
 	/** Event called when a skill gets finished */
 	virtual void OnSkillFinished(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill) override;
 
+	FName GetMostWeightedSkillID(const AEODCharacterBase* TargetCharacter) const;
+
 	/** Returns the melee attack skill that is more appropriate to use in current state against the given enemy */
 	FName GetMostWeightedMeleeSkillID(const AEODCharacterBase* TargetCharacter) const;
 
+	FName GetMostWeightedRangedSkillID(const AEODCharacterBase* TargetCharacter) const;
+
+	FName GetHealingSkillID(bool bPartyHeal = false) const;
+
+	FName GetWeightedBuffSkillID(bool bPartyBuff = false) const;
+
+	FName GetWeightedDebuffSkillID() const;
+
 	void GenerateSkillTypesList();
 
-private:
-	
-	/** Cache for skills that can knock down enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> KnockDownSkills;
+protected:
 
-	/** Cache for skills that can knock back enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> KnockBackSkills;
+	// --------------------------------------
+	//  Pseudo Constants
+	// --------------------------------------
 
-	/** Cache for skills that can interrupt enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> InterruptSkills;
+	UPROPERTY(EditAnywhere, Category = Skills, BlueprintReadOnly)
+	float MaxMeleeRange;
 
-	/** Cache for skills that can stun enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> StunSkills;
-	
-	/** Cache for skills that can crystalize enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> CrystalizeSkills;
+	// --------------------------------------
+	//  Cache
+	// --------------------------------------
 
-	/** Cache for skills that can flinch enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> FlinchSkills;
-
-	/** Cache for ranged skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> RangedSkills;
-
-	/** Cache for melee skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly)
 	TArray<FName> MeleeSkills;
 
-	/** Cache for self healing skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> SelfHealSkills;
+	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly)
+	TArray<FName> RangedSkills;
 
-	/** Cache for party healing skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> PartyHealSkills;
+	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly)
+	TArray<FName> SelfHealingSkills;
+	
+	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly)
+	TArray<FName> PartyHealingSkills;
 
-	/** Cache for skills that put a debuff on enemies */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<FName> DebuffSkills;
-
-	/** Cache for self buff skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly)
 	TArray<FName> SelfBuffSkills;
-
-	/** Cache for party buff skills */
-	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	
+	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly)
 	TArray<FName> PartyBuffSkills;
 
-	/** A map of skills to their usability weight */
-	// UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// TMap<FName, int32> SkillPriorityMap;
+	UPROPERTY(Transient, Category = Skills, BlueprintReadOnly)
+	TArray<FName> DebuffSkills;
 
-	/** A map of skills to their usability weight */
-	// UPROPERTY(Transient, Category = Skills, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	// TMap<FName, int32> SkillWeightMap;
+private:
 
+	FName GetRandomUnblockableSkill(const TArray<FName>& SkillSource, const TArray<FName>& SkillsToIgnore) const;
+	FName GetRandomUndodgableSkill(const TArray<FName>& SkillSource, const TArray<FName>& SkillsToIgnore) const;
+	FName GetRandomInterruptSkill(const TArray<FName>& SkillSource, const TArray<FName>& SkillsToIgnore) const;
+	FName GetRandomCCESkill(const TArray<FName>& SkillSource, const TArray<FName>& SkillsToIgnore) const;
+	FName GetRandomNormalSkill(const TArray<FName>& SkillSource, const TArray<FName>& SkillsToIgnore) const;
+	FName GetAnyRandomSkill(const TArray<FName>& SkillSource, const TArray<FName>& SkillsToIgnore) const;
+
+	inline TArray<FName> GetAvailableSkills(const TArray<FName>& SkillSource, const TArray<FName>& SkillsToIgnore) const;
+	inline FName GetRandomName(const TArray<FName>& NameArray) const;
 
 };
+
+inline TArray<FName> UAISkillsComponent::GetAvailableSkills(const TArray<FName>& SkillSource, const TArray<FName>& SkillsToIgnore) const
+{
+	if (SkillSource == SkillsToIgnore)
+	{
+		return TArray<FName>();
+	}
+
+	if (SkillsToIgnore.Num() == 0)
+	{
+		return SkillSource;
+	}
+	else
+	{
+		TArray<FName> AvailableSkills;
+		for (const FName& Key : SkillSource)
+		{
+			if (!SkillsToIgnore.Contains(Key))
+			{
+				AvailableSkills.Add(Key);
+			}
+		}
+		return AvailableSkills;
+	}
+}
+
+inline FName UAISkillsComponent::GetRandomName(const TArray<FName>& NameArray) const
+{
+	int32 ArraySize = NameArray.Num();
+	if (ArraySize > 0)
+	{
+		int32 RandomIndex = FMath::RandRange(0, ArraySize - 1);
+		FName RandomName = NameArray[RandomIndex];
+		return RandomName;
+	}
+	else
+	{
+		return NAME_None;
+	}
+}
