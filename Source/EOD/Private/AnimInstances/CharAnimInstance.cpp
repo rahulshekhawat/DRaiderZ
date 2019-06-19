@@ -13,8 +13,8 @@ void UCharAnimInstance::NativeInitializeAnimation()
 {
 	EODCharacterOwner = TryGetPawnOwner() ? Cast<AEODCharacterBase>(TryGetPawnOwner()) : nullptr;
 
-	OnMontageBlendingOut.AddDynamic(this, &UCharAnimInstance::HandleMontageBlendingOut);
-	OnMontageEnded.AddDynamic(this, &UCharAnimInstance::HandleMontageEnded);
+	OnMontageBlendingOut.AddUniqueDynamic(this, &UCharAnimInstance::HandleMontageBlendingOut);
+	OnMontageEnded.AddUniqueDynamic(this, &UCharAnimInstance::HandleMontageEnded);
 }
 
 void UCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
