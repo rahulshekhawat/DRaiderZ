@@ -520,6 +520,13 @@ void AAICharacterBase::UpdateMovement(float DeltaTime)
 
 void AAICharacterBase::UpdateRotation(float DeltaTime)
 {
+	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
+	// if (bCharacterStateAllowsRotation && MoveComp)
+	if (CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun && MoveComp)
+	{
+		FRotator DesiredRotation = MoveComp->GetMovementDesiredRotaion();
+		MoveComp->SetDesiredCustomRotation(DesiredRotation);
+	}
 }
 
 void AAICharacterBase::InitiateDeathSequence_Implementation()

@@ -12,6 +12,9 @@
 UEODCharacterMovementComponent::UEODCharacterMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	RotationRate = FRotator(300.f, 600.f, 300.f);
+	bAllowPhysicsRotationDuringAnimRootMotion = true;
+
+	bOrientRotationToMovement = false;
 }
 
 void UEODCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

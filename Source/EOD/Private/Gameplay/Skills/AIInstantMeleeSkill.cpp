@@ -26,6 +26,13 @@ void UAIInstantMeleeSkill::TriggerSkill()
 	bool bIsLocalController = AIController && AIController->IsLocalController(); 
 	if (bIsLocalController)
 	{
+		Instigator->SetCharacterStateAllowsMovement(false);
+		Instigator->SetCharacterStateAllowsRotation(false);
+
+		FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
+		StateInfo.NewReplicationIndex = Instigator->CharacterStateInfo.NewReplicationIndex + 1;
+		Instigator->CharacterStateInfo = StateInfo;
+
 		UBlackboardComponent* BComp = AIController->GetBlackboardComponent();
 		if (BComp)
 		{
@@ -45,14 +52,6 @@ void UAIInstantMeleeSkill::TriggerSkill()
 				MoveComp->SetDesiredCustomRotationYaw(DesiredRotationYaw);
 			}
 		}
-
-
-		Instigator->SetCharacterStateAllowsMovement(false);
-		Instigator->SetCharacterStateAllowsRotation(false);
-
-		FCharacterStateInfo StateInfo(ECharacterState::UsingActiveSkill, SkillIndex);
-		StateInfo.NewReplicationIndex = Instigator->CharacterStateInfo.NewReplicationIndex + 1;
-		Instigator->CharacterStateInfo = StateInfo;
 	}
 
 	if (SkillMontage)

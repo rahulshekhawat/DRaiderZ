@@ -49,7 +49,7 @@ public:
 	//  Rotation
 	// --------------------------------------
 
-	FORCEINLINE FRotator GetDesiredCustomRotation() const
+	FORCEINLINE const FRotator& GetDesiredCustomRotation() const
 	{
 		return DesiredCustomRotation;
 	}
@@ -61,6 +61,8 @@ public:
 	inline void SetDesiredCustomRotationYaw(float RotationYaw);
 
 	inline void SetDesiredCustomRotationYaw_LocalOnly(float RotationYaw);
+
+	inline FRotator GetMovementDesiredRotaion() const;
 
 protected:
 
@@ -123,4 +125,23 @@ inline void UEODCharacterMovementComponent::SetDesiredCustomRotationYaw(float Ro
 inline void UEODCharacterMovementComponent::SetDesiredCustomRotationYaw_LocalOnly(float RotationYaw)
 {
 	SetDesiredCustomRotation_LocalOnly(FRotator(DesiredCustomRotation.Pitch, RotationYaw, DesiredCustomRotation.Roll));
+}
+
+inline FRotator UEODCharacterMovementComponent::GetMovementDesiredRotaion() const
+{
+	if (Acceleration.SizeSquared() < KINDA_SMALL_NUMBER)
+	{
+		// Not sure why but using bHasRequestedVelocity gives incorrect result but it shouldn't (as per the method definition of ComputeOrientToMovementRotation
+		// if (bHasRequestedVelocity RequestedVelocity.SizeSquared() > KINDA_SMALL_NUMBER)
+		if (RequestedVelocity.SizeSquared() > KINDA_SMALL_NUMBER)
+		{
+			return RequestedVelocity.GetSafeNormal().Rotation();
+		}
+
+		// Don't change rotation if there is no acceleration.
+		return UpdatedComponent->GetComponentRotation();
+	}
+
+	// Rotate toward direction of acceleration.
+	return Acceleration.GetSafeNormal().Rotation();
 }
