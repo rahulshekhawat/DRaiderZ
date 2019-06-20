@@ -52,7 +52,10 @@ void AEODAIControllerBase::SetPawn(APawn* InPawn)
 		int32 CurrentValue = StatsComponent->Health.GetCurrentValue();
 
 		AICharacter->UpdateHealth(MaxValue, CurrentValue);
-		StatsComponent->Health.OnStatValueChanged.AddUObject(AICharacter, &AAICharacterBase::UpdateHealth);
+		if (!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(AICharacter))
+		{
+			StatsComponent->Health.OnStatValueChanged.AddUObject(AICharacter, &AAICharacterBase::UpdateHealth);
+		}
 	}
 }
 

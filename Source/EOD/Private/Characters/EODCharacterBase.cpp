@@ -1292,6 +1292,10 @@ void AEODCharacterBase::OnRep_LastReceivedHit(const FReceivedHitInfo& OldHitInfo
 
 void AEODCharacterBase::OnRep_Health(FCharacterStat& OldHealth)
 {
+	if (Health.CurrentValue <= 0)
+	{
+		InitiateDeathSequence();
+	}
 }
 
 void AEODCharacterBase::OnRep_Mana(FCharacterStat& OldMana)

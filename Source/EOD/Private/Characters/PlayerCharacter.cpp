@@ -131,6 +131,12 @@ bool APlayerCharacter::CanUseAnySkill() const
 	return (GetEquippedWeaponType() != EWeaponType::None) && !IsWeaponSheathed() && (IsIdleOrMoving() || IsBlocking() || IsNormalAttacking());
 }
 
+void APlayerCharacter::InitiateDeathSequence_Implementation()
+{
+	PrintToScreen(this, FString("Initiating player death sequence"), 10.f);
+
+}
+
 void APlayerCharacter::PlaySystemSound(USoundBase* SoundToPlay)
 {
 	check(SystemAudioComponent);

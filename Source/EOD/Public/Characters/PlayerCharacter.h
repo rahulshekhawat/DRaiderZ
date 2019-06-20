@@ -132,6 +132,12 @@ public:
 	virtual bool CanUseAnySkill() const override;
 
 	// --------------------------------------
+	//  Gameplay
+	// --------------------------------------
+
+	virtual void InitiateDeathSequence_Implementation() override;
+
+	// --------------------------------------
 	//  Sounds
 	// --------------------------------------
 

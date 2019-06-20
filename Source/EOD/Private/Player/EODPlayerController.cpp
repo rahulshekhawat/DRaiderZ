@@ -174,6 +174,18 @@ void AEODPlayerController::SetPawn(APawn* InPawn)
 {
 	Super::SetPawn(InPawn);
 	EODCharacter = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
+
+	if (Role >= ROLE_Authority && StatsComponent && EODCharacter)
+	{
+		int32 MaxValue = StatsComponent->Health.GetMaxValue();
+		int32 CurrentValue = StatsComponent->Health.GetCurrentValue();
+
+		EODCharacter->UpdateHealth(MaxValue, CurrentValue);
+		if (!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(EODCharacter))
+		{
+			StatsComponent->Health.OnStatValueChanged.AddUObject(EODCharacter, &AEODCharacterBase::UpdateHealth);
+		}
+	}
 }
 
 void AEODPlayerController::LoadPlayerState()
