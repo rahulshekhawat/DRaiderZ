@@ -318,6 +318,8 @@ struct EOD_API FPlayerAnimationReferencesTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerAnimations)
 	TSoftObjectPtr<UAnimMontage> Die;
 
+	//~ @todo Rebirth
+
 	////////////////////////////////
 	//~ @todo Remove following
 

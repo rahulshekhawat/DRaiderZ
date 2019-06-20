@@ -576,6 +576,8 @@ void AAICharacterBase::InitiateDeathSequence_Implementation()
 	}
 
 	CharacterStateInfo.CharacterState = ECharacterState::Dead;
+
+	//~ @todo Implement respawn
 }
 
 void AAICharacterBase::DestroyFloatingHealthWidget()

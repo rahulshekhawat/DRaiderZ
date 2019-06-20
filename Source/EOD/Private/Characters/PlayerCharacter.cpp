@@ -28,6 +28,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Engine/StreamableManager.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
@@ -133,8 +134,32 @@ bool APlayerCharacter::CanUseAnySkill() const
 
 void APlayerCharacter::InitiateDeathSequence_Implementation()
 {
-	PrintToScreen(this, FString("Initiating player death sequence"), 10.f);
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	float DeathMontageDuration = 0.f;
+	if (AnimInstance)
+	{
+		AnimInstance->StopAllMontages(0.f);
 
+		FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+		UAnimMontage* DieMontage = AnimRef ? AnimRef->Die.Get() : nullptr;
+		if (DieMontage)
+		{
+			AnimInstance->Montage_Play(DieMontage);
+			AnimInstance->Montage_JumpToSection(FName("DeathStart"), DieMontage);
+		}
+	}
+
+	UCapsuleComponent* CapComp = GetCapsuleComponent();
+	if (CapComp)
+	{
+		CapComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	CharacterStateInfo.CharacterState = ECharacterState::Dead;
+
+	//~ @todo stop health regeneration.
+	//~ @todo provide option for respawn
+	//~ @todo cleanup gameplay effects
 }
 
 void APlayerCharacter::PlaySystemSound(USoundBase* SoundToPlay)
