@@ -413,7 +413,7 @@ bool AEODCharacterBase::CanNormalAttack() const
 
 bool AEODCharacterBase::CanUseAnySkill() const
 {
-	return IsIdleOrMoving();
+	return SkillManager && SkillManager->CanUseAnySkill();
 }
 
 bool AEODCharacterBase::CanUseSkill(FName SkillID, UGameplaySkillBase* Skill)

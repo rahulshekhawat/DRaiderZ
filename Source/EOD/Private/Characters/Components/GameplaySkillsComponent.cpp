@@ -121,7 +121,7 @@ void UGameplaySkillsComponent::CancelSkillsWithTag(FGameplayTag Tag)
 
 bool UGameplaySkillsComponent::CanUseAnySkill() const
 {
-	return IsValid(EODCharacterOwner) && EODCharacterOwner->CanUseAnySkill();
+	return EODCharacterOwner && EODCharacterOwner->IsIdleOrMoving() && SkillIndexToSkillMap.Num() > 0;
 }
 
 bool UGameplaySkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
