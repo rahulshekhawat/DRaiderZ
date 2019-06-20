@@ -129,24 +129,12 @@ void UAISkillsComponent::CancelAllActiveSkills()
 
 bool UAISkillsComponent::CanUseAnySkill() const
 {
-	return false;
+	return Super::CanUseAnySkill();
 }
 
 bool UAISkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
 {
-	if (!SkillIndexToSkillMap.Contains(SkillIndex))
-	{
-		return false;
-	}
-
-	UAISkillBase* AISkill = Skill ? Cast<UAISkillBase>(Skill) : Cast<UAISkillBase>(SkillIndexToSkillMap[SkillIndex]);
-	if (!AISkill)
-	{
-		return false;
-	}
-
-	bool bCanTriggerSkill = AISkill->CanTriggerSkill();
-	return bCanTriggerSkill;
+	return Super::CanUseSkill(SkillIndex, Skill);
 }
 
 void UAISkillsComponent::OnSkillCancelled(uint8 SkillIndex, FName SkillGroup, UGameplaySkillBase* Skill)

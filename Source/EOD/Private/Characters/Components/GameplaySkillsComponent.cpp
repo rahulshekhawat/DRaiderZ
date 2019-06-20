@@ -135,6 +135,17 @@ bool UGameplaySkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase*
 	return Skill ? Skill->CanTriggerSkill() : false;
 }
 
+bool UGameplaySkillsComponent::CanUseSkill(FName SkillGroup, UGameplaySkillBase* Skill)
+{
+	check(SkillGroupToSkillMap.Contains(SkillGroup));
+	if (Skill == nullptr)
+	{
+		Skill = SkillGroupToSkillMap[SkillGroup];
+	}
+
+	return Skill ? Skill->CanTriggerSkill() : false;
+}
+
 void UGameplaySkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill)
 {
 }

@@ -81,6 +81,8 @@ public:
 
 	virtual bool CanReleaseSkill() const override;
 
+	virtual void CancelSkill() override;
+
 	virtual void FinishSkill() override;
 
 	virtual TSharedPtr<FAttackInfo> GetAttackInfoPtr(int32 CollisionIndex = 1) override;
@@ -106,5 +108,9 @@ public:
 	FAISkillInfo SkillInfo;
 
 	float SkillDuration;
+
+protected:
+
+	FTimerHandle SkillTimerHandle;
 
 };

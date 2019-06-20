@@ -61,9 +61,12 @@ public:
 	/** Returns true if the character can use any skill right now */
 	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual bool CanUseAnySkill() const;
+	
+	/** Returns true if the character can use skill corresponding to given SkillGroup */
+	UFUNCTION(BlueprintCallable, Category = "Skill System")
+	virtual bool CanUseSkill(FName SkillGroup, UGameplaySkillBase* Skill = nullptr);
 
 	/** Returns true if the character can use skill corresponding to given SkillIndex */
-	UFUNCTION(BlueprintCallable, Category = "Skill System")
 	virtual bool CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Skill System")

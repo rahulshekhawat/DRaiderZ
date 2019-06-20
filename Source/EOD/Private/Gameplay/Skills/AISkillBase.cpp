@@ -36,6 +36,31 @@ bool UAISkillBase::CanReleaseSkill() const
 	return false;
 }
 
+void UAISkillBase::CancelSkill()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	if (Instigator)
+	{
+		UWorld* World = Instigator->GetWorld();
+		check(World);
+		World->GetTimerManager().ClearTimer(SkillTimerHandle);
+	}
+
+	UGameplaySkillsComponent* SkillsComp = InstigatorSkillComponent.Get();
+	if (SkillsComp)
+	{
+		SkillsComp->OnSkillCancelled(SkillIndex, SkillGroup, this);
+	}
+
+	//~ @todo
+	// Instigator->RemoveGameplayTagModifier(FGameplayTagMod(ActivationOwnedTags, this));
+
+	DisableGameplayEffectEvents();
+
+	//~ @todo CCImmunities
+	// LoseCCImmunities();
+}
+
 void UAISkillBase::FinishSkill()
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
@@ -49,6 +74,14 @@ void UAISkillBase::FinishSkill()
 	{
 		SkillsComp->OnSkillFinished(SkillIndex, SkillGroup, this);
 	}
+
+	//~ @todo
+	// Instigator->RemoveGameplayTagModifier(FGameplayTagMod(ActivationOwnedTags, this));
+
+	DisableGameplayEffectEvents();
+
+	//~ @todo CCImmunities
+	// LoseCCImmunities();
 }
 
 TSharedPtr<FAttackInfo> UAISkillBase::GetAttackInfoPtr(int32 CollisionIndex)

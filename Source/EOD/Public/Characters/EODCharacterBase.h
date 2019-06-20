@@ -228,6 +228,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Has Been Hit"))
 	bool BP_HasBeenHit() const;
 
+	/** Returns true if character is using any skill */
+	UFUNCTION(BlueprintPure, Category = CharacterStatus, meta = (DisplayName = "Is Using Any Skill"))
+	bool BP_IsUsingAnySkill() const;
+
 	/** Returns true if character can dodge */
 	virtual bool CanDodge() const;
 

@@ -341,6 +341,11 @@ bool AEODCharacterBase::CanJump() const
 	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun;
 }
 
+bool AEODCharacterBase::BP_IsUsingAnySkill() const
+{
+	return IsUsingAnySkill();
+}
+
 bool AEODCharacterBase::CanDodge() const
 {
 	return CharacterStateInfo.CharacterState == ECharacterState::IdleWalkRun;

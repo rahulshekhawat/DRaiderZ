@@ -12,6 +12,7 @@
 #include "FloatingHealthBarWidget.h"
 #include "AISkillsComponent.h"
 #include "EODCharacterMovementComponent.h"
+#include "CharAnimInstance.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -281,16 +282,23 @@ bool AAICharacterBase::CCEKnockdown(const float Duration)
 
 void AAICharacterBase::CCEEndKnockdown()
 {
-	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	UCharAnimInstance* AnimInstance = GetMesh() ? Cast<UCharAnimInstance>(GetMesh()->GetAnimInstance()) : nullptr;
 	if (AnimInstance && KnockdownMontage && AnimInstance->Montage_IsPlaying(KnockdownMontage))
 	{
 		PlayAnimMontage(KnockdownMontage, 1.f, UCharacterLibrary::SectionName_KnockdownEnd);
-		ResetState();
+		float Duration = AnimInstance->GetSectionLength(KnockdownMontage, UCharacterLibrary::SectionName_KnockdownEnd);
+		Duration = Duration - KnockdownMontage->BlendOut.GetBlendTime();
+		if (Duration > 0.f)
+		{
+			UWorld* World = GetWorld();
+			check(World);
+			World->GetTimerManager().SetTimer(CrowdControlTimerHandle, this, &AAICharacterBase::ResetState, Duration);
+		}
+		else
+		{
+			ResetState();
+		}
 	}
-
-	UWorld* World = GetWorld();
-	check(World);
-	World->GetTimerManager().ClearTimer(CrowdControlTimerHandle);
 }
 
 bool AAICharacterBase::CCEKnockback(const float Duration, const FVector& ImpulseDirection)
@@ -396,29 +404,29 @@ void AAICharacterBase::OnMontageEnded(UAnimMontage* AnimMontage, bool bInterrupt
 
 bool AAICharacterBase::CanUseAnySkill() const
 {
-	return false;
+	return Super::CanUseAnySkill();
 }
 
 bool AAICharacterBase::CanUseSkill(FName SkillID, UGameplaySkillBase* Skill)
 {
 	bool bCanUseSkill = false;
-	if (GetGameplaySkillsComponent())
+	UGameplaySkillsComponent* SkillsComp = GetGameplaySkillsComponent();
+	if (SkillsComp)
 	{
-		uint8 SkillIndex = GetGameplaySkillsComponent()->GetSkillIndexForSkillGroup(SkillID);
-		bCanUseSkill = GetGameplaySkillsComponent()->CanUseSkill(SkillIndex, Skill);
+		bCanUseSkill = SkillsComp->CanUseSkill(SkillID, Skill);
 	}
 	return bCanUseSkill;
 }
 
 bool AAICharacterBase::UseSkill_Implementation(FName SkillID, UGameplaySkillBase* Skill)
 {
-	if (CanUseSkill(SkillID, Skill))
+	UGameplaySkillsComponent* SkillsComp = GetGameplaySkillsComponent();
+	if (SkillsComp && CanUseSkill(SkillID, Skill))
 	{
-		uint8 SkillIndex = GetGameplaySkillsComponent()->GetSkillIndexForSkillGroup(SkillID);
-		GetGameplaySkillsComponent()->TriggerSkill(SkillIndex, Skill);
+		uint8 SkillIndex = SkillsComp->GetSkillIndexForSkillGroup(SkillID);
+		SkillsComp->TriggerSkill(SkillIndex, Skill);
 		return true;
 	}
-
 	return false;
 }
 

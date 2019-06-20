@@ -21,9 +21,4 @@ public:
 	/** Trigger this skill, i.e., either instantly activate this skill or start charging this skill. */
 	virtual void TriggerSkill() override;
 
-protected:
-
-	FTimerHandle SkillTimerHandle;
-
-
 };
