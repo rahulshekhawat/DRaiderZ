@@ -145,7 +145,6 @@ void APlayerCharacter::InitiateDeathSequence_Implementation()
 		if (DieMontage)
 		{
 			AnimInstance->Montage_Play(DieMontage);
-			AnimInstance->Montage_JumpToSection(FName("DeathStart"), DieMontage);
 		}
 	}
 

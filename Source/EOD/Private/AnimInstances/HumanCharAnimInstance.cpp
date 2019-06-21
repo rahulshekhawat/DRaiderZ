@@ -116,6 +116,7 @@ void UHumanCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 
+	/*
 	if (HumanOwner->IsDead())
 	{
 		UAnimMontage* DeathMontage = AnimationReferences->Die.Get();
@@ -138,6 +139,7 @@ void UHumanCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			// do nothing
 		}
 	}
+	*/
 
 	//~ @todo
 	/*
