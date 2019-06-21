@@ -245,11 +245,11 @@ struct EOD_API FSkillState
 	UPROPERTY(Transient, BlueprintReadWrite, Category = "Skill State")
 	bool bUnlocked;
 
-	FSkillState()
+	FSkillState() :
+		CurrentUpgradeLevel(0),
+		MaxUpgradeLevel(1),
+		bUnlocked(false)
 	{
-		CurrentUpgradeLevel = 0;
-		MaxUpgradeLevel = 1;
-		bUnlocked = false;
 	}
 };
 

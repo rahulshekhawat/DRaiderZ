@@ -13,6 +13,8 @@
 
 AEODGameModeBase::AEODGameModeBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	//~ @todo change respawn delay to something more sensible
+	RespawnDelay = 2.f;
 }
 
 void AEODGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -62,10 +64,29 @@ UClass* AEODGameModeBase::GetDefaultPawnClassForController_Implementation(AContr
 	return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
 
-/*
-AStatusEffectsManager* AEODGameModeBase::BP_GetStatusEffectsManager() const
+void AEODGameModeBase::SetOffCharacterRespawn(const FVector& RespawnLocation, const TSubclassOf<AEODCharacterBase>& CharacterClass)
 {
-	return GetStatusEffectsManager();
-}
-*/
+	FRespawnInfo SpawnInfo(RespawnLocation, CharacterClass);
 
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FTimerDelegate Delegate;
+		Delegate.BindUObject(this, &AEODGameModeBase::RespawnCharacter, SpawnInfo);
+		FTimerHandle TempHandle;
+		World->GetTimerManager().SetTimer(TempHandle, Delegate, RespawnDelay, false);
+	}
+}
+
+void AEODGameModeBase::RespawnCharacter(FRespawnInfo RespawnInfo)
+{
+	UClass* RespawnClass = RespawnInfo.RespawnClass.Get();
+	UWorld* World = GetWorld();
+	if (RespawnClass && World)
+	{
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.Owner = this;
+		SpawnInfo.ObjectFlags |= RF_Transient;
+		World->SpawnActor<AEODCharacterBase>(RespawnClass, RespawnInfo.RespawnLocation, FRotator::ZeroRotator, SpawnInfo);
+	}
+}

@@ -32,6 +32,8 @@ const FName AAICharacterBase::HealthWidgetCompName(TEXT("Health Indicator"));
 AAICharacterBase::AAICharacterBase(const FObjectInitializer& ObjectInitializer) : 
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UAISkillsComponent>(AEODCharacterBase::GameplaySkillsComponentName))
 {
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
 	// Mob characters don't have strafe animations and so they must be rotated in the direction of their movement.
 	if (GetCharacterMovement())
 	{

@@ -9,6 +9,31 @@
 class AEODCharacterBase;
 class AStatusEffectsManager;
 
+/** A struct containing respawn info */
+USTRUCT(BlueprintType)
+struct EOD_API FRespawnInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(Transient)
+	FVector RespawnLocation;
+	
+	UPROPERTY(Transient)
+	TSubclassOf<AEODCharacterBase> RespawnClass;
+
+	FRespawnInfo() :
+		RespawnLocation(FVector::ZeroVector),
+		RespawnClass(NULL)
+	{
+	}
+
+	FRespawnInfo(const FVector& Location, TSubclassOf<AEODCharacterBase> CharClass) :
+		RespawnLocation(Location),
+		RespawnClass(CharClass)
+	{
+	}
+};
+
 /**
  * 
  */
@@ -20,7 +45,7 @@ class EOD_API AEODGameModeBase : public AGameModeBase
 public:
 
 	// --------------------------------------
-	//	UE4 Method Overrides
+	//  UE4 Method Overrides
 	// --------------------------------------
 
 	AEODGameModeBase(const FObjectInitializer& ObjectInitializer);
@@ -37,15 +62,24 @@ public:
 	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 
 	// --------------------------------------
-	//	Manager Classes
+	//  Respawn mechanics
 	// --------------------------------------
 
-	// FORCEINLINE AStatusEffectsManager* GetStatusEffectsManager() const;
+	UFUNCTION(BlueprintCallable, Category = Respawn)
+	void SetOffCharacterRespawn(const FVector& RespawnLocation, const TSubclassOf<AEODCharacterBase>& CharacterClass);
 
-	// UFUNCTION(BlueprintPure, Category = Managers, meta = (DisplayName = "Get Status Effects Manager"))
-	// AStatusEffectsManager* BP_GetStatusEffectsManager() const;
+	UFUNCTION()
+	void RespawnCharacter(FRespawnInfo RespawnInfo);
 
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Respawn)
+	float RespawnDelay;
+
+	// --------------------------------------
+	//  Manager Classes
+	// --------------------------------------
+
 
 	/** Blueprint class used for spawning female characters */
 	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
@@ -54,13 +88,6 @@ protected:
 	/** Blueprint class used for spawning male characters */
 	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
 	TSubclassOf<AEODCharacterBase> MalePawnClass;
-
-	/** Blueprint class used for spawning status effect manager */
-	// UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
-	// TSubclassOf<AStatusEffectsManager> StatusEffectsManagerClass;
-
-	// UPROPERTY(Transient)
-	// AStatusEffectsManager* StatusEffectsManager;
 
 };
 
