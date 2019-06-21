@@ -90,10 +90,3 @@ protected:
 	TSubclassOf<AEODCharacterBase> MalePawnClass;
 
 };
-
-/*
-FORCEINLINE AStatusEffectsManager* AEODGameModeBase::GetStatusEffectsManager() const
-{
-	return StatusEffectsManager;
-}
-*/

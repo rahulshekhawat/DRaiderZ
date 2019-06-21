@@ -339,9 +339,9 @@ struct EOD_API FSkillTreeSlotSaveData
 	UPROPERTY()
 	int32 CurrentUpgrade;
 
-	FSkillTreeSlotSaveData()
+	FSkillTreeSlotSaveData() :
+		CurrentUpgrade(0)
 	{
-		CurrentUpgrade = 0;
 	}
 };
 
@@ -392,9 +392,9 @@ struct EOD_API FGameplaySkillTableRow : public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UGameplaySkillBase> SkillClass;
 
-	FGameplaySkillTableRow()
+	FGameplaySkillTableRow() :
+		SkillClass(NULL)
 	{
-		SkillClass = NULL;
 	}
 };
 
@@ -619,17 +619,17 @@ struct EOD_API FSkillTreeSlot : public FTableRowBase
 		return (ColumnPosition >= 0) && (RowPosition >= 0);
 	}
 
-	FSkillTreeSlot()
+	FSkillTreeSlot() :
+		bUnlockedByDefault(true),
+		Vocation(EVocations::Berserker),
+		PlayerSkill(NULL),
+		ColumnPosition(-1),
+		RowPosition(-1),
+		SkillRequiredToUnlock(NAME_None),
+		MinimumPointsToUnlock(0),
+		UpgradePointsGap(0),
+		MaxUpgrades(1)
 	{
-		bUnlockedByDefault = true;
-		Vocation = EVocations::Berserker;
-		PlayerSkill = NULL;
-		ColumnPosition = -1;
-		RowPosition = -1;
-		SkillRequiredToUnlock = NAME_None;
-		MinimumPointsToUnlock = 0;
-		UpgradePointsGap = 0;
-		MaxUpgrades = 1;
 	}
 };
 
@@ -921,37 +921,33 @@ struct EOD_API FSkillTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
 	uint8 CrowdControlImmunities;
 
-	/** Status effect that this skill triggers */
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skills)
-	// TSubclassOf<class UStatusEffectBase> StatusEffect;
-
-	FSkillTableRow()
+	FSkillTableRow() :
+		Icon(nullptr),
+		SkillStartMontageSectionName("Default"),
+		SkillLoopMontageSectionName(NAME_None),
+		SkillEndMontageSectionName(NAME_None),
+		SupportedWeapons(0),
+		DamageType(EDamageType::Physical),
+		SkillEffect(ESkillEffect::DamageMelee),
+		StaminaRequired(0),
+		ManaRequired(0),
+		bAllowsMovement(false),
+		bHasDirectionalAnimations(false),
+		bPassiveSkill(false),
+		bCanBeUsedWhileHit(false),
+		CurrentUpgradeLevel(1),
+		MaxUpgrades(1),
+		Cooldown(1.f),
+		LoopDuration(0.f),
+		DamagePercent(0),
+		bUnblockable(false),
+		bUndodgable(false),
+		bIgnoresBlock(false),
+		CrowdControlEffect(ECrowdControlEffect::Flinch),
+		CrowdControlEffectDuration(1.f),
+		CameraShakeOnHit(ECameraShakeType::Medium),
+		CrowdControlImmunities(0)
 	{
-		Icon = nullptr;
-		SupportedWeapons = 0;
-		DamageType = EDamageType::Physical;
-		SkillEffect = ESkillEffect::DamageMelee;
-		StaminaRequired = 0;
-		ManaRequired = 0;
-		bAllowsMovement = false;
-		bHasDirectionalAnimations = false;
-		bPassiveSkill = false;
-		bCanBeUsedWhileHit = false;
-		CurrentUpgradeLevel = 1;
-		MaxUpgrades = 1;
-		Cooldown = 1.f;
-		LoopDuration = 0.f;
-		DamagePercent = 0;
-		bUnblockable = false;
-		bUndodgable = false;
-		bIgnoresBlock = false;
-		CrowdControlEffect = ECrowdControlEffect::Flinch;
-		CrowdControlEffectDuration = 1.f;
-		CameraShakeOnHit = ECameraShakeType::Medium;
-		CrowdControlImmunities = 0;
-		SkillStartMontageSectionName = FName("Default");
-		SkillLoopMontageSectionName = NAME_None;
-		SkillEndMontageSectionName = NAME_None;
 	}
 };
 
