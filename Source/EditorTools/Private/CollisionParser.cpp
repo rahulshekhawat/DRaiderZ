@@ -20,6 +20,9 @@ const FString UCollisionParser::CollisionImportSettingsFilePath = FString("F:/Ga
 const FString UCollisionParser::AnimationsNotFoundFilePath = FString("F:/Game Dev/Unreal Projects/EOD/data_files/AnimationsNotFound.txt");
 const FString UCollisionParser::ProcessedAnimationsListFilePath = FString("F:/Game Dev/Unreal Projects/EOD/data_files/ProcessedAnimationsList.txt");
 
+UCollisionParser::UCollisionParser(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+}
 
 void UCollisionParser::ImportAndApplyCollisionInfo()
 {

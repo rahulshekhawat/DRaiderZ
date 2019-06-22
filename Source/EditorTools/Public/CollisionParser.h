@@ -60,6 +60,8 @@ class EDITORTOOLS_API UCollisionParser : public UObject
 	
 public:
 	
+	UCollisionParser(const FObjectInitializer& ObjectInitializer);
+
 	static const FName EditorDir_Models;
 
 	static const FString CollisionImportSettingsFilePath;

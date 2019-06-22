@@ -9,6 +9,6 @@ public class EODEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 
-		ExtraModuleNames.AddRange( new string[] { "EOD", "EditorTools" } );
+        ExtraModuleNames.AddRange( new string[] { "EOD", "EditorTools" } );
 	}
 }

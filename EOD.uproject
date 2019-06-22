@@ -16,6 +16,14 @@
 				"AssetRegistry",
 				"UMG"
 			]
+		},
+		{
+			"Name": "EditorTools",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit",
+			"AdditionalDependencies": [
+				"CoreUObject"
+			]
 		}
 	],
 	"Plugins": [
