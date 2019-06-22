@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "AssetData.h"
 #include "UObject/NoExportTypes.h"
 #include "SoundParser.generated.h"
 
 class USkeletalMesh;
+class UAnimSequenceBase;
 
 /**
  * 
@@ -22,5 +25,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
 	static void ImportSoundForSkeletalMesh(USkeletalMesh* Mesh);
+
+	static TArray<FAssetData> GetAllAnimationsWithString(const FString& String);
+
+	static const FString DataFolderPath;
+	static const FString AnimationSoundXmlFilePostfix;
+	
 
 };
