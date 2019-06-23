@@ -24,5 +24,7 @@ public:
 	UEditorFunctionLibrary(const FObjectInitializer& ObjectInitializer);
 
 	static TArray<FAssetData> GetAllAnimationsForSkeletalMesh(USkeletalMesh* SkeletalMesh);
+	
+	static FString GetNestedFileExtension(const FString& FilePath, bool bIncludeDot = true);
 
 };

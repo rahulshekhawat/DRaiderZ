@@ -5,7 +5,6 @@
 #include "EditorFunctionLibrary.h"
 #include "EOD.h"
 
-#include "XmlFile.h"
 #include "Misc/Paths.h"
 #include "Misc/FileHelper.h"
 #include "AssetRegistryModule.h"
@@ -16,7 +15,10 @@
 #include "HAL/FileManagerGeneric.h"
 
 const FString USoundParser::DataFolderPath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data"));
+const FString USoundParser::SoundXmlFilePath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data/Sound/sound.xml"));
+
 const FString USoundParser::AnimationSoundXmlFilePostfix(TEXT(".elu.animationsoundevent.xml"));
+const FString USoundParser::AnimationXmlFilePostfix(TEXT(".elu.animation.xml"));
 
 USoundParser::USoundParser(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -31,40 +33,89 @@ void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 		return;
 	}
 
+	FString FullMeshName = Mesh->GetFName().ToString();
+	FString MeshName = FullMeshName.RightChop(3);
+
 	FString SoundEventFilePath;
-	bool bFound = GetSoundEventFile(Mesh, SoundEventFilePath);
-	if (!bFound)
+	FString AnimXmlFilePath;
+	bool bFoundSoundXml = GetFilePath(MeshName + AnimationSoundXmlFilePostfix, SoundEventFilePath);
+	bool bFoundAnimXml = GetFilePath(MeshName + AnimationXmlFilePostfix, AnimXmlFilePath);
+	if (!(bFoundSoundXml && bFoundAnimXml))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Couldn't find sound even file for the given skeletal mesh"));
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't find sound or animation xml file for the given skeletal mesh"));
 		return;
+	}
+
+	FXmlFile SoundEventFileObj(SoundEventFilePath);
+	FXmlNode* RootSoundEventNode = SoundEventFileObj.GetRootNode();
+	TArray<FXmlNode*> AnimationNodes = GetNodesWithTag(RootSoundEventNode, TEXT("Animation"));
+
+	FXmlFile AnimFileObj(AnimXmlFilePath);
+	FXmlNode* RootAnimNode = AnimFileObj.GetRootNode();
+	TArray<FXmlNode*> AddAnimationNodes = GetNodesWithTag(RootAnimNode, TEXT("AddAnimation"));
+
+	FXmlFile SoundFileObj(SoundXmlFilePath);
+	FXmlNode* RootSoundNode = SoundFileObj.GetRootNode();
+	TArray<FXmlNode*> AddAnimationNodes = GetNodesWithTag(RootSoundNode, TEXT("SOUND"));
+
+
+
+	for (FXmlNode* AnimationNode : AnimationNodes)
+	{
+		if (AnimationNode)
+		{
+			FString AnimName = AnimationNode->GetAttribute(TEXT("name"));
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *AnimName);
+		}
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *SoundEventFilePath);
 }
 
-bool USoundParser::GetSoundEventFile(USkeletalMesh* Mesh, FString& OutFilePath)
+bool USoundParser::GetFilePath(const FString& InFileName, FString& OutFilePath)
 {
-	FString FullMeshName = Mesh->GetFName().ToString();
-	FString MeshName = FullMeshName.RightChop(3);
+	FString FileExtension = UEditorFunctionLibrary::GetNestedFileExtension(InFileName);
 
-	FString MeshAnimationSoundEventXmlFileName = MeshName + AnimationSoundXmlFilePostfix;
-
-	TArray<FString> AllSoundEventFiles;
-	IFileManager& FileManager = IFileManager::Get();
-	FString SearchString = FString("*") + AnimationSoundXmlFilePostfix;
-	FileManager.FindFilesRecursive(AllSoundEventFiles, *DataFolderPath, *SearchString, true, false);
-
-	FScopedSlowTask SlowTask(AllSoundEventFiles.Num(), FText::FromString("Printing Sound Event Files!"));
-	SlowTask.MakeDialog();
-
-	for (const FString& FilePath : AllSoundEventFiles)
+	if (FileExtension != TEXT(""))
 	{
-		const FString CleanFileName = FPaths::GetCleanFilename(FilePath);
-		if (CleanFileName == MeshAnimationSoundEventXmlFileName)
+		TArray<FString> AllFiles;
+		IFileManager& FileManager = IFileManager::Get();
+
+		FString SearchString = FString("*") + FileExtension;
+		FileManager.FindFilesRecursive(AllFiles, *DataFolderPath, *SearchString, true, false);
+
+		for (const FString& FilePath : AllFiles)
 		{
-			OutFilePath = FilePath;
-			return true;
+			const FString CleanFileName = FPaths::GetCleanFilename(FilePath);
+			if (CleanFileName == InFileName)
+			{
+				OutFilePath = FilePath;
+				return true;
+			}
 		}
 	}
+
 	return false;
+}
+
+TArray<FXmlNode*> USoundParser::GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag)
+{
+	if (!BaseNode)
+	{
+		return TArray<FXmlNode*>();
+	}
+
+	TArray<FXmlNode*> ResultNodes;
+	if (BaseNode->GetTag() == Tag)
+	{
+		ResultNodes.Add(BaseNode);
+	}
+
+	TArray<FXmlNode*> ChildrenNodes = BaseNode->GetChildrenNodes();
+	for (FXmlNode* ChildNode : ChildrenNodes)
+	{
+		TArray<FXmlNode*> ResultingChildNodes = GetNodesWithTag(ChildNode, Tag);
+		ResultNodes.Append(ResultingChildNodes);
+	}
+	return ResultNodes;
 }

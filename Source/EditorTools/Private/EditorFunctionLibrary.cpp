@@ -3,6 +3,7 @@
 
 #include "EditorFunctionLibrary.h"
 
+#include "Misc/Paths.h"
 #include "AssetRegistryModule.h"
 #include "Engine/SkeletalMesh.h"
 #include "Animation/Skeleton.h"
@@ -52,4 +53,15 @@ TArray<FAssetData> UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(USkel
 	}
 
 	return  Animations;
+}
+
+FString UEditorFunctionLibrary::GetNestedFileExtension(const FString& FilePath, bool bIncludeDot)
+{
+	const FString Filename = FPaths::GetCleanFilename(FilePath);
+	int32 DotPos = Filename.Find(TEXT("."), ESearchCase::CaseSensitive, ESearchDir::FromStart);
+	if (DotPos != INDEX_NONE)
+	{
+		return Filename.Mid(DotPos + (bIncludeDot ? 0 : 1));
+	}
+	return TEXT("");
 }
