@@ -7,52 +7,51 @@
 #include "XmlFile.h"
 #include "AssetData.h"
 #include "UObject/NoExportTypes.h"
-#include "SoundParser.generated.h"
+#include "SoundImporter.generated.h"
 
 class USkeletalMesh;
 class UAnimSequenceBase;
 
-USTRUCT(BlueprintType)
 struct EDITORTOOLS_API FAnimSoundInfo
 {
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY()
 	FString AnimationName;
-
-	UPROPERTY()
 	FString AnimationFileName;
+	FAssetData AnimationAssetData;
 
 	// map of frame and sound assets
 	TMap<float, FAssetData> FrameToSoundAssetMap;
 
-	FAssetData AnimationAssetData;
-
+	FAnimSoundInfo() :
+		AnimationName(),
+		AnimationFileName(),
+		AnimationAssetData(),
+		FrameToSoundAssetMap()
+	{
+	}
 };
 
 /**
  * 
  */
 UCLASS()
-class EDITORTOOLS_API USoundParser : public UObject
+class EDITORTOOLS_API USoundImporter : public UObject
 {
 	GENERATED_BODY()
-
-public:
 	
-	USoundParser(const FObjectInitializer& ObjectInitializer);
+public:
 
+	USoundImporter(const FObjectInitializer& ObjectInitializer);
+	
 	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
 	static void ImportSoundForSkeletalMesh(USkeletalMesh* Mesh);
 
 	static bool GetFilePath(const FString& InFileName, FString& OutFilePath);
+	static bool GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName);
 
 	static const FString DataFolderPath;
 	static const FString SoundXmlFilePath;
 
 	static const FString AnimationSoundXmlFilePostfix;
 	static const FString AnimationXmlFilePostfix;
-
-	static bool GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName);
 
 };

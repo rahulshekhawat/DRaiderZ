@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 
-#include "SoundParser.h"
+#include "SoundImporter.h"
 #include "EditorFunctionLibrary.h"
 #include "EOD.h"
 
@@ -16,17 +16,18 @@
 #include "HAL/FileManagerGeneric.h"
 #include "Animation/AnimNotifies/AnimNotify_PlaySound.h"
 
-const FString USoundParser::DataFolderPath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data"));
-const FString USoundParser::SoundXmlFilePath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data/Sound/sound.xml"));
+const FString USoundImporter::DataFolderPath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data"));
+const FString USoundImporter::SoundXmlFilePath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data/Sound/sound.xml"));
 
-const FString USoundParser::AnimationSoundXmlFilePostfix(TEXT(".elu.animationsoundevent.xml"));
-const FString USoundParser::AnimationXmlFilePostfix(TEXT(".elu.animation.xml"));
+const FString USoundImporter::AnimationSoundXmlFilePostfix(TEXT(".elu.animationsoundevent.xml"));
+const FString USoundImporter::AnimationXmlFilePostfix(TEXT(".elu.animation.xml"));
 
-USoundParser::USoundParser(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+
+USoundImporter::USoundImporter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
-void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
+void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 {
 	TArray<FAssetData> AnimationAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
 	if (AnimationAssets.Num() == 0)
@@ -194,11 +195,9 @@ void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 			}
 		}
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *SoundEventFilePath);
 }
 
-bool USoundParser::GetFilePath(const FString& InFileName, FString& OutFilePath)
+bool USoundImporter::GetFilePath(const FString& InFileName, FString& OutFilePath)
 {
 	FString FileExtension = UEditorFunctionLibrary::GetNestedFileExtension(InFileName);
 
@@ -224,7 +223,7 @@ bool USoundParser::GetFilePath(const FString& InFileName, FString& OutFilePath)
 	return false;
 }
 
-bool USoundParser::GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName)
+bool USoundImporter::GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName)
 {
 	for (FXmlNode* Node : AddAnimNodes)
 	{
