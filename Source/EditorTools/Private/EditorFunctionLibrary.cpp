@@ -55,6 +55,14 @@ TArray<FAssetData> UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(USkel
 	return  Animations;
 }
 
+TArray<FAssetData> UEditorFunctionLibrary::GetAllSoundAssets()
+{
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+	TArray<FAssetData> SoundAssets;
+	AssetRegistryModule.Get().GetAssetsByClass(FName("SoundBase"), SoundAssets, true);
+	return SoundAssets;
+}
+
 FString UEditorFunctionLibrary::GetNestedFileExtension(const FString& FilePath, bool bIncludeDot)
 {
 	const FString Filename = FPaths::GetCleanFilename(FilePath);
@@ -62,6 +70,17 @@ FString UEditorFunctionLibrary::GetNestedFileExtension(const FString& FilePath, 
 	if (DotPos != INDEX_NONE)
 	{
 		return Filename.Mid(DotPos + (bIncludeDot ? 0 : 1));
+	}
+	return TEXT("");
+}
+
+FString UEditorFunctionLibrary::GetBaseFileName(const FString& FilePath)
+{
+	const FString Filename = FPaths::GetCleanFilename(FilePath);
+	int32 ExtPos = Filename.Find(TEXT("."), ESearchCase::CaseSensitive, ESearchDir::FromStart);
+	if (ExtPos != INDEX_NONE)
+	{
+		return Filename.Left(ExtPos);
 	}
 	return TEXT("");
 }

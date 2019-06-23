@@ -17,19 +17,16 @@ struct EDITORTOOLS_API FAnimSoundInfo
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(Transient)
+	UPROPERTY()
 	FString AnimationName;
 
-	UPROPERTY(Transient)
+	UPROPERTY()
 	FString AnimationFileName;
 
-	// map of frame and sound name
-	UPROPERTY(Transient)
-	TMap<int32, FString> FrameToSoundNameMap;
-	
-	// map of frame and sound file name
-	UPROPERTY(Transient)
-	TMap<int32, FString> FrameToSoundFilenameMap;
+	// map of frame and sound assets
+	TMap<int32, FAssetData> FrameToSoundAssetMap;
+
+	FAssetData AnimationAssetData;
 
 };
 
@@ -58,9 +55,6 @@ public:
 
 	static TArray<FXmlNode*> GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag);
 
-	//~ .elu.animationsoundevent.xml
-	// static TArray<FXmlNode*> GetAnimationNodes(const FString& XmlFilePath);
-	//~ elu.animation.xml
-	// static TArray<FXmlNode*> GetAddAnimationNodes(const FString& XmlFilePath);
+	static bool GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName);
 
 };
