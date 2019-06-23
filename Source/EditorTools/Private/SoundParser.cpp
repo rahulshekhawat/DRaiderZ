@@ -5,6 +5,7 @@
 #include "EditorFunctionLibrary.h"
 #include "EOD.h"
 
+#include "Sound/SoundBase.h"
 #include "Misc/Paths.h"
 #include "Misc/FileHelper.h"
 #include "AssetRegistryModule.h"
@@ -13,6 +14,7 @@
 #include "Animation/AnimSequence.h"
 #include "Misc/ScopedSlowTask.h"
 #include "HAL/FileManagerGeneric.h"
+#include "Animation/AnimNotifies/AnimNotify_PlaySound.h"
 
 const FString USoundParser::DataFolderPath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data"));
 const FString USoundParser::SoundXmlFilePath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data/Sound/sound.xml"));
@@ -54,9 +56,9 @@ void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 	FXmlNode* RootAnimNode = AnimFileObj.GetRootNode();
 	TArray<FXmlNode*> AddAnimationNodes = GetNodesWithTag(RootAnimNode, TEXT("AddAnimation"));
 
-	FXmlFile SoundFileObj(SoundXmlFilePath);
-	FXmlNode* RootSoundNode = SoundFileObj.GetRootNode();
-	TArray<FXmlNode*> SOUNDNodes = GetNodesWithTag(RootSoundNode, TEXT("SOUND"));
+	// FXmlFile SoundFileObj(SoundXmlFilePath);
+	// FXmlNode* RootSoundNode = SoundFileObj.GetRootNode();
+	// TArray<FXmlNode*> SOUNDNodes = GetNodesWithTag(RootSoundNode, TEXT("SOUND"));
 
 	TArray<FAssetData> SoundAssets = UEditorFunctionLibrary::GetAllSoundAssets();
 
@@ -101,6 +103,7 @@ void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 					{
 						FString FrameStr = EventNode->GetAttribute(TEXT("frame"));
 						int32 Frame = FCString::Atoi(*FrameStr);
+						float ActualFrame = float(Frame) / 160.f;
 
 						const FString& SoundName = EventNode->GetAttribute(TEXT("param1"));
 
@@ -110,6 +113,8 @@ void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 							{
 								LogMessage = FString("Found sound file: ") + SoundName;
 								UE_LOG(LogTemp, Log, TEXT("%s"), *LogMessage);
+
+								AnimSoundInfo.FrameToSoundAssetMap.Add(ActualFrame, SoundAsset);
 
 								break;
 							}
@@ -122,9 +127,72 @@ void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 			}
 		}
 
-
-
+		AnimSoundInfoArray.Add(AnimSoundInfo);
 		GenTask.EnterProgressFrame();
+	}
+
+	UClass* SoundNotifyClass = UAnimNotify_PlaySound::StaticClass();
+	for (const FAnimSoundInfo& AnimSoundInfo : AnimSoundInfoArray)
+	{
+		UAnimSequenceBase* Animation = Cast<UAnimSequenceBase>(AnimSoundInfo.AnimationAssetData.GetAsset());
+		if (!Animation)
+		{
+			continue;
+		}
+
+		for (const TPair<float, FAssetData>& FrameSoundPair : AnimSoundInfo.FrameToSoundAssetMap)
+		{
+			const FAssetData& SoundAssetData = FrameSoundPair.Value;
+			USoundBase* Sound = Cast<USoundBase>(SoundAssetData.GetAsset());
+			if (!Sound)
+			{
+				continue;
+			}
+
+			float ActualFrame = FrameSoundPair.Key;
+			float FrameTime = ActualFrame * (1.f / 30.f);
+
+			bool bNotifyAlreadyExists = false;
+			for (const FAnimNotifyEvent& NotifyEvent : Animation->Notifies)
+			{
+				if (NotifyEvent.Notify && NotifyEvent.Notify->IsA(SoundNotifyClass))
+				{
+					UAnimNotify_PlaySound* SoundNotify = Cast<UAnimNotify_PlaySound>(NotifyEvent.Notify);
+					if (SoundNotify && SoundNotify->Sound == Sound)
+					{
+						float Time = NotifyEvent.GetTime();
+						if (FMath::IsNearlyEqual(Time, FrameTime, 0.1f))
+						{
+							bNotifyAlreadyExists = true;
+						}
+					}
+				}
+			}
+
+			if (!bNotifyAlreadyExists)
+			{
+				Animation->Modify();
+				int32 NewNotifyIndex = Animation->Notifies.Add(FAnimNotifyEvent());
+				FAnimNotifyEvent& NewEvent = Animation->Notifies[NewNotifyIndex];
+				NewEvent.NotifyName = TEXT("Play Sound");
+
+				NewEvent.Link(Animation, FrameTime);
+				NewEvent.TriggerTimeOffset = GetTriggerTimeOffsetForType(Animation->CalculateOffsetForNotify(FrameTime));
+				NewEvent.TrackIndex = 0; // Let's create a global index convention perhaps?
+
+				UObject* AnimNotify = NewObject<UObject>(Animation, UAnimNotify_PlaySound::StaticClass(), SoundAssetData.AssetName, RF_NoFlags);
+				UAnimNotify_PlaySound* SoundNotify = Cast<UAnimNotify_PlaySound>(AnimNotify);
+				NewEvent.Notify = SoundNotify;
+				if (SoundNotify)
+				{
+					SoundNotify->Sound = Sound;
+					NewEvent.NotifyName = FName(*NewEvent.Notify->GetNotifyName());
+					NewEvent.Notify->OnAnimNotifyCreatedInEditor(NewEvent);
+				}
+
+				Animation->MarkPackageDirty();
+			}
+		}
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *SoundEventFilePath);

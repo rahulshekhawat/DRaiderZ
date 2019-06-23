@@ -24,7 +24,7 @@ struct EDITORTOOLS_API FAnimSoundInfo
 	FString AnimationFileName;
 
 	// map of frame and sound assets
-	TMap<int32, FAssetData> FrameToSoundAssetMap;
+	TMap<float, FAssetData> FrameToSoundAssetMap;
 
 	FAssetData AnimationAssetData;
 
