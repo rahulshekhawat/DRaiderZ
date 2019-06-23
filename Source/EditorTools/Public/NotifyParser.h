@@ -7,6 +7,8 @@
 #include "NotifyParser.generated.h"
 
 class USkeletalMesh;
+class UAnimNotify;
+class UAnimNotifyState;
 
 /**
  * 
@@ -22,5 +24,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = NotifyParser)
 	static void DeleteAllNotifies(USkeletalMesh* SkeletalMesh);
+	
+	UFUNCTION(BlueprintCallable, Category = NotifyParser)
+	static void DeleteAllNotifiesOfClass(USkeletalMesh* SkeletalMesh, TSubclassOf<UAnimNotify> NotifyClass);
+
+	UFUNCTION(BlueprintCallable, Category = NotifyParser)
+	static void DeleteAllNotifyStatesOfClass(USkeletalMesh* SkeletalMesh, TSubclassOf<UAnimNotifyState> NotifyClass);
+
 
 };
