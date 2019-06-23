@@ -26,18 +26,24 @@ void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 	FString FullMeshName = Mesh->GetFName().ToString();
 	FString MeshName = FullMeshName.RightChop(3);
 	TArray<FAssetData> Animations = GetAllAnimationsWithString(MeshName);
+
+	FSoftObjectPath SkeletonSoftPath(Mesh->Skeleton);
 	
 	int32 AnimNum = Animations.Num();
 	for (int i = 0; i < AnimNum; i++)
 	{
 		const FAssetData& AssetData = Animations[i];
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *AssetData.GetFullName());
+		FAssetDataTagMapSharedView::FFindTagResult TagResult = AssetData.TagsAndValues.FindTag(TEXT("Skeleton"));
+		const FString& Result =  TagResult.GetValue();
+		FSoftObjectPath ResultPath(Result);
+
+		if (ResultPath == SkeletonSoftPath)
+		{
+
+		}
 	}
 
 	FString MeshAnimationSoundEventXmlFileName = MeshName + AnimationSoundXmlFilePostfix;
-
-
-
 }
 
 TArray<FAssetData> USoundParser::GetAllAnimationsWithString(const FString& String)
