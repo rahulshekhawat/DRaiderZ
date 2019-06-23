@@ -79,9 +79,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
 	static TArray<FString> GetAnimationNamesFromTalentID(FString TalentID);
-	
-	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
-	static void ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh);
 
 	
 	
