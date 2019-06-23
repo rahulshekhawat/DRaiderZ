@@ -2,12 +2,18 @@
 
 
 #include "SoundParser.h"
+#include "EditorFunctionLibrary.h"
+#include "EOD.h"
 
+#include "XmlFile.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
 #include "AssetRegistryModule.h"
 #include "Engine/SkeletalMesh.h"
 #include "Animation/Skeleton.h"
 #include "Animation/AnimSequence.h"
 #include "Misc/ScopedSlowTask.h"
+#include "HAL/FileManagerGeneric.h"
 
 const FString USoundParser::DataFolderPath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data"));
 const FString USoundParser::AnimationSoundXmlFilePostfix(TEXT(".elu.animationsoundevent.xml"));
@@ -18,55 +24,47 @@ USoundParser::USoundParser(const FObjectInitializer& ObjectInitializer) : Super(
 
 void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 {
-	if (Mesh == nullptr || Mesh->Skeleton == nullptr)
+	TArray<FAssetData> AnimationAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
+	if (AnimationAssets.Num() == 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Import failed because we couldn't find any animations"));
 		return;
 	}
 
-	FString FullMeshName = Mesh->GetFName().ToString();
-	FString MeshName = FullMeshName.RightChop(3);
-	TArray<FAssetData> Animations = GetAllAnimationsWithString(MeshName);
-
-	FSoftObjectPath SkeletonSoftPath(Mesh->Skeleton);
-	
-	int32 AnimNum = Animations.Num();
-	for (int i = 0; i < AnimNum; i++)
+	FString SoundEventFilePath;
+	bool bFound = GetSoundEventFile(Mesh, SoundEventFilePath);
+	if (!bFound)
 	{
-		const FAssetData& AssetData = Animations[i];
-		FAssetDataTagMapSharedView::FFindTagResult TagResult = AssetData.TagsAndValues.FindTag(TEXT("Skeleton"));
-		const FString& Result =  TagResult.GetValue();
-		FSoftObjectPath ResultPath(Result);
-
-		if (ResultPath == SkeletonSoftPath)
-		{
-
-		}
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't find sound even file for the given skeletal mesh"));
+		return;
 	}
 
-	FString MeshAnimationSoundEventXmlFileName = MeshName + AnimationSoundXmlFilePostfix;
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *SoundEventFilePath);
 }
 
-TArray<FAssetData> USoundParser::GetAllAnimationsWithString(const FString& String)
+bool USoundParser::GetSoundEventFile(USkeletalMesh* Mesh, FString& OutFilePath)
 {
-	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
-	TArray<FAssetData> AnimationsAssetData;
-	AssetRegistryModule.Get().GetAssetsByClass(FName("AnimSequenceBase"), AnimationsAssetData, true);
+	FString FullMeshName = Mesh->GetFName().ToString();
+	FString MeshName = FullMeshName.RightChop(3);
 
-	int32 AssetNum = AnimationsAssetData.Num();
+	FString MeshAnimationSoundEventXmlFileName = MeshName + AnimationSoundXmlFilePostfix;
 
-	FScopedSlowTask FindAnimationTask(AssetNum, FText::FromString("Finding animations"));
-	FindAnimationTask.MakeDialog();
+	TArray<FString> AllSoundEventFiles;
+	IFileManager& FileManager = IFileManager::Get();
+	FString SearchString = FString("*") + AnimationSoundXmlFilePostfix;
+	FileManager.FindFilesRecursive(AllSoundEventFiles, *DataFolderPath, *SearchString, true, false);
 
-	TArray<FAssetData> Animations;
-	for (int i = 0; i < AssetNum; i++)
+	FScopedSlowTask SlowTask(AllSoundEventFiles.Num(), FText::FromString("Printing Sound Event Files!"));
+	SlowTask.MakeDialog();
+
+	for (const FString& FilePath : AllSoundEventFiles)
 	{
-		FAssetData AssetData = AnimationsAssetData[i];
-		if (AssetData.GetFullName().Contains(String))
+		const FString CleanFileName = FPaths::GetCleanFilename(FilePath);
+		if (CleanFileName == MeshAnimationSoundEventXmlFileName)
 		{
-			Animations.Add(AssetData);
+			OutFilePath = FilePath;
+			return true;
 		}
-		FindAnimationTask.EnterProgressFrame();
 	}
-
-	return  Animations;
+	return false;
 }

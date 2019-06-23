@@ -13,9 +13,18 @@ public class EditorTools : ModuleRules
 
 		PrivateIncludePaths.AddRange(
             new string[]{ "EditorTools/Private" });
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "MoviePlayer", "RHI",
-                                                            "XmlParser", "Json", "EOD" });
+
+        PublicDependencyModuleNames.AddRange(new string[] {
+            "Core",
+            "CoreUObject",
+            "Engine",
+            "InputCore",
+            "UMG",
+            "MoviePlayer",
+            "RHI",
+            "Json",
+            "EOD",
+            "XmlParser" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd" });
 

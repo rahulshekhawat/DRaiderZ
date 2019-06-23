@@ -26,7 +26,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
 	static void ImportSoundForSkeletalMesh(USkeletalMesh* Mesh);
 
-	static TArray<FAssetData> GetAllAnimationsWithString(const FString& String);
+	static bool GetSoundEventFile(USkeletalMesh* Mesh, FString& OutFilePath);
 
 	static const FString DataFolderPath;
 	static const FString AnimationSoundXmlFilePostfix;

@@ -56,13 +56,13 @@ void UNotifyParser::DeleteAllNotifiesOfClass(USkeletalMesh* SkeletalMesh, TSubcl
 		}
 
 		int32 NotifyNum = Animation->Notifies.Num();
-		for (int i = NotifyNum - 1; i >= 0; i--)
+		for (int j = NotifyNum - 1; j >= 0; j--)
 		{
-			const FAnimNotifyEvent& NotifyEvent = Animation->Notifies[i];
+			const FAnimNotifyEvent& NotifyEvent = Animation->Notifies[j];
 			if (NotifyEvent.Notify && NotifyEvent.Notify->IsA(NotifyClass))
 			{
 				Animation->Modify();
-				Animation->Notifies.RemoveAt(i);
+				Animation->Notifies.RemoveAt(j);
 				//~ @todo notify tracks
 				// Animation->AnimNotifyTracks.Empty();
 				Animation->MarkPackageDirty();
@@ -90,13 +90,13 @@ void UNotifyParser::DeleteAllNotifyStatesOfClass(USkeletalMesh* SkeletalMesh, TS
 		}
 
 		int32 NotifyNum = Animation->Notifies.Num();
-		for (int i = NotifyNum - 1; i >= 0; i--)
+		for (int j = NotifyNum - 1; j >= 0; j--)
 		{
-			const FAnimNotifyEvent& NotifyEvent = Animation->Notifies[i];
+			const FAnimNotifyEvent& NotifyEvent = Animation->Notifies[j];
 			if (NotifyEvent.NotifyStateClass && NotifyEvent.NotifyStateClass->IsA(NotifyClass))
 			{
 				Animation->Modify();
-				Animation->Notifies.RemoveAt(i);
+				Animation->Notifies.RemoveAt(j);
 				//~ @todo notify tracks
 				// Animation->AnimNotifyTracks.Empty();
 				Animation->MarkPackageDirty();
