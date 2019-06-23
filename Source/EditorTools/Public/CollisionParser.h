@@ -7,6 +7,7 @@
 #include "UObject/NoExportTypes.h"
 #include "CollisionParser.generated.h"
 
+class USkeletalMesh;
 
 USTRUCT(BlueprintType)
 struct FRaidCollision
@@ -78,6 +79,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
 	static TArray<FString> GetAnimationNamesFromTalentID(FString TalentID);
+	
+	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
+	static void ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh);
 
 	
 	

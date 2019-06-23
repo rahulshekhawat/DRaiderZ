@@ -287,3 +287,7 @@ TArray<FString> UCollisionParser::GetAnimationNamesFromTalentID(FString TalentID
 	return AnimationNames;
 }
 
+void UCollisionParser::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
+{
+}
+

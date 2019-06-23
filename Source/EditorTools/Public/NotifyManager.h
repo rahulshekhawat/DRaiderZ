@@ -6,6 +6,10 @@
 #include "UObject/NoExportTypes.h"
 #include "NotifyManager.generated.h"
 
+class USkeletalMesh;
+class UAnimNotify;
+class UAnimNotifyState;
+
 /**
  * 
  */
@@ -15,6 +19,8 @@ class EDITORTOOLS_API UNotifyManager : public UObject
 	GENERATED_BODY()
 	
 public:
+
+	UNotifyManager(const FObjectInitializer& ObjectInitializer);
 
 	/**
 	 * Removes all anim notifies from every single animation that exists in editor
@@ -32,6 +38,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = AnimNotifyLibrary)
 	static void CleanUpNotifyStatesFromAllAnimations(TSubclassOf<class UAnimNotifyState> NotifyStateClass);
 	
+	UFUNCTION(BlueprintCallable, Category = NotifyParser)
+	static void DeleteAllNotifies(USkeletalMesh* SkeletalMesh);
+	
+	UFUNCTION(BlueprintCallable, Category = NotifyParser)
+	static void DeleteAllNotifiesOfClass(USkeletalMesh* SkeletalMesh, TSubclassOf<UAnimNotify> NotifyClass);
+
+	UFUNCTION(BlueprintCallable, Category = NotifyParser)
+	static void DeleteAllNotifyStatesOfClass(USkeletalMesh* SkeletalMesh, TSubclassOf<UAnimNotifyState> NotifyClass);
 	
 	
 };
