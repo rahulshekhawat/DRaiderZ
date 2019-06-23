@@ -50,11 +50,11 @@ void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 
 	FXmlFile SoundEventFileObj(SoundEventFilePath);
 	FXmlNode* RootSoundEventNode = SoundEventFileObj.GetRootNode();
-	TArray<FXmlNode*> AnimationNodes = GetNodesWithTag(RootSoundEventNode, TEXT("Animation"));
+	TArray<FXmlNode*> AnimationNodes = UEditorFunctionLibrary::GetNodesWithTag(RootSoundEventNode, TEXT("Animation"));
 
 	FXmlFile AnimFileObj(AnimXmlFilePath);
 	FXmlNode* RootAnimNode = AnimFileObj.GetRootNode();
-	TArray<FXmlNode*> AddAnimationNodes = GetNodesWithTag(RootAnimNode, TEXT("AddAnimation"));
+	TArray<FXmlNode*> AddAnimationNodes = UEditorFunctionLibrary::GetNodesWithTag(RootAnimNode, TEXT("AddAnimation"));
 
 	// FXmlFile SoundFileObj(SoundXmlFilePath);
 	// FXmlNode* RootSoundNode = SoundFileObj.GetRootNode();
@@ -96,7 +96,7 @@ void USoundParser::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 				AnimSoundInfo.AnimationFileName = AnimationFileName;
 				AnimSoundInfo.AnimationAssetData = AssetData;
 
-				TArray<FXmlNode*> EventNodes = GetNodesWithTag(AnimNode, TEXT("EVENT"));
+				TArray<FXmlNode*> EventNodes = UEditorFunctionLibrary::GetNodesWithTag(AnimNode, TEXT("EVENT"));
 				for (FXmlNode* EventNode : EventNodes)
 				{
 					if (EventNode && EventNode->GetAttribute(TEXT("name")) == TEXT("sh_sound"))
@@ -222,28 +222,6 @@ bool USoundParser::GetFilePath(const FString& InFileName, FString& OutFilePath)
 	}
 
 	return false;
-}
-
-TArray<FXmlNode*> USoundParser::GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag)
-{
-	if (!BaseNode)
-	{
-		return TArray<FXmlNode*>();
-	}
-
-	TArray<FXmlNode*> ResultNodes;
-	if (BaseNode->GetTag() == Tag)
-	{
-		ResultNodes.Add(BaseNode);
-	}
-
-	TArray<FXmlNode*> ChildrenNodes = BaseNode->GetChildrenNodes();
-	for (FXmlNode* ChildNode : ChildrenNodes)
-	{
-		TArray<FXmlNode*> ResultingChildNodes = GetNodesWithTag(ChildNode, Tag);
-		ResultNodes.Append(ResultingChildNodes);
-	}
-	return ResultNodes;
 }
 
 bool USoundParser::GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName)

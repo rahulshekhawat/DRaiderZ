@@ -84,3 +84,25 @@ FString UEditorFunctionLibrary::GetBaseFileName(const FString& FilePath)
 	}
 	return TEXT("");
 }
+
+TArray<FXmlNode*> UEditorFunctionLibrary::GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag)
+{
+	if (!BaseNode)
+	{
+		return TArray<FXmlNode*>();
+	}
+
+	TArray<FXmlNode*> ResultNodes;
+	if (BaseNode->GetTag() == Tag)
+	{
+		ResultNodes.Add(BaseNode);
+	}
+
+	TArray<FXmlNode*> ChildrenNodes = BaseNode->GetChildrenNodes();
+	for (FXmlNode* ChildNode : ChildrenNodes)
+	{
+		TArray<FXmlNode*> ResultingChildNodes = GetNodesWithTag(ChildNode, Tag);
+		ResultNodes.Append(ResultingChildNodes);
+	}
+	return ResultNodes;
+}

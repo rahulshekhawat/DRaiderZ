@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+#include "XmlFile.h"
 #include "AssetData.h"
 #include "UObject/NoExportTypes.h"
 #include "EditorFunctionLibrary.generated.h"
@@ -28,5 +29,7 @@ public:
 	
 	static FString GetNestedFileExtension(const FString& FilePath, bool bIncludeDot = true);
 	static FString GetBaseFileName(const FString& FilePath);
+
+	static TArray<FXmlNode*> GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag);
 
 };

@@ -53,8 +53,6 @@ public:
 	static const FString AnimationSoundXmlFilePostfix;
 	static const FString AnimationXmlFilePostfix;
 
-	static TArray<FXmlNode*> GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag);
-
 	static bool GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName);
 
 };
