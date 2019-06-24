@@ -29,5 +29,6 @@ public:
 	static const FString TalentFilePath;
 
 	static bool GetNPCID(FXmlNode* NPCRootNode, const FString& MeshName, FString& OutNPCID);
+	static TArray<FXmlNode*> GetNPCTalents(FXmlNode* TalentRootNode, const FString& InNPCID);
 
 };

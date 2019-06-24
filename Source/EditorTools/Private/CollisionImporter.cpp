@@ -28,9 +28,19 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 
 	FString NPCID;
 	bool bFound =  GetNPCID(NPCRootNode, MeshName, NPCID);
+	if (!bFound)
+	{
+		return;
+	}
 
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *NPCID);
+	FXmlFile TalentFileObj(TalentFilePath);
+	FXmlNode* TalentRootNode = TalentFileObj.GetRootNode();
 
+	TArray<FXmlNode*> TalentNodes = GetNPCTalents(TalentRootNode, NPCID);
+	if (TalentNodes.Num() == 0)
+	{
+		return;
+	}
 }
 
 bool UCollisionImporter::GetNPCID(FXmlNode* NPCRootNode, const FString& MeshName, FString& OutNPCID)
@@ -45,4 +55,32 @@ bool UCollisionImporter::GetNPCID(FXmlNode* NPCRootNode, const FString& MeshName
 		}
 	}
 	return false;
+}
+
+TArray<FXmlNode*> UCollisionImporter::GetNPCTalents(FXmlNode* TalentRootNode, const FString& InNPCID)
+{
+	TArray<FXmlNode*> AllTalentNodes = UEditorFunctionLibrary::GetNodesWithTag(TalentRootNode, TEXT("TALENT"));
+	TArray<FXmlNode*> ResultNodes;
+	for (FXmlNode* Node : AllTalentNodes)
+	{
+		FString NPCAttribute = Node ? Node->GetAttribute(TEXT("NPC")) : TEXT("");
+		if (NPCAttribute == TEXT(""))
+		{
+			continue;
+		}
+
+		TArray<FString> NPCIDs;
+		NPCAttribute.ParseIntoArray(NPCIDs, TEXT(","));
+
+		for (FString NPCID : NPCIDs)
+		{
+			FString TrimmedNPCID = NPCID.TrimStartAndEnd();
+			if (TrimmedNPCID == InNPCID)
+			{
+				ResultNodes.Add(Node);
+				break;
+			}
+		}
+	}
+	return ResultNodes;
 }
