@@ -10,6 +10,7 @@
 #include "SoundImporter.generated.h"
 
 class USkeletalMesh;
+class USoundAttenuation;
 class UAnimSequenceBase;
 
 struct EDITORTOOLS_API FAnimSoundInfo
@@ -43,7 +44,7 @@ public:
 	USoundImporter(const FObjectInitializer& ObjectInitializer);
 	
 	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
-	static void ImportSoundForSkeletalMesh(USkeletalMesh* Mesh);
+	static void ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAttenuation* SoundAttentionToApply = nullptr);
 
 	static bool GetFilePath(const FString& InFileName, FString& OutFilePath);
 	static bool GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName);

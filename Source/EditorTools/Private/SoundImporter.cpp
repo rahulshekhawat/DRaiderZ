@@ -27,7 +27,7 @@ USoundImporter::USoundImporter(const FObjectInitializer& ObjectInitializer) : Su
 {
 }
 
-void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
+void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAttenuation* SoundAttentionToApply)
 {
 	TArray<FAssetData> AnimationAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
 	if (AnimationAssets.Num() == 0)
@@ -186,7 +186,12 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh)
 				NewEvent.Notify = SoundNotify;
 				if (SoundNotify)
 				{
+					Sound->Modify();
+					Sound->AttenuationSettings = SoundAttentionToApply;
+					Sound->MarkPackageDirty();
+
 					SoundNotify->Sound = Sound;
+					SoundNotify->bFollow = true;
 					NewEvent.NotifyName = FName(*NewEvent.Notify->GetNotifyName());
 					NewEvent.Notify->OnAnimNotifyCreatedInEditor(NewEvent);
 				}
