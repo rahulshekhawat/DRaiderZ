@@ -45,8 +45,26 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 		return;
 	}
 
+
+
+
+
+
+
+	TArray<FCollisionInfo> CollsionInfoArray;
 	for (FXmlNode* Node : TalentNodes)
 	{
+		if (!Node)
+		{
+			continue;
+		}
+
+		FCollisionInfo CollisionInfo;
+		CollisionInfo.AnimationName = Node->GetAttribute(TEXT("UseAni"));
+
+
+
+
 		const FString& TalentID = Node ? Node->GetAttribute(TEXT("id")) : TEXT("");
 		if (TalentID == TEXT(""))
 		{

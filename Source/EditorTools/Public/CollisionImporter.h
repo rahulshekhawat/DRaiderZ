@@ -10,6 +10,24 @@
 
 class USkeletalMesh;
 
+struct EDITORTOOLS_API FCollisionInfo
+{
+	FString AnimationName;
+	FString AnimationFileName;
+	FAssetData AnimationAssetData;
+
+	TMap<float, FString> FrameToCollisionStringMap;
+
+	FCollisionInfo() :
+		AnimationName(),
+		AnimationFileName(),
+		AnimationAssetData(),
+		FrameToCollisionStringMap()
+	{
+	}
+};
+
+
 /**
  * 
  */
