@@ -7,7 +7,9 @@
 #include "Engine/SkeletalMesh.h"
 
 const FString UCollisionImporter::NPCFilePath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data/system/npc.xml"));
-const FString UCollisionImporter::TalentFilePath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data/system/talent.xml"));
+// FXmlParser can't parse talent.xml, so it has been replaced with talent_unrealengine.xml which removed a few TALENT IDs that FXmlParser was unable to parse
+// const FString UCollisionImporter::TalentFilePath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data/system/talent.xml"));
+const FString UCollisionImporter::TalentFilePath(TEXT("F:/Game Dev/asset_src/XMLFiles/talent_unrealengine.xml"));
 
 UCollisionImporter::UCollisionImporter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -33,6 +35,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 		return;
 	}
 
+	//~ @todo XmlParser can't parse talent.xml file
 	FXmlFile TalentFileObj(TalentFilePath);
 	FXmlNode* TalentRootNode = TalentFileObj.GetRootNode();
 
@@ -40,6 +43,17 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	if (TalentNodes.Num() == 0)
 	{
 		return;
+	}
+
+	for (FXmlNode* Node : TalentNodes)
+	{
+		const FString& TalentID = Node ? Node->GetAttribute(TEXT("id")) : TEXT("");
+		if (TalentID == TEXT(""))
+		{
+			continue;
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("%s"), *TalentID);
 	}
 }
 
