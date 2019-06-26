@@ -31,6 +31,7 @@ public:
 	static const FString SoundXmlFilePath;
 	static const FString NPCXmlFilePath;
 	static const FString TalentXmlFilePath;
+	static const FString TalentHitInfoXmlFilePath;
 
 	static const FString EluAnimationXmlExt;
 	static const FString EluAnimationEventXmlExt;
