@@ -6,6 +6,7 @@
 #include "EditorFunctionLibrary.h"
 #include "RaiderzXmlUtilities.h"
 
+#include "PackageTools.h"
 #include "Sound/SoundBase.h"
 #include "Misc/Paths.h"
 #include "Misc/FileHelper.h"
@@ -59,8 +60,13 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 	FXmlNode* RootAnimNode = AnimFileObj.GetRootNode();
 	TArray<FXmlNode*> AddAnimationNodes = URaiderzXmlUtilities::GetNodesWithTag(RootAnimNode, TEXT("AddAnimation"));
 
+
+	FXmlFile SoundFileObj(URaiderzXmlUtilities::SoundXmlFilePath);
+	FXmlNode* RootSoundNode = SoundFileObj.GetRootNode();
+	TArray<FXmlNode*> SoundNodes = URaiderzXmlUtilities::GetNodesWithTag(RootSoundNode, TEXT("SOUND"));
+
 	TArray<FAssetData> AllSoundAssets = UEditorFunctionLibrary::GetAllSoundAssets();
-	TArray<FAnimSoundInfo> AnimSoundInfoArray = GenerateAnimSoundInfoArray(AnimationNodes, AddAnimationNodes, MeshAnimAssets, AllSoundAssets);
+	TArray<FAnimSoundInfo> AnimSoundInfoArray = GenerateAnimSoundInfoArray(AnimationNodes, AddAnimationNodes, SoundNodes, MeshAnimAssets, AllSoundAssets);
 
 	CreateAndApplySoundNotifies(AnimSoundInfoArray, AttenuationToApply);
 }
@@ -83,6 +89,7 @@ bool USoundImporter::GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes,
 TArray<FAnimSoundInfo> USoundImporter::GenerateAnimSoundInfoArray(
 	const TArray<FXmlNode*>& AnimationNodes,
 	const TArray<FXmlNode*>& AddAnimationNodes,
+	const TArray<FXmlNode*>& SoundNodes,
 	const TArray<FAssetData>& MeshAnimAssets,
 	const TArray<FAssetData>& AllSoundAssets)
 {
@@ -106,7 +113,7 @@ TArray<FAnimSoundInfo> USoundImporter::GenerateAnimSoundInfoArray(
 			continue;
 		}
 
-		FAnimSoundInfo AnimSoundInfo = GetAnimSoundInfo(AnimNode, AnimationFileName, MeshAnimAssets, AllSoundAssets);
+		FAnimSoundInfo AnimSoundInfo = GetAnimSoundInfo(AnimNode, SoundNodes, AnimationFileName, MeshAnimAssets, AllSoundAssets);
 
 		AnimSoundInfoArray.Add(AnimSoundInfo);
 		GenTask.EnterProgressFrame();
@@ -116,6 +123,7 @@ TArray<FAnimSoundInfo> USoundImporter::GenerateAnimSoundInfoArray(
 
 FAnimSoundInfo USoundImporter::GetAnimSoundInfo(
 	FXmlNode* AnimNode,
+	const TArray<FXmlNode*>& SoundNodes,
 	const FString& AnimationFileName,
 	const TArray<FAssetData>& MeshAnimAssets,
 	const TArray<FAssetData>& AllSoundAssets)
@@ -138,13 +146,13 @@ FAnimSoundInfo USoundImporter::GetAnimSoundInfo(
 		AnimSoundInfo.AnimationName = AnimationName;
 		AnimSoundInfo.AnimationFileName = AnimationFileName;
 		AnimSoundInfo.AnimationAssetData = AssetData;
-		AnimSoundInfo.FrameToSoundAssetMap = GetFrameToSoundAssetMap(AnimNode, AllSoundAssets);
+		AnimSoundInfo.FrameToSoundAssetMap = GetFrameToSoundAssetMap(AnimNode, SoundNodes, AllSoundAssets);
 		break;
 	}
 	return AnimSoundInfo;
 }
 
-TMap<float, FAssetData> USoundImporter::GetFrameToSoundAssetMap(FXmlNode* AnimNode, const TArray<FAssetData>& AllSoundAssets)
+TMap<float, FAssetData> USoundImporter::GetFrameToSoundAssetMap(FXmlNode* AnimNode, const TArray<FXmlNode*>& SoundNodes, const TArray<FAssetData>& AllSoundAssets)
 {
 	TMap<float, FAssetData> FrameToSoundAssetMap;
 	TArray<FXmlNode*> EventNodes = URaiderzXmlUtilities::GetNodesWithTag(AnimNode, TEXT("EVENT"));
@@ -159,7 +167,7 @@ TMap<float, FAssetData> USoundImporter::GetFrameToSoundAssetMap(FXmlNode* AnimNo
 		int32 Frame = FCString::Atoi(*FrameStr);
 		float ActualFrame = float(Frame) / 160.f;
 
-		FAssetData SoundAssetData = GetSoundAsset(EventNode, AllSoundAssets);
+		FAssetData SoundAssetData = GetSoundAsset(EventNode, SoundNodes, AllSoundAssets);
 		if (SoundAssetData.IsValid())
 		{
 			FrameToSoundAssetMap.Add(ActualFrame, SoundAssetData);
@@ -168,22 +176,50 @@ TMap<float, FAssetData> USoundImporter::GetFrameToSoundAssetMap(FXmlNode* AnimNo
 	return FrameToSoundAssetMap;
 }
 
-FAssetData USoundImporter::GetSoundAsset(FXmlNode* EventNode, const TArray<FAssetData>& AllSoundAssets)
+FString USoundImporter::GetEditorSoundName(FXmlNode* EventNode, const TArray<FXmlNode*>& SoundNodes)
+{
+	if (!EventNode || SoundNodes.Num() == 0)
+	{
+		return TEXT("");	
+	}
+
+	const FString& SoundName = EventNode->GetAttribute(TEXT("param1"));
+	for (FXmlNode* Node : SoundNodes)
+	{
+		if (!Node)
+		{
+			continue;
+		}
+
+		if (Node->GetAttribute(TEXT("name")) == SoundName)
+		{
+			const FString& SoundFilePath = Node->GetAttribute(TEXT("filename"));
+			const FString& SoundFileName = FPaths::GetCleanFilename(SoundFilePath);
+			const FString& ProbableEditorSoundName = URaiderzXmlUtilities::GetRaiderzBaseFileName(SoundFileName);
+			const FString& EditorSoundName = PackageTools::SanitizePackageName(ProbableEditorSoundName);
+			return  EditorSoundName;
+		}
+	}
+
+	return TEXT("");
+}
+
+FAssetData USoundImporter::GetSoundAsset(FXmlNode* EventNode, const TArray<FXmlNode*>& SoundNodes, const TArray<FAssetData>& AllSoundAssets)
 {
 	if (!EventNode)
 	{
 		return FAssetData();
 	}
 
-	const FString& SoundName = EventNode->GetAttribute(TEXT("param1"));
-	if (SoundName == TEXT(""))
+	const FString& EditorSoundName = GetEditorSoundName(EventNode, SoundNodes);
+	if (EditorSoundName == TEXT(""))
 	{
 		return FAssetData();
 	}
 
 	for (const FAssetData& SoundAsset : AllSoundAssets)
 	{
-		if (SoundAsset.AssetName.ToString() == SoundName)
+		if (SoundAsset.AssetName.ToString() == EditorSoundName)
 		{
 			return SoundAsset;
 		}
