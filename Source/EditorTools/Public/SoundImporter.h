@@ -72,6 +72,8 @@ private:
 	static void AddSoundNotifiesToAnimation(UAnimSequenceBase* Animation, const TMap<float, FAssetData>& FrameToSoundAssetMap, USoundAttenuation* AttenuationToApply);
 	static bool HasSoundNotify(UAnimSequenceBase* Animation, float NotifyTime, USoundBase* NotifySound);
 
+	static void FilterAnimSoundInfoArray(TArray<FAnimSoundInfo>& AnimSoundInfoArray);
+
 	/** Name of the mesh that is currently being processed */
 	static FString CurrentMeshName;
 

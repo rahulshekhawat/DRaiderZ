@@ -71,6 +71,7 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 	TArray<FAssetData> AllSoundAssets = UEditorFunctionLibrary::GetAllSoundAssets();
 	TArray<FAnimSoundInfo> AnimSoundInfoArray = GenerateAnimSoundInfoArray(AnimationNodes, AddAnimationNodes, SoundNodes, MeshAnimAssets, AllSoundAssets);
 
+	FilterAnimSoundInfoArray(AnimSoundInfoArray);
 	CreateAndApplySoundNotifies(AnimSoundInfoArray, AttenuationToApply);
 
 	CurrentMeshName = TEXT("");
@@ -341,4 +342,28 @@ bool USoundImporter::HasSoundNotify(UAnimSequenceBase* Animation, float NotifyTi
 		}
 	}
 	return false;
+}
+
+void USoundImporter::FilterAnimSoundInfoArray(TArray<FAnimSoundInfo>& AnimSoundInfoArray)
+{
+	int32 Num = AnimSoundInfoArray.Num();
+
+	FScopedSlowTask FilterTask(AnimSoundInfoArray.Num(), FText::FromString("Filtering anim sound info array!"));
+	FilterTask.MakeDialog();
+
+	for (int i = Num - 1; i >= 0; i--)
+	{
+		const FAnimSoundInfo& SoundInfo = AnimSoundInfoArray[i];
+		for (int j = i - 1; j >= 0; j--)
+		{
+			const FAnimSoundInfo& ComInfo = AnimSoundInfoArray[j];
+			if (SoundInfo.AnimationAssetData == ComInfo.AnimationAssetData)
+			{
+				AnimSoundInfoArray.RemoveAt(i);
+				break;
+			}
+		}
+
+		FilterTask.EnterProgressFrame();
+	}
 }
