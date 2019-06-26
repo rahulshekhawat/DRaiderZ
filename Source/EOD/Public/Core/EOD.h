@@ -73,3 +73,9 @@ inline FString EnumToString(const FString& EnumName, const T Value, const FStrin
 	}
 	return DefaultString;
 }
+
+inline void PrintLog(const FString& LogMessage)
+{
+	UE_LOG(LogTemp, Log, TEXT("%s"), *LogMessage);
+}
+

@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "CollisionParser.h"
+#include "EOD.h"
 #include "Notifies/AnimNotify_RaidCollision.h"
 
 #include "XmlFile.h"
@@ -57,7 +58,7 @@ void UCollisionParser::ImportAndApplyCollisionInfo()
 	// If we are unable to parse collision info file
 	if (!CollisionInfoRoot)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("unable to parse talent_hit_info.xml"));
+		PrintLog(TEXT("unable to parse talent_hit_info.xml"));
 		return;
 	}
 	
@@ -238,7 +239,7 @@ void UCollisionParser::ImportAndApplyCollisionInfo()
 			++NumOfParsedCollision;
 			Write_ProcessedAnimationsList.Add(AnimationName);
 			FString Message = FString("Processed animation: ") + AnimationName;
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *Message);
+			PrintLog(Message);
 		}
 
 		if (NumOfParsedCollision >= NumberOfCollisionsToParse)

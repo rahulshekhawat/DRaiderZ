@@ -27,7 +27,7 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 	TArray<FAssetData> AnimationAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
 	if (AnimationAssets.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Import failed because we couldn't find any animations"));
+		PrintLog(TEXT("Import failed because we couldn't find any animations"));
 		return;
 	}
 
@@ -40,7 +40,7 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 	bool bFoundAnimXml = GetFilePath(MeshName + URaiderzXmlUtilities::EluAnimationXmlExt, AnimXmlFilePath);
 	if (!(bFoundSoundXml && bFoundAnimXml))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Couldn't find sound or animation xml file for the given skeletal mesh"));
+		PrintLog(TEXT("Couldn't find sound or animation xml file for the given skeletal mesh"));
 		return;
 	}
 
@@ -86,7 +86,7 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 			if (AssetData.AssetName.ToString() == EditorAnimFileName)
 			{
 				FString LogMessage = FString("Found animation file: ") + EditorAnimFileName;
-				UE_LOG(LogTemp, Log, TEXT("%s"), *LogMessage);
+				PrintLog(LogMessage);
 
 				AnimSoundInfo.AnimationName = AnimationName;
 				AnimSoundInfo.AnimationFileName = AnimationFileName;
@@ -108,7 +108,7 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 							if (SoundAsset.AssetName.ToString() == SoundName)
 							{
 								LogMessage = FString("Found sound file: ") + SoundName;
-								UE_LOG(LogTemp, Log, TEXT("%s"), *LogMessage);
+								PrintLog(LogMessage);
 
 								AnimSoundInfo.FrameToSoundAssetMap.Add(ActualFrame, SoundAsset);
 

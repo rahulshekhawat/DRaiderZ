@@ -2,6 +2,7 @@
 
 
 #include "CollisionImporter.h"
+#include "EOD.h"
 #include "RaiderzXmlUtilities.h"
 #include "EditorFunctionLibrary.h"
 
@@ -66,8 +67,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 		{
 			continue;
 		}
-
-		UE_LOG(LogTemp, Log, TEXT("%s"), *TalentID);
+		PrintLog(TalentID);
 	}
 }
 
