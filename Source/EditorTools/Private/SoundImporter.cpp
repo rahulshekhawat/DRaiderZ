@@ -2,8 +2,9 @@
 
 
 #include "SoundImporter.h"
-#include "EditorFunctionLibrary.h"
 #include "EOD.h"
+#include "EditorFunctionLibrary.h"
+#include "RaiderzXmlUtilities.h"
 
 #include "Sound/SoundBase.h"
 #include "Misc/Paths.h"
@@ -15,12 +16,6 @@
 #include "Misc/ScopedSlowTask.h"
 #include "HAL/FileManagerGeneric.h"
 #include "Animation/AnimNotifies/AnimNotify_PlaySound.h"
-
-const FString USoundImporter::DataFolderPath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data"));
-const FString USoundImporter::SoundXmlFilePath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data/Sound/sound.xml"));
-
-const FString USoundImporter::AnimationSoundXmlFilePostfix(TEXT(".elu.animationsoundevent.xml"));
-const FString USoundImporter::AnimationXmlFilePostfix(TEXT(".elu.animation.xml"));
 
 
 USoundImporter::USoundImporter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -41,8 +36,8 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 
 	FString SoundEventFilePath;
 	FString AnimXmlFilePath;
-	bool bFoundSoundXml = GetFilePath(MeshName + AnimationSoundXmlFilePostfix, SoundEventFilePath);
-	bool bFoundAnimXml = GetFilePath(MeshName + AnimationXmlFilePostfix, AnimXmlFilePath);
+	bool bFoundSoundXml = GetFilePath(MeshName + URaiderzXmlUtilities::EluAnimationSoundEventXmlExt, SoundEventFilePath);
+	bool bFoundAnimXml = GetFilePath(MeshName + URaiderzXmlUtilities::EluAnimationXmlExt, AnimXmlFilePath);
 	if (!(bFoundSoundXml && bFoundAnimXml))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Couldn't find sound or animation xml file for the given skeletal mesh"));
@@ -212,7 +207,7 @@ bool USoundImporter::GetFilePath(const FString& InFileName, FString& OutFilePath
 		IFileManager& FileManager = IFileManager::Get();
 
 		FString SearchString = FString("*") + FileExtension;
-		FileManager.FindFilesRecursive(AllFiles, *DataFolderPath, *SearchString, true, false);
+		FileManager.FindFilesRecursive(AllFiles, *URaiderzXmlUtilities::DataFolderPath, *SearchString, true, false);
 
 		for (const FString& FilePath : AllFiles)
 		{

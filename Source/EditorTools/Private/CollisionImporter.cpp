@@ -2,14 +2,10 @@
 
 
 #include "CollisionImporter.h"
+#include "RaiderzXmlUtilities.h"
 #include "EditorFunctionLibrary.h"
 
 #include "Engine/SkeletalMesh.h"
-
-const FString UCollisionImporter::NPCFilePath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data/system/npc.xml"));
-// FXmlParser can't parse talent.xml, so it has been replaced with talent_unrealengine.xml which removed a few TALENT IDs that FXmlParser was unable to parse
-// const FString UCollisionImporter::TalentFilePath(TEXT("F:/Zunk/Zunk_Tests/datadump/Data/system/talent.xml"));
-const FString UCollisionImporter::TalentFilePath(TEXT("F:/Game Dev/asset_src/XMLFiles/talent_unrealengine.xml"));
 
 UCollisionImporter::UCollisionImporter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -25,7 +21,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	FString FullMeshName = Mesh->GetFName().ToString();
 	FString MeshName = FullMeshName.RightChop(3);
 
-	FXmlFile NPCFileObj(NPCFilePath);
+	FXmlFile NPCFileObj(URaiderzXmlUtilities::NPCXmlFilePath);
 	FXmlNode* NPCRootNode = NPCFileObj.GetRootNode();
 
 	FString NPCID;
@@ -36,7 +32,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	}
 
 	//~ @todo XmlParser can't parse talent.xml file
-	FXmlFile TalentFileObj(TalentFilePath);
+	FXmlFile TalentFileObj(URaiderzXmlUtilities::TalentXmlFilePath);
 	FXmlNode* TalentRootNode = TalentFileObj.GetRootNode();
 
 	TArray<FXmlNode*> TalentNodes = GetNPCTalents(TalentRootNode, NPCID);

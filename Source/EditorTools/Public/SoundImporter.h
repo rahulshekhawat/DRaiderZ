@@ -49,10 +49,5 @@ public:
 	static bool GetFilePath(const FString& InFileName, FString& OutFilePath);
 	static bool GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName);
 
-	static const FString DataFolderPath;
-	static const FString SoundXmlFilePath;
-
-	static const FString AnimationSoundXmlFilePostfix;
-	static const FString AnimationXmlFilePostfix;
 
 };

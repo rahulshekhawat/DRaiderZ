@@ -20,8 +20,14 @@ public:
 
 	static const FString DataFolderPath;
 	static const FString SoundXmlFilePath;
+	static const FString NPCXmlFilePath;
+	static const FString TalentXmlFilePath;
 
-	static const FString AnimationSoundXmlFilePostfix;
-	static const FString AnimationXmlFilePostfix;
+	static const FString EluAnimationXmlExt;
+	static const FString EluAnimationEventXmlExt;
+	static const FString EluAnimationInfoXmlExt;
+	static const FString EluAnimationSoundEventXmlExt;
+	static const FString EluXmlExt;
+	static const FString SceneXmlExt;
 
 };

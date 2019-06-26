@@ -43,9 +43,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
 	static void ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh);
 
-	static const FString NPCFilePath;
-	static const FString TalentFilePath;
-
 	static bool GetNPCID(FXmlNode* NPCRootNode, const FString& MeshName, FString& OutNPCID);
 	static TArray<FXmlNode*> GetNPCTalents(FXmlNode* TalentRootNode, const FString& InNPCID);
 
