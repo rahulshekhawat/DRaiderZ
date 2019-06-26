@@ -66,6 +66,8 @@ private:
 	static FXmlNode* GetTalentHitNodeWithID(const TArray<FXmlNode*>& TalentHitNodes, const FString& TalentID);
 	static bool GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* TalentNode, FString& OutFileName);
 
+	static void CreateAndApplyCollisionNotifies(const TArray<FCollisionInfo>& CollisionInfoArray);
+
 	static FXmlNode* GetNPCNode(FXmlNode* NPCRootNode, const FString& MeshName);
 	static TArray<FXmlNode*> GetNPCTalents(FXmlNode* TalentRootNode, const FString& InNPCID);
 

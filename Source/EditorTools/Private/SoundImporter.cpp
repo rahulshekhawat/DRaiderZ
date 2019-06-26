@@ -249,8 +249,8 @@ FAssetData USoundImporter::GetSoundAsset(FXmlNode* EventNode, const TArray<FXmlN
 
 void USoundImporter::CreateAndApplySoundNotifies(const TArray<FAnimSoundInfo>& AnimSoundInfoArray, USoundAttenuation* AttenuationToApply)
 {
-	FScopedSlowTask SlowTask(AnimSoundInfoArray.Num(), FText::FromString("Adding sound notifies!"));
-	SlowTask.MakeDialog();
+	FScopedSlowTask AddNotifyTask(AnimSoundInfoArray.Num(), FText::FromString("Adding sound notifies!"));
+	AddNotifyTask.MakeDialog();
 
 	for (const FAnimSoundInfo& AnimSoundInfo : AnimSoundInfoArray)
 	{
@@ -258,11 +258,11 @@ void USoundImporter::CreateAndApplySoundNotifies(const TArray<FAnimSoundInfo>& A
 		if (!Animation)
 		{
 			continue;
-			SlowTask.EnterProgressFrame();
+			AddNotifyTask.EnterProgressFrame();
 		}
 
 		AddSoundNotifiesToAnimation(Animation, AnimSoundInfo.FrameToSoundAssetMap, AttenuationToApply);
-		SlowTask.EnterProgressFrame();
+		AddNotifyTask.EnterProgressFrame();
 	}
 }
 

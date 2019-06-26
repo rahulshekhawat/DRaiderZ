@@ -66,6 +66,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	TArray<FAssetData> MeshAnimAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
 	TArray<FCollisionInfo> CollisionInfoArray = GenerateCollisionInfoArray(NPCNode, TalentNodes, AddAnimationNodes, TalentHitNodes, MeshAnimAssets);
 
+	CreateAndApplyCollisionNotifies(CollisionInfoArray);
 }
 
 TArray<FCollisionInfo> UCollisionImporter::GenerateCollisionInfoArray(
@@ -195,6 +196,25 @@ bool UCollisionImporter::GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNo
 		}
 	}
 	return false;
+}
+
+void UCollisionImporter::CreateAndApplyCollisionNotifies(const TArray<FCollisionInfo>& CollisionInfoArray)
+{
+	if (CollisionInfoArray.Num() == 0)
+	{
+		PrintWarning(TEXT("No collision info found"));
+	}
+	else
+	{
+		PrintWarning(TEXT("We have collision info"));
+	}
+
+	for (const FCollisionInfo& CollisionInfo : CollisionInfoArray)
+	{
+		PrintLog(CollisionInfo.TalentID);
+	}
+
+	// PrintLog()
 }
 
 FXmlNode* UCollisionImporter::GetNPCNode(FXmlNode* NPCRootNode, const FString& MeshName)

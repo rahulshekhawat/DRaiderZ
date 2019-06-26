@@ -65,31 +65,32 @@ TArray<FAssetData> UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(USkel
 	}
 
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
-	TArray<FAssetData> AnimationsAssetData;
-	AssetRegistryModule.Get().GetAssetsByClass(FName("AnimSequenceBase"), AnimationsAssetData, true);
+	TArray<FAssetData> AllAnimations;
+	AssetRegistryModule.Get().GetAssetsByClass(FName("AnimSequenceBase"), AllAnimations, true);
 
-	int32 AssetNum = AnimationsAssetData.Num();
-	TArray<FAssetData> Animations;
+	int32 AssetNum = AllAnimations.Num();
+	TArray<FAssetData> MeshAnimations;
 
-	FScopedSlowTask FindAnimationTask(AssetNum, FText::FromString("Finding animations!"));
+	FString TaskMessage = TEXT("Finding animations for mesh '") + SkeletalMesh->GetFName().ToString() + TEXT("'");
+	FScopedSlowTask FindAnimationTask(AssetNum, FText::FromString(TaskMessage));
 	FindAnimationTask.MakeDialog();
 
 	for (int i = 0; i < AssetNum; i++)
 	{
-		FAssetData AssetData = AnimationsAssetData[i];
+		FAssetData AssetData = AllAnimations[i];
 		FAssetDataTagMapSharedView::FFindTagResult TagResult = AssetData.TagsAndValues.FindTag(TEXT("Skeleton"));
 		const FString& Result = TagResult.GetValue();
 		FSoftObjectPath ResultPath(Result);
 
 		if (ResultPath == SkeletonSoftPath)
 		{
-			Animations.Add(AssetData);
+			MeshAnimations.Add(AssetData);
 		}
 
 		FindAnimationTask.EnterProgressFrame();
 	}
 
-	return  Animations;
+	return MeshAnimations;
 }
 
 TArray<FAssetData> UEditorFunctionLibrary::GetAllSoundAssets()
