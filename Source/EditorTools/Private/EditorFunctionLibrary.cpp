@@ -30,6 +30,27 @@ bool UEditorFunctionLibrary::IsHumanPlayerMesh(USkeletalMesh* Mesh)
 	return false;
 }
 
+FString UEditorFunctionLibrary::GetRaiderZMeshName(USkeletalMesh* Mesh)
+{
+	if (Mesh)
+	{
+		FString FullMeshName = Mesh->GetFName().ToString();
+		if (FullMeshName.StartsWith(TEXT("SK_hf")))
+		{
+			return TEXT("hf");
+		}
+		else if (FullMeshName.StartsWith(TEXT("SK_hm")))
+		{
+			return TEXT("hm");
+		}
+		else
+		{
+			return FullMeshName.RightChop(3);
+		}
+	}
+	return TEXT("");
+}
+
 TArray<FAssetData> UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(USkeletalMesh* SkeletalMesh)
 {
 	if (SkeletalMesh == nullptr)

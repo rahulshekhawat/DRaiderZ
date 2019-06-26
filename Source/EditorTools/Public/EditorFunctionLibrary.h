@@ -25,6 +25,7 @@ public:
 	UEditorFunctionLibrary(const FObjectInitializer& ObjectInitializer);
 
 	static bool IsHumanPlayerMesh(USkeletalMesh* Mesh);
+	static FString GetRaiderZMeshName(USkeletalMesh* Mesh);
 
 	static TArray<FAssetData> GetAllAnimationsForSkeletalMesh(USkeletalMesh* SkeletalMesh);
 	static TArray<FAssetData> GetAllSoundAssets();

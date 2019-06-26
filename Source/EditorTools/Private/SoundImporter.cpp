@@ -18,6 +18,7 @@
 #include "HAL/FileManagerGeneric.h"
 #include "Animation/AnimNotifies/AnimNotify_PlaySound.h"
 
+FString USoundImporter::CurrentMeshName(TEXT(""));
 
 USoundImporter::USoundImporter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -25,8 +26,6 @@ USoundImporter::USoundImporter(const FObjectInitializer& ObjectInitializer) : Su
 
 void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAttenuation* AttenuationToApply)
 {
-	bool bIsPlayerMesh = UEditorFunctionLibrary::IsHumanPlayerMesh(Mesh);
-
 	TArray<FAssetData> MeshAnimAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
 	if (MeshAnimAssets.Num() == 0)
 	{
@@ -34,11 +33,14 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 		return;
 	}
 
-	FString FullMeshName = Mesh->GetFName().ToString();
-	FString MeshName = FullMeshName.RightChop(3);
+	CurrentMeshName = UEditorFunctionLibrary::GetRaiderZMeshName(Mesh);
+	check(CurrentMeshName != TEXT(""));
+
+	FScopedSlowTask SlowTask(3, FText::FromString("Finding and parsing XML files!"));
+	SlowTask.MakeDialog();
 
 	FString SoundEventFilePath;
-	bool bFoundSoundXml = URaiderzXmlUtilities::GetRaiderzFilePath(MeshName + URaiderzXmlUtilities::EluAnimationSoundEventXmlExt, SoundEventFilePath);
+	bool bFoundSoundXml = URaiderzXmlUtilities::GetRaiderzFilePath(CurrentMeshName + URaiderzXmlUtilities::EluAnimationSoundEventXmlExt, SoundEventFilePath);
 	if (!bFoundSoundXml)
 	{
 		PrintError(TEXT("Couldn't find animationsoundevent.xml file for the given skeletal mesh"));
@@ -47,10 +49,10 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 	FXmlFile SoundEventFileObj(SoundEventFilePath);
 	FXmlNode* RootSoundEventNode = SoundEventFileObj.GetRootNode();
 	TArray<FXmlNode*> AnimationNodes = URaiderzXmlUtilities::GetNodesWithTag(RootSoundEventNode, TEXT("Animation"));
-
+	SlowTask.EnterProgressFrame();
 
 	FString AnimXmlFilePath;
-	bool bFoundAnimXml = URaiderzXmlUtilities::GetRaiderzFilePath(MeshName + URaiderzXmlUtilities::EluAnimationXmlExt, AnimXmlFilePath);
+	bool bFoundAnimXml = URaiderzXmlUtilities::GetRaiderzFilePath(CurrentMeshName + URaiderzXmlUtilities::EluAnimationXmlExt, AnimXmlFilePath);
 	if (!bFoundAnimXml)
 	{
 		PrintError(TEXT("Couldn't find .elu.animation.xml file for the given skeletal mesh"));
@@ -59,16 +61,20 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 	FXmlFile AnimFileObj(AnimXmlFilePath);
 	FXmlNode* RootAnimNode = AnimFileObj.GetRootNode();
 	TArray<FXmlNode*> AddAnimationNodes = URaiderzXmlUtilities::GetNodesWithTag(RootAnimNode, TEXT("AddAnimation"));
-
+	SlowTask.EnterProgressFrame();
 
 	FXmlFile SoundFileObj(URaiderzXmlUtilities::SoundXmlFilePath);
 	FXmlNode* RootSoundNode = SoundFileObj.GetRootNode();
 	TArray<FXmlNode*> SoundNodes = URaiderzXmlUtilities::GetNodesWithTag(RootSoundNode, TEXT("SOUND"));
+	SlowTask.EnterProgressFrame();
 
 	TArray<FAssetData> AllSoundAssets = UEditorFunctionLibrary::GetAllSoundAssets();
 	TArray<FAnimSoundInfo> AnimSoundInfoArray = GenerateAnimSoundInfoArray(AnimationNodes, AddAnimationNodes, SoundNodes, MeshAnimAssets, AllSoundAssets);
 
 	CreateAndApplySoundNotifies(AnimSoundInfoArray, AttenuationToApply);
+
+	CurrentMeshName = TEXT("");
+	PrintLog(TEXT("Finished imported sound notifies!"));
 }
 
 bool USoundImporter::GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* AnimNode, FString& OutFileName)
@@ -183,7 +189,19 @@ FString USoundImporter::GetEditorSoundName(FXmlNode* EventNode, const TArray<FXm
 		return TEXT("");	
 	}
 
-	const FString& SoundName = EventNode->GetAttribute(TEXT("param1"));
+	FString SoundName = EventNode->GetAttribute(TEXT("param1"));
+	if (SoundName.StartsWith(TEXT("$vox_")))
+	{
+		if (CurrentMeshName == TEXT("hm"))
+		{
+			SoundName = SoundName.Replace(TEXT("$vox_"), TEXT("m1_"));
+		}
+		else if (CurrentMeshName == TEXT("hf"))
+		{
+			SoundName = SoundName.Replace(TEXT("$vox_"), TEXT("w1_"));
+		}
+	}
+
 	for (FXmlNode* Node : SoundNodes)
 	{
 		if (!Node)
@@ -230,15 +248,20 @@ FAssetData USoundImporter::GetSoundAsset(FXmlNode* EventNode, const TArray<FXmlN
 
 void USoundImporter::CreateAndApplySoundNotifies(const TArray<FAnimSoundInfo>& AnimSoundInfoArray, USoundAttenuation* AttenuationToApply)
 {
+	FScopedSlowTask SlowTask(AnimSoundInfoArray.Num(), FText::FromString("Adding sound notifies!"));
+	SlowTask.MakeDialog();
+
 	for (const FAnimSoundInfo& AnimSoundInfo : AnimSoundInfoArray)
 	{
 		UAnimSequenceBase* Animation = Cast<UAnimSequenceBase>(AnimSoundInfo.AnimationAssetData.GetAsset());
 		if (!Animation)
 		{
 			continue;
+			SlowTask.EnterProgressFrame();
 		}
 
 		AddSoundNotifiesToAnimation(Animation, AnimSoundInfo.FrameToSoundAssetMap, AttenuationToApply);
+		SlowTask.EnterProgressFrame();
 	}
 }
 
