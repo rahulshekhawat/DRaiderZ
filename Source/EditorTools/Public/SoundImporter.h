@@ -44,10 +44,26 @@ public:
 	USoundImporter(const FObjectInitializer& ObjectInitializer);
 	
 	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
-	static void ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAttenuation* SoundAttentionToApply = nullptr);
+	static void ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAttenuation* AttenuationToApply = nullptr);
 
-	static bool GetFilePath(const FString& InFileName, FString& OutFilePath);
-	static bool GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName);
+private:
 
+	static bool GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* AnimNode, FString& OutFileName);
+
+	static TArray<FAnimSoundInfo> GenerateAnimSoundInfoArray(
+		const TArray<FXmlNode*>& AnimationNodes,
+		const TArray<FXmlNode*>& AddAnimationNodes,
+		const TArray<FAssetData>& MeshAnimAssets,
+		const TArray<FAssetData>& AllSoundAssets);
+
+	static FAnimSoundInfo GetAnimSoundInfo(
+		FXmlNode* AnimNode,
+		const FString& AnimationFileName,
+		const TArray<FAssetData>& MeshAnimAssets,
+		const TArray<FAssetData>& AllSoundAssets);
+
+	static TMap<float, FAssetData> GetFrameToSoundAssetMap(FXmlNode* AnimNode, const TArray<FAssetData>& AllSoundAssets);
+
+	static FAssetData GetSoundAsset(FXmlNode* EventNode, const TArray<FAssetData>& AllSoundAssets);
 
 };

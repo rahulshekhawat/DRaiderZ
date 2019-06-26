@@ -22,10 +22,12 @@ USoundImporter::USoundImporter(const FObjectInitializer& ObjectInitializer) : Su
 {
 }
 
-void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAttenuation* SoundAttentionToApply)
+void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAttenuation* AttenuationToApply)
 {
-	TArray<FAssetData> AnimationAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
-	if (AnimationAssets.Num() == 0)
+	bool bIsPlayerMesh = UEditorFunctionLibrary::IsHumanPlayerMesh(Mesh);
+
+	TArray<FAssetData> MeshAnimAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
+	if (MeshAnimAssets.Num() == 0)
 	{
 		PrintLog(TEXT("Import failed because we couldn't find any animations"));
 		return;
@@ -36,8 +38,9 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 
 	FString SoundEventFilePath;
 	FString AnimXmlFilePath;
-	bool bFoundSoundXml = GetFilePath(MeshName + URaiderzXmlUtilities::EluAnimationSoundEventXmlExt, SoundEventFilePath);
-	bool bFoundAnimXml = GetFilePath(MeshName + URaiderzXmlUtilities::EluAnimationXmlExt, AnimXmlFilePath);
+	bool bFoundSoundXml = URaiderzXmlUtilities::GetRaiderzFilePath(MeshName + URaiderzXmlUtilities::EluAnimationSoundEventXmlExt, SoundEventFilePath);
+	bool bFoundAnimXml = URaiderzXmlUtilities::GetRaiderzFilePath(MeshName + URaiderzXmlUtilities::EluAnimationXmlExt, AnimXmlFilePath);
+
 	if (!(bFoundSoundXml && bFoundAnimXml))
 	{
 		PrintLog(TEXT("Couldn't find sound or animation xml file for the given skeletal mesh"));
@@ -46,86 +49,17 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 
 	FXmlFile SoundEventFileObj(SoundEventFilePath);
 	FXmlNode* RootSoundEventNode = SoundEventFileObj.GetRootNode();
-	TArray<FXmlNode*> AnimationNodes = UEditorFunctionLibrary::GetNodesWithTag(RootSoundEventNode, TEXT("Animation"));
+	TArray<FXmlNode*> AnimationNodes = URaiderzXmlUtilities::GetNodesWithTag(RootSoundEventNode, TEXT("Animation"));
 
 	FXmlFile AnimFileObj(AnimXmlFilePath);
 	FXmlNode* RootAnimNode = AnimFileObj.GetRootNode();
-	TArray<FXmlNode*> AddAnimationNodes = UEditorFunctionLibrary::GetNodesWithTag(RootAnimNode, TEXT("AddAnimation"));
+	TArray<FXmlNode*> AddAnimationNodes = URaiderzXmlUtilities::GetNodesWithTag(RootAnimNode, TEXT("AddAnimation"));
 
-	// FXmlFile SoundFileObj(SoundXmlFilePath);
-	// FXmlNode* RootSoundNode = SoundFileObj.GetRootNode();
-	// TArray<FXmlNode*> SOUNDNodes = GetNodesWithTag(RootSoundNode, TEXT("SOUND"));
+	TArray<FAssetData> AllSoundAssets = UEditorFunctionLibrary::GetAllSoundAssets();
 
-	TArray<FAssetData> SoundAssets = UEditorFunctionLibrary::GetAllSoundAssets();
+	TArray<FAnimSoundInfo> AnimSoundInfoArray = GenerateAnimSoundInfoArray(AnimationNodes, AddAnimationNodes, MeshAnimAssets, AllSoundAssets);
 
-	FScopedSlowTask GenTask(AnimationNodes.Num(), FText::FromString("Generating AnimSoundInfo Array!"));
-	GenTask.MakeDialog();
 
-	TArray<FAnimSoundInfo> AnimSoundInfoArray;
-	for (FXmlNode* AnimNode : AnimationNodes)
-	{
-		if (!AnimNode)
-		{
-			GenTask.EnterProgressFrame();
-			continue;
-		}
-
-		const FString& AnimationName = AnimNode->GetAttribute(TEXT("name"));
-		FString AnimationFileName;
-		bool bFoundFilename = GetAnimationFileName(AddAnimationNodes, AnimationName, AnimationFileName);
-		if (!bFoundFilename)
-		{
-			GenTask.EnterProgressFrame();
-			continue;
-		}
-
-		FAnimSoundInfo AnimSoundInfo;
-		FString EditorAnimFileName = TEXT("A_") + UEditorFunctionLibrary::GetBaseFileName(AnimationFileName);
-		for (const FAssetData& AssetData : AnimationAssets)
-		{
-			if (AssetData.AssetName.ToString() == EditorAnimFileName)
-			{
-				FString LogMessage = FString("Found animation file: ") + EditorAnimFileName;
-				PrintLog(LogMessage);
-
-				AnimSoundInfo.AnimationName = AnimationName;
-				AnimSoundInfo.AnimationFileName = AnimationFileName;
-				AnimSoundInfo.AnimationAssetData = AssetData;
-
-				TArray<FXmlNode*> EventNodes = UEditorFunctionLibrary::GetNodesWithTag(AnimNode, TEXT("EVENT"));
-				for (FXmlNode* EventNode : EventNodes)
-				{
-					if (EventNode && EventNode->GetAttribute(TEXT("name")) == TEXT("sh_sound"))
-					{
-						FString FrameStr = EventNode->GetAttribute(TEXT("frame"));
-						int32 Frame = FCString::Atoi(*FrameStr);
-						float ActualFrame = float(Frame) / 160.f;
-
-						const FString& SoundName = EventNode->GetAttribute(TEXT("param1"));
-
-						for (const FAssetData& SoundAsset : SoundAssets)
-						{
-							if (SoundAsset.AssetName.ToString() == SoundName)
-							{
-								LogMessage = FString("Found sound file: ") + SoundName;
-								PrintLog(LogMessage);
-
-								AnimSoundInfo.FrameToSoundAssetMap.Add(ActualFrame, SoundAsset);
-
-								break;
-							}
-
-						}
-					}
-				}
-
-				break;
-			}
-		}
-
-		AnimSoundInfoArray.Add(AnimSoundInfo);
-		GenTask.EnterProgressFrame();
-	}
 
 	UClass* SoundNotifyClass = UAnimNotify_PlaySound::StaticClass();
 	for (const FAnimSoundInfo& AnimSoundInfo : AnimSoundInfoArray)
@@ -182,7 +116,7 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 				if (SoundNotify)
 				{
 					Sound->Modify();
-					Sound->AttenuationSettings = SoundAttentionToApply;
+					Sound->AttenuationSettings = AttenuationToApply;
 					Sound->MarkPackageDirty();
 
 					SoundNotify->Sound = Sound;
@@ -197,41 +131,131 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 	}
 }
 
-bool USoundImporter::GetFilePath(const FString& InFileName, FString& OutFilePath)
+bool USoundImporter::GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* AnimNode, FString& OutFileName)
 {
-	FString FileExtension = UEditorFunctionLibrary::GetNestedFileExtension(InFileName);
-
-	if (FileExtension != TEXT(""))
+	if (AnimNode)
 	{
-		TArray<FString> AllFiles;
-		IFileManager& FileManager = IFileManager::Get();
-
-		FString SearchString = FString("*") + FileExtension;
-		FileManager.FindFilesRecursive(AllFiles, *URaiderzXmlUtilities::DataFolderPath, *SearchString, true, false);
-
-		for (const FString& FilePath : AllFiles)
+		const FString& AnimationName = AnimNode->GetAttribute(TEXT("name"));
+		for (FXmlNode* Node : AddAnimNodes)
 		{
-			const FString CleanFileName = FPaths::GetCleanFilename(FilePath);
-			if (CleanFileName == InFileName)
+			if (Node && Node->GetAttribute(TEXT("name")) == AnimationName)
 			{
-				OutFilePath = FilePath;
+				OutFileName = Node->GetAttribute(TEXT("filename"));
 				return true;
 			}
 		}
 	}
-
 	return false;
 }
 
-bool USoundImporter::GetAnimationFileName(TArray<FXmlNode*> AddAnimNodes, const FString& AnimationName, FString& OutFileName)
+TArray<FAnimSoundInfo> USoundImporter::GenerateAnimSoundInfoArray(
+	const TArray<FXmlNode*>& AnimationNodes,
+	const TArray<FXmlNode*>& AddAnimationNodes,
+	const TArray<FAssetData>& MeshAnimAssets,
+	const TArray<FAssetData>& AllSoundAssets)
 {
-	for (FXmlNode* Node : AddAnimNodes)
+	FScopedSlowTask GenTask(AnimationNodes.Num(), FText::FromString("Generating AnimSoundInfo Array!"));
+	GenTask.MakeDialog();
+
+	TArray<FAnimSoundInfo> AnimSoundInfoArray;
+	for (FXmlNode* AnimNode : AnimationNodes)
 	{
-		if (Node && Node->GetAttribute(TEXT("name")) == AnimationName)
+		if (!AnimNode)
 		{
-			OutFileName = Node->GetAttribute(TEXT("filename"));
-			return true;
+			GenTask.EnterProgressFrame();
+			continue;
+		}
+
+		FString AnimationFileName;
+		bool bFoundFileName = GetAnimationFileName(AddAnimationNodes, AnimNode, AnimationFileName);
+		if (!bFoundFileName)
+		{
+			GenTask.EnterProgressFrame();
+			continue;
+		}
+
+		FAnimSoundInfo AnimSoundInfo = GetAnimSoundInfo(AnimNode, AnimationFileName, MeshAnimAssets, AllSoundAssets);
+
+		AnimSoundInfoArray.Add(AnimSoundInfo);
+		GenTask.EnterProgressFrame();
+	}
+	return AnimSoundInfoArray;
+}
+
+FAnimSoundInfo USoundImporter::GetAnimSoundInfo(
+	FXmlNode* AnimNode,
+	const FString& AnimationFileName,
+	const TArray<FAssetData>& MeshAnimAssets,
+	const TArray<FAssetData>& AllSoundAssets)
+{
+	check(AnimNode);
+	const FString& AnimationName = AnimNode->GetAttribute(TEXT("name"));
+
+	FAnimSoundInfo AnimSoundInfo;
+	FString EditorAnimFileName = TEXT("A_") + URaiderzXmlUtilities::GetRaiderzBaseFileName(AnimationFileName);
+	for (const FAssetData& AssetData : MeshAnimAssets)
+	{
+		if (AssetData.AssetName.ToString() != EditorAnimFileName)
+		{
+			continue;
+		}
+
+		FString LogMessage = FString("Found animation file: ") + EditorAnimFileName;
+		PrintLog(LogMessage);
+
+		AnimSoundInfo.AnimationName = AnimationName;
+		AnimSoundInfo.AnimationFileName = AnimationFileName;
+		AnimSoundInfo.AnimationAssetData = AssetData;
+		AnimSoundInfo.FrameToSoundAssetMap = GetFrameToSoundAssetMap(AnimNode, AllSoundAssets);
+		break;
+	}
+	return AnimSoundInfo;
+}
+
+TMap<float, FAssetData> USoundImporter::GetFrameToSoundAssetMap(FXmlNode* AnimNode, const TArray<FAssetData>& AllSoundAssets)
+{
+	TMap<float, FAssetData> FrameToSoundAssetMap;
+	TArray<FXmlNode*> EventNodes = URaiderzXmlUtilities::GetNodesWithTag(AnimNode, TEXT("EVENT"));
+	for (FXmlNode* EventNode : EventNodes)
+	{
+		if (!EventNode && EventNode->GetAttribute(TEXT("name")) != TEXT("sh_sound"))
+		{
+			continue;
+		}
+
+		FString FrameStr = EventNode->GetAttribute(TEXT("frame"));
+		int32 Frame = FCString::Atoi(*FrameStr);
+		float ActualFrame = float(Frame) / 160.f;
+
+		FAssetData SoundAssetData = GetSoundAsset(EventNode, AllSoundAssets);
+		if (SoundAssetData.IsValid())
+		{
+			FrameToSoundAssetMap.Add(ActualFrame, SoundAssetData);
 		}
 	}
-	return false;
+	return FrameToSoundAssetMap;
+}
+
+FAssetData USoundImporter::GetSoundAsset(FXmlNode* EventNode, const TArray<FAssetData>& AllSoundAssets)
+{
+	if (!EventNode)
+	{
+		return FAssetData();
+	}
+
+	const FString& SoundName = EventNode->GetAttribute(TEXT("param1"));
+	if (SoundName == TEXT(""))
+	{
+		return FAssetData();
+	}
+
+	for (const FAssetData& SoundAsset : AllSoundAssets)
+	{
+		if (SoundAsset.AssetName.ToString() == SoundName)
+		{
+			return SoundAsset;
+		}
+	}
+
+	return FAssetData();
 }

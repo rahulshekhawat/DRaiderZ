@@ -24,12 +24,10 @@ public:
 
 	UEditorFunctionLibrary(const FObjectInitializer& ObjectInitializer);
 
+	static bool IsHumanPlayerMesh(USkeletalMesh* Mesh);
+
 	static TArray<FAssetData> GetAllAnimationsForSkeletalMesh(USkeletalMesh* SkeletalMesh);
 	static TArray<FAssetData> GetAllSoundAssets();
-	
-	static FString GetNestedFileExtension(const FString& FilePath, bool bIncludeDot = true);
-	static FString GetBaseFileName(const FString& FilePath);
 
-	static TArray<FXmlNode*> GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag);
 
 };

@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "XmlFile.h"
 #include "UObject/NoExportTypes.h"
 #include "RaiderzXmlUtilities.generated.h"
 
@@ -17,6 +19,13 @@ class EDITORTOOLS_API URaiderzXmlUtilities : public UObject
 public:
 
 	URaiderzXmlUtilities(const FObjectInitializer& ObjectInitializer);
+
+	static bool GetRaiderzFilePath(const FString& InFileName, FString& OutFilePath);
+
+	static FString GetRaiderzFileExtension(const FString& FilePath, bool bIncludeDot = true);
+	static FString GetRaiderzBaseFileName(const FString& FilePath);
+
+	static TArray<FXmlNode*> GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag);
 
 	static const FString DataFolderPath;
 	static const FString SoundXmlFilePath;

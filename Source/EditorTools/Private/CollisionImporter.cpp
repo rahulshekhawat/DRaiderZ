@@ -73,7 +73,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 
 bool UCollisionImporter::GetNPCID(FXmlNode* NPCRootNode, const FString& MeshName, FString& OutNPCID)
 {
-	TArray<FXmlNode*> NPCNodes = UEditorFunctionLibrary::GetNodesWithTag(NPCRootNode, TEXT("NPC"));
+	TArray<FXmlNode*> NPCNodes = URaiderzXmlUtilities::GetNodesWithTag(NPCRootNode, TEXT("NPC"));
 	for (FXmlNode* Node : NPCNodes)
 	{
 		if (Node->GetAttribute(TEXT("MeshName")) == MeshName)
@@ -87,7 +87,7 @@ bool UCollisionImporter::GetNPCID(FXmlNode* NPCRootNode, const FString& MeshName
 
 TArray<FXmlNode*> UCollisionImporter::GetNPCTalents(FXmlNode* TalentRootNode, const FString& InNPCID)
 {
-	TArray<FXmlNode*> AllTalentNodes = UEditorFunctionLibrary::GetNodesWithTag(TalentRootNode, TEXT("TALENT"));
+	TArray<FXmlNode*> AllTalentNodes = URaiderzXmlUtilities::GetNodesWithTag(TalentRootNode, TEXT("TALENT"));
 	TArray<FXmlNode*> ResultNodes;
 	for (FXmlNode* Node : AllTalentNodes)
 	{

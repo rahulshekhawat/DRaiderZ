@@ -79,3 +79,12 @@ inline void PrintLog(const FString& LogMessage)
 	UE_LOG(LogTemp, Log, TEXT("%s"), *LogMessage);
 }
 
+inline void PrintWarning(const FString& LogMessage)
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *LogMessage);
+}
+
+inline void PrintError(const FString& LogMessage)
+{
+	UE_LOG(LogTemp, Error, TEXT("%s"), *LogMessage);
+}

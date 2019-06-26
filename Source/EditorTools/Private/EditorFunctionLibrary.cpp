@@ -14,6 +14,22 @@ UEditorFunctionLibrary::UEditorFunctionLibrary(const FObjectInitializer& ObjectI
 {
 }
 
+bool UEditorFunctionLibrary::IsHumanPlayerMesh(USkeletalMesh* Mesh)
+{
+	if (Mesh == nullptr)
+	{
+		return false;
+	}
+
+	FString FullMeshName = Mesh->GetFName().ToString();
+	if (FullMeshName.StartsWith(TEXT("SK_hf")) || FullMeshName.StartsWith(TEXT("SK_hm")))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 TArray<FAssetData> UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(USkeletalMesh* SkeletalMesh)
 {
 	if (SkeletalMesh == nullptr)
@@ -61,48 +77,4 @@ TArray<FAssetData> UEditorFunctionLibrary::GetAllSoundAssets()
 	TArray<FAssetData> SoundAssets;
 	AssetRegistryModule.Get().GetAssetsByClass(FName("SoundBase"), SoundAssets, true);
 	return SoundAssets;
-}
-
-FString UEditorFunctionLibrary::GetNestedFileExtension(const FString& FilePath, bool bIncludeDot)
-{
-	const FString Filename = FPaths::GetCleanFilename(FilePath);
-	int32 DotPos = Filename.Find(TEXT("."), ESearchCase::CaseSensitive, ESearchDir::FromStart);
-	if (DotPos != INDEX_NONE)
-	{
-		return Filename.Mid(DotPos + (bIncludeDot ? 0 : 1));
-	}
-	return TEXT("");
-}
-
-FString UEditorFunctionLibrary::GetBaseFileName(const FString& FilePath)
-{
-	const FString Filename = FPaths::GetCleanFilename(FilePath);
-	int32 ExtPos = Filename.Find(TEXT("."), ESearchCase::CaseSensitive, ESearchDir::FromStart);
-	if (ExtPos != INDEX_NONE)
-	{
-		return Filename.Left(ExtPos);
-	}
-	return TEXT("");
-}
-
-TArray<FXmlNode*> UEditorFunctionLibrary::GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag)
-{
-	if (!BaseNode)
-	{
-		return TArray<FXmlNode*>();
-	}
-
-	TArray<FXmlNode*> ResultNodes;
-	if (BaseNode->GetTag() == Tag)
-	{
-		ResultNodes.Add(BaseNode);
-	}
-
-	TArray<FXmlNode*> ChildrenNodes = BaseNode->GetChildrenNodes();
-	for (FXmlNode* ChildNode : ChildrenNodes)
-	{
-		TArray<FXmlNode*> ResultingChildNodes = GetNodesWithTag(ChildNode, Tag);
-		ResultNodes.Append(ResultingChildNodes);
-	}
-	return ResultNodes;
 }
