@@ -7,6 +7,7 @@
 #include "EditorFunctionLibrary.h"
 
 #include "Engine/SkeletalMesh.h"
+#include "Misc/ScopedSlowTask.h"
 
 FString UCollisionImporter::CurrentMeshName(TEXT(""));
 
@@ -24,14 +25,17 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	CurrentMeshName = UEditorFunctionLibrary::GetRaiderZMeshName(Mesh);
 	check(CurrentMeshName != TEXT(""));
 
+	FScopedSlowTask SlowTask(4, FText::FromString("Finding and parsing XML files!"));
+	SlowTask.MakeDialog();
+
 	FXmlFile NPCFileObj(URaiderzXmlUtilities::NPCXmlFilePath);
 	FXmlNode* NPCRootNode = NPCFileObj.GetRootNode();
-
 	FXmlNode* NPCNode = GetNPCNode(NPCRootNode, CurrentMeshName);
 	if (NPCNode == nullptr)
 	{
 		return;
 	}
+	SlowTask.EnterProgressFrame();
 
 	const FString& NPCID = NPCNode->GetAttribute(TEXT("id"));
 	const FString& NPCAniPrefix = NPCNode->GetAttribute(TEXT("AniPrefix"));
@@ -43,6 +47,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	{
 		return;
 	}
+	SlowTask.EnterProgressFrame();
 
 	FString AnimXmlFilePath;
 	bool bFoundAnimXml = URaiderzXmlUtilities::GetRaiderzFilePath(CurrentMeshName + URaiderzXmlUtilities::EluAnimationXmlExt, AnimXmlFilePath);
@@ -54,6 +59,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	FXmlFile AnimFileObj(AnimXmlFilePath);
 	FXmlNode* RootAnimNode = AnimFileObj.GetRootNode();
 	TArray<FXmlNode*> AddAnimationNodes = URaiderzXmlUtilities::GetNodesWithTag(RootAnimNode, TEXT("AddAnimation"));
+	SlowTask.EnterProgressFrame();
 
 	FXmlFile TalentHitInfoFileObj(URaiderzXmlUtilities::TalentHitInfoXmlFilePath);
 	FXmlNode* RootTalentHitInfoNode = TalentHitInfoFileObj.GetRootNode();
@@ -62,6 +68,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	{
 		return;
 	}
+	SlowTask.EnterProgressFrame();
 
 	TArray<FAssetData> MeshAnimAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
 	TArray<FCollisionInfo> CollisionInfoArray = GenerateCollisionInfoArray(NPCNode, TalentNodes, AddAnimationNodes, TalentHitNodes, MeshAnimAssets);
@@ -76,6 +83,9 @@ TArray<FCollisionInfo> UCollisionImporter::GenerateCollisionInfoArray(
 	const TArray<FXmlNode*>& TalentHitNodes,
 	const TArray<FAssetData>& MeshAnimAssets)
 {
+	FScopedSlowTask GenTask(TalentNodes.Num(), FText::FromString("Generating CollisionInfo Array!"));
+	GenTask.MakeDialog();
+
 	if (TalentNodes.Num() == 0)
 	{
 		return TArray<FCollisionInfo>();
@@ -86,6 +96,7 @@ TArray<FCollisionInfo> UCollisionImporter::GenerateCollisionInfoArray(
 	{
 		if (!TalentNode)
 		{
+			GenTask.EnterProgressFrame();
 			continue;
 		}
 
@@ -93,11 +104,14 @@ TArray<FCollisionInfo> UCollisionImporter::GenerateCollisionInfoArray(
 		bool bFoundFileName = GetAnimationFileName(AddAnimNodes, TalentNode, AnimationFileName);
 		if (!bFoundFileName)
 		{
+			GenTask.EnterProgressFrame();
 			continue;
 		}
 
 		FCollisionInfo CollisionInfo = GetCollisionInfo(NPCNode, TalentNode, AddAnimNodes, TalentHitNodes, AnimationFileName, MeshAnimAssets);
 		CollisionInfoArray.Add(CollisionInfo);
+
+		GenTask.EnterProgressFrame();
 	}
 	return CollisionInfoArray;
 }
@@ -200,21 +214,15 @@ bool UCollisionImporter::GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNo
 
 void UCollisionImporter::CreateAndApplyCollisionNotifies(const TArray<FCollisionInfo>& CollisionInfoArray)
 {
-	if (CollisionInfoArray.Num() == 0)
-	{
-		PrintWarning(TEXT("No collision info found"));
-	}
-	else
-	{
-		PrintWarning(TEXT("We have collision info"));
-	}
+	FScopedSlowTask AddNotifyTask(CollisionInfoArray.Num(), FText::FromString("Adding collision notifies!"));
+	AddNotifyTask.MakeDialog();
 
 	for (const FCollisionInfo& CollisionInfo : CollisionInfoArray)
 	{
 		PrintLog(CollisionInfo.TalentID);
-	}
 
-	// PrintLog()
+		AddNotifyTask.EnterProgressFrame();
+	}
 }
 
 FXmlNode* UCollisionImporter::GetNPCNode(FXmlNode* NPCRootNode, const FString& MeshName)
