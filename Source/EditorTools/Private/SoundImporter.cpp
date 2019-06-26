@@ -29,7 +29,7 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 	TArray<FAssetData> MeshAnimAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
 	if (MeshAnimAssets.Num() == 0)
 	{
-		PrintLog(TEXT("Import failed because we couldn't find any animations"));
+		PrintError(TEXT("Import failed because we couldn't find any animations"));
 		return;
 	}
 
@@ -37,112 +37,44 @@ void USoundImporter::ImportSoundForSkeletalMesh(USkeletalMesh* Mesh, USoundAtten
 	FString MeshName = FullMeshName.RightChop(3);
 
 	FString SoundEventFilePath;
-	FString AnimXmlFilePath;
 	bool bFoundSoundXml = URaiderzXmlUtilities::GetRaiderzFilePath(MeshName + URaiderzXmlUtilities::EluAnimationSoundEventXmlExt, SoundEventFilePath);
-	bool bFoundAnimXml = URaiderzXmlUtilities::GetRaiderzFilePath(MeshName + URaiderzXmlUtilities::EluAnimationXmlExt, AnimXmlFilePath);
-
-	if (!(bFoundSoundXml && bFoundAnimXml))
+	if (!bFoundSoundXml)
 	{
-		PrintLog(TEXT("Couldn't find sound or animation xml file for the given skeletal mesh"));
+		PrintError(TEXT("Couldn't find animationsoundevent.xml file for the given skeletal mesh"));
 		return;
 	}
-
 	FXmlFile SoundEventFileObj(SoundEventFilePath);
 	FXmlNode* RootSoundEventNode = SoundEventFileObj.GetRootNode();
 	TArray<FXmlNode*> AnimationNodes = URaiderzXmlUtilities::GetNodesWithTag(RootSoundEventNode, TEXT("Animation"));
 
+
+	FString AnimXmlFilePath;
+	bool bFoundAnimXml = URaiderzXmlUtilities::GetRaiderzFilePath(MeshName + URaiderzXmlUtilities::EluAnimationXmlExt, AnimXmlFilePath);
+	if (!bFoundAnimXml)
+	{
+		PrintError(TEXT("Couldn't find .elu.animation.xml file for the given skeletal mesh"));
+		return;
+	}
 	FXmlFile AnimFileObj(AnimXmlFilePath);
 	FXmlNode* RootAnimNode = AnimFileObj.GetRootNode();
 	TArray<FXmlNode*> AddAnimationNodes = URaiderzXmlUtilities::GetNodesWithTag(RootAnimNode, TEXT("AddAnimation"));
 
 	TArray<FAssetData> AllSoundAssets = UEditorFunctionLibrary::GetAllSoundAssets();
-
 	TArray<FAnimSoundInfo> AnimSoundInfoArray = GenerateAnimSoundInfoArray(AnimationNodes, AddAnimationNodes, MeshAnimAssets, AllSoundAssets);
 
-
-
-	UClass* SoundNotifyClass = UAnimNotify_PlaySound::StaticClass();
-	for (const FAnimSoundInfo& AnimSoundInfo : AnimSoundInfoArray)
-	{
-		UAnimSequenceBase* Animation = Cast<UAnimSequenceBase>(AnimSoundInfo.AnimationAssetData.GetAsset());
-		if (!Animation)
-		{
-			continue;
-		}
-
-		for (const TPair<float, FAssetData>& FrameSoundPair : AnimSoundInfo.FrameToSoundAssetMap)
-		{
-			const FAssetData& SoundAssetData = FrameSoundPair.Value;
-			USoundBase* Sound = Cast<USoundBase>(SoundAssetData.GetAsset());
-			if (!Sound)
-			{
-				continue;
-			}
-
-			float ActualFrame = FrameSoundPair.Key;
-			float FrameTime = ActualFrame * (1.f / 30.f);
-
-			bool bNotifyAlreadyExists = false;
-			for (const FAnimNotifyEvent& NotifyEvent : Animation->Notifies)
-			{
-				if (NotifyEvent.Notify && NotifyEvent.Notify->IsA(SoundNotifyClass))
-				{
-					UAnimNotify_PlaySound* SoundNotify = Cast<UAnimNotify_PlaySound>(NotifyEvent.Notify);
-					if (SoundNotify && SoundNotify->Sound == Sound)
-					{
-						float Time = NotifyEvent.GetTime();
-						if (FMath::IsNearlyEqual(Time, FrameTime, 0.1f))
-						{
-							bNotifyAlreadyExists = true;
-						}
-					}
-				}
-			}
-
-			if (!bNotifyAlreadyExists)
-			{
-				Animation->Modify();
-				int32 NewNotifyIndex = Animation->Notifies.Add(FAnimNotifyEvent());
-				FAnimNotifyEvent& NewEvent = Animation->Notifies[NewNotifyIndex];
-				NewEvent.NotifyName = TEXT("Play Sound");
-
-				NewEvent.Link(Animation, FrameTime);
-				NewEvent.TriggerTimeOffset = GetTriggerTimeOffsetForType(Animation->CalculateOffsetForNotify(FrameTime));
-				NewEvent.TrackIndex = 0; // Let's create a global index convention perhaps?
-
-				UObject* AnimNotify = NewObject<UObject>(Animation, UAnimNotify_PlaySound::StaticClass(), SoundAssetData.AssetName, RF_NoFlags);
-				UAnimNotify_PlaySound* SoundNotify = Cast<UAnimNotify_PlaySound>(AnimNotify);
-				NewEvent.Notify = SoundNotify;
-				if (SoundNotify)
-				{
-					Sound->Modify();
-					Sound->AttenuationSettings = AttenuationToApply;
-					Sound->MarkPackageDirty();
-
-					SoundNotify->Sound = Sound;
-					SoundNotify->bFollow = true;
-					NewEvent.NotifyName = FName(*NewEvent.Notify->GetNotifyName());
-					NewEvent.Notify->OnAnimNotifyCreatedInEditor(NewEvent);
-				}
-
-				Animation->MarkPackageDirty();
-			}
-		}
-	}
+	CreateAndApplySoundNotifies(AnimSoundInfoArray, AttenuationToApply);
 }
 
 bool USoundImporter::GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* AnimNode, FString& OutFileName)
 {
-	if (AnimNode)
+	check(AnimNode);
+	const FString& AnimationName = AnimNode->GetAttribute(TEXT("name"));
+	for (FXmlNode* Node : AddAnimNodes)
 	{
-		const FString& AnimationName = AnimNode->GetAttribute(TEXT("name"));
-		for (FXmlNode* Node : AddAnimNodes)
+		if (Node && Node->GetAttribute(TEXT("name")) == AnimationName)
 		{
-			if (Node && Node->GetAttribute(TEXT("name")) == AnimationName)
-			{
-				OutFileName = Node->GetAttribute(TEXT("filename"));
-				return true;
-			}
+			OutFileName = Node->GetAttribute(TEXT("filename"));
+			return true;
 		}
 	}
 	return false;
@@ -258,4 +190,96 @@ FAssetData USoundImporter::GetSoundAsset(FXmlNode* EventNode, const TArray<FAsse
 	}
 
 	return FAssetData();
+}
+
+void USoundImporter::CreateAndApplySoundNotifies(const TArray<FAnimSoundInfo>& AnimSoundInfoArray, USoundAttenuation* AttenuationToApply)
+{
+	for (const FAnimSoundInfo& AnimSoundInfo : AnimSoundInfoArray)
+	{
+		UAnimSequenceBase* Animation = Cast<UAnimSequenceBase>(AnimSoundInfo.AnimationAssetData.GetAsset());
+		if (!Animation)
+		{
+			continue;
+		}
+
+		AddSoundNotifiesToAnimation(Animation, AnimSoundInfo.FrameToSoundAssetMap, AttenuationToApply);
+	}
+}
+
+void USoundImporter::AddSoundNotifiesToAnimation(UAnimSequenceBase* Animation, const TMap<float, FAssetData>& FrameToSoundAssetMap, USoundAttenuation* AttenuationToApply)
+{
+	check(Animation);
+	for (const TPair<float, FAssetData>& FrameSoundPair : FrameToSoundAssetMap)
+	{
+		const FAssetData& SoundAssetData = FrameSoundPair.Value;
+		USoundBase* Sound = Cast<USoundBase>(SoundAssetData.GetAsset());
+		if (!Sound)
+		{
+			continue;
+		}
+
+		float ActualFrame = FrameSoundPair.Key;
+		float FrameTime = ActualFrame * (1.f / 30.f);
+
+		bool bNotifyExists = HasSoundNotify(Animation, FrameTime, Sound);
+		if (bNotifyExists)
+		{
+			// Skip adding notify if it already exists
+			continue;
+		}
+
+		Animation->Modify();
+		int32 NewNotifyIndex = Animation->Notifies.Add(FAnimNotifyEvent());
+		FAnimNotifyEvent& NewEvent = Animation->Notifies[NewNotifyIndex];
+		NewEvent.NotifyName = TEXT("Play Sound");
+
+		NewEvent.Link(Animation, FrameTime);
+		NewEvent.TriggerTimeOffset = GetTriggerTimeOffsetForType(Animation->CalculateOffsetForNotify(FrameTime));
+		NewEvent.TrackIndex = 0; // Let's create a global index convention perhaps?
+
+		UObject* AnimNotify = NewObject<UObject>(Animation, UAnimNotify_PlaySound::StaticClass(), SoundAssetData.AssetName, RF_NoFlags);
+		UAnimNotify_PlaySound* SoundNotify = Cast<UAnimNotify_PlaySound>(AnimNotify);
+		NewEvent.Notify = SoundNotify;
+		if (SoundNotify)
+		{
+			Sound->Modify();
+			Sound->AttenuationSettings = AttenuationToApply;
+			Sound->MarkPackageDirty();
+
+			SoundNotify->Sound = Sound;
+			SoundNotify->bFollow = true;
+			NewEvent.NotifyName = FName(*NewEvent.Notify->GetNotifyName());
+			NewEvent.Notify->OnAnimNotifyCreatedInEditor(NewEvent);
+		}
+
+		Animation->MarkPackageDirty();
+	}
+}
+
+bool USoundImporter::HasSoundNotify(UAnimSequenceBase* Animation, float NotifyTime, USoundBase* NotifySound)
+{
+	if (!Animation)
+	{
+		return false;
+	}
+
+	UClass* SoundNotifyClass = UAnimNotify_PlaySound::StaticClass();
+	check(SoundNotifyClass);
+
+	for (const FAnimNotifyEvent& NotifyEvent : Animation->Notifies)
+	{
+		if (NotifyEvent.Notify && NotifyEvent.Notify->IsA(SoundNotifyClass))
+		{
+			UAnimNotify_PlaySound* SoundNotify = Cast<UAnimNotify_PlaySound>(NotifyEvent.Notify);
+			if (SoundNotify && SoundNotify->Sound == NotifySound)
+			{
+				float Time = NotifyEvent.GetTime();
+				if (FMath::IsNearlyEqual(Time, NotifyTime, 0.1f))
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }

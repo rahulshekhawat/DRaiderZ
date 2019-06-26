@@ -9,6 +9,7 @@
 #include "UObject/NoExportTypes.h"
 #include "SoundImporter.generated.h"
 
+class USoundBase;
 class USkeletalMesh;
 class USoundAttenuation;
 class UAnimSequenceBase;
@@ -62,8 +63,10 @@ private:
 		const TArray<FAssetData>& MeshAnimAssets,
 		const TArray<FAssetData>& AllSoundAssets);
 
-	static TMap<float, FAssetData> GetFrameToSoundAssetMap(FXmlNode* AnimNode, const TArray<FAssetData>& AllSoundAssets);
-
 	static FAssetData GetSoundAsset(FXmlNode* EventNode, const TArray<FAssetData>& AllSoundAssets);
+	static TMap<float, FAssetData> GetFrameToSoundAssetMap(FXmlNode* AnimNode, const TArray<FAssetData>& AllSoundAssets);
+	static void CreateAndApplySoundNotifies(const TArray<FAnimSoundInfo>& AnimSoundInfoArray, USoundAttenuation* AttenuationToApply);
+	static void AddSoundNotifiesToAnimation(UAnimSequenceBase* Animation, const TMap<float, FAssetData>& FrameToSoundAssetMap, USoundAttenuation* AttenuationToApply);
+	static bool HasSoundNotify(UAnimSequenceBase* Animation, float NotifyTime, USoundBase* NotifySound);
 
 };
