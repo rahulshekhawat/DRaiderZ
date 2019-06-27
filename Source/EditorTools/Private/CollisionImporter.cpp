@@ -19,6 +19,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 {
 	if (Mesh == nullptr)
 	{
+		PrintError(TEXT("Import failed because skeletal mesh is not valid"));
 		return;
 	}
 
@@ -33,6 +34,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	FXmlNode* NPCNode = GetNPCNode(NPCRootNode, CurrentMeshName);
 	if (NPCNode == nullptr)
 	{
+		PrintError(TEXT("Import failed because we couldn't find a proper NPC ID for the given skeletal mesh"));
 		return;
 	}
 	SlowTask.EnterProgressFrame();
@@ -45,6 +47,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	TArray<FXmlNode*> TalentNodes = GetNPCTalents(TalentRootNode, NPCID);
 	if (TalentNodes.Num() == 0)
 	{
+		PrintWarning(TEXT("Couldn't find any talent associated with the given skeletal mesh"));
 		return;
 	}
 	SlowTask.EnterProgressFrame();
@@ -64,10 +67,7 @@ void UCollisionImporter::ImportCollisionForSkeletalMesh(USkeletalMesh* Mesh)
 	FXmlFile TalentHitInfoFileObj(URaiderzXmlUtilities::TalentHitInfoXmlFilePath);
 	FXmlNode* RootTalentHitInfoNode = TalentHitInfoFileObj.GetRootNode();
 	TArray<FXmlNode*> TalentHitNodes = URaiderzXmlUtilities::GetNodesWithTag(RootTalentHitInfoNode, TEXT("TALENT_HIT"));
-	if (TalentHitNodes.Num() == 0)
-	{
-		return;
-	}
+	check(TalentHitNodes.Num() != 0);
 	SlowTask.EnterProgressFrame();
 
 	TArray<FAssetData> MeshAnimAssets = UEditorFunctionLibrary::GetAllAnimationsForSkeletalMesh(Mesh);
@@ -101,7 +101,7 @@ TArray<FCollisionInfo> UCollisionImporter::GenerateCollisionInfoArray(
 		}
 
 		FString AnimationFileName;
-		bool bFoundFileName = GetAnimationFileName(AddAnimNodes, TalentNode, AnimationFileName);
+		bool bFoundFileName = GetAnimationFileName(AddAnimNodes, TalentNode, NPCNode, AnimationFileName);
 		if (!bFoundFileName)
 		{
 			GenTask.EnterProgressFrame();
@@ -191,11 +191,16 @@ FXmlNode* UCollisionImporter::GetTalentHitNodeWithID(const TArray<FXmlNode*>& Ta
 	return nullptr;
 }
 
-bool UCollisionImporter::GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* TalentNode, FString& OutFileName)
+bool UCollisionImporter::GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* TalentNode, FXmlNode* NPCNode, FString& OutFileName)
 {
 	check(TalentNode);
+	check(NPCNode);
 
+	const FString& AniPrefix = NPCNode->GetAttribute(TEXT("AniPrefix"));
 	const FString& AnimationName = TalentNode->GetAttribute(TEXT("UseAni"));
+	const FString& PrefixedAniName = AniPrefix + AnimationName;
+
+	//~ @todo CastingAni
 	if (AnimationName == TEXT(""))
 	{
 		return false;
@@ -203,12 +208,26 @@ bool UCollisionImporter::GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNo
 
 	for (FXmlNode* Node : AddAnimNodes)
 	{
-		if (Node && Node->GetAttribute(TEXT("name")) == AnimationName)
+		check(Node);
+		if (Node->GetAttribute(TEXT("name")) == AnimationName || Node->GetAttribute("name") == PrefixedAniName)
 		{
 			OutFileName = Node->GetAttribute(TEXT("filename"));
 			return true;
 		}
 	}
+
+	// If we couldn't find the animation file in previous loop, try again (sometimes the npc.xml doesn't contain the AniPrefix)
+	for (FXmlNode* Node : AddAnimNodes)
+	{
+		check(Node);
+		const FString& NodeAttri = Node->GetAttribute(TEXT("name"));
+		if (NodeAttri.Contains(AnimationName))
+		{
+			OutFileName = Node->GetAttribute(TEXT("filename"));
+			return true;
+		}
+	}
+
 	return false;
 }
 

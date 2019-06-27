@@ -64,7 +64,7 @@ private:
 
 	static TMap<FString, TArray<FString>> GetFrameToCollisionStringMap(const TArray<FXmlNode*>& TalentHitNodes, FXmlNode* TalentNode, FXmlNode* NPCNode);
 	static FXmlNode* GetTalentHitNodeWithID(const TArray<FXmlNode*>& TalentHitNodes, const FString& TalentID);
-	static bool GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* TalentNode, FString& OutFileName);
+	static bool GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* TalentNode, FXmlNode* NPCNode, FString& OutFileName);
 
 	static void CreateAndApplyCollisionNotifies(const TArray<FCollisionInfo>& CollisionInfoArray);
 
