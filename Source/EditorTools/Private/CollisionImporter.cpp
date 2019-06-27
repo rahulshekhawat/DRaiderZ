@@ -108,27 +108,36 @@ TArray<FCollisionInfo> UCollisionImporter::GenerateCollisionInfoArray(
 			continue;
 		}
 
-		FCollisionInfo CollisionInfo = GetCollisionInfo(NPCNode, TalentNode, AddAnimNodes, TalentHitNodes, AnimationFileName, MeshAnimAssets);
-		CollisionInfoArray.Add(CollisionInfo);
+		FCollisionInfo CollisionInfo;
+		bool bSuccess = GetCollisionInfo(NPCNode, TalentNode, AddAnimNodes, TalentHitNodes, AnimationFileName, MeshAnimAssets, CollisionInfo);
+		if (bSuccess)
+		{
+			CollisionInfoArray.Add(CollisionInfo);
+		}
+		else
+		{
+			FString Warning = TEXT("Unable to generate collision info for TalentID: ") + TalentNode->GetAttribute("id");
+			PrintWarning(Warning);
+		}
 
 		GenTask.EnterProgressFrame();
 	}
 	return CollisionInfoArray;
 }
 
-FCollisionInfo UCollisionImporter::GetCollisionInfo(
+bool UCollisionImporter::GetCollisionInfo(
 	FXmlNode* NPCNode,
 	FXmlNode* TalentNode,
 	const TArray<FXmlNode*>& AddAnimNodes,
 	const TArray<FXmlNode*>& TalentHitNodes,
 	const FString& AnimationFileName,
-	const TArray<FAssetData>& MeshAnimAssets)
+	const TArray<FAssetData>& MeshAnimAssets,
+	FCollisionInfo& OutCollisionInfo)
 {
 	check(TalentNode);
 	const FString& AnimationName = TalentNode->GetAttribute(TEXT("UseAni"));
 	const FString& TalentID = TalentNode->GetAttribute(TEXT("id"));
-	
-	FCollisionInfo CollisionInfo;
+
 	FString EditorAnimFileName = TEXT("A_") + URaiderzXmlUtilities::GetRaiderzBaseFileName(AnimationFileName);
 	for (const FAssetData& AssetData : MeshAnimAssets)
 	{
@@ -140,15 +149,15 @@ FCollisionInfo UCollisionImporter::GetCollisionInfo(
 		FString LogMessage = FString("Found animation file: ") + EditorAnimFileName;
 		PrintLog(LogMessage);
 
-		CollisionInfo.TalentID = TalentID;
-		CollisionInfo.AnimationName = AnimationName;
-		CollisionInfo.AnimationFileName = AnimationFileName;
-		CollisionInfo.AnimationAssetData = AssetData;
-		CollisionInfo.FrameToCollisionStringMap = GetFrameToCollisionStringMap(TalentHitNodes, TalentNode, NPCNode);
-		break;
+		OutCollisionInfo.TalentID = TalentID;
+		OutCollisionInfo.AnimationName = AnimationName;
+		OutCollisionInfo.AnimationFileName = AnimationFileName;
+		OutCollisionInfo.AnimationAssetData = AssetData;
+		OutCollisionInfo.FrameToCollisionStringMap = GetFrameToCollisionStringMap(TalentHitNodes, TalentNode, NPCNode);
+		return true;
 	}
 
-	return CollisionInfo;
+	return false;
 }
 
 TMap<FString, TArray<FString>> UCollisionImporter::GetFrameToCollisionStringMap(const TArray<FXmlNode*>& TalentHitNodes, FXmlNode* TalentNode, FXmlNode* NPCNode)

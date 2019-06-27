@@ -54,13 +54,14 @@ private:
 		const TArray<FXmlNode*>& TalentHitNodes,
 		const TArray<FAssetData>& MeshAnimAssets);
 
-	static FCollisionInfo GetCollisionInfo(
+	static bool GetCollisionInfo(
 		FXmlNode* NPCNode,
 		FXmlNode* TalentNode,
 		const TArray<FXmlNode*>& AddAnimNodes,
 		const TArray<FXmlNode*>& TalentHitNodes,
 		const FString& AnimationFileName,
-		const TArray<FAssetData>& MeshAnimAssets);
+		const TArray<FAssetData>& MeshAnimAssets,
+		FCollisionInfo& OutCollisionInfo);
 
 	static TMap<FString, TArray<FString>> GetFrameToCollisionStringMap(const TArray<FXmlNode*>& TalentHitNodes, FXmlNode* TalentNode, FXmlNode* NPCNode);
 	static FXmlNode* GetTalentHitNodeWithID(const TArray<FXmlNode*>& TalentHitNodes, const FString& TalentID);
