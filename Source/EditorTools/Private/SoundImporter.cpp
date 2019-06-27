@@ -297,8 +297,7 @@ void USoundImporter::AddSoundNotifiesToAnimation(UAnimSequenceBase* Animation, c
 		NewEvent.TriggerTimeOffset = GetTriggerTimeOffsetForType(Animation->CalculateOffsetForNotify(FrameTime));
 		NewEvent.TrackIndex = 0; // Let's create a global index convention perhaps?
 
-		UObject* AnimNotify = NewObject<UObject>(Animation, UAnimNotify_PlaySound::StaticClass(), SoundAssetData.AssetName, RF_NoFlags);
-		UAnimNotify_PlaySound* SoundNotify = Cast<UAnimNotify_PlaySound>(AnimNotify);
+		UAnimNotify_PlaySound* SoundNotify = NewObject<UAnimNotify_PlaySound>(Animation, UAnimNotify_PlaySound::StaticClass(), SoundAssetData.AssetName, RF_NoFlags);
 		NewEvent.Notify = SoundNotify;
 		if (SoundNotify)
 		{

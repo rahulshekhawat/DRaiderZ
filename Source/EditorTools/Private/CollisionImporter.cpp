@@ -5,9 +5,12 @@
 #include "EOD.h"
 #include "RaiderzXmlUtilities.h"
 #include "EditorFunctionLibrary.h"
+#include "AnimNotify_CapsuleCollision.h"
 
 #include "Engine/SkeletalMesh.h"
 #include "Misc/ScopedSlowTask.h"
+#include "Animation/Skeleton.h"
+#include "Animation/AnimSequence.h"
 
 FString UCollisionImporter::CurrentMeshName(TEXT(""));
 
@@ -247,10 +250,81 @@ void UCollisionImporter::CreateAndApplyCollisionNotifies(const TArray<FCollision
 
 	for (const FCollisionInfo& CollisionInfo : CollisionInfoArray)
 	{
-		PrintLog(CollisionInfo.TalentID);
+		UAnimSequenceBase* Animation = Cast<UAnimSequenceBase>(CollisionInfo.AnimationAssetData.GetAsset());
+		if (!Animation)
+		{
+			continue;
+			AddNotifyTask.EnterProgressFrame();			
+		}
 
+		AddCollisionNotifiesToAnimation(Animation, CollisionInfo.FrameToCollisionStringMap);
 		AddNotifyTask.EnterProgressFrame();
 	}
+}
+
+void UCollisionImporter::AddCollisionNotifiesToAnimation(UAnimSequenceBase* Animation, const TMap<FString, TArray<FString>>& FrameToCollisionStringMap)
+{
+	check(Animation);
+	for (const TPair<FString, TArray<FString>>& FrameCollisionPair : FrameToCollisionStringMap)
+	{
+		float FrameTime = FCString::Atof(*FrameCollisionPair.Key);
+		TArray<FRaidCapsule> RaidCapsules = GenerateRaidCapsules(FrameCollisionPair.Value);
+
+		bool bCollsionNotifyExists = HasCollisionNotify(Animation, FrameTime, RaidCapsules);
+		if (bCollsionNotifyExists)
+		{
+			// Skip adding notify if it already exists
+			continue;
+		}
+
+		Animation->Modify();
+		int32 NewNotifyIndex = Animation->Notifies.Add(FAnimNotifyEvent());
+		FAnimNotifyEvent& NewEvent = Animation->Notifies[NewNotifyIndex];
+		NewEvent.NotifyName = TEXT("Capsule Collision");
+
+		NewEvent.Link(Animation, FrameTime);
+		NewEvent.TriggerTimeOffset = GetTriggerTimeOffsetForType(Animation->CalculateOffsetForNotify(FrameTime));
+		NewEvent.TrackIndex = 0; // Let's create a global index convention perhaps?
+
+		UAnimNotify_CapsuleCollision* AnimNotify = NewObject<UAnimNotify_CapsuleCollision>(Animation, UAnimNotify_CapsuleCollision::StaticClass(), NAME_None, RF_NoFlags);
+		NewEvent.Notify = AnimNotify;
+		if (AnimNotify)
+		{
+			AnimNotify->InitializeFromRaidCapsules(RaidCapsules);
+			NewEvent.NotifyName = FName(*NewEvent.Notify->GetNotifyName());
+			NewEvent.Notify->OnAnimNotifyCreatedInEditor(NewEvent);			
+		}
+
+		Animation->MarkPackageDirty();
+	}
+}
+
+TArray<FRaidCapsule> UCollisionImporter::GenerateRaidCapsules(const TArray<FString>& CapsuleStrings)
+{
+	TArray<FRaidCapsule> RaidCapsules;
+	for (const FString& CapString : CapsuleStrings)
+	{
+		TArray<FString> CapsuleContentArray;
+		CapString.ParseIntoArray(CapsuleContentArray, TEXT(" "));
+		check(CapsuleContentArray.Num() == 7);
+
+		FRaidCapsule RaidCapsule;
+		RaidCapsule.Bottom.X = FCString::Atof(*CapsuleContentArray[0]);
+		RaidCapsule.Bottom.Y = FCString::Atof(*CapsuleContentArray[1]);
+		RaidCapsule.Bottom.Z = FCString::Atof(*CapsuleContentArray[2]);
+		RaidCapsule.Top.X = FCString::Atof(*CapsuleContentArray[3]);
+		RaidCapsule.Top.Y = FCString::Atof(*CapsuleContentArray[4]);
+		RaidCapsule.Top.Z = FCString::Atof(*CapsuleContentArray[5]);
+		RaidCapsule.Radius = FCString::Atof(*CapsuleContentArray[6]);
+
+		RaidCapsules.Add(RaidCapsule);
+	}
+	return RaidCapsules;
+}
+
+bool UCollisionImporter::HasCollisionNotify(UAnimSequenceBase* Animation, float FrameTime, const TArray<FRaidCapsule>& RaidCapsules)
+{
+	return false;
 }
 
 FXmlNode* UCollisionImporter::GetNPCNode(FXmlNode* NPCRootNode, const FString& MeshName)

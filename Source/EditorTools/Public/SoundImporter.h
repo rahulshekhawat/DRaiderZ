@@ -68,6 +68,7 @@ private:
 	static FString GetEditorSoundName(FXmlNode* EventNode, const TArray<FXmlNode*>& SoundNodes);
 	static FAssetData GetSoundAsset(FXmlNode* EventNode, const TArray<FXmlNode*>& SoundNodes, const TArray<FAssetData>& AllSoundAssets);
 	static TMap<float, FAssetData> GetFrameToSoundAssetMap(FXmlNode* AnimNode, const TArray<FXmlNode*>& SoundNodes, const TArray<FAssetData>& AllSoundAssets);
+
 	static void CreateAndApplySoundNotifies(const TArray<FAnimSoundInfo>& AnimSoundInfoArray, USoundAttenuation* AttenuationToApply);
 	static void AddSoundNotifiesToAnimation(UAnimSequenceBase* Animation, const TMap<float, FAssetData>& FrameToSoundAssetMap, USoundAttenuation* AttenuationToApply);
 	static bool HasSoundNotify(UAnimSequenceBase* Animation, float NotifyTime, USoundBase* NotifySound);

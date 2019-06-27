@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AnimNotify_RaidCollision.h"
 
 #include "XmlFile.h"
 #include "AssetData.h"
@@ -10,6 +11,7 @@
 #include "CollisionImporter.generated.h"
 
 class USkeletalMesh;
+class UAnimSequenceBase;
 
 struct EDITORTOOLS_API FCollisionInfo
 {
@@ -28,7 +30,6 @@ struct EDITORTOOLS_API FCollisionInfo
 	{
 	}
 };
-
 
 /**
  * 
@@ -68,6 +69,9 @@ private:
 	static bool GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* TalentNode, FXmlNode* NPCNode, FString& OutFileName);
 
 	static void CreateAndApplyCollisionNotifies(const TArray<FCollisionInfo>& CollisionInfoArray);
+	static void AddCollisionNotifiesToAnimation(UAnimSequenceBase* Animation, const TMap<FString, TArray<FString>>& FrameToCollisionStringMap);
+	static TArray<FRaidCapsule> GenerateRaidCapsules(const TArray<FString>& CapsuleStrings);
+	static bool HasCollisionNotify(UAnimSequenceBase* Animation, float FrameTime, const TArray<FRaidCapsule>& RaidCapsules);
 
 	static FXmlNode* GetNPCNode(FXmlNode* NPCRootNode, const FString& MeshName);
 	static TArray<FXmlNode*> GetNPCTalents(FXmlNode* TalentRootNode, const FString& InNPCID);
