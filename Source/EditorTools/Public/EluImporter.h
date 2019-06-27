@@ -18,4 +18,11 @@ public:
 
 	UEluImporter(const FObjectInitializer& ObjectInitializer);
 
+	UFUNCTION(BlueprintCallable, Category = "Elu Importer")
+	static void ImportEluFile();
+
+private:
+
+	static bool ImportEluFile_Internal(const FString& EluFilePath);
+
 };

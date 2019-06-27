@@ -22,6 +22,11 @@ public:
 	static void ImportFbxFile();
 
 	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
-	static void ImportFbxFilesFromPath(const FString& ImportPath);
+	static void ImportFbxFilesInFolder();
+
+private:
+
+
+
 
 };

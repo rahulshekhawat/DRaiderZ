@@ -16,13 +16,12 @@ UFbxImportUtilities::UFbxImportUtilities(const FObjectInitializer& ObjectInitial
 void UFbxImportUtilities::ImportFbxFile()
 {
 	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
-	bool bOpened = false;
+	bool bSuccess = false;
 	TArray<FString> SelectedFiles;
-	FString OpenFilePath;
 	if (DesktopPlatform)
 	{
 		const void* ParentWindowWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
-		bOpened = DesktopPlatform->OpenFileDialog(
+		bSuccess = DesktopPlatform->OpenFileDialog(
 			ParentWindowWindowHandle,
 			TEXT("Select FBX file to import"),
 			URaiderzXmlUtilities::DarkRaiderzAssetPath,
@@ -33,19 +32,16 @@ void UFbxImportUtilities::ImportFbxFile()
 		);
 	}
 
-	if (bOpened)
-	{
-		for (const FString& File : SelectedFiles)
-		{
-			PrintLog(File);
-		}
-	}
-	else
+	if (!bSuccess || SelectedFiles.Num() == 0)
 	{
 		PrintWarning(TEXT("User failed to select any files!"));
 	}
+
 }
 
-void UFbxImportUtilities::ImportFbxFilesFromPath(const FString& ImportPath)
+void UFbxImportUtilities::ImportFbxFilesInFolder()
 {
+
+
+
 }

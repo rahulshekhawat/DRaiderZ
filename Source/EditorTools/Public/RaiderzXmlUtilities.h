@@ -20,15 +20,20 @@ public:
 
 	URaiderzXmlUtilities(const FObjectInitializer& ObjectInitializer);
 
+	//---
 	static bool GetRaiderzFilePath(const FString& InFileName, FString& OutFilePath);
-
 	static FString GetRaiderzFileExtension(const FString& FilePath, bool bIncludeDot = true);
 	static FString GetRaiderzBaseFileName(const FString& FilePath);
 
+	//--- 
 	static TArray<FXmlNode*> GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag);
 
-	static const FString DarkRaiderzAssetPath;
+	//---
+	static bool ReadStringFromBinaryData(FString& StringBuffer, const TArray<uint8>& BinaryData, UINT& Offset);
+	static bool WriteBinaryDataToBuffer(void* Buffer, const UINT NumOfBytesToRead, const TArray<uint8>& BinaryData, UINT& Offset);
 
+
+	static const FString DarkRaiderzAssetPath;
 	static const FString DataFolderPath;
 	static const FString SoundXmlFilePath;
 	static const FString NPCXmlFilePath;

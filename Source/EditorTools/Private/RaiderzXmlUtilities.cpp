@@ -7,7 +7,6 @@
 #include "HAL/FileManagerGeneric.h"
 
 const FString URaiderzXmlUtilities::DarkRaiderzAssetPath(TEXT("F:/GameDev/DarkRaidAssets"));
-
 const FString URaiderzXmlUtilities::DataFolderPath(TEXT("E:/RaiderzAssets/datadump/Data"));
 const FString URaiderzXmlUtilities::SoundXmlFilePath(TEXT("E:/RaiderzAssets/datadump/Data/Sound/sound.xml"));
 const FString URaiderzXmlUtilities::NPCXmlFilePath(TEXT("E:/RaiderzAssets/datadump/Data/system/npc.xml"));
@@ -96,4 +95,51 @@ TArray<FXmlNode*> URaiderzXmlUtilities::GetNodesWithTag(FXmlNode* BaseNode, cons
 		ResultNodes.Append(ResultingChildNodes);
 	}
 	return ResultNodes;
+}
+
+bool URaiderzXmlUtilities::ReadStringFromBinaryData(FString& StringBuffer, const TArray<uint8>& BinaryData, UINT& Offset)
+{
+	int StringLength;
+	if (!WriteBinaryDataToBuffer(&StringLength, sizeof(StringLength), BinaryData, Offset))
+	{
+		return false;
+	}
+
+	// Check if there are enough bytes to write to Buffer.
+	// Binary.Num() was cast to UINT to prevent type mismatch error for signed/unsigned
+	if ((UINT)BinaryData.Num() < StringLength + Offset)
+	{
+		return false;
+	}
+
+	const uint8* BinaryDataPtr = BinaryData.GetData();
+	char* String = new char[StringLength + 1];
+	memcpy(String, BinaryDataPtr + Offset, StringLength);
+	StringBuffer = FString(ANSI_TO_TCHAR(String));
+	Offset += StringLength;
+	delete[] String;
+
+	return true;
+}
+
+bool URaiderzXmlUtilities::WriteBinaryDataToBuffer(void* Buffer, const UINT NumOfBytesToRead, const TArray<uint8>& BinaryData, UINT& Offset)
+{
+	// If there are no bytes to read
+	if (NumOfBytesToRead == 0)
+	{
+		// @todo Should it return false since no binary data was written to buffer?
+		return true;
+	}
+
+	// Check if there are enough bytes to write to Buffer.
+	// Binary.Num() was cast to UINT to prevent type mismatch error for signed/unsigned
+	if ((UINT)BinaryData.Num() < NumOfBytesToRead + Offset)
+	{
+		return false;
+	}
+
+	const uint8* BinaryDataPtr = BinaryData.GetData();
+	memcpy(Buffer, BinaryDataPtr + Offset, NumOfBytesToRead);
+	Offset += NumOfBytesToRead;
+	return true;
 }
