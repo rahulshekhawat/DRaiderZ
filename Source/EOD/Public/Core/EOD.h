@@ -13,7 +13,7 @@
 #define EOD_MESSAGE_LOGGING_ENABLED 1
 #define EOD_SCREEN_MESSAGES_ENABLED 1
 #define EOD_CONSOLE_MESSAGES_ENABLED 1
-#define EOD_DRAWING_DEBUG_SHAPES_ENABLED 0
+#define EOD_DRAWING_DEBUG_SHAPES_ENABLED 1
 
 #define SURFACETYPE_FLESH       SurfaceType1
 #define SURFACETYPE_METAL       SurfaceType2
@@ -74,17 +74,20 @@ inline FString EnumToString(const FString& EnumName, const T Value, const FStrin
 	return DefaultString;
 }
 
+DECLARE_LOG_CATEGORY_CLASS(LogRaiderZ, Log, All);
+
+
 inline void PrintLog(const FString& LogMessage)
 {
-	UE_LOG(LogTemp, Log, TEXT("%s"), *LogMessage);
+	UE_LOG(LogRaiderZ, Log, TEXT("%s"), *LogMessage);
 }
 
 inline void PrintWarning(const FString& LogMessage)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *LogMessage);
+	UE_LOG(LogRaiderZ, Warning, TEXT("%s"), *LogMessage);
 }
 
 inline void PrintError(const FString& LogMessage)
 {
-	UE_LOG(LogTemp, Error, TEXT("%s"), *LogMessage);
+	UE_LOG(LogRaiderZ, Error, TEXT("%s"), *LogMessage);
 }
