@@ -73,6 +73,7 @@ void UAnimNotify_CapsuleCollision::Notify(USkeletalMeshComponent* MeshComp, UAni
 		FVector End = TransformedCenter + FVector(0.f, 0.f, 1.f);
 		bool bHit = World->SweepMultiByChannel(HitResults, TransformedCenter, End, TransformedQuat, COLLISION_COMBAT, CollisionShape, Params);
 		bAnyHit = bAnyHit || bHit;
+		AllHitResults.Append(HitResults);
 	}
 
 	CombatManager->OnMeleeAttack(Owner, bAnyHit, AllHitResults, SkillInfo);
