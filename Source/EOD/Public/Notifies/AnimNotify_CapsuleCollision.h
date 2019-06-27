@@ -4,8 +4,38 @@
 
 #include "CoreMinimal.h"
 #include "CombatLibrary.h"
+#include "AnimNotify_RaidCollision.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "AnimNotify_CapsuleCollision.generated.h"
+
+/** A struct to hold capsule information */
+USTRUCT(BlueprintType)
+struct FEODCapsule
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector Center;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FRotator Rotation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Radius;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float HalfHeight;
+
+	FORCEINLINE bool operator==(const FEODCapsule& Other) const
+	{
+		return (this->Center == Other.Center && this->Rotation == Other.Rotation && this->Radius == Other.Radius && this->HalfHeight == Other.HalfHeight);
+	}
+
+	FORCEINLINE bool operator!=(const FEODCapsule& Other) const
+	{
+		return this->Center != Other.Center || this->Rotation != Other.Rotation || this->Radius != Other.Radius || this->HalfHeight != Other.HalfHeight;
+	}
+};
 
 /**
  * 
@@ -17,25 +47,14 @@ class EOD_API UAnimNotify_CapsuleCollision : public UAnimNotify
 	
 public:
 
+	void InitializeFromRaidCapsules(const TArray<FRaidCapsule>& RaidCapsules);
+
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
-	/** Position of collision capsule's center */
-	UPROPERTY(EditAnywhere, Category = CapsuleInfo)
-	FVector Center;
-	
-	/** Rotation of collision capsule */
-	UPROPERTY(EditAnywhere, Category = CapsuleInfo)
-	FRotator Rotation;
-	
-	/** Radius of collision capsule */
-	UPROPERTY(EditAnywhere, Category = CapsuleInfo)
-	float Radius;
-	
-	/** Half height of collision capsule */
-	UPROPERTY(EditAnywhere, Category = CapsuleInfo)
-	float HalfHeight;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CapsuleInfo)
+	TArray<FEODCapsule> CollisionCapsules;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkillInfo)
 	FCollisionSkillInfo SkillInfo;
-	
+
 };

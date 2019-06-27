@@ -27,11 +27,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = ShapeInfo)
 	float Radius;
 
-	FORCEINLINE bool operator == (const FRaidCapsule& Other) const
+	FORCEINLINE bool operator==(const FRaidCapsule& Other) const
 	{
 		return (this->Bottom == Other.Bottom && this->Top == Other.Top && this->Radius == Other.Radius);
 	}
 
+	FORCEINLINE bool operator!=(const FRaidCapsule& Other) const
+	{
+		return this->Bottom != Other.Bottom || this->Top != Other.Top || this->Radius != Other.Radius;
+	}
 };
 
 /**
