@@ -81,6 +81,3 @@ struct FEluHeader
 	int MeshNum;
 };
 
-
-
-

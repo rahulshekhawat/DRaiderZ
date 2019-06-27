@@ -12,7 +12,7 @@ FEluMeshNodeLoader::~FEluMeshNodeLoader()
 {
 }
 
-bool FEluMeshNodeLoader_v12::Load(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v12::Load(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	check(MeshNode);
 	check(BinaryData.GetData());
@@ -51,7 +51,7 @@ bool FEluMeshNodeLoader_v12::Load(FEluMeshNode* MeshNode, TArray<uint8>& BinaryD
 	return true;
 }
 
-bool FEluMeshNodeLoader_v12::LoadName(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v12::LoadName(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::ReadStringFromBinaryData(MeshNode->NodeName, BinaryData, Offset))
 	{
@@ -68,7 +68,7 @@ bool FEluMeshNodeLoader_v12::LoadName(FEluMeshNode* MeshNode, TArray<uint8>& Bin
 	return true;
 }
 
-bool FEluMeshNodeLoader_v12::LoadInfo(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v12::LoadInfo(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&MeshNode->dwFlag, sizeof(MeshNode->dwFlag), BinaryData, Offset))
 	{
@@ -106,7 +106,7 @@ bool FEluMeshNodeLoader_v12::LoadInfo(FEluMeshNode* MeshNode, TArray<uint8>& Bin
 	return true;
 }
 
-bool FEluMeshNodeLoader_v12::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v12::LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&MeshNode->PointsCount, sizeof(MeshNode->PointsCount), BinaryData, Offset))
 	{
@@ -181,7 +181,7 @@ bool FEluMeshNodeLoader_v12::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& B
 	return true;
 }
 
-bool FEluMeshNodeLoader_v12::LoadFace(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v12::LoadFace(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&MeshNode->FaceCount, sizeof(MeshNode->FaceCount), BinaryData, Offset))
 	{
@@ -254,7 +254,7 @@ bool FEluMeshNodeLoader_v12::LoadFace(FEluMeshNode* MeshNode, TArray<uint8>& Bin
 	return true;
 }
 
-bool FEluMeshNodeLoader_v12::LoadVertexInfo(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v12::LoadVertexInfo(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&MeshNode->PointColorCount, sizeof(MeshNode->PointColorCount), BinaryData, Offset))
 	{
@@ -337,7 +337,7 @@ bool FEluMeshNodeLoader_v12::LoadVertexInfo(FEluMeshNode* MeshNode, TArray<uint8
 	return true;
 }
 
-bool FEluMeshNodeLoader_v12::LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v12::LoadEtc(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&MeshNode->BoneCount, sizeof(MeshNode->BoneCount), BinaryData, Offset))
 	{
@@ -456,7 +456,7 @@ bool FEluMeshNodeLoader_v12::LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& Bina
 	return true;
 }
 
-bool FEluMeshNodeLoader_v13::Load(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v13::Load(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	check(MeshNode);
 	check(BinaryData.GetData());
@@ -491,7 +491,7 @@ bool FEluMeshNodeLoader_v13::Load(FEluMeshNode* MeshNode, TArray<uint8>& BinaryD
 	return true;
 }
 
-bool FEluMeshNodeLoader_v13::LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v13::LoadEtc(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!FEluMeshNodeLoader_v12::LoadEtc(MeshNode, BinaryData, Offset))
 	{
@@ -504,7 +504,7 @@ bool FEluMeshNodeLoader_v13::LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& Bina
 	return true;
 }
 
-bool FEluMeshNodeLoader_v15::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v15::LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	// @unknown
 	DWORD dwFVF;
@@ -596,7 +596,7 @@ bool FEluMeshNodeLoader_v15::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& B
 	return true;
 }
 
-bool FEluMeshNodeLoader_v15::LoadFace(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v15::LoadFace(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&MeshNode->FaceCount, sizeof(MeshNode->FaceCount), BinaryData, Offset))
 	{
@@ -643,7 +643,7 @@ bool FEluMeshNodeLoader_v15::LoadFace(FEluMeshNode* MeshNode, TArray<uint8>& Bin
 	return true;
 }
 
-bool FEluMeshNodeLoader_v15::LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v15::LoadEtc(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&MeshNode->BoneCount, sizeof(MeshNode->BoneCount), BinaryData, Offset))
 	{
@@ -757,7 +757,7 @@ bool FEluMeshNodeLoader_v15::LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& Bina
 	return true;
 }
 
-bool FEluMeshNodeLoader_v16::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v16::LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	// @unknown
 	DWORD dwFVF;
@@ -849,7 +849,7 @@ bool FEluMeshNodeLoader_v16::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& B
 	return true;
 }
 
-bool FEluMeshNodeLoader_v17::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v17::LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	// @unknown
 	DWORD dwFVF;
@@ -935,7 +935,7 @@ bool FEluMeshNodeLoader_v17::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& B
 	return true;
 }
 
-bool FEluMeshNodeLoader_v18::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v18::LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&MeshNode->PointsCount, sizeof(MeshNode->PointsCount), BinaryData, Offset))
 	{
@@ -1026,7 +1026,7 @@ bool FEluMeshNodeLoader_v18::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& B
 	return true;
 }
 
-bool FEluMeshNodeLoader_v20::LoadName(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v20::LoadName(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::ReadStringFromBinaryData(MeshNode->NodeName, BinaryData, Offset))
 	{
@@ -1048,7 +1048,7 @@ bool FEluMeshNodeLoader_v20::LoadName(FEluMeshNode* MeshNode, TArray<uint8>& Bin
 	return true;
 }
 
-bool FEluMeshNodeLoader_v20::LoadInfo(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v20::LoadInfo(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&MeshNode->LocalMatrix, sizeof(MeshNode->LocalMatrix), BinaryData, Offset))
 	{
@@ -1078,7 +1078,7 @@ bool FEluMeshNodeLoader_v20::LoadInfo(FEluMeshNode* MeshNode, TArray<uint8>& Bin
 	return true;
 }
 
-bool FEluMeshNodeLoader_v20::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v20::LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&MeshNode->PointsCount, sizeof(MeshNode->PointsCount), BinaryData, Offset))
 	{
@@ -1169,7 +1169,7 @@ bool FEluMeshNodeLoader_v20::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& B
 	return true;
 }
 
-bool FEluMeshNodeLoader_v20::LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v20::LoadEtc(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	//~ Begin neglected data
 	int PrimitiveType;
@@ -1253,7 +1253,7 @@ bool FEluMeshNodeLoader_v20::LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& Bina
 	return true;
 }
 
-bool FEluMeshNodeLoader_v14::LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
+bool FEluMeshNodeLoader_v14::LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT & Offset)
 {
 	// @unknown
 	DWORD dwFVF;

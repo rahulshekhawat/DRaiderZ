@@ -218,7 +218,7 @@ public:
 	 * @param Offset Offset to start reading binary data from in binary stream. This will get modified.
 	 * @return Returns true if binary data writing was successful.
 	 */
-	virtual bool Load(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) = 0;
+	virtual bool Load(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) = 0;
 };
 
 
@@ -226,20 +226,20 @@ class EDITORTOOLS_API FEluMeshNodeLoader_v12 : public FEluMeshNodeLoader
 {
 
 public:
-	virtual bool Load(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
+	virtual bool Load(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
 	
 	//~ 
-	virtual bool LoadName(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
+	virtual bool LoadName(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
 
-	virtual bool LoadInfo(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
+	virtual bool LoadInfo(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
 
-	virtual bool LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
+	virtual bool LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
 
-	virtual bool LoadFace(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
+	virtual bool LoadFace(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
 
-	virtual bool LoadVertexInfo(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
+	virtual bool LoadVertexInfo(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
 
-	virtual bool LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
+	virtual bool LoadEtc(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset);
 	//~
 };
 
@@ -247,10 +247,10 @@ class EDITORTOOLS_API FEluMeshNodeLoader_v13 : public FEluMeshNodeLoader_v12
 {
 
 public:
-	virtual bool Load(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool Load(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 	
 	//~
-	virtual bool LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadEtc(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 	//~
 };
 
@@ -259,7 +259,7 @@ class EDITORTOOLS_API FEluMeshNodeLoader_v14 : public FEluMeshNodeLoader_v13
 
 public:
 	
-	virtual bool LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 
 };
 
@@ -267,18 +267,18 @@ class EDITORTOOLS_API FEluMeshNodeLoader_v15 : public FEluMeshNodeLoader_v14
 {
 
 public:
-	virtual bool LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 
-	virtual bool LoadFace(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadFace(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 	
-	virtual bool LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadEtc(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 };
 
 class EDITORTOOLS_API FEluMeshNodeLoader_v16 : public FEluMeshNodeLoader_v15
 {
 
 public:
-	virtual bool LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 
 };
 
@@ -286,26 +286,26 @@ class EDITORTOOLS_API FEluMeshNodeLoader_v17 : public FEluMeshNodeLoader_v16
 {
 
 public:
-	virtual bool LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 };
 
 class EDITORTOOLS_API FEluMeshNodeLoader_v18 : public FEluMeshNodeLoader_v17
 {
 
 public:
-	virtual bool LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 };
 
 class EDITORTOOLS_API FEluMeshNodeLoader_v20 : public FEluMeshNodeLoader_v18
 {
 
 public:
-	virtual bool LoadName(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadName(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 
-	virtual bool LoadInfo(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadInfo(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 
-	virtual bool LoadVertex(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadVertex(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 
-	virtual bool LoadEtc(FEluMeshNode* MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
+	virtual bool LoadEtc(TSharedPtr<FEluMeshNode> MeshNode, TArray<uint8>& BinaryData, UINT& Offset) override;
 
 };

@@ -24,6 +24,7 @@ public class EditorTools : ModuleRules
             "RHI",
             "Json",
             "EOD",
+            "RawMesh",
             "DesktopPlatform",
             "XmlParser" });
 
