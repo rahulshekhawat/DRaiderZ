@@ -27,6 +27,8 @@ public:
 
 	static TArray<FXmlNode*> GetNodesWithTag(FXmlNode* BaseNode, const FString& Tag);
 
+	static const FString DarkRaiderzAssetPath;
+
 	static const FString DataFolderPath;
 	static const FString SoundXmlFilePath;
 	static const FString NPCXmlFilePath;

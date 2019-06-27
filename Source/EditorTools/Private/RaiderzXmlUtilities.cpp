@@ -6,6 +6,8 @@
 #include "Misc/Paths.h"
 #include "HAL/FileManagerGeneric.h"
 
+const FString URaiderzXmlUtilities::DarkRaiderzAssetPath(TEXT("F:/GameDev/DarkRaidAssets"));
+
 const FString URaiderzXmlUtilities::DataFolderPath(TEXT("E:/RaiderzAssets/datadump/Data"));
 const FString URaiderzXmlUtilities::SoundXmlFilePath(TEXT("E:/RaiderzAssets/datadump/Data/Sound/sound.xml"));
 const FString URaiderzXmlUtilities::NPCXmlFilePath(TEXT("E:/RaiderzAssets/datadump/Data/system/npc.xml"));

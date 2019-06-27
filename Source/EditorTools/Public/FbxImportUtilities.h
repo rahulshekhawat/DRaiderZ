@@ -19,6 +19,9 @@ public:
 	UFbxImportUtilities(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
+	static void ImportFbxFile();
+
+	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
 	static void ImportFbxFilesFromPath(const FString& ImportPath);
 
 };
