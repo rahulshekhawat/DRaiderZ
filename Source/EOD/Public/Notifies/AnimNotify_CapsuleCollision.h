@@ -48,6 +48,7 @@ class EOD_API UAnimNotify_CapsuleCollision : public UAnimNotify
 public:
 
 	void InitializeFromRaidCapsules(const TArray<FRaidCapsule>& RaidCapsules);
+	bool HasRaidCapsules(const TArray<FRaidCapsule>& RaidCapsules);
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 

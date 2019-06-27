@@ -30,6 +30,36 @@ void UAnimNotify_CapsuleCollision::InitializeFromRaidCapsules(const TArray<FRaid
 	}
 }
 
+bool UAnimNotify_CapsuleCollision::HasRaidCapsules(const TArray<FRaidCapsule>& RaidCapsules)
+{
+	if (RaidCapsules.Num() != CollisionCapsules.Num())
+	{
+		return false;
+	}
+
+	bool bResult = true;
+	for (const FRaidCapsule& RaidCapsule : RaidCapsules)
+	{
+		FEODCapsule EODCapsule;
+		EODCapsule.Radius = RaidCapsule.Radius;
+
+		FVector CorrectedBottom = RaidCapsule.Bottom.RotateAngleAxis(90.f, FVector(0.f, 0.f, 1.f));
+		FVector CorrectedTop = RaidCapsule.Top.RotateAngleAxis(90.f, FVector(0.f, 0.f, 1.f));
+		FVector HalfHeightVector = (CorrectedTop - CorrectedBottom) / 2;
+
+		EODCapsule.HalfHeight = HalfHeightVector.Size();
+		EODCapsule.Center = CorrectedBottom + HalfHeightVector;
+		EODCapsule.Rotation = FRotationMatrix::MakeFromZ(HalfHeightVector).Rotator();
+
+		bResult = bResult && CollisionCapsules.Contains(EODCapsule);
+		if (!bResult)
+		{
+			break;
+		}
+	}
+	return bResult;
+}
+
 void UAnimNotify_CapsuleCollision::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	UWorld* World = MeshComp ? MeshComp->GetWorld() : nullptr;

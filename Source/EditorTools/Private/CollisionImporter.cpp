@@ -278,23 +278,20 @@ void UCollisionImporter::AddCollisionNotifiesToAnimation(UAnimSequenceBase* Anim
 		}
 
 		Animation->Modify();
-		int32 NewNotifyIndex = Animation->Notifies.Add(FAnimNotifyEvent());
-		FAnimNotifyEvent& NewEvent = Animation->Notifies[NewNotifyIndex];
-		NewEvent.NotifyName = TEXT("Capsule Collision");
-
-		NewEvent.Link(Animation, FrameTime);
+		FAnimNotifyEvent NewEvent;
 		NewEvent.TriggerTimeOffset = GetTriggerTimeOffsetForType(Animation->CalculateOffsetForNotify(FrameTime));
-		NewEvent.TrackIndex = 0; // Let's create a global index convention perhaps?
+		//~ @todo proper track index
+		NewEvent.TrackIndex = 0;
 
 		UAnimNotify_CapsuleCollision* AnimNotify = NewObject<UAnimNotify_CapsuleCollision>(Animation, UAnimNotify_CapsuleCollision::StaticClass(), NAME_None, RF_NoFlags);
-		NewEvent.Notify = AnimNotify;
 		if (AnimNotify)
 		{
 			AnimNotify->InitializeFromRaidCapsules(RaidCapsules);
-			NewEvent.NotifyName = FName(*NewEvent.Notify->GetNotifyName());
-			NewEvent.Notify->OnAnimNotifyCreatedInEditor(NewEvent);			
+			NewEvent.NotifyName = FName(*AnimNotify->GetNotifyName());
 		}
-
+		NewEvent.Notify = AnimNotify;
+		NewEvent.Link(Animation, FrameTime);
+		Animation->Notifies.Add(NewEvent);
 		Animation->MarkPackageDirty();
 	}
 }
@@ -324,6 +321,29 @@ TArray<FRaidCapsule> UCollisionImporter::GenerateRaidCapsules(const TArray<FStri
 
 bool UCollisionImporter::HasCollisionNotify(UAnimSequenceBase* Animation, float FrameTime, const TArray<FRaidCapsule>& RaidCapsules)
 {
+	if (!Animation)
+	{
+		return false;
+	}
+
+	UClass* CollisionNotifyClass = UAnimNotify_CapsuleCollision::StaticClass();
+	check(CollisionNotifyClass);
+
+	for (const FAnimNotifyEvent& NotifyEvent : Animation->Notifies)
+	{
+		if (NotifyEvent.Notify && NotifyEvent.Notify->IsA(CollisionNotifyClass))
+		{
+			UAnimNotify_CapsuleCollision* CollisionNotify = Cast<UAnimNotify_CapsuleCollision>(NotifyEvent.Notify);
+			if (CollisionNotify && CollisionNotify->HasRaidCapsules(RaidCapsules))
+			{
+				float Time = NotifyEvent.GetTime();
+				if (FMath::IsNearlyEqual(Time, FrameTime, 0.1f))
+				{
+					return true;
+				}
+			}
+		}
+	}
 	return false;
 }
 

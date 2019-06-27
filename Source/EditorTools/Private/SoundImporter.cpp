@@ -284,33 +284,34 @@ void USoundImporter::AddSoundNotifiesToAnimation(UAnimSequenceBase* Animation, c
 		bool bNotifyExists = HasSoundNotify(Animation, FrameTime, Sound);
 		if (bNotifyExists)
 		{
+			//~ @todo update sound attenution
 			// Skip adding notify if it already exists
 			continue;
 		}
 
 		Animation->Modify();
-		int32 NewNotifyIndex = Animation->Notifies.Add(FAnimNotifyEvent());
-		FAnimNotifyEvent& NewEvent = Animation->Notifies[NewNotifyIndex];
-		NewEvent.NotifyName = TEXT("Play Sound");
-
-		NewEvent.Link(Animation, FrameTime);
+		FAnimNotifyEvent NewEvent;
 		NewEvent.TriggerTimeOffset = GetTriggerTimeOffsetForType(Animation->CalculateOffsetForNotify(FrameTime));
-		NewEvent.TrackIndex = 0; // Let's create a global index convention perhaps?
+		//~ @todo proper track index
+		NewEvent.TrackIndex = 0;
 
 		UAnimNotify_PlaySound* SoundNotify = NewObject<UAnimNotify_PlaySound>(Animation, UAnimNotify_PlaySound::StaticClass(), SoundAssetData.AssetName, RF_NoFlags);
-		NewEvent.Notify = SoundNotify;
 		if (SoundNotify)
 		{
-			Sound->Modify();
-			Sound->AttenuationSettings = AttenuationToApply;
-			Sound->MarkPackageDirty();
+			if (Sound->AttenuationSettings != AttenuationToApply)
+			{
+				Sound->Modify();
+				Sound->AttenuationSettings = AttenuationToApply;
+				Sound->MarkPackageDirty();
+			}
 
 			SoundNotify->Sound = Sound;
 			SoundNotify->bFollow = true;
-			NewEvent.NotifyName = FName(*NewEvent.Notify->GetNotifyName());
-			NewEvent.Notify->OnAnimNotifyCreatedInEditor(NewEvent);
+			NewEvent.NotifyName = FName(*SoundNotify->GetNotifyName());
 		}
-
+		NewEvent.Notify = SoundNotify;
+		NewEvent.Link(Animation, FrameTime);
+		Animation->Notifies.Add(NewEvent);
 		Animation->MarkPackageDirty();
 	}
 }
