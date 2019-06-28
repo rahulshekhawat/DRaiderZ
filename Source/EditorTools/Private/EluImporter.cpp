@@ -149,6 +149,8 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 	FString PackageName = FString("/Game/RaiderZ/Zunk/TestPackage");
 	bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
 
+	//~ @todo fix static mesh import for 4.22 (this only works in 4.21, not 4.22)
+	/*
 	if (!bPackageExists && EluMeshNodes.Num() != 0)
 	{
 		// If package doesn't exist, it's safe to create new package
@@ -205,7 +207,7 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 			}
 		}
 
-		NewObj->SourceModels[0].RawMeshBulkData->SaveRawMesh(RawMesh);
+		NewObj->SourceModels[0].SaveRawMesh(RawMesh);
 
 		TArray<FText> ErrorText;
 		NewObj->Build(false, &ErrorText);
@@ -214,5 +216,6 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 
 		// FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
 	}
+	*/
 	return true;
 }
