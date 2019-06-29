@@ -18,11 +18,11 @@ public:
 
 	UFbxImportUtilities(const FObjectInitializer& ObjectInitializer);
 
-	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
-	static void ImportFbxFile();
+	UFUNCTION(BlueprintCallable, Category = "RaiderZ Library", meta = (DisplayName = "Import RaiderZ Fbx File"))
+	static void ImportRaiderzFbxFile();
 
-	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
-	static void ImportFbxFilesInFolder();
+	UFUNCTION(BlueprintCallable, Category = "RaiderZ Library", meta = (DisplayName = "Import RaiderZ Fbx Files From Folder"))
+	static void ImportRaiderzFbxFilesFromFolder();
 
 private:
 

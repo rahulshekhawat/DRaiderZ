@@ -13,7 +13,7 @@ UFbxImportUtilities::UFbxImportUtilities(const FObjectInitializer& ObjectInitial
 {
 }
 
-void UFbxImportUtilities::ImportFbxFile()
+void UFbxImportUtilities::ImportRaiderzFbxFile()
 {
 	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
 	bool bSuccess = false;
@@ -35,13 +35,30 @@ void UFbxImportUtilities::ImportFbxFile()
 	if (!bSuccess || SelectedFiles.Num() == 0)
 	{
 		PrintWarning(TEXT("User failed to select any files!"));
+		return;
 	}
-
 }
 
-void UFbxImportUtilities::ImportFbxFilesInFolder()
+void UFbxImportUtilities::ImportRaiderzFbxFilesFromFolder()
 {
+	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+	bool bSuccess = false;
+	FString SelectedFolderPath;
+	if (DesktopPlatform)
+	{
+		const void* ParentWindowWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
 
+		bSuccess = DesktopPlatform->OpenDirectoryDialog(
+			ParentWindowWindowHandle,
+			TEXT("Select fbx models folder"),
+			TEXT("F:/Game Dev/asset_dest/Model"),
+			SelectedFolderPath
+		);
+	}
 
-
+	if (!bSuccess || SelectedFolderPath == TEXT(""))
+	{
+		PrintWarning(TEXT("User failed to select any folder!"));
+		return;
+	}
 }
