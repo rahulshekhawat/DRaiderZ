@@ -3,6 +3,7 @@
 
 #include "EditorFunctionLibrary.h"
 #include "EOD.h"
+#include "Gameplay/Skills/ActiveSkillBase.h"
 
 #include "Misc/Paths.h"
 #include "AssetRegistryModule.h"
@@ -13,6 +14,7 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "KismetCompilerModule.h"
 #include "PackageTools.h"
+#include "AssetRegistryModule.h"
 
 UEditorFunctionLibrary::UEditorFunctionLibrary(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -40,10 +42,21 @@ void UEditorFunctionLibrary::CreateBlueprint(UClass* ParentClass)
 			UPackage* Package = CreatePackage(nullptr, *PackageName);
 			Package->FullyLoad();
 
+			UBlueprint* Blueprint = FKismetEditorUtilities::CreateBlueprint(ParentClass, Package, FName("BP_Wow_ok"), EBlueprintType::BPTYPE_Normal, BlueprintClass, BlueprintGeneratedClass);			
+			UObject* CDO = Blueprint->GeneratedClass->GetDefaultObject<UObject>();
 
-			UBlueprint* Blueprint = FKismetEditorUtilities::CreateBlueprint(ParentClass, Package, FName("BP_Wow_ok"), EBlueprintType::BPTYPE_Normal, BlueprintClass, BlueprintGeneratedClass);
+			if (CDO)
+			{
+				UFloatProperty* FloatProp = FindField<UFloatProperty>(CDO->GetClass(), TEXT("FailSafeDuration"));
+				if (FloatProp)
+				{
+					FloatProp->SetPropertyValue_InContainer(CDO, 12.0);
+				}
+			}
+
 			if (Blueprint)
 			{
+				FAssetRegistryModule::AssetCreated(Blueprint);
 				Blueprint->MarkPackageDirty();
 			}
 		}
