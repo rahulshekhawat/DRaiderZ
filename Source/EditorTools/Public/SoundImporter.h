@@ -72,6 +72,7 @@ private:
 	static void CreateAndApplySoundNotifies(const TArray<FAnimSoundInfo>& AnimSoundInfoArray, USoundAttenuation* AttenuationToApply);
 	static void AddSoundNotifiesToAnimation(UAnimSequenceBase* Animation, const TMap<float, FAssetData>& FrameToSoundAssetMap, USoundAttenuation* AttenuationToApply);
 	static bool HasSoundNotify(UAnimSequenceBase* Animation, float NotifyTime, USoundBase* NotifySound);
+	static void ApplyAttenuationToNotifySound(UAnimSequenceBase* Animation, float NotifyTime, USoundBase* NotifySound, USoundAttenuation* AttenuationToApply);
 
 	static void FilterAnimSoundInfoArray(TArray<FAnimSoundInfo>& AnimSoundInfoArray);
 

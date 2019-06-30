@@ -7,6 +7,7 @@
 #include "EluMeshNodeLoader.h"
 #include "RaiderzXmlUtilities.h"
 
+#include "Editor.h"
 #include "RawMesh.h"
 #include "Engine/StaticMesh.h"
 #include "UObject/Package.h"
@@ -148,6 +149,24 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 
 	FString PackageName = FString("/Game/RaiderZ/Zunk/TestPackage");
 	bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
+
+	if (!bPackageExists && EluMeshNodes.Num() != 0)
+	{
+
+
+
+	}
+
+	// Unselect all actors.
+	// GEditor->SelectNone(false, false);
+	// GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPreImport(this, Class, InParent, Name, Type);
+
+	// FbxImporter->ImportFromFile(FbxImportFileName, Type, true)
+	// ImportAllSkeletalMesh(RootNodeToImport, FbxImporter, Flags, NodeIndex, InterestingNodeCount, SceneInfoPtr);
+	// ImportAllStaticMesh(RootNodeToImport, FbxImporter, Flags, NodeIndex, InterestingNodeCount, SceneInfoPtr);
+
+	
+
 
 	//~ @todo fix static mesh import for 4.22 (this only works in 4.21, not 4.22)
 	/*

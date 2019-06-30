@@ -284,7 +284,8 @@ void USoundImporter::AddSoundNotifiesToAnimation(UAnimSequenceBase* Animation, c
 		bool bNotifyExists = HasSoundNotify(Animation, FrameTime, Sound);
 		if (bNotifyExists)
 		{
-			//~ @todo update sound attenution
+			ApplyAttenuationToNotifySound(Animation, FrameTime, Sound, AttenuationToApply);
+
 			// Skip adding notify if it already exists
 			continue;
 		}
@@ -342,6 +343,40 @@ bool USoundImporter::HasSoundNotify(UAnimSequenceBase* Animation, float NotifyTi
 		}
 	}
 	return false;
+}
+
+void USoundImporter::ApplyAttenuationToNotifySound(UAnimSequenceBase* Animation, float NotifyTime, USoundBase* NotifySound, USoundAttenuation* AttenuationToApply)
+{
+	if (!Animation || !NotifySound)
+	{
+		return;
+	}
+
+	UClass* SoundNotifyClass = UAnimNotify_PlaySound::StaticClass();
+	check(SoundNotifyClass);
+
+	for (const FAnimNotifyEvent& NotifyEvent : Animation->Notifies)
+	{
+		if (NotifyEvent.Notify && NotifyEvent.Notify->IsA(SoundNotifyClass))
+		{
+			UAnimNotify_PlaySound* SoundNotify = Cast<UAnimNotify_PlaySound>(NotifyEvent.Notify);
+			if (SoundNotify && SoundNotify->Sound == NotifySound)
+			{
+				float Time = NotifyEvent.GetTime();
+				if (FMath::IsNearlyEqual(Time, NotifyTime, 0.1f))
+				{
+					if (SoundNotify->Sound->AttenuationSettings != AttenuationToApply)
+					{
+						SoundNotify->Sound->Modify();
+						SoundNotify->Sound->AttenuationSettings = AttenuationToApply;
+						SoundNotify->Sound->MarkPackageDirty();
+					}
+					return;
+				}
+			}
+		}
+	}
+	return;
 }
 
 void USoundImporter::FilterAnimSoundInfoArray(TArray<FAnimSoundInfo>& AnimSoundInfoArray)
