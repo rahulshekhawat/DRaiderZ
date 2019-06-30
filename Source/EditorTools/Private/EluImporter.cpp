@@ -147,15 +147,114 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 		}
 	}
 
+
+
+	//~ Reference method: UnFbx::FFbxImporter::ImportStaticMeshAsSingle()
 	FString PackageName = FString("/Game/RaiderZ/Zunk/TestPackage");
 	bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
 
 	if (!bPackageExists && EluMeshNodes.Num() != 0)
 	{
+		// If package doesn't exist, it's safe to create new package
+		PackageName = PackageTools::SanitizePackageName(PackageName);
+		UPackage* Package = CreatePackage(nullptr, *PackageName);
+		Package->FullyLoad();
+
+		const FString EluFileName = URaiderzXmlUtilities::GetRaiderzBaseFileName(EluFilePath);
+		UStaticMesh* StaticMesh = NewObject<UStaticMesh>(Package, FName(*EluFileName), RF_Public);
+
+		int32 LODIndex = 0;
+		if (StaticMesh->SourceModels.Num() < 1)
+		{
+			StaticMesh->AddSourceModel();
+			LODIndex = StaticMesh->SourceModels.Num() - 1;
+		}
+
+		FMeshDescription* MeshDesc = StaticMesh->GetMeshDescription(LODIndex);
+		if (MeshDesc == nullptr)
+		{
+			MeshDesc = StaticMesh->CreateMeshDescription(LODIndex);
+			check(MeshDesc != nullptr);
+
+			StaticMesh->CommitMeshDescription(LODIndex);
+
+			StaticMesh->SourceModels[LODIndex].ReductionSettings.MaxDeviation = 0.0f;
+			StaticMesh->SourceModels[LODIndex].ReductionSettings.PercentTriangles = 1.0f;
+			StaticMesh->SourceModels[LODIndex].ReductionSettings.PercentVertices = 1.0f;
+		}
+
+		FStaticMeshSourceModel& SrcModel = StaticMesh->SourceModels[LODIndex];
+		StaticMesh->LightingGuid = FGuid::NewGuid();
+
+		bool bBuildStatus = true;
+		//~ @todo materials
+		
+		
+		// material creation might set build status to false
+		if (bBuildStatus)
+		{
+			/*
+			// Setup default LOD settings based on the selected LOD group.
+			if (LODIndex == 0)
+			{
+				ITargetPlatform* CurrentPlatform = GetTargetPlatformManagerRef().GetRunningTargetPlatform();
+				check(CurrentPlatform);
+				const FStaticMeshLODGroup& LODGroup = CurrentPlatform->GetStaticMeshLODSettings().GetLODGroup(ImportOptions->StaticMeshLODGroup);
+				int32 NumLODs = LODGroup.GetDefaultNumLODs();
+				while (StaticMesh->SourceModels.Num() < NumLODs)
+				{
+					StaticMesh->AddSourceModel();
+				}
+				for (int32 ModelLODIndex = 0; ModelLODIndex < NumLODs; ++ModelLODIndex)
+				{
+					StaticMesh->SourceModels[ModelLODIndex].ReductionSettings = LODGroup.GetDefaultSettings(ModelLODIndex);
+				}
+				StaticMesh->LightMapResolution = LODGroup.GetDefaultLightMapResolution();
+			}
+			*/
+
+			/*
+			// @todo This overrides restored values currently but we need to be able to import over the existing settings if the user chose to do so.
+			SrcModel.BuildSettings.bRemoveDegenerates = ImportOptions->bRemoveDegenerates;
+			SrcModel.BuildSettings.bBuildAdjacencyBuffer = ImportOptions->bBuildAdjacencyBuffer;
+			SrcModel.BuildSettings.bBuildReversedIndexBuffer = ImportOptions->bBuildReversedIndexBuffer;
+			SrcModel.BuildSettings.bRecomputeNormals = ImportOptions->NormalImportMethod == FBXNIM_ComputeNormals;
+			SrcModel.BuildSettings.bRecomputeTangents = ImportOptions->NormalImportMethod != FBXNIM_ImportNormalsAndTangents;
+			SrcModel.BuildSettings.bUseMikkTSpace = (ImportOptions->NormalGenerationMethod == EFBXNormalGenerationMethod::MikkTSpace) && (!ImportOptions->ShouldImportNormals() || !ImportOptions->ShouldImportTangents());
+			if (ImportOptions->bGenerateLightmapUVs)
+			{
+				SrcModel.BuildSettings.bGenerateLightmapUVs = true;
+				SrcModel.BuildSettings.DstLightmapIndex = FirstOpenUVChannel;
+				StaticMesh->LightMapCoordinateIndex = FirstOpenUVChannel;
+			}
+			else
+			{
+				SrcModel.BuildSettings.bGenerateLightmapUVs = false;
+			}
+			*/
+
+
+			// StaticMesh->Build(false, )
+
+		}
+	}
+
+	//~ @todo check UnFbx::FFbxImporter::BuildStaticMeshFromGeometry
+	
+
+	/*
+
+	if (!bPackageExists && EluMeshNodes.Num() != 0)
+	{
+		FlushRenderingCommands();
+
+		
+
 
 
 
 	}
+	*/
 
 	// Unselect all actors.
 	// GEditor->SelectNone(false, false);
@@ -170,12 +269,7 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 
 	//~ @todo fix static mesh import for 4.22 (this only works in 4.21, not 4.22)
 	/*
-	if (!bPackageExists && EluMeshNodes.Num() != 0)
 	{
-		// If package doesn't exist, it's safe to create new package
-		PackageName = PackageTools::SanitizePackageName(PackageName);
-		UPackage* Package = CreatePackage(nullptr, *PackageName);
-		Package->FullyLoad();
 
 		UStaticMesh* NewObj = NewObject<UStaticMesh>(Package, UStaticMesh::StaticClass(), *FString("TestPackage"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
 		NewObj->Modify();
