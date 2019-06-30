@@ -24,6 +24,9 @@ public:
 
 	UEditorFunctionLibrary(const FObjectInitializer& ObjectInitializer);
 
+	UFUNCTION(BlueprintCallable, Category = EditorLibrary)
+	static void CreateBlueprint(UClass* ParentClass);
+	
 	static bool IsHumanPlayerMesh(USkeletalMesh* Mesh);
 	static FString GetRaiderZMeshName(USkeletalMesh* Mesh);
 

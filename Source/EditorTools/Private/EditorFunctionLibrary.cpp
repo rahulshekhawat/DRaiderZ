@@ -2,6 +2,7 @@
 
 
 #include "EditorFunctionLibrary.h"
+#include "EOD.h"
 
 #include "Misc/Paths.h"
 #include "AssetRegistryModule.h"
@@ -9,9 +10,44 @@
 #include "Animation/Skeleton.h"
 #include "Animation/AnimSequence.h"
 #include "Misc/ScopedSlowTask.h"
+#include "Kismet2/KismetEditorUtilities.h"
+#include "KismetCompilerModule.h"
+#include "PackageTools.h"
 
 UEditorFunctionLibrary::UEditorFunctionLibrary(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+}
+
+void UEditorFunctionLibrary::CreateBlueprint(UClass* ParentClass)
+{
+	bool bResult = FKismetEditorUtilities::CanCreateBlueprintOfClass(ParentClass);
+	if (bResult)
+	{
+		IKismetCompilerInterface& KismetCompilerModule = FModuleManager::LoadModuleChecked<IKismetCompilerInterface>("KismetCompiler");
+
+		UClass* BlueprintClass = nullptr;
+		UClass* BlueprintGeneratedClass = nullptr;
+		KismetCompilerModule.GetBlueprintTypesForClass(ParentClass, BlueprintClass, BlueprintGeneratedClass);
+
+		//~ @note Current just test code. Need to replace it with proper package name/path.
+		FString PackageName = FString("/Game/RaiderZ/Zunk/TestPackage");
+		bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
+
+		if (!bPackageExists)
+		{
+			// If package doesn't exist, it's safe to create new package
+			PackageName = PackageTools::SanitizePackageName(PackageName);
+			UPackage* Package = CreatePackage(nullptr, *PackageName);
+			Package->FullyLoad();
+
+
+			UBlueprint* Blueprint = FKismetEditorUtilities::CreateBlueprint(ParentClass, Package, FName("BP_Wow_ok"), EBlueprintType::BPTYPE_Normal, BlueprintClass, BlueprintGeneratedClass);
+			if (Blueprint)
+			{
+				Blueprint->MarkPackageDirty();
+			}
+		}
+	}
 }
 
 bool UEditorFunctionLibrary::IsHumanPlayerMesh(USkeletalMesh* Mesh)
