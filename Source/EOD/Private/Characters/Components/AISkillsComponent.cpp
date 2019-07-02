@@ -17,6 +17,7 @@ void UAISkillsComponent::BeginPlay()
 	Super::BeginPlay();
 
 	InitializeSkills();
+
 }
 
 void UAISkillsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -51,6 +52,12 @@ void UAISkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 	{
 		FGameplaySkillTableRow* Row = SkillsDataTable->FindRow<FGameplaySkillTableRow>(Key, ContextString);
 		check(Row);
+
+		if (!Row->SkillClass.Get())
+		{
+			continue;
+		}
+
 		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->SkillClass, Key, RF_Transient);
 		check(GameplaySkill);
 		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
