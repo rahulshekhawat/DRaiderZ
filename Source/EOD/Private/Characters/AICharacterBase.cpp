@@ -539,6 +539,14 @@ void AAICharacterBase::UpdateRotation(float DeltaTime)
 	}
 }
 
+void AAICharacterBase::PlayAttackBlockedAnimation()
+{
+	if (BlockAttackMontage)
+	{
+		PlayAnimMontage(BlockAttackMontage, 1.f);
+	}
+}
+
 void AAICharacterBase::InitiateDeathSequence_Implementation()
 {
 	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;

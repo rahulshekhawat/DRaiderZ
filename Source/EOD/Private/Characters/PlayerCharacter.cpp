@@ -170,10 +170,11 @@ void APlayerCharacter::PlaySystemSound(USoundBase* SoundToPlay)
 
 void APlayerCharacter::PlayAttackBlockedAnimation()
 {
-	if (GetActiveAnimationReferences() && GetActiveAnimationReferences()->BlockAttack.Get())
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* BlockAttackAnim = AnimRef ? AnimRef->BlockAttack.Get() : nullptr;
+	if (BlockAttackAnim)
 	{
-		// PlayAnimationMontage(GetActiveAnimationReferences()->BlockAttack.Get(),
-			// UCharacterLibrary::SectionName_BlockAttack);
+		PlayAnimMontage(BlockAttackAnim, 1.f);
 	}
 }
 

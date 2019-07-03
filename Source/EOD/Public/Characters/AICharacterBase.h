@@ -240,6 +240,9 @@ public:
 	/** Updates character rotation every frame */
 	virtual void UpdateRotation(float DeltaTime) override;
 
+	/** Plays BlockAttack animation on blocking an incoming attack */
+	virtual void PlayAttackBlockedAnimation() override;
+
 	// --------------------------------------
 	//  Gameplay
 	// --------------------------------------
