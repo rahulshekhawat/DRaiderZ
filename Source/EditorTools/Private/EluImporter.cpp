@@ -7,6 +7,7 @@
 #include "EluMeshNodeLoader.h"
 #include "RaiderzXmlUtilities.h"
 
+#include "MeshUtilities.h"
 #include "Editor.h"
 #include "RawMesh.h"
 #include "AssetRegistryModule.h"
@@ -160,8 +161,12 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 
 	UStaticMesh* StaticMesh = NewObject<UStaticMesh>(Package, UStaticMesh::StaticClass(), *FString("WAKA"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
 	StaticMesh->AddSourceModel();
+	StaticMesh->LightingGuid = FGuid::NewGuid();
+	StaticMesh->LightMapCoordinateIndex = 1;
+	StaticMesh->LightMapResolution = 64;
 
-	const FStaticMeshSourceModel& SrcModel = StaticMesh->SourceModels[0];
+
+	// const FStaticMeshSourceModel& SrcModel = StaticMesh->SourceModels[0];
 	// SrcModel.MeshDescription.Get().
 
 	FRawMesh RawMesh;
@@ -238,6 +243,20 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 	{
 		PrintError("MESH INVLAID");
 	}
+
+	IMeshUtilities& MeshUtilities = FModuleManager::Get().LoadModuleChecked<IMeshUtilities>("MeshUtilities");
+	TArray<FVector2D> OutUniqueUVs;
+	bool bResult = MeshUtilities.GenerateUniqueUVsForStaticMesh(RawMesh, 1024, OutUniqueUVs);
+	if (bResult)
+	{
+		PrintWarning("Unique UV generation succeeded!");
+	}
+	else
+	{
+		PrintError("Unique UV generation failed!");
+	}
+
+	RawMesh.WedgeTexCoords[0] = OutUniqueUVs;
 
 	// StaticMesh->SourceModels[0].RawMeshBulkData->SaveRawMesh(RawMesh);
 
