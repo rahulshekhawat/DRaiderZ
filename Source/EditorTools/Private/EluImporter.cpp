@@ -153,6 +153,105 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 	bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
 
 
+	// If package doesn't exist, it's safe to create new package
+	PackageName = PackageTools::SanitizePackageName(PackageName);
+	UPackage* Package = CreatePackage(nullptr, *PackageName);
+	Package->FullyLoad();
+
+	UStaticMesh* StaticMesh = NewObject<UStaticMesh>(Package, UStaticMesh::StaticClass(), *FString("WAKA"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
+	StaticMesh->AddSourceModel();
+
+	const FStaticMeshSourceModel& SrcModel = StaticMesh->SourceModels[0];
+	// SrcModel.MeshDescription.Get().
+
+	FRawMesh RawMesh;
+	// int32 NodeNums = EluMeshNodes.Num();
+	TSharedPtr<FEluMeshNode> MeshNode = EluMeshNodes[0];
+	// PrintWarning(MeshNode->ToString());
+
+	RawMesh.VertexPositions.Empty();
+	RawMesh.VertexPositions += MeshNode->PointsTable;
+
+	for (const FMeshPolygonData& PolyData : MeshNode->PolygonTable)
+	{
+		RawMesh.FaceMaterialIndices.Add(PolyData.MaterialID);
+		RawMesh.FaceSmoothingMasks.Add(1);
+
+		for (const FFaceSubData& FaceData : PolyData.FaceSubDatas)
+		{
+			RawMesh.WedgeIndices.Add(FaceData.p);
+
+			if (MeshNode->TangentTanTable.Num() > FaceData.n_tan)
+			{
+				const FVector& Tangent_X = MeshNode->TangentTanTable[FaceData.n_tan];
+				RawMesh.WedgeTangentX.Add(Tangent_X);
+			}
+			else
+			{
+				RawMesh.WedgeTangentX.Add(FVector::ZeroVector);
+			}
+
+
+			if (MeshNode->TangentBinTable.Num() > FaceData.n_bin)
+			{
+				const FVector& Tangent_Y = MeshNode->TangentBinTable[FaceData.n_bin];
+				RawMesh.WedgeTangentY.Add(Tangent_Y);
+			}
+			else
+			{
+				RawMesh.WedgeTangentY.Add(FVector::ZeroVector);
+			}
+
+			const FVector& Normal = MeshNode->NormalsTable[FaceData.p];
+			RawMesh.WedgeTangentZ.Add(Normal);
+
+			RawMesh.WedgeColors.Add(FColor(0, 0, 0));
+
+			/*
+			if (MeshNode->PointColorTable.Num() > FaceData.)
+			{
+
+			}
+			else
+			{
+
+			}
+			*/
+			
+
+			FVector TexCoord = MeshNode->TexCoordTable[FaceData.uv];
+			RawMesh.WedgeTexCoords[0].Add(FVector2D(TexCoord.X, TexCoord.Y));
+			RawMesh.WedgeTexCoords[1].Add(FVector2D(0, 0));
+
+		}
+	}
+
+	if (RawMesh.IsValid())
+	{
+		PrintWarning("MESH IS VALID");
+	}
+	else if (RawMesh.IsValidOrFixable())
+	{
+		PrintWarning("MESH IS VALID OR FIXABLE");
+	}
+	else
+	{
+		PrintError("MESH INVLAID");
+	}
+
+	// StaticMesh->SourceModels[0].RawMeshBulkData->SaveRawMesh(RawMesh);
+
+	StaticMesh->SourceModels[0].SaveRawMesh(RawMesh);
+
+	TArray<FText> ErrorText;
+	StaticMesh->Build(false, &ErrorText);
+	StaticMesh->MarkPackageDirty();
+	FAssetRegistryModule::AssetCreated(StaticMesh);
+
+
+
+	//~ temporarily disabled
+	/*
 	if (!bPackageExists && EluMeshNodes.Num() != 0)
 	{
 		// If package doesn't exist, it's safe to create new package
@@ -221,7 +320,7 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 
 
 	}
-
+	*/
 
 
 	//~ @todo check UnFbx::FFbxImporter::BuildStaticMeshFromGeometry
