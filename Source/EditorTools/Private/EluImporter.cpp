@@ -9,7 +9,9 @@
 
 #include "Editor.h"
 #include "RawMesh.h"
+#include "AssetRegistryModule.h"
 #include "Engine/StaticMesh.h"
+#include "Engine/SkeletalMesh.h"
 #include "UObject/Package.h"
 #include "PackageTools.h"
 #include "Misc/PackageName.h"
@@ -147,11 +149,9 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 		}
 	}
 
-
-
-	//~ Reference method: UnFbx::FFbxImporter::ImportStaticMeshAsSingle()
-	FString PackageName = FString("/Game/RaiderZ/Zunk/TestPackage");
+	FString PackageName = FString("/Game/RaiderZ/Zunk/WAKA");
 	bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
+
 
 	if (!bPackageExists && EluMeshNodes.Num() != 0)
 	{
@@ -160,129 +160,18 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 		UPackage* Package = CreatePackage(nullptr, *PackageName);
 		Package->FullyLoad();
 
-		const FString EluFileName = URaiderzXmlUtilities::GetRaiderzBaseFileName(EluFilePath);
-		UStaticMesh* StaticMesh = NewObject<UStaticMesh>(Package, FName(*EluFileName), RF_Public);
-
-		int32 LODIndex = 0;
-		if (StaticMesh->SourceModels.Num() < 1)
-		{
-			StaticMesh->AddSourceModel();
-			LODIndex = StaticMesh->SourceModels.Num() - 1;
-		}
-
-		FMeshDescription* MeshDesc = StaticMesh->GetMeshDescription(LODIndex);
-		if (MeshDesc == nullptr)
-		{
-			MeshDesc = StaticMesh->CreateMeshDescription(LODIndex);
-			check(MeshDesc != nullptr);
-
-			StaticMesh->CommitMeshDescription(LODIndex);
-
-			StaticMesh->SourceModels[LODIndex].ReductionSettings.MaxDeviation = 0.0f;
-			StaticMesh->SourceModels[LODIndex].ReductionSettings.PercentTriangles = 1.0f;
-			StaticMesh->SourceModels[LODIndex].ReductionSettings.PercentVertices = 1.0f;
-		}
-
-		FStaticMeshSourceModel& SrcModel = StaticMesh->SourceModels[LODIndex];
-		StaticMesh->LightingGuid = FGuid::NewGuid();
-
-		bool bBuildStatus = true;
-		//~ @todo materials
-		
-		
-		// material creation might set build status to false
-		if (bBuildStatus)
-		{
-			/*
-			// Setup default LOD settings based on the selected LOD group.
-			if (LODIndex == 0)
-			{
-				ITargetPlatform* CurrentPlatform = GetTargetPlatformManagerRef().GetRunningTargetPlatform();
-				check(CurrentPlatform);
-				const FStaticMeshLODGroup& LODGroup = CurrentPlatform->GetStaticMeshLODSettings().GetLODGroup(ImportOptions->StaticMeshLODGroup);
-				int32 NumLODs = LODGroup.GetDefaultNumLODs();
-				while (StaticMesh->SourceModels.Num() < NumLODs)
-				{
-					StaticMesh->AddSourceModel();
-				}
-				for (int32 ModelLODIndex = 0; ModelLODIndex < NumLODs; ++ModelLODIndex)
-				{
-					StaticMesh->SourceModels[ModelLODIndex].ReductionSettings = LODGroup.GetDefaultSettings(ModelLODIndex);
-				}
-				StaticMesh->LightMapResolution = LODGroup.GetDefaultLightMapResolution();
-			}
-			*/
-
-			/*
-			// @todo This overrides restored values currently but we need to be able to import over the existing settings if the user chose to do so.
-			SrcModel.BuildSettings.bRemoveDegenerates = ImportOptions->bRemoveDegenerates;
-			SrcModel.BuildSettings.bBuildAdjacencyBuffer = ImportOptions->bBuildAdjacencyBuffer;
-			SrcModel.BuildSettings.bBuildReversedIndexBuffer = ImportOptions->bBuildReversedIndexBuffer;
-			SrcModel.BuildSettings.bRecomputeNormals = ImportOptions->NormalImportMethod == FBXNIM_ComputeNormals;
-			SrcModel.BuildSettings.bRecomputeTangents = ImportOptions->NormalImportMethod != FBXNIM_ImportNormalsAndTangents;
-			SrcModel.BuildSettings.bUseMikkTSpace = (ImportOptions->NormalGenerationMethod == EFBXNormalGenerationMethod::MikkTSpace) && (!ImportOptions->ShouldImportNormals() || !ImportOptions->ShouldImportTangents());
-			if (ImportOptions->bGenerateLightmapUVs)
-			{
-				SrcModel.BuildSettings.bGenerateLightmapUVs = true;
-				SrcModel.BuildSettings.DstLightmapIndex = FirstOpenUVChannel;
-				StaticMesh->LightMapCoordinateIndex = FirstOpenUVChannel;
-			}
-			else
-			{
-				SrcModel.BuildSettings.bGenerateLightmapUVs = false;
-			}
-			*/
-
-
-			// StaticMesh->Build(false, )
-
-		}
-	}
-
-	//~ @todo check UnFbx::FFbxImporter::BuildStaticMeshFromGeometry
-	
-
-	/*
-
-	if (!bPackageExists && EluMeshNodes.Num() != 0)
-	{
-		FlushRenderingCommands();
-
-		
-
-
-
-
-	}
-	*/
-
-	// Unselect all actors.
-	// GEditor->SelectNone(false, false);
-	// GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPreImport(this, Class, InParent, Name, Type);
-
-	// FbxImporter->ImportFromFile(FbxImportFileName, Type, true)
-	// ImportAllSkeletalMesh(RootNodeToImport, FbxImporter, Flags, NodeIndex, InterestingNodeCount, SceneInfoPtr);
-	// ImportAllStaticMesh(RootNodeToImport, FbxImporter, Flags, NodeIndex, InterestingNodeCount, SceneInfoPtr);
-
-	
-
-
-	//~ @todo fix static mesh import for 4.22 (this only works in 4.21, not 4.22)
-	/*
-	{
-
-		UStaticMesh* NewObj = NewObject<UStaticMesh>(Package, UStaticMesh::StaticClass(), *FString("TestPackage"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
-		NewObj->Modify();
-		// WTF IS GOING ON IN THE FOLLOWING LINE?
-		// UPDATE: most likely an override of new operator to allow directly adding FStaticMeshSourceModel() to the array;
-		new(NewObj->SourceModels) FStaticMeshSourceModel();
+		UStaticMesh* NewObj = NewObject<UStaticMesh>(Package, UStaticMesh::StaticClass(), *FString("WAKA"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
+		NewObj->AddSourceModel();
+		// new(NewObj->SourceModels) FStaticMeshSourceModel();
 
 		int32 PointsOffset = 0;
 		FRawMesh RawMesh;
+		// RawMesh.VertexPositions = TArray<FVector>();
 
 		for (int i = 0; i < EluMeshNodes.Num(); ++i)
 		{
-			TSharedPtr<FEluMeshNode> EluMeshNode = EluMeshNodes[i];
+			TSharedPtr<FEluMeshNode>EluMeshNode = EluMeshNodes[i];
+			// FEluMeshNode* EluMeshNode = EluMeshNodes[i];
 			if (EluMeshNode->PointsTable.Num() == 0)
 			{
 				continue;
@@ -291,25 +180,25 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 			PointsOffset = RawMesh.VertexPositions.Num();
 			RawMesh.VertexPositions += EluMeshNode->PointsTable;
 
-			for (int j = 0; j < EluMeshNode->VertexIndexTable.Num(); ++j)
+			for (int i = 0; i < EluMeshNode->VertexIndexTable.Num(); ++i)
 			{
 				RawMesh.FaceSmoothingMasks.Add(1);
 				RawMesh.FaceMaterialIndices.Add(EluMeshNode->MaterialID);
 
-				RawMesh.WedgeIndices.Add(PointsOffset + EluMeshNode->VertexIndexTable[j].p);
+				RawMesh.WedgeIndices.Add(PointsOffset + EluMeshNode->VertexIndexTable[i].p);
 
 				RawMesh.WedgeTangentX.Add(FVector(0, 0, 0));
 				RawMesh.WedgeTangentY.Add(FVector(0, 0, 0));
 
 				if (EluMeshNode->NormalsTable.Num() > 0)
 				{
-					FVector Normal = EluMeshNode->NormalsTable[EluMeshNode->VertexIndexTable[j].n];
+					FVector Normal = EluMeshNode->NormalsTable[EluMeshNode->VertexIndexTable[i].n];
 					RawMesh.WedgeTangentZ.Add(Normal);
 				}
 
 				if (EluMeshNode->TexCoordTable.Num() > 0)
 				{
-					FVector TexCoord = EluMeshNode->TexCoordTable[EluMeshNode->VertexIndexTable[j].uv];
+					FVector TexCoord = EluMeshNode->TexCoordTable[EluMeshNode->VertexIndexTable[i].uv];
 					RawMesh.WedgeTexCoords[0].Add(FVector2D(TexCoord.X, TexCoord.Y));
 					RawMesh.WedgeTexCoords[1].Add(FVector2D(0, 0));
 				}
@@ -320,15 +209,31 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 			}
 		}
 
-		NewObj->SourceModels[0].SaveRawMesh(RawMesh);
+		NewObj->SourceModels[0].RawMeshBulkData->SaveRawMesh(RawMesh);
 
 		TArray<FText> ErrorText;
 		NewObj->Build(false, &ErrorText);
 		NewObj->MarkPackageDirty();
-		PrintWarning(TEXT("Finished importing elu mesh"));
+		FAssetRegistryModule::AssetCreated(NewObj);
 
-		// FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
+		UE_LOG(LogTemp, Warning, TEXT("BAAAL"));
+
+
+
 	}
-	*/
+
+
+
+	//~ @todo check UnFbx::FFbxImporter::BuildStaticMeshFromGeometry
+	
+	// Unselect all actors.
+	// GEditor->SelectNone(false, false);
+	// GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPreImport(this, Class, InParent, Name, Type);
+
+	// FbxImporter->ImportFromFile(FbxImportFileName, Type, true)
+	// ImportAllSkeletalMesh(RootNodeToImport, FbxImporter, Flags, NodeIndex, InterestingNodeCount, SceneInfoPtr);
+	// ImportAllStaticMesh(RootNodeToImport, FbxImporter, Flags, NodeIndex, InterestingNodeCount, SceneInfoPtr);
+
+	
 	return true;
 }
