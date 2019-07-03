@@ -21,6 +21,14 @@ public:
 	WORD n;		// normal	index
 	WORD n_tan;	// tangent	index
 	WORD n_bin;	// binormal  index
+
+	FString ToString()
+	{
+		FString	FinalString;
+		FinalString = TEXT("p: ") + FString::FromInt(p) + TEXT(", uv: ") + FString::FromInt(uv) + TEXT(", uv2: ") + FString::FromInt(uv2) +
+			TEXT(", n: ") + FString::FromInt(n) + TEXT(", n_tan: ") + FString::FromInt(n_tan) + TEXT(", n_bin: ") + FString::FromInt(n_bin);
+		return FinalString;
+	}
 };
 
 class EDITORTOOLS_API FVertexIndex
@@ -50,6 +58,18 @@ public:
 	int Vertices;
 	TArray<FFaceSubData> FaceSubDatas;
 	short MaterialID;
+
+	FString ToString()
+	{
+		FString FinalString;
+		FinalString += TEXT("Material ID: ") + FString::FromInt(MaterialID) + TEXT("\n");
+		for (int i = 0; i < FaceSubDatas.Num(); i++)
+		{
+			FFaceSubData& SubData = FaceSubDatas[i];
+			FinalString += TEXT("SubData_") + FString::FromInt(i) + TEXT(": ") + SubData.ToString() + TEXT("\n");
+		}
+		return FinalString;
+	}
 };
 
 class EDITORTOOLS_API FPhysiqueSubData
@@ -197,6 +217,30 @@ public:
 
 	void AddFlag(DWORD Flag) { dwFlag |= Flag; }
 
+	FString ToString()
+	{
+		FString FinalString;
+		FinalString += TEXT("Node name: ") + NodeName + TEXT("\n");
+		FinalString += TEXT("LODIndex: ") + FString::FromInt(LODProjectIndex)  + TEXT("\n");
+
+		FinalString += TEXT("Num of points: ") + FString::FromInt(PointsTable.Num())  + TEXT("\n");
+		FinalString += TEXT("Num of normals: ") + FString::FromInt(NormalsTable.Num())  + TEXT("\n");
+		FinalString += TEXT("Num of tangents tan: ") + FString::FromInt(TangentTanTable.Num())  + TEXT("\n");
+		FinalString += TEXT("Num of tangents bin: ") + FString::FromInt(TangentBinTable.Num())  + TEXT("\n");
+
+		FinalString += TEXT("Num of tex coords: ") + FString::FromInt(TexCoordTable.Num())  + TEXT("\n");
+		FinalString += TEXT("Num of extra tex coords: ") + FString::FromInt(TexCoordExtraTable.Num())  + TEXT("\n");
+
+		FinalString += TEXT("Num of point color: ") + FString::FromInt(PointColorTable.Num())  + TEXT("\n");
+
+		for (int i = 0; i < PolygonTable.Num(); i++)
+		{
+			FMeshPolygonData& PolyData = PolygonTable[i];
+			FinalString += TEXT("PolyData_") + FString::FromInt(i) + TEXT(": ") + PolyData.ToString() + TEXT("\n");
+		}
+
+		return FinalString;
+	}
 };
 
 
