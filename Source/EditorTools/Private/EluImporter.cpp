@@ -3,10 +3,9 @@
 
 #include "EluImporter.h"
 #include "EOD.h"
-#include "EluLibrary.h"
-#include "EluMeshNodeLoader.h"
 #include "RaiderzXmlUtilities.h"
 
+#include "PackageTools.h"
 #include "MeshUtilities.h"
 #include "Editor.h"
 #include "RawMesh.h"
@@ -17,6 +16,8 @@
 #include "PackageTools.h"
 #include "Misc/PackageName.h"
 #include "Misc/FileHelper.h"
+#include "Animation/Skeleton.h"
+#include "Rendering/SkeletalMeshModel.h"
 #include "Developer/DesktopPlatform/Public/IDesktopPlatform.h"
 #include "Developer/DesktopPlatform/Public/DesktopPlatformModule.h"
 #include "Runtime/Slate/Public/Framework/Application/SlateApplication.h"
@@ -26,7 +27,31 @@ UEluImporter::UEluImporter(const FObjectInitializer& ObjectInitializer) : Super(
 {
 }
 
-void UEluImporter::ImportEluFile()
+void UEluImporter::ImportEluStaticMesh()
+{
+	FString EluFile;
+	bool bSuccess = PickEluFile(EluFile);
+	if (!bSuccess)
+	{
+		return;
+	}
+
+	bool bImportSuccess = ImportEluStaticMesh_Internal(EluFile);
+}
+
+void UEluImporter::ImportEluSkeletalMesh()
+{
+	FString EluFile;
+	bool bSuccess = PickEluFile(EluFile);
+	if (!bSuccess)
+	{
+		return;
+	}
+
+	bool bImportSuccess = ImportEluSkeletalMesh_Internal(EluFile);
+}
+
+bool UEluImporter::PickEluFile(FString& OutFilePath)
 {
 	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
 	bool bSuccess = false;
@@ -47,20 +72,24 @@ void UEluImporter::ImportEluFile()
 
 	if (!bSuccess || SelectedFiles.Num() == 0)
 	{
-		PrintWarning(TEXT("User failed to select any files!"));
+		PrintWarning(TEXT("User failed to select any elu file!"));
+		return false;
 	}
 
-	const FString& EluFilePath = SelectedFiles[0];
-	bool bImportSuccessful = ImportEluFile_Internal(EluFilePath);
+	OutFilePath = SelectedFiles[0];
+	return true;
 }
 
-bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
+FEluFileData UEluImporter::LoadEluData(const FString& EluFilePath)
 {
+	FEluFileData EluData;
+
 	TArray<uint8> BinaryData;
 	bool bSuccess = FFileHelper::LoadFileToArray(BinaryData, *EluFilePath);
 	if (!bSuccess)
 	{
-		return false;
+		EluData.bLoadSuccess = false;
+		return EluData;
 	}
 
 	UINT Offset = 0;
@@ -72,7 +101,9 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 		FString LogMessage = TEXT("Failed to verify elu signatures for file: ") + FPaths::GetCleanFilename(EluFilePath); +TEXT(". File signature: ") +
 			FString::FromInt(EluHeader.Signature) + TEXT(", expected signature: ") + FString::FromInt(EXPORTER_SIG);
 		PrintError(LogMessage);
-		return false;
+
+		EluData.bLoadSuccess = false;
+		return EluData;
 	}
 
 	if (EluHeader.Version != EXPORTER_CURRENT_MESH_VER)
@@ -135,7 +166,9 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 	{
 		FString LogMessage = TEXT("elu version of file '") + FPaths::GetCleanFilename(EluFilePath) + TEXT("' is not supported");
 		PrintError(LogMessage);
-		return false;
+
+		EluData.bLoadSuccess = false;
+		return EluData;
 	}
 
 	TArray<TSharedPtr<FEluMeshNode>> EluMeshNodes;
@@ -149,6 +182,23 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 			EluMeshNodes.Add(EluMeshNode);
 		}
 	}
+
+	EluData.bLoadSuccess = true;
+	EluData.EluHeader = EluHeader;
+	EluData.EluMeshNodes = EluMeshNodes;
+
+	return EluData;
+}
+
+bool UEluImporter::ImportEluStaticMesh_Internal(const FString& EluFilePath)
+{
+	FEluFileData EluData = LoadEluData(EluFilePath);
+	if (!EluData.bLoadSuccess)
+	{
+		return false;
+	}
+
+	const TArray<TSharedPtr<FEluMeshNode>>& EluMeshNodes = EluData.EluMeshNodes;
 
 	/*
 	int32 NodeNum = EluMeshNodes.Num();
@@ -208,17 +258,17 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 			}
 
 			int32 PolyNum = MeshNode->PolygonTable.Num();
-			for (int i = PolyNum - 1; i >= 0; i--)
+			for (int j = PolyNum - 1; j >= 0; j--)
 			{
-				const FMeshPolygonData& PolyData = MeshNode->PolygonTable[i];
+				const FMeshPolygonData& PolyData = MeshNode->PolygonTable[j];
 
 				RawMesh.FaceMaterialIndices.Add(PolyData.MaterialID);
 				RawMesh.FaceSmoothingMasks.Add(1);
 
 				int32 SubNum = PolyData.FaceSubDatas.Num();
-				for (int j = SubNum - 1; j >= 0; j--)
+				for (int k = SubNum - 1; k >= 0; k--)
 				{
-					const FFaceSubData& FaceData = PolyData.FaceSubDatas[j];
+					const FFaceSubData& FaceData = PolyData.FaceSubDatas[k];
 
 					RawMesh.WedgeIndices.Add(PointsOffset + FaceData.p);
 
@@ -282,7 +332,6 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 		FAssetRegistryModule::AssetCreated(StaticMesh);
 	}
 
-
 	/*
 	IMeshUtilities& MeshUtilities = FModuleManager::Get().LoadModuleChecked<IMeshUtilities>("MeshUtilities");
 	TArray<FVector2D> OutUniqueUVs;
@@ -300,7 +349,7 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 	*/
 
 	//~ @todo check UnFbx::FFbxImporter::BuildStaticMeshFromGeometry
-	
+
 	// Unselect all actors.
 	// GEditor->SelectNone(false, false);
 	// GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPreImport(this, Class, InParent, Name, Type);
@@ -309,6 +358,97 @@ bool UEluImporter::ImportEluFile_Internal(const FString& EluFilePath)
 	// ImportAllSkeletalMesh(RootNodeToImport, FbxImporter, Flags, NodeIndex, InterestingNodeCount, SceneInfoPtr);
 	// ImportAllStaticMesh(RootNodeToImport, FbxImporter, Flags, NodeIndex, InterestingNodeCount, SceneInfoPtr);
 
-	
+
+	return true;
+}
+
+bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
+{
+	FEluFileData EluData = LoadEluData(EluFilePath);
+	if (!EluData.bLoadSuccess)
+	{
+		return false;
+	}
+
+	const TArray<TSharedPtr<FEluMeshNode>>& EluMeshNodes = EluData.EluMeshNodes;
+	FString SkelPackName = FString("/Game/RaiderZ/Zunk/Skel");
+	SkelPackName = PackageTools::SanitizePackageName(SkelPackName);
+	UPackage* SkelPack = CreatePackage(nullptr, *SkelPackName);
+	SkelPack->FullyLoad();
+
+	USkeleton* Skel = NewObject<USkeleton>(SkelPack, *FString("Skel"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
+	const FReferenceSkeleton& RefSkel = Skel->GetReferenceSkeleton();
+	// horrible hack to modify the skeleton in place
+	FReferenceSkeletonModifier SkelMod((FReferenceSkeleton&)RefSkel, Skel);
+
+	SkelMod.Add(FMeshBoneInfo(TEXT("root_bone"), TEXT("root_bone"), INDEX_NONE), FTransform());
+
+	for (int i = 0; i < EluMeshNodes.Num(); i++)
+	{
+		TSharedPtr<FEluMeshNode> MeshNode = EluMeshNodes[i];
+		FTransform Transform(MeshNode->LocalMatrix);
+		FString SanitizedNodeName = UPackageTools::SanitizePackageName(MeshNode->NodeName);
+		SkelMod.Add(FMeshBoneInfo(FName(*SanitizedNodeName), SanitizedNodeName, MeshNode->ParentNodeID + 1), Transform);
+	}
+
+
+	Skel->MarkPackageDirty();
+	FAssetRegistryModule::AssetCreated(Skel);
+
+
+
+	FString PackageName = FString("/Game/RaiderZ/Zunk/SkelMesh");
+	bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
+
+	// If package doesn't exist, it's safe to create new package
+	PackageName = PackageTools::SanitizePackageName(PackageName);
+	UPackage* Package = CreatePackage(nullptr, *PackageName);
+	Package->FullyLoad();
+
+	USkeletalMesh* SkeletalMesh = NewObject<USkeletalMesh>(Package, USkeletalMesh::StaticClass(), *FString("WAKA"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
+	check(SkeletalMesh);
+
+	FSkeletalMeshModel* ImportedModel = SkeletalMesh->GetImportedModel();
+	SkeletalMesh->PreEditChange(nullptr);
+
+	ImportedModel->LODModels.Add(new FSkeletalMeshLODModel());
+	SkeletalMesh->AddLODInfo();
+
+	FSkeletalMeshLODModel& LODModel = ImportedModel->LODModels[0];
+
+	SkeletalMesh->GetLODInfo(0)->LODHysteresis = 0.02;
+
+	FSkeletalMeshOptimizationSettings Settings;
+	SkeletalMesh->GetLODInfo(0)->ReductionSettings = Settings;
+
+
+	LODModel.NumTexCoords = 1;
+
+	TArray<FSoftSkinVertex> SoftVertices;
+	TArray<FVector> Points;
+	TArray<SkeletalMeshImportData::FMeshWedge> Wedges;
+	TArray<SkeletalMeshImportData::FMeshFace> Faces;
+	TArray<SkeletalMeshImportData::FVertInfluence> Influences;
+
+	TArray<int32> PointsMap;
+	TArray<FVector> TangentX;
+	TArray<FVector> TangentY;
+	TArray<FVector> TangentZ;
+	TArray<uint16> MatIndices;
+	TArray<uint32> SmoothingGroups;
+
+
+
+
+	// FSoftSkinVertex SkinVertex;
+
+
+
+
+	// if (!(Skel->GetReferenceSkeleton().FindBoneIndex(FName("RootBone")) > -1))
+	{
+		// SkelMod.Add(FMeshBoneInfo(TEXT("RootBone"), TEXT("RootBone"), INDEX_NONE), FTransform());
+	}
+
 	return true;
 }
