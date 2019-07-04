@@ -26,7 +26,9 @@ public class EditorTools : ModuleRules
             "EOD",
             "RawMesh",
             "DesktopPlatform",
-            "XmlParser" });
+            "XmlParser",
+            "RenderCore"
+        });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd" });
 
