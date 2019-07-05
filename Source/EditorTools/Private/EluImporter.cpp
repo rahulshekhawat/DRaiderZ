@@ -5,6 +5,7 @@
 #include "EOD.h"
 #include "RaiderzXmlUtilities.h"
 
+#include "ReferenceSkeleton.h"
 #include "RenderCommandFence.h"
 #include "PackageTools.h"
 #include "MeshUtilities.h"
@@ -244,8 +245,8 @@ bool UEluImporter::ImportEluStaticMesh_Internal(const FString& EluFilePath)
 				continue;
 			}
 
-			// FString LogMessage = TEXT("Processing node: ") + MeshNode->NodeName;
-			// PrintWarning(LogMessage);
+			FString LogMessage = TEXT("Processing node: ") + MeshNode->NodeName;
+			PrintWarning(LogMessage);
 			// LogMessage = TEXT("Local matrix: \n") + MeshNode->LocalMatrix.ToString();
 			// PrintWarning(LogMessage);
 
@@ -396,7 +397,20 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 	Skel->MarkPackageDirty();
 	FAssetRegistryModule::AssetCreated(Skel);
 
+	
+	
+	/*
+	for (int i = 0; i < EluMeshNodes.Num(); i++)
+	{
+		TSharedPtr<FEluMeshNode> MeshNode = EluMeshNodes[i];
+		FString BoneName = PackageTools::SanitizePackageName(MeshNode->NodeName);
+		int32 BoneIndex = Skel->GetReferenceSkeleton().FindBoneIndex(FName(*BoneName));
+		int32 RawBoneIndex = Skel->GetReferenceSkeleton().FindRawBoneIndex(FName(*BoneName));
 
+		FString LogMessage = TEXT("Node name: ") + BoneName + TEXT(", Bone index: ") + FString::FromInt(BoneIndex) + TEXT(", Raw bone index: ") + FString::FromInt(RawBoneIndex);
+		PrintWarning(LogMessage);
+	}
+	*/
 
 	FString PackageName = FString("/Game/RaiderZ/Zunk/SkelMesh");
 	bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
@@ -414,6 +428,8 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 
 	SkeletalMesh->Skeleton = Skel;
 	SkeletalMesh->RefSkeleton = Skel->GetReferenceSkeleton();
+	// SkeletalMesh->RefSkeleton.RebuildNameToIndexMap();
+	SkeletalMesh->RefSkeleton.RebuildRefSkeleton(SkeletalMesh->Skeleton, true);
 
 	SkeletalMesh->RefBasesInvMatrix.Empty();
 	SkeletalMesh->CalculateInvRefMatrices();
@@ -454,6 +470,169 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 
 	// FSoftSkinVertex SkinVertex;
 
+	TSharedPtr<FEluMeshNode> ArekNode;
+	for (TSharedPtr<FEluMeshNode> Node : EluMeshNodes)
+	{
+		if (Node->NodeName == TEXT("arek"))
+		{
+			ArekNode = Node;
+			break;
+		}
+	}
+
+	check(ArekNode.IsValid());
+
+	for (const FVector& Point : ArekNode->PointsTable)
+	{
+		const FVector& TransformedPoint = ArekNode->LocalMatrix.TransformPosition(Point);
+		int32 VertIndex = Points.Add(TransformedPoint);
+		PointsMap.Add(VertIndex);
+	}
+
+	int32 PointsOffset = 0;
+	int32 PolyNum = ArekNode->PolygonTable.Num();
+	for (int j = PolyNum - 1; j >= 0; j--)
+	{
+		const FMeshPolygonData& PolyData = ArekNode->PolygonTable[j];
+		int32 SubNum = PolyData.FaceSubDatas.Num();
+		check(SubNum == 3);
+
+		SkeletalMeshImportData::FMeshFace MeshFace;
+		MeshFace.MeshMaterialIndex = PolyData.MaterialID;
+		MeshFace.SmoothingGroups = 1;
+
+		for (int k = SubNum - 1; k >= 0; k--)
+		{
+			const FFaceSubData& FaceData = PolyData.FaceSubDatas[k];
+
+			SkeletalMeshImportData::FMeshWedge MeshWedge;
+			MeshWedge.iVertex = PointsOffset + FaceData.p;
+			MeshWedge.Color = FColor(0, 0, 0);
+
+			// RawMesh.WedgeColors.Add(FColor(0, 0, 0));
+
+			if (ArekNode->TexCoordTable.Num() > FaceData.uv)
+			{
+				FVector TexCoord = ArekNode->TexCoordTable[FaceData.uv];
+				MeshWedge.UVs[0] = FVector2D(TexCoord.X, TexCoord.Y);
+				MeshWedge.UVs[1] = FVector2D(0, 0);
+				// RawMesh.WedgeTexCoords[0].Add(FVector2D(TexCoord.X, TexCoord.Y));
+				// RawMesh.WedgeTexCoords[1].Add(FVector2D(0, 0));
+			}
+			else
+			{
+				MeshWedge.UVs[0] = FVector2D(0, 0);
+				MeshWedge.UVs[1] = FVector2D(0, 0);
+				// RawMesh.WedgeTexCoords[0].Add(FVector2D(0, 0));
+				// RawMesh.WedgeTexCoords[1].Add(FVector2D(0, 0));
+			}
+
+			int32 WedgeIndex = Wedges.Add(MeshWedge);
+
+			FString LogMessage = TEXT("Wedge Index: ") + FString::FromInt(WedgeIndex);
+			LogMessage += TEXT(", Wedges.Num(): ") + FString::FromInt(Wedges.Num());
+			PrintWarning(LogMessage);
+
+
+			MeshFace.iWedge[2 - k] = (uint32)WedgeIndex;
+			// RawMesh.WedgeIndices.Add(PointsOffset + FaceData.p);
+
+			if (ArekNode->TangentTanTable.Num() > FaceData.n_tan)
+			{
+				const FVector& Tangent_X = ArekNode->TangentTanTable[FaceData.n_tan];
+				MeshFace.TangentX[2 - k] = Tangent_X;
+				// RawMesh.WedgeTangentX.Add(Tangent_X);
+			}
+			else
+			{
+				MeshFace.TangentX[2 - k] = FVector::ZeroVector;
+				// RawMesh.WedgeTangentX.Add(FVector::ZeroVector);
+			}
+
+
+			if (ArekNode->TangentBinTable.Num() > FaceData.n_bin)
+			{
+				const FVector& Tangent_Y = ArekNode->TangentBinTable[FaceData.n_bin];
+				MeshFace.TangentY[2 - k] = Tangent_Y;
+				// RawMesh.WedgeTangentY.Add(Tangent_Y);
+			}
+			else
+			{
+				MeshFace.TangentY[2 - k] = FVector::ZeroVector;
+				// RawMesh.WedgeTangentY.Add(FVector::ZeroVector);
+			}
+
+			if (ArekNode->NormalsTable.Num() > FaceData.n)
+			{
+				const FVector& Normal = ArekNode->NormalsTable[FaceData.n];
+				MeshFace.TangentZ[2 - k] = Normal;
+				// RawMesh.WedgeTangentZ.Add(Normal);
+			}
+			else
+			{
+				MeshFace.TangentZ[2 - k] = FVector::ZeroVector;
+				// RawMesh.WedgeTangentZ.Add(FVector::ZeroVector);
+			}
+		}
+		Faces.Add(MeshFace);
+
+	}
+
+	int32 PhysiqueTableNum = ArekNode->PhysiqueTable.Num();
+	for (int i = 0; i < PhysiqueTableNum; i++)
+	{
+		int32 VertexIndex = (PhysiqueTableNum - 1) - i;
+
+		const FPhysiqueInfo& PhysiqueInfo = ArekNode->PhysiqueTable[i];
+		for (const FPhysiqueSubData& PhysiqueSubData : PhysiqueInfo.PhysiqueSubDatas)
+		{
+			FString BoneName = EluMeshNodes[ArekNode->BoneTableIndex[PhysiqueSubData.cid]]->NodeName;
+			FString SanitizedBoneName = PackageTools::SanitizePackageName(BoneName);
+
+			// int32 BoneIndex = Skel->GetReferenceSkeleton().FindBoneIndex(FName(*SanitizedBoneName));
+			int32 BoneIndex = Skel->GetReferenceSkeleton().FindRawBoneIndex(FName(*SanitizedBoneName));
+			if (BoneIndex < 0)
+			{
+				FString LogMessage = TEXT("Couldn't find bone index for bone name: ") + SanitizedBoneName;
+				PrintError(LogMessage);
+			}
+
+			SkeletalMeshImportData::FVertInfluence VertInfluence;
+			VertInfluence.VertIndex = PointsOffset + VertexIndex;
+			VertInfluence.Weight = PhysiqueSubData.weight;
+			VertInfluence.BoneIndex = BoneIndex;
+
+			// Influences.AddUnique(VertInfluence);
+			Influences.Add(VertInfluence);
+		}
+	}
+
+	PrintWarning("Finished bone processing");
+
+
+	// now create a map from vert indices to faces
+	for (int32 FaceIndex = 0; FaceIndex < Faces.Num(); FaceIndex++)
+	{
+		const SkeletalMeshImportData::FMeshFace& Face = Faces[FaceIndex];
+		for (int32 VertexIndex = 0; VertexIndex < 3; VertexIndex++)
+		{
+			int32 WedgeIndex = Face.iWedge[VertexIndex];
+			FString Message = TEXT("Wedge Index: ") + FString::FromInt(WedgeIndex);
+			PrintWarning(Message);
+
+			if (WedgeIndex >= Wedges.Num())
+			{
+				PrintError("YO WEDGE INDEX IS MORE THAN WEDGET NUM");
+			}
+
+			// Wedges[Face.iWedge[VertexIndex]].iVertex;
+			// Vert2Faces.AddUnique(Wedges[Face.iWedge[VertexIndex]].iVertex, FaceIndex);
+		}
+	}
+
+	PrintWarning("That was successful");
+
+	/*
 	int32 PointsOffset = 0;
 	int32 NodeNum = EluMeshNodes.Num();
 	for (int i = 0; i < NodeNum; i++)
@@ -495,18 +674,18 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 			{
 				const FFaceSubData& FaceData = PolyData.FaceSubDatas[k];
 
-				MeshFace.iWedge[k - 2] = PointsOffset + FaceData.p;
+				MeshFace.iWedge[2 - k] = PointsOffset + FaceData.p;
 				// RawMesh.WedgeIndices.Add(PointsOffset + FaceData.p);
 
 				if (MeshNode->TangentTanTable.Num() > FaceData.n_tan)
 				{
 					const FVector& Tangent_X = MeshNode->TangentTanTable[FaceData.n_tan];
-					MeshFace.TangentX[k - 2] = Tangent_X;
+					MeshFace.TangentX[2 - k] = Tangent_X;
 					// RawMesh.WedgeTangentX.Add(Tangent_X);
 				}
 				else
 				{
-					MeshFace.TangentX[k - 2] = FVector::ZeroVector;
+					MeshFace.TangentX[2 - k] = FVector::ZeroVector;
 					// RawMesh.WedgeTangentX.Add(FVector::ZeroVector);
 				}
 
@@ -514,24 +693,24 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 				if (MeshNode->TangentBinTable.Num() > FaceData.n_bin)
 				{
 					const FVector& Tangent_Y = MeshNode->TangentBinTable[FaceData.n_bin];
-					MeshFace.TangentY[k - 2] = Tangent_Y;
+					MeshFace.TangentY[2 - k] = Tangent_Y;
 					// RawMesh.WedgeTangentY.Add(Tangent_Y);
 				}
 				else
 				{
-					MeshFace.TangentY[k - 2] = FVector::ZeroVector;
+					MeshFace.TangentY[2 - k] = FVector::ZeroVector;
 					// RawMesh.WedgeTangentY.Add(FVector::ZeroVector);
 				}
 
 				if (MeshNode->NormalsTable.Num() > FaceData.n)
 				{
 					const FVector& Normal = MeshNode->NormalsTable[FaceData.n];
-					MeshFace.TangentZ[k - 2] = Normal;
+					MeshFace.TangentZ[2 - k] = Normal;
 					// RawMesh.WedgeTangentZ.Add(Normal);
 				}
 				else
 				{
-					MeshFace.TangentZ[k - 2] = FVector::ZeroVector;
+					MeshFace.TangentZ[2 - k] = FVector::ZeroVector;
 					// RawMesh.WedgeTangentZ.Add(FVector::ZeroVector);
 				}
 
@@ -613,16 +792,19 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 			// Influences.AddUnique(VertInfluence);
 			Influences.Add(VertInfluence);
 		}
-		*/
+		/////////////
 		//~ End bone
 	}
+	*/
 
 	IMeshUtilities::MeshBuildOptions BuildSettings;
 	BuildSettings.bUseMikkTSpace = false;
 	BuildSettings.bComputeNormals = false;
 	BuildSettings.bComputeTangents = false;
 	BuildSettings.bRemoveDegenerateTriangles = true;
+	
 
+	
 	IMeshUtilities& MeshUtilities = FModuleManager::Get().LoadModuleChecked<IMeshUtilities>("MeshUtilities");
 	bool success = MeshUtilities.BuildSkeletalMesh(LODModel, SkeletalMesh->RefSkeleton, Influences, Wedges, Faces, Points, PointsMap, BuildSettings);
 
@@ -646,6 +828,7 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 
 	SkeletalMesh->PostEditChange();
 	SkeletalMesh->MarkPackageDirty();
+	
 
 	return true;
 }
