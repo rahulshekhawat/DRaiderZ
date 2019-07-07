@@ -383,7 +383,7 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 	// horrible hack to modify the skeleton in place
 	FReferenceSkeletonModifier SkelMod((FReferenceSkeleton&)RefSkel, Skel);
 
-	SkelMod.Add(FMeshBoneInfo(TEXT("root_bone"), TEXT("root_bone"), INDEX_NONE), FTransform());
+	SkelMod.Add(FMeshBoneInfo(TEXT("armature_obj"), TEXT("armature_obj"), INDEX_NONE), FTransform());
 
 	for (int i = 0; i < EluMeshNodes.Num(); i++)
 	{
@@ -562,34 +562,28 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 
 		//~ Begin bone
 		int32 PhysiqueTableNum = MeshNode->PhysiqueTable.Num();
-		for (int i = 0; i < PhysiqueTableNum; i++)
+		for (int j = 0; j < PhysiqueTableNum; j++)
 		{
-			//~ @note CHECK
-			int32 VertexIndex = PointsOffset + i;
-			// int32 VertexIndex = (PhysiqueTableNum - 1) - i;
-			
-
-			const FPhysiqueInfo& PhysiqueInfo = MeshNode->PhysiqueTable[i];
+			const FPhysiqueInfo& PhysiqueInfo = MeshNode->PhysiqueTable[j];
 			for (const FPhysiqueSubData& PhysiqueSubData : PhysiqueInfo.PhysiqueSubDatas)
 			{
 				FString BoneName = EluMeshNodes[MeshNode->BoneTableIndex[PhysiqueSubData.cid]]->NodeName;
 				FString SanitizedBoneName = PackageTools::SanitizePackageName(BoneName);
 
-				// int32 BoneIndex = Skel->GetReferenceSkeleton().FindBoneIndex(FName(*SanitizedBoneName));
-				// int32 BoneIndex = Skel->GetReferenceSkeleton().FindRawBoneIndex(FName(*SanitizedBoneName));
 				int32 BoneIndex = SkeletalMesh->RefSkeleton.FindBoneIndex(FName(*SanitizedBoneName));
 				if (BoneIndex < 0)
 				{
-					FString LogMessage = TEXT("Couldn't find bone index for bone name: ") + SanitizedBoneName;
+					LogMessage = TEXT("Couldn't find bone index for bone name: ") + SanitizedBoneName;
 					PrintError(LogMessage);
 				}
 
 				SkeletalMeshImportData::FVertInfluence VertInfluence;
-				VertInfluence.VertIndex = PointsOffset + VertexIndex;
+				VertInfluence.VertIndex = PointsOffset + j;
 				VertInfluence.Weight = PhysiqueSubData.weight;
 				VertInfluence.BoneIndex = BoneIndex;
 
 				Influences.Add(VertInfluence);
+				break;
 			}
 		}
 		//~ End bone
