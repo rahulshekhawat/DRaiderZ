@@ -178,11 +178,8 @@ FEluFileData UEluImporter::LoadEluData(const FString& EluFilePath)
 	{
 		TSharedPtr<FEluMeshNode> EluMeshNode(new FEluMeshNode());
 		bool bLoadSuccessful = EluMeshNodeLoader->Load(EluMeshNode, BinaryData, Offset);
-
-		if (bLoadSuccessful)
-		{
-			EluMeshNodes.Add(EluMeshNode);
-		}
+		check(bLoadSuccessful);
+		EluMeshNodes.Add(EluMeshNode);
 	}
 
 	EluData.bLoadSuccess = true;
@@ -556,11 +553,46 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 				{
 					MeshFace.TangentZ[2 - k] = FVector::ZeroVector;
 				}
+
+
+				//~ Begin bone
+				int32 PhysiqueTableNum = MeshNode->PhysiqueTable.Num();
+				if (PhysiqueTableNum > FaceData.p)
+				{
+					const FPhysiqueInfo& PhysiqueInfo = MeshNode->PhysiqueTable[FaceData.p];
+					for (const FPhysiqueSubData& PhysiqueSubData : PhysiqueInfo.PhysiqueSubDatas)
+					{
+						FString BoneName = EluMeshNodes[MeshNode->BoneTableIndex[PhysiqueSubData.cid]]->NodeName;
+						FString SanitizedBoneName = PackageTools::SanitizePackageName(BoneName);
+
+						int32 BoneIndex = SkeletalMesh->RefSkeleton.FindBoneIndex(FName(*SanitizedBoneName));
+						if (BoneIndex < 0)
+						{
+							LogMessage = TEXT("Couldn't find bone index for bone name: ") + SanitizedBoneName;
+							PrintError(LogMessage);
+						}
+
+						SkeletalMeshImportData::FVertInfluence VertInfluence;
+						VertInfluence.VertIndex = WedgeIndex;
+						VertInfluence.Weight = PhysiqueSubData.weight;
+						VertInfluence.BoneIndex = BoneIndex;
+
+						Influences.Add(VertInfluence);
+						break;
+					}
+				}
+				else
+				{
+					FString Message = TEXT("Invalid facedata.p || PhysiqueTableNum: ") + FString::FromInt(PhysiqueTableNum) + TEXT(", Facedata.p: ") + FString::FromInt(FaceData.p);
+					PrintError(Message);
+				}
+				//~ End bone
 			}
 			Faces.Add(MeshFace);
 		}
 
 		//~ Begin bone
+		/*
 		int32 PhysiqueTableNum = MeshNode->PhysiqueTable.Num();
 		for (int j = 0; j < PhysiqueTableNum; j++)
 		{
@@ -586,6 +618,7 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 				break;
 			}
 		}
+		*/
 		//~ End bone
 	}
 
