@@ -7,6 +7,7 @@
 UCharAnimInstance::UCharAnimInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	IdleWalkRun_AnimationsBlendTime = 0.2f;
+	Default_AnimationBlendTime = 0.2f;
 }
 
 void UCharAnimInstance::NativeInitializeAnimation()

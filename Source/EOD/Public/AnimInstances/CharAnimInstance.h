@@ -40,6 +40,9 @@ public:
 	/** Blend time for transition between IdleWalkRun animations (of all state machines) */
 	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Animation Update")
 	float IdleWalkRun_AnimationsBlendTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Animation Update")
+	float Default_AnimationBlendTime;
 	
 	UPROPERTY(Transient, BlueprintReadonly, Category = "Animation Update")
 	float BlockMovementDirectionYaw;
@@ -55,6 +58,10 @@ public:
 
 	UPROPERTY(Transient, BlueprintReadonly, Category = "Animation Update")
 	bool bPCTryingToMove;
+
+	/** True if this character is engaged in combat */
+	UPROPERTY(Transient, BlueprintReadonly, Category = "Animation Update")
+	bool bCombatMode;
 
 	UPROPERTY(Transient, BlueprintReadonly, Category = "Animation Update")
 	ECharMovementDirection CharacterMovementDirection;
@@ -127,6 +134,8 @@ public:
 	// --------------------------------------
 
 	FORCEINLINE void OnTransitionableMontageTriggered(bool bIsCurrentMontageMovable) { bMovableMontagePlaying = bIsCurrentMontageMovable; }
+
+	FORCEINLINE void OnCombatModeChange(bool bInCombat) { bCombatMode = bInCombat; }
 
 protected:
 

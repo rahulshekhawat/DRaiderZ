@@ -71,6 +71,21 @@ public:
 	//  Crowd Control Effects
 	// --------------------------------------
 
+	/** Returns true if character can flinch */
+	virtual bool CanFlinch() const override;
+
+	/** Returns true if character can stun */
+	virtual bool CanStun() const override;
+
+	/** Returns true if character can get knocked down */
+	virtual bool CanKnockdown() const override;
+
+	/** Returns true if character can get knocked back */
+	virtual bool CanKnockback() const override;
+
+	/** Returns true if character can be interrupted */
+	virtual bool CanInterrupt() const override;
+
 	/** Flinch this character (visual feedback) */
 	virtual bool CCEFlinch(const float BCAngle) override;
 
@@ -150,13 +165,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* DieMontage;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
 	USoundBase* HitSound;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
 	USoundBase* CritHitSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
 	USoundBase* HitMissSound;
 
 	// --------------------------------------

@@ -104,6 +104,31 @@ void AAICharacterBase::Destroyed()
 	Super::Destroyed();
 }
 
+bool AAICharacterBase::CanFlinch() const
+{
+	return Super::CanFlinch() && FlinchMontage;
+}
+
+bool AAICharacterBase::CanStun() const
+{
+	return Super::CanStun() && StunMontage;
+}
+
+bool AAICharacterBase::CanKnockdown() const
+{
+	return Super::CanKnockdown() && KnockdownMontage;
+}
+
+bool AAICharacterBase::CanKnockback() const
+{
+	return Super::CanKnockback() && KnockdownMontage;
+}
+
+bool AAICharacterBase::CanInterrupt() const
+{
+	return Super::CanInterrupt() && InterruptMontage;
+}
+
 bool AAICharacterBase::CCEFlinch(const float BCAngle)
 {
 	if (CanFlinch())
