@@ -9,6 +9,8 @@
 #include "UObject/NoExportTypes.h"
 #include "EluImporter.generated.h"
 
+class USkeletalMesh;
+
 struct EDITORTOOLS_API FEluFileData
 {
 public:
@@ -43,6 +45,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Elu Importer")
 	static void ImportEluSkeletalMesh();
+
+	UFUNCTION(BlueprintCallable, Category = "Elu Importer")
+	static void ImportEluAnimation(USkeletalMesh* Mesh);
 
 	static const int TICKSPERFRAME = 160;
 

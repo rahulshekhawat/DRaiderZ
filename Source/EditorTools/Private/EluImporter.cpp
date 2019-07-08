@@ -5,6 +5,7 @@
 #include "EOD.h"
 #include "RaiderzXmlUtilities.h"
 
+#include "Animation/AnimSequence.h"
 #include "ReferenceSkeleton.h"
 #include "RenderCommandFence.h"
 #include "PackageTools.h"
@@ -51,6 +52,76 @@ void UEluImporter::ImportEluSkeletalMesh()
 	}
 
 	bool bImportSuccess = ImportEluSkeletalMesh_Internal(EluFile);
+}
+
+void UEluImporter::ImportEluAnimation(USkeletalMesh* Mesh)
+{
+	if (!Mesh)
+	{
+		return;
+	}
+
+
+	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+	bool bSuccess = false;
+	TArray<FString> SelectedFiles;
+	if (DesktopPlatform)
+	{
+		const void* ParentWindowWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
+		bSuccess = DesktopPlatform->OpenFileDialog(
+			ParentWindowWindowHandle,
+			TEXT("Select RaiderZ file to import"),
+			URaiderzXmlUtilities::DataFolderPath,
+			TEXT(""),
+			TEXT("RaiderZ animation files|*.ani"),
+			EFileDialogFlags::None,
+			SelectedFiles
+		);
+	}
+
+	if (!bSuccess || SelectedFiles.Num() == 0)
+	{
+		PrintWarning(TEXT("User failed to select any .ani file!"));
+		return;
+	}
+
+	FString AniFilePath = SelectedFiles[0];
+
+	FAniFileData AniData = LoadAniData(AniFilePath);
+	if (!AniData.bLoadSuccess)
+	{
+		return;
+	}
+
+	FString PackageName = FString("/Game/RaiderZ/Zunk/TeshAni");
+	bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
+	if (bPackageExists)
+	{
+		return;
+	}
+
+	// If package doesn't exist, it's safe to create new package
+	PackageName = PackageTools::SanitizePackageName(PackageName);
+	UPackage* Package = CreatePackage(nullptr, *PackageName);
+	Package->FullyLoad();
+
+
+	UAnimSequence* AnimSeq = NewObject<UAnimSequence>(Package, UAnimSequence::StaticClass(), *FString("TestAni"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
+	AnimSeq->SetSkeleton(Mesh->Skeleton);
+
+	// AnimSeq->GetFrameRate()
+
+	// FRawAnimSequenceTrack t;
+
+	// AnimSeq->AddNewRawTrack()
+
+	// AnimSeq->GetRawTrackToSkeletonMapTable()
+
+	// AnimSeq->AddNewRawTrack
+
+
+	
+
 }
 
 bool UEluImporter::PickEluFile(FString& OutFilePath)
