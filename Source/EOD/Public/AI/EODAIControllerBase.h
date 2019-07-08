@@ -49,6 +49,8 @@ protected:
 	UPROPERTY(Category = Stats, VisibleAnywhere, BlueprintReadOnly)
 	UAIStatsComponent* StatsComponent;
 
+	virtual void OnPossess(APawn* InPawn) override;
+
 	// --------------------------------------
 	//  Blackboard and Behaviour Tree
 	// --------------------------------------

@@ -59,6 +59,17 @@ void AEODAIControllerBase::SetPawn(APawn* InPawn)
 	}
 }
 
+void AEODAIControllerBase::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	UBlackboardComponent* BlackboardComponent = GetBlackboardComponent();
+	if (IsValid(BlackboardComponent) && IsValid(InPawn))
+	{
+		BlackboardComponent->SetValueAsVector(UAILibrary::BBKey_SpawnLocation, InPawn->GetActorLocation());
+	}
+}
+
 void AEODAIControllerBase::InitializeBlackboardValues(UBlackboardComponent* BlackboardComponent)
 {
 	if (IsValid(BlackboardComponent))
