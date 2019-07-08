@@ -5,12 +5,12 @@
 #include "EluLibrary.h"
 #include "RaiderzXmlUtilities.h"
 
-void UAnimationFileLoadImpl_v6::LoadVertexAniBoundingBox(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset)
+void FAnimationFileLoadImpl_v6::LoadVertexAniBoundingBox(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset)
 {
 	//~ pass
 }
 
-bool UAnimationFileLoadImpl_v6::LoadVertexAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
+bool FAnimationFileLoadImpl_v6::LoadVertexAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
 {
 	if (!URaiderzXmlUtilities::ReadStringFromBinaryData(Node->NodeName, BinaryData, Offset))
 	{
@@ -54,7 +54,7 @@ bool UAnimationFileLoadImpl_v6::LoadVertexAni(TSharedPtr<FAniNode> Node, TArray<
 	return true;
 }
 
-bool UAnimationFileLoadImpl_v6::LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
+bool FAnimationFileLoadImpl_v6::LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
 {
 	if (!URaiderzXmlUtilities::ReadStringFromBinaryData(Node->NodeName, BinaryData, Offset))
 	{
@@ -140,7 +140,7 @@ bool UAnimationFileLoadImpl_v6::LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<ui
 	return true;
 }
 
-bool UAnimationFileLoadImpl_v6::LoadVisibilityKey(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
+bool FAnimationFileLoadImpl_v6::LoadVisibilityKey(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
 {
 	if (Version >= EXPORTER_ANI_VER5)
 	{
@@ -208,7 +208,7 @@ bool UAnimationFileLoadImpl_v6::LoadVisibilityKey(TSharedPtr<FAniNode> Node, TAr
 	return true;
 }
 
-bool UAnimationFileLoadImpl_v9::LoadVisibilityKey(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
+bool FAnimationFileLoadImpl_v9::LoadVisibilityKey(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
 {
 	int vis_key_num = 0;
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&vis_key_num, sizeof(vis_key_num), BinaryData, Offset))
@@ -237,7 +237,7 @@ bool UAnimationFileLoadImpl_v9::LoadVisibilityKey(TSharedPtr<FAniNode> Node, TAr
 	return true;
 }
 
-bool UAnimationFileLoadImpl_v11::LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
+bool FAnimationFileLoadImpl_v11::LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
 {
 	if (!URaiderzXmlUtilities::ReadStringFromBinaryData(Node->NodeName, BinaryData, Offset))
 	{
@@ -317,7 +317,7 @@ bool UAnimationFileLoadImpl_v11::LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<u
 	return true;
 }
 
-bool UAnimationFileLoadImpl_v11::LoadVisibilityKey(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
+bool FAnimationFileLoadImpl_v11::LoadVisibilityKey(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
 {
 	FAnimType AnimType;
 	if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&AnimType, sizeof(AnimType), BinaryData, Offset))
@@ -346,7 +346,7 @@ bool UAnimationFileLoadImpl_v11::LoadVisibilityKey(TSharedPtr<FAniNode> Node, TA
 	return true;
 }
 
-bool UAnimationFileLoadImpl_v12::LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
+bool FAnimationFileLoadImpl_v12::LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)
 {
 	if (!URaiderzXmlUtilities::ReadStringFromBinaryData(Node->NodeName, BinaryData, Offset))
 	{

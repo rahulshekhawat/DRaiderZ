@@ -4,6 +4,24 @@
 
 #include "CoreMinimal.h"
 
+enum class EAnimationType
+{
+	AniType_TransForm = 0,
+	AniType_Vertex,
+	AniType_Bone,
+	AniType_Tm,
+};
+
+class EDITORTOOLS_API FAniHeader
+{
+public:
+	DWORD	sig;
+	DWORD	ver;
+	int		maxframe;
+	int		model_num;
+	int		ani_type;
+};
+
 class EDITORTOOLS_API FAnimType
 {
 public:
@@ -125,7 +143,7 @@ public:
 	TArray<FVisKey> VisibilityKeyTrack;
 };
 
-class EDITORTOOLS_API UAnimationFileLoadImpl
+class EDITORTOOLS_API FAnimationFileLoadImpl
 {
 public:
 	virtual bool LoadVertexAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version) = 0;
@@ -134,7 +152,7 @@ public:
 };
 
 
-class EDITORTOOLS_API UAnimationFileLoadImpl_v6: public UAnimationFileLoadImpl
+class EDITORTOOLS_API FAnimationFileLoadImpl_v6: public FAnimationFileLoadImpl
 {
 private:
 	virtual void LoadVertexAniBoundingBox(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset);
@@ -146,21 +164,21 @@ public:
 
 };
 
-class EDITORTOOLS_API UAnimationFileLoadImpl_v7 : public UAnimationFileLoadImpl_v6
+class EDITORTOOLS_API FAnimationFileLoadImpl_v7 : public FAnimationFileLoadImpl_v6
 {
 public:
 	//~ pass
 };
 
 
-class EDITORTOOLS_API UAnimationFileLoadImpl_v9 : public UAnimationFileLoadImpl_v7
+class EDITORTOOLS_API FAnimationFileLoadImpl_v9 : public FAnimationFileLoadImpl_v7
 {
 public:
 	virtual bool LoadVisibilityKey(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)override;
 
 };
 
-class EDITORTOOLS_API UAnimationFileLoadImpl_v11 : public UAnimationFileLoadImpl_v9
+class EDITORTOOLS_API FAnimationFileLoadImpl_v11 : public FAnimationFileLoadImpl_v9
 {
 public:
 	virtual bool LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)override;
@@ -168,7 +186,7 @@ public:
 
 };
 
-class EDITORTOOLS_API UAnimationFileLoadImpl_v12 : public UAnimationFileLoadImpl_v11
+class EDITORTOOLS_API FAnimationFileLoadImpl_v12 : public FAnimationFileLoadImpl_v11
 {
 public:
 	virtual bool LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<uint8>& BinaryData, UINT& Offset, DWORD Version)override;

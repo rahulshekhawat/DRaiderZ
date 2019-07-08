@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EluLibrary.h"
+#include "AniLoader.h"
 #include "EluMeshNodeLoader.h"
 #include "UObject/NoExportTypes.h"
 #include "EluImporter.generated.h"
@@ -14,6 +15,15 @@ public:
 	bool bLoadSuccess = false;
 	FEluHeader EluHeader;
 	TArray<TSharedPtr<FEluMeshNode>> EluMeshNodes;
+};
+
+struct EDITORTOOLS_API FAniFileData
+{
+public:
+	bool bLoadSuccess = false;
+	FAniHeader AniHeader;
+	TArray<TSharedPtr<FAniNode>> AniNodes;
+
 };
 
 /**
@@ -34,10 +44,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Elu Importer")
 	static void ImportEluSkeletalMesh();
 
+	static const int TICKSPERFRAME = 160;
+
 private:
 
 	static bool PickEluFile(FString& OutFilePath);
 	static FEluFileData LoadEluData(const FString& EluFilePath);
+	static FAniFileData LoadAniData(const FString& AniFilePath);
 	static bool ImportEluStaticMesh_Internal(const FString& EluFilePath);
 	static bool ImportEluSkeletalMesh_Internal(const FString& EluFilePath);
 

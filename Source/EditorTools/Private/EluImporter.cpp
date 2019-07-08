@@ -189,6 +189,104 @@ FEluFileData UEluImporter::LoadEluData(const FString& EluFilePath)
 	return EluData;
 }
 
+FAniFileData UEluImporter::LoadAniData(const FString& AniFilePath)
+{
+	FAniFileData AniData;
+
+	TArray<uint8> BinaryData;
+	bool bSuccess = FFileHelper::LoadFileToArray(BinaryData, *AniFilePath);
+	if (!bSuccess)
+	{
+		AniData.bLoadSuccess = false;
+		return AniData;
+	}
+
+	UINT Offset = 0;
+	FAniHeader AniHeader;
+	URaiderzXmlUtilities::WriteBinaryDataToBuffer(&AniHeader, sizeof(AniHeader), BinaryData, Offset);
+
+	int AniNodeCount = AniHeader.model_num;
+	EAnimationType AniType = (EAnimationType)AniHeader.ani_type;
+
+	FAnimationFileLoadImpl_v6 AnimFileLoadImpl_v6;
+	FAnimationFileLoadImpl_v7 AnimFileLoadImpl_v7;
+	FAnimationFileLoadImpl_v9 AnimFileLoadImpl_v9;
+	FAnimationFileLoadImpl_v11 AnimFileLoadImpl_v11;
+	FAnimationFileLoadImpl_v12 AnimFileLoadImpl_v12;
+
+	FAnimationFileLoadImpl* AnimNodeLoader = nullptr;
+	if (AniHeader.ver == EXPORTER_ANI_VER12)
+	{
+		AnimNodeLoader = &AnimFileLoadImpl_v12;
+	}
+	else if (AniHeader.ver == EXPORTER_ANI_VER11)
+	{
+		AnimNodeLoader = &AnimFileLoadImpl_v11;
+	}
+	else if (AniHeader.ver == EXPORTER_ANI_VER9)
+	{
+		AnimNodeLoader = &AnimFileLoadImpl_v9;
+	}
+	else if (AniHeader.ver == EXPORTER_ANI_VER8)
+	{
+		AnimNodeLoader = &AnimFileLoadImpl_v7;
+	}
+	else if (AniHeader.ver == EXPORTER_ANI_VER7)
+	{
+		AnimNodeLoader = &AnimFileLoadImpl_v7;
+	}
+	else if (AniHeader.ver == EXPORTER_ANI_VER6)
+	{
+		AnimNodeLoader = &AnimFileLoadImpl_v6;
+	}
+	else if (AniHeader.ver > EXPORTER_CURRENT_ANI_VER)
+	{
+		PrintError(TEXT("Animation file version is higher than latest version of runtime"));
+		AniData.bLoadSuccess = false;
+		return AniData;
+	}
+
+	TArray<TSharedPtr<FAniNode>> AniNodes;
+	for (int i = 0; i < AniHeader.model_num; i++)
+	{
+		TSharedPtr<FAniNode> AniNode(new FAniNode());
+
+		bool bLoadSuccessful = false;
+		switch ((EAnimationType)AniHeader.ani_type)
+		{
+		case EAnimationType::AniType_Vertex:
+			bLoadSuccessful = AnimNodeLoader->LoadVertexAni(AniNode, BinaryData, Offset, AniHeader.ver);
+			break;
+		case EAnimationType::AniType_Bone:
+			bLoadSuccessful = AnimNodeLoader->LoadBoneAni(AniNode, BinaryData, Offset, AniHeader.ver);
+			break;
+		case EAnimationType::AniType_TransForm:
+		case EAnimationType::AniType_Tm:
+		default:
+			PrintWarning(TEXT("Animation type is invalid"));
+			AniData.bLoadSuccess = false;
+			return AniData;
+			break;
+		}
+		check(bLoadSuccessful);
+		bLoadSuccessful = AnimNodeLoader->LoadVisibilityKey(AniNode, BinaryData, Offset, AniHeader.ver);
+		check(bLoadSuccessful);
+		AniNodes.Add(AniNode);
+	}
+
+
+	if (AniHeader.ver >= EXPORTER_ANI_VER8)	// Max Ani BoundingBox
+	{
+		//~ pass
+	}
+
+	AniData.bLoadSuccess = true;
+	AniData.AniHeader = AniHeader;
+	AniData.AniNodes = AniNodes;
+
+	return AniData;
+}
+
 bool UEluImporter::ImportEluStaticMesh_Internal(const FString& EluFilePath)
 {
 	FEluFileData EluData = LoadEluData(EluFilePath);
