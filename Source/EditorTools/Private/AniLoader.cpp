@@ -385,7 +385,7 @@ bool FAnimationFileLoadImpl_v12::LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<u
 			for (int i = 0; i < AnimType1.Count; i++)
 			{
 				FShortVecKey ShortVecKey;
-				if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&ShortVecKey, sizeof(ShortVecKey), BinaryData, Offset))
+				if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&ShortVecKey, 10 /*sizeof(ShortVecKey)*/, BinaryData, Offset))
 				{
 					return false;
 				}
@@ -450,7 +450,7 @@ bool FAnimationFileLoadImpl_v12::LoadBoneAni(TSharedPtr<FAniNode> Node, TArray<u
 			for (int i = 0; i < AnimType2.Count; i++)
 			{
 				FShortVecKey ShortVecKey;
-				if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&ShortVecKey, sizeof(ShortVecKey), BinaryData, Offset))
+				if (!URaiderzXmlUtilities::WriteBinaryDataToBuffer(&ShortVecKey, 10 /*sizeof(ShortVecKey)*/, BinaryData, Offset))
 				{
 					return false;
 				}

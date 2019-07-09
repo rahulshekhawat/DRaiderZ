@@ -93,6 +93,7 @@ void UEluImporter::ImportEluAnimation(USkeletalMesh* Mesh)
 		return;
 	}
 
+	/*
 	FString PackageName = FString("/Game/RaiderZ/Zunk/TeshAni");
 	bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
 	if (bPackageExists)
@@ -108,6 +109,7 @@ void UEluImporter::ImportEluAnimation(USkeletalMesh* Mesh)
 
 	UAnimSequence* AnimSeq = NewObject<UAnimSequence>(Package, UAnimSequence::StaticClass(), *FString("TestAni"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
 	AnimSeq->SetSkeleton(Mesh->Skeleton);
+	*/
 
 	// AnimSeq->GetFrameRate()
 

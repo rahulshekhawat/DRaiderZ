@@ -7,9 +7,9 @@
 enum class EAnimationType
 {
 	AniType_TransForm = 0,
-	AniType_Vertex,
-	AniType_Bone,
-	AniType_Tm,
+	AniType_Vertex = 1,
+	AniType_Bone = 2,
+	AniType_Tm = 3,
 };
 
 class EDITORTOOLS_API FAniHeader
@@ -28,13 +28,20 @@ public:
 	int Type;
 	int CountType;
 	int Count;
+
+	FAnimType() :
+		Type(0),
+		CountType(0),
+		Count(0)
+	{
+	}
 };
 
 class EDITORTOOLS_API FShortVecKey
 {
 public:
-	int Frame;
-	unsigned short m_x, m_y, m_z;
+	INT32 Frame;
+	UINT16 m_x, m_y, m_z;
 
 	float X() const { return halfToFloat(m_x); }
 	float Y() const { return halfToFloat(m_y); }
