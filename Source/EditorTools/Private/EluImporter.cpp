@@ -61,7 +61,6 @@ void UEluImporter::ImportEluAnimation(USkeletalMesh* Mesh)
 		return;
 	}
 
-
 	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
 	bool bSuccess = false;
 	TArray<FString> SelectedFiles;
@@ -93,7 +92,6 @@ void UEluImporter::ImportEluAnimation(USkeletalMesh* Mesh)
 		return;
 	}
 
-	/*
 	FString PackageName = FString("/Game/RaiderZ/Zunk/TeshAni");
 	bool bPackageExists = FPackageName::DoesPackageExist(PackageName);
 	if (bPackageExists)
@@ -106,24 +104,46 @@ void UEluImporter::ImportEluAnimation(USkeletalMesh* Mesh)
 	UPackage* Package = CreatePackage(nullptr, *PackageName);
 	Package->FullyLoad();
 
-
 	UAnimSequence* AnimSeq = NewObject<UAnimSequence>(Package, UAnimSequence::StaticClass(), *FString("TestAni"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
 	AnimSeq->SetSkeleton(Mesh->Skeleton);
-	*/
+	AnimSeq->Interpolation = EAnimInterpolationType::Linear;
 
-	// AnimSeq->GetFrameRate()
+	int32 NodeSize = AniData.AniNodes.Num();
+	for (int i = 0; i < NodeSize; i++)
+	{
+		TSharedPtr<FAniNode> Node = AniData.AniNodes[i];
+		check(Node.IsValid());
 
-	// FRawAnimSequenceTrack t;
+		FString BoneName = Node->NodeName;
+		FString SanitizedBoneName = PackageTools::SanitizePackageName(BoneName);
 
-	// AnimSeq->AddNewRawTrack()
+		FTransform BaseTransform = AniData.AniHeader.ver == EXPORTER_ANI_VER12 ? FTransform(Node->BaseRotation, Node->BaseTranslation, Node->BaseScale) : FTransform(Node->LocalMatrix);
+		AnimSeq->AddKeyToSequence(0.f, FName(*SanitizedBoneName), BaseTransform);
 
-	// AnimSeq->GetRawTrackToSkeletonMapTable()
+		FVector DefaultScale(1.f, 1.f, 1.f);
 
-	// AnimSeq->AddNewRawTrack
+		/*
+		for (const FVecKey& VecKey : Node->PositionKeyTrack)
+		{
+			FTransform Transform(FQuat(), VecKey.Key, DefaultScale);
+			float Frame = (float)VecKey.Frame / (float)TICKSPERFRAME;
+			
+			AnimSeq->AddKeyToSequence(Frame, FName(*SanitizedBoneName), Transform);
+		}
+		*/
 
+		/*
+		int32 PosNum = Node->PositionKeyTrack.Num();
+		int32 RotNum = Node->RotationKeyTrack.Num();
+		int32 ScaleNum = Node->ScaleKeyTrack.Num();
 
-	
+		FString Log = TEXT("Node name: ") + Node->NodeName + TEXT(", PosNum: ") + FString::FromInt(PosNum) + TEXT(", RotNum: ") + FString::FromInt(RotNum) + TEXT(", ScaleNum: ") + FString::FromInt(ScaleNum);
+		PrintWarning(Log);
+		*/
+	}
 
+	AnimSeq->MarkPackageDirty();
+	FAssetRegistryModule::AssetCreated(AnimSeq);
 }
 
 bool UEluImporter::PickEluFile(FString& OutFilePath)
