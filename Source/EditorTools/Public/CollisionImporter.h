@@ -49,14 +49,15 @@ public:
 private:
 
 	static TArray<FCollisionInfo> GenerateCollisionInfoArray(
-		FXmlNode* NPCNode,
-		const TArray<FXmlNode*>& TalentNodes,
+		const TSet<FXmlNode*> NPCNodes,
+		const TSet<FString>& NPCIDs,
+		const TSet<FString>& NPCAniPrefixes,
+		const TSet<FXmlNode*>& TalentNodes,
 		const TArray<FXmlNode*>& AddAnimNodes,
 		const TArray<FXmlNode*>& TalentHitNodes,
 		const TArray<FAssetData>& MeshAnimAssets);
 
 	static bool GetCollisionInfo(
-		FXmlNode* NPCNode,
 		FXmlNode* TalentNode,
 		const TArray<FXmlNode*>& AddAnimNodes,
 		const TArray<FXmlNode*>& TalentHitNodes,
@@ -64,9 +65,9 @@ private:
 		const TArray<FAssetData>& MeshAnimAssets,
 		FCollisionInfo& OutCollisionInfo);
 
-	static TMap<FString, TArray<FString>> GetFrameToCollisionStringMap(const TArray<FXmlNode*>& TalentHitNodes, FXmlNode* TalentNode, FXmlNode* NPCNode);
+	static TMap<FString, TArray<FString>> GetFrameToCollisionStringMap(const TArray<FXmlNode*>& TalentHitNodes, FXmlNode* TalentNode);
 	static FXmlNode* GetTalentHitNodeWithID(const TArray<FXmlNode*>& TalentHitNodes, const FString& TalentID);
-	static bool GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* TalentNode, FXmlNode* NPCNode, FString& OutFileName);
+	static bool GetAnimationFileName(const TArray<FXmlNode*>& AddAnimNodes, FXmlNode* TalentNode, const TSet<FString>& NPCAniPrefixes, FString& OutFileName);
 
 	static void CreateAndApplyCollisionNotifies(const TArray<FCollisionInfo>& CollisionInfoArray);
 	static void AddCollisionNotifiesToAnimation(UAnimSequenceBase* Animation, const TMap<FString, TArray<FString>>& FrameToCollisionStringMap);
@@ -74,7 +75,8 @@ private:
 	static bool HasCollisionNotify(UAnimSequenceBase* Animation, float FrameTime, const TArray<FRaidCapsule>& RaidCapsules);
 
 	static FXmlNode* GetNPCNode(FXmlNode* NPCRootNode, const FString& MeshName);
-	static TArray<FXmlNode*> GetNPCTalents(FXmlNode* TalentRootNode, const FString& InNPCID);
+	static TSet<FXmlNode*> GetNPCNodes(FXmlNode* NPCRootNode, const FString& MeshName);
+	static TSet<FXmlNode*> GetNPCTalents(FXmlNode* TalentRootNode, const FString& InNPCID);
 
 	/** Name of the mesh that is currently being processed */
 	static FString CurrentMeshName;
