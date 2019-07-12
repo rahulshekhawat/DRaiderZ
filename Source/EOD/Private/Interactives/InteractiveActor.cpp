@@ -7,7 +7,11 @@
 
 AInteractiveActor::AInteractiveActor(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	PrimaryActorTick.bAllowTickOnDedicatedServer = false;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bTickEvenWhenPaused = false;
+
 }
 
 void AInteractiveActor::BeginPlay()

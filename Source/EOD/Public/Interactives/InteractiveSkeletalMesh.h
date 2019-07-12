@@ -49,7 +49,7 @@ public:
 
 	static const FName InteractionCameraComponentName;
 
-private:
+protected:
 
 	UPROPERTY(Category = Components, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* PrimaryMesh;
