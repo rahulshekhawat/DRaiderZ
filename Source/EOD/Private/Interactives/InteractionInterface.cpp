@@ -12,6 +12,16 @@ void IInteractionInterface::OnInteract_Implementation(AEODCharacterBase* Charact
 	// empty defintion
 }
 
+void IInteractionInterface::OnBeginOverlap_Implementation(AEODCharacterBase* Character)
+{
+	// empty defintion
+}
+
+void IInteractionInterface::OnEndOverlap_Implementation(AEODCharacterBase* Character)
+{
+	// empty defintion
+}
+
 void IInteractionInterface::EnableCustomDepth_Implementation()
 {
 	// empty defintion

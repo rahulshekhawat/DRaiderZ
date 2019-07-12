@@ -36,6 +36,16 @@ public:
 	void OnInteract(AEODCharacterBase* Character);
 	virtual void OnInteract_Implementation(AEODCharacterBase* Character);
 
+	/** This event is called when a (player) character begins overlap with the underlying actor */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
+	void OnBeginOverlap(AEODCharacterBase* Character);
+	virtual void OnBeginOverlap_Implementation(AEODCharacterBase* Character);
+	
+	/** This event is called when a (player) character ends overlap with the underlying actor */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
+	void OnEndOverlap(AEODCharacterBase* Character);
+	virtual void OnEndOverlap_Implementation(AEODCharacterBase* Character);
+
 	/** This event is called to highlight interactive actor's meshes */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
 	void EnableCustomDepth();
