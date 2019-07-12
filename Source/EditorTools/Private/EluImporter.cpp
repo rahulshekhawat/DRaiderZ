@@ -108,6 +108,8 @@ void UEluImporter::ImportEluAnimation(USkeletalMesh* Mesh)
 	AnimSeq->SetSkeleton(Mesh->Skeleton);
 	AnimSeq->Interpolation = EAnimInterpolationType::Linear;
 
+	AnimSeq->AdditiveAnimType = EAdditiveAnimationType::AAT_LocalSpaceBase;
+
 	int32 NodeSize = AniData.AniNodes.Num();
 	for (int i = 0; i < NodeSize; i++)
 	{

@@ -7,7 +7,8 @@
 #include "AssetProcessor.generated.h"
 
 class UStaticMesh;
-
+class UAnimSequence;
+class USoundAttenuation;
 
 /**
  * 
@@ -23,5 +24,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = AssetProcessor)
 	static bool GenerateUniqueUVForStaticMesh(UStaticMesh* StaticMesh);
+
+	UFUNCTION(BlueprintCallable, Category = AssetProcessor)
+	static bool NormalizeBoneScale(UAnimSequence* AnimSeq);
+
+	UFUNCTION(BlueprintCallable, Category = AssetProcessor)
+	static void ImportRaiderzSoundSettings(USoundAttenuation* Attenuation = nullptr);
+
 
 };
