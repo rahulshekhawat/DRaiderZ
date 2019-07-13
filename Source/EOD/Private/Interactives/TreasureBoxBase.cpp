@@ -33,6 +33,8 @@ void ATreasureBoxBase::PostInitializeComponents()
 void ATreasureBoxBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GenerateLootInfoArray();
 }
 
 void ATreasureBoxBase::OnInteract_Implementation(AEODCharacterBase* Character)
@@ -47,6 +49,45 @@ void ATreasureBoxBase::OnInteract_Implementation(AEODCharacterBase* Character)
 
 	//~ @todo check for loot, play player loot animation if there's loot, etc.
 
+}
+
+void ATreasureBoxBase::GenerateLootInfoArray()
+{
+	for (const FStoredLootInfo& StoredLootInfo : StoredLootInfoArray)
+	{
+		bool bShouldGenerate = StoredLootInfo.DropChance >= FMath::RandRange(0.f, 100.f) ? true : false;
+
+		if (bShouldGenerate)
+		{
+			FGeneratedLootInfo GeneratedLootInfo;
+			GeneratedLootInfo.ItemCount = FMath::RandRange(1, FMath::Max(1, StoredLootInfo.MaxCount));
+			GeneratedLootInfo.ItemClass = StoredLootInfo.ItemClass;
+			GeneratedLootInfoArray.Add(GeneratedLootInfo);
+		}
+	}
+}
+
+TArray<FStoredLootInfo> ATreasureBoxBase::GetStoredLootInfo_Implementation() const
+{
+	return StoredLootInfoArray;
+}
+
+TArray<FGeneratedLootInfo> ATreasureBoxBase::GetGeneratedLootInfo_Implementation() const
+{
+	return GeneratedLootInfoArray;
+}
+
+int32 ATreasureBoxBase::AcquireLootItem_Implementation(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter)
+{
+	for (const FGeneratedLootInfo& GeneratedLootInfo : GeneratedLootInfoArray)
+	{
+		if (GeneratedLootInfo.ItemClass == LootItemClass)
+		{
+			return GeneratedLootInfo.ItemCount;
+		}
+	}
+
+	return 0;
 }
 
 void ATreasureBoxBase::SpawnBox()
@@ -70,4 +111,15 @@ void ATreasureBoxBase::OpenBox()
 		PrimaryMesh->PlayAnimation(ChestOpenAnimation, false);
 	}
 	bOpen = true;
+}
+
+bool ATreasureBoxBase::BP_IsOpen() const
+{
+	return bOpen;
+}
+
+bool ATreasureBoxBase::HasLoot() const
+{
+	// If generated loot info array still contains an item
+	return GeneratedLootInfoArray.Num() > 0;
 }
