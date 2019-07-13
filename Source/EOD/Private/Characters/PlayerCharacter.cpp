@@ -184,6 +184,35 @@ void APlayerCharacter::SwitchToInteractionState()
 	CharacterStateInfo.SubStateIndex = 0;
 }
 
+void APlayerCharacter::StartLooting()
+{
+	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+	UAnimMontage* AnimMontage = AnimRef ? AnimRef->LootStart.Get() : nullptr;
+	if (AnimMontage)
+	{
+		PlayAnimMontage(AnimMontage);
+
+		SetCharacterStateInfo(ECharacterState::Looting, 0, false);
+		bCharacterStateAllowsMovement = false;
+		bCharacterStateAllowsRotation = false;
+	}
+}
+
+void APlayerCharacter::StopLooting()
+{
+	if (CharacterStateInfo.CharacterState == ECharacterState::Looting)
+	{
+		FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
+		UAnimMontage* AnimMontage = AnimRef ? AnimRef->LootStart.Get() : nullptr;
+		if (AnimMontage)
+		{
+			StopAnimMontage(AnimMontage);
+		}
+
+		ResetState();
+	}
+}
+
 void APlayerCharacter::ToggleSheathe()
 {
 	if (CanToggleSheathe())

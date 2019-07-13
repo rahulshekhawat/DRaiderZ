@@ -1724,6 +1724,29 @@ void AEODCharacterBase::ToggleSheathe()
 {
 }
 
+void AEODCharacterBase::SetCharacterStateInfo(ECharacterState NewState, uint8 SubStateIndex, bool bUpdateRepIndex)
+{
+	FCharacterStateInfo NewStateInfo(NewState, SubStateIndex);
+	if (bUpdateRepIndex)
+	{
+		NewStateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
+	}
+	else
+	{
+		NewStateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex;
+	}
+
+	CharacterStateInfo = NewStateInfo;
+}
+
+void AEODCharacterBase::StartLooting()
+{
+}
+
+void AEODCharacterBase::StopLooting()
+{
+}
+
 void AEODCharacterBase::StartWeaponSwitch()
 {
 }

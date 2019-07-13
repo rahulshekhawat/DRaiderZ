@@ -103,6 +103,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Character Stats")
 	void SwitchToInteractionState();
+	
+	virtual void StartLooting() override;
+
+	virtual void StopLooting() override;
 
 	/** Put or remove weapon inside sheath */
 	virtual void ToggleSheathe() override;

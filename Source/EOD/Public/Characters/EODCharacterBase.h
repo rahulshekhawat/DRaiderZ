@@ -284,6 +284,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character State")
 	virtual void ToggleSheathe();
 
+	UFUNCTION(BlueprintCallable, Category = "Character State")
+	virtual void SetCharacterStateInfo(ECharacterState NewState, uint8 SubStateIndex = 0, bool bUpdateRepIndex = true);
+	
+	UFUNCTION(BlueprintCallable, Category = "Character State")
+	virtual void StartLooting();
+	
+	UFUNCTION(BlueprintCallable, Category = "Character State")
+	virtual void StopLooting();
+
 	virtual void StartWeaponSwitch();
 
 	virtual void CancelWeaponSwitch();
