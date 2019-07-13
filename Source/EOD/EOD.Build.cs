@@ -21,7 +21,6 @@ public class EOD : ModuleRules
                 "EOD/Public/Gameplay/Skills",
                 "EOD/Public/Gameplay/Effects",
                 "EOD/Public/Gameplay/Events",
-                "EOD/Public/Interactives",
                 "EOD/Public/Notifies",
                 "EOD/Public/Player",
                 "EOD/Public/Player/Components",
@@ -29,7 +28,9 @@ public class EOD : ModuleRules
                 "EOD/Public/Statics",
                 "EOD/Public/UI",
                 "EOD/Public/UI/Menu",
-                "EOD/Public/Weapons"
+                "EOD/Public/Weapons",
+                "EOD/Public/Interactives",
+                "EOD/Public/Lootable"
             }
         );
 
