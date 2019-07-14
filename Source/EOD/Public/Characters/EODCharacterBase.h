@@ -220,6 +220,8 @@ public:
 	/** Returns true if character is using a normal attack */
 	FORCEINLINE bool IsNormalAttacking() const;
 
+	FORCEINLINE bool IsLooting() const;
+
 	//~ @todo
 	/** Returns true if character is using skill at SkillIndex */
 	FORCEINLINE bool IsUsingSkill(FName SkillID) const;
@@ -1623,6 +1625,11 @@ FORCEINLINE bool AEODCharacterBase::IsCastingSpell() const
 FORCEINLINE bool AEODCharacterBase::IsNormalAttacking() const
 {
 	return CharacterStateInfo.CharacterState == ECharacterState::Attacking;
+}
+
+FORCEINLINE bool AEODCharacterBase::IsLooting() const
+{
+	return CharacterStateInfo.CharacterState == ECharacterState::Looting;
 }
 
 FORCEINLINE bool AEODCharacterBase::IsUsingAnySkill() const

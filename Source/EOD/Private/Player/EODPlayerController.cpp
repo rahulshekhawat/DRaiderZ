@@ -559,9 +559,17 @@ void AEODPlayerController::TogglePlayerStatsUI()
 
 void AEODPlayerController::MovePawnForward(const float Value)
 {
-	if (Value != 0 && IsAutoMoveEnabled())
+	if (Value != 0)
 	{
-		DisableAutoMove();
+		if (IsAutoMoveEnabled())
+		{
+			DisableAutoMove();
+		}
+
+		if (EODCharacter && EODCharacter->IsLooting())
+		{
+			EODCharacter->StopLooting();
+		}
 	}
 
 	if (IsValid(EODCharacter))
@@ -572,9 +580,17 @@ void AEODPlayerController::MovePawnForward(const float Value)
 
 void AEODPlayerController::MovePawnRight(const float Value)
 {
-	if (Value != 0 && IsAutoMoveEnabled())
+	if (Value != 0)
 	{
-		DisableAutoMove();
+		if (IsAutoMoveEnabled())
+		{
+			DisableAutoMove();
+		}
+
+		if (EODCharacter && EODCharacter->IsLooting())
+		{
+			EODCharacter->StopLooting();
+		}
 	}
 
 	if (IsValid(EODCharacter))
