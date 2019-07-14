@@ -202,14 +202,27 @@ void APlayerCharacter::StopLooting()
 {
 	if (CharacterStateInfo.CharacterState == ECharacterState::Looting)
 	{
+		//~ @todo Start LootEnd animation with an offset calculated from LooStart animation's position
+
 		FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
-		UAnimMontage* AnimMontage = AnimRef ? AnimRef->LootStart.Get() : nullptr;
+		UAnimMontage* AnimMontage = AnimRef ? AnimRef->LootEnd.Get() : nullptr;
+		float Duration = 0.f;
 		if (AnimMontage)
 		{
-			StopAnimMontage(AnimMontage);
+			Duration = PlayAnimMontage(AnimMontage);
 		}
 
-		ResetState();
+		if (Duration > 0.f)
+		{
+			UWorld* World = GetWorld();
+			check(World);
+			FTimerHandle TempHandle;
+			World->GetTimerManager().SetTimer(TempHandle, this, &APlayerCharacter::ResetState, Duration);
+		}
+		else
+		{
+			ResetState();
+		}
 	}
 }
 
