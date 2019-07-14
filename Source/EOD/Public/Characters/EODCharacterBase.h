@@ -685,6 +685,14 @@ public:
 	/** Event called when backward key is relased */
 	virtual void OnReleasedBackward();
 
+	virtual void OnPressedLeft();
+
+	virtual void OnReleasedLeft();
+
+	virtual void OnPressedRight();
+
+	virtual void OnReleasedRight();
+
 protected:
 
 	/** Determines whether the cached value of DesiredRotationYawFromAxisInput was updated this frame */

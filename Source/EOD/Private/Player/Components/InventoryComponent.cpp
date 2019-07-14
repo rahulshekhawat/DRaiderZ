@@ -72,4 +72,6 @@ void UInventoryComponent::LoadInventory()
 	// @todo definition
 }
 
-
+void UInventoryComponent::ConsumeItem(TSubclassOf<UInventoryItemBase> ItemClass)
+{
+}

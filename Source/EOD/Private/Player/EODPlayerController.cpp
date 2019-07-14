@@ -60,6 +60,10 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Forward", IE_Released, this, &AEODPlayerController::OnReleasedForward);
 	InputComponent->BindAction("Backward", IE_Pressed, this, &AEODPlayerController::OnPressedBackward);
 	InputComponent->BindAction("Backward", IE_Released, this, &AEODPlayerController::OnReleasedBackward);
+	InputComponent->BindAction("Left", IE_Pressed, this, &AEODPlayerController::OnPressedLeft);
+	InputComponent->BindAction("Left", IE_Released, this, &AEODPlayerController::OnReleasedLeft);
+	InputComponent->BindAction("Right", IE_Pressed, this, &AEODPlayerController::OnPressedRight);
+	InputComponent->BindAction("Right", IE_Released, this, &AEODPlayerController::OnReleasedRight);
 
 	//~ Mouse Input
 	InputComponent->BindAxis("Turn", this, &AEODPlayerController::AddYawInput);
@@ -545,6 +549,38 @@ void AEODPlayerController::OnReleasedBackward()
 	}
 }
 
+void AEODPlayerController::OnPressedLeft()
+{
+	if (IsValid(EODCharacter))
+	{
+		EODCharacter->OnPressedLeft();
+	}
+}
+
+void AEODPlayerController::OnReleasedLeft()
+{
+	if (IsValid(EODCharacter))
+	{
+		EODCharacter->OnReleasedLeft();
+	}
+}
+
+void AEODPlayerController::OnPressedRight()
+{
+	if (IsValid(EODCharacter))
+	{
+		EODCharacter->OnPressedRight();
+	}
+}
+
+void AEODPlayerController::OnReleasedRight()
+{
+	if (IsValid(EODCharacter))
+	{
+		EODCharacter->OnReleasedRight();
+	}
+}
+
 void AEODPlayerController::TogglePlayerStatsUI()
 {
 	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetPlayerStatsWidget()) && HUDWidget->GetPlayerStatsWidget()->IsVisible())
@@ -559,17 +595,9 @@ void AEODPlayerController::TogglePlayerStatsUI()
 
 void AEODPlayerController::MovePawnForward(const float Value)
 {
-	if (Value != 0)
+	if (Value != 0 && IsAutoMoveEnabled())
 	{
-		if (IsAutoMoveEnabled())
-		{
-			DisableAutoMove();
-		}
-
-		if (EODCharacter && EODCharacter->IsLooting())
-		{
-			EODCharacter->StopLooting();
-		}
+		DisableAutoMove();
 	}
 
 	if (IsValid(EODCharacter))
@@ -580,17 +608,9 @@ void AEODPlayerController::MovePawnForward(const float Value)
 
 void AEODPlayerController::MovePawnRight(const float Value)
 {
-	if (Value != 0)
+	if (Value != 0 && IsAutoMoveEnabled())
 	{
-		if (IsAutoMoveEnabled())
-		{
-			DisableAutoMove();
-		}
-
-		if (EODCharacter && EODCharacter->IsLooting())
-		{
-			EODCharacter->StopLooting();
-		}
+		DisableAutoMove();
 	}
 
 	if (IsValid(EODCharacter))

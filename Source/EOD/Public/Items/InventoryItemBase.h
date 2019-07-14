@@ -11,7 +11,7 @@ class UTexture;
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class EOD_API UInventoryItemBase : public UObject
 {
 	GENERATED_BODY()

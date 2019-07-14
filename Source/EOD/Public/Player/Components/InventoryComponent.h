@@ -10,7 +10,7 @@
 
 // class UTexture;
 // class APlayerCharacter;
-// class UInventoryWidget;
+class UInventoryItemBase;
 class UDataTable;
 
 /** Delegate for when a new inventory item is added */
@@ -83,6 +83,10 @@ public:
 	TArray<FInventoryItem> Items;
 
 	TMap<FName, FInventorySlot> InventorySlots;
+
+	/** Reduce item count by one in inventory */
+	void ConsumeItem(TSubclassOf<UInventoryItemBase> ItemClass);
+
 
 
 };

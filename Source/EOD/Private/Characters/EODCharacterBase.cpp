@@ -1801,6 +1801,22 @@ void AEODCharacterBase::OnReleasedBackward()
 {
 }
 
+void AEODCharacterBase::OnPressedLeft()
+{
+}
+
+void AEODCharacterBase::OnReleasedLeft()
+{
+}
+
+void AEODCharacterBase::OnPressedRight()
+{
+}
+
+void AEODCharacterBase::OnReleasedRight()
+{
+}
+
 void AEODCharacterBase::ResetState()
 {
 	FCharacterStateInfo StateInfo(ECharacterState::IdleWalkRun);

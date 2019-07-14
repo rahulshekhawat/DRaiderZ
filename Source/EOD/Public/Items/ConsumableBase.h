@@ -21,7 +21,7 @@ public:
 	virtual void OnClick() override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Consumable")
-	void Consume();
-	virtual void Consume_Implementation();
+	bool Consume();
+	virtual bool Consume_Implementation();
 
 };

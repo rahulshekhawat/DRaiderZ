@@ -419,16 +419,25 @@ public:
 	// --------------------------------------
 
 	/** Event called when forward key is pressed */
-	void OnPressedForward();
+	virtual void OnPressedForward() override;
 
 	/** Event called when backward key is pressed */
-	void OnPressedBackward();
+	virtual void OnPressedBackward() override;
 
 	/** Event called when forward key is released */
-	void OnReleasedForward();
+	virtual void OnReleasedForward() override;
 
-	/** Event called when backward key is relased */
-	void OnReleasedBackward();
+	/** Event called when backward key is released */
+	virtual void OnReleasedBackward() override;
+
+	virtual void OnPressedLeft() override;
+
+	virtual void OnReleasedLeft() override;
+
+	virtual void OnPressedRight() override;
+
+	virtual void OnReleasedRight() override;
+
 
 	UPROPERTY(Transient)
 	uint32 bForwardPressed : 1;

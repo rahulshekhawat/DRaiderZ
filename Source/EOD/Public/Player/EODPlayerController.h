@@ -229,6 +229,11 @@ private:
 	 */
 	void OnReleasedBackward();
 
+	void OnPressedLeft();
+	void OnReleasedLeft();
+	void OnPressedRight();
+	void OnReleasedRight();
+
 	/** Set whether possessed pawn should move automatically or not */
 	FORCEINLINE void SetAutoMoveEnabled(bool bValue);
 

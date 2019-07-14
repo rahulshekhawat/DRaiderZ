@@ -1132,6 +1132,11 @@ void AHumanCharacter::OnPressedForward()
 		bForwardPressed = true;
 		World->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &AHumanCharacter::DisableForwardPressed, 0.1f, false);
 	}
+
+	if (IsLooting())
+	{
+		StopLooting();
+	}
 }
 
 void AHumanCharacter::OnPressedBackward()
@@ -1143,6 +1148,11 @@ void AHumanCharacter::OnPressedBackward()
 		bBackwardPressed = true;
 		World->GetTimerManager().SetTimer(SPAttackTimerHandle, this, &AHumanCharacter::DisableBackwardPressed, 0.1f, false);
 	}
+
+	if (IsLooting())
+	{
+		StopLooting();
+	}
 }
 
 void AHumanCharacter::OnReleasedForward()
@@ -1150,6 +1160,30 @@ void AHumanCharacter::OnReleasedForward()
 }
 
 void AHumanCharacter::OnReleasedBackward()
+{
+}
+
+void AHumanCharacter::OnPressedLeft()
+{
+	if (IsLooting())
+	{
+		StopLooting();
+	}
+}
+
+void AHumanCharacter::OnReleasedLeft()
+{
+}
+
+void AHumanCharacter::OnPressedRight()
+{
+	if (IsLooting())
+	{
+		StopLooting();
+	}
+}
+
+void AHumanCharacter::OnReleasedRight()
 {
 }
 

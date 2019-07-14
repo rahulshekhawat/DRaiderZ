@@ -1,7 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
-
 #include "ConsumableBase.h"
+#include "InventoryComponent.h"
 
 UConsumableBase::UConsumableBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -9,9 +9,18 @@ UConsumableBase::UConsumableBase(const FObjectInitializer& ObjectInitializer) : 
 
 void UConsumableBase::OnClick()
 {
-	Consume();
+	bool bConsumeSuccess = Consume();
+	if (bConsumeSuccess)
+	{
+		UInventoryComponent* InvComp = Cast<UInventoryComponent>(GetOuter());
+		// InvComp->RemoveSingle
+
+
+		// InvComp->
+	}
 }
 
-void UConsumableBase::Consume_Implementation()
+bool UConsumableBase::Consume_Implementation()
 {
+	return false;
 }
