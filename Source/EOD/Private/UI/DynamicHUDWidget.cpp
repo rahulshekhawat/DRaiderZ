@@ -12,6 +12,7 @@
 #include "NotificationWidget.h"
 #include "EODPlayerController.h"
 #include "GameplayEffectBase.h"
+#include "SkillTreeEnvelopWidget.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -36,12 +37,12 @@ bool UDynamicHUDWidget::Initialize()
 		StatusIndicatorWidget &&
 		InventoryWidget &&
 		PlayerStatsWidget &&
-		SkillTreeWidget &&
+		SkillTreeEnvelop &&
 		SkillBarWidget &&
 		PlayerLevel &&
 		PlayerName)
 	{
-		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
+		SkillTreeEnvelop->SetVisibility(ESlateVisibility::Hidden);
 		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 		PlayerStatsWidget->SetVisibility(ESlateVisibility::Hidden);
 
@@ -59,6 +60,15 @@ void UDynamicHUDWidget::NativeConstruct()
 void UDynamicHUDWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
+
+UDynamicSkillTreeWidget* UDynamicHUDWidget::GetSkillTreeWidget() const
+{
+	if (SkillTreeEnvelop)
+	{
+		return SkillTreeEnvelop->SkillTreeWidget;
+	}
+	return nullptr;
 }
 
 void UDynamicHUDWidget::AddSkillBarWidget(UDynamicSkillBarWidget* NewWidget)

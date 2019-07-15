@@ -17,6 +17,7 @@
 #include "PlayerStatsWidget.h"
 #include "DynamicSkillBarWidget.h"
 #include "DynamicSkillTreeWidget.h"
+#include "SkillTreeEnvelopWidget.h"
 
 #include "ActiveSkillBase.h"
 
@@ -478,15 +479,15 @@ void AEODPlayerController::TogglePlayerHUD()
 
 void AEODPlayerController::TogglePlayerSkillTreeUI()
 {
-	UDynamicSkillTreeWidget* STWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
-	if (STWidget && STWidget->IsVisible())
+	USkillTreeEnvelopWidget* STEnvelop = HUDWidget ? HUDWidget->GetSkillTreeEnvelopWidget() : nullptr;
+	if (STEnvelop && STEnvelop->IsVisible())
 	{
-		STWidget->SetVisibility(ESlateVisibility::Hidden);
+		STEnvelop->SetVisibility(ESlateVisibility::Hidden);
 		UGameplayStatics::PlaySound2D(this, UIDownSound);
 	}
-	else if (STWidget && !STWidget->IsVisible())
+	else if (STEnvelop && !STEnvelop->IsVisible())
 	{
-		STWidget->SetVisibility(ESlateVisibility::Visible);
+		STEnvelop->SetVisibility(ESlateVisibility::Visible);
 		UGameplayStatics::PlaySound2D(this, UIUpSound);
 		// STWidget->RefreshVisuals();
 	}

@@ -11,6 +11,7 @@ class USoundBase;
 class UTextBlock;
 class UCanvasPanel;
 class UCanvasPanelSlot;
+class USkillTreeEnvelopWidget;
 class UDynamicSkillBarWidget;
 class UInventoryWidget;
 class UPlayerStatsWidget;
@@ -68,7 +69,7 @@ protected:
 
 	/** Widget containing skill trees of all vocations */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UDynamicSkillTreeWidget* SkillTreeWidget;
+	USkillTreeEnvelopWidget* SkillTreeEnvelop;
 
 	/** Widget containing skills that can be used by player */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
@@ -90,9 +91,11 @@ public:
 
 	FORCEINLINE UInventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
 
-	FORCEINLINE UDynamicSkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
-
 	FORCEINLINE UPlayerStatsWidget* GetPlayerStatsWidget() const { return PlayerStatsWidget; }
+
+	FORCEINLINE USkillTreeEnvelopWidget* GetSkillTreeEnvelopWidget() const { return SkillTreeEnvelop; }
+
+	UDynamicSkillTreeWidget* GetSkillTreeWidget() const;
 
 	/** Add skill bar widget as a child to HUD widget */
 	void AddSkillBarWidget(UDynamicSkillBarWidget* NewWidget);
