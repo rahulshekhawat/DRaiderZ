@@ -378,7 +378,7 @@ void UDynamicSkillTreeWidget::AddSkillPointsInfoToCanvas(UCanvasPanel* CPanel)
 	if (CPanel && SkillPointsInfo)
 	{
 		UCanvasPanelSlot* CPSlot = CPanel->AddChildToCanvas(SkillPointsInfo);
-		CPSlot->SetSize(FVector2D(400.f, 320.f));
+		CPSlot->SetSize(FVector2D(440.f, 320.f));
 		CPSlot->SetPosition(FVector2D(0.f, -25.f));
 		CPSlot->SetAnchors(FAnchors(0.5f, 1.f, 0.5f, 1.f));
 		CPSlot->SetAlignment(FVector2D(0.5f, 1.f));
