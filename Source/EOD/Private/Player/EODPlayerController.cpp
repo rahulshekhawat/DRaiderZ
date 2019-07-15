@@ -25,7 +25,7 @@
 
 #include "SkillTreeComponent.h"
 #include "PlayerStatsComponent.h"
-
+#include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
@@ -482,10 +482,12 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 	if (STWidget && STWidget->IsVisible())
 	{
 		STWidget->SetVisibility(ESlateVisibility::Hidden);
+		UGameplayStatics::PlaySound2D(this, UIDownSound);
 	}
 	else if (STWidget && !STWidget->IsVisible())
 	{
 		STWidget->SetVisibility(ESlateVisibility::Visible);
+		UGameplayStatics::PlaySound2D(this, UIUpSound);
 		// STWidget->RefreshVisuals();
 	}
 }
@@ -496,10 +498,12 @@ void AEODPlayerController::TogglePlayerInventoryUI()
 	if (InventoryWidget && InventoryWidget->IsVisible())
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Hidden);
+		UGameplayStatics::PlaySound2D(this, UIDownSound);
 	}
 	else if (InventoryWidget && !InventoryWidget->IsVisible())
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Visible);
+		UGameplayStatics::PlaySound2D(this, UIUpSound);
 	}
 }
 
@@ -586,10 +590,12 @@ void AEODPlayerController::TogglePlayerStatsUI()
 	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetPlayerStatsWidget()) && HUDWidget->GetPlayerStatsWidget()->IsVisible())
 	{
 		HUDWidget->GetPlayerStatsWidget()->SetVisibility(ESlateVisibility::Hidden);
+		UGameplayStatics::PlaySound2D(this, UIDownSound);
 	}
 	else if (IsValid(HUDWidget) && IsValid(HUDWidget->GetPlayerStatsWidget()) && !HUDWidget->GetPlayerStatsWidget()->IsVisible())
 	{
 		HUDWidget->GetPlayerStatsWidget()->SetVisibility(ESlateVisibility::Visible);
+		UGameplayStatics::PlaySound2D(this, UIUpSound);
 	}
 }
 

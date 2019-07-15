@@ -153,6 +153,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
 	TSubclassOf<UInGameMenuWidget> PauseMenuWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI Sound")
+	USoundBase* UIUpSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI Sound")
+	USoundBase* UIDownSound;
+
 private:
 
 	void InitializeWidgets();
