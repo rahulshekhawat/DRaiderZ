@@ -207,9 +207,9 @@ protected:
 
 inline FActiveSkillLevelUpInfo UActiveSkillBase::GetCurrentSkillLevelupInfo() const
 {
-	if (SkillLevelUpsInfo.Num() > CurrentUpgrade)
+	if (SkillLevelUpsInfo.Num() >= CurrentUpgrade)
 	{
-		return SkillLevelUpsInfo[CurrentUpgrade];
+		return SkillLevelUpsInfo[CurrentUpgrade - 1];
 	}
 	else if (SkillLevelUpsInfo.Num() > 0)
 	{
