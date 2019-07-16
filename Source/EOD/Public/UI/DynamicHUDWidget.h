@@ -100,9 +100,13 @@ public:
 	/** Add dialogue widget as a child to HUD widget */
 	void AddDialogueWidget(UDialogueWindowWidget* NewWidget);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gameplay UI")
 	void AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
+	virtual void AddGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gameplay UI")
 	void RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
+	virtual void RemoveGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect);
 
 	void SetPlayerLevel(int32 Level);
 	

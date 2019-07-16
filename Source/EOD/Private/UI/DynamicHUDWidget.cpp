@@ -91,7 +91,7 @@ void UDynamicHUDWidget::AddDialogueWidget(UDialogueWindowWidget* NewWidget)
 	}
 }
 
-void UDynamicHUDWidget::AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect)
+void UDynamicHUDWidget::AddGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect)
 {
 	UClass* GEWClass = GameplayEffectWidgetClass.Get();
 	if (!GameplayEffect || !MainCanvas || !GEWClass)
@@ -118,13 +118,12 @@ void UDynamicHUDWidget::AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect)
 	GameplayEffectUIMap.Add(GameplayEffect, ContainerWidget);
 }
 
-void UDynamicHUDWidget::RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect)
+void UDynamicHUDWidget::RemoveGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect)
 {
 	UContainerWidget* ContWidget = GameplayEffectUIMap.Contains(GameplayEffect) ? GameplayEffectUIMap[GameplayEffect] : nullptr;
 	if (ContWidget)
 	{
 		ContWidget->RemoveFromParent();
-		// ContWidget->MarkPendingKill();
 	}
 	GameplayEffectUIMap.Remove(GameplayEffect);
 }
