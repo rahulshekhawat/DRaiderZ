@@ -221,11 +221,12 @@ void UContainerWidget::SetIcon(UTexture* NewIcon)
 
 void UContainerWidget::SetInGameName(const FString& NewInGameName)
 {
-	ToolTipText = FText::FromString(NewInGameName);
+	ContainerData.InGameName = NewInGameName;
 }
 
 void UContainerWidget::SetDescription(const FString& NewDescription)
 {
+	ContainerData.Description = NewDescription;
 }
 
 void UContainerWidget::SetItemType(EEODItemType EODItemType)
