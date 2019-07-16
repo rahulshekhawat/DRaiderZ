@@ -26,11 +26,11 @@ public:
 	//  Gameplay Effect Interface
 	// --------------------------------------
 
-	virtual void InitEffect(AEODCharacterBase* Instigator, TArray<AEODCharacterBase*> Targets);
+	virtual void InitEffect(AEODCharacterBase* Instigator, TArray<AEODCharacterBase*> Targets, int32 ActivationLevel = 1);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gameplay Effects")
-	void ActivateEffect(int32 ActivationLevel = 1);
-	virtual void ActivateEffect_Implementation(int32 ActivationLevel = 1);
+	void ActivateEffect();
+	virtual void ActivateEffect_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gameplay Effects")
 	void DeactivateEffect();
@@ -41,6 +41,9 @@ public:
 	virtual void UpdateEffect_Implementation(float DeltaTime);
 
 	FORCEINLINE bool IsActive() const { return bActive; }
+
+	UFUNCTION(BlueprintPure, Category = "Gameplay Effects")
+	virtual float GetDuration() const;
 
 	// --------------------------------------
 	//  Pseudo Constants
@@ -64,9 +67,9 @@ public:
 
 protected:
 
-	/** The duration for which this effect will last */
+	/** The base duration for which this effect will last */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
-	float GameplayEffectDuration;
+	float BaseDuration;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Base Information")
 	EGameplayEffectAuthority GameplayEffectAuthority;
@@ -82,11 +85,11 @@ protected:
 	// --------------------------------------
 
 	/** This effect's instigator */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Cache")
+	UPROPERTY(Transient)
 	TWeakObjectPtr<AEODCharacterBase> EffectInstigator;
 
 	/** Skill component of this effect's instigator */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Cache")
+	UPROPERTY(Transient)
 	TWeakObjectPtr<UGameplaySkillsComponent> InstigatorSkillComponent;
 
 	/** This effect's targets */
@@ -98,8 +101,11 @@ protected:
 	TArray<TWeakObjectPtr<UGameplaySkillsComponent>> TargetSkillComponents;
 
 	/** Determines if this gameplay effect is currently active */
-	UPROPERTY(Transient, BlueprintReadWrite, Category = "Effect Status")
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Cache")
 	bool bActive;
+
+	UPROPERTY(Transient)
+	float CurrentLevel;
 
 	// --------------------------------------
 	//  Blueprints

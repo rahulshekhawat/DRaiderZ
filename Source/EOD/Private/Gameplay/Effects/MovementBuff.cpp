@@ -14,17 +14,18 @@ UMovementBuff::UMovementBuff(const FObjectInitializer& ObjectInitializer) : Supe
 	bNeedsUpdate = false;
 }
 
-void UMovementBuff::ActivateEffect_Implementation(int32 ActivationLevel)
+void UMovementBuff::InitEffect(AEODCharacterBase* Instigator, TArray<AEODCharacterBase*> Targets, int32 ActivationLevel)
 {
-	if (ActivationLevel < 1)
-	{
-		ActivationLevel = 1;
-	}
-	else if (ActivationLevel > MaxUpgradeLevel)
-	{
-		ActivationLevel = MaxUpgradeLevel;
-	}
+	Super::InitEffect(Instigator, Targets, ActivationLevel);
 
+	if (ActivationLevel > MaxUpgradeLevel)
+	{
+		CurrentLevel = MaxUpgradeLevel;
+	}
+}
+
+void UMovementBuff::ActivateEffect_Implementation()
+{
 	AEODCharacterBase* Instigator = EffectInstigator.Get();
 	if (Instigator)
 	{
@@ -34,7 +35,7 @@ void UMovementBuff::ActivateEffect_Implementation(int32 ActivationLevel)
 			Instigator->AddRunningModifier(this, true);
 		}
 
-		int32 NetDuration = GameplayEffectDuration + (ActivationLevel - 1) * (ExtraEffectDurationPerLevel);
+		int32 NetDuration = GetDuration();
 
 		UWorld* World = Instigator->GetWorld();
 		check(World);
@@ -75,4 +76,9 @@ void UMovementBuff::DeactivateEffect_Implementation()
 
 void UMovementBuff::UpdateEffect_Implementation(float DeltaTime)
 {
+}
+
+float UMovementBuff::GetDuration() const
+{
+	return (BaseDuration + (CurrentLevel - 1) * (ExtraEffectDurationPerLevel));
 }

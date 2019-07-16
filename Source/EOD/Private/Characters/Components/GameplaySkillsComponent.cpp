@@ -302,8 +302,8 @@ void UGameplaySkillsComponent::ActivateGameplayEffect(
 		TargetChars.Add(TargetChar);
 	}
 
-	GameplayEffect->InitEffect(InstigatorChar, TargetChars);
-	GameplayEffect->ActivateEffect(Level);
+	GameplayEffect->InitEffect(InstigatorChar, TargetChars, Level);
+	GameplayEffect->ActivateEffect();
 	AddGameplayEffect(GameplayEffect);
 }
 

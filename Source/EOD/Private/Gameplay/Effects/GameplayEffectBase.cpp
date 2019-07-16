@@ -9,7 +9,7 @@ UGameplayEffectBase::UGameplayEffectBase(const FObjectInitializer& ObjectInitial
 {
 }
 
-void UGameplayEffectBase::InitEffect(AEODCharacterBase* Instigator, TArray<AEODCharacterBase*> Targets)
+void UGameplayEffectBase::InitEffect(AEODCharacterBase* Instigator, TArray<AEODCharacterBase*> Targets, int32 ActivationLevel)
 {
 	EffectInstigator = Instigator;
 	if (Instigator)
@@ -25,18 +25,34 @@ void UGameplayEffectBase::InitEffect(AEODCharacterBase* Instigator, TArray<AEODC
 			TargetSkillComponents.Add(Target->GetGameplaySkillsComponent());
 		}
 	}
+
+	if (ActivationLevel < 1)
+	{
+		CurrentLevel = 1;
+	}
+	else
+	{
+		CurrentLevel = ActivationLevel;
+	}
 }
 
-void UGameplayEffectBase::ActivateEffect_Implementation(int32 ActivationLevel)
+void UGameplayEffectBase::ActivateEffect_Implementation()
 {
+	bActive = true;
 }
 
 void UGameplayEffectBase::DeactivateEffect_Implementation()
 {
+	bActive = false;
 }
 
 void UGameplayEffectBase::UpdateEffect_Implementation(float DeltaTime)
 {
+}
+
+float UGameplayEffectBase::GetDuration() const
+{
+	return BaseDuration;
 }
 
 AEODCharacterBase* UGameplayEffectBase::GetEffectInstigator() const

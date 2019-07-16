@@ -22,9 +22,13 @@ public:
 	//	Gameplay Effect Interface
 	// --------------------------------------
 
-	virtual void ActivateEffect_Implementation(int32 ActivationLevel = 1) override;
+	virtual void InitEffect(AEODCharacterBase* Instigator, TArray<AEODCharacterBase*> Targets, int32 ActivationLevel = 1) override;
+
+	virtual void ActivateEffect_Implementation() override;
 	virtual void DeactivateEffect_Implementation() override;
 	virtual void UpdateEffect_Implementation(float DeltaTime) override;
+
+	virtual float GetDuration() const override;
 
 	// --------------------------------------
 	//  Pseudo Constants
