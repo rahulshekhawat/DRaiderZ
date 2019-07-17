@@ -210,4 +210,14 @@ public:
 		const AActor* DamageInstigator,
 		const FVector& HitLocation);
 
+	UFUNCTION(BlueprintPure, Category = "Utility")
+	FString GetMapDisplayName(FName EditorMapName) const;
+
+protected:
+
+	/** TMap<EditorMapName, MapNameForPlayer> */
+	UPROPERTY(EditAnywhere, Category = "Maps")
+	TMap<FName, FString> MapNames;
+
+
 };

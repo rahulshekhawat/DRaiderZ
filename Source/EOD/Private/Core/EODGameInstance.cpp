@@ -246,3 +246,12 @@ void UEODGameInstance::DisplayGameplayText(
 {
 	//~ @todo
 }
+
+FString UEODGameInstance::GetMapDisplayName(FName EditorMapName) const
+{
+	if (MapNames.Contains(EditorMapName))
+	{
+		return MapNames[EditorMapName];
+	}
+	return EditorMapName.ToString();
+}
