@@ -17,9 +17,9 @@
 #include "PlayerStatsWidget.h"
 #include "DynamicSkillBarWidget.h"
 #include "DynamicSkillTreeWidget.h"
+#include "InteractivePopupWidget.h"
 
 #include "ActiveSkillBase.h"
-
 #include "EODLibrary.h"
 #include "PlayerSaveGame.h"
 
@@ -292,6 +292,63 @@ void AEODPlayerController::SetGender(ECharacterGender NewGender)
 UDynamicSkillBarWidget* AEODPlayerController::GetSkillBarWidget() const
 {
 	return  HUDWidget ? HUDWidget->GetSkillBarWidget() : nullptr;
+}
+
+UInteractivePopupWidget* AEODPlayerController::GetActivePopupWidget() const
+{
+	return HUDWidget ? HUDWidget->GetInteractivePopupWidget() : nullptr;
+}
+
+void AEODPlayerController::RegisterPopupWidget(UObject* RegisteringObj, const FString& InKeyText, const FString& InDetailText, UTexture* InIcon)
+{
+	UInteractivePopupWidget* IPWidget = GetActivePopupWidget();
+	if (RegisteringObj && IPWidget)
+	{
+		UnregisterActivePopupWidget();
+
+		IPWidget->RegisterWithObject(RegisteringObj);
+
+		if (InKeyText != TEXT(""))
+		{
+			IPWidget->SetKeyText(FText::FromString(InKeyText));
+		}
+
+		if (InDetailText != TEXT(""))
+		{
+			IPWidget->SetDetailText(FText::FromString(InDetailText));
+		}
+
+		if (InIcon)
+		{
+			IPWidget->SetIcon(InIcon);
+		}
+		else
+		{
+			IPWidget->ResetIcon();
+		}
+	}
+}
+
+void AEODPlayerController::UnregisterPopupWidget(UObject* RegisteringObj)
+{
+	UInteractivePopupWidget* IPWidget = GetActivePopupWidget();
+	if (IPWidget)
+	{
+		bool bResult = IPWidget->IsRegisteredWithObject(RegisteringObj);
+		if (bResult)
+		{
+			IPWidget->Unregister();
+		}
+	}
+}
+
+void AEODPlayerController::UnregisterActivePopupWidget()
+{
+	UInteractivePopupWidget* IPWidget = GetActivePopupWidget();
+	if (IPWidget)
+	{
+		IPWidget->Unregister();
+	}
 }
 
 void AEODPlayerController::InitializeWidgets()

@@ -23,6 +23,8 @@ class UStatsComponentBase;
 class UDialogueWindowWidget;
 class UPlayerStatsComponent;
 
+
+
 /**
  * EODPlayerController is the base (and final c++) class for in-game player controller
  * @note All blueprint classes for player controller must inherit from EmberPlayerController
@@ -126,6 +128,18 @@ public:
 	FORCEINLINE UInGameMenuWidget* GetPauseMenuWidget() const { return InGameMenuWidget; }
 
 	UDynamicSkillBarWidget* GetSkillBarWidget() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "Player UI")
+	UInteractivePopupWidget* GetActivePopupWidget() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Player UI")
+	void RegisterPopupWidget(UObject* RegisteringObj, const FString& InKeyText, const FString& InDetailText, UTexture* InIcon = nullptr);
+
+	UFUNCTION(BlueprintCallable, Category = "Player UI")
+	void UnregisterPopupWidget(UObject* RegisteringObj);
+
+	UFUNCTION(BlueprintCallable, Category = "Player UI")
+	void UnregisterActivePopupWidget();
 
 protected:
 
