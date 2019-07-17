@@ -483,27 +483,52 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 	{
 		STWidget->SetVisibility(ESlateVisibility::Hidden);
 		UGameplayStatics::PlaySound2D(this, UIDownSound);
+
+		UPlayerStatsWidget* StatsWidget = HUDWidget->GetPlayerStatsWidget();
+		UInventoryWidget* InvWidget = HUDWidget->GetInventoryWidget();
+
+		check(StatsWidget);
+		check(InvWidget);
+
+		if (!InvWidget->IsVisible() && !StatsWidget->IsVisible())
+		{
+			SwitchToGameInput();
+		}
 	}
 	else if (STWidget && !STWidget->IsVisible())
 	{
 		STWidget->SetVisibility(ESlateVisibility::Visible);
 		UGameplayStatics::PlaySound2D(this, UIUpSound);
-		// STWidget->RefreshVisuals();
+
+		SwitchToUIInput();
 	}
 }
 
 void AEODPlayerController::TogglePlayerInventoryUI()
 {
-	UInventoryWidget* InventoryWidget = HUDWidget ? HUDWidget->GetInventoryWidget() : nullptr;
-	if (InventoryWidget && InventoryWidget->IsVisible())
+	UInventoryWidget* InvWidget = HUDWidget ? HUDWidget->GetInventoryWidget() : nullptr;
+	if (InvWidget && InvWidget->IsVisible())
 	{
-		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Hidden);
+		InvWidget->SetVisibility(ESlateVisibility::Hidden);
 		UGameplayStatics::PlaySound2D(this, UIDownSound);
+
+		UPlayerStatsWidget* StatsWidget = HUDWidget->GetPlayerStatsWidget();
+		UDynamicSkillTreeWidget* STWidget = HUDWidget->GetSkillTreeWidget();
+
+		check(StatsWidget);
+		check(STWidget);
+		
+		if (!StatsWidget->IsVisible() && !STWidget->IsVisible())
+		{
+			SwitchToGameInput();
+		}
 	}
-	else if (InventoryWidget && !InventoryWidget->IsVisible())
+	else if (InvWidget && !InvWidget->IsVisible())
 	{
 		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Visible);
 		UGameplayStatics::PlaySound2D(this, UIUpSound);
+
+		SwitchToUIInput();
 	}
 }
 
@@ -587,15 +612,29 @@ void AEODPlayerController::OnReleasedRight()
 
 void AEODPlayerController::TogglePlayerStatsUI()
 {
-	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetPlayerStatsWidget()) && HUDWidget->GetPlayerStatsWidget()->IsVisible())
+	UPlayerStatsWidget* StatsWidget = HUDWidget ? HUDWidget->GetPlayerStatsWidget() : nullptr;
+	if (StatsWidget && StatsWidget->IsVisible())
 	{
-		HUDWidget->GetPlayerStatsWidget()->SetVisibility(ESlateVisibility::Hidden);
+		StatsWidget->SetVisibility(ESlateVisibility::Hidden);
 		UGameplayStatics::PlaySound2D(this, UIDownSound);
+
+		UInventoryWidget* InvWidget = HUDWidget->GetInventoryWidget();
+		UDynamicSkillTreeWidget* STWidget = HUDWidget->GetSkillTreeWidget();
+
+		check(InvWidget);
+		check(STWidget);
+
+		if (!InvWidget->IsVisible() && !STWidget->IsVisible())
+		{
+			SwitchToGameInput();
+		}
 	}
-	else if (IsValid(HUDWidget) && IsValid(HUDWidget->GetPlayerStatsWidget()) && !HUDWidget->GetPlayerStatsWidget()->IsVisible())
+	else if (StatsWidget && !StatsWidget->IsVisible())
 	{
-		HUDWidget->GetPlayerStatsWidget()->SetVisibility(ESlateVisibility::Visible);
+		StatsWidget->SetVisibility(ESlateVisibility::Visible);
 		UGameplayStatics::PlaySound2D(this, UIUpSound);
+
+		SwitchToUIInput();
 	}
 }
 
