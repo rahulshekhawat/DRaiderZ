@@ -19,6 +19,7 @@ class UDialogueWindowWidget;
 class UDynamicSkillTreeWidget;
 class UNotificationWidget;
 class UGameplayEffectBase;
+class UInteractivePopupWidget;
 
 /**
  * 
@@ -75,6 +76,9 @@ protected:
 	UDynamicSkillBarWidget* SkillBarWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UInteractivePopupWidget* InteractivePopup;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* PlayerLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
@@ -93,6 +97,8 @@ public:
 	FORCEINLINE UDynamicSkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
 
 	FORCEINLINE UPlayerStatsWidget* GetPlayerStatsWidget() const { return PlayerStatsWidget; }
+
+	FORCEINLINE UInteractivePopupWidget* GetInteractivePopupWidget() const { return InteractivePopup; }
 
 	/** Add skill bar widget as a child to HUD widget */
 	void AddSkillBarWidget(UDynamicSkillBarWidget* NewWidget);

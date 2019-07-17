@@ -12,6 +12,7 @@
 #include "NotificationWidget.h"
 #include "EODPlayerController.h"
 #include "GameplayEffectBase.h"
+#include "InteractivePopupWidget.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -39,8 +40,10 @@ bool UDynamicHUDWidget::Initialize()
 		SkillTreeWidget &&
 		SkillBarWidget &&
 		PlayerLevel &&
-		PlayerName)
+		PlayerName &&
+		InteractivePopup)
 	{
+		InteractivePopup->SetVisibility(ESlateVisibility::Hidden);
 		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
 		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 		PlayerStatsWidget->SetVisibility(ESlateVisibility::Hidden);
