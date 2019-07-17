@@ -22,6 +22,16 @@ void IInteractionInterface::OnEndOverlap_Implementation(AEODCharacterBase* Chara
 	// empty defintion
 }
 
+void IInteractionInterface::OnGainFocus_Implementation(AEODCharacterBase* Character)
+{
+	// empty defintion
+}
+
+void IInteractionInterface::OnLoseFocus_Implementation(AEODCharacterBase* Character)
+{
+	// empty defintion
+}
+
 void IInteractionInterface::EnableCustomDepth_Implementation()
 {
 	// empty defintion

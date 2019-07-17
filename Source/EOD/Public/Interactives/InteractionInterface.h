@@ -46,6 +46,14 @@ public:
 	void OnEndOverlap(AEODCharacterBase* Character);
 	virtual void OnEndOverlap_Implementation(AEODCharacterBase* Character);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
+	void OnGainFocus(AEODCharacterBase* Character);
+	virtual void OnGainFocus_Implementation(AEODCharacterBase* Character);
+		
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
+	void OnLoseFocus(AEODCharacterBase* Character);
+	virtual void OnLoseFocus_Implementation(AEODCharacterBase* Character);
+
 	/** This event is called to highlight interactive actor's meshes */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
 	void EnableCustomDepth();
