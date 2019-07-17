@@ -452,6 +452,7 @@ void APlayerCharacter::OnInteractionSphereBeginOverlap(
 	}
 
 	InteractiveObj->Execute_EnableCustomDepth(OtherActor);
+	InteractiveObj->Execute_OnBeginOverlap(OtherActor, this);
 	ActiveInteractiveActor = OtherActor;
 	OverlappingInteractiveActors.Add(OtherActor);
 
@@ -473,6 +474,7 @@ void APlayerCharacter::OnInteractionSphereEndOverlap(
 	}
 
 	InteractiveObj->Execute_DisableCustomDepth(OtherActor);
+	InteractiveObj->Execute_OnEndOverlap(OtherActor, this);
 	OverlappingInteractiveActors.Remove(OtherActor);
 
 	if (ActiveInteractiveActor == OtherActor)
