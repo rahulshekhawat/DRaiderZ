@@ -200,6 +200,15 @@ public:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
 
+	void GainFocus(AActor* InteractiveActor);
+	void LoseFocus(AActor* InteractiveActor);
+	void LoseFocusOfCurrentInteractiveActor();
+
+	UFUNCTION()
+	void UpdateFocusedInteractiveActor();
+
+	FTimerHandle InteractionTimerHandle;
+
 	virtual bool CanStartInteraction() const override;
 
 	/** Trigger interaction with an NPC or an in-game interactive object */
@@ -248,11 +257,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PlayerInteraction)
 	USoundBase* InteractiveActorDetectedSound;
 		
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Character Interaction")
-	TArray<AActor*> OverlappingInteractiveActors;
+	UPROPERTY(Transient)
+	TArray<TWeakObjectPtr<AActor>> OverlappingInteractiveActors;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Character Interaction")
-	AActor* ActiveInteractiveActor;
+	AActor* FocusedInteractiveActor;
 	
 	UPROPERTY(Transient, BlueprintReadWrite, Category = PlayerInteraction)
 	UDialogueWindowWidget* DialogueWidget;

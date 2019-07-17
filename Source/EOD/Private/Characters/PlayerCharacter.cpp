@@ -445,19 +445,32 @@ void APlayerCharacter::OnInteractionSphereBeginOverlap(
 		return;
 	}
 
-	if (ActiveInteractiveActor)
-	{
-		IInteractionInterface* OldInteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
-		OldInteractiveObj->Execute_DisableCustomDepth(ActiveInteractiveActor);
-	}
-
-	InteractiveObj->Execute_EnableCustomDepth(OtherActor);
 	InteractiveObj->Execute_OnBeginOverlap(OtherActor, this);
-	ActiveInteractiveActor = OtherActor;
-	OverlappingInteractiveActors.Add(OtherActor);
 
-	GameplayAudioComponent->SetSound(InteractiveActorDetectedSound);
-	GameplayAudioComponent->Play();
+	if (OverlappingInteractiveActors.Num() == 0)
+	{
+		FocusedInteractiveActor = OtherActor;
+		InteractiveObj->Execute_OnGainFocus(OtherActor, this);
+		InteractiveObj->Execute_EnableCustomDepth(OtherActor);
+		OverlappingInteractiveActors.Add(OtherActor);
+
+		GameplayAudioComponent->SetSound(InteractiveActorDetectedSound);
+		GameplayAudioComponent->Play();
+	}
+	else
+	{
+		OverlappingInteractiveActors.Add(OtherActor);
+		UWorld* World = GetWorld();
+		check(World);
+		if (World->GetTimerManager().IsTimerActive(InteractionTimerHandle))
+		{
+			// nothing
+		}
+		else
+		{
+			World->GetTimerManager().SetTimer(InteractionTimerHandle, this, &APlayerCharacter::UpdateFocusedInteractiveActor, 0.2f, true, 0);
+		}
+	}
 }
 
 void APlayerCharacter::OnInteractionSphereEndOverlap(
@@ -477,22 +490,110 @@ void APlayerCharacter::OnInteractionSphereEndOverlap(
 	InteractiveObj->Execute_OnEndOverlap(OtherActor, this);
 	OverlappingInteractiveActors.Remove(OtherActor);
 
-	if (ActiveInteractiveActor == OtherActor)
+	if (OtherActor == FocusedInteractiveActor)
 	{
+		InteractiveObj->Execute_OnLoseFocus(OtherActor, this);
+		FocusedInteractiveActor = nullptr;
+
+		UWorld* World = GetWorld();
+		check(World);
 		if (OverlappingInteractiveActors.Num() > 0)
 		{
-			ActiveInteractiveActor = OverlappingInteractiveActors[OverlappingInteractiveActors.Num() - 1];
-			IInteractionInterface* NewInteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
-			NewInteractiveObj->Execute_EnableCustomDepth(ActiveInteractiveActor);
-
-			GameplayAudioComponent->SetSound(InteractiveActorDetectedSound);
-			GameplayAudioComponent->Play();
+			if (!World->GetTimerManager().IsTimerActive(InteractionTimerHandle))
+			{
+				World->GetTimerManager().SetTimer(InteractionTimerHandle, this, &APlayerCharacter::UpdateFocusedInteractiveActor, 0.2f, true, 0);
+			}
 		}
 		else
 		{
-			ActiveInteractiveActor = nullptr;
+			World->GetTimerManager().ClearTimer(InteractionTimerHandle);
 		}
 	}
+}
+
+void APlayerCharacter::GainFocus(AActor* InteractiveActor)
+{
+}
+
+void APlayerCharacter::LoseFocus(AActor* InteractiveActor)
+{
+}
+
+void APlayerCharacter::LoseFocusOfCurrentInteractiveActor()
+{
+}
+
+void APlayerCharacter::UpdateFocusedInteractiveActor()
+{
+	FVector ThisLoc = GetActorLocation();
+	AActor* ActorToFocus = nullptr;
+	float CurrentMin = 0.f;
+
+	int32 Num = OverlappingInteractiveActors.Num();
+	for (int i = Num - 1; i >= 0; i--)
+	{
+		TWeakObjectPtr<AActor> WeakActor = OverlappingInteractiveActors[i];
+		if (!WeakActor.IsValid())
+		{
+			OverlappingInteractiveActors.Remove(WeakActor);
+			continue;
+		}
+
+		AActor* Actor = WeakActor.Get();
+		FVector ActorLoc = Actor->GetActorLocation();
+		if (ActorToFocus == nullptr)
+		{
+			ActorToFocus = Actor;
+			CurrentMin = FVector::DistSquared(ActorLoc, ThisLoc);
+		}
+		else
+		{
+			float DistSquared = FVector::DistSquared(ActorLoc, ThisLoc);
+			if (CurrentMin > DistSquared)
+			{
+				CurrentMin = DistSquared;
+				ActorToFocus = Actor;
+			}
+		}
+	}
+
+	if (!ActorToFocus)
+	{
+		UWorld* World = GetWorld();
+		World->GetTimerManager().ClearTimer(InteractionTimerHandle);
+		return;
+	}
+
+	if (OverlappingInteractiveActors.Num() == 1)
+	{
+		UWorld* World = GetWorld();
+		World->GetTimerManager().ClearTimer(InteractionTimerHandle);
+	}
+
+	if (ActorToFocus == FocusedInteractiveActor)
+	{
+		// Do nothing
+		return;
+	}
+
+	if (FocusedInteractiveActor)
+	{
+		IInteractionInterface* OldInterface = Cast<IInteractionInterface>(FocusedInteractiveActor);
+		check(OldInterface);
+		OldInterface->Execute_OnLoseFocus(FocusedInteractiveActor, this);
+		OldInterface->Execute_DisableCustomDepth(FocusedInteractiveActor);
+
+		FocusedInteractiveActor = nullptr;
+	}
+
+
+	FocusedInteractiveActor = ActorToFocus;
+	IInteractionInterface* FocusedInterface = Cast<IInteractionInterface>(FocusedInteractiveActor);
+	FocusedInterface->Execute_OnGainFocus(FocusedInteractiveActor, this);
+	FocusedInterface->Execute_EnableCustomDepth(FocusedInteractiveActor);
+
+	GameplayAudioComponent->SetSound(InteractiveActorDetectedSound);
+	GameplayAudioComponent->Play();
 }
 
 bool APlayerCharacter::CanStartInteraction() const
@@ -514,10 +615,10 @@ void APlayerCharacter::TriggerInteraction()
 
 void APlayerCharacter::StartInteraction()
 {
-	IInteractionInterface* InteractionObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
+	IInteractionInterface* InteractionObj = Cast<IInteractionInterface>(FocusedInteractiveActor);
 	if (InteractionObj)
 	{
-		InteractionObj->Execute_OnInteract(ActiveInteractiveActor, this);
+		InteractionObj->Execute_OnInteract(FocusedInteractiveActor, this);
 	}
 
 
