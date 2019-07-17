@@ -48,4 +48,37 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI Setters")
 	void SetIcon(UTexture* InTexture);
 
+	UFUNCTION(BlueprintCallable, Category = "UI Setters")
+	void ResetDetailText();
+	
+	UFUNCTION(BlueprintCallable, Category = "UI Setters")
+	void ResetKeyText();
+	
+	UFUNCTION(BlueprintCallable, Category = "UI Setters")
+	void ResetIcon();
+
+	UFUNCTION(BlueprintCallable, Category = "UI Getters")
+	UObject* GetRegisteringObject() const;
+
+	/** Returns true if this widget is visible and has a valid RegisteringObj */
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	bool IsRegistered() const;
+
+	/** Returns true if this widget is visible and has RegisteringObj is a weak ptr to InObj */
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	bool IsRegisteredWithObject(UObject* InObj) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void RegisterWithObject(UObject* Obj);
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void Unregister();
+
+protected:
+
+	/** The object that caused this popup */
+	UPROPERTY(Transient)
+	TWeakObjectPtr<UObject> RegisteringObj;
+
+
 };

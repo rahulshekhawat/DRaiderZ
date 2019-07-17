@@ -57,3 +57,60 @@ void UInteractivePopupWidget::SetIcon(UTexture* InTexture)
 		IconImage->SetBrush(SlateBrush);
 	}
 }
+
+void UInteractivePopupWidget::ResetDetailText()
+{
+	check(DetailText);
+	DetailText->SetText(FText::FromString(TEXT("Interact")));
+}
+
+void UInteractivePopupWidget::ResetKeyText()
+{
+	check(KeyText);
+	KeyText->SetText(FText::FromString(TEXT("E")));
+}
+
+void UInteractivePopupWidget::ResetIcon()
+{
+	FSlateBrush DefaultBrush = GetClass()->GetDefaultObject<UInteractivePopupWidget>()->IconImage->Brush;
+	check(IconImage);
+	IconImage->SetBrush(DefaultBrush);
+}
+
+UObject* UInteractivePopupWidget::GetRegisteringObject() const
+{
+	return RegisteringObj.Get();
+}
+
+bool UInteractivePopupWidget::IsRegistered() const
+{
+	if (this->IsVisible() && RegisteringObj.IsValid())
+	{
+		return true;
+	}
+	return false;
+}
+
+bool UInteractivePopupWidget::IsRegisteredWithObject(UObject* InObj) const
+{
+	if (InObj && this->IsVisible() && RegisteringObj.Get() == InObj)
+	{
+		return true;
+	}
+	return false;
+}
+
+void UInteractivePopupWidget::RegisterWithObject(UObject* Obj)
+{
+	if (Obj)
+	{
+		RegisteringObj = Obj;
+		this->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+}
+
+void UInteractivePopupWidget::Unregister()
+{
+	this->SetVisibility(ESlateVisibility::Hidden);
+	RegisteringObj = nullptr;
+}
