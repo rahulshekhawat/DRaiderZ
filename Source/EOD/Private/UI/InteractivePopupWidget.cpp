@@ -67,7 +67,8 @@ void UInteractivePopupWidget::ResetDetailText()
 void UInteractivePopupWidget::ResetKeyText()
 {
 	check(KeyText);
-	KeyText->SetText(FText::FromString(TEXT("E")));
+	FString SubTextString = TEXT("<SubText>E</>");
+	KeyText->SetText(FText::FromString(SubTextString));
 }
 
 void UInteractivePopupWidget::ResetIcon()

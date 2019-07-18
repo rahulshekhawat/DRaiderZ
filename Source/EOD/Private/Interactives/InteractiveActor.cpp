@@ -1,6 +1,7 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "InteractiveActor.h"
+#include "EODPlayerController.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -72,4 +73,22 @@ void AInteractiveActor::DisableCustomDepth_Implementation()
 
 void AInteractiveActor::OnInteract_Implementation(AEODCharacterBase* Character)
 {
+}
+
+void AInteractiveActor::OnGainFocus_Implementation(AEODCharacterBase* Character)
+{
+	AEODPlayerController* PC = Character ? Cast<AEODPlayerController>(Character->Controller) : nullptr;
+	if (PC)
+	{
+		PC->RegisterPopupWidget(this, TEXT(""), TEXT(""), nullptr);
+	}
+}
+
+void AInteractiveActor::OnLoseFocus_Implementation(AEODCharacterBase* Character)
+{
+	AEODPlayerController* PC = Character ? Cast<AEODPlayerController>(Character->Controller) : nullptr;
+	if (PC)
+	{
+		PC->UnregisterPopupWidget(this);
+	}
 }
