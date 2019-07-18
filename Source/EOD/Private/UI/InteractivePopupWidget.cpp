@@ -72,9 +72,12 @@ void UInteractivePopupWidget::ResetKeyText()
 
 void UInteractivePopupWidget::ResetIcon()
 {
-	FSlateBrush DefaultBrush = GetClass()->GetDefaultObject<UInteractivePopupWidget>()->IconImage->Brush;
 	check(IconImage);
-	IconImage->SetBrush(DefaultBrush);
+	FSlateBrush SlateBrush;
+	SlateBrush.SetResourceObject(DefaultIcon);
+	SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+	SlateBrush.Tiling = ESlateBrushTileType::NoTile;
+	IconImage->SetBrush(SlateBrush);
 }
 
 UObject* UInteractivePopupWidget::GetRegisteringObject() const

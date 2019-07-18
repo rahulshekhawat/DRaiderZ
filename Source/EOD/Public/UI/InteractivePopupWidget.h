@@ -80,5 +80,7 @@ protected:
 	UPROPERTY(Transient)
 	TWeakObjectPtr<UObject> RegisteringObj;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pseudo Constants")
+	UTexture* DefaultIcon;
 
 };

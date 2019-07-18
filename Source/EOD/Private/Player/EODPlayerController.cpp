@@ -308,12 +308,21 @@ void AEODPlayerController::RegisterPopupWidget(UObject* RegisteringObj, const FS
 
 		IPWidget->RegisterWithObject(RegisteringObj);
 
-		if (InKeyText != TEXT(""))
+		if (InKeyText == TEXT(""))
 		{
-			IPWidget->SetKeyText(FText::FromString(InKeyText));
+			IPWidget->ResetKeyText();
+		}
+		else
+		{
+			FString SubTextString = TEXT("<SubText>") + InKeyText + TEXT("</>");
+			IPWidget->SetKeyText(FText::FromString(SubTextString));
 		}
 
-		if (InDetailText != TEXT(""))
+		if (InDetailText == TEXT(""))
+		{
+			IPWidget->ResetDetailText();
+		}
+		else
 		{
 			IPWidget->SetDetailText(FText::FromString(InDetailText));
 		}
