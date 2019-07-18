@@ -220,6 +220,8 @@ public:
 
 	void TogglePlayerWeapon();
 
+	FName GetKeyNameForActionName(FName InActionName);
+
 private:
 
 	/** Determines whether automatic movement is enabled on possessed pawn */

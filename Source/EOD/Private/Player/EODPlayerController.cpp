@@ -25,10 +25,12 @@
 
 #include "SkillTreeComponent.h"
 #include "PlayerStatsComponent.h"
-#include "Kismet/GameplayStatics.h"
+
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerInput.h"
 #include "GameFramework/SpringArmComponent.h"
 
 
@@ -610,6 +612,65 @@ void AEODPlayerController::TogglePlayerWeapon()
 	{
 		HumanChar->ToggleWeapon();
 	}
+}
+
+FName AEODPlayerController::GetKeyNameForActionName(FName InActionName)
+{
+	if (PlayerInput)
+	{
+		const TArray<FInputActionKeyMapping>& ActionKeys = PlayerInput->GetKeysForAction(InActionName);
+		for (const FInputActionKeyMapping ActionKey : ActionKeys)
+		{
+			FName KeyName = ActionKey.Key.GetFName();
+
+			if (KeyName == TEXT("One"))
+			{
+				return TEXT("1");
+			}
+			else if (KeyName == TEXT("Two"))
+			{
+				return TEXT("2");
+			}
+			else if (KeyName == TEXT("Three"))
+			{
+				return TEXT("3");
+			}
+			else if (KeyName == TEXT("Four"))
+			{
+				return TEXT("4");
+			}
+			else if (KeyName == TEXT("Five"))
+			{
+				return TEXT("5");
+			}
+			else if (KeyName == TEXT("Six"))
+			{
+				return TEXT("6");
+			}
+			else if (KeyName == TEXT("Seven"))
+			{
+				return TEXT("7");
+			}
+			else if (KeyName == TEXT("Eight"))
+			{
+				return TEXT("8");
+			}
+			else if (KeyName == TEXT("Nine"))
+			{
+				return TEXT("9");
+			}
+			else if (KeyName == TEXT("Zero"))
+			{
+				return TEXT("0");
+			}
+			else
+			{
+				return KeyName;
+			}
+		}
+	}
+
+	return NAME_None;
 }
 
 void AEODPlayerController::OnPressedForward()

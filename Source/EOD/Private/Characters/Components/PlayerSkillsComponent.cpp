@@ -525,6 +525,24 @@ void UPlayerSkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill
 		World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
 
 		SupersedingSkill->OnActivatedAsChainSkill();
+
+		AEODCharacterBase* CharOwner = GetCharacterOwner();
+		AEODPlayerController* PC = CharOwner ? Cast<AEODPlayerController>(CharOwner->Controller) : nullptr;
+		if (PC)
+		{
+			FString ActionString = TEXT("Skill_") + FString::FromInt(LastPressedSkillKey);
+			FName ActionName = FName(*ActionString);
+			FName KeyName = PC->GetKeyNameForActionName(ActionName);
+
+			if (KeyName == NAME_None)
+			{
+				PrintWarning(TEXT("Key name is invalid"));
+			}
+			else
+			{
+				PC->RegisterPopupWidget(this, KeyName.ToString(), SupersedingSkill->GetInGameSkillName(), SupersedingSkill->GetSkillIcon());
+			}
+		}
 	}
 }
 
@@ -573,6 +591,13 @@ void UPlayerSkillsComponent::ResetChainSkill()
 		UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SupersedingChainSkillGroup.Value]);
 		PlayerSkill->OnDeactivatedAsChainSkill();
 	}
+
+	AEODCharacterBase* CharOwner = GetCharacterOwner();
+	AEODPlayerController* PC = CharOwner ? Cast<AEODPlayerController>(CharOwner->Controller) : nullptr;
+	if (PC)
+	{
+		PC->UnregisterPopupWidget(this);
+	}	
 
 	Super::ResetChainSkill();
 }
