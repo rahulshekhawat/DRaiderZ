@@ -215,7 +215,7 @@ public:
 	virtual void TriggerInteraction() override;
 	virtual void StartInteraction() override;
 	virtual void UpdateInteraction() override;
-	virtual void CancelInteraction() override;
+	virtual void CancelInteraction(EInteractionCancelType CancelType) override;
 	virtual void FinishInteraction() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Character Interaction")

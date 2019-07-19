@@ -1712,7 +1712,7 @@ void AEODCharacterBase::UpdateInteraction()
 {
 }
 
-void AEODCharacterBase::CancelInteraction()
+void AEODCharacterBase::CancelInteraction(EInteractionCancelType CancelType)
 {
 }
 

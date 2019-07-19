@@ -9,7 +9,7 @@
 #include "InventoryComponent.h"
 #include "PlayerStatsComponent.h"
 #include "PlayerSkillsComponent.h"
-
+#include "InteractionInterface.h"
 #include "DynamicHUDWidget.h"
 #include "EODGameModeBase.h"
 #include "StatusIndicatorWidget.h"
@@ -925,10 +925,8 @@ void AEODPlayerController::OnPressingEscapeKey()
 {
 	if (IsValid(EODCharacter) && EODCharacter->IsInteracting())
 	{
-		EODCharacter->CancelInteraction();
+		EODCharacter->CancelInteraction(EInteractionCancelType::ManualCancel);
 	}
-
-
 
 	if (IsPaused())
 	{

@@ -19,7 +19,7 @@ EInteractionResult IInteractionInterface::OnInteractionUpdate_Implementation(AEO
 	return EInteractionResult();
 }
 
-void IInteractionInterface::OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelReason CancelReason)
+void IInteractionInterface::OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelType CancelType)
 {
 	// empty defintion
 }

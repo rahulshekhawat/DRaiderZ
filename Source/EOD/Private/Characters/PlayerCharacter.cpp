@@ -615,61 +615,52 @@ void APlayerCharacter::TriggerInteraction()
 
 void APlayerCharacter::StartInteraction()
 {
-	IInteractionInterface* InteractionObj = Cast<IInteractionInterface>(FocusedInteractiveActor);
-	if (InteractionObj)
+	IInteractionInterface* InteractionInterface = Cast<IInteractionInterface>(FocusedInteractiveActor);
+	if (InteractionInterface == nullptr)
 	{
-		FCharacterStateInfo NewStateInfo(ECharacterState::Interacting, 0);
+		return;
+	}
+
+	EInteractionResult Result = InteractionInterface->Execute_OnInteractionStart(FocusedInteractiveActor, this);
+	FCharacterStateInfo NewStateInfo(ECharacterState::Interacting, 0);
+	switch (Result)
+	{
+	case EInteractionResult::InteractionRequestFailed:
+		break;
+	case EInteractionResult::InteractionUpdated:
 		CharacterStateInfo = NewStateInfo;
 		SetCharacterStateAllowsMovement(false);
 		SetCharacterStateAllowsRotation(false);
-
-		if (GameplayAudioComponent)
-		{
-			GameplayAudioComponent->SetSound(DialogueTriggeredSound);
-			GameplayAudioComponent->Play();
-		}
-
-		//~ @todo
-		// InteractionObj->Execute_OnInteract(FocusedInteractiveActor, this);
-	}
-	else
-	{
-		CancelInteraction();
+		break;
+	case EInteractionResult::InteractionCancelled:
+		break;
+	case EInteractionResult::InteractionExitedByPlayer:
+		break;
+	case EInteractionResult::InteractionFinished:
+		break;
+	default:
+		break;
 	}
 
 	/*
-
-	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
-	if (PC && ActiveInteractiveActor)
+	PC->SetViewTargetWithBlend(ActiveInteractiveActor, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
+	if (GameplayAudioComponent)
 	{
-		IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
-		// Just in case, make sure 'ActiveInteractiveActor' implements 'IInteractionInterface'
-		if (InteractiveObj)
-		{
-			PC->SetViewTargetWithBlend(ActiveInteractiveActor, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
-
-			FCharacterStateInfo NewStateInfo;
-			NewStateInfo.CharacterState = ECharacterState::Interacting;
-			NewStateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
-			CharacterStateInfo = NewStateInfo;
-			SetCharacterStateAllowsMovement_Local(false);
-			SetCharacterStateAllowsRotation(false);
-
-			// DisplayDialogueWidget();
-
-
-			InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this);
-		}
-	}
-	else
-	{
-		CancelInteraction();
+		GameplayAudioComponent->SetSound(DialogueTriggeredSound);
+		GameplayAudioComponent->Play();
 	}
 	*/
 }
 
 void APlayerCharacter::UpdateInteraction()
 {
+	IInteractionInterface* InteractionInterface = Cast<IInteractionInterface>(FocusedInteractiveActor);
+	if (InteractionInterface == nullptr)
+	{
+		FinishInteraction();
+		return;
+	}
+
 	UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
 	if (GameSingleton && DialogueWidget && DialogueWidget->GetDialogueWindowID() != NAME_None)
 	{
@@ -695,23 +686,20 @@ void APlayerCharacter::UpdateInteraction()
 	}
 }
 
-void APlayerCharacter::CancelInteraction()
+void APlayerCharacter::CancelInteraction(EInteractionCancelType CancelType)
 {
-	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
-	if (PC)
+	IInteractionInterface* InteractionInterface = Cast<IInteractionInterface>(FocusedInteractiveActor);
+	if (InteractionInterface)
 	{
-		PC->SetViewTargetWithBlend(this, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
-		ResetState();
-
-		RemoveDialogueWidget();
-
-		GameplayAudioComponent->SetSound(DialogueEndSound);
-		GameplayAudioComponent->Play();
+		InteractionInterface->Execute_OnInteractionCancel(FocusedInteractiveActor, this, CancelType);
 	}
+
+	ResetState();
 }
 
 void APlayerCharacter::FinishInteraction()
 {
+	ResetState();
 }
 
 void APlayerCharacter::RequestDialogue_Implementation(AActor* Requestor, FName DialogueWindowID)

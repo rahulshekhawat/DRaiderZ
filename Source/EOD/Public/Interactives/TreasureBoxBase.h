@@ -33,7 +33,7 @@ public:
 	virtual EInteractionResult OnInteractionUpdate_Implementation(AEODCharacterBase* Character);
 
 	/** This event is called when a (player) character cancels interaction with the interactive actor */
-	virtual void OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelReason CancelReason);
+	virtual void OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelType CancelType);
 	//~ End Interactive Interface
 
 	//~ Begin Lootable Interface

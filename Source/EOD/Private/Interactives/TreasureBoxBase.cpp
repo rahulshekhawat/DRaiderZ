@@ -59,7 +59,7 @@ EInteractionResult ATreasureBoxBase::OnInteractionUpdate_Implementation(AEODChar
 	return EInteractionResult();
 }
 
-void ATreasureBoxBase::OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelReason CancelReason)
+void ATreasureBoxBase::OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelType CancelType)
 {
 }
 

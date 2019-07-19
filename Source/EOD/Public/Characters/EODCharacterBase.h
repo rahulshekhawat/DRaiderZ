@@ -9,6 +9,7 @@
 #include "CharacterLibrary.h"
 #include "StatsComponentBase.h"
 #include "CombatInterface.h"
+#include "InteractionInterface.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -354,7 +355,7 @@ public:
 	virtual void UpdateInteraction();
 
 	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
-	virtual void CancelInteraction();
+	virtual void CancelInteraction(EInteractionCancelType CancelType);
 
 	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
 	virtual void FinishInteraction();

@@ -19,11 +19,10 @@ enum class EInteractionResult : uint8
 };
 
 UENUM(BlueprintType)
-enum class EInteractionCancelReason : uint8
+enum class EInteractionCancelType : uint8
 {
-	Finished,
-	Interrupted,
-	Exited
+	ManualCancel,
+	AutoCancel
 };
 
 
@@ -62,8 +61,8 @@ public:
 
 	/** This event is called when a (player) character cancels interaction with the interactive actor */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
-	void OnInteractionCancel(AEODCharacterBase* Character, EInteractionCancelReason CancelReason);
-	virtual void OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelReason CancelReason);
+	void OnInteractionCancel(AEODCharacterBase* Character, EInteractionCancelType CancelType);
+	virtual void OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelType CancelType);
 
 	/** This event is called when a (player) character begins overlap with the underlying actor */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
