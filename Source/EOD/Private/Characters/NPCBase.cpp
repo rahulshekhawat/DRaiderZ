@@ -33,10 +33,6 @@ void ANPCBase::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ANPCBase::OnInteract_Implementation(AEODCharacterBase* Character)
-{
-}
-
 void ANPCBase::EnableCustomDepth_Implementation()
 {
 	if (IsValid(GetMesh()))

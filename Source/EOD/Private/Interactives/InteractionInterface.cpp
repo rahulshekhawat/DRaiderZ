@@ -7,7 +7,19 @@ UInteractionInterface::UInteractionInterface(const FObjectInitializer& ObjectIni
 	
 }
 
-void IInteractionInterface::OnInteract_Implementation(AEODCharacterBase* Character)
+EInteractionResult IInteractionInterface::OnInteractionStart_Implementation(AEODCharacterBase* Character)
+{
+	// empty defintion
+	return EInteractionResult();
+}
+
+EInteractionResult IInteractionInterface::OnInteractionUpdate_Implementation(AEODCharacterBase* Character)
+{
+	// empty defintion
+	return EInteractionResult();
+}
+
+void IInteractionInterface::OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelReason CancelReason)
 {
 	// empty defintion
 }

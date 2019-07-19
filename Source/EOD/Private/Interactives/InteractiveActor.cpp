@@ -71,10 +71,6 @@ void AInteractiveActor::DisableCustomDepth_Implementation()
 	}
 }
 
-void AInteractiveActor::OnInteract_Implementation(AEODCharacterBase* Character)
-{
-}
-
 void AInteractiveActor::OnGainFocus_Implementation(AEODCharacterBase* Character)
 {
 	AEODPlayerController* PC = Character ? Cast<AEODPlayerController>(Character->Controller) : nullptr;

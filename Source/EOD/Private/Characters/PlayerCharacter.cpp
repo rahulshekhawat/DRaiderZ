@@ -618,21 +618,26 @@ void APlayerCharacter::StartInteraction()
 	IInteractionInterface* InteractionObj = Cast<IInteractionInterface>(FocusedInteractiveActor);
 	if (InteractionObj)
 	{
-		InteractionObj->Execute_OnInteract(FocusedInteractiveActor, this);
+		FCharacterStateInfo NewStateInfo(ECharacterState::Interacting, 0);
+		CharacterStateInfo = NewStateInfo;
+		SetCharacterStateAllowsMovement(false);
+		SetCharacterStateAllowsRotation(false);
+
+		if (GameplayAudioComponent)
+		{
+			GameplayAudioComponent->SetSound(DialogueTriggeredSound);
+			GameplayAudioComponent->Play();
+		}
+
+		//~ @todo
+		// InteractionObj->Execute_OnInteract(FocusedInteractiveActor, this);
 	}
-
-
-
+	else
+	{
+		CancelInteraction();
+	}
 
 	/*
-	if (ActiveInteractiveActor)
-	{
-		IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(ActiveInteractiveActor);
-		if (InteractiveObj)
-		{
-			InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this);
-		}
-	}
 
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetController());
 	if (PC && ActiveInteractiveActor)
@@ -652,11 +657,6 @@ void APlayerCharacter::StartInteraction()
 
 			// DisplayDialogueWidget();
 
-			if (GameplayAudioComponent)
-			{
-				GameplayAudioComponent->SetSound(DialogueTriggeredSound);
-				GameplayAudioComponent->Play();
-			}
 
 			InteractiveObj->Execute_OnInteract(ActiveInteractiveActor, this);
 		}

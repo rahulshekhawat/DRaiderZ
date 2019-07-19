@@ -26,7 +26,14 @@ public:
 	virtual void BeginPlay() override;
 
 	//~ Begin Interactive Interface
-	virtual void OnInteract_Implementation(AEODCharacterBase* Character) override;
+	/** This event is called when a (player) character starts interacting with the interactive actor */
+	virtual EInteractionResult OnInteractionStart_Implementation(AEODCharacterBase* Character);
+
+	/** This event is called when a (player) character wants to update the current interaction with the interactive actor */
+	virtual EInteractionResult OnInteractionUpdate_Implementation(AEODCharacterBase* Character);
+
+	/** This event is called when a (player) character cancels interaction with the interactive actor */
+	virtual void OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelReason CancelReason);
 	//~ End Interactive Interface
 
 	//~ Begin Lootable Interface

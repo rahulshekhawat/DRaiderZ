@@ -37,8 +37,10 @@ void ATreasureBoxBase::BeginPlay()
 	GenerateLootInfoArray();
 }
 
-void ATreasureBoxBase::OnInteract_Implementation(AEODCharacterBase* Character)
+EInteractionResult ATreasureBoxBase::OnInteractionStart_Implementation(AEODCharacterBase* Character)
 {
+	//~ @todo
+	/*
 	// Ignore interaction request if it's not the local player interacting with us
 	if (!Character->Controller && !Character->Controller->IsLocalPlayerController())
 	{
@@ -48,7 +50,17 @@ void ATreasureBoxBase::OnInteract_Implementation(AEODCharacterBase* Character)
 	OpenBox();
 
 	//~ @todo check for loot, play player loot animation if there's loot, etc.
+	*/
+	return EInteractionResult();
+}
 
+EInteractionResult ATreasureBoxBase::OnInteractionUpdate_Implementation(AEODCharacterBase* Character)
+{
+	return EInteractionResult();
+}
+
+void ATreasureBoxBase::OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelReason CancelReason)
+{
 }
 
 void ATreasureBoxBase::GenerateLootInfoArray()

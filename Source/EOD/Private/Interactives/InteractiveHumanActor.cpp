@@ -114,10 +114,6 @@ void AInteractiveHumanActor::DisableCustomDepth_Implementation()
 	if (Feet) { Feet->SetRenderCustomDepth(false); }
 }
 
-void AInteractiveHumanActor::OnInteract_Implementation(AEODCharacterBase* Character)
-{
-}
-
 USkeletalMeshComponent* AInteractiveHumanActor::CreateNewArmorComponent(const FName Name, const FObjectInitializer& ObjectInitializer)
 {
 	USkeletalMeshComponent* Sk = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, Name);

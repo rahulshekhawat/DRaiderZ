@@ -8,6 +8,25 @@
 class UUserWidget;
 class AEODCharacterBase;
 
+UENUM(BlueprintType)
+enum class EInteractionResult : uint8
+{
+	InteractionRequestFailed,
+	InteractionUpdated, // And it's not over yet
+	InteractionCancelled,
+	InteractionExitedByPlayer,
+	InteractionFinished
+};
+
+UENUM(BlueprintType)
+enum class EInteractionCancelReason : uint8
+{
+	Finished,
+	Interrupted,
+	Exited
+};
+
+
 /** An interface that must be implemented for all in-game interactive actors */
 UINTERFACE(BlueprintType)
 class EOD_API UInteractionInterface : public UInterface
@@ -31,10 +50,20 @@ public:
 	//  Interaction Interface
 	// --------------------------------------
 
-	/** This event is called when a (player) character interacts with the underlying actor */
+	/** This event is called when a (player) character starts interacting with the interactive actor */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
-	void OnInteract(AEODCharacterBase* Character);
-	virtual void OnInteract_Implementation(AEODCharacterBase* Character);
+	EInteractionResult OnInteractionStart(AEODCharacterBase* Character);
+	virtual EInteractionResult OnInteractionStart_Implementation(AEODCharacterBase* Character);
+
+	/** This event is called when a (player) character wants to update the current interaction with the interactive actor */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
+	EInteractionResult OnInteractionUpdate(AEODCharacterBase* Character);
+	virtual EInteractionResult OnInteractionUpdate_Implementation(AEODCharacterBase* Character);
+
+	/** This event is called when a (player) character cancels interaction with the interactive actor */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
+	void OnInteractionCancel(AEODCharacterBase* Character, EInteractionCancelReason CancelReason);
+	virtual void OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelReason CancelReason);
 
 	/** This event is called when a (player) character begins overlap with the underlying actor */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)

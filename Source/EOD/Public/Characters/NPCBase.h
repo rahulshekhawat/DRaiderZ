@@ -24,8 +24,6 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual void OnInteract_Implementation(AEODCharacterBase* Character) override;
-
 	virtual void EnableCustomDepth_Implementation() override;
 
 	virtual void DisableCustomDepth_Implementation() override;

@@ -36,7 +36,7 @@ public:
 	virtual void DisableCustomDepth_Implementation() override;
 
 	/** This event is called when a (player) character interacts with the underlying actor */
-	virtual void OnInteract_Implementation(AEODCharacterBase* Character) override;
+	// virtual void OnInteract_Implementation(AEODCharacterBase* Character) override;
 
 	virtual void OnGainFocus_Implementation(AEODCharacterBase* Character) override;
 
