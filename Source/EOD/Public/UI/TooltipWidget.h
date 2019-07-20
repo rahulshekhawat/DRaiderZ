@@ -3,8 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EODLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "TooltipWidget.generated.h"
+
+class UImage;
+class UVerticalBox;
+class URichTextBlock;
+class UStatValueWidget;
 
 /**
  * UTooltipWidget pops up on hovering over a relevant UI element (e.g. inventory item)
@@ -28,8 +34,36 @@ public:
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
+	
+protected:
 
+	UPROPERTY(BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
+	UImage* Icon;
 	
+	UPROPERTY(BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
+	URichTextBlock* TitleText;
 	
+	UPROPERTY(BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
+	URichTextBlock* SubTitleText;
 	
+	UPROPERTY(BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
+	URichTextBlock* DescriptionText;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Child Widget", meta = (BindWidget))
+	UVerticalBox* StatsVerticalBox;
+
+public:
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetIcon(UTexture* InTexture);
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetTitle(const FString& InValue, ERarity Rarity);
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetSubTitle(const FString& InValue);
+
+	UFUNCTION(BlueprintCallable, Category = "Utility")
+	void SetDescription(const FString& InValue);
+
 };

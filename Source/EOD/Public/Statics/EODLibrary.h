@@ -15,6 +15,15 @@ class UGameUserSettings;
 class UContainerWidget;
 
 UENUM(BlueprintType)
+enum class ERarity : uint8
+{
+	Common,
+	Uncommon,
+	Rare,
+	Legendary
+};
+
+UENUM(BlueprintType)
 enum class EEODContainerType : uint8
 {
 	None,
