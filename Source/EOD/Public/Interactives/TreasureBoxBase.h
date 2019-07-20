@@ -53,7 +53,7 @@ public:
 	bool BP_IsOpen() const;
 
 	/** Returns true if this treasure box has any loot remaining */
-	UFUNCTION(BlueprintPure, Category = "Treasure Box", meta = (DisplayName = "IsOpen"))
+	UFUNCTION(BlueprintPure, Category = "Treasure Box")
 	bool HasLoot() const;
 
 	/** Returns true if this treasure box has already been opened */

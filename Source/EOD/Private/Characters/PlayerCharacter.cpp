@@ -184,7 +184,7 @@ void APlayerCharacter::SwitchToInteractionState()
 	CharacterStateInfo.SubStateIndex = 0;
 }
 
-void APlayerCharacter::StartLooting()
+bool APlayerCharacter::StartLooting()
 {
 	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();
 	UAnimMontage* AnimMontage = AnimRef ? AnimRef->LootStart.Get() : nullptr;
@@ -195,12 +195,15 @@ void APlayerCharacter::StartLooting()
 		SetCharacterStateInfo(ECharacterState::Looting, 0, false);
 		bCharacterStateAllowsMovement = false;
 		bCharacterStateAllowsRotation = false;
+		return true;
 	}
+
+	return false;
 }
 
 void APlayerCharacter::StopLooting()
 {
-	if (CharacterStateInfo.CharacterState == ECharacterState::Looting)
+	if (IsLooting())
 	{
 		//~ @todo Start LootEnd animation with an offset calculated from LooStart animation's position
 
@@ -622,25 +625,6 @@ void APlayerCharacter::StartInteraction()
 	}
 
 	EInteractionResult Result = InteractionInterface->Execute_OnInteractionStart(FocusedInteractiveActor, this);
-	FCharacterStateInfo NewStateInfo(ECharacterState::Interacting, 0);
-	switch (Result)
-	{
-	case EInteractionResult::InteractionRequestFailed:
-		break;
-	case EInteractionResult::InteractionUpdated:
-		CharacterStateInfo = NewStateInfo;
-		SetCharacterStateAllowsMovement(false);
-		SetCharacterStateAllowsRotation(false);
-		break;
-	case EInteractionResult::InteractionCancelled:
-		break;
-	case EInteractionResult::InteractionExitedByPlayer:
-		break;
-	case EInteractionResult::InteractionFinished:
-		break;
-	default:
-		break;
-	}
 
 	/*
 	PC->SetViewTargetWithBlend(ActiveInteractiveActor, 0.5, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
@@ -657,10 +641,16 @@ void APlayerCharacter::UpdateInteraction()
 	IInteractionInterface* InteractionInterface = Cast<IInteractionInterface>(FocusedInteractiveActor);
 	if (InteractionInterface == nullptr)
 	{
-		FinishInteraction();
+		if (IsInteracting())
+		{
+			ResetState();
+		}
 		return;
 	}
 
+	InteractionInterface->Execute_OnInteractionUpdate(FocusedInteractiveActor, this);
+
+	/*
 	UGameSingleton* GameSingleton = Cast<UGameSingleton>(GEngine->GameSingleton);
 	if (GameSingleton && DialogueWidget && DialogueWidget->GetDialogueWindowID() != NAME_None)
 	{
@@ -684,6 +674,7 @@ void APlayerCharacter::UpdateInteraction()
 			GameplayAudioComponent->Play();
 		}
 	}
+	*/
 }
 
 void APlayerCharacter::CancelInteraction(EInteractionCancelType CancelType)
@@ -693,13 +684,15 @@ void APlayerCharacter::CancelInteraction(EInteractionCancelType CancelType)
 	{
 		InteractionInterface->Execute_OnInteractionCancel(FocusedInteractiveActor, this, CancelType);
 	}
-
-	ResetState();
 }
 
 void APlayerCharacter::FinishInteraction()
 {
-	ResetState();
+	IInteractionInterface* InteractionInterface = Cast<IInteractionInterface>(FocusedInteractiveActor);
+	if (InteractionInterface)
+	{
+		InteractionInterface->Execute_OnInteractionFinish(FocusedInteractiveActor, this);
+	}
 }
 
 void APlayerCharacter::RequestDialogue_Implementation(AActor* Requestor, FName DialogueWindowID)

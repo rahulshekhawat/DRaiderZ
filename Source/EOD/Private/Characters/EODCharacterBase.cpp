@@ -1739,8 +1739,9 @@ void AEODCharacterBase::SetCharacterStateInfo(ECharacterState NewState, uint8 Su
 	CharacterStateInfo = NewStateInfo;
 }
 
-void AEODCharacterBase::StartLooting()
+bool AEODCharacterBase::StartLooting()
 {
+	return false;
 }
 
 void AEODCharacterBase::StopLooting()

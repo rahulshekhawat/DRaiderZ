@@ -104,7 +104,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character Stats")
 	void SwitchToInteractionState();
 	
-	virtual void StartLooting() override;
+	virtual bool StartLooting() override;
 
 	virtual void StopLooting() override;
 

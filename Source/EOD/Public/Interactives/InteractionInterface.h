@@ -15,7 +15,8 @@ enum class EInteractionResult : uint8
 	InteractionUpdated, // And it's not over yet
 	InteractionCancelled,
 	InteractionExitedByPlayer,
-	InteractionFinished
+	InteractionFinished,
+	DelayedFinish
 };
 
 UENUM(BlueprintType)
@@ -63,6 +64,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
 	void OnInteractionCancel(AEODCharacterBase* Character, EInteractionCancelType CancelType);
 	virtual void OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelType CancelType);
+	
+	/** This event is called when a (player) character finishes interaction with the interactive actor */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)
+	void OnInteractionFinish(AEODCharacterBase* Character);
+	virtual void OnInteractionFinish_Implementation(AEODCharacterBase* Character);
 
 	/** This event is called when a (player) character begins overlap with the underlying actor */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = InGameInteraction)

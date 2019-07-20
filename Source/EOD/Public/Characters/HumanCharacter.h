@@ -432,9 +432,9 @@ public:
 
 	virtual void OnPressedLeft() override;
 
-	virtual void OnReleasedLeft() override;
-
 	virtual void OnPressedRight() override;
+
+	virtual void OnReleasedLeft() override;
 
 	virtual void OnReleasedRight() override;
 

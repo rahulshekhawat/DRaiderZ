@@ -30,7 +30,7 @@ public class EOD : ModuleRules
                 "EOD/Public/UI/Menu",
                 "EOD/Public/Weapons",
                 "EOD/Public/Interactives",
-                "EOD/Public/Lootable",
+                "EOD/Public/Lootables",
                 "EOD/Public/Items"
             }
         );

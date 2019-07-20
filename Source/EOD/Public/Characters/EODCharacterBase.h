@@ -289,9 +289,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Character State")
 	virtual void SetCharacterStateInfo(ECharacterState NewState, uint8 SubStateIndex = 0, bool bUpdateRepIndex = true);
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Character State")
-	virtual void StartLooting();
+	virtual bool StartLooting();
 	
 	UFUNCTION(BlueprintCallable, Category = "Character State")
 	virtual void StopLooting();
