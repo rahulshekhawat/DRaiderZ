@@ -16,9 +16,8 @@ class EOD_API UContainerWidgetBase : public UUserWidget
 	
 public:
 
-	// --------------------------------------
+	///////////////////////////////////////////////////////////////////////////
 	//  UE4 Method Overrides
-	// --------------------------------------
 
 	UContainerWidgetBase(const FObjectInitializer& ObjectInitializer);
 
