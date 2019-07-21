@@ -31,7 +31,8 @@ public class EOD : ModuleRules
                 "EOD/Public/Weapons",
                 "EOD/Public/Interactives",
                 "EOD/Public/Lootables",
-                "EOD/Public/Items"
+                "EOD/Public/Items",
+                "EOD/Public/Widgets"
             }
         );
 

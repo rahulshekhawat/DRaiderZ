@@ -22,7 +22,7 @@ enum class EContainerType : uint8
 	None,			// This container has not yet been initialized
 	Inventory,		// This container belongs to an inventory widget
 	SkillTree,		// This container belongs to a skill tree widget
-	SkillBar,		// This container belongs to a skill bar 
+	SkillBar,		// This container belongs to a skill bar widget
 
 	//~ @todo Add character stats widget
 };
