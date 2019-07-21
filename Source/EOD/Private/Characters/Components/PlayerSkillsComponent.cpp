@@ -89,77 +89,6 @@ void UPlayerSkillsComponent::OnReleasingSkillKey(const int32 SkillKeyIndex)
 	LastReleasedSkillKey = SkillKeyIndex;
 }
 
-void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
-{
-	// If skills have already been initialized
-	if (SkillIndexToSkillMap.Num() > 0)
-	{
-		return;
-	}
-
-	if (!CompOwner)
-	{
-		// If CompOwner is invalid, try to initalize it from locally cached component owner
-		CompOwner = GetCharacterOwner();
-	}
-
-	check(CompOwner);
-	if (!SkillsDataTable)
-	{
-		return;
-	}
-
-	FString ContextString = FString("UPlayerSkillsComponent::InitializeSkills()");
-	TArray<FName> Keys = SkillsDataTable->GetRowNames();
-	uint8 SkillIndex = 1;
-	for (FName Key : Keys)
-	{
-		FGameplaySkillTableRow* Row = SkillsDataTable->FindRow<FGameplaySkillTableRow>(Key, ContextString);
-		check(Row);
-
-		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->SkillClass, Key, RF_Transient);
-		check(GameplaySkill);
-
-		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
-		GameplaySkill->SetSkillIndex(SkillIndex);
-	
-		if (GameplaySkill->GetSkillGroup() == NAME_None)
-		{
-			GameplaySkill->SetSkillGroup(Key);
-		}
-		else
-		{
-			check(GameplaySkill->GetSkillGroup() == Key);
-		}
-
-		SkillIndexToSkillMap.Add(GameplaySkill->GetSkillIndex(), GameplaySkill);
-		SkillGroupToSkillMap.Add(GameplaySkill->GetSkillGroup(), GameplaySkill);
-		SkillGroupToSkillIndexMap.Add(GameplaySkill->GetSkillGroup(), GameplaySkill->GetSkillIndex());
-
-		SkillIndex++;
-	}
-
-	UEODGameInstance* GI = Cast<UEODGameInstance>(CompOwner->GetGameInstance());
-	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
-	if (SaveGame)
-	{
-		this->SkillBarMap = SaveGame->SkillBarMap;
-		TMap<FName, FSkillTreeSlotSaveData> SkillTreeSlotsSaveData = SaveGame->SkillTreeSlotsSaveData;
-		
-		TArray<FName> SkillGroups;
-		SkillTreeSlotsSaveData.GetKeys(SkillGroups);
-		for (FName SkillGroup : SkillGroups)
-		{
-			FSkillTreeSlotSaveData& SlotSaveData = SkillTreeSlotsSaveData[SkillGroup];
-			UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(GetSkillForSkillGroup(SkillGroup));
-			if (PlayerSkill)
-			{
-				PlayerSkill->UnlockSkill(SlotSaveData.CurrentUpgrade);
-			}
-		}
-	}
-}
-
 bool UPlayerSkillsComponent::AddSkillToSkillBar(uint8 SkillBarIndex, FName SkillGroup)
 {
 	uint8 SkillIndex = SkillGroupToSkillIndexMap.Contains(SkillGroup) ? SkillGroupToSkillIndexMap[SkillGroup] : 0;
@@ -621,4 +550,100 @@ void UPlayerSkillsComponent::Server_ReleaseSkill_Implementation(uint8 SkillIndex
 
 	SkillChargeDuration = SkillIndex;
 	ReleaseSkill(SkillIndex);
+}
+
+void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
+{
+	// If there are already skills in Skill Map
+	if (SkillIndexToSkillMap.Num() > 0)
+	{
+		VerifySkillsInitializedCorrectly();
+		return;
+	}
+
+	if (!CompOwner)
+	{
+		// If CompOwner is invalid, try to initalize it from locally cached component owner
+		CompOwner = GetCharacterOwner();
+	}
+
+	check(CompOwner);
+	if (!SkillsDataTable)
+	{
+		return;
+	}
+
+	FString ContextString = FString("UPlayerSkillsComponent::InitializeSkills() - Looking for player skill class");
+	TArray<FName> Keys = SkillsDataTable->GetRowNames();
+	uint8 SkillIndex = 1;
+	for (FName Key : Keys)
+	{
+		FGameplaySkillTableRow* Row = SkillsDataTable->FindRow<FGameplaySkillTableRow>(Key, ContextString);
+		check(Row);
+
+		UGameplaySkillBase* GameplaySkill = NewObject<UGameplaySkillBase>(this, Row->SkillClass, Key, RF_Transient);
+		check(GameplaySkill);
+
+		GameplaySkill->InitSkill(CompOwner, CompOwner->Controller);
+		GameplaySkill->SetSkillIndex(SkillIndex);
+	
+		if (GameplaySkill->GetSkillGroup() == NAME_None)
+		{
+			GameplaySkill->SetSkillGroup(Key);
+		}
+		else
+		{
+			check(GameplaySkill->GetSkillGroup() == Key);
+		}
+
+		SkillIndexToSkillMap.Add(GameplaySkill->GetSkillIndex(), GameplaySkill);
+		SkillGroupToSkillMap.Add(GameplaySkill->GetSkillGroup(), GameplaySkill);
+		SkillGroupToSkillIndexMap.Add(GameplaySkill->GetSkillGroup(), GameplaySkill->GetSkillIndex());
+
+		SkillIndex++;
+	}
+
+	UnlockPlayerSkillsFromSaveGame(CompOwner);
+}
+
+void UPlayerSkillsComponent::VerifySkillsInitializedCorrectly()
+{
+	check(SkillsDataTable != nullptr);
+
+	TArray<FName> Keys = SkillsDataTable->GetRowNames();
+
+	int32 Num1 = SkillIndexToSkillMap.Num();
+	int32 Num2 = SkillGroupToSkillMap.Num();
+	int32 Num3 = SkillGroupToSkillIndexMap.Num();
+	int32 KeyNum = Keys.Num();
+
+	check(Num1 == Num2 && Num2 == Num3);
+	check(Num1 == KeyNum);
+
+	//~ @todo [optional] check the skills have been constructed correctly
+}
+
+void UPlayerSkillsComponent::UnlockPlayerSkillsFromSaveGame(AEODCharacterBase* CompOwner)
+{
+	check(CompOwner);
+
+	UEODGameInstance* GI = Cast<UEODGameInstance>(CompOwner->GetGameInstance());
+	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
+	if (SaveGame)
+	{
+		this->SkillBarMap = SaveGame->SkillBarMap;
+		TMap<FName, FSkillTreeSlotSaveData> SkillTreeSlotsSaveData = SaveGame->SkillTreeSlotsSaveData;
+
+		TArray<FName> SkillGroups;
+		SkillTreeSlotsSaveData.GetKeys(SkillGroups);
+		for (FName SkillGroup : SkillGroups)
+		{
+			FSkillTreeSlotSaveData& SlotSaveData = SkillTreeSlotsSaveData[SkillGroup];
+			UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(GetSkillForSkillGroup(SkillGroup));
+			if (PlayerSkill)
+			{
+				PlayerSkill->UnlockSkill(SlotSaveData.CurrentUpgrade);
+			}
+		}
+	}
 }

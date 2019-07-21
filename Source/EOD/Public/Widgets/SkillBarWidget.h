@@ -15,11 +15,10 @@ UCLASS()
 class EOD_API USkillBarWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
-public:
 
 	///////////////////////////////////////////////////////////////////////////
 	//  UE4 Method Overrides
+public:
 
 	USkillBarWidget(const FObjectInitializer& ObjectInitializer);
 

@@ -6,9 +6,13 @@
 #include "GameplaySkillsComponent.h"
 #include "PlayerSkillsComponent.generated.h"
 
+class UContainerWidget;
+
 class UGameplaySkillBase;
 class UPlayerSkillBase;
-class UContainerWidget;
+class USkillBarWidget;
+class USkillTreeWidget;
+class USkillPointsInfoWidget;
 
 /**
  * 
@@ -40,9 +44,7 @@ public:
 
 	// --------------------------------------
 	//  Gameplay
-	// --------------------------------------
-
-	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr) override;
+	// -------------------------------------
 
 	virtual void UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown) override;
 
@@ -106,6 +108,34 @@ protected:
 	virtual void Server_TriggerSkill_Implementation(uint8 SkillIndex) override;
 	virtual void Server_ReleaseSkill_Implementation(uint8 SkillIndex, float ChargeDuration) override;
 
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Player Skills
+public:
+
+	inline USkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
+
+	inline USkillBarWidget* GetSkillBarWidget() const { return SkillBarWidget; }
+
+	inline USkillPointsInfoWidget* GetSkillPointsInfoWidget() const { return SkillPointsInfoWidget; }
+
+	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr) override;
+	
+	/** Verifies skills have been initialized correctly. Raises an exception if not */
+	void VerifySkillsInitializedCorrectly();
+
+	void UnlockPlayerSkillsFromSaveGame(AEODCharacterBase* CompOwner = nullptr);
+
+private:
+
+	UPROPERTY(Transient)
+	USkillTreeWidget* SkillTreeWidget;
+	
+	UPROPERTY(Transient)
+	USkillBarWidget* SkillBarWidget;
+	
+	UPROPERTY(Transient)
+	USkillPointsInfoWidget* SkillPointsInfoWidget;
 
 
 };
