@@ -32,64 +32,64 @@ public:
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_1;
+	USkillBarContainerWidget* SkillContainer_1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_2;
+	USkillBarContainerWidget* SkillContainer_2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_3;
+	USkillBarContainerWidget* SkillContainer_3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_4;
+	USkillBarContainerWidget* SkillContainer_4;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_5;
+	USkillBarContainerWidget* SkillContainer_5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_6;
+	USkillBarContainerWidget* SkillContainer_6;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_7;
+	USkillBarContainerWidget* SkillContainer_7;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_8;
+	USkillBarContainerWidget* SkillContainer_8;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_9;
+	USkillBarContainerWidget* SkillContainer_9;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_10;
+	USkillBarContainerWidget* SkillContainer_10;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_11;
+	USkillBarContainerWidget* SkillContainer_11;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_12;
+	USkillBarContainerWidget* SkillContainer_12;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_13;
+	USkillBarContainerWidget* SkillContainer_13;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_14;
+	USkillBarContainerWidget* SkillContainer_14;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_15;
+	USkillBarContainerWidget* SkillContainer_15;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_16;
+	USkillBarContainerWidget* SkillContainer_16;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_17;
+	USkillBarContainerWidget* SkillContainer_17;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_18;
+	USkillBarContainerWidget* SkillContainer_18;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_19;
+	USkillBarContainerWidget* SkillContainer_19;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	UContainerWidget* SkillContainer_20;
+	USkillBarContainerWidget* SkillContainer_20;
 
 
 
