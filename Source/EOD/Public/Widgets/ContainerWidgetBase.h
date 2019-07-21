@@ -59,7 +59,7 @@ public:
 protected:
 
 	UPROPERTY(Transient)
-	UObject* ContainerData;
+	TWeakObjectPtr<UObject> ContainerData;
 
 
 };

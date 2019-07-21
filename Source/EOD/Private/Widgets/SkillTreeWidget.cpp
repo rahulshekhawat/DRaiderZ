@@ -3,8 +3,6 @@
 
 #include "SkillTreeWidget.h"
 
-#include "Components/Button.h"
-
 USkillTreeWidget::USkillTreeWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
@@ -57,22 +55,89 @@ void USkillTreeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void USkillTreeWidget::AddNewSTContainer(UPlayerSkillBase* PlayerSkill)
+{
+	//~ @todo
+}
+
 void USkillTreeWidget::ActivateAssassinTab()
 {
+	if (CurrentActiveTabIndex != 0 && SkillTreeSwitcher)
+	{
+		ResetTabStyleByIndex(CurrentActiveTabIndex);
+		SetButtonStyleToSelected(AssassinTab);
+		SkillTreeSwitcher->SetActiveWidgetIndex(0);
+		CurrentActiveTabIndex = 0;
+
+		AddSkillPointsInfoToCanvas(AssassinInfoCanvas);
+	}
 }
 
 void USkillTreeWidget::ActivateBerserkerTab()
 {
+	if (CurrentActiveTabIndex != 1 && SkillTreeSwitcher)
+	{
+		ResetTabStyleByIndex(CurrentActiveTabIndex);
+		SetButtonStyleToSelected(BerserkerTab);
+		SkillTreeSwitcher->SetActiveWidgetIndex(1);
+		CurrentActiveTabIndex = 1;
+
+		AddSkillPointsInfoToCanvas(BerserkerInfoCanvas);
+	}
 }
 
 void USkillTreeWidget::ActivateClericTab()
 {
+	if (CurrentActiveTabIndex != 2 && SkillTreeSwitcher)
+	{
+		ResetTabStyleByIndex(CurrentActiveTabIndex);
+		SetButtonStyleToSelected(ClericTab);
+		SkillTreeSwitcher->SetActiveWidgetIndex(2);
+		CurrentActiveTabIndex = 2;
+
+		AddSkillPointsInfoToCanvas(ClericInfoCanvas);
+	}
 }
 
 void USkillTreeWidget::ActivateDefenderTab()
 {
+	if (CurrentActiveTabIndex != 3 && SkillTreeSwitcher)
+	{
+		ResetTabStyleByIndex(CurrentActiveTabIndex);
+		SetButtonStyleToSelected(DefenderTab);
+		SkillTreeSwitcher->SetActiveWidgetIndex(3);
+		CurrentActiveTabIndex = 3;
+
+		AddSkillPointsInfoToCanvas(DefenderInfoCanvas);
+	}
 }
 
 void USkillTreeWidget::ActivateSorcererTab()
 {
+	if (CurrentActiveTabIndex != 4 && SkillTreeSwitcher)
+	{
+		ResetTabStyleByIndex(CurrentActiveTabIndex);
+		SetButtonStyleToSelected(SorcererTab);
+		SkillTreeSwitcher->SetActiveWidgetIndex(4);
+		CurrentActiveTabIndex = 4;
+
+		AddSkillPointsInfoToCanvas(SorcererInfoCanvas);
+	}
+}
+
+void USkillTreeWidget::OnSkillSlotClicked(USkillTreeContainerWidget* Widget, UUserWidget* ParentWidget)
+{
+	//~ @todo
+	/*
+	check(this == ParentWidget && Widget && SkillTreeComp);
+
+	FContainerData ContData = Widget->GetContainerData();
+	bool bAllocationSuccessful = SkillTreeComp->AttemptPointAllocationToSlot(ContData.ItemID);
+
+	if (bAllocationSuccessful)
+	{
+		UpdateSkillSlots();
+		UGameplayStatics::PlaySound2D(this, SkillPointAllocatedSound);
+	}
+	*/
 }

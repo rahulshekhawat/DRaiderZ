@@ -396,5 +396,5 @@ void UDynamicSkillTreeWidget::OnSkillSlotClicked(UContainerWidget* Widget, UUser
 	{
 		UpdateSkillSlots();
 		UGameplayStatics::PlaySound2D(this, SkillPointAllocatedSound);
-	}	
+	}
 }
