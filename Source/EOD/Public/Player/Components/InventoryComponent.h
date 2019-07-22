@@ -46,7 +46,7 @@ public:
 	// --------------------------------------
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	TArray<FInventoryItem>& GetInventoryItems();
+	const TArray<FInventoryItem>& GetInventoryItems();
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Inventory")
 	FOnInventoryItemChangedMCDelegate OnInventoryItemAdded;

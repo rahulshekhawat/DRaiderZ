@@ -177,9 +177,8 @@ void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Intentional additional calls to InitializeUIWidgets and BindUIDelegates (another in Restart())
-	InitializeUIWidgets();
-	BindUIDelegates();
+	// Intentional additional calls to InitializeWidgets (another in Restart())
+	InitializeWidgets();
 
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
@@ -221,9 +220,8 @@ void AEODCharacterBase::Restart()
 {
 	Super::Restart();
 
-	// Intentional additional calls to InitializeUIWidgets and BindUIDelegates (another in BeginPlay())
-	InitializeUIWidgets();
-	BindUIDelegates();
+	// Intentional additional calls to InitializeWidgets (another in BeginPlay())
+	InitializeWidgets();
 }
 
 float AEODCharacterBase::BP_GetRotationYawFromAxisInput()
@@ -520,12 +518,8 @@ void AEODCharacterBase::DisableiFrames()
 	bActiveiFrames = false;
 }
 
-void AEODCharacterBase::InitializeUIWidgets()
-{
-}
-
-void AEODCharacterBase::BindUIDelegates()
-{
+// void AEODCharacterBase::BindUIDelegates()
+// {
 	//~ @todo
 	/*
 	if (GetController() && GetController()->IsLocalPlayerController())
@@ -562,9 +556,13 @@ void AEODCharacterBase::BindUIDelegates()
 		}
 	}
 	*/
+// }
+
+void AEODCharacterBase::InitializeWidgets()
+{
 }
 
-void AEODCharacterBase::UnbindUIDelegates()
+void AEODCharacterBase::DeinitializeWidgets()
 {
 }
 

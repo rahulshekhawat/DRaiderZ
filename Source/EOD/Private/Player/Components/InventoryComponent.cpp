@@ -29,7 +29,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-TArray<FInventoryItem>& UInventoryComponent::GetInventoryItems()
+const TArray<FInventoryItem>& UInventoryComponent::GetInventoryItems()
 {
 	return Items;
 }

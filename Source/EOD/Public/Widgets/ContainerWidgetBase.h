@@ -13,11 +13,10 @@ UCLASS()
 class EOD_API UContainerWidgetBase : public UUserWidget
 {
 	GENERATED_BODY()
-	
-public:
 
 	///////////////////////////////////////////////////////////////////////////
 	//  UE4 Method Overrides
+public:
 
 	UContainerWidgetBase(const FObjectInitializer& ObjectInitializer);
 
@@ -27,6 +26,9 @@ public:
 
 	virtual void NativeDestruct() override;
 
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Child Widgets
 protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
@@ -47,19 +49,34 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	class UTextBlock* CooldownText;
 
-public:
 
 	///////////////////////////////////////////////////////////////////////////
 	//  Behaviour
+public:
 
-	virtual void PostManualConstruction(UUserWidget* InParentWidget, UObject* InContainerData);
+	virtual void PostManualConstruction(UUserWidget* InParentWidget, UObject* InDataObj);
+
+	virtual void ResetContainer();
+
+	virtual void SetDataObj(UObject* InDataObj);
 
 	virtual bool IsContainerEmpty() const;
+
+	inline UObject* GetDataObj() const { return DataObj.Get(); }
 
 protected:
 
 	UPROPERTY(Transient)
-	TWeakObjectPtr<UObject> ContainerData;
+	TWeakObjectPtr<UObject> DataObj;
 
+	/** Sets the display icon of this container */
+	UFUNCTION()
+	void SetIcon(UTexture* NewIcon);
+
+	UFUNCTION()
+	void SetSubText(int32 InCurrentValue, int32 InMaxValue);
+
+	UFUNCTION()
+	void SetCooldown(float InCooldown);
 
 };

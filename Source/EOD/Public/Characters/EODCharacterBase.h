@@ -720,11 +720,9 @@ private:
 	//  User Interface
 	// --------------------------------------
 
-	virtual void InitializeUIWidgets();
+	virtual void InitializeWidgets();
 
-	virtual void BindUIDelegates();
-
-	virtual void UnbindUIDelegates();
+	virtual void DeinitializeWidgets();
 
 public:
 

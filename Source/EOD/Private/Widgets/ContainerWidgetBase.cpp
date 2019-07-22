@@ -27,8 +27,9 @@ void UContainerWidgetBase::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UContainerWidgetBase::PostManualConstruction(UUserWidget* InParentWidget, UObject* InContainerData)
+void UContainerWidgetBase::PostManualConstruction(UUserWidget* InParentWidget, UObject* InDataObj)
 {
+
 	// check(ParentWidget); // ParentWidget shouldn't be NULL
 
 	/*
@@ -45,7 +46,27 @@ void UContainerWidgetBase::PostManualConstruction(UUserWidget* InParentWidget, U
 	*/
 }
 
+void UContainerWidgetBase::ResetContainer()
+{
+}
+
+void UContainerWidgetBase::SetDataObj(UObject* InDataObj)
+{
+}
+
 bool UContainerWidgetBase::IsContainerEmpty() const
 {
-	return (ContainerData != nullptr);
+	return (DataObj != nullptr);
+}
+
+void UContainerWidgetBase::SetIcon(UTexture* NewIcon)
+{
+}
+
+void UContainerWidgetBase::SetSubText(int32 InCurrentValue, int32 InMaxValue)
+{
+}
+
+void UContainerWidgetBase::SetCooldown(float InCooldown)
+{
 }

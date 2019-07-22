@@ -848,11 +848,23 @@ void APlayerCharacter::TurnOffTargetSwitch()
 	// Empty override to prevent call of Super::TurnOffTargetSwitch()
 }
 
-void APlayerCharacter::InitializeUIWidgets()
+void APlayerCharacter::InitializeWidgets()
 {
-	UPlayerSkillsComponent* SkillsComp = Cast<UPlayerSkillsComponent>(GetGameplaySkillsComponent());
-	check(SkillsComp);
-	SkillsComp->InitializeUIWidgets(this);
+	AEODPlayerController* EODPC = Cast<AEODPlayerController>(Controller);
+	if (EODPC)
+	{
+		EODPC->InitWidgets();
+		EODPC->BindWidgetDelegates();
+	}
+}
+
+void APlayerCharacter::DeinitializeWidgets()
+{
+	AEODPlayerController* EODPC = Cast<AEODPlayerController>(Controller);
+	if (EODPC)
+	{
+		EODPC->UnbindWidgetDelegates();
+	}
 }
 
 void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)

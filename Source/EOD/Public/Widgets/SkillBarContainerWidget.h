@@ -13,5 +13,24 @@ UCLASS()
 class EOD_API USkillBarContainerWidget : public UContainerWidgetBase
 {
 	GENERATED_BODY()
+		
+	///////////////////////////////////////////////////////////////////////////
+	//  UE4 Method Overrides
+public:
+
+	USkillBarContainerWidget(const FObjectInitializer& ObjectInitializer);
+
+	virtual bool Initialize() override;
+
+	virtual void NativeConstruct() override;
+
+	virtual void NativeDestruct() override;
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Behaviour
+public:
+
+	virtual void SetDataObj(UObject* InDataObj) override;
 	
 };

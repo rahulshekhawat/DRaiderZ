@@ -282,7 +282,9 @@ public:
 
 	virtual void TurnOffTargetSwitch() override;
 
-	virtual void InitializeUIWidgets() override;
+	virtual void InitializeWidgets() override;
+
+	virtual void DeinitializeWidgets() override;
 
 	void OnSkillGroupAddedToSkillBar(const FString& SkillGroup);
 

@@ -437,32 +437,42 @@ void AEODPlayerController::InitHUDWidget()
 
 void AEODPlayerController::InitStatusIndicatorWidget()
 {
+	UStatusIndicatorWidget* SIWidget = GetStatusIndicatorWidget();
+	if (SIWidget && StatsComponent)
+	{
+		SIWidget->UpdateHealthBar(StatsComponent->Health.GetMaxValue(), StatsComponent->Health.GetCurrentValue());
+		SIWidget->UpdateManaBar(StatsComponent->Mana.GetMaxValue(), StatsComponent->Mana.GetCurrentValue());
+		SIWidget->UpdateStaminaBar(StatsComponent->Stamina.GetMaxValue(), StatsComponent->Stamina.GetCurrentValue());
+	}
 }
 
 void AEODPlayerController::InitInventoryWidget()
 {
-	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetInventoryWidget()))
+	UInventoryWidget* InvWidget = GetInventoryWidget();
+	if (InvWidget && InventoryComponent)
 	{
-		UInventoryWidget* InvWidget = HUDWidget->GetInventoryWidget();
-		TArray<FInventoryItem> Items = InventoryComponent->GetInventoryItems();
+		const TArray<FInventoryItem>& Items = InventoryComponent->GetInventoryItems();
 		for (const FInventoryItem& Item : Items)
 		{
 			InvWidget->AddItem(Item);
 		}
-
-		InventoryComponent->OnInventoryItemAdded.AddDynamic(InvWidget, &UInventoryWidget::AddItem);
-		InventoryComponent->OnInventoryItemRemoved.AddDynamic(InvWidget, &UInventoryWidget::RemoveItem);
 	}
 }
 
 void AEODPlayerController::InitSkillTreeWidget()
 {
+	USkillTreeWidget* STWidget = GetSkillTreeWidget();
+	UPlayerSkillsComponent* SkillsComp = EODCharacter ? Cast<UPlayerSkillsComponent>(EODCharacter->GetGameplaySkillsComponent()) : nullptr;
+	if (STWidget && SkillsComp)
+	{
+
+	}
 }
 
 void AEODPlayerController::InitSkillBarWidget()
 {
-	UPlayerSkillsComponent* SkillsComp = EODCharacter ? Cast<UPlayerSkillsComponent>(EODCharacter->GetGameplaySkillsComponent()) : nullptr;
 	USkillBarWidget* SBWidget = GetSkillBarWidget();
+	UPlayerSkillsComponent* SkillsComp = EODCharacter ? Cast<UPlayerSkillsComponent>(EODCharacter->GetGameplaySkillsComponent()) : nullptr;
 	if (SBWidget && SkillsComp)
 	{
 		SBWidget->SetOwnerSkillsComponent(SkillsComp);
@@ -576,6 +586,12 @@ void AEODPlayerController::BindSkillBarDelegates()
 
 void AEODPlayerController::BindInventoryDelegates()
 {
+	UInventoryWidget* InvWidget = GetInventoryWidget();
+	if (InvWidget && InventoryComponent)
+	{
+		InventoryComponent->OnInventoryItemAdded.AddDynamic(InvWidget, &UInventoryWidget::AddItem);
+		InventoryComponent->OnInventoryItemRemoved.AddDynamic(InvWidget, &UInventoryWidget::RemoveItem);
+	}
 }
 
 void AEODPlayerController::BindPlayerStatsDelegates()
