@@ -255,3 +255,8 @@ FString UEODGameInstance::GetMapDisplayName(FName EditorMapName) const
 	}
 	return EditorMapName.ToString();
 }
+
+FString UEODGameInstance::GetPlayerName() const
+{
+	return GetCurrentPlayerSaveGameName();
+}

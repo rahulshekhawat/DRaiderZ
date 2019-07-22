@@ -213,6 +213,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Utility")
 	FString GetMapDisplayName(FName EditorMapName) const;
 
+	UFUNCTION(BlueprintPure, Category = "Utility")
+	FString GetPlayerName() const;
+
 protected:
 
 	/** TMap<EditorMapName, MapNameForPlayer> */

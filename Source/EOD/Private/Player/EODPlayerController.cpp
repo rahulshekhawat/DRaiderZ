@@ -429,6 +429,15 @@ void AEODPlayerController::UnbindWidgetDelegates()
 void AEODPlayerController::InitHUDWidget()
 {
 	//~ @todo load player name and level
+	if (HUDWidget)
+	{
+		UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
+		UPlayerSaveGame* SaveGame = EODGI ? EODGI->GetCurrentPlayerSaveGameObject() : nullptr;
+		check(SaveGame);
+
+		HUDWidget->SetPlayerName(EODGI->GetPlayerName());
+		HUDWidget->SetPlayerLevel(SaveGame->CharacterLevel);
+	}
 }
 
 void AEODPlayerController::InitStatusIndicatorWidget()
