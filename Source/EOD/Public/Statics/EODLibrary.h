@@ -60,6 +60,24 @@ enum class EEODTaskStatus : uint8
 	Aborted
 };
 
+UENUM(BlueprintType)
+enum class EWidgetCreationStatus : uint8
+{
+	Unknown,
+	WaitingCreation,
+	CannotBeCreated,
+	SuccessfullyCreated
+};
+
+UENUM(BlueprintType)
+enum class EWidgetInitializationStatus : uint8
+{
+	Unknown,
+	WaitingInitialization,
+	CannotBeInitialized,
+	Initialized
+};
+
 USTRUCT(BlueprintType)
 struct EOD_API FGameplayTagMod
 {

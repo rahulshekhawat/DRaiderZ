@@ -113,11 +113,11 @@ protected:
 	//  Player Skills
 public:
 
-	inline USkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
+	inline USkillTreeWidget* GetSkillTreeWidget() const { return STWidget; }
 
-	inline USkillBarWidget* GetSkillBarWidget() const { return SkillBarWidget; }
+	inline USkillBarWidget* GetSkillBarWidget() const { return SBWidget; }
 
-	inline USkillPointsInfoWidget* GetSkillPointsInfoWidget() const { return SkillPointsInfoWidget; }
+	inline USkillPointsInfoWidget* GetSkillPointsInfoWidget() const { return SPIWidget; }
 
 	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr) override;
 	
@@ -129,13 +129,13 @@ public:
 private:
 
 	UPROPERTY(Transient)
-	USkillTreeWidget* SkillTreeWidget;
+	USkillTreeWidget* STWidget;
 	
 	UPROPERTY(Transient)
-	USkillBarWidget* SkillBarWidget;
+	USkillBarWidget* SBWidget;
 	
 	UPROPERTY(Transient)
-	USkillPointsInfoWidget* SkillPointsInfoWidget;
+	USkillPointsInfoWidget* SPIWidget;
 
 
 };

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "EODCharacterBase.h"
 #include "CombatLibrary.h"
-
+#include "EODLibrary.h"
 #include "GameFramework/PlayerController.h"
 #include "EODPlayerController.generated.h"
 
@@ -22,8 +22,6 @@ class UInventoryComponent;
 class UStatsComponentBase;
 class UDialogueWindowWidget;
 class UPlayerStatsComponent;
-
-
 
 /**
  * EODPlayerController is the base (and final c++) class for in-game player controller
@@ -175,19 +173,35 @@ protected:
 
 private:
 
+	virtual void CreateHUDWidget();
+	virtual void InitWidgets();
+	virtual void BindWidgetDelegates();
+	virtual void UnbindWidgetDelegates();
+
+	virtual void InitHUDWidget();
+	virtual void InitStatusIndicatorWidget();
+	virtual void InitSkillTreeWidget();
+	virtual void InitSkillBarWidget();
+	virtual void InitInventoryWidget();
+	virtual void InitPlayerStatsWidget();
+
+	virtual void BindHUDDelegates();
+	virtual void BindStatusIndicatorDelegates();
+	virtual void BindSkillTreeDelegates();
+	virtual void BindSkillBarDelegates();
+	virtual void BindInventoryDelegates();
+	virtual void BindPlayerStatsDelegates();
+
+	virtual void UnbindHUDDelegates();
+	virtual void UnbindStatusIndicatorDelegates();
+	virtual void UnbindSkillTreeDelegates();
+	virtual void UnbindSkillBarDelegates();
+	virtual void UnbindInventoryDelegates();
+	virtual void UnbindPlayerStatsDelegates();
+
 	void InitializeWidgets();
 
 	void InitializeHUDWidget();
-
-	void InitStatusIndicatorWidget();
-
-	void InitInventoryWidget();
-
-	void InitSkillTreeWidget();
-
-	void InitSkillBarWidget();
-
-	void InitPlayerStatsWidget();
 
 public:
 

@@ -162,7 +162,11 @@ void AEODPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	LoadPlayerState();
-	InitializeWidgets();
+
+	CreateHUDWidget();
+	InitWidgets();
+	BindWidgetDelegates();
+
 	SwitchToGameInput();
 }
 
@@ -362,39 +366,69 @@ void AEODPlayerController::UnregisterActivePopupWidget()
 	}
 }
 
-void AEODPlayerController::InitializeWidgets()
+void AEODPlayerController::CreateHUDWidget()
 {
-	if (!IsLocalPlayerController())
+	bool bLocalPC = IsLocalPlayerController();
+	if (bLocalPC == false || (bLocalPC && HUDWidget) || HUDWidgetClass.Get() == nullptr)
 	{
 		return;
 	}
-	
-	InitializeHUDWidget();
 
-	check(SkillTreeComponent);
-	SkillTreeComponent->InitializeSkillTreeWidget();
-
-	// If HUD widget created successfully
+	HUDWidget = CreateWidget<UDynamicHUDWidget>(this, HUDWidgetClass);
 	if (HUDWidget)
 	{
-		InitStatusIndicatorWidget();
-		InitSkillBarWidget();
-		// InitInventoryWidget();
-		// InitSkillTreeWidget();
-		InitPlayerStatsWidget();
+		HUDWidget->AddToViewport();
 	}
 }
 
-void AEODPlayerController::InitializeHUDWidget()
+void AEODPlayerController::InitWidgets()
 {
-	if (!HUDWidget && IsLocalPlayerController() && HUDWidgetClass.Get())
+	if (HUDWidget == nullptr)
 	{
-		HUDWidget = CreateWidget<UDynamicHUDWidget>(this, HUDWidgetClass);
-		if (HUDWidget)
-		{
-			HUDWidget->AddToViewport();
-		}
+		return;
 	}
+
+	InitHUDWidget();
+	InitStatusIndicatorWidget();
+	InitSkillTreeWidget();
+	InitSkillBarWidget();
+	InitInventoryWidget();
+	InitPlayerStatsWidget();
+}
+
+void AEODPlayerController::BindWidgetDelegates()
+{
+	if (HUDWidget == nullptr)
+	{
+		return;
+	}
+
+	BindHUDDelegates();
+	BindStatusIndicatorDelegates();
+	BindSkillTreeDelegates();
+	BindSkillBarDelegates();
+	BindInventoryDelegates();
+	BindPlayerStatsDelegates();
+}
+
+void AEODPlayerController::UnbindWidgetDelegates()
+{
+	if (HUDWidget == nullptr)
+	{
+		return;
+	}
+
+	UnbindHUDDelegates();
+	UnbindStatusIndicatorDelegates();
+	UnbindSkillTreeDelegates();
+	UnbindSkillBarDelegates();
+	UnbindInventoryDelegates();
+	UnbindPlayerStatsDelegates();
+}
+
+void AEODPlayerController::InitHUDWidget()
+{
+	//~ @todo load player name and level
 }
 
 void AEODPlayerController::InitStatusIndicatorWidget()
@@ -528,6 +562,89 @@ void AEODPlayerController::InitPlayerStatsWidget()
 			StatsComponent->MagickalAttack.ForceBroadcastDelegate();
 			StatsComponent->MagickalCritRate.ForceBroadcastDelegate();
 			StatsComponent->MagickalResistance.ForceBroadcastDelegate();
+		}
+	}
+}
+
+void AEODPlayerController::BindHUDDelegates()
+{
+}
+
+void AEODPlayerController::BindStatusIndicatorDelegates()
+{
+}
+
+void AEODPlayerController::BindSkillTreeDelegates()
+{
+}
+
+void AEODPlayerController::BindSkillBarDelegates()
+{
+}
+
+void AEODPlayerController::BindInventoryDelegates()
+{
+}
+
+void AEODPlayerController::BindPlayerStatsDelegates()
+{
+}
+
+void AEODPlayerController::UnbindHUDDelegates()
+{
+}
+
+void AEODPlayerController::UnbindStatusIndicatorDelegates()
+{
+}
+
+void AEODPlayerController::UnbindSkillTreeDelegates()
+{
+}
+
+void AEODPlayerController::UnbindSkillBarDelegates()
+{
+}
+
+void AEODPlayerController::UnbindInventoryDelegates()
+{
+}
+
+void AEODPlayerController::UnbindPlayerStatsDelegates()
+{
+}
+
+void AEODPlayerController::InitializeWidgets()
+{
+	if (!IsLocalPlayerController())
+	{
+		return;
+	}
+
+	InitializeHUDWidget();
+
+	check(SkillTreeComponent);
+	SkillTreeComponent->InitializeSkillTreeWidget();
+
+	// If HUD widget created successfully
+	if (HUDWidget)
+	{
+		InitStatusIndicatorWidget();
+		InitSkillBarWidget();
+		// InitInventoryWidget();
+		// InitSkillTreeWidget();
+		InitPlayerStatsWidget();
+	}
+}
+
+void AEODPlayerController::InitializeHUDWidget()
+{
+	if (!HUDWidget && IsLocalPlayerController() && HUDWidgetClass.Get())
+	{
+		HUDWidget = CreateWidget<UDynamicHUDWidget>(this, HUDWidgetClass);
+		if (HUDWidget)
+		{
+			HUDWidget->AddToViewport();
 		}
 	}
 }
