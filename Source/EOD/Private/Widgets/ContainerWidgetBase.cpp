@@ -2,6 +2,7 @@
 
 
 #include "ContainerWidgetBase.h"
+#include "TooltipWidget.h"
 
 UContainerWidgetBase::UContainerWidgetBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -9,8 +10,18 @@ UContainerWidgetBase::UContainerWidgetBase(const FObjectInitializer& ObjectIniti
 
 bool UContainerWidgetBase::Initialize()
 {
-	if (Super::Initialize())
+	if (Super::Initialize() &&
+		RootBorder &&
+		MainButton &&
+		ItemImage &&
+		SubText &&
+		CooldownText)
 	{
+		InitializeTooltipWidget();
+
+		SubText->SetVisibility(ESlateVisibility::Hidden);
+		CooldownText->SetVisibility(ESlateVisibility::Hidden);
+
 		return true;
 	}
 
@@ -61,6 +72,25 @@ bool UContainerWidgetBase::IsContainerEmpty() const
 
 void UContainerWidgetBase::SetIcon(UTexture* NewIcon)
 {
+	// If the NewIcon is a valid texture
+	if (NewIcon)
+	{
+		FSlateBrush SlateBrush;
+		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+		SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+		SlateBrush.ImageType = ESlateBrushImageType::FullColor;
+		SlateBrush.SetResourceObject(NewIcon);
+		ItemImage->SetBrush(SlateBrush);
+	}
+	// If the NewIcon is NULL, we simply remove the previously set image inside ItemImage
+	else
+	{
+		FSlateBrush SlateBrush;
+		SlateBrush.ImageSize = FVector2D(52.0, 52.0);
+		SlateBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
+		SlateBrush.ImageType = ESlateBrushImageType::NoImage;
+		ItemImage->SetBrush(SlateBrush);
+	}
 }
 
 void UContainerWidgetBase::SetSubText(int32 InCurrentValue, int32 InMaxValue)
@@ -68,5 +98,32 @@ void UContainerWidgetBase::SetSubText(int32 InCurrentValue, int32 InMaxValue)
 }
 
 void UContainerWidgetBase::SetCooldown(float InCooldown)
+{
+}
+
+UWidget* UContainerWidgetBase::GetTooltipWidget()
+{
+	if (DataObj.Get())
+	{
+		return ToolTipWidget;
+	}
+
+	return nullptr;
+}
+
+void UContainerWidgetBase::InitializeTooltipWidget()
+{
+	if (TooltipWidgetClass.Get())
+	{
+		ToolTipWidget = CreateWidget<UUserWidget>(this, TooltipWidgetClass.Get());
+	}
+
+	if (!RootBorder->ToolTipWidgetDelegate.IsBoundToObject(this))
+	{
+		RootBorder->ToolTipWidgetDelegate.BindUFunction(this, TEXT("GetTooltipWidget"));
+	}
+}
+
+void UContainerWidgetBase::UpdateTooltipWidget()
 {
 }

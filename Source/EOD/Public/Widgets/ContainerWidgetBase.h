@@ -3,8 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Components/Image.h"
+#include "Components/Button.h"
+#include "Components/Border.h"
+#include "Components/TextBlock.h"
 #include "Blueprint/UserWidget.h"
 #include "ContainerWidgetBase.generated.h"
+
+class UTooltipWidget;
 
 /**
  * Base class for container widgets
@@ -32,22 +39,22 @@ public:
 protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	class UBorder* RootBorder;
+	UBorder* RootBorder;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	class UButton* MainButton;
+	UButton* MainButton;
 
 	/** The icon of the item placed in this container */
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	class UImage* ItemImage;
+	UImage* ItemImage;
 
 	/** SubText displays the number of items placed in the container */
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	class UTextBlock* SubText;
+	UTextBlock* SubText;
 
 	/** Displays the remaining cooldown */
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	class UTextBlock* CooldownText;
+	UTextBlock* CooldownText;
 
 
 	///////////////////////////////////////////////////////////////////////////
@@ -66,6 +73,9 @@ public:
 
 protected:
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Classes)
+	TSubclassOf<UTooltipWidget> TooltipWidgetClass;
+
 	UPROPERTY(Transient)
 	TWeakObjectPtr<UObject> DataObj;
 
@@ -78,5 +88,13 @@ protected:
 
 	UFUNCTION()
 	void SetCooldown(float InCooldown);
+
+	UFUNCTION()
+	UWidget* GetTooltipWidget();
+
+	void InitializeTooltipWidget();
+
+	/** Update tooltip widget description from DataObj */
+	virtual void UpdateTooltipWidget();
 
 };

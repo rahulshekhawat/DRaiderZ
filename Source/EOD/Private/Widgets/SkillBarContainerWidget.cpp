@@ -3,6 +3,7 @@
 
 #include "SkillBarContainerWidget.h"
 #include "PlayerSkillBase.h"
+#include "TooltipWidget.h"
 
 USkillBarContainerWidget::USkillBarContainerWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -33,8 +34,17 @@ void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(InDataObj);
 	if (Skill)
 	{
+		DataObj = Skill;
+
 		SetIcon(Skill->GetSkillIcon());
+		SetSubText(Skill->GetCurrentUpgrade(), Skill->GetMaxUpgradeLevel());
+		SetCooldown(Skill->GetRemainingCooldown());
+
+		//~ @todo enable/disable skill
+
+		UpdateTooltipWidget();
 	}
+
 
 
 	// Skill bar container widget
@@ -60,4 +70,20 @@ void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 		}
 	}
 	*/
+}
+
+void USkillBarContainerWidget::UpdateTooltipWidget()
+{
+	UTooltipWidget* TTWidget = Cast<UTooltipWidget>(ToolTipWidget);
+	if (TTWidget && DataObj.Get())
+	{
+		UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(DataObj.Get());
+		check(Skill);
+		
+		TTWidget->SetIcon(Skill->GetSkillIcon());
+		TTWidget->SetTitle(Skill->GetInGameSkillName());
+		TTWidget->SetSubTitle(TEXT("Active Skill"));
+		TTWidget->SetDescription(Skill->GetInGameDescription());
+
+	}
 }

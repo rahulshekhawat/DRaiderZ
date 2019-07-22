@@ -364,7 +364,7 @@ void AEODPlayerController::UnregisterActivePopupWidget()
 void AEODPlayerController::CreateHUDWidget()
 {
 	bool bLocalPC = IsLocalPlayerController();
-	if (bLocalPC == false || (bLocalPC && HUDWidget) || HUDWidgetClass.Get() == nullptr)
+	if (!bLocalPC || (bLocalPC && HUDWidget) || HUDWidgetClass.Get() == nullptr)
 	{
 		return;
 	}

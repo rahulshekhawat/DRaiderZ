@@ -58,7 +58,7 @@ public:
 	void SetIcon(UTexture* InTexture);
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
-	void SetTitle(const FString& InValue, ERarity Rarity);
+	void SetTitle(const FString& InValue, ERarity Rarity = ERarity::Common);
 
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void SetSubTitle(const FString& InValue);

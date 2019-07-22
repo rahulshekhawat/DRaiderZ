@@ -32,5 +32,10 @@ public:
 public:
 
 	virtual void SetDataObj(UObject* InDataObj) override;
+
+protected:
+
+	/** Update tooltip widget description from DataObj */
+	virtual void UpdateTooltipWidget() override;
 	
 };
