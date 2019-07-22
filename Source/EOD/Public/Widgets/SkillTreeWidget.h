@@ -44,6 +44,10 @@ public:
 
 	///////////////////////////////////////////////////////////////////////////
 	//  Child Widgets
+public:
+
+	inline USkillPointsInfoWidget* GetSkillPointsInfoWidget() const { return SkillPointsInfo; }
+
 protected:
 	
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))

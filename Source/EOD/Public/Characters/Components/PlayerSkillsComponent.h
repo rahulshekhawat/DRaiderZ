@@ -7,7 +7,7 @@
 #include "PlayerSkillsComponent.generated.h"
 
 class UContainerWidget;
-
+class UHUDWidget;
 class UGameplaySkillBase;
 class UPlayerSkillBase;
 class USkillBarWidget;
@@ -119,14 +119,23 @@ public:
 
 	inline USkillPointsInfoWidget* GetSkillPointsInfoWidget() const { return SPIWidget; }
 
+	void InitializeUIWidgets(AEODCharacterBase* CompOwner = nullptr);
+
 	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr) override;
-	
+
+private:
+
 	/** Verifies skills have been initialized correctly. Raises an exception if not */
 	void VerifySkillsInitializedCorrectly();
 
 	void UnlockPlayerSkillsFromSaveGame(AEODCharacterBase* CompOwner = nullptr);
 
-private:
+	void InitializeSkillBarWidget(AEODCharacterBase* CompOwner = nullptr);
+
+	void InitializeSkillTreeWidget(AEODCharacterBase* CompOwner = nullptr);
+
+	UPROPERTY(Transient)
+	UHUDWidget* HUDWidget;
 
 	UPROPERTY(Transient)
 	USkillTreeWidget* STWidget;
@@ -136,6 +145,5 @@ private:
 	
 	UPROPERTY(Transient)
 	USkillPointsInfoWidget* SPIWidget;
-
 
 };

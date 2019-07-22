@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EODCharacterBase.h"
-#include "CombatLibrary.h"
 #include "EODLibrary.h"
+#include "CombatLibrary.h"
+#include "EODCharacterBase.h"
+#include "HUDWidget.h"
+
 #include "GameFramework/PlayerController.h"
 #include "EODPlayerController.generated.h"
 
 class UGameplaySkillBase;
 class UActiveSkillBase;
-class UHUDWidget;
-class UDynamicHUDWidget;
-class UDynamicSkillBarWidget;
+// class UHUDWidget;
 class UInGameMenuWidget;
 class USkillTreeComponent;
 class APlayerSkillTreeManager;
@@ -32,11 +32,9 @@ class EOD_API AEODPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-public:
-
-	// --------------------------------------
+	///////////////////////////////////////////////////////////////////////////
 	//  UE4 Method Overrides
-	// --------------------------------------
+public:
 
 	AEODPlayerController(const FObjectInitializer& ObjectInitializer);
 
@@ -52,24 +50,23 @@ public:
 
 	virtual void SetPawn(APawn* InPawn) override;
 
-	// --------------------------------------
-	//  Pawn
-	// --------------------------------------
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+public:
 
 	/** Returns the gender of the pawn that the player selected during player creation */
 	FORCEINLINE ECharacterGender GetGender() const { return Gender; }
 
 	FORCEINLINE AEODCharacterBase* GetEODCharacter() const { return EODCharacter; }
 
+	UFUNCTION(BlueprintCallable, Category = Utility)
 	void AddEXP(int32 Value);
 
-protected:
-
-	void SetGender(ECharacterGender NewGender);
-
-	void SetLeveupEXP(int32 EXP);
-
 private:
+	
+	UPROPERTY(EditDefaultsOnly, Category = Constants)
+	int32 DodgeStaminaCost;
 
 	UPROPERTY(Transient)
 	AEODCharacterBase* EODCharacter;
@@ -80,18 +77,21 @@ private:
 	
 	UPROPERTY(Transient)
 	int32 LeveupEXP;
+	
+	void SetGender(ECharacterGender NewGender);
 
+	void SetLeveupEXP(int32 EXP);
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Components
 public:
 
-	// --------------------------------------
-	//  Components
-	// --------------------------------------
+	inline UInventoryComponent* GetInventoryComponent() const;
 
-	FORCEINLINE UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	inline USkillTreeComponent* GetSkillTreeComponent() const;
 
-	FORCEINLINE USkillTreeComponent* GetSkillTreeComponent() const { return SkillTreeComponent; }
-
-	FORCEINLINE UPlayerStatsComponent* GetStatsComponent() const { return StatsComponent; }
+	inline UPlayerStatsComponent* GetStatsComponent() const;
 
 	static const FName InventoryComponentName;
 	
@@ -99,115 +99,122 @@ public:
 
 	static const FName StatsComponentName;
 
-private:
+protected:
 
 	/** Player inventory */
-	UPROPERTY(Category = Components, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components)
 	UInventoryComponent* InventoryComponent;
 
 	/** Player skill tree */
-	UPROPERTY(Category = Components, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components)
 	USkillTreeComponent* SkillTreeComponent;
 
 	/** Player Stats */
-	UPROPERTY(Category = Components, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components)
 	UPlayerStatsComponent* StatsComponent;
 
+
+	///////////////////////////////////////////////////////////////////////////
+	//  UI
 public:
 
-	// --------------------------------------
-	//  User Interface
-	// --------------------------------------
+	inline UHUDWidget* GetHUDWidget() const;
 
-	FORCEINLINE UDynamicHUDWidget* GetHUDWidget() const { return HUDWidget; }
+	inline UDialogueWindowWidget* GetDialogueWidget() const;
 
-	FORCEINLINE UDialogueWindowWidget* GetDialogueWidget() const { return DialogueWidget; }
+	inline UInGameMenuWidget* GetPauseMenuWidget() const;
 
-	FORCEINLINE UInGameMenuWidget* GetPauseMenuWidget() const { return InGameMenuWidget; }
+	inline USkillBarWidget* GetSkillBarWidget() const;
 
-	UDynamicSkillBarWidget* GetSkillBarWidget() const;
-	
-	UFUNCTION(BlueprintCallable, Category = "Player UI")
+	inline USkillTreeWidget* GetSkillTreeWidget() const;
+
+	inline UInventoryWidget* GetInventoryWidget() const;
+
+	inline UPlayerStatsWidget* GetPlayerStatsWidget() const;
+
+	inline UStatusIndicatorWidget* GetStatusIndicatorWidget() const;
+
+	UFUNCTION(BlueprintCallable, Category = UI)
 	UInteractivePopupWidget* GetActivePopupWidget() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Player UI")
+	UFUNCTION(BlueprintCallable, Category = UI)
 	void RegisterPopupWidget(UObject* RegisteringObj, const FString& InKeyText, const FString& InDetailText, UTexture* InIcon = nullptr);
 
-	UFUNCTION(BlueprintCallable, Category = "Player UI")
+	UFUNCTION(BlueprintCallable, Category = UI)
 	void UnregisterPopupWidget(UObject* RegisteringObj);
 
-	UFUNCTION(BlueprintCallable, Category = "Player UI")
+	UFUNCTION(BlueprintCallable, Category = UI)
 	void UnregisterActivePopupWidget();
 
 protected:
-
-	/** Player's head-up display widget */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI")
-	UDynamicHUDWidget* HUDWidget;
-
+	
 	/** The widget class to use for player's head-up display */
-	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
-	TSubclassOf<UDynamicHUDWidget> HUDWidgetClass;
-
-	/** Dialogue widget used to display NPC dialogues */
-	UPROPERTY(Transient, BlueprintReadWrite, Category = "Player UI")
-	UDialogueWindowWidget* DialogueWidget;
-
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<UHUDWidget> HUDWidgetClass;
+	
 	/** The widget class used for dialogue widget */
-	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
+	UPROPERTY(EditDefaultsOnly, Category = UI)
 	TSubclassOf<UDialogueWindowWidget> DialogueWidgetClass;
-
-	/** In-game menu widget that can be brought up when player presses escape key */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Player UI")
-	UInGameMenuWidget* InGameMenuWidget;
-
+	
 	/** The widget class used for in-game widget */
-	UPROPERTY(EditDefaultsOnly, Category = "Player UI")
+	UPROPERTY(EditDefaultsOnly, Category = UI)
 	TSubclassOf<UInGameMenuWidget> PauseMenuWidgetClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "UI Sound")
+	/** Player's head-up display widget */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = UI)
+	UHUDWidget* HUDWidget;
+
+	/** Dialogue widget used to display NPC dialogues */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = UI)
+	UDialogueWindowWidget* DialogueWidget;
+
+	/** In-game menu widget that can be brought up when player presses escape key */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = UI)
+	UInGameMenuWidget* InGameMenuWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
 	USoundBase* UIUpSound;
 
-	UPROPERTY(EditDefaultsOnly, Category = "UI Sound")
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
 	USoundBase* UIDownSound;
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//  UI Initialization
+public:
+
+	void CreateHUDWidget();
+	void InitWidgets();
+	void BindWidgetDelegates();
+	void UnbindWidgetDelegates();
 
 private:
 
-	virtual void CreateHUDWidget();
-	virtual void InitWidgets();
-	virtual void BindWidgetDelegates();
-	virtual void UnbindWidgetDelegates();
+	void InitHUDWidget();
+	void InitStatusIndicatorWidget();
+	void InitSkillTreeWidget();
+	void InitSkillBarWidget();
+	void InitInventoryWidget();
+	void InitPlayerStatsWidget();
 
-	virtual void InitHUDWidget();
-	virtual void InitStatusIndicatorWidget();
-	virtual void InitSkillTreeWidget();
-	virtual void InitSkillBarWidget();
-	virtual void InitInventoryWidget();
-	virtual void InitPlayerStatsWidget();
+	void BindHUDDelegates();
+	void BindStatusIndicatorDelegates();
+	void BindSkillTreeDelegates();
+	void BindSkillBarDelegates();
+	void BindInventoryDelegates();
+	void BindPlayerStatsDelegates();
 
-	virtual void BindHUDDelegates();
-	virtual void BindStatusIndicatorDelegates();
-	virtual void BindSkillTreeDelegates();
-	virtual void BindSkillBarDelegates();
-	virtual void BindInventoryDelegates();
-	virtual void BindPlayerStatsDelegates();
+	void UnbindHUDDelegates();
+	void UnbindStatusIndicatorDelegates();
+	void UnbindSkillTreeDelegates();
+	void UnbindSkillBarDelegates();
+	void UnbindInventoryDelegates();
+	void UnbindPlayerStatsDelegates();
 
-	virtual void UnbindHUDDelegates();
-	virtual void UnbindStatusIndicatorDelegates();
-	virtual void UnbindSkillTreeDelegates();
-	virtual void UnbindSkillBarDelegates();
-	virtual void UnbindInventoryDelegates();
-	virtual void UnbindPlayerStatsDelegates();
 
-	void InitializeWidgets();
-
-	void InitializeHUDWidget();
-
-public:
-
-	// --------------------------------------
+	///////////////////////////////////////////////////////////////////////////
 	//  Input Handling
-	// --------------------------------------
+public:
 
 	/** Returns true if auto move is enabled */
 	FORCEINLINE bool IsAutoMoveEnabled() const { return bAutoMoveEnabled; }
@@ -218,11 +225,11 @@ public:
 	/** Switch to game input mode */
 	inline void SwitchToGameInput();
 
-	/** Toggle display of PlayerStatsWidget */
-	void TogglePlayerStatsUI();
-
 	/** Toggle display of HUDWidget */
 	void TogglePlayerHUD();
+
+	/** Toggle display of PlayerStatsWidget */
+	void TogglePlayerStatsUI();
 
 	/** Toggle display of SkillTreeWidget */
 	void TogglePlayerSkillTreeUI();
@@ -271,7 +278,7 @@ private:
 	void OnReleasedRight();
 
 	/** Set whether possessed pawn should move automatically or not */
-	FORCEINLINE void SetAutoMoveEnabled(bool bValue);
+	inline void SetAutoMoveEnabled(bool bValue);
 
 	/** Enable automatic movement */
 	inline void EnableAutoMove();
@@ -338,32 +345,21 @@ private:
 	template<uint32 SkillKeyIndex>
 	inline void ReleasedSkillKey();
 
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Save and Load System
 public:
 
-	// --------------------------------------
-	//  Save/Load System
-	// --------------------------------------
-
-	/** Saves current player state */
 	UFUNCTION(BlueprintCallable, Category = "Save/Load System")
 	void SavePlayerState();
 
+	UFUNCTION(BlueprintCallable, Category = "Save/Load System")
 	void LoadPlayerState();
 
-private:
 
-	// --------------------------------------
-	//  Pseudo Constants
-	// --------------------------------------
-
-	UPROPERTY(EditDefaultsOnly, Category = "Player Constants")
-	int32 DodgeStaminaCost;
-
-private:
-
-	// --------------------------------------
-	//  Network : RPCs and Rep Notifies
-	// --------------------------------------
+	///////////////////////////////////////////////////////////////////////////
+	//  Network
+protected:
 
 	/** Call this to set gender of player pawn on server */
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -385,6 +381,61 @@ private:
 
 };
 
+inline UInventoryComponent* AEODPlayerController::GetInventoryComponent() const
+{
+	return InventoryComponent;
+}
+
+inline USkillTreeComponent* AEODPlayerController::GetSkillTreeComponent() const
+{
+	return SkillTreeComponent;
+}
+
+inline UPlayerStatsComponent* AEODPlayerController::GetStatsComponent() const
+{
+	return StatsComponent;
+}
+
+inline UHUDWidget* AEODPlayerController::GetHUDWidget() const
+{
+	return HUDWidget;
+}
+
+inline UDialogueWindowWidget* AEODPlayerController::GetDialogueWidget() const
+{
+	return DialogueWidget;
+}
+
+inline UInGameMenuWidget* AEODPlayerController::GetPauseMenuWidget() const
+{
+	return InGameMenuWidget;
+}
+
+inline USkillBarWidget* AEODPlayerController::GetSkillBarWidget() const
+{
+	return HUDWidget ? HUDWidget->GetSkillBarWidget() : nullptr;
+}
+
+inline USkillTreeWidget* AEODPlayerController::GetSkillTreeWidget() const
+{
+	return HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
+}
+
+inline UInventoryWidget* AEODPlayerController::GetInventoryWidget() const
+{
+	return HUDWidget ? HUDWidget->GetInventoryWidget() : nullptr;
+}
+
+inline UPlayerStatsWidget* AEODPlayerController::GetPlayerStatsWidget() const
+{
+	return HUDWidget ? HUDWidget->GetPlayerStatsWidget() : nullptr;
+}
+
+inline UStatusIndicatorWidget* AEODPlayerController::GetStatusIndicatorWidget() const
+{
+	return HUDWidget ? HUDWidget->GetStatusIndicatorWidget() : nullptr;
+}
+
 inline void AEODPlayerController::SwitchToUIInput()
 {
 	bShowMouseCursor = true;
@@ -402,7 +453,7 @@ inline void AEODPlayerController::SwitchToGameInput()
 	SetInputMode(GameOnlyInputMode);
 }
 
-FORCEINLINE void AEODPlayerController::SetAutoMoveEnabled(bool bValue)
+inline void AEODPlayerController::SetAutoMoveEnabled(bool bValue)
 {
 	bAutoMoveEnabled = bValue;
 }

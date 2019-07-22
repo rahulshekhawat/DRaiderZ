@@ -78,11 +78,6 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	
-	if (GetGameplaySkillsComponent())
-	{
-		GetGameplaySkillsComponent()->InitializeSkills(this);
-	}
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -96,6 +91,10 @@ void APlayerCharacter::BeginPlay()
 
 	LoadCharacterState();
 
+
+	// UGameplaySkillsComponent* SkillsComp = GetGameplaySkillsComponent();
+	// check(SkillsComp);
+	// SkillsComp->
 }
 
 bool APlayerCharacter::CanMove() const
@@ -847,6 +846,13 @@ void APlayerCharacter::TurnOnTargetSwitch()
 void APlayerCharacter::TurnOffTargetSwitch()
 {
 	// Empty override to prevent call of Super::TurnOffTargetSwitch()
+}
+
+void APlayerCharacter::InitializeUIWidgets()
+{
+	UPlayerSkillsComponent* SkillsComp = Cast<UPlayerSkillsComponent>(GetGameplaySkillsComponent());
+	check(SkillsComp);
+	SkillsComp->InitializeUIWidgets(this);
 }
 
 void APlayerCharacter::OnSkillGroupAddedToSkillBar(const FString & SkillGroup)

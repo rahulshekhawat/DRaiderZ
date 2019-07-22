@@ -70,3 +70,11 @@ void UHUDWidget::SetPlayerName(FString Name)
 	check(PlayerName);
 	PlayerName->SetText(FText::FromString(Name));
 }
+
+void UHUDWidget::AddGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect)
+{
+}
+
+void UHUDWidget::RemoveGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect)
+{
+}

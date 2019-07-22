@@ -7,12 +7,14 @@
 #include "PlayerSaveGame.h"
 #include "GameplaySkillBase.h"
 #include "ActiveSkillBase.h"
-#include "DynamicSkillBarWidget.h"
 #include "EODPlayerController.h"
 #include "ContainerWidget.h"
 #include "PlayerStatsComponent.h"
 #include "GameplayEffectBase.h"
-#include "DynamicHUDWidget.h"
+#include "HUDWidget.h"
+#include "SkillTreeWidget.h"
+#include "SkillBarWidget.h"
+#include "SkillBarContainerWidget.h"
 
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
@@ -339,42 +341,24 @@ void UPlayerSkillsComponent::UpdateSkillCooldown(uint8 SkillIndex, float Remaini
 void UPlayerSkillsComponent::AddGameplayEffect(UGameplayEffectBase* GameplayEffect)
 {
 	Super::AddGameplayEffect(GameplayEffect);
-	if (GameplayEffect && GameplayEffect->Icon)
+	if (GameplayEffect && GameplayEffect->Icon && HUDWidget)
 	{
-		AEODCharacterBase* EODChar = GetCharacterOwner();
-		AEODPlayerController* EODPC = EODChar ? Cast<AEODPlayerController>(EODChar->Controller) : nullptr;
-		UDynamicHUDWidget* HUDWidget = EODPC ? EODPC->GetHUDWidget() : nullptr;
-
-		if (HUDWidget)
-		{
-			HUDWidget->AddGameplayEffectUI(GameplayEffect);
-		}
+		HUDWidget->AddGameplayEffectUI(GameplayEffect);
 	}
 }
 
 void UPlayerSkillsComponent::RemoveGameplayEffect(UGameplayEffectBase* GameplayEffect)
 {
 	Super::RemoveGameplayEffect(GameplayEffect);
-	if (GameplayEffect && GameplayEffect->Icon)
+	if (GameplayEffect && GameplayEffect->Icon && HUDWidget)
 	{
-		AEODCharacterBase* EODChar = GetCharacterOwner();
-		AEODPlayerController* EODPC = EODChar ? Cast<AEODPlayerController>(EODChar->Controller) : nullptr;
-		UDynamicHUDWidget* HUDWidget = EODPC ? EODPC->GetHUDWidget() : nullptr;
-
-		if (HUDWidget)
-		{
-			HUDWidget->RemoveGameplayEffectUI(GameplayEffect);
-		}
+		HUDWidget->RemoveGameplayEffectUI(GameplayEffect);
 	}
 }
 
 TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill(FName SkillGroup) 
 {
-	AEODCharacterBase* CharOwner = GetCharacterOwner();
-	AEODPlayerController* PC = CharOwner ? Cast<AEODPlayerController>(CharOwner->Controller) : nullptr;
-	UDynamicSkillBarWidget* SkillBarWidget = PC ? PC->GetSkillBarWidget() : nullptr;
-
-	if (!SkillBarWidget)
+	if (!SBWidget)
 	{
 		return TArray<UContainerWidget*>();
 	}
@@ -419,7 +403,8 @@ TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill
 
 	for (uint8 Key : SkillWidgetsIndices)
 	{
-		UContainerWidget* Widget = SkillBarWidget->GetContainerAtIndex(Key);
+		UContainerWidget* Widget = nullptr;
+		// USkillBarContainerWidget* Widget = SBWidget->GetContainerAtIndex(Key);
 		if (Widget)
 		{
 			SkillWidgets.Add(Widget);
@@ -477,10 +462,7 @@ void UPlayerSkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill
 
 void UPlayerSkillsComponent::OnPlayerWeaponChanged()
 {
-	AEODPlayerController* PC = GetCharacterOwner() ? Cast<AEODPlayerController>(GetCharacterOwner()->Controller) : nullptr;
-	UDynamicSkillBarWidget* SkillBarWidget = PC ? PC->GetSkillBarWidget() : nullptr;
-
-	if (!SkillBarWidget)
+	if (!SBWidget)
 	{
 		return;
 	}
@@ -494,7 +476,9 @@ void UPlayerSkillsComponent::OnPlayerWeaponChanged()
 		if (SkillIndexToSkillMap.Contains(SkillKey))
 		{
 			UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SkillKey]);
-			UContainerWidget* Cont = SkillBarWidget->GetContainerAtIndex(Key);
+
+			UContainerWidget* Cont = nullptr;
+			// UContainerWidgetBase* Cont = SBWidget->GetContainerAtIndex(Key);
 			if (Skill && Cont)
 			{
 				if (Skill->CanPlayerActivateThisSkill())
@@ -550,6 +534,42 @@ void UPlayerSkillsComponent::Server_ReleaseSkill_Implementation(uint8 SkillIndex
 
 	SkillChargeDuration = SkillIndex;
 	ReleaseSkill(SkillIndex);
+}
+
+void UPlayerSkillsComponent::InitializeUIWidgets(AEODCharacterBase* CompOwner)
+{
+	if (!CompOwner)
+	{
+		// If CompOwner is invalid, try to initalize it from locally cached component owner
+		CompOwner = GetCharacterOwner();
+	}
+
+	check(CompOwner);
+
+	AEODPlayerController* EODPC = Cast<AEODPlayerController>(CompOwner->Controller);
+	if (!EODPC || !EODPC->GetHUDWidget())
+	{
+		return;
+	}
+
+	HUDWidget = EODPC->GetHUDWidget();
+	STWidget = EODPC->GetSkillTreeWidget();
+	SBWidget = EODPC->GetSkillBarWidget();
+	check(STWidget);
+	check(SBWidget);
+	SPIWidget = STWidget->GetSkillPointsInfoWidget();
+	check(SPIWidget);
+
+	InitializeSkillTreeWidget();
+	InitializeSkillBarWidget();
+}
+
+void UPlayerSkillsComponent::InitializeSkillBarWidget(AEODCharacterBase* CompOwner)
+{
+}
+
+void UPlayerSkillsComponent::InitializeSkillTreeWidget(AEODCharacterBase* CompOwner)
+{
 }
 
 void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)

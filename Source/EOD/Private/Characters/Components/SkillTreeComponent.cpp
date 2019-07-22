@@ -29,7 +29,8 @@ void USkillTreeComponent::InitializeSkillTreeWidget()
 	//~ @todo modularize the logic for widgets and local skill data
 
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetOuter());
-	UDynamicHUDWidget* HUDWidget = PC ? PC->GetHUDWidget() : nullptr;
+	// UDynamicHUDWidget* HUDWidget = PC ? PC->GetHUDWidget() : nullptr;
+	UDynamicHUDWidget* HUDWidget = nullptr;
 	SkillTreeWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
 	SkillPointsInfoWidget = SkillTreeWidget ? SkillTreeWidget->GetSkillPointsInfoWidget() : nullptr;
 

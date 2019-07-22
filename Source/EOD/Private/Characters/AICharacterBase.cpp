@@ -61,11 +61,6 @@ AAICharacterBase::AAICharacterBase(const FObjectInitializer& ObjectInitializer) 
 void AAICharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	if (GetGameplaySkillsComponent())
-	{
-		GetGameplaySkillsComponent()->InitializeSkills(this);
-	}
 }
 
 void AAICharacterBase::BeginPlay()

@@ -15,8 +15,8 @@
 #include "StatusIndicatorWidget.h"
 #include "InventoryWidget.h"
 #include "PlayerStatsWidget.h"
-#include "DynamicSkillBarWidget.h"
-#include "DynamicSkillTreeWidget.h"
+#include "SkillBarWidget.h"
+#include "SkillTreeWidget.h"
 #include "InteractivePopupWidget.h"
 
 #include "ActiveSkillBase.h"
@@ -295,11 +295,6 @@ void AEODPlayerController::SetGender(ECharacterGender NewGender)
 	}
 }
 
-UDynamicSkillBarWidget* AEODPlayerController::GetSkillBarWidget() const
-{
-	return  HUDWidget ? HUDWidget->GetSkillBarWidget() : nullptr;
-}
-
 UInteractivePopupWidget* AEODPlayerController::GetActivePopupWidget() const
 {
 	return HUDWidget ? HUDWidget->GetInteractivePopupWidget() : nullptr;
@@ -374,7 +369,7 @@ void AEODPlayerController::CreateHUDWidget()
 		return;
 	}
 
-	HUDWidget = CreateWidget<UDynamicHUDWidget>(this, HUDWidgetClass);
+	HUDWidget = CreateWidget<UHUDWidget>(this, HUDWidgetClass);
 	if (HUDWidget)
 	{
 		HUDWidget->AddToViewport();
@@ -442,32 +437,6 @@ void AEODPlayerController::InitHUDWidget()
 
 void AEODPlayerController::InitStatusIndicatorWidget()
 {
-	if (HUDWidget && StatsComponent)
-	{
-		UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
-		if (StatusIndicatorWidget)
-		{
-			if (!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
-			{
-				StatsComponent->Health.OnStatValueChanged.AddUObject(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
-			}
-
-			if (!StatsComponent->Mana.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
-			{
-				StatsComponent->Mana.OnStatValueChanged.AddUObject(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
-			}
-
-			if (!StatsComponent->Stamina.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
-			{
-				StatsComponent->Stamina.OnStatValueChanged.AddUObject(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
-			}
-
-			//~ Catch up UI to current stat values
-			StatsComponent->Health.ForceBroadcastDelegate();
-			StatsComponent->Mana.ForceBroadcastDelegate();
-			StatsComponent->Stamina.ForceBroadcastDelegate();
-		}
-	}
 }
 
 void AEODPlayerController::InitInventoryWidget()
@@ -488,23 +457,17 @@ void AEODPlayerController::InitInventoryWidget()
 
 void AEODPlayerController::InitSkillTreeWidget()
 {
-	if (IsValid(HUDWidget) && IsValid(HUDWidget->GetSkillTreeWidget()))
-	{
-	}
 }
 
 void AEODPlayerController::InitSkillBarWidget()
 {
 	UPlayerSkillsComponent* SkillsComp = EODCharacter ? Cast<UPlayerSkillsComponent>(EODCharacter->GetGameplaySkillsComponent()) : nullptr;
-	if (HUDWidget && SkillsComp)
+	USkillBarWidget* SBWidget = GetSkillBarWidget();
+	if (SBWidget && SkillsComp)
 	{
-		UDynamicSkillBarWidget* SkillBarWidget = HUDWidget->GetSkillBarWidget();
-		if (SkillBarWidget)
-		{
-			SkillBarWidget->SetSkillOwnerComponent(SkillsComp);
-			SkillBarWidget->InitializeSkillBarLayout(SkillsComp->GetSkillBarMap(), SkillsComp->GetSkillsMap());
-		}
-	}	
+		SBWidget->SetOwnerSkillsComponent(SkillsComp);
+		SBWidget->InitializeSkillBarLayout(SkillsComp->GetSkillBarMap(), SkillsComp->GetSkillsMap());
+	}
 }
 
 void AEODPlayerController::InitPlayerStatsWidget()
@@ -581,6 +544,26 @@ void AEODPlayerController::BindHUDDelegates()
 
 void AEODPlayerController::BindStatusIndicatorDelegates()
 {
+	UStatusIndicatorWidget* StatusIndicatorWidget = GetStatusIndicatorWidget();
+	if (StatusIndicatorWidget)
+	{
+		check(StatsComponent);
+
+		if (!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
+		{
+			StatsComponent->Health.OnStatValueChanged.AddUObject(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
+		}
+
+		if (!StatsComponent->Mana.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
+		{
+			StatsComponent->Mana.OnStatValueChanged.AddUObject(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
+		}
+
+		if (!StatsComponent->Stamina.OnStatValueChanged.IsBoundToObject(StatusIndicatorWidget))
+		{
+			StatsComponent->Stamina.OnStatValueChanged.AddUObject(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
+		}
+	}
 }
 
 void AEODPlayerController::BindSkillTreeDelegates()
@@ -623,41 +606,6 @@ void AEODPlayerController::UnbindPlayerStatsDelegates()
 {
 }
 
-void AEODPlayerController::InitializeWidgets()
-{
-	if (!IsLocalPlayerController())
-	{
-		return;
-	}
-
-	InitializeHUDWidget();
-
-	check(SkillTreeComponent);
-	SkillTreeComponent->InitializeSkillTreeWidget();
-
-	// If HUD widget created successfully
-	if (HUDWidget)
-	{
-		InitStatusIndicatorWidget();
-		InitSkillBarWidget();
-		// InitInventoryWidget();
-		// InitSkillTreeWidget();
-		InitPlayerStatsWidget();
-	}
-}
-
-void AEODPlayerController::InitializeHUDWidget()
-{
-	if (!HUDWidget && IsLocalPlayerController() && HUDWidgetClass.Get())
-	{
-		HUDWidget = CreateWidget<UDynamicHUDWidget>(this, HUDWidgetClass);
-		if (HUDWidget)
-		{
-			HUDWidget->AddToViewport();
-		}
-	}
-}
-
 void AEODPlayerController::TogglePlayerHUD()
 {
 	if (IsValid(HUDWidget) && HUDWidget->IsVisible())
@@ -670,16 +618,47 @@ void AEODPlayerController::TogglePlayerHUD()
 	}
 }
 
+void AEODPlayerController::TogglePlayerStatsUI()
+{
+	UPlayerStatsWidget* StatsWidget = GetPlayerStatsWidget();
+	check(StatsWidget);
+	if (StatsWidget->IsVisible())
+	{
+		StatsWidget->SetVisibility(ESlateVisibility::Hidden);
+		UGameplayStatics::PlaySound2D(this, UIDownSound);
+
+		UInventoryWidget* InvWidget = HUDWidget->GetInventoryWidget();
+		USkillTreeWidget* STWidget = HUDWidget->GetSkillTreeWidget();
+
+		check(InvWidget);
+		check(STWidget);
+
+		if (!InvWidget->IsVisible() && !STWidget->IsVisible())
+		{
+			SwitchToGameInput();
+		}
+	}
+	else
+	{
+		StatsWidget->SetVisibility(ESlateVisibility::Visible);
+		UGameplayStatics::PlaySound2D(this, UIUpSound);
+
+		SwitchToUIInput();
+	}
+}
+
 void AEODPlayerController::TogglePlayerSkillTreeUI()
 {
-	UDynamicSkillTreeWidget* STWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
-	if (STWidget && STWidget->IsVisible())
+	USkillTreeWidget* STWidget = GetSkillTreeWidget();
+	check(STWidget);
+
+	if (STWidget->IsVisible())
 	{
 		STWidget->SetVisibility(ESlateVisibility::Hidden);
 		UGameplayStatics::PlaySound2D(this, UIDownSound);
 
-		UPlayerStatsWidget* StatsWidget = HUDWidget->GetPlayerStatsWidget();
-		UInventoryWidget* InvWidget = HUDWidget->GetInventoryWidget();
+		UPlayerStatsWidget* StatsWidget = GetPlayerStatsWidget();
+		UInventoryWidget* InvWidget = GetInventoryWidget();
 
 		check(StatsWidget);
 		check(InvWidget);
@@ -689,7 +668,7 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 			SwitchToGameInput();
 		}
 	}
-	else if (STWidget && !STWidget->IsVisible())
+	else
 	{
 		STWidget->SetVisibility(ESlateVisibility::Visible);
 		UGameplayStatics::PlaySound2D(this, UIUpSound);
@@ -700,14 +679,15 @@ void AEODPlayerController::TogglePlayerSkillTreeUI()
 
 void AEODPlayerController::TogglePlayerInventoryUI()
 {
-	UInventoryWidget* InvWidget = HUDWidget ? HUDWidget->GetInventoryWidget() : nullptr;
-	if (InvWidget && InvWidget->IsVisible())
+	UInventoryWidget* InvWidget = GetInventoryWidget();
+	check(InvWidget);
+	if (InvWidget->IsVisible())
 	{
 		InvWidget->SetVisibility(ESlateVisibility::Hidden);
 		UGameplayStatics::PlaySound2D(this, UIDownSound);
 
-		UPlayerStatsWidget* StatsWidget = HUDWidget->GetPlayerStatsWidget();
-		UDynamicSkillTreeWidget* STWidget = HUDWidget->GetSkillTreeWidget();
+		UPlayerStatsWidget* StatsWidget = GetPlayerStatsWidget();
+		USkillTreeWidget* STWidget = GetSkillTreeWidget();
 
 		check(StatsWidget);
 		check(STWidget);
@@ -717,9 +697,9 @@ void AEODPlayerController::TogglePlayerInventoryUI()
 			SwitchToGameInput();
 		}
 	}
-	else if (InvWidget && !InvWidget->IsVisible())
+	else
 	{
-		HUDWidget->GetInventoryWidget()->SetVisibility(ESlateVisibility::Visible);
+		InvWidget->SetVisibility(ESlateVisibility::Visible);
 		UGameplayStatics::PlaySound2D(this, UIUpSound);
 
 		SwitchToUIInput();
@@ -860,34 +840,6 @@ void AEODPlayerController::OnReleasedRight()
 	if (IsValid(EODCharacter))
 	{
 		EODCharacter->OnReleasedRight();
-	}
-}
-
-void AEODPlayerController::TogglePlayerStatsUI()
-{
-	UPlayerStatsWidget* StatsWidget = HUDWidget ? HUDWidget->GetPlayerStatsWidget() : nullptr;
-	if (StatsWidget && StatsWidget->IsVisible())
-	{
-		StatsWidget->SetVisibility(ESlateVisibility::Hidden);
-		UGameplayStatics::PlaySound2D(this, UIDownSound);
-
-		UInventoryWidget* InvWidget = HUDWidget->GetInventoryWidget();
-		UDynamicSkillTreeWidget* STWidget = HUDWidget->GetSkillTreeWidget();
-
-		check(InvWidget);
-		check(STWidget);
-
-		if (!InvWidget->IsVisible() && !STWidget->IsVisible())
-		{
-			SwitchToGameInput();
-		}
-	}
-	else if (StatsWidget && !StatsWidget->IsVisible())
-	{
-		StatsWidget->SetVisibility(ESlateVisibility::Visible);
-		UGameplayStatics::PlaySound2D(this, UIUpSound);
-
-		SwitchToUIInput();
 	}
 }
 

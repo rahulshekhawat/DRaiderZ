@@ -177,7 +177,8 @@ void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Intentional additional call to BindUIDelegates (another in Restart())
+	// Intentional additional calls to InitializeUIWidgets and BindUIDelegates (another in Restart())
+	InitializeUIWidgets();
 	BindUIDelegates();
 
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
@@ -185,15 +186,15 @@ void AEODCharacterBase::BeginPlay()
 	{
 		MoveComp->SetDesiredCustomRotation(GetActorRotation());
 	}
-
-
-
 }
 
 void AEODCharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	UGameplaySkillsComponent* SkillsComp = GetGameplaySkillsComponent();
+	check(SkillsComp);
+	SkillsComp->InitializeSkills(this);
 }
 
 void AEODCharacterBase::PossessedBy(AController* NewController)
@@ -220,7 +221,8 @@ void AEODCharacterBase::Restart()
 {
 	Super::Restart();
 
-	// Intentional additional call to BindUIDelegates (another in BeginPlay())
+	// Intentional additional calls to InitializeUIWidgets and BindUIDelegates (another in BeginPlay())
+	InitializeUIWidgets();
 	BindUIDelegates();
 }
 
@@ -516,6 +518,10 @@ void AEODCharacterBase::EnableiFrames(float Duration)
 void AEODCharacterBase::DisableiFrames()
 {
 	bActiveiFrames = false;
+}
+
+void AEODCharacterBase::InitializeUIWidgets()
+{
 }
 
 void AEODCharacterBase::BindUIDelegates()

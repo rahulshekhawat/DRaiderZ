@@ -12,6 +12,7 @@ class USkillBarWidget;
 class UInventoryWidget;
 class USkillTreeWidget;
 class UPlayerStatsWidget;
+class UGameplayEffectBase;
 class UStatusIndicatorWidget;
 class UInteractivePopupWidget;
 
@@ -38,48 +39,75 @@ public:
 
 	///////////////////////////////////////////////////////////////////////////
 	//  Child Widgets
+public:
+
+	inline UCanvasPanel* GetMainCanvas() const { return MainCanvas; }
+
+	inline UStatusIndicatorWidget* GetStatusIndicatorWidget() const { return StatusIndicatorWidget; }
+
+	inline UPlayerStatsWidget* GetPlayerStatsWidget() const { return PlayerStatsWidget; }
+
+	inline UInventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
+
+	inline USkillTreeWidget* GetSkillTreeWidget() const { return SkillTreeWidget; }
+
+	inline USkillBarWidget* GetSkillBarWidget() const { return SkillBarWidget; }
+	
+	inline UInteractivePopupWidget* GetInteractivePopupWidget() const { return InteractivePopup; }
+
 protected:
 	
 	/** The main canvas that contains all the child widgets */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UCanvasPanel* MainCanvas;
 
 	/** Widget containing health, mana, and stamina bars */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UStatusIndicatorWidget* StatusIndicatorWidget;
 
 	/** Widget containing player stats info */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UPlayerStatsWidget* PlayerStatsWidget;
 
 	/** Widget containing player inventory items */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UInventoryWidget* InventoryWidget;
 
 	/** Widget containing skill trees of all vocations */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	USkillTreeWidget* SkillTreeWidget;
 	
 	/** Widget containing skills that the player can actively use */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	USkillBarWidget* SkillBarWidget;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UInteractivePopupWidget* InteractivePopup;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* PlayerLevel;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* PlayerName;
-	
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Utility
 public:
 	
-	UFUNCTION(BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SetPlayerLevel(int32 Level);
 
-	UFUNCTION(BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SetPlayerName(FString Name);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Gameplay)
+	void AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
+	virtual void AddGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Gameplay)
+	void RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
+	virtual void RemoveGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect);
 
 
 };
