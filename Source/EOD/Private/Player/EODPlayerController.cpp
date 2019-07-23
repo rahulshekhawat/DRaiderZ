@@ -53,10 +53,7 @@ void AEODPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (!InputComponent)
-	{
-		return;
-	}
+	check(InputComponent);
 
 	InputComponent->BindAction("Forward", IE_Pressed, this, &AEODPlayerController::OnPressedForward);
 	InputComponent->BindAction("Forward", IE_Released, this, &AEODPlayerController::OnReleasedForward);
@@ -184,85 +181,63 @@ void AEODPlayerController::SetPawn(APawn* InPawn)
 {
 	Super::SetPawn(InPawn);
 	EODCharacter = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
-
-	if (Role >= ROLE_Authority && StatsComponent && EODCharacter)
-	{
-		int32 MaxValue = StatsComponent->Health.GetMaxValue();
-		int32 CurrentValue = StatsComponent->Health.GetCurrentValue();
-
-		EODCharacter->UpdateHealth(MaxValue, CurrentValue);
-		if (!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(EODCharacter))
-		{
-			StatsComponent->Health.OnStatValueChanged.AddUObject(EODCharacter, &AEODCharacterBase::UpdateHealth);
-		}
-	}
 }
 
 void AEODPlayerController::LoadPlayerState()
 {
-	if (IsLocalController() && EODCharacter)
+	bool bLocalPC = IsLocalPlayerController();
+	if (!bLocalPC)
 	{
-		UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
-		UPlayerSaveGame* SaveGame = EODGI ? EODGI->GetCurrentPlayerSaveGameObject() : nullptr;
-		UDataTable* PSDataTable = EODGI ? EODGI->PlayerStatsDataTable : nullptr;
+		return;
+	}
 
-		if (!SaveGame)
+	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
+	UPlayerSaveGame* SaveGame = EODGI ? EODGI->GetCurrentPlayerSaveGameObject() : nullptr;
+	UDataTable* PSDataTable = EODGI ? EODGI->PlayerStatsDataTable : nullptr;
+
+	check(SaveGame);
+
+	// Load player gender
+	SetGender(SaveGame->CharacterGender);
+
+
+
+
+	// SetLeveupEXP()
+	
+
+	// int32 CharacterLevel = 1;
+
+
+
+
+	/*
+	// Load player level and exp
+	if (SaveGame->CharacterLevel <= 0)
+	{
+		SaveGame->CharacterLevel = 1;
+		if (PSDataTable)
 		{
-			return;
-		}
-
-		// Load player gender
-		SetGender(SaveGame->CharacterGender);
-
-		// Load player level and exp
-		if (SaveGame->CharacterLevel <= 0)
-		{
-			SaveGame->CharacterLevel = 1;
-			if (PSDataTable)
+			FName LevelName = FName(*FString::FromInt(SaveGame->CharacterLevel + 1));
+			FPlayerStatsTableRow* TableRow = PSDataTable->FindRow<FPlayerStatsTableRow>(LevelName, FString("APlayerCharacter::LoadCharacterState()"));
+			if (TableRow)
 			{
-				FName LevelName = FName(*FString::FromInt(SaveGame->CharacterLevel + 1));
-				FPlayerStatsTableRow* TableRow = PSDataTable->FindRow<FPlayerStatsTableRow>(LevelName, FString("APlayerCharacter::LoadCharacterState()"));
-				if (TableRow)
-				{
-					SetLeveupEXP(TableRow->ExpRequired);
-					SaveGame->LevelupEXP = TableRow->ExpRequired;
-				}
-			}
-		}
-		else if (SaveGame->CharacterLevel >= 100)
-		{
-			SaveGame->CharacterLevel = 99;
-			SetLeveupEXP(0);
-			SaveGame->LevelupEXP = 0;
-		}
-		else
-		{
-			SetLeveupEXP(SaveGame->LevelupEXP);
-		}
-
-		if (HUDWidget && EODGI)
-		{
-			FString PlayerName = EODGI->GetCurrentPlayerSaveGameName();
-			HUDWidget->SetPlayerName(PlayerName);
-
-			UPlayerStatsWidget* PSWidget = HUDWidget->GetPlayerStatsWidget();
-			if (PSWidget)
-			{
-				PSWidget->SetPlayerName(PlayerName);
-
-				FString Type = FString("Human");
-				if (Gender == ECharacterGender::Female)
-				{
-					Type += FString(" Female");
-				}
-				else if (Gender == ECharacterGender::Male)
-				{
-					Type += FString(" Male");
-				}
-				PSWidget->SetPlayerType(Type);
+				SetLeveupEXP(TableRow->ExpRequired);
+				SaveGame->LevelupEXP = TableRow->ExpRequired;
 			}
 		}
 	}
+	else if (SaveGame->CharacterLevel >= 100)
+	{
+		SaveGame->CharacterLevel = 99;
+		SetLeveupEXP(0);
+		SaveGame->LevelupEXP = 0;
+	}
+	else
+	{
+		SetLeveupEXP(SaveGame->LevelupEXP);
+	}
+	*/
 }
 
 void AEODPlayerController::AddEXP(int32 Value)
@@ -461,12 +436,57 @@ void AEODPlayerController::InitInventoryWidget()
 
 void AEODPlayerController::InitSkillTreeWidget()
 {
-	USkillTreeWidget* STWidget = GetSkillTreeWidget();
 	UPlayerSkillsComponent* SkillsComp = EODCharacter ? Cast<UPlayerSkillsComponent>(EODCharacter->GetGameplaySkillsComponent()) : nullptr;
-	if (STWidget && SkillsComp)
+
+	USkillTreeWidget* STWidget = GetSkillTreeWidget();
+	USkillPointsInfoWidget* SPIWidget = STWidget ? STWidget->GetSkillPointsInfoWidget() : nullptr;
+
+	UEODGameInstance* GI = Cast<UEODGameInstance>(GetGameInstance());
+	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
+	
+	if (STWidget && SPIWidget && SkillsComp)
 	{
+		
+
 
 	}
+
+
+	//~ @todo modularize the logic for widgets and local skill data
+
+	//~ !todo
+	/*
+	AEODPlayerController* PC = Cast<AEODPlayerController>(GetOuter());
+	// UDynamicHUDWidget* HUDWidget = PC ? PC->GetHUDWidget() : nullptr;
+	UDynamicHUDWidget* HUDWidget = nullptr;
+	SkillTreeWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
+	SkillPointsInfoWidget = SkillTreeWidget ? SkillTreeWidget->GetSkillPointsInfoWidget() : nullptr;
+
+	UEODGameInstance* GI = Cast<UEODGameInstance>(PC->GetGameInstance());
+	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
+
+	if (SaveGame)
+	{
+		SetSkillPointsAllocationInfo(SaveGame->SkillPointsAllocationInfo);
+		SkillTreeSlotsSaveData = SaveGame->SkillTreeSlotsSaveData;
+	}
+	else
+	{
+		SetSkillPointsAllocationInfo(SkillPointsAllocationInfo);
+	}
+
+	if (SkillPointsAllocationInfo.AvailableSkillPoints + SkillPointsAllocationInfo.UsedSkillPoints < SkillPointsUnlockedByDefault)
+	{
+		SetAvailableSkillPoints(SkillPointsUnlockedByDefault - SkillPointsAllocationInfo.UsedSkillPoints);
+	}
+
+	if (SkillTreeWidget)
+	{
+		SkillTreeWidget->InitializeSkillTreeLayout(this, SkillTreeLayoutTable, SkillTreeSlotsSaveData);
+	}
+
+	SkillTreeWidget->UpdateSkillSlots();
+	*/
 }
 
 void AEODPlayerController::InitSkillBarWidget()
@@ -482,70 +502,33 @@ void AEODPlayerController::InitSkillBarWidget()
 
 void AEODPlayerController::InitPlayerStatsWidget()
 {
-	if (HUDWidget && StatsComponent)
+	//~ @todo
+	/*
+	if (HUDWidget && EODGI)
 	{
-		UPlayerStatsWidget* StatsWidget = HUDWidget->GetPlayerStatsWidget();
-		if (StatsWidget)
+		FString PlayerName = EODGI->GetCurrentPlayerSaveGameName();
+		HUDWidget->SetPlayerName(PlayerName);
+
+		UPlayerStatsWidget* PSWidget = HUDWidget->GetPlayerStatsWidget();
+		if (PSWidget)
 		{
-			if (!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			PSWidget->SetPlayerName(PlayerName);
+
+			FString Type = FString("Human");
+			if (Gender == ECharacterGender::Female)
 			{
-				StatsComponent->Health.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateHealth);
+				Type += FString(" Female");
 			}
-
-			if (!StatsComponent->Mana.OnStatValueChanged.IsBoundToObject(StatsWidget))
+			else if (Gender == ECharacterGender::Male)
 			{
-				StatsComponent->Mana.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMana);
+				Type += FString(" Male");
 			}
-
-			if (!StatsComponent->Stamina.OnStatValueChanged.IsBoundToObject(StatsWidget))
-			{
-				StatsComponent->Stamina.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateStamina);
-			}
-
-			//~ Catch up UI to current stat values
-			StatsComponent->Health.ForceBroadcastDelegate();
-			StatsComponent->Mana.ForceBroadcastDelegate();
-			StatsComponent->Stamina.ForceBroadcastDelegate();
-
-			if (!StatsComponent->PhysicalAttack.OnStatValueChanged.IsBoundToObject(StatsWidget))
-			{
-				StatsComponent->PhysicalAttack.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdatePAtt);
-			}
-
-			if (!StatsComponent->PhysicalCritRate.OnStatValueChanged.IsBoundToObject(StatsWidget))
-			{
-				StatsComponent->PhysicalCritRate.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdatePCrit);
-			}
-
-			if (!StatsComponent->PhysicalResistance.OnStatValueChanged.IsBoundToObject(StatsWidget))
-			{
-				StatsComponent->PhysicalResistance.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdatePDef);
-			}
-
-			if (!StatsComponent->MagickalAttack.OnStatValueChanged.IsBoundToObject(StatsWidget))
-			{
-				StatsComponent->MagickalAttack.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMAtt);
-			}
-
-			if (!StatsComponent->MagickalCritRate.OnStatValueChanged.IsBoundToObject(StatsWidget))
-			{
-				StatsComponent->MagickalCritRate.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMCrit);
-			}
-
-			if (!StatsComponent->MagickalResistance.OnStatValueChanged.IsBoundToObject(StatsWidget))
-			{
-				StatsComponent->MagickalResistance.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMDef);
-			}
-
-			//~ Catch up UI to current stat values
-			StatsComponent->PhysicalAttack.ForceBroadcastDelegate();
-			StatsComponent->PhysicalCritRate.ForceBroadcastDelegate();
-			StatsComponent->PhysicalResistance.ForceBroadcastDelegate();
-			StatsComponent->MagickalAttack.ForceBroadcastDelegate();
-			StatsComponent->MagickalCritRate.ForceBroadcastDelegate();
-			StatsComponent->MagickalResistance.ForceBroadcastDelegate();
+			PSWidget->SetPlayerType(Type);
 		}
 	}
+	*/
+
+
 }
 
 void AEODPlayerController::BindHUDDelegates()
@@ -596,6 +579,69 @@ void AEODPlayerController::BindInventoryDelegates()
 
 void AEODPlayerController::BindPlayerStatsDelegates()
 {
+	UPlayerStatsWidget* StatsWidget = GetPlayerStatsWidget();
+	if (StatsWidget)
+	{
+		check(StatsComponent);
+
+		if (!StatsComponent->Health.OnStatValueChanged.IsBoundToObject(StatsWidget))
+		{
+			StatsComponent->Health.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateHealth);
+		}
+
+		if (!StatsComponent->Mana.OnStatValueChanged.IsBoundToObject(StatsWidget))
+		{
+			StatsComponent->Mana.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMana);
+		}
+
+		if (!StatsComponent->Stamina.OnStatValueChanged.IsBoundToObject(StatsWidget))
+		{
+			StatsComponent->Stamina.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateStamina);
+		}
+
+		//~ Catch up UI to current stat values
+		StatsComponent->Health.ForceBroadcastDelegate();
+		StatsComponent->Mana.ForceBroadcastDelegate();
+		StatsComponent->Stamina.ForceBroadcastDelegate();
+
+		if (!StatsComponent->PhysicalAttack.OnStatValueChanged.IsBoundToObject(StatsWidget))
+		{
+			StatsComponent->PhysicalAttack.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdatePAtt);
+		}
+
+		if (!StatsComponent->PhysicalCritRate.OnStatValueChanged.IsBoundToObject(StatsWidget))
+		{
+			StatsComponent->PhysicalCritRate.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdatePCrit);
+		}
+
+		if (!StatsComponent->PhysicalResistance.OnStatValueChanged.IsBoundToObject(StatsWidget))
+		{
+			StatsComponent->PhysicalResistance.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdatePDef);
+		}
+
+		if (!StatsComponent->MagickalAttack.OnStatValueChanged.IsBoundToObject(StatsWidget))
+		{
+			StatsComponent->MagickalAttack.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMAtt);
+		}
+
+		if (!StatsComponent->MagickalCritRate.OnStatValueChanged.IsBoundToObject(StatsWidget))
+		{
+			StatsComponent->MagickalCritRate.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMCrit);
+		}
+
+		if (!StatsComponent->MagickalResistance.OnStatValueChanged.IsBoundToObject(StatsWidget))
+		{
+			StatsComponent->MagickalResistance.OnStatValueChanged.AddUObject(StatsWidget, &UPlayerStatsWidget::UpdateMDef);
+		}
+
+		//~ Catch up UI to current stat values
+		StatsComponent->PhysicalAttack.ForceBroadcastDelegate();
+		StatsComponent->PhysicalCritRate.ForceBroadcastDelegate();
+		StatsComponent->PhysicalResistance.ForceBroadcastDelegate();
+		StatsComponent->MagickalAttack.ForceBroadcastDelegate();
+		StatsComponent->MagickalCritRate.ForceBroadcastDelegate();
+		StatsComponent->MagickalResistance.ForceBroadcastDelegate();
+	}
 }
 
 void AEODPlayerController::UnbindHUDDelegates()
@@ -638,6 +684,7 @@ void AEODPlayerController::TogglePlayerStatsUI()
 {
 	UPlayerStatsWidget* StatsWidget = GetPlayerStatsWidget();
 	check(StatsWidget);
+
 	if (StatsWidget->IsVisible())
 	{
 		StatsWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -697,6 +744,7 @@ void AEODPlayerController::TogglePlayerInventoryUI()
 {
 	UInventoryWidget* InvWidget = GetInventoryWidget();
 	check(InvWidget);
+
 	if (InvWidget->IsVisible())
 	{
 		InvWidget->SetVisibility(ESlateVisibility::Hidden);
