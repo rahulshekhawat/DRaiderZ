@@ -6,6 +6,8 @@
 #include "Widgets/ContainerWidgetBase.h"
 #include "SkillTreeContainerWidget.generated.h"
 
+class UButton;
+
 /**
  * 
  */
@@ -14,10 +16,9 @@ class EOD_API USkillTreeContainerWidget : public UContainerWidgetBase
 {
 	GENERATED_BODY()
 
-public:
-
 	///////////////////////////////////////////////////////////////////////////
 	//  UE4 Method Overrides
+public:
 
 	USkillTreeContainerWidget(const FObjectInitializer& ObjectInitializer);
 
@@ -26,11 +27,18 @@ public:
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Behaviour
+public:
+
+	virtual void SetDataObj(UObject* InDataObj) override;
 	
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	class UButton* UpgradeButton;
+	UButton* UpgradeButton;
 
 
 

@@ -2,6 +2,7 @@
 
 
 #include "SkillTreeContainerWidget.h"
+#include "PlayerSkillBase.h"
 
 USkillTreeContainerWidget::USkillTreeContainerWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -25,4 +26,21 @@ void USkillTreeContainerWidget::NativeConstruct()
 void USkillTreeContainerWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
+
+void USkillTreeContainerWidget::SetDataObj(UObject* InDataObj)
+{
+	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(InDataObj);
+	if (Skill)
+	{
+		DataObj = Skill;
+
+		SetIcon(Skill->GetSkillIcon());
+		SetSubText(Skill->GetCurrentUpgrade(), Skill->GetMaxUpgradeLevel());
+		SetCooldown(Skill->GetRemainingCooldown());
+
+		//~ @todo enable/disable skill
+
+		UpdateTooltipWidget();
+	}
 }

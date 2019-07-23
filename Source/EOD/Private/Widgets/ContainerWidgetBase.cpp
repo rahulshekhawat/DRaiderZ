@@ -38,6 +38,33 @@ void UContainerWidgetBase::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void UContainerWidgetBase::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+}
+
+bool UContainerWidgetBase::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	return false;
+}
+
+void UContainerWidgetBase::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+}
+
+void UContainerWidgetBase::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+}
+
+FReply UContainerWidgetBase::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	return FReply::Handled();
+}
+
+FReply UContainerWidgetBase::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	return FReply::Handled();
+}
+
 void UContainerWidgetBase::PostManualConstruction(UUserWidget* InParentWidget, UObject* InDataObj)
 {
 
