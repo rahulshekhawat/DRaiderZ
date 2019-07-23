@@ -2,6 +2,7 @@
 
 
 #include "SkillTreeWidget.h"
+#include "EOD.h"
 #include "PlayerSkillBase.h"
 #include "PlayerSkillsComponent.h"
 
@@ -127,15 +128,19 @@ USkillTreeContainerWidget* USkillTreeWidget::AddNewSTContainer(UPlayerSkillBase*
 	if (STContainer)
 	{
 		STContainer->SetDataObj(PlayerSkill);
-		STContainer->OnClicked.AddUniqueDynamic(this, &USkillTreeWidget::OnSkillSlotClicked);
+		STContainer->OnUpgradeButtonClicked.AddUniqueDynamic(this, &USkillTreeWidget::OnSkillUpgradeButtonClicked);
 		SkillContainersMap.Add(PlayerSkill->GetSkillGroup(), STContainer);
 	}
 
 	return STContainer;
 }
 
-void USkillTreeWidget::OnSkillSlotClicked(UContainerWidgetBase* Widget)
+void USkillTreeWidget::OnSkillUpgradeButtonClicked(UContainerWidgetBase* Widget)
 {
+	USkillTreeContainerWidget* STWidget = Cast<USkillTreeContainerWidget>(Widget);
+	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(STWidget->GetDataObj());
+	// Skill->SetCurrentUpgrade()
+
 	//~ @todo
 	/*
 	check(this == ParentWidget && Widget && SkillTreeComp);

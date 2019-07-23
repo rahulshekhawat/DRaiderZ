@@ -10,8 +10,11 @@ USkillTreeContainerWidget::USkillTreeContainerWidget(const FObjectInitializer& O
 
 bool USkillTreeContainerWidget::Initialize()
 {
-	if (Super::Initialize())
+	if (Super::Initialize() &&
+		UpgradeButton)
 	{
+		UpgradeButton->OnClicked.AddUniqueDynamic(this, &USkillTreeContainerWidget::UpgradeButtonClicked);
+
 		return true;
 	}
 
@@ -43,4 +46,9 @@ void USkillTreeContainerWidget::SetDataObj(UObject* InDataObj)
 
 		UpdateTooltipWidget();
 	}
+}
+
+void USkillTreeContainerWidget::UpgradeButtonClicked()
+{
+	OnUpgradeButtonClicked.Broadcast(this);
 }

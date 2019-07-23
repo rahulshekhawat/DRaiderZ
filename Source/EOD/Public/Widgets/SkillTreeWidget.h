@@ -160,7 +160,7 @@ private:
 	TMap<FName, USkillTreeContainerWidget*> SkillContainersMap;
 	
 	UFUNCTION()
-	void OnSkillSlotClicked(UContainerWidgetBase* Widget);
+	void OnSkillUpgradeButtonClicked(UContainerWidgetBase* Widget);
 
 
 	///////////////////////////////////////////////////////////////////////////

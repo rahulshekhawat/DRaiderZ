@@ -34,13 +34,15 @@ public:
 public:
 
 	virtual void SetDataObj(UObject* InDataObj) override;
-	
+
+	FContainerMCDelegate OnUpgradeButtonClicked;
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UButton* UpgradeButton;
 
-
-
+	UFUNCTION()
+	virtual void UpgradeButtonClicked();
 	
 };
