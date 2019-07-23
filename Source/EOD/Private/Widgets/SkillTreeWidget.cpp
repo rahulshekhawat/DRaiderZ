@@ -5,6 +5,9 @@
 #include "PlayerSkillBase.h"
 #include "PlayerSkillsComponent.h"
 
+#include "Blueprint/WidgetTree.h"
+#include "Materials/MaterialInterface.h"
+
 USkillTreeWidget::USkillTreeWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
@@ -86,6 +89,24 @@ void USkillTreeWidget::InitializeSkillTreeLayout(UDataTable* STLayoutTable, UPla
 		}
 
 		SetupSlotPosition(STWidget, SkillTreeSlot->Vocation, SkillTreeSlot->ColumnPosition, SkillTreeSlot->RowPosition);
+
+		if (SkillTreeSlot->SkillRequiredToUnlock != NAME_None)
+		{
+			FSkillTreeSlot* UnlockSlot = STLayoutTable->FindRow<FSkillTreeSlot>(SkillTreeSlot->SkillRequiredToUnlock, ContextString);
+			check(UnlockSlot);
+
+			UImage* TempImage = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
+			if (TempImage)
+			{
+				FSlateBrush SlateBrush;
+				SlateBrush.SetResourceObject(ArrowTexture);
+				SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+				SlateBrush.Tiling = ESlateBrushTileType::NoTile;
+				TempImage->SetBrush(SlateBrush);
+			}
+			SetupArrowPosition(TempImage, UnlockSlot->Vocation, UnlockSlot->ColumnPosition, UnlockSlot->RowPosition);
+			ConnectorArrows.Add(TempImage);
+		}
 	}
 
 
