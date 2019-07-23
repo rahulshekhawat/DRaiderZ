@@ -78,6 +78,12 @@ void USkillTreeWidget::InitializeSkillTreeLayout(UDataTable* STLayoutTable, UPla
 
 	for (FName RowName : RowNames)
 	{
+		// Just in case InitializeSkillTreeLayout has already been called
+		if (SkillContainersMap.Contains(RowName))
+		{
+			continue;
+		}
+
 		FSkillTreeSlot* SkillTreeSlot = STLayoutTable->FindRow<FSkillTreeSlot>(RowName, ContextString);
 		check(SkillTreeSlot);
 		
@@ -108,66 +114,15 @@ void USkillTreeWidget::InitializeSkillTreeLayout(UDataTable* STLayoutTable, UPla
 			ConnectorArrows.Add(TempImage);
 		}
 	}
-
-
-
-
-
-	/*
-	// Initialize skill slots
-	for (FName RowName : RowNames)
-	{
-		FSkillTreeSlot* SkillTreeSlot = STLayoutTable->FindRow<FSkillTreeSlot>(RowName, ContextString);
-
-		AddNewSkillSlot(RowName, SkillTreeSlot);
-
-		// Draw connector arrow
-		if (SkillTreeSlot->SkillRequiredToUnlock != NAME_None)
-		{
-			FSkillTreeSlot* UnlockSlot = SkillLayoutTable->FindRow<FSkillTreeSlot>(SkillTreeSlot->SkillRequiredToUnlock, ContextString);
-			if (UnlockSlot)
-			{
-				UImage* TempImage = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
-				if (TempImage)
-				{
-					FSlateBrush SlateBrush;
-					SlateBrush.SetResourceObject(ArrowTexture);
-					SlateBrush.DrawAs = ESlateBrushDrawType::Image;
-					SlateBrush.Tiling = ESlateBrushTileType::NoTile;
-					TempImage->SetBrush(SlateBrush);
-				}
-				SetupArrowPosition(TempImage, UnlockSlot->Vocation, UnlockSlot->ColumnPosition, UnlockSlot->RowPosition);
-				ConnectorArrows.Add(TempImage);
-			}
-		}
-	}
-
-
-	TArray<FName> Keys;
-	SkillContainersMap.GetKeys(Keys);
-
-	for (FName Key : Keys)
-	{
-		if (SkillTreeSlotSaveData.Contains(Key))
-		{
-			UContainerWidget* Container = SkillContainersMap[Key];
-			FSkillTreeSlotSaveData TempSlotData = SkillTreeSlotSaveData[Key];
-			if (Container)
-			{
-				Container->SetCurrentValue(TempSlotData.CurrentUpgrade);
-			}
-		}
-	}
-	*/
 }
 
 USkillTreeContainerWidget* USkillTreeWidget::AddNewSTContainer(UPlayerSkillBase* PlayerSkill)
 {
-	if (PlayerSkill == nullptr && SkillTreeSlotClass.Get())
+	if (PlayerSkill == nullptr || SkillTreeSlotClass.Get() == nullptr || SkillContainersMap.Contains(PlayerSkill->GetSkillGroup()))
 	{
 		return nullptr;
 	}
-	
+
 	USkillTreeContainerWidget* STContainer = CreateWidget<USkillTreeContainerWidget>(GetOwningPlayer(), SkillTreeSlotClass);
 	if (STContainer)
 	{

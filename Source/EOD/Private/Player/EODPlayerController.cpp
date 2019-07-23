@@ -468,43 +468,6 @@ void AEODPlayerController::InitSkillTreeWidget()
 		STWidget->InitializeSkillTreeLayout(SkillsComp->SkillTreeLayoutTable, SkillsComp);
 
 	}
-
-
-	//~ @todo modularize the logic for widgets and local skill data
-
-	//~ !todo
-	/*
-	AEODPlayerController* PC = Cast<AEODPlayerController>(GetOuter());
-	// UDynamicHUDWidget* HUDWidget = PC ? PC->GetHUDWidget() : nullptr;
-	UDynamicHUDWidget* HUDWidget = nullptr;
-	SkillTreeWidget = HUDWidget ? HUDWidget->GetSkillTreeWidget() : nullptr;
-	SkillPointsInfoWidget = SkillTreeWidget ? SkillTreeWidget->GetSkillPointsInfoWidget() : nullptr;
-
-	UEODGameInstance* GI = Cast<UEODGameInstance>(PC->GetGameInstance());
-	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
-
-	if (SaveGame)
-	{
-		SetSkillPointsAllocationInfo(SaveGame->SkillPointsAllocationInfo);
-		SkillTreeSlotsSaveData = SaveGame->SkillTreeSlotsSaveData;
-	}
-	else
-	{
-		SetSkillPointsAllocationInfo(SkillPointsAllocationInfo);
-	}
-
-	if (SkillPointsAllocationInfo.AvailableSkillPoints + SkillPointsAllocationInfo.UsedSkillPoints < SkillPointsUnlockedByDefault)
-	{
-		SetAvailableSkillPoints(SkillPointsUnlockedByDefault - SkillPointsAllocationInfo.UsedSkillPoints);
-	}
-
-	if (SkillTreeWidget)
-	{
-		SkillTreeWidget->InitializeSkillTreeLayout(this, SkillTreeLayoutTable, SkillTreeSlotsSaveData);
-	}
-
-	SkillTreeWidget->UpdateSkillSlots();
-	*/
 }
 
 void AEODPlayerController::InitSkillBarWidget()
