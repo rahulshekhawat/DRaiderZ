@@ -6,6 +6,8 @@
 #include "Gameplay/Skills/GameplaySkillBase.h"
 #include "PlayerSkillBase.generated.h"
 
+class UContainerWidgetBase;
+
 /**
  * The base class of skills that can be used by player, added to skill bar, upgraded by player, etc.
  */
@@ -117,9 +119,16 @@ public:
 	/** Returns true if this skill can be used with the given weapon type */
 	inline bool IsWeaponTypeSupported(EWeaponType WeaponType) const;
 
+	void LinkToWidget(UContainerWidgetBase* ContainerWidget);
+
+	void UnlinkFromWidget(UContainerWidgetBase* ContainerWidget);
+
 protected:
 
 	float SkillDuration;
+
+	UPROPERTY(Transient)
+	TSet<UContainerWidgetBase*> RegisteredWidgets;
 
 };
 

@@ -139,6 +139,12 @@ void USkillTreeWidget::OnSkillUpgradeButtonClicked(UContainerWidgetBase* Widget)
 {
 	USkillTreeContainerWidget* STWidget = Cast<USkillTreeContainerWidget>(Widget);
 	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(STWidget->GetDataObj());
+	if (Skill)
+	{
+		// Skill->SetCurrentUpgrade()
+	}
+
+
 	// Skill->SetCurrentUpgrade()
 
 	//~ @todo

@@ -43,6 +43,8 @@ void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 		//~ @todo enable/disable skill
 
 		UpdateTooltipWidget();
+
+		Skill->LinkToWidget(this);
 	}
 
 
