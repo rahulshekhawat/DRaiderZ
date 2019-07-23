@@ -155,6 +155,8 @@ public:
 	/** Returns true if any skill point is available to be allocated */
 	inline bool IsAnySkillPointAvailable() const { return SkillPointsAllocationInfo.AvailableSkillPoints > 0; }
 
+	inline int32 GetSkillPointsUnlockedByDefault() const { return SkillPointsUnlockedByDefault; }
+
 	/** Attempt to allocate a skill point to a slot associated with the given SkillGroup. Returns true if the point allocation was successful */
 	bool AttemptPointAllocationToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
 
@@ -166,6 +168,9 @@ public:
 
 	/** Returns the status of this skill slot */
 	// ESkillSlotStatus GetSkillSlotStatus(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = SkillTree)
+	UDataTable* SkillTreeLayoutTable;
 
 protected:
 
@@ -174,10 +179,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
 	int32 SkillPointsUnlockedByDefault;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
-	UDataTable* SkillTreeLayoutTable;
-
 
 private:
 

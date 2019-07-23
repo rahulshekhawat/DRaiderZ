@@ -2,6 +2,8 @@
 
 
 #include "SkillTreeWidget.h"
+#include "PlayerSkillBase.h"
+#include "PlayerSkillsComponent.h"
 
 USkillTreeWidget::USkillTreeWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -55,9 +57,122 @@ void USkillTreeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void USkillTreeWidget::AddNewSTContainer(UPlayerSkillBase* PlayerSkill)
+void USkillTreeWidget::InitializeSkillTreeLayout(UDataTable* STLayoutTable, UPlayerSkillsComponent* InSkillsComp)
+{
+	ensureMsgf(STLayoutTable != nullptr, TEXT("Tried to initialize skill tree with an invalid STLayoutTable"));
+	if (STLayoutTable == nullptr)
+	{
+		return;
+	}
+
+	check(InSkillsComp);
+	OwnerSkillsComp = InSkillsComp;
+
+	FString ContextString = TEXT(__FUNCTION__);
+	TArray<FName> RowNames = STLayoutTable->GetRowNames();
+
+	const TMap<FName, UGameplaySkillBase*>& SGToSkillMap =  InSkillsComp->GetSkillGroupToSkillMap();
+
+	for (FName RowName : RowNames)
+	{
+		FSkillTreeSlot* SkillTreeSlot = STLayoutTable->FindRow<FSkillTreeSlot>(RowName, ContextString);
+		check(SkillTreeSlot);
+		
+		UPlayerSkillBase* PlayerSkill = SGToSkillMap.Contains(RowName) ? Cast<UPlayerSkillBase>(SGToSkillMap[RowName]) : nullptr;
+		USkillTreeContainerWidget* STWidget = AddNewSTContainer(PlayerSkill);
+		if (STWidget == nullptr)
+		{
+			continue;
+		}
+
+		SetupSlotPosition(STWidget, SkillTreeSlot->Vocation, SkillTreeSlot->ColumnPosition, SkillTreeSlot->RowPosition);
+	}
+
+
+
+
+
+	/*
+	// Initialize skill slots
+	for (FName RowName : RowNames)
+	{
+		FSkillTreeSlot* SkillTreeSlot = STLayoutTable->FindRow<FSkillTreeSlot>(RowName, ContextString);
+
+		AddNewSkillSlot(RowName, SkillTreeSlot);
+
+		// Draw connector arrow
+		if (SkillTreeSlot->SkillRequiredToUnlock != NAME_None)
+		{
+			FSkillTreeSlot* UnlockSlot = SkillLayoutTable->FindRow<FSkillTreeSlot>(SkillTreeSlot->SkillRequiredToUnlock, ContextString);
+			if (UnlockSlot)
+			{
+				UImage* TempImage = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
+				if (TempImage)
+				{
+					FSlateBrush SlateBrush;
+					SlateBrush.SetResourceObject(ArrowTexture);
+					SlateBrush.DrawAs = ESlateBrushDrawType::Image;
+					SlateBrush.Tiling = ESlateBrushTileType::NoTile;
+					TempImage->SetBrush(SlateBrush);
+				}
+				SetupArrowPosition(TempImage, UnlockSlot->Vocation, UnlockSlot->ColumnPosition, UnlockSlot->RowPosition);
+				ConnectorArrows.Add(TempImage);
+			}
+		}
+	}
+
+
+	TArray<FName> Keys;
+	SkillContainersMap.GetKeys(Keys);
+
+	for (FName Key : Keys)
+	{
+		if (SkillTreeSlotSaveData.Contains(Key))
+		{
+			UContainerWidget* Container = SkillContainersMap[Key];
+			FSkillTreeSlotSaveData TempSlotData = SkillTreeSlotSaveData[Key];
+			if (Container)
+			{
+				Container->SetCurrentValue(TempSlotData.CurrentUpgrade);
+			}
+		}
+	}
+	*/
+}
+
+USkillTreeContainerWidget* USkillTreeWidget::AddNewSTContainer(UPlayerSkillBase* PlayerSkill)
+{
+	if (PlayerSkill == nullptr && SkillTreeSlotClass.Get())
+	{
+		return nullptr;
+	}
+	
+	USkillTreeContainerWidget* STContainer = CreateWidget<USkillTreeContainerWidget>(GetOwningPlayer(), SkillTreeSlotClass);
+	if (STContainer)
+	{
+		STContainer->SetDataObj(PlayerSkill);
+		STContainer->OnClicked.AddUniqueDynamic(this, &USkillTreeWidget::OnSkillSlotClicked);
+		SkillContainersMap.Add(PlayerSkill->GetSkillGroup(), STContainer);
+	}
+
+	return STContainer;
+}
+
+void USkillTreeWidget::OnSkillSlotClicked(UContainerWidgetBase* Widget)
 {
 	//~ @todo
+	/*
+	check(this == ParentWidget && Widget && SkillTreeComp);
+
+	FContainerData ContData = Widget->GetContainerData();
+	bool bAllocationSuccessful = SkillTreeComp->AttemptPointAllocationToSlot(ContData.ItemID);
+
+	if (bAllocationSuccessful)
+	{
+		UpdateSkillSlots();
+		UGameplayStatics::PlaySound2D(this, SkillPointAllocatedSound);
+	}
+	*/
 }
 
 void USkillTreeWidget::ActivateAssassinTab()
@@ -123,21 +238,4 @@ void USkillTreeWidget::ActivateSorcererTab()
 
 		AddSkillPointsInfoToCanvas(SorcererInfoCanvas);
 	}
-}
-
-void USkillTreeWidget::OnSkillSlotClicked(USkillTreeContainerWidget* Widget, UUserWidget* ParentWidget)
-{
-	//~ @todo
-	/*
-	check(this == ParentWidget && Widget && SkillTreeComp);
-
-	FContainerData ContData = Widget->GetContainerData();
-	bool bAllocationSuccessful = SkillTreeComp->AttemptPointAllocationToSlot(ContData.ItemID);
-
-	if (bAllocationSuccessful)
-	{
-		UpdateSkillSlots();
-		UGameplayStatics::PlaySound2D(this, SkillPointAllocatedSound);
-	}
-	*/
 }

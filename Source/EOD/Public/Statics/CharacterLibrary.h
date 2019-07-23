@@ -371,15 +371,15 @@ struct EOD_API FSkillPointsAllocationInfo
 	UPROPERTY()
 	int32 SorcererPoints;
 
-	FSkillPointsAllocationInfo()
+	FSkillPointsAllocationInfo() :
+		AvailableSkillPoints(0),
+		UsedSkillPoints(0),
+		AssassinPoints(0),
+		BerserkerPoints(0),
+		ClericPoints(0),
+		DefenderPoints(0),
+		SorcererPoints(0)
 	{
-		AvailableSkillPoints = 0;
-		UsedSkillPoints = 0;
-		AssassinPoints = 0;
-		BerserkerPoints = 0;
-		ClericPoints = 0;
-		DefenderPoints = 0;
-		SorcererPoints = 0;
 	}
 };
 

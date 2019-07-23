@@ -17,7 +17,7 @@
 #include "SkillTreeWidget.generated.h"
 
 class UPlayerSkillBase;
-class USkillTreeComponent;
+class UPlayerSkillsComponent;
 
 class USoundBase;
 
@@ -106,6 +106,8 @@ protected:
 	//
 public:
 
+	void InitializeSkillTreeLayout(UDataTable* STLayoutTable, UPlayerSkillsComponent* InSkillsComp);
+
 	/**
 	 * Initialize skill tree layout from SkillLayoutTable, i.e., create and add skill slots to the skill tree
 	 * @note Use this version to initialize skill tree if there is no player save game present (i.e., we don't have access to SkillTreeSlotSaveData)
@@ -127,24 +129,23 @@ public:
 
 protected:
 
-	/** The skill tree component responsible for managing this skill tree widget */
-	// UPROPERTY(Transient)
-	// USkillTreeComponent* SkillTreeComp;
+	UPROPERTY(Transient)
+	TWeakObjectPtr<UPlayerSkillsComponent> OwnerSkillsComp;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
 	USoundBase* SkillPointAllocatedSound;
 
 	/** The class to use for creating skill slot widgets */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
 	TSubclassOf<USkillTreeContainerWidget> SkillTreeSlotClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
 	UMaterialInterface* ArrowTexture;
 
 private:
 
 	/** Add a new skill tree container to skill tree from player skill */
-	void AddNewSTContainer(UPlayerSkillBase* PlayerSkill);
+	USkillTreeContainerWidget* AddNewSTContainer(UPlayerSkillBase* PlayerSkill);
 
 	inline void SetupSlotPosition(USkillTreeContainerWidget* ItemContainer, EVocations Vocation, int32 Column, int32 Row);
 
@@ -157,6 +158,9 @@ private:
 	/** A map of skill group to it's respective skill slot container */
 	UPROPERTY(Transient)
 	TMap<FName, USkillTreeContainerWidget*> SkillContainersMap;
+	
+	UFUNCTION()
+	void OnSkillSlotClicked(UContainerWidgetBase* Widget);
 
 
 	///////////////////////////////////////////////////////////////////////////
@@ -189,9 +193,6 @@ private:
 	inline void AddSkillPointsInfoToCanvas(UCanvasPanel* CPanel);
 
 	inline UCanvasPanel* GetCanvasPanelOfVocation(EVocations Vocation);
-	
-	UFUNCTION()
-	void OnSkillSlotClicked(class USkillTreeContainerWidget* Widget, UUserWidget* ParentWidget);
 
 	FButtonStyle DefaultButtonStyle;
 

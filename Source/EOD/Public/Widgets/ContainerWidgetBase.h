@@ -12,6 +12,9 @@
 #include "ContainerWidgetBase.generated.h"
 
 class UTooltipWidget;
+class UContainerWidgetBase;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FContainerMCDelegate, UContainerWidgetBase*, Container);
 
 /**
  * Base class for container widgets
@@ -55,6 +58,17 @@ protected:
 	/** Displays the remaining cooldown */
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UTextBlock* CooldownText;
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Mouse Events
+public:
+
+	FContainerMCDelegate OnClicked;
+
+protected:
+
+
 
 
 	///////////////////////////////////////////////////////////////////////////

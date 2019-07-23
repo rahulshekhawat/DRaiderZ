@@ -203,6 +203,8 @@ void AEODPlayerController::LoadPlayerState()
 
 
 
+
+
 	// SetLeveupEXP()
 	
 
@@ -446,8 +448,24 @@ void AEODPlayerController::InitSkillTreeWidget()
 	
 	if (STWidget && SPIWidget && SkillsComp)
 	{
-		// SkillsComp->
+		FSkillPointsAllocationInfo SPAllocationInfo = SaveGame ? SaveGame->SkillPointsAllocationInfo : FSkillPointsAllocationInfo();
 
+		int32 PointsUnlockedByDefault = SkillsComp->GetSkillPointsUnlockedByDefault();
+		if ((SPAllocationInfo.AvailableSkillPoints + SPAllocationInfo.UsedSkillPoints) < PointsUnlockedByDefault)
+		{
+			SPAllocationInfo.AvailableSkillPoints = PointsUnlockedByDefault - SPAllocationInfo.UsedSkillPoints;
+		}
+
+		SPIWidget->UpdateAvailableSkillPointsText(SPAllocationInfo.AvailableSkillPoints);
+		SPIWidget->UpdateUsedSkillPointsText(SPAllocationInfo.UsedSkillPoints);
+
+		SPIWidget->UpdateAssassinPointsText(SPAllocationInfo.AssassinPoints);
+		SPIWidget->UpdateBerserkerPointsText(SPAllocationInfo.BerserkerPoints);
+		SPIWidget->UpdateClericPointsText(SPAllocationInfo.ClericPoints);
+		SPIWidget->UpdateDefenderPointsText(SPAllocationInfo.DefenderPoints);
+		SPIWidget->UpdateSorcererPointsText(SPAllocationInfo.SorcererPoints);
+
+		STWidget->InitializeSkillTreeLayout(SkillsComp->SkillTreeLayoutTable, SkillsComp);
 
 	}
 
