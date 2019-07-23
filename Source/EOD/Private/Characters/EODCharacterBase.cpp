@@ -180,6 +180,9 @@ void AEODCharacterBase::BeginPlay()
 	// Intentional additional calls to InitializeWidgets (another in Restart())
 	InitializeWidgets();
 
+	// Intentional additional calls to LoadCharacterState (another in Restart())
+	LoadCharacterState();
+
 	UEODCharacterMovementComponent* MoveComp = Cast<UEODCharacterMovementComponent>(GetCharacterMovement());
 	if (MoveComp)
 	{
@@ -222,6 +225,9 @@ void AEODCharacterBase::Restart()
 
 	// Intentional additional calls to InitializeWidgets (another in BeginPlay())
 	InitializeWidgets();
+
+	// Intentional additional calls to LoadCharacterState (another in BeginPlay())
+	LoadCharacterState();
 }
 
 float AEODCharacterBase::BP_GetRotationYawFromAxisInput()

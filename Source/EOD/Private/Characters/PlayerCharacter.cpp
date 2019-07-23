@@ -89,9 +89,6 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LoadCharacterState();
-
-
 	// UGameplaySkillsComponent* SkillsComp = GetGameplaySkillsComponent();
 	// check(SkillsComp);
 	// SkillsComp->
@@ -327,6 +324,13 @@ void APlayerCharacter::SaveCharacterState()
 
 void APlayerCharacter::LoadCharacterState()
 {
+	AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
+	if (PC)
+	{
+		PC->LoadPlayerState();
+	}
+
+	/*
 	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
 	UPlayerSaveGame* SaveGame = EODGI ? EODGI->GetCurrentPlayerSaveGameObject() : nullptr;
 
@@ -334,6 +338,7 @@ void APlayerCharacter::LoadCharacterState()
 	{
 		SetCharacterLevel(SaveGame->CharacterLevel);
 	}
+	*/
 }
 
 TSharedPtr<FAttackInfo> APlayerCharacter::GetAttackInfoPtr(const FName& SkillGroup, const int32 CollisionIndex)
