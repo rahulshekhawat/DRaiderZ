@@ -185,9 +185,6 @@ private:
 	UPROPERTY(Transient)
 	FSkillPointsAllocationInfo SkillPointsAllocationInfo;
 
-	/** Returns true if player can currently allocate a point to slot associated with the given SkillGroup */
-	bool CanAllocatePointToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
-
 	inline void ModifyAllocatedPointsAssassin(int32 Value);
 	inline void ModifyAllocatedPointsBerserker(int32 Value);
 	inline void ModifyAllocatedPointsCleric(int32 Value);
@@ -208,6 +205,9 @@ private:
 	void SetSkillSlotUpgrade(FName SkillGroup, int32 Value);
 
 public:
+
+	/** Returns true if player can currently allocate a point to slot associated with the given SkillGroup */
+	bool CanAllocatePointToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
 
 	inline void SetSkillPointsAllocationInfo(const FSkillPointsAllocationInfo& NewInfo);
 

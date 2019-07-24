@@ -58,6 +58,10 @@ public:
 
 	void DisableUpgradeButton();
 
+	virtual void EnableContainer() override;
+
+	virtual void DisableContainer() override;
+
 	virtual void EnableCooldown() override;
 
 	virtual void DisableCooldown() override;

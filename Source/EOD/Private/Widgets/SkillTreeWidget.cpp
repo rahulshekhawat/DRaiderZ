@@ -114,6 +114,15 @@ void USkillTreeWidget::InitializeSkillTreeLayout(UDataTable* STLayoutTable, UPla
 			SetupArrowPosition(TempImage, UnlockSlot->Vocation, UnlockSlot->ColumnPosition, UnlockSlot->RowPosition);
 			ConnectorArrows.Add(TempImage);
 		}
+
+		if (InSkillsComp->CanAllocatePointToSlot(RowName, SkillTreeSlot))
+		{
+			STWidget->EnableUpgradeButton();
+		}
+		else
+		{
+			STWidget->DisableUpgradeButton();
+		}
 	}
 }
 

@@ -5,6 +5,7 @@
 #include "PlayerSkillBase.h"
 #include "DragVisualWidget.h"
 #include "EODGlobalNames.h"
+#include "PlayerSkillsComponent.h"
 
 #include "WidgetBlueprintLibrary.h"
 
@@ -134,6 +135,22 @@ void USkillTreeContainerWidget::SetDataObj(UObject* InDataObj)
 		UpdateTooltipWidget();
 
 		Skill->LinkToWidget(this);
+
+		if (Skill->IsUnlocked())
+		{
+			EnableContainer();
+		}
+		else
+		{
+			DisableContainer();
+		}
+	}
+
+	UPlayerSkillsComponent* SkillsComp = Skill ? Cast<UPlayerSkillsComponent>(Skill->InstigatorSkillComponent.Get()) : nullptr;
+	if (SkillsComp)
+	{
+		// SkillsComp->
+
 	}
 }
 
@@ -147,6 +164,24 @@ void USkillTreeContainerWidget::DisableUpgradeButton()
 {
 	check(UpgradeButton);
 	UpgradeButton->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void USkillTreeContainerWidget::EnableContainer()
+{
+	check(ItemImage);
+	ItemImage->SetColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f));
+
+	check(MainButton);
+	MainButton->SetVisibility(ESlateVisibility::Visible);
+}
+
+void USkillTreeContainerWidget::DisableContainer()
+{
+	check(ItemImage);
+	ItemImage->SetColorAndOpacity(FLinearColor(0.15f, 0.15f, 0.15f, 1.f));
+
+	check(MainButton);
+	MainButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 }
 
 void USkillTreeContainerWidget::EnableCooldown()
