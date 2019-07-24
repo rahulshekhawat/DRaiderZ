@@ -17,6 +17,7 @@
 #include "SkillBarContainerWidget.h"
 #include "PlayerSkillBase.h"
 #include "PlayerSkillsComponent.h"
+#include "StatusEffectWidget.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -24,6 +25,8 @@
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
 
 UHUDWidget::UHUDWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -40,7 +43,8 @@ bool UHUDWidget::Initialize()
 		SkillBarWidget &&
 		PlayerLevel &&
 		PlayerName &&
-		InteractivePopup)
+		InteractivePopup &&
+		StatusEffectsHBox)
 	{
 		InteractivePopup->SetVisibility(ESlateVisibility::Hidden);
 		SkillTreeWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -100,8 +104,36 @@ void UHUDWidget::SetPlayerName(FString Name)
 
 void UHUDWidget::AddGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect)
 {
+	if (GameplayEffect == nullptr)
+	{
+		return;
+	}
+
+	check(StatusEffectWidgetClass.Get());
+	check(StatusEffectsHBox);
+	UStatusEffectWidget* StatusEffectWidget = CreateWidget<UStatusEffectWidget>(GetOwningPlayer(), StatusEffectWidgetClass.Get());
+	if (StatusEffectWidget)
+	{
+		StatusEffectWidget->SetDuration(GameplayEffect->GetDuration());
+		StatusEffectWidget->SetIcon(GameplayEffect->Icon);
+
+		UHorizontalBoxSlot* HBoxSlot = StatusEffectsHBox->AddChildToHorizontalBox(StatusEffectWidget);
+		check(HBoxSlot);
+		HBoxSlot->SetPadding(FMargin(-5.f, 0.f, -5.f, 0.f));		
+
+		GameplayEffectWidgetsMap.Add(GameplayEffect, StatusEffectWidget);
+	}
 }
 
 void UHUDWidget::RemoveGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect)
 {
+	if (GameplayEffectWidgetsMap.Contains(GameplayEffect))
+	{
+		UStatusEffectWidget* Widget = GameplayEffectWidgetsMap[GameplayEffect];
+		if (Widget)
+		{
+			Widget->RemoveFromParent();
+		}
+		GameplayEffectWidgetsMap.Remove(GameplayEffect);
+	}
 }

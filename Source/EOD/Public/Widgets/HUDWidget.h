@@ -15,6 +15,7 @@ class UPlayerStatsWidget;
 class UGameplayEffectBase;
 class UStatusIndicatorWidget;
 class UInteractivePopupWidget;
+class UHorizontalBox;
 
 /**
  * 
@@ -90,6 +91,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* PlayerName;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	UHorizontalBox* StatusEffectsHBox;
 
 	///////////////////////////////////////////////////////////////////////////
 	//  Mouse Events
@@ -116,5 +119,13 @@ public:
 	void RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
 	virtual void RemoveGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect);
 
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Classes)
+	TSubclassOf<class UStatusEffectWidget> StatusEffectWidgetClass;
+
+	UPROPERTY(Transient)
+	TMap<UGameplayEffectBase*, UStatusEffectWidget*> GameplayEffectWidgetsMap;
+	// TMap<TWeakObjectPtr<UGameplayEffectBase>, UStatusEffectWidget*> GameplayEffectWidgetsMap;
 
 };
