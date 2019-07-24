@@ -27,13 +27,16 @@ public:
 
 	//~ Begin Interactive Interface
 	/** This event is called when a (player) character starts interacting with the interactive actor */
-	virtual EInteractionResult OnInteractionStart_Implementation(AEODCharacterBase* Character);
+	virtual EInteractionResult OnInteractionStart_Implementation(AEODCharacterBase* Character) override;
 
 	/** This event is called when a (player) character wants to update the current interaction with the interactive actor */
-	virtual EInteractionResult OnInteractionUpdate_Implementation(AEODCharacterBase* Character);
+	virtual EInteractionResult OnInteractionUpdate_Implementation(AEODCharacterBase* Character) override;
 
 	/** This event is called when a (player) character cancels interaction with the interactive actor */
-	virtual void OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelType CancelType);
+	virtual void OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelType CancelType) override;
+
+	/** This event is called when a (player) character finishes interaction with the interactive actor */
+	virtual void OnInteractionFinish_Implementation(AEODCharacterBase* Character) override;
 	//~ End Interactive Interface
 
 	//~ Begin Lootable Interface
@@ -43,17 +46,17 @@ public:
 	virtual int32 AcquireLootItem_Implementation(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter) override;
 	//~ End Lootable Interface
 
-	UFUNCTION(BlueprintCallable, Category = "Treasure Box")
+	UFUNCTION(BlueprintCallable, Category = TreasureBox)
 	void SpawnBox();
 
-	UFUNCTION(BlueprintCallable, Category = "Treasure Box")
+	UFUNCTION(BlueprintCallable, Category = TreasureBox)
 	void OpenBox();
 
-	UFUNCTION(BlueprintPure, Category = "Treasure Box", meta = (DisplayName = "IsOpen"))
+	UFUNCTION(BlueprintPure, Category = TreasureBox, meta = (DisplayName = "IsOpen"))
 	bool BP_IsOpen() const;
 
 	/** Returns true if this treasure box has any loot remaining */
-	UFUNCTION(BlueprintPure, Category = "Treasure Box")
+	UFUNCTION(BlueprintPure, Category = TreasureBox)
 	bool HasLoot() const;
 
 	/** Returns true if this treasure box has already been opened */
@@ -61,30 +64,33 @@ public:
 
 protected:
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Treasure Box")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = TreasureBox)
 	bool bOpen;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Treasure Box")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = TreasureBox)
 	bool bSpawnByDefault;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	UAnimSequenceBase* ChestDropAnimation;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	UAnimSequenceBase* ChestOpenAnimation;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	UAnimSequenceBase* HiddenIdleAnimation;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	UAnimSequenceBase* VisibleIdleAnimation;
 
 	/** List of all the loot items that this box contains by default */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loot")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Loot)
 	TArray<FStoredLootInfo> StoredLootInfoArray;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Loot")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Loot)
 	TArray<FGeneratedLootInfo> GeneratedLootInfoArray;
+
+	UPROPERTY(Transient)
+	bool bInteractionInProgress;
 
 };
 

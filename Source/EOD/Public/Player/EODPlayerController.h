@@ -7,6 +7,7 @@
 #include "CombatLibrary.h"
 #include "EODCharacterBase.h"
 #include "HUDWidget.h"
+#include "LootableInterface.h"
 
 #include "GameFramework/PlayerController.h"
 #include "EODPlayerController.generated.h"
@@ -145,6 +146,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = UI)
 	void UnregisterActivePopupWidget();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = UI)
+	bool CreateLootWidget(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource);
+	virtual bool CreateLootWidget_Implementation(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = UI)
+	void RemoveLootWidget(UObject* LootSource);
+	virtual void RemoveLootWidget_Implementation(UObject* LootSource);
 
 protected:
 	

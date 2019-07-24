@@ -3,12 +3,14 @@
 
 #include "TreasureBoxBase.h"
 #include "EODCharacterBase.h"
+#include "EODPlayerController.h"
 
 #include "Components/SkeletalMeshComponent.h"
 
 ATreasureBoxBase::ATreasureBoxBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bSpawnByDefault = true;
+	bInteractionInProgress = false;
 
 	if (PrimaryMesh)
 	{
@@ -39,6 +41,31 @@ void ATreasureBoxBase::BeginPlay()
 
 EInteractionResult ATreasureBoxBase::OnInteractionStart_Implementation(AEODCharacterBase* Character)
 {
+	AEODPlayerController* PC = Character ? Cast<AEODPlayerController>(Character->Controller) : nullptr;
+	if (PC == nullptr || PC->IsLocalPlayerController() == false)
+	{
+		return EInteractionResult::InteractionRequestFailed;
+	}
+
+	bool bLootWidgetCreated = PC->CreateLootWidget(GeneratedLootInfoArray, this);
+	if (bLootWidgetCreated == false)
+	{
+		return EInteractionResult::InteractionRequestFailed;
+	}
+
+	// Only start looting once the loot widget has been created successfully
+	bool bLootStarted = Character->StartLooting();
+	if (bLootStarted == false)
+	{
+		// Remove loot widget if the player couldn't start looting
+		PC->RemoveLootWidget(this);
+		return EInteractionResult::InteractionRequestFailed;
+	}
+
+	OpenBox();
+	bInteractionInProgress = true;
+	return EInteractionResult::InteractionUpdated;
+	
 	//~ @todo
 	/*
 	// Ignore interaction request if it's not the local player interacting with us
@@ -56,11 +83,28 @@ EInteractionResult ATreasureBoxBase::OnInteractionStart_Implementation(AEODChara
 
 EInteractionResult ATreasureBoxBase::OnInteractionUpdate_Implementation(AEODCharacterBase* Character)
 {
+	//~ @todo pick up all loot and finish interaction
+
 	return EInteractionResult();
 }
 
 void ATreasureBoxBase::OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelType CancelType)
 {
+	OnInteractionFinish_Implementation(Character);
+}
+
+void ATreasureBoxBase::OnInteractionFinish_Implementation(AEODCharacterBase* Character)
+{
+	if (bInteractionInProgress && Character)
+	{
+		Character->StopLooting();
+		AEODPlayerController* PC = Cast<AEODPlayerController>(Character->Controller);
+		if (PC)
+		{
+			PC->RemoveLootWidget(this);
+		}
+		bInteractionInProgress = false;
+	}
 }
 
 void ATreasureBoxBase::GenerateLootInfoArray()
