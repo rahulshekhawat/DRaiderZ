@@ -8,11 +8,14 @@
 #include "EODGlobalNames.h"
 #include "DragVisualWidget.h"
 #include "EODDragDropOperation.h"
+#include "SkillTreeContainerWidget.h"
+#include "PlayerSkillsComponent.h"
 
 #include "WidgetBlueprintLibrary.h"
 
 USkillBarContainerWidget::USkillBarContainerWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	SkillBarIndex = -1;
 }
 
 bool USkillBarContainerWidget::Initialize()
@@ -62,9 +65,42 @@ void USkillBarContainerWidget::NativeOnDragDetected(const FGeometry& InGeometry,
 
 bool USkillBarContainerWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	if (InOperation)
+	UEODDragDropOperation* DragOp = Cast<UEODDragDropOperation>(InOperation);
+	if (DragOp == nullptr)
 	{
-		SetDataObj(InOperation->Payload);
+		return false;
+	}
+
+	USkillTreeContainerWidget* SourceSTCont = DragOp ? Cast<USkillTreeContainerWidget>(DragOp->DragOpSourceContainer) : nullptr;
+	if (SourceSTCont != nullptr)
+	{
+		UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(DragOp->Payload);
+		check(Skill);
+
+		UPlayerSkillsComponent* SkillsComp = Cast<UPlayerSkillsComponent>(Skill->InstigatorSkillComponent.Get());
+		check(SkillsComp);
+		SkillsComp->AddSkillToSkillBar(SkillBarIndex, Skill->GetSkillGroup());
+		SetDataObj(Skill);
+		return true;
+	}
+
+	USkillBarContainerWidget* SourceSBCont = DragOp ? Cast<USkillBarContainerWidget>(DragOp->DragOpSourceContainer) : nullptr;
+	if (SourceSBCont)
+	{
+		UPlayerSkillBase* SourceSkill = Cast<UPlayerSkillBase>(DragOp->Payload);
+		check(SourceSkill);
+
+		UPlayerSkillsComponent* SkillsComp = Cast<UPlayerSkillsComponent>(SourceSkill->InstigatorSkillComponent.Get());
+		check(SkillsComp);
+
+		UPlayerSkillBase* DestSkill = Cast<UPlayerSkillBase>(GetDataObj());
+
+		SourceSBCont->SetDataObj(DestSkill);
+		this->SetDataObj(SourceSkill);
+
+		SkillsComp->AddSkillToSkillBar(SourceSBCont->SkillBarIndex, DestSkill->GetSkillGroup());
+		SkillsComp->AddSkillToSkillBar(this->SkillBarIndex, SourceSkill->GetSkillGroup());
+
 		return true;
 	}
 

@@ -34,6 +34,12 @@ bool USkillBarWidget::Initialize()
 		SkillContainer_19 &&
 		SkillContainer_20)
 	{
+		for (int i = 1; i <= 20; i++)
+		{
+			USkillBarContainerWidget* Cont = GetContainerAtIndex(i);
+			Cont->SkillBarIndex = i;
+		}
+
 		return true;
 	}
 

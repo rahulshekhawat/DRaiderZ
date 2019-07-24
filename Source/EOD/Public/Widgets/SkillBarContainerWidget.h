@@ -55,6 +55,15 @@ public:
 protected:
 
 	/** Update tooltip widget description from DataObj */
-	virtual void UpdateTooltipWidget() override;
+	virtual void 
+		UpdateTooltipWidget() override;
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Utility
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Utility)
+	int32 SkillBarIndex;
+
 	
 };
