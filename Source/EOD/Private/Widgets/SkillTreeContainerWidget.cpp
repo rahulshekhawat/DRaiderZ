@@ -137,6 +137,18 @@ void USkillTreeContainerWidget::SetDataObj(UObject* InDataObj)
 	}
 }
 
+void USkillTreeContainerWidget::EnableUpgradeButton()
+{
+	check(UpgradeButton);
+	UpgradeButton->SetVisibility(ESlateVisibility::Visible);
+}
+
+void USkillTreeContainerWidget::DisableUpgradeButton()
+{
+	check(UpgradeButton);
+	UpgradeButton->SetVisibility(ESlateVisibility::Hidden);
+}
+
 void USkillTreeContainerWidget::UpgradeButtonClicked()
 {
 	OnUpgradeButtonClicked.Broadcast(this);

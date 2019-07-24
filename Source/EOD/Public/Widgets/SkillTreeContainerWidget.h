@@ -7,7 +7,7 @@
 #include "SkillTreeContainerWidget.generated.h"
 
 class UButton;
-
+class USkillTreeWidget;
 /**
  * 
  */
@@ -50,7 +50,13 @@ protected:
 	//  Behaviour
 public:
 
+	inline void SetParentSkillTreeWidget(USkillTreeWidget* ParentWidget);
+
 	virtual void SetDataObj(UObject* InDataObj) override;
+
+	void EnableUpgradeButton();
+
+	void DisableUpgradeButton();
 
 	FContainerMCDelegate OnUpgradeButtonClicked;
 
@@ -59,7 +65,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
 	UButton* UpgradeButton;
 
+	UPROPERTY(Transient)
+	USkillTreeWidget* ParentTreeWidget;
+
 	UFUNCTION()
 	virtual void UpgradeButtonClicked();
 	
 };
+
+inline void USkillTreeContainerWidget::SetParentSkillTreeWidget(USkillTreeWidget* ParentWidget)
+{
+	ParentTreeWidget = ParentWidget;
+}

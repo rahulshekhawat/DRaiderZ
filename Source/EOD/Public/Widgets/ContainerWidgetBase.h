@@ -97,6 +97,10 @@ public:
 
 	virtual bool IsContainerEmpty() const;
 
+	virtual void EnableContainer();
+
+	virtual void DisableContainer();
+
 	inline UObject* GetDataObj() const { return DataObj.Get(); }
 
 protected:

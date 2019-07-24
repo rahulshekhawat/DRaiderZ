@@ -120,6 +120,18 @@ bool UContainerWidgetBase::IsContainerEmpty() const
 	return (DataObj != nullptr);
 }
 
+void UContainerWidgetBase::EnableContainer()
+{
+	check(RootBorder);
+	RootBorder->SetContentColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f));
+}
+
+void UContainerWidgetBase::DisableContainer()
+{
+	check(RootBorder);
+	RootBorder->SetContentColorAndOpacity(FLinearColor(0.15f, 0.15f, 0.15f, 1.f));
+}
+
 void UContainerWidgetBase::SetIcon(UTexture* NewIcon)
 {
 	// If the NewIcon is a valid texture
