@@ -70,7 +70,7 @@ bool USkillTreeContainerWidget::NativeOnDrop(const FGeometry& InGeometry, const 
 	// return OnDrop(InGeometry, InDragDropEvent, InOperation);
 	
 	// You can't drop anything on a skill tree container
-	return false;
+	return true;
 }
 
 void USkillTreeContainerWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)

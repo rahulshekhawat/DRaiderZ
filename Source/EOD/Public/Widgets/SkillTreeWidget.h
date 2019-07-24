@@ -114,19 +114,6 @@ public:
 	/** Iterates over all skill slots in this tree and updates the bIsEnabled, bCanBeDragged, bCanBeClicked state of skill slot */
 	void UpdateSkillSlotUpgradeButtons();
 
-	/**
-	 * Initialize skill tree layout from SkillLayoutTable, i.e., create and add skill slots to the skill tree
-	 * @note Use this version to initialize skill tree if there is no player save game present (i.e., we don't have access to SkillTreeSlotSaveData)
-	 */
-	// void InitializeSkillTreeLayout(USkillTreeComponent* SkillTreeComponent, UDataTable* SkillLayoutTable);
-
-	/**
-	 * Initialize skill tree layout from SkillLayoutTable, i.e., create and add skill slots to the skill tree
-	 * Update skill tree slot information from SkillTreeSlotSaveData
-	 */
-	// void InitializeSkillTreeLayout(USkillTreeComponent* SkillTreeComponent, UDataTable* const SkillLayoutTable, const TMap<FName, FSkillTreeSlotSaveData>& SkillTreeSlotSaveData);
-
-
 protected:
 
 	UPROPERTY(Transient)

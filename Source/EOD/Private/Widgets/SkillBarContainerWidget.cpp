@@ -5,6 +5,10 @@
 #include "PlayerSkillBase.h"
 #include "TooltipWidget.h"
 #include "GameplaySkillsComponent.h"
+#include "EODGlobalNames.h"
+#include "DragVisualWidget.h"
+
+#include "WidgetBlueprintLibrary.h"
 
 USkillBarContainerWidget::USkillBarContainerWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -30,6 +34,73 @@ void USkillBarContainerWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void USkillBarContainerWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+	UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(GetDataObj());
+	if (PlayerSkill)
+	{
+		UClass* DragWidgetClass = DragVisualClass.Get();
+		check(DragWidgetClass);
+
+		UDragDropOperation* DragDropOp = UWidgetBlueprintLibrary::CreateDragDropOperation(UDragDropOperation::StaticClass());
+		if (DragDropOp)
+		{
+			UDragVisualWidget* DragVisualWidget = CreateWidget<UDragVisualWidget>(GetOwningPlayer(), DragWidgetClass);
+			DragVisualWidget->DragIcon = PlayerSkill->GetSkillIcon();
+
+			DragDropOp->DefaultDragVisual = DragVisualWidget;
+			DragDropOp->Payload = GetDataObj();
+			DragDropOp->Pivot = EDragPivot::CenterCenter;
+			DragDropOp->Offset = FVector2D(0.f, 0.f);
+		}
+
+		OutOperation = DragDropOp;
+	}
+}
+
+bool USkillBarContainerWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	return true;
+}
+
+void USkillBarContainerWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	check(MainButton);
+	MainButton->SetRenderScale(FVector2D(0.95f, 0.95f));
+}
+
+void USkillBarContainerWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	check(MainButton);
+	MainButton->SetRenderScale(FVector2D(1.f, 1.f));
+}
+
+FReply USkillBarContainerWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	bool bRMBDown = InMouseEvent.IsMouseButtonDown(FKey(KeyboardKeysNames::RightMouseButton));
+
+	FReply Reply = FReply::Handled();
+	if (bRMBDown)
+	{
+		UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(GetDataObj());
+		if (Skill)
+		{
+			TSharedPtr<SWidget> SlateWidgetDetectingDrag = this->GetCachedWidget();
+			if (SlateWidgetDetectingDrag.IsValid())
+			{
+				Reply = Reply.DetectDrag(SlateWidgetDetectingDrag.ToSharedRef(), InMouseEvent.GetEffectingButton());
+			}
+		}
+	}
+
+	return Reply;
+}
+
+FReply USkillBarContainerWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	return FReply::Handled();
+}
+
 void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 {
 	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(InDataObj);
@@ -47,32 +118,6 @@ void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 
 		Skill->LinkToWidget(this);
 	}
-
-
-
-	// Skill bar container widget
-	/*
-	if (Skill && Cont)
-	{
-		Cont->SetIcon(Skill->GetSkillIcon());
-		Cont->SetInGameName(Skill->GetInGameSkillName());
-		Cont->SetDescription(Skill->GetInGameDescription());
-		Cont->SetMaxValue(Skill->GetMaxUpgradeLevel());
-		Cont->SetItemID(Skill->GetSkillGroup());
-		Cont->SetItemGroup(Skill->GetSkillGroup());
-
-		if (Skill->CanPlayerActivateThisSkill())
-		{
-			Cont->ItemImage->SetIsEnabled(true);
-			Cont->SetCanBeClicked(true);
-		}
-		else
-		{
-			Cont->ItemImage->SetIsEnabled(false);
-			Cont->SetCanBeClicked(false);
-		}
-	}
-	*/
 }
 
 void USkillBarContainerWidget::MainButtonClicked()
@@ -99,6 +144,5 @@ void USkillBarContainerWidget::UpdateTooltipWidget()
 		TTWidget->SetTitle(Skill->GetInGameSkillName());
 		TTWidget->SetSubTitle(TEXT("Active Skill"));
 		TTWidget->SetDescription(Skill->GetInGameDescription());
-
 	}
 }
