@@ -32,7 +32,8 @@ public class EOD : ModuleRules
                 "EOD/Public/Interactives",
                 "EOD/Public/Lootables",
                 "EOD/Public/Items",
-                "EOD/Public/Widgets"
+                "EOD/Public/Widgets",
+                "EOD/Public/UI_DEPRECATED"
             }
         );
 
