@@ -110,6 +110,12 @@ void UContainerWidgetBase::PostManualConstruction(UUserWidget* InParentWidget, U
 
 void UContainerWidgetBase::ResetContainer()
 {
+	//~ @todo
+}
+
+void UContainerWidgetBase::RefreshContainer()
+{
+	SetDataObj(GetDataObj());
 }
 
 void UContainerWidgetBase::SetDataObj(UObject* InDataObj)

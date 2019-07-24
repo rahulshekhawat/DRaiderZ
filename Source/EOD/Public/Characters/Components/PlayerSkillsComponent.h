@@ -117,13 +117,21 @@ protected:
 	//  Player Skills
 public:
 
+	inline UHUDWidget* GetHUDWidget() const { return HUDWidget; }
+
 	inline USkillTreeWidget* GetSkillTreeWidget() const { return STWidget; }
 
 	inline USkillBarWidget* GetSkillBarWidget() const { return SBWidget; }
 
 	inline USkillPointsInfoWidget* GetSkillPointsInfoWidget() const { return SPIWidget; }
 
-	void InitializeUIWidgets(AEODCharacterBase* CompOwner = nullptr);
+	inline void SetHUDWidget(UHUDWidget* InWidget) { HUDWidget = InWidget; }
+
+	inline void SetSkillTreeWidget(USkillTreeWidget* InWidget) { STWidget = InWidget; }
+
+	inline void SetSkillBarWidget(USkillBarWidget* InWidget) { SBWidget = InWidget; }
+
+	inline void SetSkillPointsInfoWidget(USkillPointsInfoWidget* InWidget) { SPIWidget = InWidget; }
 
 	virtual void InitializeSkills(AEODCharacterBase* CompOwner = nullptr) override;
 
@@ -133,10 +141,6 @@ private:
 	void VerifySkillsInitializedCorrectly();
 
 	void UnlockPlayerSkillsFromSaveGame(AEODCharacterBase* CompOwner = nullptr);
-
-	void InitializeSkillBarWidget(AEODCharacterBase* CompOwner = nullptr);
-
-	void InitializeSkillTreeWidget(AEODCharacterBase* CompOwner = nullptr);
 
 	UPROPERTY(Transient)
 	UHUDWidget* HUDWidget;
@@ -170,16 +174,13 @@ public:
 
 	/** Returns true if a skill point can be allocated to this skill slot */
 	bool IsSkillAvailable(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
-
-	/** Returns the status of this skill slot */
-	// ESkillSlotStatus GetSkillSlotStatus(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = SkillTree)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = SkillSystem)
 	UDataTable* SkillTreeLayoutTable;
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = SkillSystem)
 	int32 SkillPointsUnlockedByDefault;
 
 private:

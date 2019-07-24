@@ -93,6 +93,8 @@ public:
 
 	virtual void ResetContainer();
 
+	virtual void RefreshContainer();
+
 	virtual void SetDataObj(UObject* InDataObj);
 
 	virtual bool IsContainerEmpty() const;

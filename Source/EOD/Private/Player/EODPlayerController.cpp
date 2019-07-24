@@ -200,19 +200,6 @@ void AEODPlayerController::LoadPlayerState()
 	// Load player gender
 	SetGender(SaveGame->CharacterGender);
 
-
-
-
-
-
-	// SetLeveupEXP()
-	
-
-	// int32 CharacterLevel = 1;
-
-
-
-
 	/*
 	// Load player level and exp
 	if (SaveGame->CharacterLevel <= 0)
@@ -448,6 +435,10 @@ void AEODPlayerController::InitSkillTreeWidget()
 	
 	if (STWidget && SPIWidget && SkillsComp)
 	{
+		SkillsComp->SetHUDWidget(GetHUDWidget());
+		SkillsComp->SetSkillTreeWidget(STWidget);
+		SkillsComp->SetSkillPointsInfoWidget(STWidget->GetSkillPointsInfoWidget());
+
 		FSkillPointsAllocationInfo SPAllocationInfo = SaveGame ? SaveGame->SkillPointsAllocationInfo : FSkillPointsAllocationInfo();
 
 		int32 PointsUnlockedByDefault = SkillsComp->GetSkillPointsUnlockedByDefault();
@@ -470,7 +461,6 @@ void AEODPlayerController::InitSkillTreeWidget()
 		SPIWidget->UpdateSorcererPointsText(SPAllocationInfo.SorcererPoints);
 
 		STWidget->InitializeSkillTreeLayout(SkillsComp->SkillTreeLayoutTable, SkillsComp);
-
 	}
 }
 
@@ -480,6 +470,8 @@ void AEODPlayerController::InitSkillBarWidget()
 	UPlayerSkillsComponent* SkillsComp = EODCharacter ? Cast<UPlayerSkillsComponent>(EODCharacter->GetGameplaySkillsComponent()) : nullptr;
 	if (SBWidget && SkillsComp)
 	{
+		SkillsComp->SetSkillBarWidget(SBWidget);
+
 		SBWidget->SetOwnerSkillsComponent(SkillsComp);
 		SBWidget->InitializeSkillBarLayout(SkillsComp->GetSkillBarMap(), SkillsComp->GetSkillsMap());
 	}
@@ -487,33 +479,37 @@ void AEODPlayerController::InitSkillBarWidget()
 
 void AEODPlayerController::InitPlayerStatsWidget()
 {
-	//~ @todo
-	/*
-	if (HUDWidget && EODGI)
+	UEODGameInstance* EODGI = Cast<UEODGameInstance>(GetGameInstance());
+	UPlayerStatsWidget* PSWidget = GetPlayerStatsWidget();
+	if (PSWidget && EODGI)
 	{
-		FString PlayerName = EODGI->GetCurrentPlayerSaveGameName();
-		HUDWidget->SetPlayerName(PlayerName);
-
-		UPlayerStatsWidget* PSWidget = HUDWidget->GetPlayerStatsWidget();
-		if (PSWidget)
+		PSWidget->SetPlayerName(EODGI->GetPlayerName());
+		FString PlayerType = TEXT("Human");
+		if (Gender == ECharacterGender::Female)
 		{
-			PSWidget->SetPlayerName(PlayerName);
-
-			FString Type = FString("Human");
-			if (Gender == ECharacterGender::Female)
-			{
-				Type += FString(" Female");
-			}
-			else if (Gender == ECharacterGender::Male)
-			{
-				Type += FString(" Male");
-			}
-			PSWidget->SetPlayerType(Type);
+			PlayerType += TEXT(" Female");
 		}
+		else if (Gender == ECharacterGender::Male)
+		{
+			PlayerType += FString(" Male");
+		}
+		PSWidget->SetPlayerType(PlayerType);
+
+		
+		check(StatsComponent);
+		PSWidget->UpdateHealth(StatsComponent->Health.GetMaxValue(), StatsComponent->Health.GetCurrentValue());
+		PSWidget->UpdateMana(StatsComponent->Mana.GetMaxValue(), StatsComponent->Mana.GetCurrentValue());
+		PSWidget->UpdateStamina(StatsComponent->Stamina.GetMaxValue(), StatsComponent->Stamina.GetCurrentValue());
+
+		PSWidget->UpdatePAtt(StatsComponent->PhysicalAttack.GetValue());
+		PSWidget->UpdatePCrit(StatsComponent->PhysicalCritRate.GetValue());
+		PSWidget->UpdatePDef(StatsComponent->PhysicalResistance.GetValue());
+		PSWidget->UpdateMAtt(StatsComponent->MagickalAttack.GetValue());
+		PSWidget->UpdateMCrit(StatsComponent->MagickalCritRate.GetValue());
+		PSWidget->UpdateMDef(StatsComponent->MagickalResistance.GetValue());
+
+		//~ @todo set level and exp
 	}
-	*/
-
-
 }
 
 void AEODPlayerController::BindHUDDelegates()
@@ -555,10 +551,11 @@ void AEODPlayerController::BindSkillBarDelegates()
 void AEODPlayerController::BindInventoryDelegates()
 {
 	UInventoryWidget* InvWidget = GetInventoryWidget();
-	if (InvWidget && InventoryComponent)
+	if (InvWidget)
 	{
-		InventoryComponent->OnInventoryItemAdded.AddDynamic(InvWidget, &UInventoryWidget::AddItem);
-		InventoryComponent->OnInventoryItemRemoved.AddDynamic(InvWidget, &UInventoryWidget::RemoveItem);
+		check(InventoryComponent);
+		InventoryComponent->OnInventoryItemAdded.AddUniqueDynamic(InvWidget, &UInventoryWidget::AddItem);
+		InventoryComponent->OnInventoryItemRemoved.AddUniqueDynamic(InvWidget, &UInventoryWidget::RemoveItem);
 	}
 }
 
@@ -1050,18 +1047,20 @@ void AEODPlayerController::OnReleasingGuardKey()
 
 void AEODPlayerController::OnPressingEscapeKey()
 {
-	if (IsValid(EODCharacter) && EODCharacter->IsInteracting())
+	if (EODCharacter && EODCharacter->IsInteracting())
 	{
 		EODCharacter->CancelInteraction(EInteractionCancelType::ManualCancel);
 	}
-
-	if (IsPaused())
-	{
-		SetPause(false);
-	}
 	else
 	{
-		SetPause(true);
+		if (IsPaused())
+		{
+			SetPause(false);
+		}
+		else
+		{
+			SetPause(true);
+		}
 	}
 }
 
@@ -1115,8 +1114,7 @@ bool AEODPlayerController::Server_SetGender_Validate(ECharacterGender NewGender)
 void AEODPlayerController::Server_OnInitiateDodge_Implementation()
 {
 	check(StatsComponent);
-	// int32 DodgeCost = DodgeStaminaCost * StatsComponent->GetStaminaConsumptionModifier();
-	int32 DodgeCost = DodgeStaminaCost;
+	int32 DodgeCost = DodgeStaminaCost * StatsComponent->StaminaConsumptionModifier.GetValue();
 	StatsComponent->Stamina.ModifyCurrentValue(-DodgeCost);
 }
 
@@ -1127,18 +1125,5 @@ bool AEODPlayerController::Server_OnInitiateDodge_Validate()
 
 void AEODPlayerController::Client_SetupLocalPlayerOnUnpossess_Implementation(APawn* InPawn)
 {
-	/*
-	AEODCharacterBase* EODChar = InPawn ? Cast<AEODCharacterBase>(InPawn) : nullptr;
-	if (IsValid(EODChar) && IsValid(HUDWidget))
-	{
-		if (IsValid(EODChar->GetCharacterStatsComponent()) && IsValid(HUDWidget->GetStatusIndicatorWidget()))
-		{
-			UStatusIndicatorWidget* StatusIndicatorWidget = HUDWidget->GetStatusIndicatorWidget();
-			UStatsComponentBase* StatsComp = EODChar->GetCharacterStatsComponent();
-			StatsComp->OnHealthChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateHealthBar);
-			StatsComp->OnManaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateManaBar);
-			StatsComp->OnStaminaChanged.RemoveDynamic(StatusIndicatorWidget, &UStatusIndicatorWidget::UpdateStaminaBar);
-		}
-	}
-	*/
+	InitStatusIndicatorWidget();
 }

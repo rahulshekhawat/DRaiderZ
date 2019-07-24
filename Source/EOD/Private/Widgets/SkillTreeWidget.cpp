@@ -8,6 +8,7 @@
 
 #include "Blueprint/WidgetTree.h"
 #include "Materials/MaterialInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 USkillTreeWidget::USkillTreeWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -137,6 +138,39 @@ USkillTreeContainerWidget* USkillTreeWidget::GetSkillSlotForSkillGroup(FName Ski
 	return nullptr;
 }
 
+void USkillTreeWidget::UpdateSkillSlotUpgradeButtons()
+{
+	UPlayerSkillsComponent* SkillsComp = OwnerSkillsComp.Get();
+	check(SkillsComp);
+
+	TArray<FName> Keys;
+	SkillContainersMap.GetKeys(Keys);
+
+	bool bAnySkillPointAvailable = SkillsComp->IsAnySkillPointAvailable();
+	for (FName SkillGroup : Keys)
+	{
+		USkillTreeContainerWidget* SlotWidget = SkillContainersMap[SkillGroup];
+		check(SlotWidget);
+
+		if (bAnySkillPointAvailable)
+		{
+			bool bCanAllocatePoint = SkillsComp->CanAllocatePointToSlot(SkillGroup);
+			if (bCanAllocatePoint)
+			{
+				SlotWidget->EnableUpgradeButton();
+			}
+			else
+			{
+				SlotWidget->DisableUpgradeButton();
+			}
+		}
+		else
+		{
+			SlotWidget->DisableUpgradeButton();
+		}
+	}
+}
+
 USkillTreeContainerWidget* USkillTreeWidget::AddNewSTContainer(UPlayerSkillBase* PlayerSkill)
 {
 	if (PlayerSkill == nullptr || SkillTreeSlotClass.Get() == nullptr || SkillContainersMap.Contains(PlayerSkill->GetSkillGroup()))
@@ -159,27 +193,18 @@ void USkillTreeWidget::OnSkillUpgradeButtonClicked(UContainerWidgetBase* Widget)
 {
 	USkillTreeContainerWidget* STWidget = Cast<USkillTreeContainerWidget>(Widget);
 	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(STWidget->GetDataObj());
-	if (Skill)
+
+	UPlayerSkillsComponent* SkillsComp = OwnerSkillsComp.Get();
+	if (SkillsComp && Skill)
 	{
-		// Skill->SetCurrentUpgrade()
+		bool bAllocationSuccessful = SkillsComp->AttemptPointAllocationToSlot(Skill->GetSkillGroup());
+		if (bAllocationSuccessful)
+		{
+			UGameplayStatics::PlaySound2D(this, SkillPointAllocatedSound);
+			STWidget->EnableContainer();
+			UpdateSkillSlotUpgradeButtons();
+		}
 	}
-
-
-	// Skill->SetCurrentUpgrade()
-
-	//~ @todo
-	/*
-	check(this == ParentWidget && Widget && SkillTreeComp);
-
-	FContainerData ContData = Widget->GetContainerData();
-	bool bAllocationSuccessful = SkillTreeComp->AttemptPointAllocationToSlot(ContData.ItemID);
-
-	if (bAllocationSuccessful)
-	{
-		UpdateSkillSlots();
-		UGameplayStatics::PlaySound2D(this, SkillPointAllocatedSound);
-	}
-	*/
 }
 
 void USkillTreeWidget::ActivateAssassinTab()

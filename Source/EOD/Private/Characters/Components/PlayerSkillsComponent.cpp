@@ -536,42 +536,6 @@ void UPlayerSkillsComponent::Server_ReleaseSkill_Implementation(uint8 SkillIndex
 	ReleaseSkill(SkillIndex);
 }
 
-void UPlayerSkillsComponent::InitializeUIWidgets(AEODCharacterBase* CompOwner)
-{
-	if (!CompOwner)
-	{
-		// If CompOwner is invalid, try to initalize it from locally cached component owner
-		CompOwner = GetCharacterOwner();
-	}
-
-	check(CompOwner);
-
-	AEODPlayerController* EODPC = Cast<AEODPlayerController>(CompOwner->Controller);
-	if (!EODPC || !EODPC->GetHUDWidget())
-	{
-		return;
-	}
-
-	HUDWidget = EODPC->GetHUDWidget();
-	STWidget = EODPC->GetSkillTreeWidget();
-	SBWidget = EODPC->GetSkillBarWidget();
-	check(STWidget);
-	check(SBWidget);
-	SPIWidget = STWidget->GetSkillPointsInfoWidget();
-	check(SPIWidget);
-
-	InitializeSkillTreeWidget();
-	InitializeSkillBarWidget();
-}
-
-void UPlayerSkillsComponent::InitializeSkillBarWidget(AEODCharacterBase* CompOwner)
-{
-}
-
-void UPlayerSkillsComponent::InitializeSkillTreeWidget(AEODCharacterBase* CompOwner)
-{
-}
-
 void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 {
 	// If there are already skills in Skill Map
@@ -952,19 +916,12 @@ void UPlayerSkillsComponent::ModifySkillSlotUpgrade(FName SkillGroup, int32 Valu
 		SetSkillSlotUpgrade(SkillGroup, SaveData.CurrentUpgrade);
 	}
 
-
-	//~ @todo save
-	/*
-	AEODPlayerController* PC = Cast<AEODPlayerController>(GetOuter());
-	UEODGameInstance* GI = PC ? Cast<UEODGameInstance>(PC->GetGameInstance()) : nullptr;
-	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
-	if (SaveGame)
+	UWorld* World = GetWorld();
+	UEODGameInstance* EODGI = World ? Cast<UEODGameInstance>(World->GetGameInstance()) : nullptr;
+	if (EODGI)
 	{
-		SaveGame->SkillTreeSlotsSaveData = this->SkillTreeSlotsSaveData;
-		SaveGame->SkillPointsAllocationInfo = this->SkillPointsAllocationInfo;
-		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
+		UGameplayStatics::SaveGameToSlot(SaveGame, EODGI->GetCurrentPlayerSaveGameName(), EODGI->PlayerIndex);
 	}
-	*/
 }
 
 void UPlayerSkillsComponent::SetSkillSlotUpgrade(FName SkillGroup, int32 Value)
