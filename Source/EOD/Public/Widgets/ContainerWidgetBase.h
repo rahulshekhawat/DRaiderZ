@@ -106,6 +106,16 @@ public:
 	virtual void DisableCooldown();
 
 	virtual void SetCooldownValue(float InValue);
+	
+	/** Sets the display icon of this container */
+	UFUNCTION()
+	virtual void SetIcon(UTexture* NewIcon);
+
+	UFUNCTION()
+	virtual void SetSubText(int32 InCurrentValue, int32 InMaxValue);
+
+	UFUNCTION()
+	virtual void SetCurrentValue(int32 InValue) { ; }
 
 	inline UObject* GetDataObj() const { return DataObj.Get(); }
 
@@ -122,17 +132,7 @@ protected:
 
 	UPROPERTY(Transient)
 	bool bCooldownEnabled;
-
-	/** Sets the display icon of this container */
-	UFUNCTION()
-	void SetIcon(UTexture* NewIcon);
-
-	UFUNCTION()
-	void SetSubText(int32 InCurrentValue, int32 InMaxValue);
-
-	UFUNCTION()
-	void SetCooldown(float InCooldown);
-
+	
 	UFUNCTION()
 	UWidget* GetTooltipWidget();
 

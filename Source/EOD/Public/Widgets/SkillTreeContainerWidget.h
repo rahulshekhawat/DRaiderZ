@@ -30,6 +30,13 @@ public:
 
 
 	///////////////////////////////////////////////////////////////////////////
+	//  Child Widgets
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = ContainerChild, meta = (BindWidget))
+	UButton* UpgradeButton;
+
+
+	///////////////////////////////////////////////////////////////////////////
 	//  Mouse Events
 protected:
 
@@ -68,12 +75,11 @@ public:
 
 	virtual void SetCooldownValue(float InValue) override;
 
+	virtual void SetCurrentValue(int32 InValue) override;
+
 	FContainerMCDelegate OnUpgradeButtonClicked;
 
 protected:
-
-	UPROPERTY(BlueprintReadOnly, Category = "Container Child", meta = (BindWidget))
-	UButton* UpgradeButton;
 
 	UPROPERTY(Transient)
 	USkillTreeWidget* ParentTreeWidget;

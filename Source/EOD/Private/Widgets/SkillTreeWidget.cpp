@@ -115,7 +115,8 @@ void USkillTreeWidget::InitializeSkillTreeLayout(UDataTable* STLayoutTable, UPla
 			ConnectorArrows.Add(TempImage);
 		}
 
-		if (InSkillsComp->CanAllocatePointToSlot(RowName, SkillTreeSlot))
+		bool bCanAllocatePoint = InSkillsComp->CanAllocatePointToSlot(RowName, SkillTreeSlot);
+		if (bCanAllocatePoint)
 		{
 			STWidget->EnableUpgradeButton();
 		}
@@ -124,6 +125,16 @@ void USkillTreeWidget::InitializeSkillTreeLayout(UDataTable* STLayoutTable, UPla
 			STWidget->DisableUpgradeButton();
 		}
 	}
+}
+
+USkillTreeContainerWidget* USkillTreeWidget::GetSkillSlotForSkillGroup(FName SkillGroup)
+{
+	if (SkillContainersMap.Contains(SkillGroup))
+	{
+		return SkillContainersMap[SkillGroup];
+	}
+
+	return nullptr;
 }
 
 USkillTreeContainerWidget* USkillTreeWidget::AddNewSTContainer(UPlayerSkillBase* PlayerSkill)

@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlayerSaveGame.h"
 #include "CharacterLibrary.h"
+
 #include "GameplaySkillsComponent.h"
 #include "PlayerSkillsComponent.generated.h"
 
 class UContainerWidget;
+class UPlayerSaveGame;
 class UHUDWidget;
 class UGameplaySkillBase;
 class UPlayerSkillBase;
@@ -152,10 +155,12 @@ private:
 	//  Skill Tree Manager
 public:
 
-	/** Returns true if any skill point is available to be allocated */
-	inline bool IsAnySkillPointAvailable() const { return SkillPointsAllocationInfo.AvailableSkillPoints > 0; }
-
 	inline int32 GetSkillPointsUnlockedByDefault() const { return SkillPointsUnlockedByDefault; }
+
+	UPlayerSaveGame* GetPlayerSaveGame() const;
+
+	/** Returns true if any skill point is available to be allocated */
+	bool IsAnySkillPointAvailable() const;
 
 	/** Attempt to allocate a skill point to a slot associated with the given SkillGroup. Returns true if the point allocation was successful */
 	bool AttemptPointAllocationToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo = nullptr);
@@ -174,16 +179,10 @@ public:
 
 protected:
 
-	UPROPERTY(Transient)
-	TMap<FName, FSkillTreeSlotSaveData> SkillTreeSlotsSaveData;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Layout")
 	int32 SkillPointsUnlockedByDefault;
 
 private:
-
-	UPROPERTY(Transient)
-	FSkillPointsAllocationInfo SkillPointsAllocationInfo;
 
 	inline void ModifyAllocatedPointsAssassin(int32 Value);
 	inline void ModifyAllocatedPointsBerserker(int32 Value);
@@ -215,42 +214,55 @@ public:
 
 inline void UPlayerSkillsComponent::ModifyAllocatedPointsAssassin(int32 Value)
 {
-	SetAllocatedPointsAssassin(SkillPointsAllocationInfo.AssassinPoints + Value);
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	FSkillPointsAllocationInfo SPAInfo = SaveGame ? SaveGame->SkillPointsAllocationInfo : FSkillPointsAllocationInfo();
+	SetAllocatedPointsAssassin(SPAInfo.AssassinPoints + Value);
 }
 
 inline void UPlayerSkillsComponent::ModifyAllocatedPointsBerserker(int32 Value)
 {
-	SetAllocatedPointsBerserker(SkillPointsAllocationInfo.BerserkerPoints + Value);
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	FSkillPointsAllocationInfo SPAInfo = SaveGame ? SaveGame->SkillPointsAllocationInfo : FSkillPointsAllocationInfo();
+	SetAllocatedPointsBerserker(SPAInfo.BerserkerPoints + Value);
 }
 
 inline void UPlayerSkillsComponent::ModifyAllocatedPointsCleric(int32 Value)
 {
-	SetAllocatedPointsCleric(SkillPointsAllocationInfo.ClericPoints + Value);
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	FSkillPointsAllocationInfo SPAInfo = SaveGame ? SaveGame->SkillPointsAllocationInfo : FSkillPointsAllocationInfo();
+	SetAllocatedPointsCleric(SPAInfo.ClericPoints + Value);
 }
 
 inline void UPlayerSkillsComponent::ModifyAllocatedPointsDefender(int32 Value)
 {
-	SetAllocatedPointsDefender(SkillPointsAllocationInfo.DefenderPoints + Value);
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	FSkillPointsAllocationInfo SPAInfo = SaveGame ? SaveGame->SkillPointsAllocationInfo : FSkillPointsAllocationInfo();
+	SetAllocatedPointsDefender(SPAInfo.DefenderPoints + Value);
 }
 
 inline void UPlayerSkillsComponent::ModifyAllocatedPointsSorcerer(int32 Value)
 {
-	SetAllocatedPointsSorcerer(SkillPointsAllocationInfo.SorcererPoints + Value);
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	FSkillPointsAllocationInfo SPAInfo = SaveGame ? SaveGame->SkillPointsAllocationInfo : FSkillPointsAllocationInfo();
+	SetAllocatedPointsSorcerer(SPAInfo.SorcererPoints + Value);
 }
 
 inline void UPlayerSkillsComponent::ModifyAvailableSkillPoints(int32 Value)
 {
-	SetAvailableSkillPoints(SkillPointsAllocationInfo.AvailableSkillPoints + Value);
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	FSkillPointsAllocationInfo SPAInfo = SaveGame ? SaveGame->SkillPointsAllocationInfo : FSkillPointsAllocationInfo();
+	SetAvailableSkillPoints(SPAInfo.AvailableSkillPoints + Value);
 }
 
 inline void UPlayerSkillsComponent::ModifyUsedSkillPoints(int32 Value)
 {
-	SetUsedSkillPoints(SkillPointsAllocationInfo.UsedSkillPoints + Value);
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	FSkillPointsAllocationInfo SPAInfo = SaveGame ? SaveGame->SkillPointsAllocationInfo : FSkillPointsAllocationInfo();
+	SetUsedSkillPoints(SPAInfo.UsedSkillPoints + Value);
 }
 
 inline void UPlayerSkillsComponent::SetSkillPointsAllocationInfo(const FSkillPointsAllocationInfo& NewInfo)
 {
-	SkillPointsAllocationInfo = NewInfo;
 	SetAvailableSkillPoints(NewInfo.AvailableSkillPoints);
 	SetUsedSkillPoints(NewInfo.UsedSkillPoints);
 	SetAllocatedPointsAssassin(NewInfo.AssassinPoints);

@@ -198,10 +198,9 @@ void UContainerWidgetBase::SetIcon(UTexture* NewIcon)
 
 void UContainerWidgetBase::SetSubText(int32 InCurrentValue, int32 InMaxValue)
 {
-}
-
-void UContainerWidgetBase::SetCooldown(float InCooldown)
-{
+	check(SubText);
+	FString Content = FString::FromInt(InCurrentValue) + TEXT("/") + FString::FromInt(InMaxValue);
+	SubText->SetText(FText::FromString(Content));
 }
 
 UWidget* UContainerWidgetBase::GetTooltipWidget()

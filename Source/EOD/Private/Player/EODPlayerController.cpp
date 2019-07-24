@@ -454,6 +454,10 @@ void AEODPlayerController::InitSkillTreeWidget()
 		if ((SPAllocationInfo.AvailableSkillPoints + SPAllocationInfo.UsedSkillPoints) < PointsUnlockedByDefault)
 		{
 			SPAllocationInfo.AvailableSkillPoints = PointsUnlockedByDefault - SPAllocationInfo.UsedSkillPoints;
+			if (SaveGame)
+			{
+				SaveGame->SkillPointsAllocationInfo.AvailableSkillPoints = SPAllocationInfo.AvailableSkillPoints;
+			}
 		}
 
 		SPIWidget->UpdateAvailableSkillPointsText(SPAllocationInfo.AvailableSkillPoints);

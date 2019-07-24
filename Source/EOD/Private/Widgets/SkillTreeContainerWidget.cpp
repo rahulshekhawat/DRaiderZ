@@ -20,6 +20,7 @@ bool USkillTreeContainerWidget::Initialize()
 	{
 		// Skill Tree Container's Main Button can never be clicked
 		MainButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		SubText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
 		UpgradeButton->OnClicked.AddUniqueDynamic(this, &USkillTreeContainerWidget::UpgradeButtonClicked);
 		return true;
@@ -128,7 +129,7 @@ void USkillTreeContainerWidget::SetDataObj(UObject* InDataObj)
 
 		SetIcon(Skill->GetSkillIcon());
 		SetSubText(Skill->GetCurrentUpgrade(), Skill->GetMaxUpgradeLevel());
-		SetCooldown(Skill->GetRemainingCooldown());
+		SetCooldownValue(Skill->GetRemainingCooldown());
 
 		//~ @todo enable/disable skill
 
@@ -144,13 +145,8 @@ void USkillTreeContainerWidget::SetDataObj(UObject* InDataObj)
 		{
 			DisableContainer();
 		}
-	}
 
-	UPlayerSkillsComponent* SkillsComp = Skill ? Cast<UPlayerSkillsComponent>(Skill->InstigatorSkillComponent.Get()) : nullptr;
-	if (SkillsComp)
-	{
-		// SkillsComp->
-
+		SetSubText(Skill->GetCurrentUpgrade(), Skill->GetMaxUpgradeLevel());
 	}
 }
 
@@ -171,8 +167,9 @@ void USkillTreeContainerWidget::EnableContainer()
 	check(ItemImage);
 	ItemImage->SetColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f));
 
+	//~ Skill tree container's main button is always disabled
 	check(MainButton);
-	MainButton->SetVisibility(ESlateVisibility::Visible);
+	MainButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 }
 
 void USkillTreeContainerWidget::DisableContainer()
@@ -197,6 +194,13 @@ void USkillTreeContainerWidget::DisableCooldown()
 void USkillTreeContainerWidget::SetCooldownValue(float InValue)
 {
 	//~ intentional empty override
+}
+
+void USkillTreeContainerWidget::SetCurrentValue(int32 InValue)
+{
+	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(GetDataObj());
+	check(Skill);
+	SetSubText(InValue, Skill->GetMaxUpgradeLevel());
 }
 
 void USkillTreeContainerWidget::UpgradeButtonClicked()

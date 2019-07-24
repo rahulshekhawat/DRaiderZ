@@ -4,7 +4,6 @@
 #include "PlayerSkillsComponent.h"
 #include "PlayerCharacter.h"
 #include "EODGameInstance.h"
-#include "PlayerSaveGame.h"
 #include "GameplaySkillBase.h"
 #include "ActiveSkillBase.h"
 #include "EODPlayerController.h"
@@ -16,6 +15,7 @@
 #include "SkillBarWidget.h"
 #include "SkillBarContainerWidget.h"
 
+#include "Engine/World.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 #include "Components/Image.h"
@@ -668,6 +668,28 @@ void UPlayerSkillsComponent::UnlockPlayerSkillsFromSaveGame(AEODCharacterBase* C
 	}
 }
 
+UPlayerSaveGame* UPlayerSkillsComponent::GetPlayerSaveGame() const
+{
+	UWorld* World = GetWorld();
+	UEODGameInstance* EODGI = World ? Cast<UEODGameInstance>(World->GetGameInstance()) : nullptr;
+	UPlayerSaveGame* SaveGame = EODGI ? EODGI->GetCurrentPlayerSaveGameObject() : nullptr;
+	return SaveGame;
+}
+
+bool UPlayerSkillsComponent::IsAnySkillPointAvailable() const
+{
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	if (SaveGame)
+	{
+		FSkillPointsAllocationInfo& SPAInfo = SaveGame->SkillPointsAllocationInfo;
+		if (SPAInfo.AvailableSkillPoints > 0 || (SPAInfo.AvailableSkillPoints + SPAInfo.UsedSkillPoints) > SkillPointsUnlockedByDefault)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool UPlayerSkillsComponent::AttemptPointAllocationToSlot(FName SkillGroup, FSkillTreeSlot* SkillSlotInfo)
 {
 	FSkillTreeSlot* SkillTreeSlot = SkillSlotInfo;
@@ -713,15 +735,15 @@ bool UPlayerSkillsComponent::AttemptPointAllocationToSlot(FName SkillGroup, FSki
 
 bool UPlayerSkillsComponent::IsAnySkillPointAllocatedToSlot(FName SkillGroup)
 {
-	if (SkillTreeSlotsSaveData.Contains(SkillGroup))
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	if (SaveGame->SkillTreeSlotsSaveData.Contains(SkillGroup))
 	{
-		FSkillTreeSlotSaveData& SaveData = SkillTreeSlotsSaveData[SkillGroup];
+		FSkillTreeSlotSaveData& SaveData = SaveGame->SkillTreeSlotsSaveData[SkillGroup];
 		if (SaveData.CurrentUpgrade > 0)
 		{
 			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -739,13 +761,15 @@ bool UPlayerSkillsComponent::IsSkillAvailable(FName SkillGroup, FSkillTreeSlot* 
 		SkillTreeSlot = SkillTreeLayoutTable->FindRow<FSkillTreeSlot>(SkillGroup, ContextString);
 	}
 
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+
 	// If skil tree slot was not found
-	if (SkillTreeSlot == nullptr)
+	if (SkillTreeSlot == nullptr || SaveGame == nullptr)
 	{
 		return false;
 	}
 
-	int32 CurrentSkillGroupUpgrade = SkillTreeSlotsSaveData.Contains(SkillGroup) ? SkillTreeSlotsSaveData[SkillGroup].CurrentUpgrade : 0;
+	int32 CurrentSkillGroupUpgrade = SaveGame->SkillTreeSlotsSaveData.Contains(SkillGroup) ? SaveGame->SkillTreeSlotsSaveData[SkillGroup].CurrentUpgrade : 0;
 	// If the skill upgrade is already maxxed out
 	if (CurrentSkillGroupUpgrade == SkillTreeSlot->MaxUpgrades)
 	{
@@ -757,19 +781,19 @@ bool UPlayerSkillsComponent::IsSkillAvailable(FName SkillGroup, FSkillTreeSlot* 
 	switch (SkillTreeSlot->Vocation)
 	{
 	case EVocations::Assassin:
-		AllocatedPoints = SkillPointsAllocationInfo.AssassinPoints;
+		AllocatedPoints = SaveGame->SkillPointsAllocationInfo.AssassinPoints;
 		break;
 	case EVocations::Berserker:
-		AllocatedPoints = SkillPointsAllocationInfo.BerserkerPoints;
+		AllocatedPoints = SaveGame->SkillPointsAllocationInfo.BerserkerPoints;
 		break;
 	case EVocations::Cleric:
-		AllocatedPoints = SkillPointsAllocationInfo.ClericPoints;
+		AllocatedPoints = SaveGame->SkillPointsAllocationInfo.ClericPoints;
 		break;
 	case EVocations::Defender:
-		AllocatedPoints = SkillPointsAllocationInfo.DefenderPoints;
+		AllocatedPoints = SaveGame->SkillPointsAllocationInfo.DefenderPoints;
 		break;
 	case EVocations::Sorcerer:
-		AllocatedPoints = SkillPointsAllocationInfo.SorcererPoints;
+		AllocatedPoints = SaveGame->SkillPointsAllocationInfo.SorcererPoints;
 		break;
 	default:
 		break;
@@ -782,7 +806,7 @@ bool UPlayerSkillsComponent::IsSkillAvailable(FName SkillGroup, FSkillTreeSlot* 
 
 	if (SkillTreeSlot->SkillRequiredToUnlock != NAME_None)
 	{
-		int32 UnlockSkillUpgradeLevel = SkillTreeSlotsSaveData.Contains(SkillTreeSlot->SkillRequiredToUnlock) ? SkillTreeSlotsSaveData[SkillTreeSlot->SkillRequiredToUnlock].CurrentUpgrade : 0;
+		int32 UnlockSkillUpgradeLevel = SaveGame->SkillTreeSlotsSaveData.Contains(SkillTreeSlot->SkillRequiredToUnlock) ? SaveGame->SkillTreeSlotsSaveData[SkillTreeSlot->SkillRequiredToUnlock].CurrentUpgrade : 0;
 		if (UnlockSkillUpgradeLevel == 0)
 		{
 			return false;
@@ -804,7 +828,13 @@ bool UPlayerSkillsComponent::CanAllocatePointToSlot(FName SkillGroup, FSkillTree
 
 void UPlayerSkillsComponent::SetAllocatedPointsAssassin(int32 Value)
 {
-	SkillPointsAllocationInfo.AssassinPoints = Value;
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	if (SaveGame == nullptr)
+	{
+		return;
+	}
+
+	SaveGame->SkillPointsAllocationInfo.AssassinPoints = Value;
 	if (SPIWidget)
 	{
 		SPIWidget->UpdateAssassinPointsText(Value);
@@ -813,7 +843,13 @@ void UPlayerSkillsComponent::SetAllocatedPointsAssassin(int32 Value)
 
 void UPlayerSkillsComponent::SetAllocatedPointsBerserker(int32 Value)
 {
-	SkillPointsAllocationInfo.BerserkerPoints = Value;
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	if (SaveGame == nullptr)
+	{
+		return;
+	}
+
+	SaveGame->SkillPointsAllocationInfo.BerserkerPoints = Value;
 	if (SPIWidget)
 	{
 		SPIWidget->UpdateBerserkerPointsText(Value);
@@ -822,7 +858,13 @@ void UPlayerSkillsComponent::SetAllocatedPointsBerserker(int32 Value)
 
 void UPlayerSkillsComponent::SetAllocatedPointsCleric(int32 Value)
 {
-	SkillPointsAllocationInfo.ClericPoints = Value;
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	if (SaveGame == nullptr)
+	{
+		return;
+	}
+
+	SaveGame->SkillPointsAllocationInfo.ClericPoints = Value;
 	if (SPIWidget)
 	{
 		SPIWidget->UpdateClericPointsText(Value);
@@ -831,7 +873,13 @@ void UPlayerSkillsComponent::SetAllocatedPointsCleric(int32 Value)
 
 void UPlayerSkillsComponent::SetAllocatedPointsDefender(int32 Value)
 {
-	SkillPointsAllocationInfo.DefenderPoints = Value;
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	if (SaveGame == nullptr)
+	{
+		return;
+	}
+
+	SaveGame->SkillPointsAllocationInfo.DefenderPoints = Value;
 	if (SPIWidget)
 	{
 		SPIWidget->UpdateDefenderPointsText(Value);
@@ -840,7 +888,13 @@ void UPlayerSkillsComponent::SetAllocatedPointsDefender(int32 Value)
 
 void UPlayerSkillsComponent::SetAllocatedPointsSorcerer(int32 Value)
 {
-	SkillPointsAllocationInfo.SorcererPoints = Value;
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	if (SaveGame == nullptr)
+	{
+		return;
+	}
+
+	SaveGame->SkillPointsAllocationInfo.SorcererPoints = Value;
 	if (SPIWidget)
 	{
 		SPIWidget->UpdateSorcererPointsText(Value);
@@ -849,7 +903,13 @@ void UPlayerSkillsComponent::SetAllocatedPointsSorcerer(int32 Value)
 
 void UPlayerSkillsComponent::SetAvailableSkillPoints(int32 Value)
 {
-	SkillPointsAllocationInfo.AvailableSkillPoints = Value;
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	if (SaveGame == nullptr)
+	{
+		return;
+	}
+
+	SaveGame->SkillPointsAllocationInfo.AvailableSkillPoints = Value;
 	if (SPIWidget)
 	{
 		SPIWidget->UpdateAvailableSkillPointsText(Value);
@@ -858,7 +918,13 @@ void UPlayerSkillsComponent::SetAvailableSkillPoints(int32 Value)
 
 void UPlayerSkillsComponent::SetUsedSkillPoints(int32 Value)
 {
-	SkillPointsAllocationInfo.UsedSkillPoints = Value;
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	if (SaveGame == nullptr)
+	{
+		return;
+	}
+
+	SaveGame->SkillPointsAllocationInfo.UsedSkillPoints = Value;
 	if (SPIWidget)
 	{
 		SPIWidget->UpdateUsedSkillPointsText(Value);
@@ -867,19 +933,28 @@ void UPlayerSkillsComponent::SetUsedSkillPoints(int32 Value)
 
 void UPlayerSkillsComponent::ModifySkillSlotUpgrade(FName SkillGroup, int32 Value)
 {
-	if (SkillTreeSlotsSaveData.Contains(SkillGroup))
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	if (SaveGame == nullptr)
 	{
-		FSkillTreeSlotSaveData& SaveData = SkillTreeSlotsSaveData[SkillGroup];
+		return;
+	}
+
+	if (SaveGame->SkillTreeSlotsSaveData.Contains(SkillGroup))
+	{
+		FSkillTreeSlotSaveData& SaveData = SaveGame->SkillTreeSlotsSaveData[SkillGroup];
 		SetSkillSlotUpgrade(SkillGroup, SaveData.CurrentUpgrade + Value);
 	}
 	else
 	{
 		FSkillTreeSlotSaveData SaveData;
 		SaveData.CurrentUpgrade += Value;
-		SkillTreeSlotsSaveData.Add(SkillGroup, SaveData);
+		SaveGame->SkillTreeSlotsSaveData.Add(SkillGroup, SaveData);
 		SetSkillSlotUpgrade(SkillGroup, SaveData.CurrentUpgrade);
 	}
 
+
+	//~ @todo save
+	/*
 	AEODPlayerController* PC = Cast<AEODPlayerController>(GetOuter());
 	UEODGameInstance* GI = PC ? Cast<UEODGameInstance>(PC->GetGameInstance()) : nullptr;
 	UPlayerSaveGame* SaveGame = GI ? GI->GetCurrentPlayerSaveGameObject() : nullptr;
@@ -889,20 +964,21 @@ void UPlayerSkillsComponent::ModifySkillSlotUpgrade(FName SkillGroup, int32 Valu
 		SaveGame->SkillPointsAllocationInfo = this->SkillPointsAllocationInfo;
 		UGameplayStatics::SaveGameToSlot(SaveGame, GI->GetCurrentPlayerSaveGameName(), GI->PlayerIndex);
 	}
+	*/
 }
 
 void UPlayerSkillsComponent::SetSkillSlotUpgrade(FName SkillGroup, int32 Value)
 {
-	check(SkillTreeSlotsSaveData.Contains(SkillGroup));
-	FSkillTreeSlotSaveData& SaveData = SkillTreeSlotsSaveData[SkillGroup];
+	UPlayerSaveGame* SaveGame = GetPlayerSaveGame();
+	check(SaveGame);
+
+	check(SaveGame->SkillTreeSlotsSaveData.Contains(SkillGroup));
+	FSkillTreeSlotSaveData& SaveData = SaveGame->SkillTreeSlotsSaveData[SkillGroup];
 	SaveData.CurrentUpgrade = Value;
 
-	// UContainerWidget* SlotWidget = STWidget ? STWidget->GetSkillSlotForSkillGroup(SkillGroup) : nullptr;
-	UContainerWidget* SlotWidget = nullptr;
+	USkillTreeContainerWidget* SlotWidget = STWidget ? STWidget->GetSkillSlotForSkillGroup(SkillGroup) : nullptr;
 	if (SlotWidget)
 	{
 		SlotWidget->SetCurrentValue(Value);
 	}
-
-	//~ @todo store new upgrade info to save game?
 }

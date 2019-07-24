@@ -39,7 +39,7 @@ void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 
 		SetIcon(Skill->GetSkillIcon());
 		SetSubText(Skill->GetCurrentUpgrade(), Skill->GetMaxUpgradeLevel());
-		SetCooldown(Skill->GetRemainingCooldown());
+		SetCooldownValue(Skill->GetRemainingCooldown());
 
 		//~ @todo enable/disable skill
 
