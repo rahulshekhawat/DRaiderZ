@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EODLibrary.h"
-
 #include "Blueprint/UserWidget.h"
 #include "DragVisualWidget.generated.h"
+
+class UTexture;
 
 /**
  * 
@@ -26,7 +26,7 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	UPROPERTY(Transient, BlueprintReadWrite, Category = EODItemInfo)
-	FEODItemInfo EODItemInfo;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
+	UTexture* DragIcon;
 	
 };

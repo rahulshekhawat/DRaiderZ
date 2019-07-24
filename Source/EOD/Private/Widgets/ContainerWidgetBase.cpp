@@ -3,6 +3,9 @@
 
 #include "ContainerWidgetBase.h"
 #include "TooltipWidget.h"
+#include "DragVisualWidget.h"
+
+#include "WidgetBlueprintLibrary.h"
 
 UContainerWidgetBase::UContainerWidgetBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -22,6 +25,8 @@ bool UContainerWidgetBase::Initialize()
 		SubText->SetVisibility(ESlateVisibility::Hidden);
 		CooldownText->SetVisibility(ESlateVisibility::Hidden);
 
+		MainButton->OnClicked.AddUniqueDynamic(this, &UContainerWidgetBase::MainButtonClicked);
+
 		return true;
 	}
 
@@ -40,6 +45,19 @@ void UContainerWidgetBase::NativeDestruct()
 
 void UContainerWidgetBase::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
+	UClass* DragWidgetClass = DragVisualClass.Get();
+	check(DragWidgetClass);
+	UDragDropOperation* DragDropOp = UWidgetBlueprintLibrary::CreateDragDropOperation(UDragDropOperation::StaticClass());
+	if (DragDropOp)
+	{
+		UDragVisualWidget* DragVisualWidget = CreateWidget<UDragVisualWidget>(GetOwningPlayer(), DragWidgetClass);
+		DragVisualWidget->DragIcon = Cast<UTexture>(this->ItemImage->Brush.GetResourceObject());
+
+		DragDropOp->DefaultDragVisual = DragVisualWidget;
+		DragDropOp->Payload = GetDataObj();
+		DragDropOp->Pivot = EDragPivot::CenterCenter;
+		DragDropOp->Offset = FVector2D(0.f, 0.f);
+	}
 }
 
 bool UContainerWidgetBase::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -63,6 +81,11 @@ FReply UContainerWidgetBase::NativeOnMouseButtonDown(const FGeometry& InGeometry
 FReply UContainerWidgetBase::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	return FReply::Handled();
+}
+
+void UContainerWidgetBase::MainButtonClicked()
+{
+	OnClicked.Broadcast(this);
 }
 
 void UContainerWidgetBase::PostManualConstruction(UUserWidget* InParentWidget, UObject* InDataObj)

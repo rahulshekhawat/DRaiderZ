@@ -11,6 +11,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ContainerWidgetBase.generated.h"
 
+class UDragVisualWidget;
 class UTooltipWidget;
 class UContainerWidgetBase;
 
@@ -80,6 +81,9 @@ protected:
 
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
+	UFUNCTION()
+	virtual void MainButtonClicked();
+
 
 	///////////////////////////////////////////////////////////////////////////
 	//  Behaviour
@@ -99,6 +103,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Classes)
 	TSubclassOf<UTooltipWidget> TooltipWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Classes)
+	TSubclassOf<UDragVisualWidget> DragVisualClass;
 
 	UPROPERTY(Transient)
 	TWeakObjectPtr<UObject> DataObj;

@@ -13,8 +13,10 @@ bool USkillTreeContainerWidget::Initialize()
 	if (Super::Initialize() &&
 		UpgradeButton)
 	{
-		UpgradeButton->OnClicked.AddUniqueDynamic(this, &USkillTreeContainerWidget::UpgradeButtonClicked);
+		// Skill Tree Container's Main Button can never be clicked
+		MainButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
+		UpgradeButton->OnClicked.AddUniqueDynamic(this, &USkillTreeContainerWidget::UpgradeButtonClicked);
 		return true;
 	}
 
@@ -29,6 +31,34 @@ void USkillTreeContainerWidget::NativeConstruct()
 void USkillTreeContainerWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
+
+void USkillTreeContainerWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+
+}
+
+bool USkillTreeContainerWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	return false;
+}
+
+void USkillTreeContainerWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+}
+
+void USkillTreeContainerWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+}
+
+FReply USkillTreeContainerWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	return FReply();
+}
+
+FReply USkillTreeContainerWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	return FReply();
 }
 
 void USkillTreeContainerWidget::SetDataObj(UObject* InDataObj)
