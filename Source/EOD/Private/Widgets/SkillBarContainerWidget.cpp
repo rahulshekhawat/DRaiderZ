@@ -7,6 +7,7 @@
 #include "GameplaySkillsComponent.h"
 #include "EODGlobalNames.h"
 #include "DragVisualWidget.h"
+#include "EODDragDropOperation.h"
 
 #include "WidgetBlueprintLibrary.h"
 
@@ -42,12 +43,13 @@ void USkillBarContainerWidget::NativeOnDragDetected(const FGeometry& InGeometry,
 		UClass* DragWidgetClass = DragVisualClass.Get();
 		check(DragWidgetClass);
 
-		UDragDropOperation* DragDropOp = UWidgetBlueprintLibrary::CreateDragDropOperation(UDragDropOperation::StaticClass());
+		UEODDragDropOperation* DragDropOp = Cast<UEODDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UEODDragDropOperation::StaticClass()));
 		if (DragDropOp)
 		{
 			UDragVisualWidget* DragVisualWidget = CreateWidget<UDragVisualWidget>(GetOwningPlayer(), DragWidgetClass);
 			DragVisualWidget->DragIcon = PlayerSkill->GetSkillIcon();
 
+			DragDropOp->DragOpSourceContainer = this;
 			DragDropOp->DefaultDragVisual = DragVisualWidget;
 			DragDropOp->Payload = GetDataObj();
 			DragDropOp->Pivot = EDragPivot::CenterCenter;
@@ -60,7 +62,13 @@ void USkillBarContainerWidget::NativeOnDragDetected(const FGeometry& InGeometry,
 
 bool USkillBarContainerWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	return true;
+	if (InOperation)
+	{
+		SetDataObj(InOperation->Payload);
+		return true;
+	}
+
+	return false;
 }
 
 void USkillBarContainerWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)

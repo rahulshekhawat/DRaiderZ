@@ -6,6 +6,7 @@
 #include "DragVisualWidget.h"
 #include "EODGlobalNames.h"
 #include "PlayerSkillsComponent.h"
+#include "EODDragDropOperation.h"
 
 #include "WidgetBlueprintLibrary.h"
 
@@ -50,12 +51,13 @@ void USkillTreeContainerWidget::NativeOnDragDetected(const FGeometry& InGeometry
 	UClass* DragWidgetClass = DragVisualClass.Get();
 	check(DragWidgetClass);
 
-	UDragDropOperation* DragDropOp = UWidgetBlueprintLibrary::CreateDragDropOperation(UDragDropOperation::StaticClass());
+	UEODDragDropOperation* DragDropOp = Cast<UEODDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UEODDragDropOperation::StaticClass()));
 	if (DragDropOp)
 	{
 		UDragVisualWidget* DragVisualWidget = CreateWidget<UDragVisualWidget>(GetOwningPlayer(), DragWidgetClass);
 		DragVisualWidget->DragIcon = PlayerSkill->GetSkillIcon();
 
+		DragDropOp->DragOpSourceContainer = this;
 		DragDropOp->DefaultDragVisual = DragVisualWidget;
 		DragDropOp->Payload = GetDataObj();
 		DragDropOp->Pivot = EDragPivot::CenterCenter;
