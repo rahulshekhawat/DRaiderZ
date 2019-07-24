@@ -58,6 +58,12 @@ public:
 
 	void DisableUpgradeButton();
 
+	virtual void EnableCooldown() override;
+
+	virtual void DisableCooldown() override;
+
+	virtual void SetCooldownValue(float InValue) override;
+
 	FContainerMCDelegate OnUpgradeButtonClicked;
 
 protected:

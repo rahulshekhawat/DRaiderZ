@@ -4,6 +4,7 @@
 #include "SkillBarContainerWidget.h"
 #include "PlayerSkillBase.h"
 #include "TooltipWidget.h"
+#include "GameplaySkillsComponent.h"
 
 USkillBarContainerWidget::USkillBarContainerWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -72,6 +73,18 @@ void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 		}
 	}
 	*/
+}
+
+void USkillBarContainerWidget::MainButtonClicked()
+{
+	Super::MainButtonClicked();
+
+	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(GetDataObj());
+	UGameplaySkillsComponent* SkillsComp = Skill ? Skill->InstigatorSkillComponent.Get() : nullptr;
+	if (SkillsComp)
+	{
+		SkillsComp->TriggerSkill(Skill->GetSkillIndex(), Skill);
+	}
 }
 
 void USkillBarContainerWidget::UpdateTooltipWidget()

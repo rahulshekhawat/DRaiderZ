@@ -133,8 +133,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tags")
 	FGameplayTagContainer ActivationRequiredTags;
 
-protected:
-
 	// --------------------------------------
 	//	Cache
 	// --------------------------------------
@@ -150,6 +148,8 @@ protected:
 	/** This skill's owner (player controller or ai controller) */
 	UPROPERTY(Transient)
 	TWeakObjectPtr<AController> SkillOwner;
+
+protected:
 
 	UPROPERTY(Transient)
 	bool bIsActive;

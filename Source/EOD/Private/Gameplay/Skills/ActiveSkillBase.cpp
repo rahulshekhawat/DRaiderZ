@@ -9,6 +9,7 @@
 #include "EODCharacterMovementComponent.h"
 #include "GameplayEffectBase.h"
 #include "EODGlobalNames.h"
+#include "ContainerWidgetBase.h"
 
 #include "TimerManager.h"
 
@@ -422,6 +423,13 @@ void UActiveSkillBase::StartCooldown()
 	UGameplaySkillsComponent* SkillComp = InstigatorSkillComponent.Get();
 	check(SkillComp);
 	SkillComp->UpdateSkillCooldown(SkillGroup, CooldownRemaining);
+
+
+	for (UContainerWidgetBase* Widget : RegisteredWidgets)
+	{
+		Widget->EnableCooldown();
+		Widget->SetCooldownValue(CooldownRemaining);
+	}
 }
 
 void UActiveSkillBase::FinishCooldown()
@@ -437,6 +445,11 @@ void UActiveSkillBase::FinishCooldown()
 	check(SkillComp);
 	CooldownRemaining = 0.f;
 	SkillComp->UpdateSkillCooldown(SkillGroup, CooldownRemaining);
+
+	for (UContainerWidgetBase* Widget : RegisteredWidgets)
+	{
+		Widget->DisableCooldown();
+	}
 }
 
 void UActiveSkillBase::CancelCooldown()
@@ -456,4 +469,9 @@ void UActiveSkillBase::UpdateCooldown()
 	UGameplaySkillsComponent* SkillComp = InstigatorSkillComponent.Get();
 	check(SkillComp);
 	SkillComp->UpdateSkillCooldown(SkillGroup, CooldownRemaining);
+
+	for (UContainerWidgetBase* Widget : RegisteredWidgets)
+	{
+		Widget->SetCooldownValue(CooldownRemaining);
+	}
 }

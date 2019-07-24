@@ -101,6 +101,12 @@ public:
 
 	virtual void DisableContainer();
 
+	virtual void EnableCooldown();
+
+	virtual void DisableCooldown();
+
+	virtual void SetCooldownValue(float InValue);
+
 	inline UObject* GetDataObj() const { return DataObj.Get(); }
 
 protected:
@@ -113,6 +119,9 @@ protected:
 
 	UPROPERTY(Transient)
 	TWeakObjectPtr<UObject> DataObj;
+
+	UPROPERTY(Transient)
+	bool bCooldownEnabled;
 
 	/** Sets the display icon of this container */
 	UFUNCTION()

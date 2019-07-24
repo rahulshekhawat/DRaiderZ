@@ -9,6 +9,7 @@
 
 UContainerWidgetBase::UContainerWidgetBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	bCooldownEnabled = false;
 }
 
 bool UContainerWidgetBase::Initialize()
@@ -130,6 +131,34 @@ void UContainerWidgetBase::DisableContainer()
 {
 	check(RootBorder);
 	RootBorder->SetContentColorAndOpacity(FLinearColor(0.15f, 0.15f, 0.15f, 1.f));
+}
+
+void UContainerWidgetBase::EnableCooldown()
+{
+	check(CooldownText);
+	CooldownText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	check(ItemImage);
+	ItemImage->SetColorAndOpacity(FLinearColor(0.15f, 0.15f, 0.15f, 1.f));
+
+	bCooldownEnabled = true;
+}
+
+void UContainerWidgetBase::DisableCooldown()
+{
+	check(CooldownText);
+	CooldownText->SetVisibility(ESlateVisibility::Hidden);
+
+	check(ItemImage);
+	ItemImage->SetColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f));
+
+	bCooldownEnabled = false;
+}
+
+void UContainerWidgetBase::SetCooldownValue(float InValue)
+{
+	check(CooldownText);
+	CooldownText->SetText(FText::FromString(FString::FromInt(InValue)));
 }
 
 void UContainerWidgetBase::SetIcon(UTexture* NewIcon)

@@ -149,6 +149,21 @@ void USkillTreeContainerWidget::DisableUpgradeButton()
 	UpgradeButton->SetVisibility(ESlateVisibility::Hidden);
 }
 
+void USkillTreeContainerWidget::EnableCooldown()
+{
+	//~ intentional empty override
+}
+
+void USkillTreeContainerWidget::DisableCooldown()
+{
+	//~ intentional empty override
+}
+
+void USkillTreeContainerWidget::SetCooldownValue(float InValue)
+{
+	//~ intentional empty override
+}
+
 void USkillTreeContainerWidget::UpgradeButtonClicked()
 {
 	OnUpgradeButtonClicked.Broadcast(this);
