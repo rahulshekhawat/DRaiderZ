@@ -92,6 +92,13 @@ protected:
 
 
 	///////////////////////////////////////////////////////////////////////////
+	//  Mouse Events
+protected:
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+
+	///////////////////////////////////////////////////////////////////////////
 	//  Utility
 public:
 	

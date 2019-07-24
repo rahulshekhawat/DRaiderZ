@@ -13,6 +13,10 @@
 #include "EODPlayerController.h"
 #include "GameplayEffectBase.h"
 #include "InteractivePopupWidget.h"
+#include "EODDragDropOperation.h"
+#include "SkillBarContainerWidget.h"
+#include "PlayerSkillBase.h"
+#include "PlayerSkillsComponent.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -57,6 +61,29 @@ void UHUDWidget::NativeConstruct()
 void UHUDWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
+
+bool UHUDWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	UEODDragDropOperation* DragOp = Cast<UEODDragDropOperation>(InOperation);
+	if (DragOp == nullptr)
+	{
+		return false;
+	}
+
+	USkillBarContainerWidget* SourceCont = Cast<USkillBarContainerWidget>(DragOp->DragOpSourceContainer);
+	if (SourceCont)
+	{
+		UPlayerSkillBase* SourceSkill = Cast<UPlayerSkillBase>(DragOp->Payload);
+		check(SourceSkill);
+
+		UPlayerSkillsComponent* SkillsComp = Cast<UPlayerSkillsComponent>(SourceSkill->InstigatorSkillComponent.Get());
+		check(SkillsComp);
+
+		SkillsComp->RemoveSkillFromSkillBar(SourceCont->SkillBarIndex, NAME_None);
+		SourceCont->SetDataObj(nullptr);
+	}
+	return true;
 }
 
 void UHUDWidget::SetPlayerLevel(int32 Level)
