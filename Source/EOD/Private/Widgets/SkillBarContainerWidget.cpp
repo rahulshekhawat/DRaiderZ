@@ -98,7 +98,15 @@ bool USkillBarContainerWidget::NativeOnDrop(const FGeometry& InGeometry, const F
 		SourceSBCont->SetDataObj(DestSkill);
 		this->SetDataObj(SourceSkill);
 
-		SkillsComp->AddSkillToSkillBar(SourceSBCont->SkillBarIndex, DestSkill->GetSkillGroup());
+		if (DestSkill)
+		{
+			SkillsComp->AddSkillToSkillBar(SourceSBCont->SkillBarIndex, DestSkill->GetSkillGroup());
+		}
+		else
+		{
+			SkillsComp->RemoveSkillFromSkillBar(SourceSBCont->SkillBarIndex, NAME_None);
+		}
+
 		SkillsComp->AddSkillToSkillBar(this->SkillBarIndex, SourceSkill->GetSkillGroup());
 
 		return true;
@@ -177,6 +185,13 @@ void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 		UpdateTooltipWidget();
 
 		NewSkill->LinkToWidget(this);
+	}
+	else
+	{
+		DataObj = nullptr;
+		SetIcon(nullptr);
+		DisableCooldown();
+		EnableContainer();
 	}
 }
 
