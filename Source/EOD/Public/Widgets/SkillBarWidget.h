@@ -110,7 +110,7 @@ public:
 	inline USkillBarContainerWidget* GetContainerAtIndex(const int32 Index) const;
 
 	/** Returns the skill index of given container. Returns -1 if the container couldn't be found. */
-	inline uint8 GetIndexOfSkillBarContainer(USkillBarContainerWidget* Container) const;
+	uint8 GetIndexOfSkillBarContainer(USkillBarContainerWidget* Container) const;
 
 protected:
 
@@ -173,9 +173,4 @@ inline USkillBarContainerWidget* USkillBarWidget::GetContainerAtIndex(const int3
 	}
 
 	return nullptr;
-}
-
-inline uint8 USkillBarWidget::GetIndexOfSkillBarContainer(USkillBarContainerWidget* Container) const
-{
-	return Container ? Container->SkillBarIndex : 0;
 }

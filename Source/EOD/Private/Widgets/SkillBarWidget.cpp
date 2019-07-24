@@ -80,3 +80,8 @@ void USkillBarWidget::SetOwnerSkillsComponent(UPlayerSkillsComponent* SkillsComp
 {
 	OwnerSkillsComponent = SkillsComponent;
 }
+
+uint8 USkillBarWidget::GetIndexOfSkillBarContainer(USkillBarContainerWidget* Container) const
+{
+	return Container ? Container->SkillBarIndex : 0;
+}

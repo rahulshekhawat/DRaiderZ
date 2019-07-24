@@ -147,20 +147,36 @@ FReply USkillBarContainerWidget::NativeOnMouseButtonUp(const FGeometry& InGeomet
 
 void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 {
-	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(InDataObj);
-	if (Skill)
+	UPlayerSkillBase* OldSkill = Cast<UPlayerSkillBase>(GetDataObj());
+	if (OldSkill)
 	{
-		DataObj = Skill;
+		OldSkill->UnlinkFromWidget(this);
+	}
 
-		SetIcon(Skill->GetSkillIcon());
-		SetSubText(Skill->GetCurrentUpgrade(), Skill->GetMaxUpgradeLevel());
-		SetCooldownValue(Skill->GetRemainingCooldown());
 
-		//~ @todo enable/disable skill
+	UPlayerSkillBase* NewSkill = Cast<UPlayerSkillBase>(InDataObj);
+	if (NewSkill)
+	{
+		DataObj = NewSkill;
+
+		SetIcon(NewSkill->GetSkillIcon());
+		SetSubText(NewSkill->GetCurrentUpgrade(), NewSkill->GetMaxUpgradeLevel());
+
+		if (NewSkill->IsSkillInCooldown())
+		{
+			EnableCooldown();
+			SetCooldownValue(NewSkill->GetRemainingCooldown());
+		}
+		else
+		{
+			DisableCooldown();
+			SetCooldownValue(0);
+
+		}
 
 		UpdateTooltipWidget();
 
-		Skill->LinkToWidget(this);
+		NewSkill->LinkToWidget(this);
 	}
 }
 
