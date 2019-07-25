@@ -123,6 +123,10 @@ public:
 
 	void UnlinkFromWidget(UContainerWidgetBase* ContainerWidget);
 
+	void RefreshWidgets();
+
+	TSet<UContainerWidgetBase*> GetRegisteredWidgets() const { return RegisteredWidgets; }
+
 protected:
 
 	float SkillDuration;

@@ -5,6 +5,7 @@
 #include "EODCharacterBase.h"
 #include "ContainerWidget.h"
 #include "PlayerSkillsComponent.h"
+#include "ContainerWidgetBase.h"
 
 #include "Components/Image.h"
 
@@ -79,45 +80,19 @@ void UPlayerSkillBase::OnWeaponChange(EWeaponType NewWeaponType, EWeaponType Old
 
 void UPlayerSkillBase::OnActivatedAsChainSkill()
 {
-	if (PrecedingSkillGroups.Num() == 0)
+	for (UContainerWidgetBase* Widget : RegisteredWidgets)
 	{
-		return;
-	}
-
-	UPlayerSkillsComponent* SkillComp = Cast<UPlayerSkillsComponent>(InstigatorSkillComponent.Get());
-	if (SkillComp)
-	{
-		TArray<UContainerWidget*> Containers = SkillComp->GetAllContainerWidgetsForSkill(SkillGroup);
-		for (UContainerWidget* Cont : Containers)
-		{
-			if (Cont)
-			{
-				Cont->ItemImage->SetIsEnabled(true);
-				Cont->SetCanBeClicked(true);
-			}
-		}
+		check(Widget);
+		Widget->EnableContainer();
 	}
 }
 
 void UPlayerSkillBase::OnDeactivatedAsChainSkill()
 {
-	if (PrecedingSkillGroups.Num() == 0)
+	for (UContainerWidgetBase* Widget : RegisteredWidgets)
 	{
-		return;
-	}
-
-	UPlayerSkillsComponent* SkillComp = Cast<UPlayerSkillsComponent>(InstigatorSkillComponent.Get());
-	if (SkillComp)
-	{
-		TArray<UContainerWidget*> Containers = SkillComp->GetAllContainerWidgetsForSkill(SkillGroup);
-		for (UContainerWidget* Cont : Containers)
-		{
-			if (Cont)
-			{
-				Cont->ItemImage->SetIsEnabled(false);
-				Cont->SetCanBeClicked(false);
-			}
-		}
+		check(Widget);
+		Widget->DisableContainer();
 	}
 }
 
@@ -150,4 +125,13 @@ void UPlayerSkillBase::LinkToWidget(UContainerWidgetBase* ContainerWidget)
 void UPlayerSkillBase::UnlinkFromWidget(UContainerWidgetBase* ContainerWidget)
 {
 	RegisteredWidgets.Remove(ContainerWidget);
+}
+
+void UPlayerSkillBase::RefreshWidgets()
+{
+	for (UContainerWidgetBase* Widget : RegisteredWidgets)
+	{
+		check(Widget);
+		Widget->RefreshContainer();
+	}
 }

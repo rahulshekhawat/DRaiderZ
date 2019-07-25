@@ -10,7 +10,6 @@
 #include "PlayerStatsComponent.h"
 #include "PlayerSkillsComponent.h"
 #include "InteractionInterface.h"
-#include "DynamicHUDWidget.h"
 #include "EODGameModeBase.h"
 #include "StatusIndicatorWidget.h"
 #include "InventoryWidget.h"

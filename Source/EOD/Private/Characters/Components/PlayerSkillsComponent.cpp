@@ -297,6 +297,7 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 
 void UPlayerSkillsComponent::CancelSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
 {
+	Super::CancelSkill(SkillIndex, Skill);
 }
 
 void UPlayerSkillsComponent::CancelAllActiveSkills()
@@ -306,12 +307,12 @@ void UPlayerSkillsComponent::CancelAllActiveSkills()
 
 bool UPlayerSkillsComponent::CanUseAnySkill() const
 {
-	return false;
+	return Super::CanUseAnySkill();
 }
 
 bool UPlayerSkillsComponent::CanUseSkill(uint8 SkillIndex, UGameplaySkillBase* Skill)
 {
-	return false;
+	return Super::CanUseSkill(SkillIndex, Skill);
 }
 
 void UPlayerSkillsComponent::UpdateSkillCooldown(FName SkillGroup, float RemainingCooldown)
@@ -323,19 +324,21 @@ void UPlayerSkillsComponent::UpdateSkillCooldown(FName SkillGroup, float Remaini
 		return;
 	}
 
-	TArray<UContainerWidget*> SkillWidgets = GetAllContainerWidgetsForSkill(SkillGroup);
-	
-	for (UContainerWidget* Widget : SkillWidgets)
+	TSet<UContainerWidgetBase*> SkillWidgets = GetAllContainerWidgetsForSkill(SkillGroup);
+	for (UContainerWidgetBase* Widget : SkillWidgets)
 	{
-		if (Widget)
-		{
-			Widget->UpdateCooldown(RemainingCooldown);
-		}
+		check(Widget);
+		Widget->SetCooldownValue(RemainingCooldown);
 	}
 }
 
 void UPlayerSkillsComponent::UpdateSkillCooldown(uint8 SkillIndex, float RemainingCooldown)
 {
+	UGameplaySkillBase* Skill = SkillIndexToSkillMap.Contains(SkillIndex) ? SkillIndexToSkillMap[SkillIndex] : nullptr;
+	if (Skill)
+	{
+		UpdateSkillCooldown(Skill->GetSkillGroup(), RemainingCooldown);
+	}
 }
 
 void UPlayerSkillsComponent::AddGameplayEffect(UGameplayEffectBase* GameplayEffect)
@@ -356,86 +359,73 @@ void UPlayerSkillsComponent::RemoveGameplayEffect(UGameplayEffectBase* GameplayE
 	}
 }
 
-TArray<UContainerWidget*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill(FName SkillGroup) 
+TSet<uint8> UPlayerSkillsComponent::GetSkillBarIndicesOfSkillGroup(FName SkillGroup)
 {
-	if (!SBWidget)
-	{
-		return TArray<UContainerWidget*>();
-	}
+	uint8 SkillIndex = GetSkillIndexForSkillGroup(SkillGroup);
+	
+	TArray<uint8> Keys;
+	SkillBarMap.GetKeys(Keys);
 
-	int SkillIndex = 0;
-	TArray<uint8> SkillsMapKeys;
-	SkillIndexToSkillMap.GetKeys(SkillsMapKeys);
-
-	for (uint8 Key : SkillsMapKeys)
-	{
-		UGameplaySkillBase* Skill = SkillIndexToSkillMap[Key];
-		if (Skill && Skill->GetSkillGroup() == SkillGroup)
-		{
-			SkillIndex = Key;
-			break;
-		}
-	}
-
-	if (SkillIndex == 0)
-	{
-		return TArray<UContainerWidget*>();
-	}
-
-	TArray<uint8> SkillBarMapKeys;
-	SkillBarMap.GetKeys(SkillBarMapKeys);
-
-	TArray<uint8> SkillWidgetsIndices;
-	for (uint8 Key : SkillBarMapKeys)
+	TSet<uint8> SkillBarIndices;
+	for (uint8 Key : Keys)
 	{
 		if (SkillBarMap[Key] == SkillIndex)
 		{
-			SkillWidgetsIndices.Add(Key);
+			SkillBarIndices.Add(Key);
 		}
 	}
 
-	if (SkillWidgetsIndices.Num() == 0)
-	{
-		return TArray<UContainerWidget*>();
-	}
+	return SkillBarIndices;
+}
 
-	TArray<UContainerWidget*> SkillWidgets;
-
-	for (uint8 Key : SkillWidgetsIndices)
+TSet<UContainerWidgetBase*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill(FName SkillGroup, bool bFastSearch)
+{
+	if (bFastSearch)
 	{
-		UContainerWidget* Widget = nullptr;
-		// USkillBarContainerWidget* Widget = SBWidget->GetContainerAtIndex(Key);
-		if (Widget)
+		UPlayerSkillBase* PlayerSkill = SkillGroupToSkillMap.Contains(SkillGroup) ? Cast<UPlayerSkillBase>(SkillGroupToSkillMap[SkillGroup]) : nullptr;
+		if (PlayerSkill)
 		{
-			SkillWidgets.Add(Widget);
+			return PlayerSkill->GetRegisteredWidgets();
 		}
 	}
+	else
+	{
+		check(SBWidget);
+		TSet<uint8> SkillBarIndices = GetSkillBarIndicesOfSkillGroup(SkillGroup);
 
-	return SkillWidgets;
+		TSet<UContainerWidgetBase*> ContainerWidgets;
+		for (uint8 SkillBarIndex : SkillBarIndices)
+		{
+			UContainerWidgetBase* Cont = SBWidget->GetContainerAtIndex(SkillBarIndex);
+			if (Cont)
+			{
+				ContainerWidgets.Add(Cont);
+			}
+		}
+
+		return ContainerWidgets;
+	}
+
+	return TSet<UContainerWidgetBase*>();
 }
 
 void UPlayerSkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill)
 {
 	UPlayerSkillBase* PlayerSkill = Cast<UPlayerSkillBase>(CurrentSkill);
-	UWorld* World = GetWorld();
-	if (!PlayerSkill || !World)
-	{
-		return;
-	}
-
-	if (PlayerSkill->GetSupersedingSkillGroup() == NAME_None)
+	if (PlayerSkill == nullptr || PlayerSkill->GetSupersedingSkillGroup() == NAME_None)
 	{
 		return;
 	}
 
 	uint8 SupersedingSkillIndex = GetSkillIndexForSkillGroup(PlayerSkill->GetSupersedingSkillGroup());
 	UPlayerSkillBase* SupersedingSkill = SkillIndexToSkillMap.Contains(SupersedingSkillIndex) ? Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SupersedingSkillIndex]) : nullptr;
-
 	if (SupersedingSkill)
 	{
 		SupersedingChainSkillGroup = TPair<uint8, uint8>(LastPressedSkillKey, SupersedingSkillIndex);
 		float SkillDuration = PlayerSkill->GetSkillDuration();
 		float ChainSkillActivationWindow = SkillDuration + ChainSkillResetDelay;
+
+		UWorld* World = GetWorld();
 		World->GetTimerManager().SetTimer(ChainSkillTimerHandle, this, &UPlayerSkillsComponent::ResetChainSkill, ChainSkillActivationWindow, false);
 
 		SupersedingSkill->OnActivatedAsChainSkill();
@@ -444,10 +434,8 @@ void UPlayerSkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill
 		AEODPlayerController* PC = CharOwner ? Cast<AEODPlayerController>(CharOwner->Controller) : nullptr;
 		if (PC)
 		{
-			FString ActionString = TEXT("Skill_") + FString::FromInt(LastPressedSkillKey);
-			FName ActionName = FName(*ActionString);
-			FName KeyName = PC->GetKeyNameForActionName(ActionName);
-
+			FString ActionName = TEXT("Skill_") + FString::FromInt(LastPressedSkillKey);
+			FName KeyName = PC->GetKeyNameForActionName(FName(*ActionName));
 			if (KeyName == NAME_None)
 			{
 				PrintWarning(TEXT("Key name is invalid"));
@@ -462,37 +450,24 @@ void UPlayerSkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill
 
 void UPlayerSkillsComponent::OnPlayerWeaponChanged()
 {
-	if (!SBWidget)
-	{
-		return;
-	}
-
 	TArray<uint8> Keys;
 	SkillBarMap.GetKeys(Keys);
 
+	TSet<UPlayerSkillBase*> SkillsOnSkillBar;
 	for (uint8 Key : Keys)
 	{
 		uint8 SkillKey = SkillBarMap[Key];
-		if (SkillIndexToSkillMap.Contains(SkillKey))
+		UPlayerSkillBase* Skill = SkillBarMap.Contains(Key) ? Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SkillKey]) : nullptr;
+		if (Skill)
 		{
-			UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SkillKey]);
-
-			UContainerWidget* Cont = nullptr;
-			// UContainerWidgetBase* Cont = SBWidget->GetContainerAtIndex(Key);
-			if (Skill && Cont)
-			{
-				if (Skill->CanPlayerActivateThisSkill())
-				{
-					Cont->ItemImage->SetIsEnabled(true);
-					Cont->SetCanBeClicked(true);
-				}
-				else
-				{
-					Cont->ItemImage->SetIsEnabled(false);
-					Cont->SetCanBeClicked(false);
-				}
-			}
+			SkillsOnSkillBar.Add(Skill);
 		}
+	}
+
+	for (UPlayerSkillBase* Skill : SkillsOnSkillBar)
+	{
+		check(Skill);
+		Skill->RefreshWidgets();
 	}
 }
 
@@ -557,7 +532,9 @@ void UPlayerSkillsComponent::InitializeSkills(AEODCharacterBase* CompOwner)
 		return;
 	}
 
-	FString ContextString = FString("UPlayerSkillsComponent::InitializeSkills() - Looking for player skill class");
+	FString ContextString = TEXT(__FUNCTION__);
+	ContextString += TEXT(" - Looking for player skill class");
+
 	TArray<FName> Keys = SkillsDataTable->GetRowNames();
 	uint8 SkillIndex = 1;
 	for (FName Key : Keys)
@@ -659,7 +636,7 @@ bool UPlayerSkillsComponent::AttemptPointAllocationToSlot(FName SkillGroup, FSki
 	FSkillTreeSlot* SkillTreeSlot = SkillSlotInfo;
 	if (SkillTreeSlot == nullptr)
 	{
-		FString ContextString = FString("USkillTreeComponent::AttemptPointAllocationToSlot()");
+		FString ContextString = TEXT(__FUNCTION__);
 		SkillTreeSlot = SkillTreeLayoutTable->FindRow<FSkillTreeSlot>(SkillGroup, ContextString);
 	}
 
@@ -721,7 +698,7 @@ bool UPlayerSkillsComponent::IsSkillAvailable(FName SkillGroup, FSkillTreeSlot* 
 	FSkillTreeSlot* SkillTreeSlot = SkillSlotInfo;
 	if (SkillTreeSlot == nullptr && SkillTreeLayoutTable)
 	{
-		FString ContextString = FString("USkillTreeComponent::CanAllocatePointToSlot()");
+		FString ContextString = TEXT(__FUNCTION__);
 		SkillTreeSlot = SkillTreeLayoutTable->FindRow<FSkillTreeSlot>(SkillGroup, ContextString);
 	}
 
