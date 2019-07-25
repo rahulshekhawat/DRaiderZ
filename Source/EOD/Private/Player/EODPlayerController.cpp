@@ -326,7 +326,7 @@ void AEODPlayerController::UnregisterActivePopupWidget()
 
 bool AEODPlayerController::CreateLootWidget_Implementation(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource)
 {
-	return false;
+	return true;
 }
 
 void AEODPlayerController::RemoveLootWidget_Implementation(UObject* LootSource)

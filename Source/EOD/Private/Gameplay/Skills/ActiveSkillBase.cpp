@@ -439,7 +439,7 @@ void UActiveSkillBase::FinishCooldown()
 
 	for (UContainerWidgetBase* Widget : RegisteredWidgets)
 	{
-		Widget->DisableCooldown();
+		Widget->RefreshContainer();
 	}
 }
 
