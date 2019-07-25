@@ -420,11 +420,6 @@ void UActiveSkillBase::StartCooldown()
 	World->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UActiveSkillBase::UpdateCooldown, 1.f, true);
 	CooldownRemaining = CurrentLevelUpInfo.Cooldown;
 
-	UGameplaySkillsComponent* SkillComp = InstigatorSkillComponent.Get();
-	check(SkillComp);
-	SkillComp->UpdateSkillCooldown(SkillGroup, CooldownRemaining);
-
-
 	for (UContainerWidgetBase* Widget : RegisteredWidgets)
 	{
 		Widget->EnableCooldown();
@@ -438,13 +433,9 @@ void UActiveSkillBase::FinishCooldown()
 	check(Instigator);
 	UWorld* World = Instigator->GetWorld();
 	check(World);
-
 	World->GetTimerManager().ClearTimer(CooldownTimerHandle);
 
-	UGameplaySkillsComponent* SkillComp = InstigatorSkillComponent.Get();
-	check(SkillComp);
 	CooldownRemaining = 0.f;
-	SkillComp->UpdateSkillCooldown(SkillGroup, CooldownRemaining);
 
 	for (UContainerWidgetBase* Widget : RegisteredWidgets)
 	{
@@ -465,10 +456,6 @@ void UActiveSkillBase::UpdateCooldown()
 	{
 		FinishCooldown();
 	}
-
-	UGameplaySkillsComponent* SkillComp = InstigatorSkillComponent.Get();
-	check(SkillComp);
-	SkillComp->UpdateSkillCooldown(SkillGroup, CooldownRemaining);
 
 	for (UContainerWidgetBase* Widget : RegisteredWidgets)
 	{

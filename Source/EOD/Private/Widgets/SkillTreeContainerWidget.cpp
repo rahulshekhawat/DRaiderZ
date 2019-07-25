@@ -124,22 +124,12 @@ FReply USkillTreeContainerWidget::NativeOnMouseButtonUp(const FGeometry& InGeome
 
 void USkillTreeContainerWidget::SetDataObj(UObject* InDataObj)
 {
-	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(InDataObj);
-	if (Skill)
+	check(InDataObj);
+
+	UPlayerSkillBase* OldSkill = Cast<UPlayerSkillBase>(GetDataObj());
+	if (OldSkill == InDataObj)
 	{
-		DataObj = Skill;
-
-		SetIcon(Skill->GetSkillIcon());
-		SetSubText(Skill->GetCurrentUpgrade(), Skill->GetMaxUpgradeLevel());
-		SetCooldownValue(Skill->GetRemainingCooldown());
-
-		//~ @todo enable/disable skill
-
-		UpdateTooltipWidget();
-
-		Skill->LinkToWidget(this);
-
-		if (Skill->IsUnlocked())
+		if (OldSkill->IsUnlocked())
 		{
 			EnableContainer();
 		}
@@ -148,7 +138,36 @@ void USkillTreeContainerWidget::SetDataObj(UObject* InDataObj)
 			DisableContainer();
 		}
 
-		SetSubText(Skill->GetCurrentUpgrade(), Skill->GetMaxUpgradeLevel());
+		SetSubText(OldSkill->GetCurrentUpgrade(), OldSkill->GetMaxUpgradeLevel());
+		UpdateTooltipWidget();
+		return;
+	}
+
+	if (OldSkill)
+	{
+		OldSkill->UnlinkFromWidget(this);
+	}
+
+	UPlayerSkillBase* NewSkill = Cast<UPlayerSkillBase>(InDataObj);
+	if (NewSkill)
+	{
+		DataObj = NewSkill;
+
+		SetIcon(NewSkill->GetSkillIcon());
+		SetSubText(NewSkill->GetCurrentUpgrade(), NewSkill->GetMaxUpgradeLevel());
+		SetCooldownValue(NewSkill->GetRemainingCooldown());
+
+		if (NewSkill->IsUnlocked())
+		{
+			EnableContainer();
+		}
+		else
+		{
+			DisableContainer();
+		}
+
+		UpdateTooltipWidget();
+		NewSkill->LinkToWidget(this);
 	}
 }
 

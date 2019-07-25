@@ -27,6 +27,24 @@ void UPlayerSkillBase::LockSkill()
 {
 }
 
+bool UPlayerSkillBase::ShouldUIActivate()
+{
+	AEODCharacterBase* Instigator = SkillInstigator.Get();
+	EWeaponType EquippedWeaponType = Instigator ? Instigator->GetEquippedWeaponType() : EWeaponType::None;
+
+	bool bHasValidWeapon = EquippedWeaponType != EWeaponType::None && IsWeaponTypeSupported(EquippedWeaponType) && !Instigator->IsWeaponSheathed();
+	bool bInCooldown = IsSkillInCooldown();
+	bool bValidChainSkill = (PrecedingSkillGroups.Num() == 0 || bActiveAsChainSkill);
+
+	bool bOwnerHasTags = true;
+	if (!ActivationRequiredTags.IsEmpty() && Instigator)
+	{
+		bOwnerHasTags = Instigator->GameplayTagContainer.HasAll(ActivationRequiredTags);
+	}
+
+	return bHasValidWeapon && !bInCooldown && bValidChainSkill && bOwnerHasTags;
+}
+
 bool UPlayerSkillBase::CanPlayerActivateThisSkill() const
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
@@ -80,19 +98,23 @@ void UPlayerSkillBase::OnWeaponChange(EWeaponType NewWeaponType, EWeaponType Old
 
 void UPlayerSkillBase::OnActivatedAsChainSkill()
 {
+	bActiveAsChainSkill = true;
+
 	for (UContainerWidgetBase* Widget : RegisteredWidgets)
 	{
 		check(Widget);
-		Widget->EnableContainer();
+		Widget->RefreshContainer();
 	}
 }
 
 void UPlayerSkillBase::OnDeactivatedAsChainSkill()
 {
+	bActiveAsChainSkill = false;
+
 	for (UContainerWidgetBase* Widget : RegisteredWidgets)
 	{
 		check(Widget);
-		Widget->DisableContainer();
+		Widget->RefreshContainer();
 	}
 }
 

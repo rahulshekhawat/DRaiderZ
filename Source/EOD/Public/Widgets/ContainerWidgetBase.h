@@ -134,6 +134,9 @@ protected:
 
 	UPROPERTY(Transient)
 	bool bCooldownEnabled;
+
+	UPROPERTY(Transient)
+	bool bContainerDisabled;
 	
 	UFUNCTION()
 	UWidget* GetTooltipWidget();

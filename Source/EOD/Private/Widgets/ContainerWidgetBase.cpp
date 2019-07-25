@@ -129,20 +129,27 @@ bool UContainerWidgetBase::IsContainerEmpty() const
 
 void UContainerWidgetBase::EnableContainer()
 {
-	check(RootBorder);
-	RootBorder->SetContentColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f));
+	if (!bCooldownEnabled)
+	{
+		check(ItemImage);
+		ItemImage->SetColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f));
 
-	check(MainButton);
-	MainButton->SetVisibility(ESlateVisibility::Visible);
+		check(MainButton);
+		MainButton->SetVisibility(ESlateVisibility::Visible);
+	}
+
+	bContainerDisabled = false;
 }
 
 void UContainerWidgetBase::DisableContainer()
 {
-	check(RootBorder);
-	RootBorder->SetContentColorAndOpacity(FLinearColor(0.15f, 0.15f, 0.15f, 1.f));
+	check(ItemImage);
+	ItemImage->SetColorAndOpacity(FLinearColor(0.15f, 0.15f, 0.15f, 1.f));
 
 	check(MainButton);
 	MainButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	bContainerDisabled = true;
 }
 
 void UContainerWidgetBase::EnableCooldown()
@@ -164,11 +171,14 @@ void UContainerWidgetBase::DisableCooldown()
 	check(CooldownText);
 	CooldownText->SetVisibility(ESlateVisibility::Hidden);
 
-	check(ItemImage);
-	ItemImage->SetColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f));
+	if (!bContainerDisabled)
+	{
+		check(ItemImage);
+		ItemImage->SetColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f));
 
-	check(MainButton);
-	MainButton->SetVisibility(ESlateVisibility::Visible);
+		check(MainButton);
+		MainButton->SetVisibility(ESlateVisibility::Visible);
+	}
 
 	bCooldownEnabled = false;
 }

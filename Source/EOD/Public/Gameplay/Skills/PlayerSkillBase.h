@@ -27,12 +27,16 @@ public:
 	virtual void UnlockSkill(int32 UnlockLevel);
 	virtual void LockSkill();
 
+	virtual bool ShouldUIActivate();
+
 	virtual bool CanPlayerActivateThisSkill() const;
 
 	virtual bool CanTriggerSkill() const override;
 
 	/** Event called when player changes it's equipped weapon */
 	virtual void OnWeaponChange(EWeaponType NewWeaponType, EWeaponType OldWeaponType);
+
+	inline bool IsActiveAsChainSkill() { return bActiveAsChainSkill; }
 
 	/** Event called when this skill is placed in SupersedingChainSkillGroup */
 	virtual void OnActivatedAsChainSkill();
@@ -87,6 +91,8 @@ public:
 	inline void SetCurrentUpgrade(int32 Value) { CurrentUpgrade = Value; }
 
 protected:
+
+	bool bActiveAsChainSkill;
 
 	int32 CurrentUpgrade;
 

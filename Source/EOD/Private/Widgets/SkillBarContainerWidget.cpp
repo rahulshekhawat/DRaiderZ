@@ -155,12 +155,45 @@ FReply USkillBarContainerWidget::NativeOnMouseButtonUp(const FGeometry& InGeomet
 
 void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 {
+	if (InDataObj == nullptr)
+	{
+		DataObj = nullptr;
+		SetIcon(nullptr);
+		DisableCooldown();
+		EnableContainer();
+		return;
+	}
+
 	UPlayerSkillBase* OldSkill = Cast<UPlayerSkillBase>(GetDataObj());
+	if (OldSkill == InDataObj)
+	{
+		if (OldSkill->ShouldUIActivate())
+		{
+			EnableContainer();
+		}
+		else
+		{
+			DisableContainer();
+		}
+
+		if (OldSkill->IsSkillInCooldown())
+		{
+			EnableCooldown();
+			SetCooldownValue(OldSkill->GetRemainingCooldown());
+		}
+		else
+		{
+			DisableCooldown();
+			SetCooldownValue(0);
+		}
+
+		return;
+	}
+
 	if (OldSkill)
 	{
 		OldSkill->UnlinkFromWidget(this);
 	}
-
 
 	UPlayerSkillBase* NewSkill = Cast<UPlayerSkillBase>(InDataObj);
 	if (NewSkill)
@@ -169,6 +202,15 @@ void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 
 		SetIcon(NewSkill->GetSkillIcon());
 		SetSubText(NewSkill->GetCurrentUpgrade(), NewSkill->GetMaxUpgradeLevel());
+
+		if (NewSkill->ShouldUIActivate())
+		{
+			EnableContainer();
+		}
+		else
+		{
+			DisableContainer();
+		}
 
 		if (NewSkill->IsSkillInCooldown())
 		{
@@ -185,13 +227,6 @@ void USkillBarContainerWidget::SetDataObj(UObject* InDataObj)
 		UpdateTooltipWidget();
 
 		NewSkill->LinkToWidget(this);
-	}
-	else
-	{
-		DataObj = nullptr;
-		SetIcon(nullptr);
-		DisableCooldown();
-		EnableContainer();
 	}
 }
 
