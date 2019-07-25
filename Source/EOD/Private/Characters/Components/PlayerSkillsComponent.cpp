@@ -324,7 +324,7 @@ void UPlayerSkillsComponent::UpdateSkillCooldown(FName SkillGroup, float Remaini
 		return;
 	}
 
-	TSet<UContainerWidgetBase*> SkillWidgets = GetAllContainerWidgetsForSkill(SkillGroup);
+	TArray<UContainerWidgetBase*> SkillWidgets = GetAllContainerWidgetsForSkill(SkillGroup);
 	for (UContainerWidgetBase* Widget : SkillWidgets)
 	{
 		check(Widget);
@@ -359,26 +359,26 @@ void UPlayerSkillsComponent::RemoveGameplayEffect(UGameplayEffectBase* GameplayE
 	}
 }
 
-TSet<uint8> UPlayerSkillsComponent::GetSkillBarIndicesOfSkillGroup(FName SkillGroup)
+TArray<uint8> UPlayerSkillsComponent::GetSkillBarIndicesOfSkillGroup(FName SkillGroup)
 {
 	uint8 SkillIndex = GetSkillIndexForSkillGroup(SkillGroup);
 	
 	TArray<uint8> Keys;
 	SkillBarMap.GetKeys(Keys);
 
-	TSet<uint8> SkillBarIndices;
+	TArray<uint8> SkillBarIndices;
 	for (uint8 Key : Keys)
 	{
 		if (SkillBarMap[Key] == SkillIndex)
 		{
-			SkillBarIndices.Add(Key);
+			SkillBarIndices.AddUnique(Key);
 		}
 	}
 
 	return SkillBarIndices;
 }
 
-TSet<UContainerWidgetBase*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill(FName SkillGroup, bool bFastSearch)
+TArray<UContainerWidgetBase*> UPlayerSkillsComponent::GetAllContainerWidgetsForSkill(FName SkillGroup, bool bFastSearch)
 {
 	if (bFastSearch)
 	{
@@ -391,22 +391,22 @@ TSet<UContainerWidgetBase*> UPlayerSkillsComponent::GetAllContainerWidgetsForSki
 	else
 	{
 		check(SBWidget);
-		TSet<uint8> SkillBarIndices = GetSkillBarIndicesOfSkillGroup(SkillGroup);
+		TArray<uint8> SkillBarIndices = GetSkillBarIndicesOfSkillGroup(SkillGroup);
 
-		TSet<UContainerWidgetBase*> ContainerWidgets;
+		TArray<UContainerWidgetBase*> ContainerWidgets;
 		for (uint8 SkillBarIndex : SkillBarIndices)
 		{
 			UContainerWidgetBase* Cont = SBWidget->GetContainerAtIndex(SkillBarIndex);
 			if (Cont)
 			{
-				ContainerWidgets.Add(Cont);
+				ContainerWidgets.AddUnique(Cont);
 			}
 		}
 
 		return ContainerWidgets;
 	}
 
-	return TSet<UContainerWidgetBase*>();
+	return TArray<UContainerWidgetBase*>();
 }
 
 void UPlayerSkillsComponent::ActivateChainSkill(UGameplaySkillBase* CurrentSkill)
@@ -453,14 +453,14 @@ void UPlayerSkillsComponent::OnPlayerWeaponChanged()
 	TArray<uint8> Keys;
 	SkillBarMap.GetKeys(Keys);
 
-	TSet<UPlayerSkillBase*> SkillsOnSkillBar;
+	TArray<UPlayerSkillBase*> SkillsOnSkillBar;
 	for (uint8 Key : Keys)
 	{
 		uint8 SkillKey = SkillBarMap[Key];
 		UPlayerSkillBase* Skill = SkillBarMap.Contains(Key) ? Cast<UPlayerSkillBase>(SkillIndexToSkillMap[SkillKey]) : nullptr;
 		if (Skill)
 		{
-			SkillsOnSkillBar.Add(Skill);
+			SkillsOnSkillBar.AddUnique(Skill);
 		}
 	}
 

@@ -125,14 +125,14 @@ public:
 
 	void RefreshWidgets();
 
-	TSet<UContainerWidgetBase*> GetRegisteredWidgets() const { return RegisteredWidgets; }
+	TArray<UContainerWidgetBase*> GetRegisteredWidgets() const { return RegisteredWidgets; }
 
 protected:
 
 	float SkillDuration;
 
 	UPROPERTY(Transient)
-	TSet<UContainerWidgetBase*> RegisteredWidgets;
+	TArray<UContainerWidgetBase*> RegisteredWidgets;
 
 };
 

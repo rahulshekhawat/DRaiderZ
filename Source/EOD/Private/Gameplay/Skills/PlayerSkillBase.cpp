@@ -119,7 +119,7 @@ float UPlayerSkillBase::GetSkillDuration() const
 
 void UPlayerSkillBase::LinkToWidget(UContainerWidgetBase* ContainerWidget)
 {
-	RegisteredWidgets.Add(ContainerWidget);
+	RegisteredWidgets.AddUnique(ContainerWidget);
 }
 
 void UPlayerSkillBase::UnlinkFromWidget(UContainerWidgetBase* ContainerWidget)

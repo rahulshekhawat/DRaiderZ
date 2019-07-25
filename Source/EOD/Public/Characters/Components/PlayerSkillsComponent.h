@@ -91,9 +91,9 @@ public:
 
 	inline const TMap<uint8, uint8>& GetSkillBarMap() const { return SkillBarMap; }
 
-	TSet<uint8> GetSkillBarIndicesOfSkillGroup(FName SkillGroup);
+	TArray<uint8> GetSkillBarIndicesOfSkillGroup(FName SkillGroup);
 
-	TSet<class UContainerWidgetBase*> GetAllContainerWidgetsForSkill(FName SkillGroup, bool bFastSearch = true);
+	TArray<class UContainerWidgetBase*> GetAllContainerWidgetsForSkill(FName SkillGroup, bool bFastSearch = true);
 
 protected:
 
