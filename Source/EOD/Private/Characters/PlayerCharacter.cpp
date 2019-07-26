@@ -151,6 +151,8 @@ void APlayerCharacter::InitiateDeathSequence_Implementation()
 	}
 
 	CharacterStateInfo.CharacterState = ECharacterState::Dead;
+	SetCharacterStateAllowsMovement(false);
+	SetCharacterStateAllowsRotation(false);
 
 	//~ @todo stop health regeneration.
 	//~ @todo provide option for respawn
