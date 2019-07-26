@@ -28,6 +28,10 @@ void UInventoryWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void UInventoryWidget::AddContainer_Implementation(UInventoryContainerWidget* InvContainer)
+{
+}
+
 void UInventoryWidget::AddItem(const FInventoryItem& Item)
 {
 }

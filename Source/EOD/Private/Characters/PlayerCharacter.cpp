@@ -612,7 +612,7 @@ bool APlayerCharacter::CanStartInteraction() const
 
 void APlayerCharacter::TriggerInteraction()
 {
-	if (IsInteracting())
+	if (IsInteracting() || IsLooting())
 	{
 		UpdateInteraction();
 	}

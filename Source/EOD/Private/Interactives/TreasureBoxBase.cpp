@@ -66,18 +66,6 @@ EInteractionResult ATreasureBoxBase::OnInteractionStart_Implementation(AEODChara
 	bInteractionInProgress = true;
 	return EInteractionResult::InteractionUpdated;
 	
-	//~ @todo
-	/*
-	// Ignore interaction request if it's not the local player interacting with us
-	if (!Character->Controller && !Character->Controller->IsLocalPlayerController())
-	{
-		return;
-	}
-
-	OpenBox();
-
-	//~ @todo check for loot, play player loot animation if there's loot, etc.
-	*/
 	return EInteractionResult();
 }
 
@@ -86,19 +74,19 @@ EInteractionResult ATreasureBoxBase::OnInteractionUpdate_Implementation(AEODChar
 	AEODPlayerController* PC = Character ? Cast<AEODPlayerController>(Character->Controller) : nullptr;
 	if (PC == nullptr || PC->IsLocalPlayerController() == false)
 	{
-		OnInteractionCancel(Character, EInteractionCancelType::AutoCancel);
+		Execute_OnInteractionCancel(this, Character, EInteractionCancelType::AutoCancel);
 		return EInteractionResult::InteractionCancelled;
 	}
 
 	PC->PickAllLoot();
-	OnInteractionFinish(Character);
+	Execute_OnInteractionFinish(this, Character);
 	
 	return EInteractionResult::InteractionFinished;
 }
 
 void ATreasureBoxBase::OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelType CancelType)
 {
-	OnInteractionFinish_Implementation(Character);
+	Execute_OnInteractionFinish(this, Character);
 }
 
 void ATreasureBoxBase::OnInteractionFinish_Implementation(AEODCharacterBase* Character)

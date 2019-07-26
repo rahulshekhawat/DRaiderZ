@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EODLibrary.h"
-
+#include "LootableInterface.h"
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
@@ -88,5 +88,39 @@ public:
 	void ConsumeItem(TSubclassOf<UInventoryItemBase> ItemClass);
 
 
+	///////////////////////////////////////////////////////////////////////////
+	//  UI
+public:
+
+	inline void SetInventoryWidget(class UInventoryWidget* InWidget) { InventoryWidget = InWidget; }
+
+	inline UInventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
+
+protected:
+
+	UPROPERTY(Transient)
+	class UInventoryWidget* InventoryWidget;
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Utility
+public:
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	void AddLoot(const FGeneratedLootInfo& LootInfo);
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	void AddInventoryItem(class UInventoryItemBase* Item, int32 Count);
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	FInventorySlot& GetEmptySlot();
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Classes)
+	TSubclassOf<class UInventoryContainerWidget> InventoryContainerClass;
+
+	UPROPERTY(Transient)
+	TArray<FInventorySlot> Slots;
 
 };

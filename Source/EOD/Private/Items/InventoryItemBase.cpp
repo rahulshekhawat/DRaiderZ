@@ -5,6 +5,7 @@
 
 UInventoryItemBase::UInventoryItemBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	bStackable = true;
 }
 
 void UInventoryItemBase::OnClick()

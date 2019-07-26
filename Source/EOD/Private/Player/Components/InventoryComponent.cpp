@@ -3,6 +3,8 @@
 #include "InventoryComponent.h"
 #include "EODPlayerController.h"
 #include "InventoryWidget.h"
+#include "InventoryItemBase.h"
+#include "InventoryContainerWidget.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -74,4 +76,59 @@ void UInventoryComponent::LoadInventory()
 
 void UInventoryComponent::ConsumeItem(TSubclassOf<UInventoryItemBase> ItemClass)
 {
+}
+
+void UInventoryComponent::AddLoot(const FGeneratedLootInfo& LootInfo)
+{
+	UInventoryItemBase* InventoryItem = NewObject<UInventoryItemBase>(this, LootInfo.ItemClass, NAME_None, RF_Transient);
+	if (InventoryItem)
+	{
+		AddInventoryItem(InventoryItem, LootInfo.ItemCount);
+	}
+}
+
+void UInventoryComponent::AddInventoryItem(UInventoryItemBase* Item, int32 Count)
+{
+	if (Item == nullptr || Count <= 0)
+	{
+		return;
+	}
+
+	FInventorySlot& Slot = GetEmptySlot();
+	Slot.ItemInSlot = Item;
+	Slot.ItemStackCount = Count;
+	if (Slot.SlotWidget)
+	{
+		Slot.SlotWidget->SetDataObj(Item);
+		Slot.SlotWidget->SetItemCount(Count);
+	}
+}
+
+FInventorySlot& UInventoryComponent::GetEmptySlot()
+{
+	for (FInventorySlot& Slot : Slots)
+	{
+		if (Slot.IsEmpty())
+		{
+			return Slot;
+		}
+	}
+
+	FInventorySlot NewSlot;
+	int32 SlotIndex = Slots.Add(NewSlot);
+	FInventorySlot& SlotRef = Slots[SlotIndex];
+	SlotRef.SlotIndex = SlotIndex;
+	SlotRef.ItemStackCount = 0;
+
+	AEODPlayerController* OwnerPC = Cast<AEODPlayerController>(GetOwner());
+	if (OwnerPC && OwnerPC->IsLocalPlayerController())
+	{
+		UInventoryContainerWidget* InvContainer = CreateWidget<UInventoryContainerWidget>(OwnerPC, InventoryContainerClass.Get());
+		UInventoryWidget* InvWidget = InventoryWidget ? InventoryWidget : OwnerPC->GetInventoryWidget();
+		check(InvWidget);
+		InvWidget->AddContainer(InvContainer);
+		SlotRef.SlotWidget = InvContainer;		
+	}
+
+	return SlotRef;
 }

@@ -19,7 +19,9 @@ UCLASS()
 class EOD_API UInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+	///////////////////////////////////////////////////////////////////////////
+	//  UE4 Method Overrides
 public:
 
 	UInventoryWidget(const FObjectInitializer& ObjectInitializer);
@@ -30,25 +32,26 @@ public:
 
 	virtual void NativeDestruct() override;
 
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Utility
+public:
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Utility)
+	void AddContainer(class UInventoryContainerWidget* InvContainer);
+	virtual void AddContainer_Implementation(class UInventoryContainerWidget* InvContainer);
+
 	UFUNCTION()
 	void AddItem(const FInventoryItem& Item);
 
 	UFUNCTION()
 	void RemoveItem(const FInventoryItem& Item);
 
-	// void RemoveItem()
+protected:
 
-	/*
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UImage* BackgroundImage;
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Containers)
+	TArray<class UInventoryContainerWidget*> InvContainers;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UScrollBox* ScrollBox;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UGridPanel* GridPanel;
-	*/
-	
 
 	
 };

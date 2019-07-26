@@ -55,8 +55,8 @@ public:
 protected:
 
 	/** Update tooltip widget description from DataObj */
-	virtual void 
-		UpdateTooltipWidget() override;
+	virtual void UpdateTooltipWidget() override;
+
 
 	///////////////////////////////////////////////////////////////////////////
 	//  Utility

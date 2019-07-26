@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Object.h"
-#include "UObject/Interface.h"
+// #include "InventoryItemBase.h"
+
 #include "Templates/SubclassOf.h"
 #include "LootableInterface.generated.h"
 
@@ -17,7 +17,7 @@ struct EOD_API FStoredLootInfo
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UObject> ItemClass;
+	TSubclassOf<class UInventoryItemBase> ItemClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 MaxCount;
@@ -34,7 +34,7 @@ struct EOD_API FGeneratedLootInfo
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UObject> ItemClass;
+	TSubclassOf<class UInventoryItemBase> ItemClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 ItemCount;

@@ -367,18 +367,6 @@ void AEODPlayerController::PickAllLoot()
 	}
 }
 
-/*
-bool AEODPlayerController::CreateLootWidget_Implementation(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource)
-{
-	PrintWarning(TEXT("Create loot widget called"));
-	return true;
-}
-
-void AEODPlayerController::RemoveLootWidget_Implementation(UObject* LootSource)
-{
-}
-*/
-
 void AEODPlayerController::CreateHUDWidget()
 {
 	bool bLocalPC = IsLocalPlayerController();
@@ -467,8 +455,11 @@ void AEODPlayerController::InitStatusIndicatorWidget()
 void AEODPlayerController::InitInventoryWidget()
 {
 	UInventoryWidget* InvWidget = GetInventoryWidget();
-	if (InvWidget && InventoryComponent)
+	if (InvWidget)
 	{
+		check(InventoryComponent);
+		InventoryComponent->SetInventoryWidget(InvWidget);
+
 		const TArray<FInventoryItem>& Items = InventoryComponent->GetInventoryItems();
 		for (const FInventoryItem& Item : Items)
 		{

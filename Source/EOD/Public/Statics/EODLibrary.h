@@ -202,15 +202,21 @@ struct EOD_API FInventorySlot
 	int32 ItemStackCount;			// Not uint32 only because uint32 is not supported in blueprints
 
 	UPROPERTY(BlueprintReadOnly)
-	FInventoryItem ItemInSlot;
+	class UInventoryItemBase* ItemInSlot;
 
 	/** Container widget associated with this inventory slot */
 	UPROPERTY(BlueprintReadOnly)
-	UContainerWidget* SlotWidget;
+	class UInventoryContainerWidget* SlotWidget;
+
+	bool IsEmpty() const
+	{
+		return ItemInSlot == nullptr;
+	}
 
 	FInventorySlot() :
-		SlotIndex(0),
-		ItemStackCount(0),
+		SlotIndex(-1),
+		ItemStackCount(-1),
+		ItemInSlot(nullptr),
 		SlotWidget(nullptr)
 	{
 	}
