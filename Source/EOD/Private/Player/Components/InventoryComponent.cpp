@@ -80,6 +80,22 @@ void UInventoryComponent::ConsumeItem(TSubclassOf<UInventoryItemBase> ItemClass)
 
 void UInventoryComponent::AddLoot(const FGeneratedLootInfo& LootInfo)
 {
+	int32 SlotIndex = -1;
+
+	for (int i = 0; i < Slots.Num(); i++)
+	{
+		FInventorySlot& Slot = Slots[i];
+		if (Slot.ItemInSlot && Slot.ItemInSlot->GetClass() == LootInfo.ItemClass.Get())
+		{
+			Slot.ItemStackCount += LootInfo.ItemCount;
+			if (Slot.SlotWidget)
+			{
+				Slot.SlotWidget->SetItemCount(Slot.ItemStackCount);
+			}
+			return;
+		}
+	}
+
 	UInventoryItemBase* InventoryItem = NewObject<UInventoryItemBase>(this, LootInfo.ItemClass, NAME_None, RF_Transient);
 	if (InventoryItem)
 	{
