@@ -172,7 +172,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = UI)
 	TSubclassOf<UInGameMenuWidget> PauseMenuWidgetClass;
 	
-	UPROPERTY(EditDefaultsOnly, Category = UI)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = UI)
 	TSubclassOf<class ULootWidget> LootWidgetClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = UI)

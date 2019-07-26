@@ -41,6 +41,12 @@ public:
 	void AddItemList(const TArray<FGeneratedLootInfo>& LootInfoArray);
 	virtual void AddItemList_Implementation(const TArray<FGeneratedLootInfo>& LootInfoArray);
 
+	UFUNCTION(BlueprintCallable, Category = Utility, meta = (DisplayName = "Set Loot Source"))
+	void BP_SetLootSource(UObject* InLootSource);
+
+	UFUNCTION(BlueprintPure, Category = Utility, meta = (DisplayName = "Get Loot Source"))
+	UObject* BP_GetLootSource() const;
+
 	inline void SetLootSource(UObject* InLootSource) { LootSource = InLootSource; }
 
 	inline UObject* GetLootSource() const { return LootSource.Get(); }

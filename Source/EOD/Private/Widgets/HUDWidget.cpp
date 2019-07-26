@@ -102,7 +102,7 @@ void UHUDWidget::SetPlayerName(FString Name)
 	PlayerName->SetText(FText::FromString(Name));
 }
 
-void UHUDWidget::AddGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect)
+void UHUDWidget::AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect)
 {
 	if (GameplayEffect == nullptr)
 	{
@@ -125,7 +125,7 @@ void UHUDWidget::AddGameplayEffectUI_Implementation(UGameplayEffectBase* Gamepla
 	}
 }
 
-void UHUDWidget::RemoveGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect)
+void UHUDWidget::RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect)
 {
 	if (GameplayEffectWidgetsMap.Contains(GameplayEffect))
 	{

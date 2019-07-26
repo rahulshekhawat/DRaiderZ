@@ -34,3 +34,13 @@ void ULootWidget::PickAllLoot_Implementation()
 void ULootWidget::AddItemList_Implementation(const TArray<FGeneratedLootInfo>& LootInfoArray)
 {
 }
+
+void ULootWidget::BP_SetLootSource(UObject* InLootSource)
+{
+	LootSource = InLootSource;
+}
+
+UObject* ULootWidget::BP_GetLootSource() const
+{
+	return LootSource.Get();
+}

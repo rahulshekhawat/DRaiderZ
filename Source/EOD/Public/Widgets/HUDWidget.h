@@ -110,14 +110,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SetPlayerName(FString Name);
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Gameplay)
-	void AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
-	virtual void AddGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect);
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Gameplay)
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	void AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
+
+	UFUNCTION(BlueprintCallable, Category = Utility)
 	void RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
-	virtual void RemoveGameplayEffectUI_Implementation(UGameplayEffectBase* GameplayEffect);
 
 protected:
 
