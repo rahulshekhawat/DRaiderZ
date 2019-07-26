@@ -17,6 +17,7 @@
 #include "SkillBarWidget.h"
 #include "SkillTreeWidget.h"
 #include "InteractivePopupWidget.h"
+#include "LootWidget.h"
 
 #include "ActiveSkillBase.h"
 #include "EODLibrary.h"
@@ -326,12 +327,57 @@ void AEODPlayerController::UnregisterActivePopupWidget()
 
 bool AEODPlayerController::CreateLootWidget_Implementation(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource)
 {
+	/*
+	if (LootWidgetClass.Get())
+	{
+
+
+	}
+
+	return false;
+
+
+	LootWidget = CreateWidget<ULootWidget>(this, LootWidgetClass);
+	if (LootWidget == nullptr)
+	{
+		return false;
+	}
+
+	LootWidget->SetLootSource(LootSource);
+	LootWidget->AddItemList(LootInfoArray);
+
+	LootWidget->AddToViewport(10000);
+	*/
+	return true;
+}
+
+void AEODPlayerController::RemoveLootWidget_Implementation(UObject* LootSource)
+{
+	if (LootWidget && LootWidget->GetLootSource() == LootSource)
+	{
+		LootWidget->RemoveFromParent();
+	}
+}
+
+void AEODPlayerController::PickAllLoot()
+{
+	if (LootWidget)
+	{
+		LootWidget->PickAllLoot();
+	}
+}
+
+/*
+bool AEODPlayerController::CreateLootWidget_Implementation(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource)
+{
+	PrintWarning(TEXT("Create loot widget called"));
 	return true;
 }
 
 void AEODPlayerController::RemoveLootWidget_Implementation(UObject* LootSource)
 {
 }
+*/
 
 void AEODPlayerController::CreateHUDWidget()
 {

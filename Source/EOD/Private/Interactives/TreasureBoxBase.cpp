@@ -83,9 +83,17 @@ EInteractionResult ATreasureBoxBase::OnInteractionStart_Implementation(AEODChara
 
 EInteractionResult ATreasureBoxBase::OnInteractionUpdate_Implementation(AEODCharacterBase* Character)
 {
-	//~ @todo pick up all loot and finish interaction
+	AEODPlayerController* PC = Character ? Cast<AEODPlayerController>(Character->Controller) : nullptr;
+	if (PC == nullptr || PC->IsLocalPlayerController() == false)
+	{
+		OnInteractionCancel(Character, EInteractionCancelType::AutoCancel);
+		return EInteractionResult::InteractionCancelled;
+	}
 
-	return EInteractionResult();
+	PC->PickAllLoot();
+	OnInteractionFinish(Character);
+	
+	return EInteractionResult::InteractionFinished;
 }
 
 void ATreasureBoxBase::OnInteractionCancel_Implementation(AEODCharacterBase* Character, EInteractionCancelType CancelType)

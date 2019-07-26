@@ -150,10 +150,13 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = UI)
 	bool CreateLootWidget(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource);
 	virtual bool CreateLootWidget_Implementation(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource);
-	
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = UI)
 	void RemoveLootWidget(UObject* LootSource);
 	virtual void RemoveLootWidget_Implementation(UObject* LootSource);
+
+	UFUNCTION(BlueprintCallable, Category = UI)
+	virtual void PickAllLoot();
 
 protected:
 	
@@ -168,6 +171,12 @@ protected:
 	/** The widget class used for in-game widget */
 	UPROPERTY(EditDefaultsOnly, Category = UI)
 	TSubclassOf<UInGameMenuWidget> PauseMenuWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<class ULootWidget> LootWidgetClass;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = UI)
+	class ULootWidget* LootWidget;
 
 	/** Player's head-up display widget */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = UI)
