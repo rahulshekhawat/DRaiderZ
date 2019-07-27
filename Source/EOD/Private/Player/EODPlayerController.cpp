@@ -325,40 +325,72 @@ void AEODPlayerController::UnregisterActivePopupWidget()
 	}
 }
 
-bool AEODPlayerController::CreateLootWidget_Implementation(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource)
+bool AEODPlayerController::CreateLootWidget(UObject* LootSource)
 {
-
-
-	/*
-	if (LootWidgetClass.Get())
-	{
-
-
-	}
-
-	return false;
-
-
-	LootWidget = CreateWidget<ULootWidget>(this, LootWidgetClass);
-	if (LootWidget == nullptr)
+	if (LootSource == nullptr || HUDWidget == nullptr)
 	{
 		return false;
 	}
 
-	LootWidget->SetLootSource(LootSource);
-	LootWidget->AddItemList(LootInfoArray);
+	LootWidget = CreateWidget<ULootWidget>(this, LootWidgetClass.Get());
+	check(LootWidget);
 
-	LootWidget->AddToViewport(10000);
-	*/
-	return true;
-}
+	bool bResult = LootWidget->InitLootWidget(LootSource);
+	if (bResult)
+	{
+		HUDWidget->AddLootWidget(LootWidget);
 
-void AEODPlayerController::RemoveLootWidget_Implementation(UObject* LootSource)
-{
-	if (LootWidget && LootWidget->GetLootSource() == LootSource)
+		UInventoryWidget* InvWidget = GetInventoryWidget();
+		UPlayerStatsWidget* PSWidget = GetPlayerStatsWidget();
+		USkillTreeWidget* STWidget = GetSkillTreeWidget();
+		check(InvWidget);
+		check(PSWidget);
+		check(STWidget);
+
+		InvWidget->SetVisibility(ESlateVisibility::Visible);
+		PSWidget->SetVisibility(ESlateVisibility::Hidden);
+		STWidget->SetVisibility(ESlateVisibility::Hidden);
+
+		SwitchToUIInput();
+
+		return true;
+	}
+	else
 	{
 		LootWidget->RemoveFromParent();
+		LootWidget = nullptr;
 	}
+
+	return false;
+}
+
+bool AEODPlayerController::RemoveLootWidget(UObject* LootSource)
+{
+	if (HUDWidget)
+	{
+		bool bRemoved = HUDWidget->RemoveLootWidget(LootSource);
+		if (bRemoved)
+		{
+			LootWidget = nullptr;
+
+			UInventoryWidget* InvWidget = GetInventoryWidget();
+			check(InvWidget);
+			InvWidget->SetVisibility(ESlateVisibility::Hidden);
+
+			UPlayerStatsWidget* PSWidget = GetPlayerStatsWidget();
+			USkillTreeWidget* STWidget = GetSkillTreeWidget();
+
+			check(PSWidget);
+			check(STWidget);
+
+			if (!PSWidget->IsVisible() && !STWidget->IsVisible())
+			{
+				SwitchToGameInput();
+			}
+		}
+	}
+
+	return true;
 }
 
 void AEODPlayerController::PickAllLoot()

@@ -147,13 +147,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = UI)
 	void UnregisterActivePopupWidget();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = UI)
-	bool CreateLootWidget(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource);
-	virtual bool CreateLootWidget_Implementation(const TArray<FGeneratedLootInfo>& LootInfoArray, UObject* LootSource);
+	UFUNCTION(BlueprintCallable, Category = UI)
+	bool CreateLootWidget(UObject* LootSource);
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = UI)
-	void RemoveLootWidget(UObject* LootSource);
-	virtual void RemoveLootWidget_Implementation(UObject* LootSource);
+	UFUNCTION(BlueprintCallable, Category = UI)
+	bool RemoveLootWidget(UObject* Lootsource);
 
 	UFUNCTION(BlueprintCallable, Category = UI)
 	virtual void PickAllLoot();

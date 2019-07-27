@@ -104,7 +104,16 @@ protected:
 	///////////////////////////////////////////////////////////////////////////
 	//  Utility
 public:
+
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	void AddLootWidget(class ULootWidget* InWidget);
+
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	void RemoveActiveLootWidget();
 	
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	bool RemoveLootWidget(UObject* InLootSource);
+
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SetPlayerLevel(int32 Level);
 
@@ -124,6 +133,8 @@ protected:
 
 	UPROPERTY(Transient)
 	TMap<UGameplayEffectBase*, UStatusEffectWidget*> GameplayEffectWidgetsMap;
-	// TMap<TWeakObjectPtr<UGameplayEffectBase>, UStatusEffectWidget*> GameplayEffectWidgetsMap;
+
+	UPROPERTY(Transient)
+	class ULootWidget* ActiveLootWidget;
 
 };

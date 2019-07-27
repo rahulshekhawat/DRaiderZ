@@ -18,12 +18,13 @@ void ILootableInterface::AcquireLoot_Implementation(const FGeneratedLootInfo& Lo
 {
 }
 
-/*
-int32 ILootableInterface::AcquireLootItem_Implementation(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter)
+void ILootableInterface::OnAllLootPicked_Implementation(AEODPlayerController* EODPC)
 {
-	return int32();
 }
-*/
+
+void ILootableInterface::OnLootCancelled_Implementation(AEODPlayerController* EODPC)
+{
+}
 
 void ILootableInterface::GenerateLootInfoArray()
 {

@@ -81,18 +81,17 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Lootable)
 	TArray<FGeneratedLootInfo> GetGeneratedLootInfo() const;
 	virtual TArray<FGeneratedLootInfo> GetGeneratedLootInfo_Implementation() const;
-
-	/**
-	 * @param LootItemClass	ItemClass that we want to acquire loot of.
-	 * @param Looter		Character that initiated the loot.
-	 * @return				Number of acquired loot items
-	 */
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Lootable)
-	// int32 AcquireLootItem(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter);
-	// virtual int32 AcquireLootItem_Implementation(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Lootable)
 	void AcquireLoot(const FGeneratedLootInfo& LootInfo, class AEODPlayerController* EODPC);
 	virtual void AcquireLoot_Implementation(const FGeneratedLootInfo& LootInfo, class AEODPlayerController* EODPC);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Lootable)
+	void OnAllLootPicked(class AEODPlayerController* EODPC);
+	virtual void OnAllLootPicked_Implementation(class AEODPlayerController* EODPC);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Lootable)
+	void OnLootCancelled(class AEODPlayerController* EODPC);
+	virtual void OnLootCancelled_Implementation(class AEODPlayerController* EODPC);
 
 };

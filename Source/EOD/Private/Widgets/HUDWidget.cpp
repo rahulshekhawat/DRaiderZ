@@ -18,6 +18,7 @@
 #include "PlayerSkillBase.h"
 #include "PlayerSkillsComponent.h"
 #include "StatusEffectWidget.h"
+#include "LootWidget.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -88,6 +89,41 @@ bool UHUDWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 		SourceCont->SetDataObj(nullptr);
 	}
 	return true;
+}
+
+void UHUDWidget::AddLootWidget(ULootWidget* InWidget)
+{
+	if (InWidget)
+	{
+		RemoveActiveLootWidget();
+		ActiveLootWidget = InWidget;
+		check(MainCanvas);
+		UCanvasPanelSlot* LootSlot = MainCanvas->AddChildToCanvas(ActiveLootWidget);
+		check(LootSlot);
+		LootSlot->SetSize(FVector2D(400.f, 500.f));
+		LootSlot->SetPosition(FVector2D(200.f, 300.f));
+	}
+}
+
+void UHUDWidget::RemoveActiveLootWidget()
+{
+	if (ActiveLootWidget)
+	{
+		ActiveLootWidget->RemoveFromParent();
+		ActiveLootWidget = nullptr;
+	}
+}
+
+bool UHUDWidget::RemoveLootWidget(UObject* InLootSource)
+{
+	if (ActiveLootWidget && ActiveLootWidget->GetLootSource() == InLootSource)
+	{
+		ActiveLootWidget->RemoveFromParent();
+		ActiveLootWidget = nullptr;
+		return true;
+	}
+
+	return false;
 }
 
 void UHUDWidget::SetPlayerLevel(int32 Level)

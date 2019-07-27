@@ -48,7 +48,7 @@ EInteractionResult ATreasureBoxBase::OnInteractionStart_Implementation(AEODChara
 		return EInteractionResult::InteractionRequestFailed;
 	}
 
-	bool bLootWidgetCreated = PC->CreateLootWidget(GeneratedLootInfoArray, this);
+	bool bLootWidgetCreated = PC->CreateLootWidget(this);
 	if (bLootWidgetCreated == false)
 	{
 		return EInteractionResult::InteractionRequestFailed;
@@ -99,6 +99,12 @@ void ATreasureBoxBase::OnInteractionFinish_Implementation(AEODCharacterBase* Cha
 		if (PC)
 		{
 			PC->RemoveLootWidget(this);
+
+			if (GeneratedLootInfoArray.Num() == 0)
+			{
+				PC->UnregisterPopupWidget(this);
+				Execute_DisableCustomDepth(this);
+			}
 		}
 		bInteractionInProgress = false;
 	}
@@ -186,6 +192,18 @@ void ATreasureBoxBase::AcquireLoot_Implementation(const FGeneratedLootInfo& Loot
 			}
 		}
 	}
+}
+
+void ATreasureBoxBase::OnAllLootPicked_Implementation(AEODPlayerController* EODPC)
+{
+	AEODCharacterBase* Character = EODPC ? Cast<AEODCharacterBase>(EODPC->GetPawn()) : nullptr;
+	Execute_OnInteractionFinish(this, Character);
+}
+
+void ATreasureBoxBase::OnLootCancelled_Implementation(AEODPlayerController* EODPC)
+{
+	AEODCharacterBase* Character = EODPC ? Cast<AEODCharacterBase>(EODPC->GetPawn()) : nullptr;
+	Execute_OnInteractionFinish(this, Character);
 }
 
 void ATreasureBoxBase::SpawnBox()

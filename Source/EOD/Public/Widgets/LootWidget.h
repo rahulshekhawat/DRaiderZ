@@ -47,10 +47,13 @@ protected:
 public:
 	
 	UFUNCTION(BlueprintCallable, Category = Utility)
-	bool InitializeWidget(UObject* InObj);
+	bool InitLootWidget(UObject* InLootSource);
 
 	UFUNCTION(BlueprintCallable, Category = Utility)
-	void DestroyWidget();
+	void OnAllLootPicked();
+
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	void OnLootCancelled();
 
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	void GenerateItemList(const TArray<FGeneratedLootInfo>& LootInfoArray);
@@ -60,6 +63,22 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SelectLootItem(class UItemInfoWidget* InWidget);
+	
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	void PickAllLoot();
+
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	void AcquireLootFromWidget(UItemInfoWidget* InWidget);
+
+	UFUNCTION(BlueprintCallable, Category = Utility, meta = (DisplayName = "Set Loot Source"))
+	void BP_SetLootSource(UObject* InLootSource);
+
+	UFUNCTION(BlueprintPure, Category = Utility, meta = (DisplayName = "Get Loot Source"))
+	UObject* BP_GetLootSource() const;
+
+	inline void SetLootSource(UObject* InLootSource) { LootSource = InLootSource; }
+
+	inline UObject* GetLootSource() const { return LootSource.Get(); }
 
 protected:
 
@@ -74,29 +93,6 @@ protected:
 
 	UPROPERTY(Transient)
 	TMap<UItemInfoWidget*, FGeneratedLootInfo> LootItemsMap;
-
-
-	///////////////////////////////////////////////////////////////////////////
-	//  Behaviour
-public:
-
-	UFUNCTION(BlueprintCallable, Category = Behaviour)
-	void PickAllLoot();
-
-	UFUNCTION(BlueprintCallable, Category = Behaviour)
-	void AcquireLootFromWidget(UItemInfoWidget* InWidget);
-
-	UFUNCTION(BlueprintCallable, Category = Utility, meta = (DisplayName = "Set Loot Source"))
-	void BP_SetLootSource(UObject* InLootSource);
-
-	UFUNCTION(BlueprintPure, Category = Utility, meta = (DisplayName = "Get Loot Source"))
-	UObject* BP_GetLootSource() const;
-
-	inline void SetLootSource(UObject* InLootSource) { LootSource = InLootSource; }
-
-	inline UObject* GetLootSource() const { return LootSource.Get(); }
-
-protected:
 
 	UPROPERTY(Transient)
 	TWeakObjectPtr<UObject> LootSource;

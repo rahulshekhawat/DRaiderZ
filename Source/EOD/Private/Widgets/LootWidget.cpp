@@ -45,18 +45,18 @@ void ULootWidget::NativeDestruct()
 	UGameplayStatics::PlaySound2D(this, UIDownSound);
 }
 
-bool ULootWidget::InitializeWidget(UObject* InObj)
+bool ULootWidget::InitLootWidget(UObject* InLootSource)
 {
-	ILootableInterface* LootInterface = Cast<ILootableInterface>(InObj);
+	ILootableInterface* LootInterface = Cast<ILootableInterface>(InLootSource);
 	if (LootInterface)
 	{
-		TArray<FGeneratedLootInfo> LootInfoArray = LootInterface->Execute_GetGeneratedLootInfo(InObj);
+		TArray<FGeneratedLootInfo> LootInfoArray = LootInterface->Execute_GetGeneratedLootInfo(InLootSource);
 		if (LootInfoArray.Num() <= 0)
 		{
 			return false;
 		}
 
-		SetLootSource(InObj);
+		SetLootSource(InLootSource);
 		GenerateItemList(LootInfoArray);
 
 		return true;
@@ -65,11 +65,36 @@ bool ULootWidget::InitializeWidget(UObject* InObj)
 	return false;
 }
 
-void ULootWidget::DestroyWidget()
+void ULootWidget::OnAllLootPicked()
 {
-	AEODPlayerController* EODPC = Cast<AEODPlayerController>(GetOwningPlayer());
-	check(EODPC);
-	EODPC->RemoveLootWidget(GetLootSource());
+	AEODPlayerController* PC = GetOwningPlayer<AEODPlayerController>();
+	check(PC);
+
+	ILootableInterface* LootInterface = Cast<ILootableInterface>(GetLootSource());
+	if (LootInterface)
+	{
+		LootInterface->Execute_OnAllLootPicked(GetLootSource(), PC);
+	}
+	else
+	{
+		PC->RemoveLootWidget(GetLootSource());
+	}
+}
+
+void ULootWidget::OnLootCancelled()
+{
+	AEODPlayerController* PC = GetOwningPlayer<AEODPlayerController>();
+	check(PC);
+
+	ILootableInterface* LootInterface = Cast<ILootableInterface>(GetLootSource());
+	if (LootInterface)
+	{
+		LootInterface->Execute_OnLootCancelled(GetLootSource(), PC);
+	}
+	else
+	{
+		PC->RemoveLootWidget(GetLootSource());
+	}
 }
 
 void ULootWidget::GenerateItemList(const TArray<FGeneratedLootInfo>& LootInfoArray)
@@ -167,7 +192,7 @@ void ULootWidget::AcquireLootFromWidget(UItemInfoWidget* InWidget)
 
 	if (LootItemsMap.Num() == 0)
 	{
-		DestroyWidget();
+		OnAllLootPicked();
 	}
 }
 

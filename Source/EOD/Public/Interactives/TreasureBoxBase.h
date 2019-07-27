@@ -60,9 +60,16 @@ public:
 public:
 
 	virtual void GenerateLootInfoArray() override;
+
 	virtual TArray<FStoredLootInfo> GetStoredLootInfo_Implementation() const override;
+
 	virtual TArray<FGeneratedLootInfo> GetGeneratedLootInfo_Implementation() const override;
+
 	virtual void AcquireLoot_Implementation(const FGeneratedLootInfo& LootInfo, class AEODPlayerController* EODPC) override;
+
+	virtual void OnAllLootPicked_Implementation(class AEODPlayerController* EODPC) override;
+
+	virtual void OnLootCancelled_Implementation(class AEODPlayerController* EODPC) override;
 
 
 	///////////////////////////////////////////////////////////////////////////
