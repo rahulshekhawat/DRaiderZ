@@ -33,12 +33,20 @@ struct EOD_API FGeneratedLootInfo
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	/** Generated Loot ID */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Loot)
+	int32 GLID;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Loot)
 	TSubclassOf<class UInventoryItemBase> ItemClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Loot)
 	int32 ItemCount;
-
+	
+	bool operator==(const FGeneratedLootInfo& Other)
+	{
+		return this->GLID == Other.GLID;
+	}
 };
 
 /** An interface that must be implemented for all in-game interactive actors */
@@ -79,8 +87,12 @@ public:
 	 * @param Looter		Character that initiated the loot.
 	 * @return				Number of acquired loot items
 	 */
+	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Lootable)
+	// int32 AcquireLootItem(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter);
+	// virtual int32 AcquireLootItem_Implementation(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter);
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Lootable)
-	int32 AcquireLootItem(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter);
-	virtual int32 AcquireLootItem_Implementation(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter);
+	void AcquireLoot(const FGeneratedLootInfo& LootInfo, class AEODPlayerController* EODPC);
+	virtual void AcquireLoot_Implementation(const FGeneratedLootInfo& LootInfo, class AEODPlayerController* EODPC);
 
 };

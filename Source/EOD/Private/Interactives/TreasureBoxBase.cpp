@@ -4,6 +4,7 @@
 #include "TreasureBoxBase.h"
 #include "EODCharacterBase.h"
 #include "EODPlayerController.h"
+#include "InventoryComponent.h"
 
 #include "Components/SkeletalMeshComponent.h"
 
@@ -42,7 +43,7 @@ void ATreasureBoxBase::BeginPlay()
 EInteractionResult ATreasureBoxBase::OnInteractionStart_Implementation(AEODCharacterBase* Character)
 {
 	AEODPlayerController* PC = Character ? Cast<AEODPlayerController>(Character->Controller) : nullptr;
-	if (PC == nullptr || PC->IsLocalPlayerController() == false)
+	if (PC == nullptr || PC->IsLocalPlayerController() == false || GeneratedLootInfoArray.Num() == 0)
 	{
 		return EInteractionResult::InteractionRequestFailed;
 	}
@@ -103,8 +104,45 @@ void ATreasureBoxBase::OnInteractionFinish_Implementation(AEODCharacterBase* Cha
 	}
 }
 
+void ATreasureBoxBase::EnableCustomDepth_Implementation()
+{
+	if (GeneratedLootInfoArray.Num() == 0)
+	{
+		return;
+	}
+
+	if (PrimaryMesh)
+	{
+		PrimaryMesh->SetRenderCustomDepth(true);
+	}
+}
+
+void ATreasureBoxBase::DisableCustomDepth_Implementation()
+{
+	if (PrimaryMesh)
+	{
+		PrimaryMesh->SetRenderCustomDepth(false);
+	}
+}
+
+void ATreasureBoxBase::OnGainFocus_Implementation(AEODCharacterBase* Character)
+{
+	if (GeneratedLootInfoArray.Num() == 0)
+	{
+		return;
+	}
+
+	Super::OnGainFocus_Implementation(Character);
+}
+
+void ATreasureBoxBase::OnLoseFocus_Implementation(AEODCharacterBase* Character)
+{
+	Super::OnLoseFocus_Implementation(Character);
+}
+
 void ATreasureBoxBase::GenerateLootInfoArray()
 {
+	int32 GLID = 100;
 	for (const FStoredLootInfo& StoredLootInfo : StoredLootInfoArray)
 	{
 		bool bShouldGenerate = StoredLootInfo.DropChance >= FMath::RandRange(0.f, 100.f) ? true : false;
@@ -112,9 +150,11 @@ void ATreasureBoxBase::GenerateLootInfoArray()
 		if (bShouldGenerate)
 		{
 			FGeneratedLootInfo GeneratedLootInfo;
+			GeneratedLootInfo.GLID = GLID;
 			GeneratedLootInfo.ItemCount = FMath::RandRange(1, FMath::Max(1, StoredLootInfo.MaxCount));
 			GeneratedLootInfo.ItemClass = StoredLootInfo.ItemClass;
 			GeneratedLootInfoArray.Add(GeneratedLootInfo);
+			GLID++;
 		}
 	}
 }
@@ -129,17 +169,23 @@ TArray<FGeneratedLootInfo> ATreasureBoxBase::GetGeneratedLootInfo_Implementation
 	return GeneratedLootInfoArray;
 }
 
-int32 ATreasureBoxBase::AcquireLootItem_Implementation(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter)
+void ATreasureBoxBase::AcquireLoot_Implementation(const FGeneratedLootInfo& LootInfo, AEODPlayerController* EODPC)
 {
-	for (const FGeneratedLootInfo& GeneratedLootInfo : GeneratedLootInfoArray)
+	if (EODPC)
 	{
-		if (GeneratedLootInfo.ItemClass == LootItemClass)
+		UInventoryComponent* InvComp = EODPC->GetInventoryComponent();
+		check(InvComp);
+		InvComp->AddLoot(LootInfo);
+		int32 Num = GeneratedLootInfoArray.Num();
+		for (int i = Num - 1; i >= 0; i--)
 		{
-			return GeneratedLootInfo.ItemCount;
+			if (GeneratedLootInfoArray[i] == LootInfo)
+			{
+				GeneratedLootInfoArray.RemoveAt(i);
+				break;
+			}
 		}
 	}
-
-	return 0;
 }
 
 void ATreasureBoxBase::SpawnBox()

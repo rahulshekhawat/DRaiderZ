@@ -16,7 +16,9 @@ UCLASS()
 class EOD_API ATreasureBoxBase : public AInteractiveSkeletalMesh, public ILootableInterface
 {
 	GENERATED_BODY()
-
+	
+	///////////////////////////////////////////////////////////////////////////
+	//  UE4 Method Overrides
 public:
 
 	ATreasureBoxBase(const FObjectInitializer& ObjectInitializer);
@@ -25,7 +27,11 @@ public:
 
 	virtual void BeginPlay() override;
 
-	//~ Begin Interactive Interface
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Interaction Interface
+public:
+
 	/** This event is called when a (player) character starts interacting with the interactive actor */
 	virtual EInteractionResult OnInteractionStart_Implementation(AEODCharacterBase* Character) override;
 
@@ -37,14 +43,31 @@ public:
 
 	/** This event is called when a (player) character finishes interaction with the interactive actor */
 	virtual void OnInteractionFinish_Implementation(AEODCharacterBase* Character) override;
-	//~ End Interactive Interface
 
-	//~ Begin Lootable Interface
+	/** This event is called to highlight interactive actor's meshes */
+	virtual void EnableCustomDepth_Implementation() override;
+
+	/** This event is called to disable highlight on interactive actor's meshes */
+	virtual void DisableCustomDepth_Implementation() override;
+
+	virtual void OnGainFocus_Implementation(AEODCharacterBase* Character) override;
+
+	virtual void OnLoseFocus_Implementation(AEODCharacterBase* Character) override;
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Lootable Interface
+public:
+
 	virtual void GenerateLootInfoArray() override;
 	virtual TArray<FStoredLootInfo> GetStoredLootInfo_Implementation() const override;
 	virtual TArray<FGeneratedLootInfo> GetGeneratedLootInfo_Implementation() const override;
-	virtual int32 AcquireLootItem_Implementation(TSubclassOf<UObject> LootItemClass, AEODCharacterBase* Looter) override;
-	//~ End Lootable Interface
+	virtual void AcquireLoot_Implementation(const FGeneratedLootInfo& LootInfo, class AEODPlayerController* EODPC) override;
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//  Utility
+public:
 
 	UFUNCTION(BlueprintCallable, Category = TreasureBox)
 	void SpawnBox();

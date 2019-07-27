@@ -35,9 +35,6 @@ public:
 	/** This event is called to disable highlight on interactive actor's meshes */
 	virtual void DisableCustomDepth_Implementation() override;
 
-	/** This event is called when a (player) character interacts with the underlying actor */
-	// virtual void OnInteract_Implementation(AEODCharacterBase* Character) override;
-
 	virtual void OnGainFocus_Implementation(AEODCharacterBase* Character) override;
 
 	virtual void OnLoseFocus_Implementation(AEODCharacterBase* Character) override;
