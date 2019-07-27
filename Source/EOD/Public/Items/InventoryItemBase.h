@@ -41,7 +41,8 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	//  Behaviour
 public:
+
 	/** Event called when player clicks on the inventory item */
-	virtual void OnClick();
+	virtual void OnClick(class AEODPlayerController* InPC);
 
 };

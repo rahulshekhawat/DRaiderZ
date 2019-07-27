@@ -8,6 +8,6 @@ UInventoryItemBase::UInventoryItemBase(const FObjectInitializer& ObjectInitializ
 	bStackable = true;
 }
 
-void UInventoryItemBase::OnClick()
+void UInventoryItemBase::OnClick(AEODPlayerController* InPC)
 {
 }

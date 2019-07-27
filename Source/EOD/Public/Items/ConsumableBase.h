@@ -14,14 +14,21 @@ class EOD_API UConsumableBase : public UInventoryItemBase
 {
 	GENERATED_BODY()
 	
+	///////////////////////////////////////////////////////////////////////////
+	//  UE4 Method Overrides
 public:
 
 	UConsumableBase(const FObjectInitializer& ObjectInitializer);
 
-	virtual void OnClick() override;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Consumable")
-	bool Consume();
-	virtual bool Consume_Implementation();
+	///////////////////////////////////////////////////////////////////////////
+	//  Behaviour
+public:
+
+	virtual void OnClick(class AEODPlayerController* InPC) override;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Consumable)
+	bool Consume(class AEODPlayerController* InPC);
+	virtual bool Consume_Implementation(class AEODPlayerController* InPC);
 
 };

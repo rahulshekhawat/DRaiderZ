@@ -3,6 +3,7 @@
 
 #include "InventoryContainerWidget.h"
 #include "InventoryItemBase.h"
+#include "EODPlayerController.h"
 
 #include "Components/TextBlock.h"
 
@@ -28,6 +29,17 @@ void UInventoryContainerWidget::NativeConstruct()
 void UInventoryContainerWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
+
+void UInventoryContainerWidget::MainButtonClicked()
+{
+	Super::MainButtonClicked();
+
+	UInventoryItemBase* InvItem = Cast<UInventoryItemBase>(GetDataObj());
+	if (InvItem)
+	{
+		InvItem->OnClick(GetOwningPlayer<AEODPlayerController>());
+	}
 }
 
 void UInventoryContainerWidget::SetDataObj(UObject* InDataObj)

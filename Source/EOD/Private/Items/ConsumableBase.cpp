@@ -2,14 +2,15 @@
 
 #include "ConsumableBase.h"
 #include "InventoryComponent.h"
+#include "EODPlayerController.h"
 
 UConsumableBase::UConsumableBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
-void UConsumableBase::OnClick()
+void UConsumableBase::OnClick(AEODPlayerController* InPC)
 {
-	bool bConsumeSuccess = Consume();
+	bool bConsumeSuccess = Consume(InPC);
 	if (bConsumeSuccess)
 	{
 		UInventoryComponent* InvComp = Cast<UInventoryComponent>(GetOuter());
@@ -20,7 +21,7 @@ void UConsumableBase::OnClick()
 	}
 }
 
-bool UConsumableBase::Consume_Implementation()
+bool UConsumableBase::Consume_Implementation(AEODPlayerController* InPC)
 {
 	return false;
 }

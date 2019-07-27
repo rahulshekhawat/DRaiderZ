@@ -31,6 +31,8 @@ public:
 	//  Behaviour
 public:
 
+	virtual void MainButtonClicked() override;
+
 	virtual void SetDataObj(UObject* InDataObj) override;
 
 	void SetItemCount(int32 InValue);
