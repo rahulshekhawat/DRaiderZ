@@ -126,6 +126,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	void RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Utility)
+	void AddCraftWidget(class UCraftWidget* CraftWidget);
+	virtual void AddCraftWidget_Implementation(class UCraftWidget* CraftWidget);
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Classes)

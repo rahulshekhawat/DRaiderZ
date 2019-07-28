@@ -100,9 +100,6 @@ public:
 	// --------------------------------------
 	//  Character States
 	// --------------------------------------
-
-	UFUNCTION(BlueprintCallable, Category = "Character Stats")
-	void SwitchToInteractionState();
 	
 	virtual bool StartLooting() override;
 

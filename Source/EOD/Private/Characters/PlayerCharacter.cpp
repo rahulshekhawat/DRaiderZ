@@ -176,12 +176,6 @@ void APlayerCharacter::PlayAttackBlockedAnimation()
 	}
 }
 
-void APlayerCharacter::SwitchToInteractionState()
-{
-	CharacterStateInfo.CharacterState = ECharacterState::Interacting;
-	CharacterStateInfo.SubStateIndex = 0;
-}
-
 bool APlayerCharacter::StartLooting()
 {
 	FPlayerAnimationReferencesTableRow* AnimRef = GetActiveAnimationReferences();

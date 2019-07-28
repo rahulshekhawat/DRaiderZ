@@ -344,6 +344,9 @@ public:
 
 	virtual bool CanStartInteraction() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
+	virtual void SwitchToInteractionState();
+
 	/** Trigger interaction with an NPC or an in-game interactive object */
 	UFUNCTION(BlueprintCallable, Category = "Character Interaction")
 	virtual void TriggerInteraction();

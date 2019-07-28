@@ -19,6 +19,7 @@
 #include "PlayerSkillsComponent.h"
 #include "StatusEffectWidget.h"
 #include "LootWidget.h"
+#include "CraftWidget.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -172,4 +173,13 @@ void UHUDWidget::RemoveGameplayEffectUI(UGameplayEffectBase* GameplayEffect)
 		}
 		GameplayEffectWidgetsMap.Remove(GameplayEffect);
 	}
+}
+
+void UHUDWidget::AddCraftWidget_Implementation(UCraftWidget* CraftWidget)
+{
+	check(MainCanvas);
+	UCanvasPanelSlot* PanelSlot = MainCanvas->AddChildToCanvas(CraftWidget);
+	check(PanelSlot);
+	PanelSlot->SetSize(FVector2D(1000.f, 750.f));
+	PanelSlot->SetPosition(FVector2D(50.f, 150.f));
 }

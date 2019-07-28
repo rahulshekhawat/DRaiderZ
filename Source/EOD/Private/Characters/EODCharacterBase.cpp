@@ -1710,6 +1710,12 @@ bool AEODCharacterBase::CanStartInteraction() const
 	return false;
 }
 
+void AEODCharacterBase::SwitchToInteractionState()
+{
+	FCharacterStateInfo StateInfo(ECharacterState::Interacting, 0);
+	CharacterStateInfo.NewReplicationIndex += StateInfo.NewReplicationIndex;
+}
+
 void AEODCharacterBase::TriggerInteraction()
 {
 }
