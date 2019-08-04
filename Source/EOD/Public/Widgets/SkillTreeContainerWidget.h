@@ -77,6 +77,9 @@ public:
 
 	virtual void SetCurrentValue(int32 InValue) override;
 
+	/** Update tooltip widget description from DataObj */
+	virtual void UpdateTooltipWidget() override;
+
 	FContainerMCDelegate OnUpgradeButtonClicked;
 
 protected:

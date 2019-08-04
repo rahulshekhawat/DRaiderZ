@@ -54,16 +54,20 @@ protected:
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SetIcon(UTexture* InTexture);
 
-	UFUNCTION(BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SetTitle(const FString& InValue, ERarity Rarity = ERarity::Common);
 
-	UFUNCTION(BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SetSubTitle(const FString& InValue);
 
-	UFUNCTION(BlueprintCallable, Category = "Utility")
+	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SetDescription(const FString& InValue);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Utility)
+	void AddStat(const FString& StatName, const FString& StatValue);
+	virtual void AddStat_Implementation(const FString& StatName, const FString& StatValue);
 
 };

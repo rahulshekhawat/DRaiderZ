@@ -65,3 +65,8 @@ void UTooltipWidget::SetDescription(const FString& InValue)
 	check(DescriptionText);
 	DescriptionText->SetText(FText::FromString(InValue));
 }
+
+void UTooltipWidget::AddStat_Implementation(const FString& StatName, const FString& StatValue)
+{
+	//~ empty
+}

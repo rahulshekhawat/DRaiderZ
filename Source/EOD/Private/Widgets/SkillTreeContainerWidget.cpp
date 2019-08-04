@@ -224,6 +224,10 @@ void USkillTreeContainerWidget::SetCurrentValue(int32 InValue)
 	SetSubText(InValue, Skill->GetMaxUpgradeLevel());
 }
 
+void USkillTreeContainerWidget::UpdateTooltipWidget()
+{
+}
+
 void USkillTreeContainerWidget::UpgradeButtonClicked()
 {
 	OnUpgradeButtonClicked.Broadcast(this);

@@ -10,6 +10,7 @@
 #include "EODDragDropOperation.h"
 #include "SkillTreeContainerWidget.h"
 #include "PlayerSkillsComponent.h"
+#include "ActiveSkillBase.h"
 
 #include "WidgetBlueprintLibrary.h"
 
@@ -253,6 +254,22 @@ void USkillBarContainerWidget::UpdateTooltipWidget()
 		TTWidget->SetIcon(Skill->GetSkillIcon());
 		TTWidget->SetTitle(Skill->GetInGameSkillName());
 		TTWidget->SetSubTitle(TEXT("Active Skill"));
-		TTWidget->SetDescription(Skill->GetInGameDescription());
+
+		const FString& InGameDesc = Skill->GetInGameDescription();
+		if (InGameDesc == TEXT(""))
+		{
+			TTWidget->SetDescription(TEXT("Description unavailable"));
+		}
+		else
+		{
+			TTWidget->SetDescription(InGameDesc);
+		}
+
+		UActiveSkillBase* ActiveSkill = Cast<UActiveSkillBase>(Skill);
+		if (ActiveSkill)
+		{
+			const FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
+			TTWidget->AddStat(TEXT("Cooldown"), FString::SanitizeFloat(SkillInfo.Cooldown));
+		}
 	}
 }
