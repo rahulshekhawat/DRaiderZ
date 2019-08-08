@@ -21,6 +21,7 @@
 #include "AISkillBase.h"
 #include "EODWidgetComponent.h"
 #include "DamageNumberWidget.h"
+#include "EODLevelScriptActor.h"
 
 #include "IdleWalkRunState.h"
 #include "DeadState.h"
@@ -30,6 +31,7 @@
 #include "NormalAttackState.h"
 #include "UsingSkillState.h"
 
+#include "EngineUtils.h"
 #include "UnrealNetwork.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -499,6 +501,21 @@ void AEODCharacterBase::BlockAttack(AActor* HitInstigator, ICombatInterface* Ins
 
 void AEODCharacterBase::InitiateDeathSequence_Implementation()
 {
+}
+
+AEODLevelScriptActor* AEODCharacterBase::GetEODLevelScriptActor() const
+{
+	UWorld* World = GetWorld();
+	for (TActorIterator<AEODLevelScriptActor> It(World, AEODLevelScriptActor::StaticClass()); It; ++It)
+	{
+		AEODLevelScriptActor* ScriptActor = *It;
+		if (IsValid(ScriptActor))
+		{
+			return ScriptActor;
+		}
+	}
+
+	return nullptr;
 }
 
 void AEODCharacterBase::CreateGhostTrail_Implementation()

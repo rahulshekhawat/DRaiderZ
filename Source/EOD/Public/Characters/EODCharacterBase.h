@@ -942,6 +942,9 @@ public:
 	void InitiateDeathSequence();
 	virtual void InitiateDeathSequence_Implementation();
 
+	UFUNCTION(BlueprintPure, Category = Gameplay)
+	class AEODLevelScriptActor* GetEODLevelScriptActor() const;
+
 	/**
 	 * Kills this character
 	 * @param CauseOfDeath - The reason for death of this character

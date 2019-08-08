@@ -121,10 +121,11 @@ void UBTService_CheckForEnemies::LookForAnotherEnemy(UBehaviorTreeComponent& Own
 
 			// Put character in combat state
 			CharacterOwner->SetInCombat(true);
+			CharacterOwner->OnInitiatingCombat.Broadcast(HitCharacter);
 			return;
 		}
 	}
 
-
 	CharacterOwner->SetInCombat(false);
+	CharacterOwner->OnLeavingCombat.Broadcast(nullptr);
 }
