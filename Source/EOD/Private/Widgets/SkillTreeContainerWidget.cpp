@@ -7,6 +7,9 @@
 #include "EODGlobalNames.h"
 #include "PlayerSkillsComponent.h"
 #include "EODDragDropOperation.h"
+#include "TooltipWidget.h"
+#include "ActiveSkillBase.h"
+#include "PlayerSkillBase.h"
 
 #include "WidgetBlueprintLibrary.h"
 
@@ -226,6 +229,33 @@ void USkillTreeContainerWidget::SetCurrentValue(int32 InValue)
 
 void USkillTreeContainerWidget::UpdateTooltipWidget()
 {
+	UTooltipWidget* TTWidget = Cast<UTooltipWidget>(ToolTipWidget);
+	if (TTWidget && DataObj.Get())
+	{
+		UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(DataObj.Get());
+		check(Skill);
+
+		TTWidget->SetIcon(Skill->GetSkillIcon());
+		TTWidget->SetTitle(Skill->GetInGameSkillName());
+		TTWidget->SetSubTitle(TEXT("Active Skill"));
+
+		const FString& InGameDesc = Skill->GetInGameDescription();
+		if (InGameDesc == TEXT(""))
+		{
+			TTWidget->SetDescription(TEXT("Description unavailable"));
+		}
+		else
+		{
+			TTWidget->SetDescription(InGameDesc);
+		}
+
+		UActiveSkillBase* ActiveSkill = Cast<UActiveSkillBase>(Skill);
+		if (ActiveSkill)
+		{
+			const FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
+			TTWidget->AddStat(TEXT("Cooldown"), FString::FromInt((int)SkillInfo.Cooldown));
+		}
+	}
 }
 
 void USkillTreeContainerWidget::UpgradeButtonClicked()

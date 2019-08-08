@@ -269,7 +269,7 @@ void USkillBarContainerWidget::UpdateTooltipWidget()
 		if (ActiveSkill)
 		{
 			const FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
-			TTWidget->AddStat(TEXT("Cooldown"), FString::SanitizeFloat(SkillInfo.Cooldown));
+			TTWidget->AddStat(TEXT("Cooldown"), FString::FromInt((int)SkillInfo.Cooldown));
 		}
 	}
 }
