@@ -269,7 +269,21 @@ void USkillBarContainerWidget::UpdateTooltipWidget()
 		if (ActiveSkill)
 		{
 			const FActiveSkillLevelUpInfo SkillInfo = ActiveSkill->GetCurrentSkillLevelupInfo();
-			TTWidget->AddStat(TEXT("Cooldown"), FString::FromInt((int)SkillInfo.Cooldown));
+
+			if (SkillInfo.ManaCost > 0)
+			{
+				FString ManaStr = FString::FromInt(SkillInfo.ManaCost);
+				TTWidget->AddStat(TEXT("Mana Cost"), ManaStr);
+			}
+
+			if (SkillInfo.StaminaCost > 0)
+			{
+				FString StaminaStr = FString::FromInt(SkillInfo.StaminaCost);
+				TTWidget->AddStat(TEXT("Stamina Cost"), StaminaStr);
+			}
+
+			FString SV = FString::FromInt((int)SkillInfo.Cooldown) + TEXT(" secs");
+			TTWidget->AddStat(TEXT("Cooldown"), SV);
 		}
 	}
 }
