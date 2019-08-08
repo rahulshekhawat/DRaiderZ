@@ -918,4 +918,10 @@ void UPlayerSkillsComponent::SetSkillSlotUpgrade(FName SkillGroup, int32 Value)
 	{
 		SlotWidget->SetCurrentValue(Value);
 	}
+
+	UPlayerSkillBase* Skill = Cast<UPlayerSkillBase>(SkillGroupToSkillMap[SkillGroup]);
+	if (Skill)
+	{
+		Skill->SetCurrentUpgrade(Value);
+	}
 }
