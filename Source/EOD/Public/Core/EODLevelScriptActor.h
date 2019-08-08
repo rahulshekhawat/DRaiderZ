@@ -106,7 +106,7 @@ public:
 	//  Sound
 	// --------------------------------------
 	
-	UFUNCTION(BlueprintCallable, Category = "Sound")
+	UFUNCTION(BlueprintCallable, Category = Sound)
 	void SwitchToBGM(USoundBase* NewBGM);
 
 protected:
@@ -118,7 +118,7 @@ protected:
 	UFUNCTION()
 	void PlayMusic(USoundBase* Music);
 
-	UFUNCTION(BlueprintCallable, Category = "Sound")
+	UFUNCTION(BlueprintCallable, Category = Sound)
 	void StopMusic(USoundBase* Music);
 
 	UFUNCTION()
@@ -127,7 +127,7 @@ protected:
 	UFUNCTION()
 	void PlayCombatMusic();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = Sound)
 	void PlayNonCombatMusic();
 
 	void QueueNextNonCombatMusic();

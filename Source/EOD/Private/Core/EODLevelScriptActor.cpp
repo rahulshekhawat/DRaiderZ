@@ -71,6 +71,10 @@ void AEODLevelScriptActor::SwitchToBGM(USoundBase* NewBGM)
 {
 	check(BGMAudioComponent);
 
+	UWorld* World = GetWorld();
+	check(World);
+	World->GetTimerManager().ClearTimer(MusicTimerHandle);
+	
 	// If the BGM is already playing
 	if (BGMAudioComponent->Sound == NewBGM && BGMAudioComponent->IsPlaying())
 	{
@@ -127,11 +131,15 @@ void AEODLevelScriptActor::StopCurrentMusic()
 
 void AEODLevelScriptActor::InitiateBackgroundMusic()
 {
+	if (BGMAudioComponent->IsPlaying())
+	{
+		return;
+	}
+
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		FTimerHandle TempTimerHandle;
-		World->GetTimerManager().SetTimer(TempTimerHandle, this, &AEODLevelScriptActor::PlayNonCombatMusic, InitialBGMTriggerDelay, false);
+		World->GetTimerManager().SetTimer(MusicTimerHandle, this, &AEODLevelScriptActor::PlayNonCombatMusic, InitialBGMTriggerDelay, false);
 	}
 }
 
@@ -153,20 +161,6 @@ void AEODLevelScriptActor::PlayNonCombatMusic()
 {
 	USoundBase* MusicToPlay = GetRandomSound(NonCombatMusicCollection);
 	PlayMusic(MusicToPlay);
-
-	/*
-	UWorld* World = GetWorld();
-	USoundBase* MusicToPlay = GetRandomSound(NonCombatMusicCollection);
-	if (MusicToPlay && World && BGMAudioComponent)
-	{
-
-
-		BGMAudioComponent->SetSound(MusicToPlay);
-		BGMAudioComponent->FadeIn(BGMFadeInDuration);
-		float Duration = MusicToPlay->GetDuration() - BGMFadeOutDuration;
-		World->GetTimerManager().SetTimer(MusicTimerHandle, this, &AEODLevelScriptActor::QueueNextNonCombatMusic, Duration, false);
-	}
-	*/
 }
 
 void AEODLevelScriptActor::QueueNextNonCombatMusic()
