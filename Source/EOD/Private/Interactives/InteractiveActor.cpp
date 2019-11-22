@@ -27,20 +27,20 @@ void AInteractiveActor::Tick(float DeltaTime)
 
 void AInteractiveActor::EnableCustomDepth_Implementation()
 {
-	TArray<UActorComponent*> SkeletalMeshComponentArray = this->GetComponentsByClass(USkeletalMeshComponent::StaticClass());
-	for (UActorComponent* ActorComp : SkeletalMeshComponentArray)
+	TArray<USkeletalMeshComponent*> SkeletalMeshComponentsArray;
+	this->GetComponents<USkeletalMeshComponent>(SkeletalMeshComponentsArray);
+	for (USkeletalMeshComponent* SMComp : SkeletalMeshComponentsArray)
 	{
-		USkeletalMeshComponent* SMComp = Cast<USkeletalMeshComponent>(ActorComp);
 		if (SMComp)
 		{
 			SMComp->SetRenderCustomDepth(true);
 		}
 	}
 
-	TArray<UActorComponent*> StaticMeshComponentArray = this->GetComponentsByClass(UStaticMeshComponent::StaticClass());
-	for (UActorComponent* ActorComp : StaticMeshComponentArray)
+	TArray<UStaticMeshComponent*> StaticMeshComponentsArray;
+	this->GetComponents<UStaticMeshComponent>(StaticMeshComponentsArray);
+	for (UStaticMeshComponent* SMComp : StaticMeshComponentsArray)
 	{
-		UStaticMeshComponent* SMComp = Cast<UStaticMeshComponent>(ActorComp);
 		if (SMComp)
 		{
 			SMComp->SetRenderCustomDepth(true);
@@ -50,20 +50,20 @@ void AInteractiveActor::EnableCustomDepth_Implementation()
 
 void AInteractiveActor::DisableCustomDepth_Implementation()
 {
-	TArray<UActorComponent*> SkeletalMeshComponentArray = this->GetComponentsByClass(USkeletalMeshComponent::StaticClass());
-	for (UActorComponent* ActorComp : SkeletalMeshComponentArray)
+	TArray<USkeletalMeshComponent*> SkeletalMeshComponentsArray;
+	this->GetComponents<USkeletalMeshComponent>(SkeletalMeshComponentsArray);
+	for (USkeletalMeshComponent* SMComp : SkeletalMeshComponentsArray)
 	{
-		USkeletalMeshComponent* SMComp = Cast<USkeletalMeshComponent>(ActorComp);
 		if (SMComp)
 		{
 			SMComp->SetRenderCustomDepth(false);
 		}
 	}
 
-	TArray<UActorComponent*> StaticMeshComponentArray = this->GetComponentsByClass(UStaticMeshComponent::StaticClass());
-	for (UActorComponent* ActorComp : StaticMeshComponentArray)
+	TArray<UStaticMeshComponent*> StaticMeshComponentsArray;
+	this->GetComponents<UStaticMeshComponent>(StaticMeshComponentsArray);
+	for (UStaticMeshComponent* SMComp : StaticMeshComponentsArray)
 	{
-		UStaticMeshComponent* SMComp = Cast<UStaticMeshComponent>(ActorComp);
 		if (SMComp)
 		{
 			SMComp->SetRenderCustomDepth(false);

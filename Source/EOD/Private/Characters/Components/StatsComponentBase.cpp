@@ -37,7 +37,7 @@ UStatsComponentBase::UStatsComponentBase(const FObjectInitializer& ObjectInitial
 {
 	// This compnent doesn't tick
 	PrimaryComponentTick.bCanEverTick = false;
-	SetIsReplicated(true);
+	SetIsReplicatedByDefault(true);
 
 }
 

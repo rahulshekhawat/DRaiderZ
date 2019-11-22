@@ -317,7 +317,7 @@ void AEODCharacterBase::CreateAndDisplayTextOnPlayerScreen_Implementation(const 
 
 void AEODCharacterBase::TriggeriFrames(float Duration, float Delay)
 {
-	if (Role < ROLE_Authority)
+	if (GetLocalRole() < ROLE_Authority)
 	{
 		Server_TriggeriFrames(Duration, Delay);
 	}
@@ -924,7 +924,7 @@ bool AEODCharacterBase::ApplyCCE(
 
 TSharedPtr<FAttackInfo> AEODCharacterBase::GetAttackInfoPtrFromNormalAttack(const FString& NormalAttackStr)
 {
-	if (Role < ROLE_Authority)
+	if (GetLocalRole() < ROLE_Authority)
 	{
 		return TSharedPtr<FAttackInfo>();
 	}
@@ -1563,7 +1563,7 @@ void AEODCharacterBase::StartBlockingAttacks()
 			MoveComp->bUseControllerDesiredRotation = true;
 		}
 
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_StartBlockingAttacks();
 		}
@@ -1579,7 +1579,7 @@ void AEODCharacterBase::StartBlockingAttacks()
 
 void AEODCharacterBase::StopBlockingAttacks()
 {
-	if (Role < ROLE_Authority)
+	if (GetLocalRole() < ROLE_Authority)
 	{
 		Server_StopBlockingAttacks();
 	}
@@ -1868,7 +1868,7 @@ void AEODCharacterBase::ResetState()
 void AEODCharacterBase::SpawnAndMountRideableCharacter(TSubclassOf<ARideBase> RideCharacterClass)
 {
 	// Only call the server RPC if RideCharacterClass points to a valid class
-	if (Role < ROLE_Authority && RideCharacterClass.Get())
+	if (GetLocalRole() < ROLE_Authority && RideCharacterClass.Get())
 	{
 		Server_SpawnAndMountRideableCharacter(RideCharacterClass);
 		return;

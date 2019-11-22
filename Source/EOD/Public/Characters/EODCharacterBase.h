@@ -1322,7 +1322,7 @@ protected:
 
 inline void AEODCharacterBase::StartBlockingDamage(float Delay)
 {
-	if (Role < ROLE_Authority)
+	if (GetLocalRole() < ROLE_Authority)
 	{
 		Server_StartBlockingDamage(Delay);
 	}
@@ -1336,7 +1336,7 @@ inline void AEODCharacterBase::StartBlockingDamage(float Delay)
 
 inline void AEODCharacterBase::StopBlockingDamage()
 {
-	if (Role < ROLE_Authority)
+	if (GetLocalRole() < ROLE_Authority)
 	{
 		Server_StopBlockingDamage();
 	}
@@ -1349,7 +1349,7 @@ inline void AEODCharacterBase::StopBlockingDamage()
 inline void AEODCharacterBase::SetWeaponSheathed(bool bNewValue)
 {
 	bWeaponSheathed = bNewValue;
-	if (Role < ROLE_Authority)
+	if (GetLocalRole() < ROLE_Authority)
 	{
 		Server_SetWeaponSheathed(bNewValue);
 	}
@@ -1362,7 +1362,7 @@ inline void AEODCharacterBase::SetWalkSpeed(const float WalkSpeed)
 	if (MoveComp && !FMath::IsNearlyEqual(MoveComp->MaxWalkSpeed, WalkSpeed, ErrorTolerance))
 	{
 		MoveComp->MaxWalkSpeed = WalkSpeed;
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_SetWalkSpeed(WalkSpeed);
 		}
@@ -1375,7 +1375,7 @@ inline void AEODCharacterBase::SetUseControllerRotationYaw(const bool bNewBool)
 	if (MoveComp && MoveComp->bUseControllerDesiredRotation != bNewBool)
 	{
 		MoveComp->bUseControllerDesiredRotation = bNewBool;
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_SetUseControllerRotationYaw(bNewBool);
 		}
@@ -1387,7 +1387,7 @@ inline void AEODCharacterBase::SetCharacterStateAllowsMovement(bool bNewValue)
 	if (bCharacterStateAllowsMovement != bNewValue)
 	{
 		bCharacterStateAllowsMovement = bNewValue;
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_SetCharacterStateAllowsMovement(bNewValue);
 		}
@@ -1409,7 +1409,7 @@ inline void AEODCharacterBase::SetCharacterMovementDirection(ECharMovementDirect
 	if (CharacterMovementDirection != NewDirection)
 	{
 		CharacterMovementDirection = NewDirection;
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_SetCharMovementDir(NewDirection);
 		}
@@ -1422,7 +1422,7 @@ inline void AEODCharacterBase::SetBlockMovementDirectionYaw(float NewYaw)
 	if (!FMath::IsNearlyEqual(NewYaw, BlockMovementDirectionYaw, AngleTolerance))
 	{
 		BlockMovementDirectionYaw = NewYaw;
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_SetBlockMovementDirectionYaw(NewYaw);
 		}
@@ -1434,7 +1434,7 @@ inline void AEODCharacterBase::SetPCTryingToMove(bool bNewValue)
 	if (bPCTryingToMove != bNewValue)
 	{
 		bPCTryingToMove = bNewValue;
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_SetPCTryingToMove(bNewValue);
 		}
@@ -1446,7 +1446,7 @@ inline void AEODCharacterBase::SetIsRunning(bool bNewValue)
 	if (bIsRunning != bNewValue)
 	{
 		bIsRunning = bNewValue;
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_SetIsRunning(bNewValue);
 		}
@@ -1740,7 +1740,7 @@ inline void AEODCharacterBase::SetCharacterRotationYaw(const float NewRotationYa
 	if (!FMath::IsNearlyEqual(CurrentRotation.Yaw, NewRotationYaw, ErrorTolerance))
 	{
 		SetActorRotation(FRotator(CurrentRotation.Pitch, NewRotationYaw, CurrentRotation.Roll));
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_SetCharacterRotationYaw(NewRotationYaw);
 		}
@@ -1757,7 +1757,7 @@ inline void AEODCharacterBase::SetCharacterRotation(const FRotator NewRotation)
 	if (!CurrentRotation.Equals(NewRotation, ErrorTolerance))
 	{
 		SetActorRotation(NewRotation);
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_SetCharacterRotation(NewRotation);
 		}

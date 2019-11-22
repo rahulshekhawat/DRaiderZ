@@ -16,12 +16,12 @@
 /** EOD Character stats */
 DECLARE_CYCLE_STAT(TEXT("EOD GameplaySkillsTick"), STAT_EODGameplaySkillsTick, STATGROUP_EOD);
 
-UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+UGameplaySkillsComponent::UGameplaySkillsComponent(const FObjectInitializer& ObjectInitializer) : 
+	Super(ObjectInitializer),
+	ChainSkillResetDelay(2.f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	SetIsReplicated(true);
-
-	ChainSkillResetDelay = 2.f;
+	SetIsReplicatedByDefault(true);
 }
 
 void UGameplaySkillsComponent::PostLoad()

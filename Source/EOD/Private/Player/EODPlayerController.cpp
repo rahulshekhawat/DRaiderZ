@@ -253,7 +253,7 @@ void AEODPlayerController::SetLeveupEXP(int32 EXP)
 void AEODPlayerController::SetGender(ECharacterGender NewGender)
 {
 	Gender = NewGender;
-	if (Role < ROLE_Authority)
+	if (GetLocalRole() < ROLE_Authority)
 	{
 		Server_SetGender(NewGender);
 	}

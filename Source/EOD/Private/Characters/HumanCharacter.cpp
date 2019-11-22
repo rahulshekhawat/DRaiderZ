@@ -539,7 +539,7 @@ void AHumanCharacter::StartDodge()
 		}
 
 		// Initiate dodge over network
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_Dodge(DodgeIndex, DesiredYaw);
 		}
@@ -644,7 +644,7 @@ void AHumanCharacter::StartNormalAttack()
 		NewStateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
 		CharacterStateInfo = NewStateInfo;
 
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_NormalAttack(AttackIndex);
 		}
@@ -727,7 +727,7 @@ void AHumanCharacter::UpdateNormalAttackState(float DeltaTime)
 		StateInfo.NewReplicationIndex = CharacterStateInfo.NewReplicationIndex + 1;
 		CharacterStateInfo = StateInfo;
 
-		if (Role < ROLE_Authority)
+		if (GetLocalRole() < ROLE_Authority)
 		{
 			Server_NormalAttack(AttackIndex);
 		}

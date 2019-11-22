@@ -83,13 +83,10 @@ void AEODLevelScriptActor::SwitchToBGM(USoundBase* NewBGM)
 	else if (BGMAudioComponent->Sound != NewBGM && BGMAudioComponent->IsPlaying())
 	{
 		StopCurrentMusic();
-		UWorld* World = GetWorld();
-		if (World)
-		{
-			FTimerDelegate TimerDelegate;
-			TimerDelegate.BindUObject(this, &AEODLevelScriptActor::PlayMusic, NewBGM);
-			World->GetTimerManager().SetTimer(MusicTimerHandle, TimerDelegate, BGMFadeOutDuration, false);
-		}
+
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUObject(this, &AEODLevelScriptActor::PlayMusic, NewBGM);
+		World->GetTimerManager().SetTimer(MusicTimerHandle, TimerDelegate, BGMFadeOutDuration, false);
 	}
 	else if (!BGMAudioComponent->IsPlaying())
 	{

@@ -87,7 +87,7 @@ void UAISkillBase::FinishSkill()
 TSharedPtr<FAttackInfo> UAISkillBase::GetAttackInfoPtr(int32 CollisionIndex)
 {
 	AEODCharacterBase* Instigator = SkillInstigator.Get();
-	if (Instigator->Role < ROLE_Authority)
+	if (Instigator->GetLocalRole() < ROLE_Authority)
 	{
 		return TSharedPtr<FAttackInfo>();
 	}

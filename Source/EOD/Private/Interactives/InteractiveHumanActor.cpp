@@ -128,10 +128,10 @@ USkeletalMeshComponent* AInteractiveHumanActor::CreateNewArmorComponent(const FN
 
 void AInteractiveHumanActor::DeleteUnusedComponents()
 {
-	TArray<UActorComponent*> SkeletalMeshComponentArray = this->GetComponentsByClass(USkeletalMeshComponent::StaticClass());
-	for (UActorComponent* ActorComp : SkeletalMeshComponentArray)
+	TArray<USkeletalMeshComponent*> SkeletalMeshComponentArray;
+	this->GetComponents<USkeletalMeshComponent>(SkeletalMeshComponentArray);
+	for (USkeletalMeshComponent* SMComp : SkeletalMeshComponentArray)
 	{
-		USkeletalMeshComponent* SMComp = Cast<USkeletalMeshComponent>(ActorComp);
 		if (SMComp && !IsValid(SMComp->SkeletalMesh))
 		{
 			SMComp->Deactivate();
@@ -143,10 +143,10 @@ void AInteractiveHumanActor::DeleteUnusedComponents()
 
 void AInteractiveHumanActor::UpdateMeshColors()
 {
-	TArray<UActorComponent*> SkeletalMeshComponentArray = this->GetComponentsByClass(USkeletalMeshComponent::StaticClass());
-	for (UActorComponent* ActorComp : SkeletalMeshComponentArray)
+	TArray<USkeletalMeshComponent*> SkeletalMeshComponentArray;
+	this->GetComponents<USkeletalMeshComponent>(SkeletalMeshComponentArray);
+	for (USkeletalMeshComponent* SMComp : SkeletalMeshComponentArray)
 	{
-		USkeletalMeshComponent* SMComp = Cast<USkeletalMeshComponent>(ActorComp);
 		if (SMComp)
 		{
 			if (SMComp->GetFName() == AInteractiveHumanActor::HairComponentName)

@@ -182,7 +182,7 @@ void UPlayerSkillsComponent::TriggerSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			ResetChainSkill();
 
 			PlayerSkill->TriggerSkill();
-			if (CharOwner->Role < ROLE_Authority)
+			if (CharOwner->GetLocalRole() < ROLE_Authority)
 			{
 				Server_TriggerSkill(SkillIndex);
 			}
@@ -275,7 +275,7 @@ void UPlayerSkillsComponent::ReleaseSkill(uint8 SkillIndex, UGameplaySkillBase* 
 			//~ @note Release delay is only relevant to server and client owner
 			Skill->ReleaseSkill(ReleaseDelay);
 
-			if (CharOwner->Role < ROLE_Authority)
+			if (CharOwner->GetLocalRole() < ROLE_Authority)
 			{
 				//~ @note Release delay is only relevant to server and client owner
 				Server_ReleaseSkill(SkillIndex, ReleaseDelay);
