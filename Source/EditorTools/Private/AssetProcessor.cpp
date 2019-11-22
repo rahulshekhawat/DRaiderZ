@@ -33,7 +33,7 @@ bool UAssetProcessor::GenerateUniqueUVForStaticMesh(UStaticMesh* StaticMesh)
 	TArray<FVector2D> OutUniqueUVs;
 
 	FRawMesh RawMesh;
-	StaticMesh->SourceModels[0].LoadRawMesh(RawMesh);
+	StaticMesh->GetSourceModels()[0].LoadRawMesh(RawMesh);
 	bool bResult = MeshUtilities.GenerateUniqueUVsForStaticMesh(RawMesh, 2048, OutUniqueUVs);
 	if (bResult)
 	{
@@ -49,7 +49,7 @@ bool UAssetProcessor::GenerateUniqueUVForStaticMesh(UStaticMesh* StaticMesh)
 	// RawMesh.WedgeTexCoords[0] = OutUniqueUVs;
 	RawMesh.WedgeTexCoords[1] = OutUniqueUVs;		// lightmap uvs
 
-	StaticMesh->SourceModels[0].SaveRawMesh(RawMesh);
+	StaticMesh->GetSourceModels()[0].SaveRawMesh(RawMesh);
 
 	TArray<FText> ErrorText;
 	StaticMesh->Build(false, &ErrorText);

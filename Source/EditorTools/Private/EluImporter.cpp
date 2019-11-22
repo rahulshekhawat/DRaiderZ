@@ -516,7 +516,7 @@ bool UEluImporter::ImportEluStaticMesh_Internal(const FString& EluFilePath)
 			}
 		}
 
-		StaticMesh->SourceModels[0].SaveRawMesh(RawMesh);
+		StaticMesh->GetSourceModels()[0].SaveRawMesh(RawMesh);
 
 		TArray<FText> ErrorText;
 		StaticMesh->Build(false, &ErrorText);
