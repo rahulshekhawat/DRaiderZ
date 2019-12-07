@@ -1211,6 +1211,16 @@ void AEODCharacterBase::Die(ECauseOfDeath CauseOfDeath, AActor* EventInstigator,
 	}
 }
 
+void AEODCharacterBase::Heal(float Value)
+{
+	UStatsComponentBase* StatsComp = GetStatsComponent();
+	if (StatsComp)
+	{
+		float HealValue = FMath::Abs(Value);
+		StatsComp->Health.ModifyCurrentValue(HealValue);
+	}
+}
+
 float AEODCharacterBase::GetOrientationYawToActor(const AActor* TargetActor)
 {
 	FVector OrientationVector = TargetActor->GetActorLocation() - GetActorLocation();

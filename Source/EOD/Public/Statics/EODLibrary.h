@@ -79,6 +79,43 @@ enum class EWidgetInitializationStatus : uint8
 };
 
 USTRUCT(BlueprintType)
+struct EOD_API FInGameInformation
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-game Information")
+	FString Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-game Information")
+	FString Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-game Information")
+	class UTexture* Icon;
+
+};
+
+/*
+USTRUCT(BlueprintType)
+struct EOD_API FUIInformation
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Information")
+	FString Title;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Information")
+	FString SubTitle;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Information")
+	FString Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Information")
+	class UTexture* Icon;
+
+};
+*/
+
+USTRUCT(BlueprintType)
 struct EOD_API FGameplayTagMod
 {
 	GENERATED_USTRUCT_BODY()

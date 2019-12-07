@@ -952,6 +952,10 @@ public:
 	 */
 	virtual void Die(ECauseOfDeath CauseOfDeath, AActor* EventInstigator = nullptr, AController* EventOwner = nullptr);
 
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	virtual void Heal(float Value);
+
+
 	// --------------------------------------
 	//  Skill System
 	// --------------------------------------
