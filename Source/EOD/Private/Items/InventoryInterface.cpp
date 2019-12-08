@@ -9,3 +9,13 @@ UInventoryInterface::UInventoryInterface(const FObjectInitializer& ObjectInitial
 void IInventoryInterface::OnClick_Implementation(AEODCharacterBase* ClickingChar) const
 {
 }
+
+EInventoryItemType IInventoryInterface::GetInventoryItemType() const
+{
+	return EInventoryItemType::None;
+}
+
+FInGameInformation IInventoryInterface::GetInGameInformation() const
+{
+	return FInGameInformation();
+}

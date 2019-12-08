@@ -3,6 +3,7 @@
 #pragma once
 
 #include "UObject/Interface.h"
+#include "EODLibrary.h"
 #include "InventoryInterface.generated.h"
 
 class AEODCharacterBase;
@@ -34,5 +35,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Inventory)
 	void OnClick(AEODCharacterBase* ClickingChar) const;
 	virtual void OnClick_Implementation(AEODCharacterBase* ClickingChar) const;
+
+	virtual EInventoryItemType GetInventoryItemType() const;
+
+	virtual FInGameInformation GetInGameInformation() const;
 
 };

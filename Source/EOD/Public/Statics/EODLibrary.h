@@ -26,10 +26,14 @@ enum class ERarity : uint8
 UENUM(BlueprintType)
 enum class EInventoryItemType : uint8
 {
-	None,		// Items like scrap, recipe, etc. that cannot be used or equipped
-	Consumable,	// A potion that is consumed when used
-	Reusable,	// A potion that can be used again and again (preferably with some cooldown limitations)
-	Equippable	// An equippable item gets removed from inventory when equipped
+	// Items like scrap, recipe, etc. that cannot be used or equipped
+	None,
+	// A item that is consumed when used
+	Consumable,
+	// A item that can be used again and again (preferably with some cooldown limitations)
+	Reusable,
+	// An equippable item gets removed from inventory when equipped
+	Equippable
 };
 
 UENUM(BlueprintType)
@@ -101,6 +105,12 @@ struct EOD_API FInGameInformation
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "In-game Information")
 	class UTexture* Icon;
 
+	FInGameInformation() :
+		Name(TEXT("")),
+		Description(TEXT("")),
+		Icon(nullptr)
+	{
+	}
 };
 
 /*
