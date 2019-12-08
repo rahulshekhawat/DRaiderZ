@@ -24,6 +24,15 @@ enum class ERarity : uint8
 };
 
 UENUM(BlueprintType)
+enum class EInventoryItemType : uint8
+{
+	None,		// Items like scrap, recipe, etc. that cannot be used or equipped
+	Consumable,	// A potion that is consumed when used
+	Reusable,	// A potion that can be used again and again (preferably with some cooldown limitations)
+	Equippable	// An equippable item gets removed from inventory when equipped
+};
+
+UENUM(BlueprintType)
 enum class EEODContainerType : uint8
 {
 	None,
