@@ -40,4 +40,11 @@ public:
 
 	virtual FInGameInformation GetInGameInformation() const;
 
+	/** 
+	 * Returns the unique inventory item ID that is generated when the item is first added to the inventory.
+	 * This ID is used to save the item information or meta data (e.g., whether the weapon in inventory is enchanted or not and so on)
+	 * This function should NOT return NAME_None if the item has additional meta data that needs to be saved/loaded
+	 */
+	virtual FName GetInventoryItemID() const;
+
 };

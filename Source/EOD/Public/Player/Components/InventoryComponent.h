@@ -110,7 +110,7 @@ public:
 	void AddLoot(const FGeneratedLootInfo& LootInfo);
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	void AddInventoryItem(class UInventoryItemBase* Item, int32 Count);
+	void AddInventoryItem(UObject* Item, int32 Count);
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	FInventorySlot& GetEmptySlot();

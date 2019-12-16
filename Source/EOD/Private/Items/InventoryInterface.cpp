@@ -19,3 +19,8 @@ FInGameInformation IInventoryInterface::GetInGameInformation() const
 {
 	return FInGameInformation();
 }
+
+FName IInventoryInterface::GetInventoryItemID() const
+{
+	return NAME_None;
+}

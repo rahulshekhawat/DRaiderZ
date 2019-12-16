@@ -6,6 +6,7 @@
 #include "InventoryItemBase.h"
 #include "ItemInfoWidget.h"
 #include "EODPlayerController.h"
+#include "InventoryInterface.h"
 
 #include "Components/Button.h"
 #include "Components/ScrollBox.h"
@@ -105,14 +106,17 @@ void ULootWidget::GenerateItemList(const TArray<FGeneratedLootInfo>& LootInfoArr
 	{
 		if (LootInfo.ItemClass.Get())
 		{
-			UInventoryItemBase const* const InvItem = Cast<UInventoryItemBase>(LootInfo.ItemClass.Get()->GetDefaultObject());
+			IInventoryInterface const* const InvItem = Cast<IInventoryInterface>(LootInfo.ItemClass.Get()->GetDefaultObject());
 			check(InvItem);
+
+			// UInventoryItemBase const* const InvItem = Cast<UInventoryItemBase>(LootInfo.ItemClass.Get()->GetDefaultObject());
+			// check(InvItem);
 
 			UItemInfoWidget* InfoWidget = CreateWidget<UItemInfoWidget>(PC, ItemInfoWidgetClass.Get());
 			check(InfoWidget);
 
-			InfoWidget->SetIcon(InvItem->Icon);
-			InfoWidget->SetItemName(InvItem->InGameName.ToString());
+			InfoWidget->SetIcon(InvItem->GetInGameInformation().Icon);
+			InfoWidget->SetItemName(InvItem->GetInGameInformation().Name);
 			
 			FString SubTextString = TEXT("x") + FString::FromInt(LootInfo.ItemCount);
 			InfoWidget->SetItemSubText(SubTextString);

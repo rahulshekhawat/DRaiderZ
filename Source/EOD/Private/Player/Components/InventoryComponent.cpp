@@ -5,6 +5,7 @@
 #include "InventoryWidget.h"
 #include "InventoryItemBase.h"
 #include "InventoryContainerWidget.h"
+#include "InventoryInterface.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -96,20 +97,22 @@ void UInventoryComponent::AddLoot(const FGeneratedLootInfo& LootInfo)
 		}
 	}
 
-	UInventoryItemBase* InventoryItem = NewObject<UInventoryItemBase>(this, LootInfo.ItemClass, NAME_None, RF_Transient);
+	UObject* InventoryItem = NewObject<UObject>(this, LootInfo.ItemClass, NAME_None, RF_Transient);
 	if (InventoryItem)
 	{
 		AddInventoryItem(InventoryItem, LootInfo.ItemCount);
 	}
 }
 
-void UInventoryComponent::AddInventoryItem(UInventoryItemBase* Item, int32 Count)
+void UInventoryComponent::AddInventoryItem(UObject* Item, int32 Count)
 {
-	if (Item == nullptr || Count <= 0)
+	IInventoryInterface* InvItem = Cast<IInventoryInterface>(Item);
+	if (InvItem == nullptr || Count <= 0)
 	{
 		return;
 	}
 
+	/*
 	FInventorySlot& Slot = GetEmptySlot();
 	Slot.ItemInSlot = Item;
 	Slot.ItemStackCount = Count;
@@ -118,6 +121,7 @@ void UInventoryComponent::AddInventoryItem(UInventoryItemBase* Item, int32 Count
 		Slot.SlotWidget->SetDataObj(Item);
 		Slot.SlotWidget->SetItemCount(Count);
 	}
+	*/
 }
 
 FInventorySlot& UInventoryComponent::GetEmptySlot()

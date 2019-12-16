@@ -3,27 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
-// #include "InventoryItemBase.h"
-
+#include "Engine/DataTable.h"
 #include "Templates/SubclassOf.h"
 #include "LootableInterface.generated.h"
 
-// class UUserWidget;
 class AEODCharacterBase;
 
 USTRUCT(BlueprintType)
-struct EOD_API FStoredLootInfo
+struct EOD_API FStoredLootInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<class UInventoryItemBase> ItemClass;
+	/** A subclass of UObject that implements the IInventoryInterface */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Loot)
+	TSubclassOf<class UObject> ItemClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Loot)
 	int32 MaxCount;
 
-	/** Chance for this item to drop between 0 and 100% */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	/** Chance for this item to drop between 0 and 1 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Loot)
 	float DropChance;
 
 };
@@ -38,7 +37,7 @@ struct EOD_API FGeneratedLootInfo
 	int32 GLID;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Loot)
-	TSubclassOf<class UInventoryItemBase> ItemClass;
+	TSubclassOf<class UObject> ItemClass;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Loot)
 	int32 ItemCount;
