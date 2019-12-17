@@ -7,6 +7,8 @@
 #include "EODGlobalNames.h"
 #include "DamageNumberWidget.h"
 
+#include "OnlineSessionSettings.h"
+#include "OnlineSubsystemTypes.h"
 #include "MoviePlayer.h"
 #include "Blueprint/UserWidget.h"
 #include "Modules/ModuleManager.h"
@@ -15,6 +17,9 @@
 
 const int32 UEODGameInstance::PlayerIndex(0);
 const FString UEODGameInstance::MetaSaveSlotName(TEXT("MetaSaveSlot"));
+
+const static FName SESSION_NAME = TEXT("EOD_Test_Game_Session");
+const static FName SERVER_NAME_SETTINGS_KEY = TEXT("EOD_Custom_Server");
 
 UEODGameInstance::UEODGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -34,6 +39,15 @@ void UEODGameInstance::Init()
 	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UEODGameInstance::OnPreLoadMap);
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEODGameInstance::OnPostLoadMap);
 
+	IOnlineSubsystem* SubSystem = IOnlineSubsystem::Get();
+	SessionInterface = SubSystem ? SubSystem->GetSessionInterface() : nullptr;
+	if (SessionInterface.IsValid())
+	{
+		SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UEODGameInstance::OnCreateSessionComplete);
+		SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UEODGameInstance::OnDestroySessionComplete);
+		SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UEODGameInstance::OnFindSessionsComplete);
+		SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UEODGameInstance::OnJoinSessionsComplete);
+	}
 }
 
 void UEODGameInstance::StartNewCampaign()
@@ -259,4 +273,68 @@ FString UEODGameInstance::GetMapDisplayName(FName EditorMapName) const
 FString UEODGameInstance::GetPlayerName() const
 {
 	return GetCurrentPlayerSaveGameName();
+}
+
+void UEODGameInstance::HostOnlineGame(FString ServerName)
+{
+	if (SessionInterface.IsValid())
+	{
+		FOnlineSessionSettings SessionSettings;
+
+		SessionSettings.bIsLANMatch = false;
+		SessionSettings.NumPublicConnections = 2;
+		SessionSettings.bShouldAdvertise = true;
+		SessionSettings.bUsesPresence = true;
+		SessionSettings.Set(SERVER_NAME_SETTINGS_KEY, ServerName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+		
+		SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
+	}
+}
+
+void UEODGameInstance::JoinOnlineGame(int32 Index)
+{
+}
+
+void UEODGameInstance::EndOnlineGame()
+{
+}
+
+void UEODGameInstance::OpenSessionListMenu()
+{
+	SessionSearch = MakeShareable(new FOnlineSessionSearch());
+	if (SessionSearch.IsValid() && SessionInterface.IsValid())
+	{
+		SessionSearch->MaxSearchResults = 100;
+		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+
+		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
+	}
+}
+
+void UEODGameInstance::OnCreateSessionComplete(FName SessionName, bool Success)
+{
+}
+
+void UEODGameInstance::OnDestroySessionComplete(FName SessionName, bool Success)
+{
+}
+
+void UEODGameInstance::OnFindSessionsComplete(bool Success)
+{
+	if (Success && SessionSearch.IsValid() && SessionSearch->SearchResults.Num() > 0)
+	{
+		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
+		{
+			FString ServerName;
+			if (SearchResult.Session.SessionSettings.Get(SERVER_NAME_SETTINGS_KEY, ServerName))
+			{
+
+
+			}
+		}
+	}
+}
+
+void UEODGameInstance::OnJoinSessionsComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+{
 }

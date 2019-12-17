@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "CharacterLibrary.h"
 
+#include "OnlineSubsystem.h"
+#include "OnlineSessionInterface.h"
+
 #include "Engine/StreamableManager.h"
 #include "Engine/GameInstance.h"
 #include "EODGameInstance.generated.h"
@@ -221,6 +224,45 @@ protected:
 	/** TMap<EditorMapName, MapNameForPlayer> */
 	UPROPERTY(EditAnywhere, Category = "Maps")
 	TMap<FName, FString> MapNames;
+
+
+public:
+
+	// --------------------------------------
+	//  Online
+	// --------------------------------------
+	
+	UFUNCTION(BlueprintCallable, Category = "Online")
+	virtual void HostOnlineGame(FString ServerName);
+
+	UFUNCTION(BlueprintCallable, Category = "Online")
+	virtual void JoinOnlineGame(int32 Index);
+
+	UFUNCTION(BlueprintCallable, Category = "Online")
+	virtual void EndOnlineGame();
+
+	UFUNCTION(BlueprintCallable, Category = "Online")
+	virtual void OpenSessionListMenu();
+
+protected:
+
+	FString DesiredServerName;
+
+	virtual void OnCreateSessionComplete(FName SessionName, bool Success);
+
+	virtual void OnDestroySessionComplete(FName SessionName, bool Success);
+
+	virtual void OnFindSessionsComplete(bool Success);
+
+	virtual void OnJoinSessionsComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	// virtual void CreateSession();
+
+
+private:
+
+	IOnlineSessionPtr SessionInterface;
+	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
 
 
 };
