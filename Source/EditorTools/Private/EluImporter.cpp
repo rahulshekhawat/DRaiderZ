@@ -108,11 +108,18 @@ void UEluImporter::ImportEluAnimation(USkeletalMesh* Mesh)
 	AnimSeq->SetSkeleton(Mesh->Skeleton);
 	AnimSeq->Interpolation = EAnimInterpolationType::Linear;
 
-	AnimSeq->AdditiveAnimType = EAdditiveAnimationType::AAT_LocalSpaceBase;
+	// AnimSeq->AdditiveAnimType = EAdditiveAnimationType::AAT_LocalSpaceBase;
 
 	int32 NodeSize = AniData.AniNodes.Num();
 	for (int i = 0; i < NodeSize; i++)
 	{
+		// FRawAnimSequenceTrack* AnimSequenceTrack;
+		// AnimSeq->AddKeyToSequence()
+		// AnimSeq->RawCurveData
+		// AnimSeq->
+
+
+		/*
 		TSharedPtr<FAniNode> Node = AniData.AniNodes[i];
 		check(Node.IsValid());
 
@@ -123,6 +130,7 @@ void UEluImporter::ImportEluAnimation(USkeletalMesh* Mesh)
 		AnimSeq->AddKeyToSequence(0.f, FName(*SanitizedBoneName), BaseTransform);
 
 		FVector DefaultScale(1.f, 1.f, 1.f);
+		*/
 
 		/*
 		for (const FVecKey& VecKey : Node->PositionKeyTrack)
@@ -610,8 +618,73 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 	UPackage* Package = CreatePackage(nullptr, *PackageName);
 	Package->FullyLoad();
 
-	USkeletalMesh* SkeletalMesh = NewObject<USkeletalMesh>(Package, USkeletalMesh::StaticClass(), *FString("WAKA"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
+	// USkeletalMesh* SkeletalMesh = NewObject<USkeletalMesh>(Package, USkeletalMesh::StaticClass(), *FString("WAKA"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
+	USkeletalMesh* SkeletalMesh = NewObject<USkeletalMesh>(Package, USkeletalMesh::StaticClass(), *FString("WAKA"), EObjectFlags::RF_Public);
 	check(SkeletalMesh);
+
+	FSkeletalMeshImportData TempData;
+	FSkeletalMeshImportData* SkelMeshImportDataPtr = &TempData;
+
+	int32 SkelType = 0;	// 0 for skeletal mesh, 1 for rigid mesh
+
+
+	for (int i = 0; i < EluMeshNodes.Num(); i++)
+	{
+		TSharedPtr<FEluMeshNode> MeshNode = EluMeshNodes[i];
+		int32 NumPoints = MeshNode->PointsTable.Num();
+		if (NumPoints > 0)
+		{
+			TempData.Points.AddUninitialized(NumPoints);
+			int32 ExistingPointsNum = TempData.Points.Num();
+			for (int PointIndex = 0; PointIndex < NumPoints; PointIndex++)
+			{
+				FVector PointPos = MeshNode->PointsTable[PointIndex];
+				if (!ensure(PointPos.ContainsNaN() == false))
+				{
+					PointPos = FVector::ZeroVector;
+				}
+
+				TempData.Points[ExistingPointsNum + PointIndex] = PointPos;
+			}
+		}
+
+		// TempData.Faces
+
+
+
+
+
+
+		// TempData.Points.AddUninitialized(MeshNode->PointsTable.Num());
+
+		/*
+		FString BoneName = PackageTools::SanitizePackageName(MeshNode->NodeName);
+		int32 BoneIndex = Skel->GetReferenceSkeleton().FindBoneIndex(FName(*BoneName));
+		int32 RawBoneIndex = Skel->GetReferenceSkeleton().FindRawBoneIndex(FName(*BoneName));
+
+		FString LogMessage = TEXT("Node name: ") + BoneName + TEXT(", Bone index: ") + FString::FromInt(BoneIndex) + TEXT(", Raw bone index: ") + FString::FromInt(RawBoneIndex);
+		PrintWarning(LogMessage);
+		*/
+	}
+
+
+
+
+
+	
+
+	//~ Begin read materials
+	//~ End read materials
+
+	// TempData.NumTexCoords = FMath::Max<uint32>(TempData.NumTexCoords, )
+
+	// TempData.Points.AddUninitialized(EluMeshNodes[0].Get()->VertexIndexCount);
+
+
+
+
+
+
 
 	SkeletalMesh->ReleaseResources();
 	SkeletalMesh->ReleaseResourcesFence.Wait();
