@@ -7,7 +7,7 @@
 #include "GameplaySkillBase.h"
 #include "AISkillBase.generated.h"
 
-class UCameraShake;
+class UMatineeCameraShake;
 class UGameplayEffectBase;
 
 USTRUCT(BlueprintType, DisplayName = "AI Skill Info")
@@ -102,7 +102,7 @@ public:
 
 	/** The camera to play when this skill hits an enemy */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
-	TSoftClassPtr<UCameraShake> CameraShakeOnHitSoftClass;
+	TSoftClassPtr<UMatineeCameraShake> CameraShakeOnHitSoftClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Info")
 	FAISkillInfo SkillInfo;

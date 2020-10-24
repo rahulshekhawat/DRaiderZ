@@ -58,7 +58,8 @@ public class EOD : ModuleRules
                 "MoviePlayer",
                 "GameplayTags",
                 "RHI",
-                "LevelSequence"
+                "LevelSequence",
+                "PhysicsCore"
             }
         );
 

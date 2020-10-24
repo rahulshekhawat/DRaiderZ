@@ -175,7 +175,7 @@ protected:
 
 	/** The camera to play when this skill hits an enemy */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Effects")
-	TSoftClassPtr<UCameraShake> CameraShakeOnHitSoftClass;
+	TSoftClassPtr<UMatineeCameraShake> CameraShakeOnHitSoftClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill Level Up Info")
 	TArray<FActiveSkillLevelUpInfo> SkillLevelUpsInfo;

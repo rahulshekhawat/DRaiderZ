@@ -30,6 +30,7 @@ public:
 	/** Perform rotation over deltaTime */
 	virtual void PhysicsRotation(float DeltaTime) override;
 
+	/*
 	//~ @note: Overriding the default definition to fix a bug where Server drops/skips animation notifies.
 	virtual void ServerMoveDual_Implementation(float TimeStamp0,
 		FVector_NetQuantize10 InAccel0,
@@ -44,6 +45,7 @@ public:
 		UPrimitiveComponent* ClientMovementBase,
 		FName ClientBaseBoneName,
 		uint8 ClientMovementMode) override;
+		*/
 
 	// --------------------------------------
 	//  Rotation

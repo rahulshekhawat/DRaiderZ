@@ -6,6 +6,7 @@
 #include "RaiderzXmlUtilities.h"
 #include "EditorFunctionLibrary.h"
 
+#include "Sound/SoundClass.h"
 #include "Sound/SoundBase.h"
 #include "Sound/SoundWave.h"
 #include "FastXml.h"

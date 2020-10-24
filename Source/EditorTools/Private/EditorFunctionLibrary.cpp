@@ -39,7 +39,7 @@ void UEditorFunctionLibrary::CreateBlueprint(UClass* ParentClass)
 		{
 			// If package doesn't exist, it's safe to create new package
 			PackageName = PackageTools::SanitizePackageName(PackageName);
-			UPackage* Package = CreatePackage(nullptr, *PackageName);
+			UPackage* Package = CreatePackage(*PackageName);
 			Package->FullyLoad();
 
 			UBlueprint* Blueprint = FKismetEditorUtilities::CreateBlueprint(ParentClass, Package, FName("BP_Wow_ok"), EBlueprintType::BPTYPE_Normal, BlueprintClass, BlueprintGeneratedClass);			
@@ -47,7 +47,7 @@ void UEditorFunctionLibrary::CreateBlueprint(UClass* ParentClass)
 
 			if (CDO)
 			{
-				UFloatProperty* FloatProp = FindField<UFloatProperty>(CDO->GetClass(), TEXT("FailSafeDuration"));
+				FFloatProperty* FloatProp = FindFProperty<FFloatProperty>(CDO->GetClass(), TEXT("FailSafeDuration"));
 				if (FloatProp)
 				{
 					FloatProp->SetPropertyValue_InContainer(CDO, 12.0);

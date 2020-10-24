@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/EngineTypes.h"
+#include "Chaos/ChaosEngineInterface.h"
 #include "CollisionQueryParams.h"
 #include "UObject/NoExportTypes.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"

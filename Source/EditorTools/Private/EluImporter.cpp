@@ -101,7 +101,7 @@ void UEluImporter::ImportEluAnimation(USkeletalMesh* Mesh)
 
 	// If package doesn't exist, it's safe to create new package
 	PackageName = PackageTools::SanitizePackageName(PackageName);
-	UPackage* Package = CreatePackage(nullptr, *PackageName);
+	UPackage* Package = CreatePackage(*PackageName);
 	Package->FullyLoad();
 
 	UAnimSequence* AnimSeq = NewObject<UAnimSequence>(Package, UAnimSequence::StaticClass(), *FString("TestAni"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
@@ -418,7 +418,7 @@ bool UEluImporter::ImportEluStaticMesh_Internal(const FString& EluFilePath)
 
 	// If package doesn't exist, it's safe to create new package
 	PackageName = PackageTools::SanitizePackageName(PackageName);
-	UPackage* Package = CreatePackage(nullptr, *PackageName);
+	UPackage* Package = CreatePackage(*PackageName);
 	Package->FullyLoad();
 
 	if (!bPackageExists && EluMeshNodes.Num() != 0)
@@ -573,9 +573,10 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 	const TArray<TSharedPtr<FEluMeshNode>>& EluMeshNodes = EluData.EluMeshNodes;
 	FString SkelPackName = FString("/Game/RaiderZ/Zunk/Skel");
 	SkelPackName = PackageTools::SanitizePackageName(SkelPackName);
-	UPackage* SkelPack = CreatePackage(nullptr, *SkelPackName);
+	UPackage* SkelPack = CreatePackage(*SkelPackName);
 	SkelPack->FullyLoad();
 
+	/*
 	USkeleton* Skel = NewObject<USkeleton>(SkelPack, *FString("Skel"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
 	const FReferenceSkeleton& RefSkel = Skel->GetReferenceSkeleton();
 	// horrible hack to modify the skeleton in place
@@ -594,7 +595,7 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 
 	Skel->MarkPackageDirty();
 	FAssetRegistryModule::AssetCreated(Skel);
-
+	*/
 	
 	
 	/*
@@ -615,7 +616,7 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 
 	// If package doesn't exist, it's safe to create new package
 	PackageName = PackageTools::SanitizePackageName(PackageName);
-	UPackage* Package = CreatePackage(nullptr, *PackageName);
+	UPackage* Package = CreatePackage(*PackageName);
 	Package->FullyLoad();
 
 	// USkeletalMesh* SkeletalMesh = NewObject<USkeletalMesh>(Package, USkeletalMesh::StaticClass(), *FString("WAKA"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
@@ -626,7 +627,6 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 	FSkeletalMeshImportData* SkelMeshImportDataPtr = &TempData;
 
 	int32 SkelType = 0;	// 0 for skeletal mesh, 1 for rigid mesh
-
 
 	for (int i = 0; i < EluMeshNodes.Num(); i++)
 	{
@@ -645,6 +645,19 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 				}
 
 				TempData.Points[ExistingPointsNum + PointIndex] = PointPos;
+			}
+		}
+
+		int32 NumPolygon = MeshNode->PolygonTable.Num();
+		if (NumPolygon > 0)
+		{
+			TempData.Faces.AddUninitialized(NumPolygon);
+			int32 ExistingPolygonNum = TempData.Faces.Num();
+			for (int PolygonIndex = 0; PolygonIndex < NumPolygon; PolygonIndex++)
+			{
+				FMeshPolygonData PolyData = MeshNode->PolygonTable[PolygonIndex];
+				
+				
 			}
 		}
 
@@ -685,7 +698,7 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 
 
 
-
+	/*
 	SkeletalMesh->ReleaseResources();
 	SkeletalMesh->ReleaseResourcesFence.Wait();
 
@@ -858,7 +871,6 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 		}
 
 		//~ Begin bone
-		/*
 		int32 PhysiqueTableNum = MeshNode->PhysiqueTable.Num();
 		for (int j = 0; j < PhysiqueTableNum; j++)
 		{
@@ -884,7 +896,6 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 				break;
 			}
 		}
-		*/
 		//~ End bone
 	}
 
@@ -921,7 +932,7 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 
 	SkeletalMesh->PostEditChange();
 	SkeletalMesh->MarkPackageDirty();
-	
+	*/
 
 	return true;
 }

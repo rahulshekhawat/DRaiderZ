@@ -12,7 +12,7 @@
 #include "CombatManager.generated.h"
 
 class AActor;
-class UCameraShake;
+class UMatineeCameraShake;
 class APlayerCharacter;
 /**
  * 

@@ -441,6 +441,13 @@ void APlayerCharacter::OnInteractionSphereBeginOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
+	/*
+	if (OtherActor->Implements<IInteractionInterface>())
+	{
+		IInteractionInterface::Execute_OnBeginOverlap(OtherActor, this);
+	}
+	*/
+
 	IInteractionInterface* InteractiveObj = Cast<IInteractionInterface>(OtherActor);
 	// If the actor is not interactive
 	if (!InteractiveObj)

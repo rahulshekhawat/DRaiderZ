@@ -91,8 +91,10 @@ void UEODCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 	}
 }
 
+/*
 void UEODCharacterMovementComponent::ServerMoveDual_Implementation(float TimeStamp0, FVector_NetQuantize10 InAccel0, uint8 PendingFlags, uint32 View0, float TimeStamp, FVector_NetQuantize10 InAccel, FVector_NetQuantize100 ClientLoc, uint8 NewFlags, uint8 ClientRoll, uint32 View, UPrimitiveComponent * ClientMovementBase, FName ClientBaseBoneName, uint8 ClientMovementMode)
 {
+	// ServerMove_PerformMovement()
 	ServerMove_Implementation(TimeStamp0, InAccel0, FVector(1.f, 2.f, 3.f), PendingFlags, ClientRoll, View0, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
 	// Prevents anim notifies from being skipped on server
 	if (CharacterOwner && CharacterOwner->GetMesh())
@@ -101,6 +103,7 @@ void UEODCharacterMovementComponent::ServerMoveDual_Implementation(float TimeSta
 	}
 	ServerMove_Implementation(TimeStamp, InAccel, ClientLoc, NewFlags, ClientRoll, View, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
 }
+*/
 
 void UEODCharacterMovementComponent::Server_SetDesiredCustomRotation_Implementation(const FRotator& NewRotation)
 {

@@ -45,6 +45,7 @@ void AMainMenuPlayerController::CreateMenuWidgets()
 		CreateMainMenuWidget();
 		CreateSettingsWidget();
 		CreateNewProfileCreationWidget();
+		CreateMultiplayerWidget();
 	}
 }
 
@@ -123,19 +124,22 @@ void AMainMenuPlayerController::SwitchToNewProfileCreationWidget_Implementation(
 
 void AMainMenuPlayerController::SwitchToMultiplayerWidget_Implementation()
 {
-	if (IsValid(ActiveWidget) && ActiveWidget != MultiplayerWidget)
+	check(MultiplayerWidget);
+
+	// If multiplayer widget is already active
+	if (ActiveWidget && ActiveWidget == MultiplayerWidget)
+	{
+		return;
+	}
+
+	if (ActiveWidget && ActiveWidget != MultiplayerWidget)
 	{
 		ActiveWidget->RemoveMenuFromScreen();
 		ActiveWidget = nullptr;
 	}
 
-	CreateMultiplayerWidget();
-
-	if (IsValid(MultiplayerWidget))
-	{
-		ActiveWidget = MultiplayerWidget;
-		ActiveWidget->AddMenuToScreen();
-	}
+	ActiveWidget = MultiplayerWidget;
+	ActiveWidget->AddMenuToScreen();
 }
 
 void AMainMenuPlayerController::SwitchToSettingsWidget_Implementation()

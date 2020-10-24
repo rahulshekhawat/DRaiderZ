@@ -7,7 +7,7 @@
 
 #include "OnlineSubsystem.h"
 #include "OnlineSessionInterface.h"
-
+#include "Camera/CameraShake.h"
 #include "Engine/StreamableManager.h"
 #include "Engine/GameInstance.h"
 #include "EODGameInstance.generated.h"
@@ -183,13 +183,13 @@ public:
 	void PlayCameraShake(ECameraShakeType CameraShakeType, const FVector& EpiCenter);
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Utility|Camera", BlueprintReadOnly)
-	TSubclassOf<UCameraShake> LowCamShakeClass;
+	TSubclassOf<UMatineeCameraShake> LowCamShakeClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Utility|Camera", BlueprintReadOnly)
-	TSubclassOf<UCameraShake> MediumCamShakeClass;
+	TSubclassOf<UMatineeCameraShake> MediumCamShakeClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Utility|Camera", BlueprintReadOnly)
-	TSubclassOf<UCameraShake> HighCamShakeClass;
+	TSubclassOf<UMatineeCameraShake> HighCamShakeClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Utility|Camera", BlueprintReadOnly)
 	float CamShakeInnerRadius;
