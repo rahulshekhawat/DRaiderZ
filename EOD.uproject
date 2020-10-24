@@ -14,7 +14,8 @@
 				"AIModule",
 				"XmlParser",
 				"AssetRegistry",
-				"UMG"
+				"UMG",
+				"GameplayAbilities"
 			]
 		},
 		{
@@ -145,6 +146,18 @@
 			"SupportedTargetPlatforms": [
 				"Lumin"
 			]
+		},
+		{
+			"Name": "CascadeToNiagaraConverter",
+			"Enabled": true
+		},
+		{
+			"Name": "CodeView",
+			"Enabled": true
+		},
+		{
+			"Name": "GameplayAbilities",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [

@@ -18,6 +18,7 @@ public class EOD : ModuleRules
                 "EOD/Public/Characters/States",
                 "EOD/Public/Core",
                 "EOD/Public/Gameplay",
+                "EOD/Public/Gameplay/Attributes",
                 "EOD/Public/Gameplay/Skills",
                 "EOD/Public/Gameplay/Effects",
                 "EOD/Public/Gameplay/Events",
@@ -52,18 +53,24 @@ public class EOD : ModuleRules
                 "UMG",
                 "AssetRegistry",
                 "AIModule",
-                "GameplayTasks",
                 "XmlParser",
                 "Json",
                 "MoviePlayer",
-                "GameplayTags",
                 "RHI",
                 "LevelSequence",
                 "PhysicsCore"
             }
         );
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+        PublicDependencyModuleNames.AddRange(
+            new string[] {
+                "GameplayAbilities",
+                "GameplayTags",
+                "GameplayTasks",
+            }
+        );
+
+        PrivateDependencyModuleNames.AddRange(new string[] { });
 
 		// Uncomment if you are using Slate UI
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
