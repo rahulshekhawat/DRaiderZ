@@ -123,4 +123,20 @@ protected:
 	UPROPERTY(Transient)
 	TArray<FInventorySlot> Slots;
 
+public:
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///
+	///	New Inventory Code
+	///
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void AddItem(UObject* ItemToAdd);
+
+protected:
+
+	FInventorySlot& GetNewInventorySlot();
+	FInventorySlot& GetInventorySlotForItem(UObject* InventoryItem);
+	
 };

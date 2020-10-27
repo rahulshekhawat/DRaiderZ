@@ -936,3 +936,10 @@ bool UEluImporter::ImportEluSkeletalMesh_Internal(const FString& EluFilePath)
 
 	return true;
 }
+
+bool UEluImporter::ImportSkeletalMeshV2_Internal(const FString& EluFilePath)
+{
+	// USkeleton* 
+
+	return true;
+}

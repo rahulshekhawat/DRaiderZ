@@ -250,6 +250,9 @@ USTRUCT(BlueprintType)
 struct EOD_API FInventorySlot
 {
 	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(BlueprintReadOnly)
+	TSubclassOf<UObject> ItemClass;
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 SlotIndex;				// Not uint32 only because uint32 is not supported in blueprints
@@ -267,6 +270,12 @@ struct EOD_API FInventorySlot
 	bool IsEmpty() const
 	{
 		return ItemInSlot == nullptr;
+	}
+
+	bool IsValid() const
+	{
+		//~ @todo check if the SlotIndex is valid
+		return true;
 	}
 
 	FInventorySlot() :

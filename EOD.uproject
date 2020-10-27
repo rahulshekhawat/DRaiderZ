@@ -149,7 +149,7 @@
 		},
 		{
 			"Name": "CascadeToNiagaraConverter",
-			"Enabled": true
+			"Enabled": false
 		},
 		{
 			"Name": "CodeView",

@@ -217,6 +217,8 @@ public:
 
 	void AddFlag(DWORD Flag) { dwFlag |= Flag; }
 
+	bool HasFlag(DWORD Flag) { return dwFlag & Flag; }
+
 	FString ToString()
 	{
 		FString FinalString;

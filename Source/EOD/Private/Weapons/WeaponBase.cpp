@@ -10,7 +10,7 @@ AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer): Super(Obj
 	// This actor doesn't tick
 	PrimaryActorTick.bCanEverTick = false;
 	SetReplicates(false);
-	SetReplicateMovement(false);
+	SetReplicatingMovement(false);
 
 	bAttachedToCharacter = false;
 	WeaponID = NAME_None;

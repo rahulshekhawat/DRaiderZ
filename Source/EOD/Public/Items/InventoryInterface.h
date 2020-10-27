@@ -47,4 +47,16 @@ public:
 	 */
 	virtual FName GetInventoryItemID() const;
 
+	/**
+	 * Function called right before an item (actor) is added to the inventory and stored in the inventory slot.
+	 * This will cause the item instance to be destroyed and therefore it's custom data (i.e., instance specific data)
+	 * must be saved so that it can be loaded back in future.
+	 * Use this method to save *ALL* all item instance data (even though it's just named save inventory data)  
+	 */
+	virtual void SaveInventoryData(int32 InventorySlotIndex) { ; }
+
+	virtual void LoadInventoryData(int32 InventorySlotIndex) { ; }
+
+	virtual bool OccupiesUniqueSlot() const { return false; }
+
 };

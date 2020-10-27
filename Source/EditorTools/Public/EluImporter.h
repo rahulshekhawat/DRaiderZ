@@ -59,4 +59,7 @@ private:
 	static bool ImportEluStaticMesh_Internal(const FString& EluFilePath);
 	static bool ImportEluSkeletalMesh_Internal(const FString& EluFilePath);
 
+	static bool ImportSkeletalMeshV2_Internal(const FString& EluFilePath);
+
+
 };

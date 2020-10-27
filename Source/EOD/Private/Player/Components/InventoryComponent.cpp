@@ -152,3 +152,57 @@ FInventorySlot& UInventoryComponent::GetEmptySlot()
 
 	return SlotRef;
 }
+
+void UInventoryComponent::AddItem(UObject* ItemToAdd)
+{
+	if (ItemToAdd && ItemToAdd->Implements<UInventoryInterface>())
+	{
+		IInventoryInterface* InventoryInterface = Cast<IInventoryInterface>(ItemToAdd);
+		const bool bOccupiesUniqueSlot = InventoryInterface->OccupiesUniqueSlot();
+		if (bOccupiesUniqueSlot)
+		{
+			FInventorySlot& UniqueSlot = GetNewInventorySlot();
+			ensureAlways(UniqueSlot.IsEmpty() && UniqueSlot.IsValid());
+			InventoryInterface->SaveInventoryData(UniqueSlot.SlotIndex);
+		}
+		else
+		{
+			FInventorySlot& Slot = GetInventorySlotForItem(ItemToAdd);
+			ensureAlways(Slot.IsValid());
+			if (Slot.IsEmpty())
+			{
+				Slot.ItemClass = ItemToAdd->GetClass();
+				Slot.ItemStackCount = 1;
+			}
+			else
+			{
+				Slot.ItemStackCount += 1;
+			}
+		}
+		
+		if (ItemToAdd->IsA(AActor::StaticClass()))
+		{
+			AActor* ItemActor = Cast<AActor>(ItemToAdd);
+			ItemActor->Destroy();
+		}
+		else
+		{
+			ItemToAdd->MarkPendingKill();
+		}
+	}
+}
+
+FInventorySlot& UInventoryComponent::GetNewInventorySlot()
+{
+	const FInventorySlot NewSlot;
+	const int32 NewSlotIndex = Slots.Add(NewSlot);
+	return Slots[NewSlotIndex];
+}
+
+FInventorySlot& UInventoryComponent::GetInventorySlotForItem(UObject* InventoryItem)
+{
+	//~  @todo
+	const FInventorySlot NewSlot;
+	const int32 NewSlotIndex = Slots.Add(NewSlot);
+	return Slots[NewSlotIndex];	
+}
