@@ -1,4 +1,4 @@
-# Dark-RaiderZ
+# Dark-RaiderZ (Source Code Only)
 
 Dark-RaiderZ is a fan game project based on a now defunct MMO called RaiderZ. The objective of this project is to create a small co-op action combat RPG that would appeal to existing RaiderZ fans, as well as attract new player that like action combat RPGs such as Dark Souls.
 
