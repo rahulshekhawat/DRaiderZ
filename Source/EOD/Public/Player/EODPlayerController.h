@@ -59,10 +59,17 @@ public:
 	/** Returns the gender of the pawn that the player selected during player creation */
 	FORCEINLINE ECharacterGender GetGender() const { return Gender; }
 
+	FORCEINLINE FGameplayTag GetGenderTag() const { return GenderTag; }
+
 	FORCEINLINE AEODCharacterBase* GetEODCharacter() const { return EODCharacter; }
 
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	void AddEXP(int32 Value);
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Settings")
+	FGameplayTag GenderTag;
 
 private:
 	

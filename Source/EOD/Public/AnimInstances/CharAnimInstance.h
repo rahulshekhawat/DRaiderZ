@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EODAction.h"
 #include "CharacterLibrary.h"
 #include "Animation/AnimInstance.h"
 #include "CharAnimInstance.generated.h"
@@ -154,5 +155,34 @@ protected:
 	 */
 	UPROPERTY(Transient)
 	bool bMovableMontagePlaying;
+
+public:
+
+	// ----------------------------------------------------------------------------------------------------------------
+	//  Action System
+	// ----------------------------------------------------------------------------------------------------------------
+	
+	UFUNCTION(BlueprintPure, Category = "Actions")
+    bool IsValidActionTag(const FGameplayTag& ActionTag) const;
+	
+	UFUNCTION(BlueprintPure, Category = "Actions")
+    FEODAction GetAction(const FGameplayTag& ActionTag) const;	
+
+protected:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actions")
+	TMap<FGameplayTag, FEODAction> CustomActions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Actions")
+	TArray<UDataTable*> ActionsDataTables;
+	
+	UPROPERTY()
+	TMap<FGameplayTag, FEODAction> GenericActions;
+	
+	UPROPERTY()
+	TMap<FGameplayTag, FWeaponActionTableRow> WeaponActions;
+
+	virtual void InitializeActions();	
+	
 	
 };

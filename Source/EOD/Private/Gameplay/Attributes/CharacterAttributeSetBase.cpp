@@ -7,7 +7,6 @@
 
 UCharacterAttributeSetBase::UCharacterAttributeSetBase()
 {
-
 }
 
 void UCharacterAttributeSetBase::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)

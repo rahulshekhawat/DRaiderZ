@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "AbilitySystemComponent.h"
 #include "EOD.h"
 #include "EODGlobalNames.h"
 #include "EODLibrary.h"
@@ -153,6 +155,7 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+	
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
@@ -170,6 +173,9 @@ public:
 
 	/** Called when the Pawn is being restarted (usually by being possessed by a Controller). Called on both server and owning client. */
 	virtual void Restart() override;
+
+	/** Called to bind input to ability system component */
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
 
@@ -366,6 +372,8 @@ public:
 	// --------------------------------------
 	//  Combat
 	// --------------------------------------
+
+	inline FGameplayTag GetEquippedWeaponTag() const { return FGameplayTag(); }
 
 	/**
 	 * [server + local]
@@ -888,6 +896,37 @@ private:
 	//~ Skill bar component - manages skill bar (for player controlled character) and skills of character
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGameplaySkillsComponent* SkillManager;
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UEODAbilitySystemComponent* AbilitySystemComponent;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Ability System")
+	class UCharacterAttributeSetBase* PrimaryAttributeSet;	
+
+protected:
+
+	/** Grants DefaultAbilities and DefaultInputAbilities to this character */
+	virtual void GrantDefaultAbilities();
+
+	/** Binds ability system component to input from EAbilityInputID enum */
+	virtual void BindAbilitySystemComponentInput();
+	
+	/** Abilities that are granted to this character by default */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability System")
+	TArray<TSubclassOf<class UGameplayAbility>> DefaultAbilities;
+
+	/** Abilities bound to player input by default */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability System")
+	TArray<TSubclassOf<class UEODGameplayAbility>> DefaultInputAbilities;
+
+	bool bDefaultAbilitiesGranted;
+
+	bool bASCBoundToInput;
+
+	/** Refreshes ability actor info and grants default abilities */
+	virtual void InitializeAbilitySystemComponent();
 
 public:
 

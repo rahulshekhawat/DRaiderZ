@@ -124,3 +124,64 @@ void UCharAnimInstance::HandleMontageEnded(UAnimMontage* AnimMontage, bool bInte
 		EODCharacterOwner->OnMontageEnded(AnimMontage, bInterrupted);
 	}
 }
+
+bool UCharAnimInstance::IsValidActionTag(const FGameplayTag& ActionTag) const
+{
+	return WeaponActions.Contains(ActionTag) || GenericActions.Contains(ActionTag);
+}
+
+FEODAction UCharAnimInstance::GetAction(const FGameplayTag& ActionTag) const
+{
+	if (ActionTag.IsValid() == false)
+	{
+		UE_LOG(LogRaiderZ, Warning, TEXT("Invalid ActionTag passed in function: %s"), *FString(__FUNCTION__));
+		return FEODAction();
+	}
+
+	if (EODCharacterOwner && EODCharacterOwner->GetEquippedWeaponTag().IsValid())
+	{
+		const FGameplayTag WeaponTag = EODCharacterOwner->GetEquippedWeaponTag();
+		if (WeaponActions.Contains(ActionTag))
+		{
+			const FWeaponActionTableRow& WeaponActionRow = WeaponActions[ActionTag];
+			if (WeaponActionRow.WeaponToActionMap.Contains(WeaponTag))
+			{
+				return WeaponActionRow.WeaponToActionMap[WeaponTag];
+			}
+		}
+	}
+	
+	if (GenericActions.Contains(ActionTag))
+	{
+		return GenericActions[ActionTag];
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't find the action tag: %s"), *ActionTag.ToString());
+		return FEODAction();
+	}
+}
+
+void UCharAnimInstance::InitializeActions()
+{
+	if (CustomActions.Num() > 0)
+	{
+		GenericActions.Append(CustomActions);
+	}
+
+	for (UDataTable* ActionsDataTable : ActionsDataTables)
+	{
+		if (ActionsDataTable == nullptr)
+		{
+			continue;
+		}
+
+		TArray<FName> RowNames = ActionsDataTable->GetRowNames();
+		for (FName RowName : RowNames)
+		{
+			FWeaponActionTableRow* Row = ActionsDataTable->FindRow<FWeaponActionTableRow>(RowName, FString(__FUNCTION__));
+			FGameplayTag KeyTag = FGameplayTag::RequestGameplayTag(RowName);
+			WeaponActions.Add(KeyTag, *Row);
+		}
+	}
+}

@@ -18,6 +18,8 @@ public class EOD : ModuleRules
                 "EOD/Public/Characters/States",
                 "EOD/Public/Core",
                 "EOD/Public/Gameplay",
+                "EOD/Public/Gameplay/Abilities",
+                "EOD/Public/Gameplay/AbilityTasks",
                 "EOD/Public/Gameplay/Attributes",
                 "EOD/Public/Gameplay/Skills",
                 "EOD/Public/Gameplay/Effects",

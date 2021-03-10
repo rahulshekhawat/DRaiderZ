@@ -32,6 +32,7 @@
 #include "UsingSkillState.h"
 
 #include "EngineUtils.h"
+#include "EODGameplayAbility.h"
 #include "UnrealNetwork.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -39,6 +40,12 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/AudioComponent.h"
+
+#include "Core/EODTypes.h"
+#include "Gameplay/EODAbilitySystemComponent.h"
+#include "Gameplay/Attributes/CharacterAttributeSetBase.h"
+
+#include "Components/InputComponent.h"
 
 /**
  * EOD Character stats
@@ -54,6 +61,17 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UEODCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Set up the Ability System Component and it's initial settings
+	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<UEODAbilitySystemComponent>(this, TEXT("Ability System Component"));
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->SetIsReplicated(true);
+		AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);		
+	}
+
+	// Add this Character's Attribute Set
+	PrimaryAttributeSet = CreateDefaultSubobject<UCharacterAttributeSetBase>(TEXT("Primary Attribute Set"));
 
 	SkillManager = ObjectInitializer.CreateDefaultSubobject<UGameplaySkillsComponent>(this, AEODCharacterBase::GameplaySkillsComponentName);
 	CameraBoomComponent = ObjectInitializer.CreateDefaultSubobject<USpringArmComponent>(this, AEODCharacterBase::SpringArmComponentName);
@@ -115,6 +133,8 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 
 	MovementSpeedModifier = 1.f;
 
+	bDefaultAbilitiesGranted	= false;
+	bASCBoundToInput			= false;
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
@@ -179,6 +199,8 @@ void AEODCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	InitializeAbilitySystemComponent();
+	
 	// Intentional additional calls to InitializeWidgets (another in Restart())
 	InitializeWidgets();
 
@@ -190,6 +212,8 @@ void AEODCharacterBase::BeginPlay()
 	{
 		MoveComp->SetDesiredCustomRotation(GetActorRotation());
 	}
+
+	GrantDefaultAbilities();
 }
 
 void AEODCharacterBase::PostInitializeComponents()
@@ -199,6 +223,20 @@ void AEODCharacterBase::PostInitializeComponents()
 	UGameplaySkillsComponent* SkillsComp = GetGameplaySkillsComponent();
 	check(SkillsComp);
 	SkillsComp->InitializeSkills(this);
+}
+
+void AEODCharacterBase::BindAbilitySystemComponentInput()
+{
+	if (bASCBoundToInput || !IsValid(InputComponent))
+	{
+		return;
+	}
+
+	if (ensureMsgf(AbilitySystemComponent, TEXT("[%s]: Ability System Component is NULL"), *FString(__FUNCTION__)))
+	{
+		AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent, FGameplayAbilityInputBinds(FString("ConfirmTarget"), FString("CancelTarget"), FString("EAbilityInputID"), static_cast<int32>(EAbilityInputID::Confirm), static_cast<int32>(EAbilityInputID::Cancel)));
+		bASCBoundToInput = true;
+	}	
 }
 
 void AEODCharacterBase::PossessedBy(AController* NewController)
@@ -230,6 +268,19 @@ void AEODCharacterBase::Restart()
 
 	// Intentional additional calls to LoadCharacterState (another in BeginPlay())
 	LoadCharacterState();
+
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		AbilitySystemComponent->RefreshAbilityActorInfo();
+	}	
+}
+
+void AEODCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	BindAbilitySystemComponentInput();
 }
 
 float AEODCharacterBase::BP_GetRotationYawFromAxisInput()
@@ -362,6 +413,46 @@ bool AEODCharacterBase::CanDodge() const
 bool AEODCharacterBase::CanGuardAgainstAttacks() const
 {
 	return (IsIdleOrMoving() || IsNormalAttacking()) && !(IsWeaponSheathed());
+}
+
+void AEODCharacterBase::GrantDefaultAbilities()
+{
+	if (GetLocalRole() != ROLE_Authority || AbilitySystemComponent == nullptr || bDefaultAbilitiesGranted == true)
+	{
+		return;
+	}
+
+	for (TSubclassOf<UGameplayAbility>& Ability : DefaultAbilities)
+	{
+		if (Ability != nullptr)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 1, static_cast<int32>(EAbilityInputID::None), this));
+		}
+	}
+	
+	for (TSubclassOf<UEODGameplayAbility>& Ability : DefaultInputAbilities)
+	{
+		if (Ability != nullptr)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 1, static_cast<int32>(Ability.GetDefaultObject()->GetAbilityInputID()), this));
+		}
+	}
+
+	bDefaultAbilitiesGranted = true;
+}
+
+void AEODCharacterBase::InitializeAbilitySystemComponent()
+{
+	if (ensureAlwaysMsgf(AbilitySystemComponent, TEXT("[%s]: Ability System Component is NULL"), *FString(__FUNCTION__)))
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		AbilitySystemComponent->RefreshAbilityActorInfo();
+
+		if (GetLocalRole() == ROLE_Authority)
+		{
+			GrantDefaultAbilities();
+		}
+	}
 }
 
 void AEODCharacterBase::AddGameplayTagModifier(FGameplayTagMod TagMod)

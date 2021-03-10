@@ -52,11 +52,11 @@ UClass* AEODGameModeBase::GetDefaultPawnClassForController_Implementation(AContr
 	AEODPlayerController* PC = Cast<AEODPlayerController>(InController);
 	if (PC)
 	{
-		if (PC->GetGender() == ECharacterGender::Female)
+		if (PC->GetGenderTag() == FGameplayTag::RequestGameplayTag(TEXT("Gender.Female")) && FemalePawnClass != NULL)
 		{
-			return FemalePawnClass;
+			return FemalePawnClass;	
 		}
-		else
+		else if (PC->GetGenderTag() == FGameplayTag::RequestGameplayTag(TEXT("Gender.Male")) && MalePawnClass != NULL)
 		{
 			return MalePawnClass;
 		}

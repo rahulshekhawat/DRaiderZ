@@ -1,3 +1,4 @@
+
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "PlayerCharacter.h"
@@ -824,6 +825,8 @@ void APlayerCharacter::OnMontageBlendingOut(UAnimMontage* AnimMontage, bool bInt
 		}
 		*/
 	}
+
+	return;
 
 	if (GetActiveAnimationReferences()->NormalAttacks.Get() == AnimMontage)
 	{
