@@ -415,6 +415,11 @@ bool AEODCharacterBase::CanGuardAgainstAttacks() const
 	return (IsIdleOrMoving() || IsNormalAttacking()) && !(IsWeaponSheathed());
 }
 
+UAbilitySystemComponent* AEODCharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 void AEODCharacterBase::GrantDefaultAbilities()
 {
 	if (GetLocalRole() != ROLE_Authority || AbilitySystemComponent == nullptr || bDefaultAbilitiesGranted == true)

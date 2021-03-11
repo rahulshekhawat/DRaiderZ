@@ -7,8 +7,6 @@
 #include "Task_PlayMontageAndWaitForEvent.generated.h"
 
 
-class UEODAbilitySystemComponent;
-
 /** Delegate type used, EventTag and Payload may be empty if it came from the montage callbacks */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayMontageAndWaitForEventDelegate, FGameplayTag, EventTag, FGameplayEventData, EventData);
 

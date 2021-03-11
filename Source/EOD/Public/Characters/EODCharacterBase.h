@@ -3,10 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-#include "AbilitySystemComponent.h"
 #include "EOD.h"
 #include "EODGlobalNames.h"
+#include "AbilitySystemInterface.h"
 #include "EODLibrary.h"
 #include "CharacterLibrary.h"
 #include "StatsComponentBase.h"
@@ -137,7 +136,7 @@ struct EOD_API FCharacterStateInfo
  * All in-game characters must inherit from this class.
  */
 UCLASS(Abstract)
-class EOD_API AEODCharacterBase : public ACharacter, public ICombatInterface
+class EOD_API AEODCharacterBase : public ACharacter, public ICombatInterface, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -897,6 +896,11 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGameplaySkillsComponent* SkillManager;
 
+public:
+	
+	/** Returns the ability system component to use for this actor. It may live on another actor, such as a Pawn using the PlayerState's component */
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
