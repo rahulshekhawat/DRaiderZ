@@ -8,20 +8,21 @@
 
 float UGMMC_AbilityCooldown::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
+	float CooldownVal = 0.f;
 	if (Spec.GetContext().GetInstigatorAbilitySystemComponent())
 	{
 		AEODCharacterBase* Character = Cast<AEODCharacterBase>(Spec.GetContext().GetInstigatorAbilitySystemComponent()->GetOwnerActor());
 		if (Character && Character->IsCooldownDisabled())
 		{
-			return 0.1f;
+			CooldownVal = 0.1f;
 		}
 	}
 
-	const UEODGameplayAbility* Ability = Cast<UEODGameplayAbility>(Spec.GetContext().GetAbilityInstance_NotReplicated());
+	const UEODGameplayAbility* Ability = Cast<UEODGameplayAbility>(Spec.GetContext().GetAbility());
 	if (Ability)
 	{
-		return Ability->CooldownDuration.GetValueAtLevel(Ability->GetAbilityLevel()); 
+		CooldownVal = Ability->CooldownDuration.GetValueAtLevel(Ability->GetAbilityLevel()); 
 	}
 	
-	return 0.f;
+	return CooldownVal;
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Core/EODTypes.h"
+#include "AnimInstances/EODAction.h"
 #include "Abilities/GameplayAbility.h"
 #include "EODGameplayAbility.generated.h"
 
@@ -18,14 +19,28 @@ class EOD_API UEODGameplayAbility : public UGameplayAbility
 public:
 
 	UEODGameplayAbility(const FObjectInitializer& ObjectInitializer);
+	
+	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
+
+	/** Actually activate ability, do not call this directly */
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	inline EAbilityInputID GetAbilityInputID() const { return AbilityInputID; }
 
 	inline bool GetActivateAbilityOnGranted() const { return bActivateAbilityOnGranted; }
 
-	// UFUNCTION(BlueprintCallable, Category = "Raiderz Gameplay Ability")
-	// bool 
+	UFUNCTION(BlueprintCallable, Category = "Raiderz Gameplay Ability")
+	FEODAction GetActionForTag(const FGameplayTag& ActionTag);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Settings")
+	FScalableFloat StaminaCost;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Settings")
+	FScalableFloat ManaCost;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Settings")
+	FGameplayTagContainer CooldownTags;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Settings")
 	FScalableFloat CooldownDuration;
 	
@@ -36,9 +51,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Settings")
 	bool bActivateAbilityOnGranted;
-
-	/** Actually activate ability, do not call this directly */
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	// If an ability is marked as 'bActivateAbilityOnGranted', activate them immediately when given here
 	// Epic's comment: Projects may want to initiate passives or do other "BeginPlay" type of logic here
