@@ -22,6 +22,12 @@ public:
 	inline EAbilityInputID GetAbilityInputID() const { return AbilityInputID; }
 
 	inline bool GetActivateAbilityOnGranted() const { return bActivateAbilityOnGranted; }
+
+	// UFUNCTION(BlueprintCallable, Category = "Raiderz Gameplay Ability")
+	// bool 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Settings")
+	FScalableFloat CooldownDuration;
 	
 protected:
 	
@@ -38,7 +44,7 @@ protected:
 	// Epic's comment: Projects may want to initiate passives or do other "BeginPlay" type of logic here
 	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 	
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Ability")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Raiderz Gameplay Ability")
 	class AEODCharacterBase* OwningCharacter;
 
 };

@@ -21,6 +21,7 @@ public class EOD : ModuleRules
                 "EOD/Public/Gameplay/Abilities",
                 "EOD/Public/Gameplay/AbilityTasks",
                 "EOD/Public/Gameplay/Attributes",
+                "EOD/Public/Gameplay/Calculations",
                 "EOD/Public/Gameplay/Skills",
                 "EOD/Public/Gameplay/Effects",
                 "EOD/Public/Gameplay/Events",

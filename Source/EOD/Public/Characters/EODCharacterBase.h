@@ -372,6 +372,7 @@ public:
 	//  Combat
 	// --------------------------------------
 
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
 	inline FGameplayTag GetEquippedWeaponTag() const { return FGameplayTag(); }
 
 	/**
@@ -900,6 +901,8 @@ public:
 	
 	/** Returns the ability system component to use for this actor. It may live on another actor, such as a Pawn using the PlayerState's component */
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	inline bool IsCooldownDisabled() const { return bCooldownDisabled; }
 	
 protected:
 
@@ -907,7 +910,11 @@ protected:
 	class UEODAbilitySystemComponent* AbilitySystemComponent;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Ability System")
-	class UCharacterAttributeSetBase* PrimaryAttributeSet;	
+	class UCharacterAttributeSetBase* PrimaryAttributeSet;
+
+	/** Determines whether the cooldown for abilities is disable for this character */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Abilities")
+	bool bCooldownDisabled;	
 
 protected:
 

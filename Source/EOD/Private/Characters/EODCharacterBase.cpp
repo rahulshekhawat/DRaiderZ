@@ -135,6 +135,8 @@ AEODCharacterBase::AEODCharacterBase(const FObjectInitializer& ObjectInitializer
 
 	bDefaultAbilitiesGranted	= false;
 	bASCBoundToInput			= false;
+
+	bCooldownDisabled			= false;
 }
 
 void AEODCharacterBase::Tick(float DeltaTime)
