@@ -20,6 +20,7 @@
 #include "StatusEffectWidget.h"
 #include "LootWidget.h"
 #include "CraftWidget.h"
+#include "StatusIndicatorWidget.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -127,6 +128,7 @@ bool UHUDWidget::RemoveLootWidget(UObject* InLootSource)
 	return false;
 }
 
+/*
 void UHUDWidget::SetPlayerLevel(int32 Level)
 {
 	check(PlayerLevel);
@@ -138,6 +140,7 @@ void UHUDWidget::SetPlayerName(FString Name)
 	check(PlayerName);
 	PlayerName->SetText(FText::FromString(Name));
 }
+*/
 
 void UHUDWidget::AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect)
 {
@@ -182,4 +185,38 @@ void UHUDWidget::AddCraftWidget_Implementation(UCraftWidget* CraftWidget)
 	check(PanelSlot);
 	PanelSlot->SetSize(FVector2D(1000.f, 750.f));
 	PanelSlot->SetPosition(FVector2D(50.f, 150.f));
+}
+
+void UHUDWidget::InitializeHUDWidget_Implementation()
+{
+}
+
+void UHUDWidget::SetPlayerName_Implementation(const FText& NewName)
+{
+	check(PlayerName);
+	PlayerName->SetText(NewName);
+}
+
+void UHUDWidget::SetPlayerLevel_Implementation(int32 NewLevel)
+{
+	check(PlayerLevel);
+	PlayerLevel->SetText(FText::FromString(FString("Lv. ") + FString::FromInt(NewLevel)));
+}
+
+void UHUDWidget::SetPlayerHealth_Implementation(float CurrentHealth, float MaxHealth)
+{
+	check(StatusIndicatorWidget);
+	StatusIndicatorWidget->UpdateHealthBar(MaxHealth, CurrentHealth);
+}
+
+void UHUDWidget::SetPlayerMana_Implementation(float CurrentMana, float MaxMana)
+{
+	check(StatusIndicatorWidget);
+	StatusIndicatorWidget->UpdateManaBar(MaxMana, CurrentMana);
+}
+
+void UHUDWidget::SetPlayerStamina_Implementation(float CurrentStamina, float MaxStamina)
+{
+	check(StatusIndicatorWidget);
+	StatusIndicatorWidget->UpdateStaminaBar(MaxStamina, CurrentStamina);
 }

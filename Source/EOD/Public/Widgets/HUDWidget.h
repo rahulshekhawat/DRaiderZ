@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/HUDWidgetInterface.h"
 #include "HUDWidget.generated.h"
 
 class UTextBlock;
@@ -21,7 +22,7 @@ class UHorizontalBox;
  * 
  */
 UCLASS()
-class EOD_API UHUDWidget : public UUserWidget
+class EOD_API UHUDWidget : public UUserWidget, public IHUDWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -114,11 +115,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	bool RemoveLootWidget(UObject* InLootSource);
 
-	UFUNCTION(BlueprintCallable, Category = Utility)
-	void SetPlayerLevel(int32 Level);
+	// UFUNCTION(BlueprintCallable, Category = Utility)
+	// void SetPlayerLevel(int32 Level);
 
-	UFUNCTION(BlueprintCallable, Category = Utility)
-	void SetPlayerName(FString Name);
+	// UFUNCTION(BlueprintCallable, Category = Utility)
+	// void SetPlayerName(FString Name);
 
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	void AddGameplayEffectUI(UGameplayEffectBase* GameplayEffect);
@@ -141,4 +142,22 @@ protected:
 	UPROPERTY(Transient)
 	class ULootWidget* ActiveLootWidget;
 
+public:
+
+	// ----------------------------------------------------------------------------------------------------------------
+	//  HUD Widget Interface
+	// ----------------------------------------------------------------------------------------------------------------
+
+	virtual void InitializeHUDWidget_Implementation() override;
+	
+	virtual void SetPlayerName_Implementation(const FText& NewName) override;
+	
+	virtual void SetPlayerLevel_Implementation(int32 NewLevel) override;
+	
+	virtual void SetPlayerHealth_Implementation(float CurrentHealth, float MaxHealth) override;
+	
+	virtual void SetPlayerMana_Implementation(float CurrentMana, float MaxMana) override;
+	
+	virtual void SetPlayerStamina_Implementation(float CurrentStamina, float MaxStamina) override;
+	
 };

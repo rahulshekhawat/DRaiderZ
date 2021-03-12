@@ -25,6 +25,7 @@ public class EOD : ModuleRules
                 "EOD/Public/Gameplay/Skills",
                 "EOD/Public/Gameplay/Effects",
                 "EOD/Public/Gameplay/Events",
+                "EOD/Public/Interfaces",
                 "EOD/Public/Notifies",
                 "EOD/Public/Player",
                 "EOD/Public/Player/Components",

@@ -372,6 +372,10 @@ public:
 	//  Combat
 	// --------------------------------------
 
+	/** Determines whether this character is currently in test mode */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Raiderz Character")
+	bool bTestMode;
+
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 	inline FGameplayTag GetEquippedWeaponTag() const { return FGameplayTag(); }
 
@@ -914,7 +918,7 @@ protected:
 
 	/** Determines whether the cooldown for abilities is disable for this character */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Abilities")
-	bool bCooldownDisabled;	
+	bool bCooldownDisabled;
 
 protected:
 

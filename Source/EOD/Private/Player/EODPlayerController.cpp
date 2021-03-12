@@ -472,7 +472,7 @@ void AEODPlayerController::InitHUDWidget()
 		UPlayerSaveGame* SaveGame = EODGI ? EODGI->GetCurrentPlayerSaveGameObject() : nullptr;
 		check(SaveGame);
 
-		HUDWidget->SetPlayerName(EODGI->GetPlayerName());
+		HUDWidget->SetPlayerName(FText::FromString(EODGI->GetPlayerName()));
 		HUDWidget->SetPlayerLevel(SaveGame->CharacterLevel);
 	}
 }
@@ -835,7 +835,6 @@ void AEODPlayerController::TogglePlayerInventoryUI()
 
 void AEODPlayerController::TogglePlayerJournalUI()
 {
-
 }
 
 void AEODPlayerController::TogglePlayerWeapon()
