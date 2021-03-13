@@ -11,6 +11,7 @@
 #include "StatsComponentBase.h"
 #include "CombatInterface.h"
 #include "InteractionInterface.h"
+#include "GameplayEffectTypes.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -22,6 +23,9 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interfaces/HUDWidgetInterface.h"
+
+
 #include "EODCharacterBase.generated.h"
 
 DECLARE_STATS_GROUP(TEXT("EOD"), STATGROUP_EOD, STATCAT_Advanced);
@@ -907,8 +911,13 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	inline bool IsCooldownDisabled() const { return bCooldownDisabled; }
+
+	UUserWidget* GetHUDWidget() const;
 	
 protected:
+
+	UPROPERTY(Transient)
+	mutable class UUserWidget* HUDWidget;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UEODAbilitySystemComponent* AbilitySystemComponent;
@@ -921,6 +930,29 @@ protected:
 	bool bCooldownDisabled;
 
 protected:
+
+	FDelegateHandle HealthChangedDelegateHandle;
+	FDelegateHandle MaxHealthChangedDelegateHandle;
+	FDelegateHandle ManaChangedDelegateHandle;
+	FDelegateHandle MaxManaChangedDelegateHandle;
+	FDelegateHandle StaminaChangedDelegateHandle;
+	FDelegateHandle MaxStaminaChangedDelegateHandle;
+	
+	virtual void OnHealthChanged(const FOnAttributeChangeData& Data);
+	
+	virtual void OnMaxHealthChanged(const FOnAttributeChangeData& Data);
+	
+	virtual void OnManaChanged(const FOnAttributeChangeData& Data);
+	
+	virtual void OnMaxManaChanged(const FOnAttributeChangeData& Data);
+	
+	virtual void OnStaminaChanged(const FOnAttributeChangeData& Data);
+	
+	virtual void OnMaxStaminaChanged(const FOnAttributeChangeData& Data);
+
+protected:
+
+	virtual void BindAttributeDelegates();
 
 	/** Grants DefaultAbilities and DefaultInputAbilities to this character */
 	virtual void GrantDefaultAbilities();

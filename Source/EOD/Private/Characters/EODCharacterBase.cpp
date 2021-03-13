@@ -216,6 +216,10 @@ void AEODCharacterBase::BeginPlay()
 	}
 
 	GrantDefaultAbilities();
+	
+	BindAttributeDelegates();
+	
+	
 }
 
 void AEODCharacterBase::PostInitializeComponents()
@@ -420,6 +424,90 @@ bool AEODCharacterBase::CanGuardAgainstAttacks() const
 UAbilitySystemComponent* AEODCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+UUserWidget* AEODCharacterBase::GetHUDWidget() const
+{
+	if (HUDWidget == nullptr)
+	{
+		if (IsLocallyControlled() && IsPlayerControlled())
+		{
+			AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
+			if(ensureAlways(PC))
+			{
+				HUDWidget = PC->GetHUDWidget();
+			}
+		}		
+	}
+	
+	return HUDWidget;
+}
+
+void AEODCharacterBase::OnHealthChanged(const FOnAttributeChangeData& Data)
+{
+	UUserWidget* HUDWidget = GetHUDWidget();
+	if (HUDWidget && PrimaryAttributeSet)
+	{
+		IHUDWidgetInterface::Execute_SetPlayerHealth(HUDWidget, PrimaryAttributeSet->GetHealth(), PrimaryAttributeSet->GetMaxHealth());
+	}
+}
+
+void AEODCharacterBase::OnMaxHealthChanged(const FOnAttributeChangeData& Data)
+{
+	UUserWidget* HUDWidget = GetHUDWidget();
+	if (HUDWidget && PrimaryAttributeSet)
+	{
+		IHUDWidgetInterface::Execute_SetPlayerHealth(HUDWidget, PrimaryAttributeSet->GetHealth(), PrimaryAttributeSet->GetMaxHealth());
+	}
+}
+
+void AEODCharacterBase::OnManaChanged(const FOnAttributeChangeData& Data)
+{
+	UUserWidget* HUDWidget = GetHUDWidget();
+	if (HUDWidget && PrimaryAttributeSet)
+	{
+		IHUDWidgetInterface::Execute_SetPlayerMana(HUDWidget, PrimaryAttributeSet->GetMana(), PrimaryAttributeSet->GetMaxMana());
+	}
+}
+
+void AEODCharacterBase::OnMaxManaChanged(const FOnAttributeChangeData& Data)
+{
+	UUserWidget* HUDWidget = GetHUDWidget();
+	if (HUDWidget && PrimaryAttributeSet)
+	{
+		IHUDWidgetInterface::Execute_SetPlayerMana(HUDWidget, PrimaryAttributeSet->GetMana(), PrimaryAttributeSet->GetMaxMana());
+	}
+}
+
+void AEODCharacterBase::OnStaminaChanged(const FOnAttributeChangeData& Data)
+{
+	UUserWidget* HUDWidget = GetHUDWidget();
+	if (HUDWidget && PrimaryAttributeSet)
+	{
+		IHUDWidgetInterface::Execute_SetPlayerStamina(HUDWidget, PrimaryAttributeSet->GetStamina(), PrimaryAttributeSet->GetMaxStamina());
+	}
+}
+
+void AEODCharacterBase::OnMaxStaminaChanged(const FOnAttributeChangeData& Data)
+{
+	UUserWidget* HUDWidget = GetHUDWidget();
+	if (HUDWidget && PrimaryAttributeSet)
+	{
+		IHUDWidgetInterface::Execute_SetPlayerStamina(HUDWidget, PrimaryAttributeSet->GetStamina(), PrimaryAttributeSet->GetMaxStamina());
+	}
+}
+
+void AEODCharacterBase::BindAttributeDelegates()
+{
+	check(AbilitySystemComponent);
+	check(PrimaryAttributeSet);
+
+	HealthChangedDelegateHandle			= AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PrimaryAttributeSet->GetHealthAttribute()).AddUObject(this, &AEODCharacterBase::OnHealthChanged);
+	MaxHealthChangedDelegateHandle		= AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PrimaryAttributeSet->GetMaxHealthAttribute()).AddUObject(this, &AEODCharacterBase::OnMaxHealthChanged);
+	ManaChangedDelegateHandle			= AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PrimaryAttributeSet->GetManaAttribute()).AddUObject(this, &AEODCharacterBase::OnManaChanged);
+	MaxManaChangedDelegateHandle		= AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PrimaryAttributeSet->GetMaxManaAttribute()).AddUObject(this, &AEODCharacterBase::OnMaxManaChanged);
+	StaminaChangedDelegateHandle		= AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PrimaryAttributeSet->GetStaminaAttribute()).AddUObject(this, &AEODCharacterBase::OnStaminaChanged);
+	MaxStaminaChangedDelegateHandle		= AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PrimaryAttributeSet->GetMaxStaminaAttribute()).AddUObject(this, &AEODCharacterBase::OnMaxStaminaChanged);
 }
 
 void AEODCharacterBase::GrantDefaultAbilities()
