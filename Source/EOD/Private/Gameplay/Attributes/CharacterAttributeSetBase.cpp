@@ -4,6 +4,9 @@
 #include "Gameplay/Attributes/CharacterAttributeSetBase.h"
 
 #include "Net/UnrealNetwork.h"
+#include "GameplayEffect.h"
+#include "GameplayEffectExtension.h"
+#include "GameplayEffectAggregatorLibrary.h"
 
 UCharacterAttributeSetBase::UCharacterAttributeSetBase()
 {
@@ -12,6 +15,19 @@ UCharacterAttributeSetBase::UCharacterAttributeSetBase()
 void UCharacterAttributeSetBase::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
+
+	if (Attribute == GetMaxHealthAttribute())
+	{
+		AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
+	}
+	else if (Attribute == GetMaxManaAttribute())
+	{
+		AdjustAttributeForMaxChange(Mana, MaxMana, NewValue, GetManaAttribute());		
+	}
+	else if (Attribute == GetMaxStaminaAttribute())
+	{
+		AdjustAttributeForMaxChange(Stamina, MaxStamina, NewValue, GetStaminaAttribute());		
+	}
 }
 
 bool UCharacterAttributeSetBase::PreGameplayEffectExecute(struct FGameplayEffectModCallbackData& Data)
@@ -22,6 +38,22 @@ bool UCharacterAttributeSetBase::PreGameplayEffectExecute(struct FGameplayEffect
 void UCharacterAttributeSetBase::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
+	
+	// Clamp health attribute
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp<float>(GetHealth(), 0.f, GetMaxHealth()));
+	}
+	// Clamp mana attribute
+	else if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	{
+		SetMana(FMath::Clamp<float>(GetMana(), 0.f, GetMaxMana()));
+	}
+	// Clamp stamina attribute
+	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
+	{
+		SetStamina(FMath::Clamp<float>(GetStamina(), 0.f, GetMaxStamina()));
+	}
 }
 
 void UCharacterAttributeSetBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -211,4 +243,20 @@ void UCharacterAttributeSetBase::OnRep_DarkResistance(const FGameplayAttributeDa
 void UCharacterAttributeSetBase::OnRep_BleedResistance(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCharacterAttributeSetBase, BleedResistance, OldValue);
+}
+
+void UCharacterAttributeSetBase::AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute,
+	const FGameplayAttributeData& MaxAttribute,
+	float NewMaxValue,
+	const FGameplayAttribute& AffectedAttributeProperty) const
+{
+	UAbilitySystemComponent* AbilitySystemComponent = GetOwningAbilitySystemComponent();
+	const float CurrentMaxValue = MaxAttribute.GetCurrentValue();
+	if (!FMath::IsNearlyEqual(CurrentMaxValue, NewMaxValue) && AbilitySystemComponent)
+	{
+		const float CurrentValue = AffectedAttribute.GetCurrentValue();
+		const float NewDelta = (CurrentMaxValue > 0.f) ? (CurrentValue * NewMaxValue / CurrentMaxValue) - CurrentValue : NewMaxValue;
+
+		AbilitySystemComponent->ApplyModToAttributeUnsafe(AffectedAttributeProperty, EGameplayModOp::Additive, NewDelta);
+	}
 }

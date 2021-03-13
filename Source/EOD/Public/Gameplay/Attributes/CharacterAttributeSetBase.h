@@ -278,5 +278,10 @@ protected:
 	virtual void OnRep_BleedResistance(const FGameplayAttributeData& OldValue);
 	//~ End Rep Notifies
 
-
+protected:
+	
+	// Called when a "Max" attribute is changed to maintain the current percentage of min / max values
+	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty) const;
+	
+	
 };
