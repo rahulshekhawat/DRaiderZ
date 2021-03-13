@@ -912,6 +912,8 @@ public:
 
 	inline bool IsCooldownDisabled() const { return bCooldownDisabled; }
 
+	inline class UCharacterAttributeSetBase* GetPrimaryAttributeSet() const { return PrimaryAttributeSet; }
+
 	UUserWidget* GetHUDWidget() const;
 	
 protected:

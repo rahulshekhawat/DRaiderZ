@@ -33,6 +33,7 @@
 
 #include "EngineUtils.h"
 #include "EODGameplayAbility.h"
+#include "RaiderzPlayerController.h"
 #include "UnrealNetwork.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -432,7 +433,7 @@ UUserWidget* AEODCharacterBase::GetHUDWidget() const
 	{
 		if (IsLocallyControlled() && IsPlayerControlled())
 		{
-			AEODPlayerController* PC = Cast<AEODPlayerController>(Controller);
+			ARaiderzPlayerController* PC = Cast<ARaiderzPlayerController>(Controller);
 			if(ensureAlways(PC))
 			{
 				HUDWidget = PC->GetHUDWidget();
