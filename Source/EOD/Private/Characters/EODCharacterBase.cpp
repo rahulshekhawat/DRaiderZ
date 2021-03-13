@@ -446,55 +446,55 @@ UUserWidget* AEODCharacterBase::GetHUDWidget() const
 
 void AEODCharacterBase::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
-	UUserWidget* HUDWidget = GetHUDWidget();
-	if (HUDWidget && PrimaryAttributeSet)
+	UUserWidget* LocalHUDWidget = GetHUDWidget();
+	if (LocalHUDWidget && PrimaryAttributeSet)
 	{
-		IHUDWidgetInterface::Execute_SetPlayerHealth(HUDWidget, PrimaryAttributeSet->GetHealth(), PrimaryAttributeSet->GetMaxHealth());
+		IHUDWidgetInterface::Execute_SetPlayerHealth(LocalHUDWidget, PrimaryAttributeSet->GetHealth(), PrimaryAttributeSet->GetMaxHealth());
 	}
 }
 
 void AEODCharacterBase::OnMaxHealthChanged(const FOnAttributeChangeData& Data)
 {
-	UUserWidget* HUDWidget = GetHUDWidget();
-	if (HUDWidget && PrimaryAttributeSet)
+	UUserWidget* LocalHUDWidget = GetHUDWidget();
+	if (LocalHUDWidget && PrimaryAttributeSet)
 	{
-		IHUDWidgetInterface::Execute_SetPlayerHealth(HUDWidget, PrimaryAttributeSet->GetHealth(), PrimaryAttributeSet->GetMaxHealth());
+		IHUDWidgetInterface::Execute_SetPlayerHealth(LocalHUDWidget, PrimaryAttributeSet->GetHealth(), PrimaryAttributeSet->GetMaxHealth());
 	}
 }
 
 void AEODCharacterBase::OnManaChanged(const FOnAttributeChangeData& Data)
 {
-	UUserWidget* HUDWidget = GetHUDWidget();
-	if (HUDWidget && PrimaryAttributeSet)
+	UUserWidget* LocalHUDWidget = GetHUDWidget();
+	if (LocalHUDWidget && PrimaryAttributeSet)
 	{
-		IHUDWidgetInterface::Execute_SetPlayerMana(HUDWidget, PrimaryAttributeSet->GetMana(), PrimaryAttributeSet->GetMaxMana());
+		IHUDWidgetInterface::Execute_SetPlayerMana(LocalHUDWidget, PrimaryAttributeSet->GetMana(), PrimaryAttributeSet->GetMaxMana());
 	}
 }
 
 void AEODCharacterBase::OnMaxManaChanged(const FOnAttributeChangeData& Data)
 {
-	UUserWidget* HUDWidget = GetHUDWidget();
-	if (HUDWidget && PrimaryAttributeSet)
+	UUserWidget* LocalHUDWidget = GetHUDWidget();
+	if (LocalHUDWidget && PrimaryAttributeSet)
 	{
-		IHUDWidgetInterface::Execute_SetPlayerMana(HUDWidget, PrimaryAttributeSet->GetMana(), PrimaryAttributeSet->GetMaxMana());
+		IHUDWidgetInterface::Execute_SetPlayerMana(LocalHUDWidget, PrimaryAttributeSet->GetMana(), PrimaryAttributeSet->GetMaxMana());
 	}
 }
 
 void AEODCharacterBase::OnStaminaChanged(const FOnAttributeChangeData& Data)
 {
-	UUserWidget* HUDWidget = GetHUDWidget();
-	if (HUDWidget && PrimaryAttributeSet)
+	UUserWidget* LocalHUDWidget = GetHUDWidget();
+	if (LocalHUDWidget && PrimaryAttributeSet)
 	{
-		IHUDWidgetInterface::Execute_SetPlayerStamina(HUDWidget, PrimaryAttributeSet->GetStamina(), PrimaryAttributeSet->GetMaxStamina());
+		IHUDWidgetInterface::Execute_SetPlayerStamina(LocalHUDWidget, PrimaryAttributeSet->GetStamina(), PrimaryAttributeSet->GetMaxStamina());
 	}
 }
 
 void AEODCharacterBase::OnMaxStaminaChanged(const FOnAttributeChangeData& Data)
 {
-	UUserWidget* HUDWidget = GetHUDWidget();
-	if (HUDWidget && PrimaryAttributeSet)
+	UUserWidget* LocalHUDWidget = GetHUDWidget();
+	if (LocalHUDWidget && PrimaryAttributeSet)
 	{
-		IHUDWidgetInterface::Execute_SetPlayerStamina(HUDWidget, PrimaryAttributeSet->GetStamina(), PrimaryAttributeSet->GetMaxStamina());
+		IHUDWidgetInterface::Execute_SetPlayerStamina(LocalHUDWidget, PrimaryAttributeSet->GetStamina(), PrimaryAttributeSet->GetMaxStamina());
 	}
 }
 

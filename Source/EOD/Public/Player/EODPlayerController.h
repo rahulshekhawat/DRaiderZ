@@ -84,7 +84,7 @@ private:
 	ECharacterGender Gender;
 	
 	UPROPERTY(Transient)
-	int32 LeveupEXP;
+	int32 LevelupEXP;
 	
 	void SetGender(ECharacterGender NewGender);
 

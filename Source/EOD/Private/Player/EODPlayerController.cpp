@@ -76,7 +76,6 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &AEODPlayerController::ZoomInCamera);
 	InputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &AEODPlayerController::ZoomOutCamera);
 
-	/*
 	InputComponent->BindAction("Guard", IE_Pressed, this, &AEODPlayerController::OnPressingGuardKey);
 	InputComponent->BindAction("Guard", IE_Released, this, &AEODPlayerController::OnReleasingGuardKey);
 
@@ -141,8 +140,6 @@ void AEODPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Skill_18", IE_Released, this, &AEODPlayerController::ReleasedSkillKey<18>);
 	InputComponent->BindAction("Skill_19", IE_Released, this, &AEODPlayerController::ReleasedSkillKey<19>);
 	InputComponent->BindAction("Skill_20", IE_Released, this, &AEODPlayerController::ReleasedSkillKey<20>);
-	*/
-
 }
 
 void AEODPlayerController::PostInitializeComponents()
@@ -233,14 +230,14 @@ void AEODPlayerController::LoadPlayerState()
 
 void AEODPlayerController::AddEXP(int32 Value)
 {
-	SetLeveupEXP(LeveupEXP - Value);
+	SetLeveupEXP(LevelupEXP - Value);
 }
 
 void AEODPlayerController::SetLeveupEXP(int32 EXP)
 {
 	//~ @todo Level up if LevelupEXP goes below zero
 
-	LeveupEXP = EXP;
+	LevelupEXP = EXP;
 
 	if (HUDWidget)
 	{

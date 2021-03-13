@@ -19,7 +19,11 @@ class EOD_API ARaiderzPlayerController : public APlayerController
 public:
 
 	ARaiderzPlayerController();
+	
+	virtual void SetupInputComponent() override;
 
+	virtual void SetPawn(APawn* InPawn) override;
+	
 	inline class UHUDWidget* GetHUDWidget() const { return HUDWidget; }
 	
 protected:
@@ -27,5 +31,13 @@ protected:
 	UPROPERTY(Transient, BlueprintReadWrite, Category = "Raiderz Widgets")
 	class UHUDWidget* HUDWidget;
 	
+	/** Move controlled pawn forward/backward */
+	void MovePawnForward(const float Value);
+
+	/** Move controlled pawn left/right */
+	void MovePawnRight(const float Value);
+
+	UPROPERTY(Transient)
+	class AEODCharacterBase* EODCharacter;
 	
 };
