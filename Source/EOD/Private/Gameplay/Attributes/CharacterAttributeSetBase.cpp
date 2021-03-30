@@ -3,6 +3,8 @@
 
 #include "Gameplay/Attributes/CharacterAttributeSetBase.h"
 
+
+#include "EODCharacterBase.h"
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffect.h"
 #include "GameplayEffectExtension.h"
@@ -38,6 +40,58 @@ bool UCharacterAttributeSetBase::PreGameplayEffectExecute(struct FGameplayEffect
 void UCharacterAttributeSetBase::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
+
+	FGameplayEffectContextHandle Context = Data.EffectSpec.GetContext();
+	UAbilitySystemComponent* Source = Context.GetOriginalInstigatorAbilitySystemComponent();
+	const FGameplayTagContainer& SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
+	const FGameplayTagContainer& TargetTags = *Data.EffectSpec.CapturedTargetTags.GetAggregatedTags();
+
+	FGameplayTagContainer SpecAssetTags;
+	Data.EffectSpec.GetAllAssetTags(SpecAssetTags);
+
+	// Get the Target actor, which should be our owner
+	AActor* TargetActor = nullptr;
+	AController* TargetController = nullptr;
+	AEODCharacterBase* TargetCharacter = nullptr;
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		TargetCharacter = Cast<AEODCharacterBase>(TargetActor);
+	}
+
+	// Get the Source actor
+	AActor* SourceActor = nullptr;
+	AController* SourceController = nullptr;
+	AEODCharacterBase* SourceCharacter = nullptr;
+	if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
+	{
+		SourceActor = Source->AbilityActorInfo->AvatarActor.Get();
+		SourceController = Source->AbilityActorInfo->PlayerController.Get();
+		if (SourceController == nullptr && SourceActor != nullptr)
+		{
+			if (APawn* Pawn = Cast<APawn>(SourceActor))
+			{
+				SourceController = Pawn->GetController();
+			}
+		}
+
+		// Use the controller to find the source pawn
+		if (SourceController)
+		{
+			SourceCharacter = Cast<AEODCharacterBase>(SourceController->GetPawn());
+		}
+		else
+		{
+			SourceCharacter = Cast<AEODCharacterBase>(SourceActor);
+		}
+
+		// Set the causer actor based on context if it's set
+		if (Context.GetEffectCauser())
+		{
+			SourceActor = Context.GetEffectCauser();
+		}
+	}
 	
 	// Clamp health attribute
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
@@ -53,6 +107,23 @@ void UCharacterAttributeSetBase::PostGameplayEffectExecute(const struct FGamepla
 	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
 	{
 		SetStamina(FMath::Clamp<float>(GetStamina(), 0.f, GetMaxStamina()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	{
+		const float DamageDone = GetDamage();
+		SetDamage(0.f);
+		//~ @todo GodMode
+		if (TargetCharacter && TargetCharacter->IsAlive())
+		{
+			//~ @todo set TargetCharacter to the SourceCharacter's LastHitActor variable;
+
+			const float NewHealth = GetHealth() - DamageDone;
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+			if (GetHealth() <= 0.f)
+			{
+				// TargetCharacter->Die();
+			}
+		}
 	}
 }
 

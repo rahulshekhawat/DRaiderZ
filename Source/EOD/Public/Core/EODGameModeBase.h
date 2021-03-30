@@ -88,5 +88,5 @@ protected:
 	/** Blueprint class used for spawning male characters */
 	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = Classes)
 	TSubclassOf<AEODCharacterBase> MalePawnClass;
-
+	
 };

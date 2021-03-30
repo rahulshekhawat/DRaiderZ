@@ -2,9 +2,12 @@
 
 
 #include "Gameplay/Abilities/EODGameplayAbility.h"
+
+#include "CharacterAttributeSetBase.h"
 #include "Calculations/GMMC_AbilityCooldown.h"
 #include "Characters/EODCharacterBase.h"
 #include "Gameplay/EODAbilitySystemComponent.h"
+#include "EODGameInstance.h"
 
 UEODGameplayAbility::UEODGameplayAbility(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -48,6 +51,37 @@ FEODAction UEODGameplayAbility::GetActionForTag(const FGameplayTag& ActionTag)
 void UEODGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);	
+}
+
+FGameplayEffectSpecHandle UEODGameplayAbility::GenerateDamageSpec(float Modifier) const
+{
+	FGameplayEffectSpecHandle DamageSpec = nullptr;
+
+	UEODGameInstance* GameInstance = OwningCharacter ? Cast<UEODGameInstance>(OwningCharacter->GetGameInstance()) : nullptr;
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo_Ensured();
+	if (ensureAlways(GameInstance) && ensureAlways(ASC) && ensureAlways(OwningCharacter))
+	{
+		TSubclassOf<UGameplayEffect> DamageGE;
+		float DamageVal = 0.f;
+		if (DamageDataTags.HasTag(FGameplayTag::RequestGameplayTag(TEXT("DamageType.Physical"))))
+		{
+			DamageGE = GameInstance->PhysicalDamageClass;
+			DamageVal = OwningCharacter->GetPrimaryAttributeSet()->GetPhysicalAttack();
+		}
+		else if (DamageDataTags.HasTag(FGameplayTag::RequestGameplayTag(TEXT("DamageType.Magic"))))
+		{
+			DamageGE = GameInstance->MagicDamageClass;
+			DamageVal = OwningCharacter->GetPrimaryAttributeSet()->GetMagicAttack();
+		}
+		// ... else if (holy, elemental, etc.)
+		
+		DamageSpec = ASC->MakeOutgoingSpec(DamageGE, GetAbilityLevel(), ASC->MakeEffectContext());
+		DamageSpec.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Damage")), DamageVal * Modifier);
+		DamageSpec.Data->DynamicAssetTags.AppendTags(DamageDataTags);
+		DamageSpec.Data->CapturedSourceTags.GetSpecTags().AppendTags(DamageDataTags);
+	}
+
+	return DamageSpec;
 }
 
 void UEODGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)

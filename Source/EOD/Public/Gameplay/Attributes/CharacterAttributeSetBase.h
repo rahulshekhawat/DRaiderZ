@@ -180,6 +180,8 @@ public:
 	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, BleedResistance)
 
 	
+	// Physical Damage is a meta attribute used by the PhysicalDamageExecution to calculate final damage, which then turns into -Health
+    // Temporary value that only exists on the Server. Not replicated.
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
 	FGameplayAttributeData Damage;
 	ATTRIBUTE_ACCESSORS(UCharacterAttributeSetBase, Damage)

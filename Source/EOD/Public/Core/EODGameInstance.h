@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CharacterLibrary.h"
+#include "GameplayEffect.h"
 
 #include "OnlineSubsystem.h"
 #include "OnlineSessionInterface.h"
@@ -264,5 +265,13 @@ private:
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
 
+public:
+
+	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = "Damage Classes")
+	TSubclassOf<UGameplayEffect> PhysicalDamageClass;
+	
+	UPROPERTY(EditAnywhere, NoClear, BlueprintReadOnly, Category = "Damage Classes")
+	TSubclassOf<UGameplayEffect> MagicDamageClass;
+	
 
 };

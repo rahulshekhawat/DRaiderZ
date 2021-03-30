@@ -43,6 +43,12 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Settings")
 	FScalableFloat CooldownDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Settings")
+	FGameplayTagContainer DamageDataTags;
+	
+	UFUNCTION(BlueprintPure, Category = "Raiderz Gameplay Ability")
+	FGameplayEffectSpecHandle GenerateDamageSpec(float Modifier = 1.f) const;
 	
 protected:
 	
